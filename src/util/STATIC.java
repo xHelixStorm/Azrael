@@ -11,6 +11,7 @@ public class STATIC {
 	
 	private static final String VERSION_OLD = FileSetting.readFile("./files/version");
 	private static final String VERSION_NEW = "9.0.0";
+	//this is a test
 	
 	public static void allowCertificates(){	
 		TrustManager[] trustAllCerts = new TrustManager[]{
