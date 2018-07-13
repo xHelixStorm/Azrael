@@ -93,12 +93,5 @@ public class ReadyListener extends ListenerAdapter{
 		
 		SqlConnect.clearAllVariables();
 		executor.shutdown();
-		
-		/*for(Guild g : e.getJDA().getGuilds()){
-			SqlConnect.SQLgetChannelID(g.getIdLong(), "sta");
-			long channel_id = SqlConnect.getChannelID();
-			
-			if(channel_id != 0){e.getJDA().getGuildById(g.getIdLong()).getTextChannelById(channel_id).sendMessage("H!gameStatus").queue();}
-		}*/
 	}
 }
