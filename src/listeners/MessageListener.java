@@ -1,11 +1,14 @@
 package listeners;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import core.UserPrivs;
+import fileManagement.FileSetting;
+import fileManagement.IniFileReader;
 import filter.LanguageFilter;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -33,6 +36,11 @@ public class MessageListener extends ListenerAdapter{
 			
 			if(!filter_lang.equals("")){
 				executor.execute(new LanguageFilter(e, filter_lang));
+			}
+			
+			if(IniFileReader.getChannelLog().equals("true")){
+				LocalDateTime time = LocalDateTime.now();
+				FileSetting.appendFile("./message_log/"+e.getTextChannel().getName()+".txt", "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw()+"\n");
 			}
 			
 			try {
