@@ -82,9 +82,10 @@ public class RankingMethods extends ListenerAdapter{
 			BufferedImage experienceBar = ImageIO.read(new File("./pictures/RankingSystem/S4League/ExperienceBar/exp"+_bar_color+"_"+_experience+".png"));
 			BufferedImage level = ImageIO.read(new File("./pictures/RankingSystem/S4League/Rank/level_"+_icon_skin+"_"+_level+".jpg"));
 			String avatar = "";
-			try{
+			try {
 				avatar = e.getMember().getUser().getAvatarUrl();
-			} catch(NullPointerException npe){
+				if(avatar.isEmpty()) {/*trigger NullPointerException if null*/}
+			} catch(NullPointerException npe) {
 				avatar = e.getMember().getUser().getDefaultAvatarUrl();
 			}
 			final String urlStr = avatar;
@@ -141,13 +142,13 @@ public class RankingMethods extends ListenerAdapter{
 			BufferedImage experienceBar = ImageIO.read(new File("./pictures/RankingSystem/S4League/ExperienceBar/exp"+_bar_color+"_"+_experiencePercentage+".png"));
 			BufferedImage level = ImageIO.read(new File("./pictures/RankingSystem/S4League/Rank/level_"+_icon_skin+"_"+_level+".jpg"));
 			String avatar = "";
-			try{
+			try {
 				avatar = e.getMember().getUser().getAvatarUrl();
-			} catch(NullPointerException npe){
+				if(avatar.isEmpty()) {/*trigger NullPointerException if null*/}
+			} catch(NullPointerException npe) {
 				avatar = e.getMember().getUser().getDefaultAvatarUrl();
 			}
-			final String urlStr = avatar;
-			final URL url = new URL(urlStr);
+			final URL url = new URL(avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestProperty(
 			    "User-Agent",
