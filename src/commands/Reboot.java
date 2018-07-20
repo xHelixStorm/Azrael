@@ -21,7 +21,7 @@ public class Reboot implements Command{
 				e.getJDA().shutdown();
 			}
 			else {
-				e.getTextChannel().sendMessage(":warning: " + e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from [GS]Heiliger or from an Administrator. Here a cookie** :cookie:").queue();
+				e.getTextChannel().sendMessage(":warning: " + e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").queue();
 			}
 		}
 	}
