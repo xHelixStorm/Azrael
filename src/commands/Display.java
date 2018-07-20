@@ -71,16 +71,26 @@ public class Display implements Command{
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -textchannels")){
-				for(TextChannel tc : e.getGuild().getTextChannels()){
-					out += tc.getName() + " (" + tc.getId() + ") \n";
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong())) {
+					for(TextChannel tc : e.getGuild().getTextChannels()){
+						out += tc.getName() + " (" + tc.getId() + ") \n";
+					}
+					e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 				}
-				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
+				else {
+					e.getTextChannel().sendMessage("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden textchannels!**").queue();
+				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -voicechannels")){
-				for(VoiceChannel vc : e.getGuild().getVoiceChannels()){
-					out += vc.getName() + " (" + vc.getId() + ") \n";
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong())) {
+					for(VoiceChannel vc : e.getGuild().getVoiceChannels()){
+						out += vc.getName() + " (" + vc.getId() + ") \n";
+					}
+					e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 				}
-				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
+				else {
+					e.getTextChannel().sendMessage("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden voicechannels!**").queue();
+				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -registered-channels")){
 				if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || IniFileReader.getAdmin().equals(e.getMember().getUser().getId())){
