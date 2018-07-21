@@ -8,10 +8,10 @@ import commandsContainer.SetDailyItem;
 import commandsContainer.SetLevelDefaultSkin;
 import commandsContainer.SetMaxExperience;
 import commandsContainer.SetMaxLevel;
-import commandsContainer.SetMuteTimer;
 import commandsContainer.SetProfileDefaultSkin;
 import commandsContainer.SetRankDefaultSkin;
 import commandsContainer.SetRankingSystem;
+import commandsContainer.SetWarning;
 import core.UserPrivs;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -36,10 +36,10 @@ public class Set implements Command{
 				if(input.equals(IniFileReader.getCommandPrefix()+"set")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Use the set command to set specific parameters for the bot:\n\n"
 							+ "**-channel-filter**: To set one or few language filters for one channel\n\n"
+							+ "**-warnings**: To set a max allowed number of warnings before the affected users gets banned together with the mute time for each warning\n\n"
 							+ "**-commands**: To disable, enable or limit specific commands to a bot channel or for the whole server\n\n"
 							+ "**-ranking**: To enable or disable the rankiing system\n\n"
 							+ "**-max-experience**: To enable/disable the max experience limiter and to set the limit in experience\n\n"
-							+ "**-mute-timer**: To define the time in minutes for a member when he/she gets muted\n\n"
 							+ "**-max_level**: To define the max level that can be reached with the ranking system\n\n"
 							+ "**-default-level-skin**: To define the default skin for level ups\n\n"
 							+ "**-default-rank-skin**: To define the default skin for rank commands like "+IniFileReader.getCommandPrefix()+"rank\n\n"
@@ -54,6 +54,12 @@ public class Set implements Command{
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -channel-filter ")){
 					input = input.substring(20+IniFileReader.getCommandPrefix().length());
 					SetChannelFilter.runTask(e, input);
+				}
+				else if(input.equals(IniFileReader.getCommandPrefix()+"set -warnings")) {
+					SetWarning.runHelp(e);
+				}
+				else if(input.contains(IniFileReader.getCommandPrefix()+"set -warnings")){
+					SetWarning.runTask(e, e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+14));
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -commands")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("To change the level on how the commands are allowed to be used, try to use the following:\n\n**"+IniFileReader.getCommandPrefix()+"set -commands disable** to disable specific commands in all channels\n**"+IniFileReader.getCommandPrefix()+"set -commands bot** to enable specific commands only in bot channel\n**"+IniFileReader.getCommandPrefix()+"set -commands enable** to enable specific commands in all channels").build()).queue();
@@ -85,16 +91,6 @@ public class Set implements Command{
 					RankingDB.SQLgetMaxExperience(e.getGuild().getIdLong());
 					long experience = RankingDB.getMaxExperience();
 					SetMaxExperience.runTask(e, input, experience);
-				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -mute-timer")){
-					e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, type **"+IniFileReader.getCommandPrefix()+"set -mute-timer 1** and/or **"+IniFileReader.getCommandPrefix()+"set -mute-timer 2** and the time in minutes that a user has to stay muted").build()).queue();
-				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -mute-timer ")){
-					input = input.substring(15+IniFileReader.getCommandPrefix().length());
-					SqlConnect.SQLgetMuteTimer(e.getGuild().getIdLong());
-					double timer1 = SqlConnect.getTimer1();
-					double timer2 = SqlConnect.getTimer2();
-					SetMuteTimer.runTask(e, input, timer1, timer2);
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -max-level")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, type **"+IniFileReader.getCommandPrefix()+"set -max-level <level in number>** for defining the max level that can be achieved in this guild").build()).queue();
