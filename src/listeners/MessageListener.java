@@ -1,11 +1,13 @@
 package listeners;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import commandsContainer.SetWarning;
 import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
@@ -19,10 +21,13 @@ import sql.SqlConnect;
 public class MessageListener extends ListenerAdapter{
 	
 	@Override
+	@SuppressWarnings("unlikely-arg-type")
 	public void onMessageReceived(MessageReceivedEvent e){
-		ExecutorService executor = Executors.newSingleThreadExecutor();
+		ExecutorService executor = Executors.newFixedThreadPool(3);
 		
 		try {
+			File warning = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
+			
 			long user_id = e.getMember().getUser().getIdLong();
 			long guild_id = e.getGuild().getIdLong();
 			String message = e.getMessage().getContentRaw();
@@ -36,6 +41,10 @@ public class MessageListener extends ListenerAdapter{
 			
 			if(!filter_lang.equals("")){
 				executor.execute(new LanguageFilter(e, filter_lang));
+			}
+			
+			if(warning.exists()) {
+				SetWarning.performUpdate(e, message);
 			}
 			
 			if(IniFileReader.getChannelLog().equals("true")){
