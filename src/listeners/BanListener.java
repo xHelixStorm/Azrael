@@ -24,19 +24,16 @@ public class BanListener extends ListenerAdapter{
 		int warning_id = SqlConnect.getWarningID();
 		int ban_id = SqlConnect.getBanID();
 		
+		SqlConnect.SQLgetMaxWarning(guild_id);
+		int max_warning_id = SqlConnect.getWarningID();
+		
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		if(channel_id != 0){
 			if(warning_id == 0){
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("**["+timestamp+"] " + user_name + " with the ID Number " + user_id + " has been banned without any warnings!**").build()).queue();
 			}
-			else if(warning_id == 1 || warning_id == 2){
+			else if((warning_id+1) < max_warning_id){
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("**["+timestamp+"] " + user_name + " with the ID Number " + user_id + " has been banned without enough warnings! Warnings: "+warning_id+"**").build()).queue();
-			}
-			else if(warning_id == 4){
-				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("**["+timestamp+"] " + user_name + " with the ID Number " + user_id + " has been banned! Database error that may have been present due to a bot downtime has been fixed!**").build()).queue();
-			}
-			else if(warning_id == 5){
-				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("**["+timestamp+"] " + user_name + " with the ID Number " + user_id + " has been directly banned after an unban!**").build()).queue();
 			}
 		}
 		
