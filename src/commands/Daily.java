@@ -17,7 +17,7 @@ import inventory.DrawDaily;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingDB;
 import sql.SqlConnect;
-import threads.CommandDelay;
+import threads.DelayDelete;
 
 public class Daily implements Command{
 
@@ -34,7 +34,7 @@ public class Daily implements Command{
 			if(!file.exists()){
 				try {
 					file.createNewFile();
-					new Thread(new CommandDelay(fileName, 3000)).start();
+					new Thread(new DelayDelete(fileName, 3000)).start();
 				} catch (IOException e2) {
 					e2.printStackTrace();
 				}
