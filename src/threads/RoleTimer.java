@@ -16,19 +16,27 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 	private long timer;
 	private long channel_id;
 	private long mute_id;
-	private double unmute;
 	private long assignedRole;
+	private String hour_add;
+	private String and_add;
+	private String minute_add;
+	private int warning_id;
+	private int max_warning_id;
 	
-	public RoleTimer(GuildMemberRoleAddEvent event, long _guild_id, String _name_id, String _user_name, double _unmute, long _timer, long _channel_id, long _mute_id, long _assignedRole){
+	public RoleTimer(GuildMemberRoleAddEvent event, long _guild_id, String _name_id, String _user_name, long _timer, long _channel_id, long _mute_id, long _assignedRole, String _hour_add, String _and_add, String _minute_add, int _warning_id, int _max_warning_id){
 		this.e = event;
 		this.guild_id = _guild_id;
 		this.name_id = _name_id;
 		this.user_name = _user_name;
-		this.unmute = _unmute;
 		this.timer = _timer;
 		this.channel_id = _channel_id;
 		this.mute_id = _mute_id;
 		this.assignedRole = _assignedRole;
+		this.hour_add = _hour_add;
+		this.minute_add = _minute_add;
+		this.warning_id = _warning_id;
+		this.max_warning_id = _max_warning_id;
+		this.and_add = _and_add;
 	}
 	
 	@Override
@@ -40,7 +48,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 		try {
 			if(UserPrivs.isUserMuted(e.getMember().getUser(), e.getGuild().getIdLong()) == true){
 				if(channel_id != 0){
-					e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been muted and will be unmuted in **"+unmute+"** hour(s)!").build()).queue();
+					e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been muted and will be unmuted in **"+hour_add+and_add+minute_add+"**!\nWarning **"+warning_id+"**/**"+max_warning_id+"**").build()).queue();
 				}
 				Thread.sleep(timer);
 				
