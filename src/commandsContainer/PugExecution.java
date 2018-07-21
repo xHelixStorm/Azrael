@@ -11,7 +11,7 @@ import preparedMessages.PugUsage;
 import threads.DelayDelete;
 
 public class PugExecution {
-	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail("https://i.imgur.com/RC5dSFY.png").setTitle("Help for the "+IniFileReader.getCommandPrefix()+"pug command!");
+	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail(IniFileReader.getPugThumbnail()).setTitle("Help for the "+IniFileReader.getCommandPrefix()+"pug command!");
 	private static String commandInfo = PugUsage.getPugInfos();
 
 	public static void Execute(MessageReceivedEvent e, String _variable, String _path, long channel_id) throws IOException{

@@ -11,7 +11,7 @@ import preparedMessages.MeowUsage;
 import threads.DelayDelete;
 
 public class MeowExecution {
-	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail("https://i.imgur.com/d4TKIXL.png").setTitle("Help for the "+IniFileReader.getCommandPrefix()+"meow command!");
+	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail(IniFileReader.getMeowThumbnail()).setTitle("Help for the "+IniFileReader.getCommandPrefix()+"meow command!");
 	private static String commandInfo = MeowUsage.getMeowInfos();
 
 	public static void Execute(MessageReceivedEvent e, String _variable, String _path, long channel_id) throws IOException{
