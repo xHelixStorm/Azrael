@@ -6,7 +6,7 @@ import java.io.IOException;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import preparedMessages.MeowUsage;
-import threads.CommandDelay;
+import threads.DelayDelete;
 
 public class MeowExecution {
 	private static String commandInfo = MeowUsage.getMeowInfos();
@@ -21,7 +21,7 @@ public class MeowExecution {
 		if(!file.exists()){
 			try {
 				file.createNewFile();
-				new Thread(new CommandDelay(fileName, 20000)).start();
+				new Thread(new DelayDelete(fileName, 20000)).start();
 			} catch (IOException e2) {
 				e2.printStackTrace();
 			}

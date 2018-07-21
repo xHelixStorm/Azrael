@@ -6,7 +6,7 @@ import java.io.IOException;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import preparedMessages.PugUsage;
-import threads.CommandDelay;
+import threads.DelayDelete;
 
 public class PugExecution {
 	private static String commandInfo = PugUsage.getPugInfos();
@@ -21,7 +21,7 @@ public class PugExecution {
 		if(!file.exists()){
 			try {
 				file.createNewFile();
-				new Thread(new CommandDelay(fileName, 20000)).start();
+				new Thread(new DelayDelete(fileName, 20000)).start();
 			} catch (IOException e2) {
 				e2.printStackTrace();
 			}

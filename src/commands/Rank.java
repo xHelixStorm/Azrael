@@ -9,7 +9,7 @@ import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import rankingSystem.RankingMethods;
 import sql.RankingDB;
-import threads.RankDelay;
+import threads.DelayDelete;
 
 public class Rank implements Command{
 
@@ -39,7 +39,7 @@ public class Rank implements Command{
 							e2.printStackTrace();
 						}
 						
-						new Thread(new RankDelay(fileName)).start();
+						new Thread(new DelayDelete(fileName, 30000)).start();
 						
 						float experienceCounter;
 						int convertedExperience;
