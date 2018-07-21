@@ -11,7 +11,6 @@ import commands.About;
 import commands.Commands;
 import commands.Daily;
 import commands.Display;
-//import commands.GameStatus;
 import commands.Help;
 import commands.Inventory;
 import commands.Meow;
@@ -76,7 +75,7 @@ public class Main {
 
 			@Override
 			public String getName() {
-				return "H!about for informations";
+				return IniFileReader.getGameMessage();
 			}
 
 			@Override
