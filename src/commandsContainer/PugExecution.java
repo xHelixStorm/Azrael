@@ -1,9 +1,11 @@
 package commandsContainer;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 
 import fileManagement.IniFileReader;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import preparedMessages.PugUsage;
 import threads.DelayDelete;
@@ -12,6 +14,7 @@ public class PugExecution {
 	private static String commandInfo = PugUsage.getPugInfos();
 
 	public static void Execute(MessageReceivedEvent e, String _variable, String _path, long channel_id) throws IOException{
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail("https://i.imgur.com/RC5dSFY.png").setTitle("Help for the "+IniFileReader.getCommandPrefix()+"pug command!");
 		String variable = _variable;
 		String path = _path;
 		String pictureName = "";
@@ -959,7 +962,7 @@ public class PugExecution {
 			else if(variable.equals("H!pug help")){
 				long channel = e.getTextChannel().getIdLong();
 				if(channel == channel_id || channel_id == 0){
-					e.getTextChannel().sendMessage("```"+commandInfo+"```").queue();
+					e.getTextChannel().sendMessage(messageBuild.setDescription(commandInfo).build()).queue();
 				}
 				else{
 					e.getTextChannel().sendMessage("Please type this command in <#"+channel_id+"> to see its usage").queue();
