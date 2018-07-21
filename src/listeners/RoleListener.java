@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.sql.Timestamp;
 
 import core.UserPrivs;
-import fileManagement.FileSetting;
-import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.Role;
@@ -62,72 +60,39 @@ public class RoleListener extends ListenerAdapter{
 					}
 					
 					long time = System.currentTimeMillis();
-					Timestamp firstTime = new Timestamp(time);
-									
 					int warning_id=SqlConnect.getWarningID();
 					
 					RankingDB.SQLgetUserDetails(user_id, guild_id);
 					long assignedRole = RankingDB.getAssignedRole();
 					
-					long sqluser_id = SqlConnect.getUser_id();
-					long sqlguild_id = SqlConnect.getGuild_id();
+					SqlConnect.SQLgetWarning(e.getGuild().getIdLong(), (warning_id+1));
+					mute_time = (long) SqlConnect.getTimer();
+					unmute = SqlConnect.getTimer();
+					long hours = (long) (unmute/1000/60/60);
+					long minutes = (long) (unmute/1000/60%60);
+					String hour_add = hours != 0 ? hours+" hours" : "";
+					String minute_add = minutes != 0 ? minutes+" minutes" : "";
+					String and_add = minutes != 0 && hours != 0 ? " and " : "";
+					Timestamp timestamp = new Timestamp(time);
+					Timestamp unmute_timestamp = new Timestamp(time+mute_time);
 					
-					if(user_id == sqluser_id && guild_id == sqlguild_id){
-						if(warning_id == 5 || warning_id == 4){
-							SqlConnect.SQLgetMuteTimer(guild_id);
-							mute_time = (long) SqlConnect.getTimer1();
-							unmute = (SqlConnect.getTimer1() / 3600000);
-							Timestamp timestamp = new Timestamp(time+mute_time);
-							SqlConnect.SQLUpdateWarning(user_id, guild_id, 1);
-							SqlConnect.SQLUpdateUnmute(user_id, guild_id, timestamp);
-							SqlConnect.SQLUpdateMuted(user_id, guild_id, true);
-							PrivateChannel pc = e.getUser().openPrivateChannel().complete();
-							pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+unmute+" hours** for being your first warning. Please, refrain from rejoining the server, since it will result in consequences.\n"
-									+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
-							pc.close();
-							new Thread(new RoleTimer(e, guild_id, name_id, user_name, unmute, mute_time, channel_id, mute_id, assignedRole)).start();
-						}
-						else if(warning_id == 1){
-							SqlConnect.SQLgetMuteTimer(guild_id);
-							mute_time = (long) SqlConnect.getTimer2();
-							unmute = (SqlConnect.getTimer2() / 3600000);
-							Timestamp timestamp = new Timestamp(time+mute_time);
-							SqlConnect.SQLUpdateWarning(user_id, guild_id, 2);
-							SqlConnect.SQLUpdateUnmute(user_id, guild_id, timestamp);
-							SqlConnect.SQLUpdateMuted(user_id, guild_id, true);
-							PrivateChannel pc = e.getUser().openPrivateChannel().complete();
-							pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+unmute+" hours** for being your second warning. Please, refrain from rejoining the server, since it will result in consequences.\n"
-									+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
-							pc.close();
-							new Thread(new RoleTimer(e, guild_id, name_id, user_name, unmute, mute_time, channel_id, mute_id, assignedRole)).start();
-						}
-						else if(warning_id == 2){
-							FileSetting.createFile(IniFileReader.getTempDirectory(), ""+user_id);
-							mute_time = 0;
-							Timestamp timestamp = new Timestamp(time+mute_time);
-							SqlConnect.SQLUpdateWarning(user_id, guild_id, 3);
-							SqlConnect.SQLUpdateUnmute(user_id, guild_id, timestamp);
-							SqlConnect.SQLUpdateBan(user_id, guild_id, 2);
-							SqlConnect.SQLUpdateMuted(user_id, guild_id, true);
-							PrivateChannel pc = e.getUser().openPrivateChannel().complete();
-							pc.sendMessage("You have been banned from "+e.getGuild().getName()+" due to your third mute. Thanks for your understanding.\n"
-									+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
-							pc.close();
-							e.getJDA().getGuildById(guild_id).getController().ban(e.getMember(), 0).reason("User has been muted for the third time due to bad behaviour!").queue();
-							if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **" + user_name + " with the ID Number " + user_id + " Has been banned after his/her third warning!**").build()).queue();}
-						}
-					}
-					else{
-						SqlConnect.SQLgetMuteTimer(guild_id);
-						mute_time = (long) SqlConnect.getTimer1();
-						unmute = (SqlConnect.getTimer1() / 3600000);
-						Timestamp timestamp = new Timestamp(time+mute_time);
-						SqlConnect.SQLInsertData(user_id, guild_id, 1, 1, firstTime, timestamp, true);
+					SqlConnect.SQLgetMaxWarning(e.getGuild().getIdLong());
+					int max_warning = SqlConnect.getWarningID();
+					if((warning_id+1) <= max_warning) {
+						SqlConnect.SQLInsertData(user_id, guild_id, (warning_id+1), 1, timestamp, unmute_timestamp, true);
 						PrivateChannel pc = e.getUser().openPrivateChannel().complete();
-						pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+unmute+" hours** for being your first warning. Please, refrain from rejoining the server, since it will result in consequences.\n"
+						pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+hour_add+and_add+minute_add+"** for being your "+SqlConnect.getDescription()+". Warning **"+(warning_id+1)+"**/**"+max_warning+"**\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
 								+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
 						pc.close();
-						new Thread(new RoleTimer(e, guild_id, name_id, user_name, unmute, mute_time, channel_id, mute_id, assignedRole)).start();
+						new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, channel_id, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning)).start();
+					}
+					else if((warning_id+1) > max_warning) {
+						PrivateChannel pc = e.getUser().openPrivateChannel().complete();
+						pc.sendMessage("You have been banned from "+e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes of this server. Thanks for your understanding.\n"
+								+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
+						pc.close();
+						e.getJDA().getGuildById(guild_id).getController().ban(e.getMember(), 0).reason("User has been muted for the third time due to bad behaviour!").queue();
+						if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **" + user_name + " with the ID Number " + user_id + " Has been banned after his/her third warning!**").build()).queue();}
 					}
 				} catch (HierarchyException hye) {
 					hye.printStackTrace();
