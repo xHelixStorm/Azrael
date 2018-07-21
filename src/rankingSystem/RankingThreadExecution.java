@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.concurrent.ThreadLocalRandom;
 
+import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingDB;
@@ -122,6 +123,11 @@ public class RankingThreadExecution implements Runnable{
 			if(daily_experience < max_experience*multiplier){
 				daily_experience += adder;
 				ExperienceGainWithDaily();
+				if(daily_experience > max_experience*multiplier) {
+					PrivateChannel pc = e.getMember().getUser().openPrivateChannel().complete();
+					pc.sendMessage("You have reached the max possible to gain experience today. More experience points can be collected tomorrow!").queue();
+					pc.close();
+				}
 			}
 		}
 		else if(max_experience_enabled == false){
