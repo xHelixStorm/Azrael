@@ -33,6 +33,10 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Bot", "TempDirectory");
 	}
+	public static String getGameMessage(){
+		readConfig();
+		return ini.get("Bot", "GameMessage");
+	}
 	public static String getAllowPatchNotes(){
 		readConfig();
 		return ini.get("Patch", "PrivatePatchNotes");
