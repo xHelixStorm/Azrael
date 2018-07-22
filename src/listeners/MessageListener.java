@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import commandsContainer.SetWarning;
+import core.Hashes;
 import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
@@ -50,6 +51,9 @@ public class MessageListener extends ListenerAdapter{
 			if(IniFileReader.getChannelLog().equals("true")){
 				LocalDateTime time = LocalDateTime.now();
 				FileSetting.appendFile("./message_log/"+e.getTextChannel().getName()+".txt", "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw()+"\n");
+				if(IniFileReader.getCacheLog().equals("true")) {
+					Hashes.addMessagePool(e.getMessageIdLong(), "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw());
+				}
 			}
 			
 			try {
