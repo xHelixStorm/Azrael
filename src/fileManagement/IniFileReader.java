@@ -57,6 +57,10 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Messages", "ChannelLog");
 	}
+	public static String getCacheLog(){
+		readConfig();
+		return ini.get("Messages", "CacheLog");
+	}
 	public static String getSQLUsername(){
 		readConfig();
 		return ini.get("SqlConnect", "username");
