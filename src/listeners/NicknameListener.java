@@ -29,6 +29,7 @@ public class NicknameListener extends ListenerAdapter{
 			}
 		} finally {
 			SqlConnect.clearAllVariables();
+			SqlConnect.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, nickname);
 		}
 	}
 }

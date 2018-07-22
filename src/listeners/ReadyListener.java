@@ -28,7 +28,7 @@ public class ReadyListener extends ListenerAdapter{
 	public void onReady(ReadyEvent e){
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the latest patch notes!");
 		System.out.println();
-		System.out.println("Azrael Version: "+STATIC.getVersion_New()+"\nAll credits to [GM]Heiliger");
+		System.out.println("Azrael Version: "+STATIC.getVersion_New()+"\nAll credits to xHelixStorm");
 		
 		String allowPatchNotes = IniFileReader.getAllowPatchNotes();
 		String allowPublicPatchNotes = IniFileReader.getAllowPublicPatchNotes();
@@ -54,6 +54,7 @@ public class ReadyListener extends ListenerAdapter{
 			long channel_id = SqlConnect.getChannelID();
 			if(channel_id != 0){e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage("Bot is now operational!").queue();}
 		}
+		SqlConnect.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), "Launched");
 		
 		if(!(STATIC.getVersion_Old().contains(STATIC.getVersion_New())) && allowPatchNotes.equals("true")){
 			for(Guild g : e.getJDA().getGuilds()){

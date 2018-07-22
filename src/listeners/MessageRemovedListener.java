@@ -34,14 +34,16 @@ public class MessageRemovedListener extends ListenerAdapter{
 		
 		if(removed_message.length() > 0) {
 			Hashes.removeMessagePool(message_id);
-		}
-		
-		if(UserPrivs.isUserAdmin(e.getGuild().getMemberById(trigger_user_id).getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getGuild().getMemberById(trigger_user_id).getUser(), e.getGuild().getIdLong())) {
-			message.setTitle(trigger_user_name+" has removed a message from a user!");
-			ServerRoles.SQLgetRole(e.getGuild().getIdLong(), "tra");
-			if(removed_message.length() > 0) {
-				if(ServerRoles.getRole_ID() != 0){e.getGuild().getTextChannelById(ServerRoles.getRole_ID()).sendMessage(message.setDescription(removed_message).build()).queue();}
+			if(trigger_user_id.length() > 0) {
+				if(UserPrivs.isUserAdmin(e.getGuild().getMemberById(trigger_user_id).getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getGuild().getMemberById(trigger_user_id).getUser(), e.getGuild().getIdLong())) {
+					message.setTitle(trigger_user_name+" has removed a message from a user!");
+					ServerRoles.SQLgetRole(e.getGuild().getIdLong(), "tra");
+					if(removed_message.length() > 0) {
+						if(ServerRoles.getRole_ID() != 0){e.getGuild().getTextChannelById(ServerRoles.getRole_ID()).sendMessage(message.setDescription(removed_message).build()).queue();}
+					}
+				}
 			}
 		}
+		ServerRoles.clearAllVariables();
 	}
 }

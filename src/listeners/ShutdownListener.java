@@ -6,6 +6,7 @@ import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.ShutdownEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import sql.SqlConnect;
 
 public class ShutdownListener extends ListenerAdapter{
 	
@@ -30,5 +31,6 @@ public class ShutdownListener extends ListenerAdapter{
 				e1.printStackTrace();
 			}
 		}
+		SqlConnect.SQLInsertActionLog("BOT_SHUTDOWN", e.getJDA().getSelfUser().getIdLong(), "Shutdown");
 	}
 }
