@@ -74,6 +74,6 @@ public class GuildListener extends ListenerAdapter {
 		if(badName == false){
 			SqlConnect.SQLDeleteNickname(user_id, guild_id);
 		}
-		SqlConnect.SQLInsertActionLog("GUILD_MEMBER_JOIN", user_id, user_name);
+		SqlConnect.SQLInsertActionLog("GUILD_MEMBER_JOIN", user_id, guild_id, user_name);
 	}
 }

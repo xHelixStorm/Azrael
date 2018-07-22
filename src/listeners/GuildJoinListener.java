@@ -16,6 +16,6 @@ public class GuildJoinListener extends ListenerAdapter{
 		SqlConnect.SQLInsertGuild(guild_id, guild_name);
 		RankingDB.SQLInsertGuild(guild_id, guild_name, 1, 1, 1, 1, 0, false);
 		ServerRoles.SQLInsertGuild(guild_id, guild_name);
-		SqlConnect.SQLInsertActionLog("GUILD_JOIN", e.getGuild().getIdLong(), e.getGuild().getName());
+		SqlConnect.SQLInsertActionLog("GUILD_JOIN", e.getGuild().getIdLong(), e.getGuild().getIdLong(), e.getGuild().getName());
 	}
 }

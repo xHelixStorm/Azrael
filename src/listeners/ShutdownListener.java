@@ -31,6 +31,6 @@ public class ShutdownListener extends ListenerAdapter{
 				e1.printStackTrace();
 			}
 		}
-		SqlConnect.SQLInsertActionLog("BOT_SHUTDOWN", e.getJDA().getSelfUser().getIdLong(), "Shutdown");
+		SqlConnect.SQLInsertActionLog("BOT_SHUTDOWN", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
 	}
 }

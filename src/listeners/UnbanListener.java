@@ -39,6 +39,7 @@ public class UnbanListener extends ListenerAdapter{
 		
 		if(channel_id != 0){e.getJDA().getGuildById(e.getGuild().getIdLong()).getTextChannelById(channel_id).sendMessage(message.setDescription("**["+timestamp+"] **"+trigger_user_name+"** has unbanned **" + user_name + "** with the ID number **" + user_id + "**!**").build()).queue();}
 		SqlConnect.SQLDeleteData(user_id, guild_id);
+		SqlConnect.SQLInsertActionLog("MEMBER_BAN_REMOVE", user_id, guild_id, "Ban removed");
 		SqlConnect.clearAllVariables();
 	}
 }

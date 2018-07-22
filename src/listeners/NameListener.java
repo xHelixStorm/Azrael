@@ -41,6 +41,6 @@ public class NameListener extends ListenerAdapter{
 				}
 			}
 		}
-		SqlConnect.SQLInsertActionLog("MEMBER_NAME_UPDATE", user_id, newname);
+		SqlConnect.SQLInsertActionLog("MEMBER_NAME_UPDATE", user_id, 0, newname);
 	}
 }

@@ -46,11 +46,11 @@ public class RoleRemovedListener extends ListenerAdapter{
 			SqlConnect.clearUnmute();
 			
 			if(log_channel_id != 0){e.getGuild().getTextChannelById(log_channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** has manually removed the mute role from **"+member_name+"** with the ID number **"+user_id+"**!").build()).queue();}
-			SqlConnect.SQLInsertActionLog("MEMBER_MUTE_REMOVE_HALFWAY", user_id, "Mute role removed manually");
+			SqlConnect.SQLInsertActionLog("MEMBER_MUTE_REMOVE_HALFWAY", user_id, guild_id, "Mute role removed manually");
 		}
 		else if(!UserPrivs.isUserMuted(e.getUser(), guild_id) && SqlConnect.getUser_id() != 0){
 			SqlConnect.SQLUpdateMuted(user_id, guild_id, false);
-			SqlConnect.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, "Mute role removed");
+			SqlConnect.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild_id, "Mute role removed");
 		}
 		SqlConnect.clearAllVariables();
 	}

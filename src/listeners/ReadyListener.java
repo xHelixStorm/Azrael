@@ -54,7 +54,7 @@ public class ReadyListener extends ListenerAdapter{
 			long channel_id = SqlConnect.getChannelID();
 			if(channel_id != 0){e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage("Bot is now operational!").queue();}
 		}
-		SqlConnect.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), "Launched");
+		SqlConnect.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		
 		if(!(STATIC.getVersion_Old().contains(STATIC.getVersion_New())) && allowPatchNotes.equals("true")){
 			for(Guild g : e.getJDA().getGuilds()){
