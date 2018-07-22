@@ -33,6 +33,7 @@ import listeners.GuildLeaveListener;
 import listeners.GuildListener;
 import listeners.MessageEditListener;
 import listeners.MessageListener;
+import listeners.MessageRemovedListener;
 import listeners.NameListener;
 import listeners.NicknameListener;
 import listeners.ReadyListener;
@@ -136,5 +137,6 @@ public class Main {
 		builder.addEventListener(new ShutdownListener());
 		builder.addEventListener(new RoleRemovedListener());
 		builder.addEventListener(new NicknameListener());
+		builder.addEventListener(new MessageRemovedListener());
 	}
 }
