@@ -29,7 +29,7 @@ public class LanguageFilter extends ListenerAdapter implements Runnable{
 
 	@Override
 	public void run() {
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE);
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle("Message removed!");
 		boolean wordFound = false;
 		boolean exceptionFound = false;
 		

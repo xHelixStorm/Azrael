@@ -29,7 +29,7 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 
 	@Override
 	public void run() {
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE);
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle("Message removed after edit!");
 		boolean wordFound = false;
 		boolean exceptionFound = false;
 		
