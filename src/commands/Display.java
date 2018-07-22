@@ -17,7 +17,8 @@ import sql.ServerRoles;
 import sql.SqlConnect;
 
 public class Display implements Command{
-	private EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA);
+	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA);
+	private static EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 
 	@Override
 	public boolean called(String[] args, MessageReceivedEvent e) {
@@ -78,7 +79,7 @@ public class Display implements Command{
 					e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 				}
 				else {
-					e.getTextChannel().sendMessage("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden textchannels!**").queue();
+					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden textchannels!**").build()).queue();
 				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -voicechannels")){
@@ -89,7 +90,7 @@ public class Display implements Command{
 					e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 				}
 				else {
-					e.getTextChannel().sendMessage("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden voicechannels!**").queue();
+					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden voicechannels!**").build()).queue();
 				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -registered-channels")){
@@ -107,7 +108,7 @@ public class Display implements Command{
 					e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 				}
 				else{
-					e.getTextChannel().sendMessage("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden channels!**").queue();
+					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden channels!**").build()).queue();
 				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -dailies")){
