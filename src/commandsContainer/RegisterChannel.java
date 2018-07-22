@@ -15,7 +15,7 @@ import sql.SqlConnect;
 public class RegisterChannel {
 	
 	public static void RegisterChannelHelper(MessageReceivedEvent _e){
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE);
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register text channels to give them unique functions!");
 		StringBuilder strB = new StringBuilder();
 		String parseMessage = null;
 		
@@ -29,6 +29,7 @@ public class RegisterChannel {
 	}
 	
 	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String _message){
+		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 		String channel;
 		long channel_id;
 		String channel_type;
@@ -66,11 +67,12 @@ public class RegisterChannel {
 			}
 		}
 		else {
-			_e.getTextChannel().sendMessage(":warning: " + _e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from [GS]Heiliger or from an Administrator. Here a cookie** :cookie:").queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").build()).queue();
 		}
 	}
 	
 	public static void runChannelsRegistration(MessageReceivedEvent _e, long _guild_id){
+		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getId().equals(IniFileReader.getAdmin())){
 			for(TextChannel tc : _e.getGuild().getTextChannels()){
 				SqlConnect.SQLInsertChannels(tc.getIdLong(), tc.getName());
@@ -78,7 +80,7 @@ public class RegisterChannel {
 			_e.getTextChannel().sendMessage("**All text channels have been registered!**").queue();
 		}
 		else {
-			_e.getTextChannel().sendMessage(":warning: " + _e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from [GS]Heiliger or from an Administrator. Here a cookie** :cookie:").queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").build()).queue();
 		}
 	}
 }

@@ -15,7 +15,7 @@ public class GuildListener extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent e){
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN);
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
 		
 		long user_id = e.getMember().getUser().getIdLong();
 		String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();

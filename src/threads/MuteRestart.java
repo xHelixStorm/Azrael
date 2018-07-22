@@ -3,13 +3,14 @@ package threads;
 import java.awt.Color;
 import java.sql.Timestamp;
 
+import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.ReadyEvent;
 
 public class MuteRestart implements Runnable{
-	private EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN);
+	private EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setThumbnail(IniFileReader.getUnmuteThumbnail()).setTitle("User unmuted!");
 	
 	private ReadyEvent e;
 	private Member member;

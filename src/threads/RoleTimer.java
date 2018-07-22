@@ -3,6 +3,7 @@ package threads;
 import java.awt.Color;
 import java.sql.Timestamp;
 import core.UserPrivs;
+import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -41,8 +42,8 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 	
 	@Override
 	public void run() {
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED);
-		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN);
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getMuteThumbnail()).setTitle("User muted!");
+		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN).setThumbnail(IniFileReader.getUnmuteThumbnail()).setTitle("User unmuted!");
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		
 		try {

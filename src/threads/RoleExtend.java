@@ -23,7 +23,7 @@ public class RoleExtend implements Runnable{
 	
 	@Override
 	public void run() {
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED);
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle("Warned users can't run away even after a reboot!");
 		boolean banHammerFound = false;
 		ArrayList<Member> users = new ArrayList<Member>();
 		ServerRoles.SQLgetRole(guild_id, "mut");

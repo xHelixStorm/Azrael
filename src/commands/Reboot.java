@@ -1,11 +1,15 @@
 package commands;
 
+import java.awt.Color;
+
 import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class Reboot implements Command{
+	private static EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 
 	@Override
 	public boolean called(String[] args, MessageReceivedEvent e) {
@@ -21,7 +25,7 @@ public class Reboot implements Command{
 				e.getJDA().shutdown();
 			}
 			else {
-				e.getTextChannel().sendMessage(":warning: " + e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").queue();
+				e.getTextChannel().sendMessage(message.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").build()).queue();
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.sql.Timestamp;
 
 import core.UserPrivs;
+import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.Role;
@@ -19,8 +20,9 @@ public class RoleListener extends ListenerAdapter{
 	
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent e){
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED);
-		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN);
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getMuteThumbnail()).setTitle("A user has been muted!");
+		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN).setTitle("Mute Retracted!");
+		EmbedBuilder message3 = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getBanThumbnail()).setTitle("User banned!");
 		
 		long user_id = e.getMember().getUser().getIdLong();
 		long guild_id = e.getMember().getGuild().getIdLong();
@@ -91,8 +93,8 @@ public class RoleListener extends ListenerAdapter{
 						pc.sendMessage("You have been banned from "+e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes of this server. Thanks for your understanding.\n"
 								+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
 						pc.close();
-						e.getJDA().getGuildById(guild_id).getController().ban(e.getMember(), 0).reason("User has been muted for the third time due to bad behaviour!").queue();
-						if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **" + user_name + " with the ID Number " + user_id + " Has been banned after his/her third warning!**").build()).queue();}
+						e.getJDA().getGuildById(guild_id).getController().ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").queue();
+						if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message3.setDescription("["+timestamp.toString()+"] **" + user_name + " with the ID Number " + user_id + " Has been banned after reaching the limit of allowed mutes on this server!**").build()).queue();}
 					}
 				} catch (HierarchyException hye) {
 					hye.printStackTrace();

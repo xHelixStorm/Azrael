@@ -15,7 +15,8 @@ import sql.ServerRoles;
 import threads.CollectUsers;
 
 public class Register implements Command{
-	private EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE);
+	private EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register various stuff from your server to enable all features!");
+	private EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 	private String message;
 	private String user_id;
 	private long guild_id;
@@ -54,7 +55,7 @@ public class Register implements Command{
 								+ "**"+IniFileReader.getCommandPrefix()+"register -role**\n\n"
 							+ "Description to register a channel:\n"
 								+ "**"+IniFileReader.getCommandPrefix()+"register -text-channel**\n\n"
-							+ "Description to register all channels:"
+							+ "Description to register all channels:\n"
 								+ "**"+IniFileReader.getCommandPrefix()+"register -text-channels**\n\n"
 							+ "Description to register a ranking role:\n"
 								+ "**"+IniFileReader.getCommandPrefix()+"register -ranking-role**\n\n"
@@ -79,7 +80,7 @@ public class Register implements Command{
 				else if(message.equals(IniFileReader.getCommandPrefix()+"register -ranking-role")){
 					RegisterRankingRole.RegisterRankingRoleHelper(e);
 				}
-				else if(message.contains(IniFileReader.getCommandPrefix()+"register -rankingrole ")){
+				else if(message.contains(IniFileReader.getCommandPrefix()+"register -ranking-role ")){
 					RegisterRankingRole.runCommand(e, guild_id, message);
 				}
 				else if(message.equals(IniFileReader.getCommandPrefix()+"register -users")){
@@ -92,7 +93,7 @@ public class Register implements Command{
 				}
 			}
 			else{
-				e.getTextChannel().sendMessage(":warning: " + e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from [GS]Heiliger or from an Administrator or an Moderator. Here a cookie** :cookie:").queue();
+				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
 			}
 		}
 	}

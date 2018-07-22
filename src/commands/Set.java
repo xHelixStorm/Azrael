@@ -29,7 +29,8 @@ public class Set implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getSetCommand().equals("true")){
-			EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE);
+			EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Set up your server to use the capacities of this bot to the fullest!");
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 			String input = e.getMessage().getContentRaw();
 			
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getId().equals(IniFileReader.getAdmin())){
@@ -178,7 +179,7 @@ public class Set implements Command{
 				}
 			}
 			else{
-				e.getTextChannel().sendMessage(":warning: " + e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from [GS]Heiliger or from an Administrator. Here a cookie** :cookie:").queue();
+				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").build()).queue();
 			}
 		}
 	}

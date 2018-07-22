@@ -11,10 +11,10 @@ import sql.SqlConnect;
 import threads.DelayDelete;
 
 public class SetWarning {
-	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE);
+	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Define the max amount of mutes that are tolerated in this server!");;
 	
 	public static void runHelp(MessageReceivedEvent _e) {
-		_e.getTextChannel().sendMessage(messageBuild.setDescription("Type a number from 1-5 to set the max allowed number of warnings, that occurs before a ban, for the mute system.\n_Note that this setting will override all previous user warnings, if the current warning of a user is higher than the one being set!_").build()).queue();
+		_e.getTextChannel().sendMessage(messageBuild.setDescription("Type a number from 1-5 to set the max allowed number of warnings, that occurs before a ban, for the mute system.\n\n_Note that this setting will override all previous user warnings, if the current warning of a user is higher than the one being set!_").build()).queue();
 	}
 	
 	public static void runTask(MessageReceivedEvent _e, String _message) {

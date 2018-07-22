@@ -81,6 +81,46 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("DiscordRoles", "password");
 	}
+	public static String getPugThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "Pug");
+	}
+	public static String getMeowThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "Meow");
+	}
+	public static String getMuteThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "Mute");
+	}
+	public static String getBanThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "Ban");
+	}
+	public static String getSettingsThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "Settings");
+	}
+	public static String getShopThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "Shop");
+	}
+	public static String getDeniedThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "Denied");
+	}
+	public static String getLeaveThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "Leave");
+	}
+	public static String getUnbanThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "Unban");
+	}
+	public static String getUnmuteThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "Unmute");
+	}
 	public static String getAboutCommand(){
 		readConfig();
 		return ini.get("Commands", "About");

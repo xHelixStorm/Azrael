@@ -26,7 +26,7 @@ public class ReadyListener extends ListenerAdapter{
 	
 	@Override
 	public void onReady(ReadyEvent e){
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA);
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the latest patch notes!");
 		System.out.println();
 		System.out.println("Azrael Version: "+STATIC.getVersion_New()+"\nAll credits to [GM]Heiliger");
 		

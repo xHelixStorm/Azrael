@@ -9,7 +9,6 @@ import preparedMessages.HelpText;
 import sql.SqlConnect;
 
 public class Commands implements Command{
-	private EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA);
 	private static String message = HelpText.getHelp();
 
 	@Override
@@ -19,6 +18,7 @@ public class Commands implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here are all available commands!");
 		if(IniFileReader.getCommandsCommand().equals("true")){
 			long guild_id = e.getGuild().getIdLong();
 			long channel = e.getTextChannel().getIdLong();

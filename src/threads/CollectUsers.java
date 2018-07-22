@@ -9,7 +9,7 @@ import sql.RankingDB;
 import sql.SqlConnect;
 
 public class CollectUsers implements Runnable{
-	private static EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN);
+	private static EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("Collection complete!");
 	MessageReceivedEvent e;
 	
 	public CollectUsers(MessageReceivedEvent _e){

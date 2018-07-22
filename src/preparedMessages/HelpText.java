@@ -25,7 +25,6 @@ public class HelpText {
 			other = true;
 		}
 		
-		textCollector.add("The following commands can be used:\n\n");
 		if(administration == true)textCollector.add("**_Administration:_**\n");
 		if(IniFileReader.getShutDownCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"shutdown**\nturns the bot off (can be used only from a GS or GM)\n\n");
 		if(IniFileReader.getRebootCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"reboot**\nrestarts the Bot(can be used only from a GS or GM)\n\n");

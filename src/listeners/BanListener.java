@@ -3,13 +3,14 @@ package listeners;
 import java.awt.Color;
 import java.sql.Timestamp;
 
+import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.guild.GuildBanEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import sql.SqlConnect;
 
 public class BanListener extends ListenerAdapter{
-	private static EmbedBuilder message = new EmbedBuilder().setColor(Color.RED);
+	private static EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getBanThumbnail()).setTitle("User banned!");
 	
 	@Override
 	public void onGuildBan(GuildBanEvent e){

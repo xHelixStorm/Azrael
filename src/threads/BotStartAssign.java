@@ -21,7 +21,7 @@ public class BotStartAssign implements Runnable{
 	
 	@Override
 	public void run() {
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN);
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("Roles assigned!");
 		boolean updatedUsers = false;
 		boolean roleExists = false;
 		int i = 0;

@@ -12,13 +12,14 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.ServerRoles;
 
 public class RegisterRole {
+	private static EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 	
 	public static void RegisterRoleHelper(MessageReceivedEvent _e){
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE);
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register various roles to create a an Administrator to User hierarchy for the bot!");
 		StringBuilder strB = new StringBuilder();
 		String parseMessage = null;
 		
-		parseMessage = "Please write the command in this format:\n**"+IniFileReader.getCommandPrefix()+"register -role <role_type> role-id**\n\nRole-ids can be displayed with the command **"+IniFileReader.getCommandPrefix()+"displayRoles**. Here are all available role_types:\n\n";
+		parseMessage = "Please write the command in this format:\n**"+IniFileReader.getCommandPrefix()+"register -role <role_type> role-id**\n\nRole-ids can be displayed with the command **"+IniFileReader.getCommandPrefix()+"display -roles**. Here are all available role_types:\n\n";
 		ServerRoles.SQLgetCategories();
 		for(Roles categories : ServerRoles.getRoles_ID()){
 			strB.append("**"+categories.getCategory_ABV()+"** for the **"+categories.getCategory_Name()+"** role\n");
@@ -80,7 +81,7 @@ public class RegisterRole {
 			}
 		}
 		else {
-			_e.getTextChannel().sendMessage(":warning: " + _e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from [GS]Heiliger or from an Administrator. Here a cookie** :cookie:").queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").build()).queue();
 		}
 	}
 }

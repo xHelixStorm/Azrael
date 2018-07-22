@@ -13,7 +13,7 @@ public class GuildLeaveListener extends ListenerAdapter{
 	
 	@Override
 	public void onGuildMemberLeave(GuildMemberLeaveEvent e){
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE);
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getLeaveThumbnail()).setTitle("User left!");
 		
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
