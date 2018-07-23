@@ -125,6 +125,10 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Thumbnails", "Unmute");
 	}
+	public static String getKickThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "Kick");
+	}
 	public static String getAboutCommand(){
 		readConfig();
 		return ini.get("Commands", "About");
