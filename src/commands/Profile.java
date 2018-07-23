@@ -40,7 +40,7 @@ public class Profile implements Command{
 							e2.printStackTrace();
 						}
 						
-						new Thread(new DelayDelete(fileName, 30000)).start();
+						new Thread(new DelayDelete(fileName, 30000, false)).start();
 						
 						float experienceCounter;
 						int convertedExperience;

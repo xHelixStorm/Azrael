@@ -34,7 +34,7 @@ public class Daily implements Command{
 			if(!file.exists()){
 				try {
 					file.createNewFile();
-					new Thread(new DelayDelete(fileName, 3000)).start();
+					new Thread(new DelayDelete(fileName, 3000, false)).start();
 				} catch (IOException e2) {
 					e2.printStackTrace();
 				}

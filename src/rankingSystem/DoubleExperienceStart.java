@@ -35,7 +35,7 @@ public class DoubleExperienceStart extends TimerTask{
 		}
 		else{
 			File doubleEvent = new File("./pictures/RankingSystem/S4League/doubleweekend.jpg");
-			FileSetting.createFile("files/double", "This file is for the purpose of enabling the double exp event.");
+			FileSetting.createFile("files/double.azr", "This file is for the purpose of enabling the double exp event.");
 			for(Guild g : e.getJDA().getGuilds()){
 				guild_id = g.getIdLong();
 				

@@ -76,17 +76,17 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 				
 				if(Files.notExists(path)){
 					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" Message has been removed due to bad behaviour!").queue();
-					FileSetting.createFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString(), "1");
-					new Thread(new DelayDelete(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr", 300000)).start();
+					FileSetting.createFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr", "1");
+					new Thread(new DelayDelete(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr", 300000, false)).start();
 				}
 				else if (Files.exists(path)){
-					report = FileSetting.readFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString());
+					report = FileSetting.readFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");
 					if(report.contains("1")){
 						e.getTextChannel().sendMessage(e.getMember().getAsMention()+" This has been the second warning. One more and you'll be **muted** from the server!").queue();
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString(), "2");
+						FileSetting.createFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr", "2");
 					}
 					else if (report.contains("2")){
-						FileSetting.deleteFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString());
+						FileSetting.deleteFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");
 						ServerRoles.SQLgetRole(e.getGuild().getIdLong(), "mut");
 						long mute_role = ServerRoles.getRole_ID();
 						e.getGuild().getController().addRolesToMember(e.getMember(), e.getGuild().getRoleById(mute_role)).queue();

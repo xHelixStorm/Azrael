@@ -47,7 +47,7 @@ public class ReadyListener extends ListenerAdapter{
 		System.out.println(out);
 		FileSetting.createTemp();
 
-		FileSetting.createFile("./files/reboot", "0");
+		FileSetting.createFile("./files/reboot.azr", "0");
 		for(Guild g : e.getJDA().getGuilds()){
 			long guild_id = g.getIdLong();
 			SqlConnect.SQLgetChannelID(guild_id, "log");
@@ -63,7 +63,7 @@ public class ReadyListener extends ListenerAdapter{
 				long channel_id = SqlConnect.getChannelID();
 				
 				if(channel_id != 0){
-					FileSetting.createFile("./files/version", STATIC.getVersion_New());
+					FileSetting.createFile("./files/version.azr", STATIC.getVersion_New());
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage(
 							messageBuild.setDescription(privatePatchNotes).build()).queue();
 					

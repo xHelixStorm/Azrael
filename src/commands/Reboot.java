@@ -21,7 +21,7 @@ public class Reboot implements Command{
 		if(IniFileReader.getRebootCommand().equals("true")){
 			if(e.getMember().getUser().getId().equals(IniFileReader.getAdmin()) || UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong())){
 				e.getTextChannel().sendMessage("**Now rebooting!**").queue();
-				FileSetting.createFile("./files/reboot", "1");			
+				FileSetting.createFile("./files/reboot.azr", "1");			
 				e.getJDA().shutdown();
 			}
 			else {

@@ -35,8 +35,8 @@ public class SetWarning {
 			}
 			_e.getTextChannel().sendMessage("The system has been set to warn "+warning_value+" time(s) before banning").queue();
 			
-			FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), "1");
-			new Thread(new DelayDelete(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), 60000)).start();
+			FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", "1");
+			new Thread(new DelayDelete(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", 600000, true)).start();
 			_e.getTextChannel().sendMessage("To complete the warning setup, you'll be asked to enter the time in minutes for every single warning. You have a total time of 10 minutes for the final setup.\n\nPlease insert the time in minutes for warning 1.").queueAfter(3, TimeUnit.SECONDS);
 		}
 		else {
@@ -46,19 +46,26 @@ public class SetWarning {
 	}
 	
 	public static void performUpdate(MessageReceivedEvent _e, String _message) {
+		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Session Expired!");
 		if(_message.replaceAll("[0-9]*", "").equals("")) {
-			String file_value = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId());
-			SqlConnect.SQLgetMaxWarning(_e.getGuild().getIdLong());
-			if(Integer.parseInt(file_value) < SqlConnect.getWarningID()) {
-				SqlConnect.SQLUpdateMuteTimeOfWarning(_e.getGuild().getIdLong(), Integer.parseInt(file_value), (Long.parseLong(_message)*60*1000));
-				_e.getTextChannel().sendMessage("The mute time of warning "+Integer.parseInt(file_value)+" has been updated!").queue();
-				_e.getTextChannel().sendMessage("Please insert the mute time for warning "+(Integer.parseInt(file_value)+1)+"!").queueAfter(1, TimeUnit.SECONDS);
-				FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), ""+(Integer.parseInt(file_value)+1));
+			String file_value = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr");
+			if(!file_value.equals("expired")) {
+				SqlConnect.SQLgetMaxWarning(_e.getGuild().getIdLong());
+				if(Integer.parseInt(file_value) < SqlConnect.getWarningID()) {
+					SqlConnect.SQLUpdateMuteTimeOfWarning(_e.getGuild().getIdLong(), Integer.parseInt(file_value), (Long.parseLong(_message)*60*1000));
+					_e.getTextChannel().sendMessage("The mute time of warning "+Integer.parseInt(file_value)+" has been updated!").queue();
+					_e.getTextChannel().sendMessage("Please insert the mute time for warning "+(Integer.parseInt(file_value)+1)+"!").queueAfter(1, TimeUnit.SECONDS);
+					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", ""+(Integer.parseInt(file_value)+1));
+				}
+				else if(Integer.parseInt(file_value) == SqlConnect.getWarningID()) {
+					SqlConnect.SQLUpdateMuteTimeOfWarning(_e.getGuild().getIdLong(), Integer.parseInt(file_value), (Long.parseLong(_message)*60*1000));
+					_e.getTextChannel().sendMessage("The warnings have been configured successfully!").queue();
+					FileSetting.deleteFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr");
+				}
 			}
-			else if(Integer.parseInt(file_value) == SqlConnect.getWarningID()) {
-				SqlConnect.SQLUpdateMuteTimeOfWarning(_e.getGuild().getIdLong(), Integer.parseInt(file_value), (Long.parseLong(_message)*60*1000));
-				_e.getTextChannel().sendMessage("The warnings have been configured successfully!").queue();
-				FileSetting.deleteFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId());
+			else {
+				_e.getTextChannel().sendMessage(denied.setDescription("Session has expired! Please retype the command!").build()).queue();
+				FileSetting.deleteFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr");
 			}
 		}
 		SqlConnect.clearAllVariables();

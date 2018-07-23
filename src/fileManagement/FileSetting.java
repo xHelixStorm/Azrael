@@ -14,7 +14,7 @@ private static PrintWriter pw;
 	
 	public static void createFile(String name, String content){
 		try {
-			pw = new PrintWriter(name+".azr", "UTF-8");
+			pw = new PrintWriter(name, "UTF-8");
 			pw.print(content);
 			pw.close();
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
@@ -37,7 +37,7 @@ private static PrintWriter pw;
 
 	public static String readFile(String name){
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(name+".azr"));
+			BufferedReader br = new BufferedReader(new FileReader(name));
 			try {
 				StringBuilder sb = new StringBuilder();
 				String line = br.readLine();
@@ -64,7 +64,7 @@ private static PrintWriter pw;
 	}
 	
 	public static void deleteFile(String name){
-		File file = new File(name+".azr");
+		File file = new File(name);
 		file.delete();
 	}
 	

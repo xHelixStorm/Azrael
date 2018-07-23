@@ -25,6 +25,7 @@ import commands.Shop;
 import commands.ShutDown;
 import commands.Top;
 import commands.Use;
+import commands.User;
 import fileManagement.IniFileReader;
 import listeners.BanListener;
 import listeners.CommandListener;
@@ -119,6 +120,7 @@ public class Main {
 		CommandHandler.commands.put("use", new Use());
 		CommandHandler.commands.put("inventory", new Inventory());
 		CommandHandler.commands.put("daily", new Daily());
+		CommandHandler.commands.put("user", new User());
 	}
 	
 	public static void addListeners(){

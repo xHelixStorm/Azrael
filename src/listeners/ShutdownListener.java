@@ -12,7 +12,7 @@ public class ShutdownListener extends ListenerAdapter{
 	
 	@Override
 	public void onShutdown(ShutdownEvent e){
-		String filecontent = FileSetting.readFile("./files/reboot");
+		String filecontent = FileSetting.readFile("./files/reboot.azr");
 		
 		try {
 			Process proc;

@@ -197,4 +197,8 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Commands", "Use");
 	}
+	public static String getUserCommand(){
+		readConfig();
+		return ini.get("Commands", "User");
+	}
 }

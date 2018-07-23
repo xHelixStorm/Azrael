@@ -9,7 +9,7 @@ import fileManagement.FileSetting;
 
 public class STATIC {
 	
-	private static final String VERSION_OLD = FileSetting.readFile("./files/version");
+	private static final String VERSION_OLD = FileSetting.readFile("./files/version.azr");
 	private static final String VERSION_NEW = "9.0.0";
 	
 	public static void allowCertificates(){	
