@@ -64,6 +64,9 @@ public class Rank implements Command{
 						
 						experienceCounter = (currentExperience / rankUpExperience)*100;
 						convertedExperience = (int) experienceCounter;
+						if(convertedExperience > 100) {
+							convertedExperience = 100;
+						}
 						
 						RankingMethods.getRank(e, convertedExperience, level, rank_skin, icon_skin, bar_color, additional_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
 					}

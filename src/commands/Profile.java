@@ -67,6 +67,9 @@ public class Profile implements Command{
 						
 						experienceCounter = (currentExperience / rankUpExperience)*100;
 						convertedExperience = (int) experienceCounter;
+						if(convertedExperience > 100) {
+							convertedExperience = 100;
+						}
 						
 						RankingDB.SQLRanking(guild_id);
 						search: for(rankingSystem.Rank ranking : RankingDB.getRankList()){
