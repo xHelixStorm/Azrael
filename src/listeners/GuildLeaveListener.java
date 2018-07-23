@@ -9,7 +9,6 @@ import net.dv8tion.jda.core.audit.AuditLogEntry;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.core.requests.restaction.pagination.AuditLogPaginationAction;
-import sql.ServerRoles;
 import sql.SqlConnect;
 
 public class GuildLeaveListener extends ListenerAdapter{
@@ -17,13 +16,13 @@ public class GuildLeaveListener extends ListenerAdapter{
 	@Override
 	public void onGuildMemberLeave(GuildMemberLeaveEvent e){
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getLeaveThumbnail()).setTitle("User left!");
+		EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User kicked!");
 		
 		String trigger_user_name = "";
 		AuditLogPaginationAction logs = e.getGuild().getAuditLogs();
 		first_entry: for (AuditLogEntry entry : logs)
 		{
-			ServerRoles.SQLgetRole(e.getGuild().getIdLong(), "mut");
-			if(entry.getType().toString().equals("MEMBER_KICK") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {
+			if(entry.getType().toString().equals("KICK") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {
 				trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 			}
 			break first_entry;
@@ -47,7 +46,7 @@ public class GuildLeaveListener extends ListenerAdapter{
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from "+guild_name+" while being muted!").build()).queue();
 			}
 			else if(trigger_user_name.length() > 0) {
-				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** kicked **"+user_name+"** from **"+guild_name+"**").build()).queue();
+				e.getGuild().getTextChannelById(channel_id).sendMessage(kick.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** kicked **"+user_name+"** from **"+guild_name+"**").build()).queue();
 			}
 			else if(IniFileReader.getLeaveMessage().equals("true")){
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from **"+guild_name+"**").build()).queue();
