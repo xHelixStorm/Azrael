@@ -93,10 +93,6 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Thumbnails", "Meow");
 	}
-	public static String getMuteThumbnail() {
-		readConfig();
-		return ini.get("Thumbnails", "Mute");
-	}
 	public static String getBanThumbnail() {
 		readConfig();
 		return ini.get("Thumbnails", "Ban");
