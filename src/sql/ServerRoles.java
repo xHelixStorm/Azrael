@@ -36,7 +36,7 @@ public class ServerRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO guilds(guild_id, name) VALUES(?,?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -55,7 +55,7 @@ public class ServerRoles {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT role_id, name FROM roles WHERE fk_guild_id = ? && fk_category_abv LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -78,7 +78,7 @@ public class ServerRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO roles(role_id, name, fk_category_abv, fk_guild_id) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name), fk_category_abv=VALUES(fk_category_abv)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_id);
@@ -99,7 +99,7 @@ public class ServerRoles {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT role_category.category_abv, role_category.rank FROM roles INNER JOIN role_category ON roles.fk_category_abv = role_category.category_abv WHERE role_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_id);
@@ -123,7 +123,7 @@ public class ServerRoles {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT guilds.guild_id, guilds.name, roles.role_id, roles.name, role_category.category_abv, role_category.rank FROM guilds INNER JOIN roles ON guilds.guild_id = roles.fk_guild_id INNER JOIN role_category ON roles.fk_category_abv = role_category.category_abv WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -152,7 +152,7 @@ public class ServerRoles {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM role_category");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();

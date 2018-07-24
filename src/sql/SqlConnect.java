@@ -29,13 +29,17 @@ public class SqlConnect {
 	private static int execution_id = 0;
 	private static long guild = 0;
 	private static boolean muted = false;
-	private static double timer1 = 0;
-	private static double timer2 = 0;
+	private static boolean custom_time = false;
+	private static double timer = 0;
+	private static String description = "";
+	private static int count = 0;
 	
+	private static Date timestamp;
 	private static Date unmute;
 	private static ArrayList<Channels> channels = new ArrayList<Channels>();
 	private static ArrayList<String> filter_lang = new ArrayList<String>();
 	private static ArrayList<String> filter_words = new ArrayList<String>();
+	private static ArrayList<String> descriptions = new ArrayList<String>();
 	
 	private static String username = IniFileReader.getSQLUsername();
 	private static String password = IniFileReader.getSQLPassword();
@@ -49,11 +53,128 @@ public class SqlConnect {
 		}
 	}
 	
-	public static void SQLInsertUser(Long _user_id, String _name){
+	public static synchronized void SQLInsertActionLog(String _event, long _target_id, long _guild_id, String _description) {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO action_log (log_id, event, target_id, guild_id, description, timestamp) VALUES(null, ?, ?, ?, ?, ?)");
+			Timestamp action_time = new Timestamp(System.currentTimeMillis());
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _event);
+			stmt.setLong(2, _target_id);
+			stmt.setLong(3, _guild_id);
+			stmt.setString(4, _description);
+			stmt.setTimestamp(5, action_time);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLgetSingleActionEventCount(String _event, long _target_id, long _guild_id) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT COUNT(*) FROM action_log WHERE target_id = ? && guild_id = ? && event LIKE ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _target_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, _event);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				setCount(rs.getInt(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLgetDoubleActionEventDescriptions(String _event, String _event2, long _target_id, long _guild_id) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT description FROM action_log WHERE target_id = ? && (guild_id = ? || guild_id = 0) && (event LIKE ? || event LIKE ?) GROUP BY description");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _target_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, _event);
+			stmt.setString(4, _event2);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				descriptions.add(rs.getString(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLgetSingleActionEventDescriptions(String _event, long _target_id, long _guild_id) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT description FROM action_log WHERE target_id = ? && guild_id = ? && event LIKE ? GROUP BY description");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _target_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, _event);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				descriptions.add(rs.getString(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	public static void SQLgetCriticalActionEvents(long _target_id, long _guild_id) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT description, timestamp FROM action_log WHERE target_id = ? && guild_id = ? && (event LIKE \"MEMBER_KICK\" || event LIKE \"MEMBER_BAN_ADD\" || event LIKE \"MEMBER_BAN_REMOVE\" || event LIKE \"MEMBER_MUTE_ADD\")");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _target_id);
+			stmt.setLong(2, _guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				descriptions.add("`["+rs.getTimestamp(2).toString()+"] - "+rs.getString(1)+"`");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLInsertUser(long _user_id, String _name){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO users (user_id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -71,7 +192,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE users SET name = ? WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _name);
@@ -89,7 +210,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO guild VALUES (?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -108,7 +229,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT nickname FROM nickname WHERE fk_user_id= ? && fk_guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -130,7 +251,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO nickname VALUES (?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -149,7 +270,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE nickname SET nickname = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _nickname);
@@ -168,7 +289,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM nickname WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -187,8 +308,8 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, fk_guild_id, fk_warning_id, fk_ban_id, unmute, muted FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT fk_user_id, fk_guild_id, fk_warning_id, fk_ban_id, timestamp, unmute, muted, custom_time FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -200,6 +321,7 @@ public class SqlConnect {
 				setBanID(rs.getInt(4));
 				setUnmute(rs.getTimestamp(5));
 				setMuted(rs.getBoolean(6));
+				setCustomTime(rs.getBoolean(7));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -210,12 +332,12 @@ public class SqlConnect {
 		}
 	}
 	
-	public static void SQLInsertData(Long _user_id, Long _guild_id, int _warning_id, int _ban_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted){
+	public static void SQLInsertData(long _user_id, long _guild_id, int _warning_id, int _ban_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted, boolean _custom_time){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO bancollect VALUES (NULL, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE fk_warning_id=VALUES(fk_warning_id), fk_ban_id=VALUES(fk_ban_id), timestamp=VALUES(timestamp), unmute=VALUES(unmute), muted=VALUES(muted)");
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO bancollect VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE fk_warning_id=VALUES(fk_warning_id), fk_ban_id=VALUES(fk_ban_id), timestamp=VALUES(timestamp), unmute=VALUES(unmute), muted=VALUES(muted), custom_time=VALUES(custom_time)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -224,6 +346,7 @@ public class SqlConnect {
 			stmt.setTimestamp(5, _timestamp);
 			stmt.setTimestamp(6, _unmute);
 			stmt.setBoolean(7, _muted);
+			stmt.setBoolean(8, _custom_time);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -233,16 +356,35 @@ public class SqlConnect {
 		}
 	}
 	
-	public static void SQLUpdateMuted(long _user_id, long _guild_id, boolean _muted){
+	public static void SQLDeleteData(long _user_id, long _guild_id) {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE bancollect SET muted = ? WHERE fk_user_id = ? && fk_guild_id = ?");
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM bancollect WHERE fk_user_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLUpdateMuted(long _user_id, long _guild_id, boolean _muted, boolean _custom_time){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE bancollect SET muted = ?, custom_time = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setBoolean(1, _muted);
-			stmt.setLong(2, _user_id);
-			stmt.setLong(3, _guild_id);
+			stmt.setBoolean(2, _custom_time);
+			stmt.setLong(3, _user_id);
+			stmt.setLong(4, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -252,11 +394,124 @@ public class SqlConnect {
 		}
 	}
 	
-	public static void SQLUpdateWarning(Long _user_id, Long _guild_id, Integer _warning_id){
+	public static void SQLgetWarning(long _guild_id, int _warning_id) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT warning_id, mute_time, description FROM warnings WHERE fk_guild_id = ? && warning_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setInt(2, _warning_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				setWarningID(rs.getInt(1));
+				setTimer(rs.getDouble(2));
+				setDescription(rs.getString(3));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLgetMaxWarning(long _guild_id) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT MAX(warning_id) FROM warnings WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				setWarningID(rs.getInt(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLInsertWarning(long _guild_id, int _warning_id) {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = "";
+			switch(_warning_id) {
+				case 1: 
+					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
+							+ "(?, 1, 0, \"first warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
+					stmt = myConn.prepareStatement(sql);
+					stmt.setLong(1, _guild_id);
+					break;
+				case 2:
+					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
+							+ "(?, 1, 0, \"first warning\"),"
+							+ "(?, 2, 0, \"second warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
+					stmt = myConn.prepareStatement(sql);
+					stmt.setLong(1, _guild_id);
+					stmt.setLong(2, _guild_id);
+					break;
+				case 3:
+					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
+							+ "(?, 1, 0, \"first warning\"),"
+							+ "(?, 2, 0, \"second warning\"),"
+							+ "(?, 3, 0, \"third warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
+					stmt = myConn.prepareStatement(sql);
+					stmt.setLong(1, _guild_id);
+					stmt.setLong(2, _guild_id);
+					stmt.setLong(3, _guild_id);
+					break;
+				case 4:
+					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
+							+ "(?, 1, 0, \"first warning\"),"
+							+ "(?, 2, 0, \"second warning\"),"
+							+ "(?, 3, 0, \"third warning\"),"
+							+ "(?, 4, 0, \"fourth warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
+					stmt = myConn.prepareStatement(sql);
+					stmt.setLong(1, _guild_id);
+					stmt.setLong(2, _guild_id);
+					stmt.setLong(3, _guild_id);
+					stmt.setLong(4, _guild_id);
+					break;
+				case 5:
+					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
+							+ "(?, 1, 0, \"first warning\"),"
+							+ "(?, 2, 0, \"second warning\"),"
+							+ "(?, 3, 0, \"third warning\"),"
+							+ "(?, 4, 0, \"fourth warning\"),"
+							+ "(?, 5, 0, \"fifth warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
+					stmt = myConn.prepareStatement(sql);
+					stmt.setLong(1, _guild_id);
+					stmt.setLong(2, _guild_id);
+					stmt.setLong(3, _guild_id);
+					stmt.setLong(4, _guild_id);
+					stmt.setLong(5, _guild_id);
+			}
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLUpdateWarning(long _user_id, long _guild_id, int _warning_id){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE bancollect SET fk_warning_id = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _warning_id);
@@ -271,16 +526,38 @@ public class SqlConnect {
 		}
 	}
 	
-	public static void SQLUpdateUnmute(Long _user_id, Long _guild_id, Timestamp _unmute){
+	public static void SQLUpdateMuteTimeOfWarning(long _guild_id, int _warning_id, long _mute_time) {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE bancollect SET unmute = ? WHERE fk_user_id = ? && fk_guild_id = ?");
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE warnings SET mute_time = ? WHERE fk_guild_id = ? && warning_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setTimestamp(1, _unmute);
-			stmt.setLong(2, _user_id);
-			stmt.setLong(3, _guild_id);
+			stmt.setLong(1, _mute_time);
+			stmt.setLong(2, _guild_id);
+			stmt.setInt(3, _warning_id);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLUpdateUnmute(Long _user_id, Long _guild_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted, boolean _custom_time){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE bancollect SET timestamp = ?, unmute = ?, muted = ?, custom_time = ? WHERE fk_user_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setTimestamp(1, _timestamp);
+			stmt.setTimestamp(2, _unmute);
+			stmt.setBoolean(3, _muted);
+			stmt.setBoolean(4, _custom_time);
+			stmt.setLong(5, _user_id);
+			stmt.setLong(6, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -294,7 +571,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE bancollect SET fk_ban_id = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _ban_id);
@@ -309,33 +586,12 @@ public class SqlConnect {
 		}
 	}
 	
-	public static void SQLUpdateWarningAndBan(long _user_id, long _guild_id, Timestamp _unmute, int _warning_id, int _ban_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE bancollect SET unmute = ?, fk_warning_id = ?, fk_ban_id = ? WHERE fk_user_id = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setTimestamp(1, _unmute);
-			stmt.setInt(2, _warning_id);
-			stmt.setInt(3, _ban_id);
-			stmt.setLong(4, _user_id);
-			stmt.setLong(5, _guild_id);
-			stmt.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static void SQLgetChannel(long _channel_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT channels.channel_id, channels.name, channel_conf.fk_channel_type, channel_conf.fk_guild_id FROM channels INNER JOIN channel_conf ON channels.channel_id = channel_conf.fk_channel_id WHERE channel_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -359,7 +615,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO channels (channel_id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -377,7 +633,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_channel_type, fk_guild_id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE fk_channel_type = VALUES(fk_channel_type)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -397,7 +653,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT fk_channel_id FROM channel_conf WHERE fk_channel_type = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _channel_type);
@@ -420,7 +676,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT fk_channel_type FROM channel_conf WHERE fk_channel_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -442,7 +698,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT channels.channel_id, channels.name, channeltypes.channel_type, channeltypes.channel, guild.guild_id, guild.name, filter_languages.language FROM channels INNER JOIN channel_conf ON channels.channel_id = channel_conf.fk_channel_id INNER JOIN channeltypes ON channel_conf.fk_channel_type = channeltypes.channel_type INNER JOIN guild ON channel_conf.fk_guild_id = guild.guild_id LEFT JOIN channel_filter ON channels.channel_id = channel_filter.fk_channel_id LEFT JOIN filter_languages ON channel_filter.fk_lang_abbrv = filter_languages.lang_abbrv WHERE guild.guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -472,7 +728,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM channeltypes");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
@@ -496,7 +752,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM command WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -518,107 +774,11 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO command (guild_id, execution_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE execution_id=VALUES(execution_id)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _execution_id);
-			stmt.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static void SQLgetMuteTimer(long _ch_guild_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM mutetimer WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _ch_guild_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setCH_GuildID(rs.getLong(1));
-				setTimer1(rs.getDouble(2));
-				setTimer2(rs.getDouble(3));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static void SQLInsertMuteTimer1(long _ch_guild_id, long _timer1){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO mutetimer (guild_id, timer1, timer2) VALUES (?, ?, NULL)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _ch_guild_id);
-			stmt.setLong(2, _timer1);
-			stmt.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static void SQLInsertMuteTimer2(long _ch_guild_id, long _timer2){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO mutetimer (guild_id, timer1, timer2) VALUES (?, NULL, ?)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _ch_guild_id);
-			stmt.setLong(2, _timer2);
-			stmt.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static void SQLUpdateMuteTimer1(long _ch_guild_id, long _timer1){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE mutetimer SET timer1 = ? WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _timer1);
-			stmt.setLong(2, _ch_guild_id);
-			stmt.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static void SQLUpdateMuteTimer2(long _ch_guild_id, long _timer2){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE mutetimer SET timer2 = ? WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _timer2);
-			stmt.setLong(2, _ch_guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -633,7 +793,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM channel_filter WHERE fk_channel_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -655,7 +815,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql;
 			if(_filter_lang.equals("all")){
 				sql = ("SELECT word FROM filter");
@@ -683,7 +843,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO channel_filter (fk_channel_id, fk_lang_abbrv) VALUES (?,?) ON DUPLICATE KEY UPDATE fk_lang_abbrv = VALUES(fk_lang_abbrv)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -701,7 +861,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.0.2:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM channel_filter WHERE fk_channel_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -711,6 +871,39 @@ public class SqlConnect {
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	//Transactions
+	@SuppressWarnings("resource")
+	public static void SQLLowerTotalWarning(long _guild_id, int _warning_id){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false);
+			String sql = ("UPDATE bancollect SET fk_warning_id = ? WHERE fk_guild_id = ? && fk_warning_id > ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setInt(1, _warning_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setInt(3, _warning_id);
+			stmt.executeUpdate();
+
+			String sql2 = ("DELETE FROM warnings WHERE warning_id > ?");
+			stmt = myConn.prepareStatement(sql2);
+			stmt.setInt(1, _warning_id);
+			stmt.executeUpdate();
+			myConn.commit();	
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				myConn.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
@@ -759,11 +952,20 @@ public class SqlConnect {
 	public static void setMuted(boolean _muted){
 		muted = _muted;
 	}
-	public static void setTimer1(double _timer1){
-		timer1 = _timer1;
+	public static void setCustomTime(boolean _custom_time) {
+		custom_time = _custom_time;
 	}
-	public static void setTimer2(double _timer2){
-		timer2 = _timer2;
+	public static void setTimer(double _timer){
+		timer = _timer;
+	}
+	public static void setDescription(String _description){
+		description = _description;
+	}
+	public static void setCount(int _count) {
+		count = _count;
+	}
+	public static void setTimestamp(Date _timestamp){
+		timestamp = _timestamp;
 	}
 	public static void setUnmute(Date _unmute){
 		unmute = _unmute;
@@ -815,11 +1017,17 @@ public class SqlConnect {
 	public static boolean getMuted(){
 		return muted;
 	}
-	public static double getTimer1(){
-		return timer1;
+	public static boolean getCustomTime() {
+		return custom_time;
 	}
-	public static double getTimer2(){
-		return timer2;
+	public static double getTimer(){
+		return timer;
+	}
+	public static String getDescription() {
+		return description;
+	}
+	public static int getCount() {
+		return count;
 	}
 	public static ArrayList<Channels> getChannels(){
 		return channels;
@@ -830,10 +1038,19 @@ public class SqlConnect {
 	public static ArrayList<String> getFilter_Words(){
 		return filter_words;
 	}
+	public static ArrayList<String> getDescriptions(){
+		return descriptions;
+	}
+	public static Date getTimestamp(){
+		return timestamp;
+	}
 	public static Date getUnmute(){
 		return unmute;
 	}
 	
+	public static void clearTimestamp() {
+		timestamp = null;
+	}
 	public static void clearUnmute(){
 		unmute = null;
 	}
@@ -845,6 +1062,9 @@ public class SqlConnect {
 	}
 	public synchronized static void clearFilter_Words(){
 		filter_words.clear();
+	}
+	public static void clearDescriptions() {
+		descriptions.clear();
 	}
 	public static void clearAllVariables(){
 		setUser_id(0);
@@ -861,8 +1081,10 @@ public class SqlConnect {
 		setChannelTypeName("");
 		setExecutionID(0);
 		setGuild(0);
-		setTimer1(0);
-		setTimer2(0);
+		setTimer(0);
 		setMuted(false);
+		setCustomTime(false);
+		setDescription("");
+		setCount(0);
 	}
 }
