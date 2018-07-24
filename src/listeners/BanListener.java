@@ -19,12 +19,15 @@ public class BanListener extends ListenerAdapter{
 	public void onGuildBan(GuildBanEvent e){
 		
 		String trigger_user_name = "";
+		String ban_reason = "";
 		AuditLogPaginationAction logs = e.getGuild().getAuditLogs();
 		first_entry: for (AuditLogEntry entry : logs)
 		{
 			ServerRoles.SQLgetRole(e.getGuild().getIdLong(), "mut");
 			if(entry.getType().toString().equals("MEMBER_BAN_ADD") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {
 				trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
+				ban_reason = entry.getReason();
+				ban_reason = !ban_reason.equals("") ? "\nReason: "+ban_reason : "";
 			}
 			break first_entry;
 		}
@@ -46,10 +49,10 @@ public class BanListener extends ListenerAdapter{
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		if(channel_id != 0){
 			if(warning_id == 0){
-				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("**["+timestamp+"] **"+trigger_user_name+"** has banned " + user_name + " with the ID Number " + user_id + " without any protocolled warnings!**").build()).queue();
+				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("**["+timestamp+"] **"+trigger_user_name+"** has banned " + user_name + " with the ID Number " + user_id + " without any protocolled warnings!**"+ban_reason).build()).queue();
 			}
 			else if((warning_id+1) < max_warning_id){
-				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("**["+timestamp+"] **"+trigger_user_name+"** has banned " + user_name + " with the ID Number " + user_id + " without enough protocolled warnings! Warnings: "+warning_id+"**").build()).queue();
+				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("**["+timestamp+"] **"+trigger_user_name+"** has banned " + user_name + " with the ID Number " + user_id + " without enough protocolled warnings! Warnings: "+warning_id+"**"+ban_reason).build()).queue();
 			}
 		}
 		
@@ -57,9 +60,9 @@ public class BanListener extends ListenerAdapter{
 			SqlConnect.SQLUpdateBan(user_id, guild_id, 2);
 		}
 		else{
-			SqlConnect.SQLInsertData(user_id, guild_id, 4, 2, timestamp, timestamp, true);
+			SqlConnect.SQLInsertData(user_id, guild_id, 4, 2, timestamp, timestamp, true, false);
 		}
-		SqlConnect.SQLUpdateMuted(user_id, guild_id, true);
+		SqlConnect.SQLUpdateMuted(user_id, guild_id, true, false);
 		SqlConnect.SQLInsertActionLog("MEMBER_BAN_ADD", user_id, guild_id, "Ban added");
 		SqlConnect.clearAllVariables();
 	}

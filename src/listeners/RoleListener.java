@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.sql.Timestamp;
 
 import core.UserPrivs;
+import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.PrivateChannel;
@@ -48,7 +49,7 @@ public class RoleListener extends ListenerAdapter{
 			if(unmute_time - System.currentTimeMillis() > 0){
 				if(channel_id != 0){
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-					e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+e.getMember().getUser().getName()+"#"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned before the mute time elapsed! Reason may be due to rejoining or manual role reassignment!").build()).queue();
+					e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned before the mute time elapsed! Reason may be due to rejoining or manual role reassignment!").build()).queue();
 				}
 			}
 			else{
@@ -67,34 +68,51 @@ public class RoleListener extends ListenerAdapter{
 					RankingDB.SQLgetUserDetails(user_id, guild_id);
 					long assignedRole = RankingDB.getAssignedRole();
 					
-					SqlConnect.SQLgetWarning(e.getGuild().getIdLong(), (warning_id+1));
-					mute_time = (long) SqlConnect.getTimer();
-					unmute = SqlConnect.getTimer();
-					long hours = (long) (unmute/1000/60/60);
-					long minutes = (long) (unmute/1000/60%60);
-					String hour_add = hours != 0 ? hours+" hours" : "";
-					String minute_add = minutes != 0 ? minutes+" minutes" : "";
-					String and_add = minutes != 0 && hours != 0 ? " and " : "";
-					Timestamp timestamp = new Timestamp(time);
-					Timestamp unmute_timestamp = new Timestamp(time+mute_time);
-					
-					SqlConnect.SQLgetMaxWarning(e.getGuild().getIdLong());
-					int max_warning = SqlConnect.getWarningID();
-					if((warning_id+1) <= max_warning) {
-						SqlConnect.SQLInsertData(user_id, guild_id, (warning_id+1), 1, timestamp, unmute_timestamp, true);
+					if(SqlConnect.getCustomTime()) {
+						mute_time = Long.parseLong(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/mute_time_"+e.getMember().getUser().getId()));
+						long hours = (mute_time/1000/60/60);
+						long minutes = (mute_time/1000/60%60);
+						String hour_add = hours != 0 ? hours+" hours" : "";
+						String minute_add = minutes != 0 ? minutes+" minutes" : "";
+						String and_add = minutes != 0 && hours != 0 ? " and " : "";
+						
 						PrivateChannel pc = e.getUser().openPrivateChannel().complete();
-						pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+hour_add+and_add+minute_add+"** for being your "+SqlConnect.getDescription()+". Warning **"+(warning_id+1)+"**/**"+max_warning+"**\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
-								+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
+						pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+hour_add+and_add+minute_add+"** . Except for the first mute, your warning counter won't increase.\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
+								+ "On a important note, this is an automated reply. You'll receive no reply in any way.").queue();
 						pc.close();
-						new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, channel_id, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning)).start();
+						new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, channel_id, mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0)).start();
+						FileSetting.deleteFile(IniFileReader.getTempDirectory()+"AutoDelFiles/mute_time_"+e.getMember().getUser().getId());
 					}
-					else if((warning_id+1) > max_warning) {
-						PrivateChannel pc = e.getUser().openPrivateChannel().complete();
-						pc.sendMessage("You have been banned from "+e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes of this server. Thanks for your understanding.\n"
-								+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
-						pc.close();
-						e.getJDA().getGuildById(guild_id).getController().ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").queue();
-						if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message3.setDescription("["+timestamp.toString()+"] **" + user_name + " with the ID Number " + user_id + " Has been banned after reaching the limit of allowed mutes on this server!**").build()).queue();}
+					else {
+						SqlConnect.SQLgetWarning(e.getGuild().getIdLong(), (warning_id+1));
+						mute_time = (long) SqlConnect.getTimer();
+						unmute = SqlConnect.getTimer();
+						long hours = (long) (unmute/1000/60/60);
+						long minutes = (long) (unmute/1000/60%60);
+						String hour_add = hours != 0 ? hours+" hours" : "";
+						String minute_add = minutes != 0 ? minutes+" minutes" : "";
+						String and_add = minutes != 0 && hours != 0 ? " and " : "";
+						Timestamp timestamp = new Timestamp(time);
+						Timestamp unmute_timestamp = new Timestamp(time+mute_time);
+						
+						SqlConnect.SQLgetMaxWarning(e.getGuild().getIdLong());
+						int max_warning = SqlConnect.getWarningID();
+						if((warning_id+1) <= max_warning) {
+							SqlConnect.SQLInsertData(user_id, guild_id, (warning_id+1), 1, timestamp, unmute_timestamp, true, false);
+							PrivateChannel pc = e.getUser().openPrivateChannel().complete();
+							pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+hour_add+and_add+minute_add+"** for being your "+SqlConnect.getDescription()+". Warning **"+(warning_id+1)+"**/**"+max_warning+"**\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
+									+ "On a important note, this is an automated reply. You'll receive no reply in any way.").queue();
+							pc.close();
+							new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, channel_id, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning)).start();
+						}
+						else if((warning_id+1) > max_warning) {
+							PrivateChannel pc = e.getUser().openPrivateChannel().complete();
+							pc.sendMessage("You have been banned from "+e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
+									+ "On a important note, this is an automated reply. You'll receive no reply in any way.").queue();
+							pc.close();
+							e.getJDA().getGuildById(guild_id).getController().ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").queue();
+							if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message3.setDescription("["+timestamp.toString()+"] **" + user_name + " with the ID Number " + user_id + " Has been banned after reaching the limit of allowed mutes on this server!**").build()).queue();}
+						}
 					}
 				} catch (HierarchyException hye) {
 					hye.printStackTrace();
@@ -107,6 +125,7 @@ public class RoleListener extends ListenerAdapter{
 			RankingDB.clearAllVariables();
 			SqlConnect.clearAllVariables();
 			SqlConnect.clearUnmute();
+			SqlConnect.clearTimestamp();
 		}
 	}
 }

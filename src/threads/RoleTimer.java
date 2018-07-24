@@ -49,7 +49,12 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 		try {
 			if(UserPrivs.isUserMuted(e.getMember().getUser(), e.getGuild().getIdLong()) == true){
 				if(channel_id != 0){
-					e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been muted and will be unmuted in **"+hour_add+and_add+minute_add+"**!\nWarning **"+warning_id+"**/**"+max_warning_id+"**").build()).queue();
+					if(warning_id == 0 && max_warning_id == 0) {
+						e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been muted with a custom mute time and will be unmuted in **"+hour_add+and_add+minute_add+"**!").build()).queue();
+					}
+					else {
+						e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been muted and will be unmuted in **"+hour_add+and_add+minute_add+"**!\nWarning **"+warning_id+"**/**"+max_warning_id+"**").build()).queue();
+					}
 				}
 				Thread.sleep(timer);
 				

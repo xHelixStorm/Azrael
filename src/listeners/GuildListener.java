@@ -23,11 +23,14 @@ public class GuildListener extends ListenerAdapter {
 		long currentTime = System.currentTimeMillis();;
 		boolean badName = false;
 		long unmute;
+		boolean muted;
 		
 		SqlConnect.SQLgetChannelID(guild_id, "log");
 		long channel_id = SqlConnect.getChannelID();
+		SqlConnect.SQLgetData(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+		muted = SqlConnect.getMuted();
 		if(IniFileReader.getJoinMessage().equals("true")){
-			if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription(":warning: The user **" + user_name + "** with the ID Number **" + user_id + "** joined **" + e.getGuild().getName() + "**").build()).queue();}
+			if(channel_id != 0 && muted == false){e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription(":warning: The user **" + user_name + "** with the ID Number **" + user_id + "** joined **" + e.getGuild().getName() + "**").build()).queue();}
 		}
 		
 		try{

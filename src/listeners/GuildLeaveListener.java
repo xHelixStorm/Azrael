@@ -19,11 +19,14 @@ public class GuildLeaveListener extends ListenerAdapter{
 		EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User kicked!");
 		
 		String trigger_user_name = "";
+		String kick_reason = "";
 		AuditLogPaginationAction logs = e.getGuild().getAuditLogs();
 		first_entry: for (AuditLogEntry entry : logs)
 		{
 			if(entry.getType().toString().equals("KICK") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {
 				trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
+				kick_reason = entry.getReason();
+				kick_reason = !kick_reason.equals("") ? "\nReason: "+kick_reason : "";
 			}
 			break first_entry;
 		}
@@ -46,7 +49,7 @@ public class GuildLeaveListener extends ListenerAdapter{
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from "+guild_name+" while being muted!").build()).queue();
 			}
 			else if(trigger_user_name.length() > 0) {
-				e.getGuild().getTextChannelById(channel_id).sendMessage(kick.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** kicked **"+user_name+"** from **"+guild_name+"**").build()).queue();
+				e.getGuild().getTextChannelById(channel_id).sendMessage(kick.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** kicked **"+user_name+"** from **"+guild_name+"**"+kick_reason).build()).queue();
 			}
 			else if(IniFileReader.getLeaveMessage().equals("true")){
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from **"+guild_name+"**").build()).queue();

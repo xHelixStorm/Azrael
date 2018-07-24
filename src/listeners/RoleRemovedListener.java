@@ -38,7 +38,7 @@ public class RoleRemovedListener extends ListenerAdapter{
 		SqlConnect.SQLgetData(user_id, guild_id);
 		
 		if(!UserPrivs.isUserMuted(e.getUser(), guild_id) &&(SqlConnect.getUnmute().getTime() - System.currentTimeMillis()) > 0){
-			if(SqlConnect.getUser_id() != 0){SqlConnect.SQLUpdateMuted(user_id, guild_id, false);}
+			if(SqlConnect.getUser_id() != 0){SqlConnect.SQLUpdateMuted(user_id, guild_id, false, false);}
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			
 			SqlConnect.SQLgetChannelID(guild_id, "log");
@@ -49,7 +49,7 @@ public class RoleRemovedListener extends ListenerAdapter{
 			SqlConnect.SQLInsertActionLog("MEMBER_MUTE_REMOVE_HALFWAY", user_id, guild_id, "Mute role removed manually");
 		}
 		else if(!UserPrivs.isUserMuted(e.getUser(), guild_id) && SqlConnect.getUser_id() != 0){
-			SqlConnect.SQLUpdateMuted(user_id, guild_id, false);
+			SqlConnect.SQLUpdateMuted(user_id, guild_id, false, false);
 			SqlConnect.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild_id, "Mute role removed");
 		}
 		SqlConnect.clearAllVariables();
