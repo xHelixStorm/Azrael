@@ -81,14 +81,8 @@ public class RankingMethods extends ListenerAdapter{
 			BufferedImage rank = ImageIO.read(new File("./pictures/RankingSystem/S4League/rank"+_rank_skin+"_blank.png"));
 			BufferedImage experienceBar = ImageIO.read(new File("./pictures/RankingSystem/S4League/ExperienceBar/exp"+_bar_color+"_"+_experience+".png"));
 			BufferedImage level = ImageIO.read(new File("./pictures/RankingSystem/S4League/Rank/level_"+_icon_skin+"_"+_level+".jpg"));
-			String avatar = "";
-			try {
-				avatar = e.getMember().getUser().getAvatarUrl();
-				if(avatar.isEmpty()) {/*trigger NullPointerException if null*/}
-			} catch(NullPointerException npe) {
-				avatar = e.getMember().getUser().getDefaultAvatarUrl();
-			}
-			final String urlStr = avatar;
+			
+			final String urlStr = e.getMember().getUser().getEffectiveAvatarUrl();
 			final URL url = new URL(urlStr);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestProperty(
@@ -141,14 +135,8 @@ public class RankingMethods extends ListenerAdapter{
 			BufferedImage profile = ImageIO.read(new File("./pictures/RankingSystem/S4League/profile"+_profile_skin+"_blank.png"));
 			BufferedImage experienceBar = ImageIO.read(new File("./pictures/RankingSystem/S4League/ExperienceBar/exp"+_bar_color+"_"+_experiencePercentage+".png"));
 			BufferedImage level = ImageIO.read(new File("./pictures/RankingSystem/S4League/Rank/level_"+_icon_skin+"_"+_level+".jpg"));
-			String avatar = "";
-			try {
-				avatar = e.getMember().getUser().getAvatarUrl();
-				if(avatar.isEmpty()) {/*trigger NullPointerException if null*/}
-			} catch(NullPointerException npe) {
-				avatar = e.getMember().getUser().getDefaultAvatarUrl();
-			}
-			final URL url = new URL(avatar);
+			
+			final URL url = new URL(e.getMember().getUser().getEffectiveAvatarUrl());
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestProperty(
 			    "User-Agent",
