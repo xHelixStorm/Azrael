@@ -63,7 +63,7 @@ public class BanListener extends ListenerAdapter{
 			SqlConnect.SQLInsertData(user_id, guild_id, 4, 2, timestamp, timestamp, true, false);
 		}
 		SqlConnect.SQLUpdateMuted(user_id, guild_id, true, false);
-		SqlConnect.SQLInsertActionLog("MEMBER_BAN_ADD", user_id, guild_id, "Ban added");
+		SqlConnect.SQLInsertActionLog("MEMBER_BAN_ADD", user_id, guild_id, "User Banned");
 		SqlConnect.clearAllVariables();
 	}
 }

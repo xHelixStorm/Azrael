@@ -55,6 +55,9 @@ public class GuildLeaveListener extends ListenerAdapter{
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from **"+guild_name+"**").build()).queue();
 			}
 		}
+		if(trigger_user_name.length() > 0) {
+			SqlConnect.SQLInsertActionLog("MEMBER_KICK", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
+		}
 		SqlConnect.clearAllVariables();
 	}
 }

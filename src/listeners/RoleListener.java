@@ -21,7 +21,7 @@ public class RoleListener extends ListenerAdapter{
 	
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent e){
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getMuteThumbnail()).setTitle("A user has been muted!");
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setTitle("A user has been muted!");
 		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN).setTitle("Mute Retracted!");
 		EmbedBuilder message3 = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getBanThumbnail()).setTitle("User banned!");
 		
@@ -120,7 +120,7 @@ public class RoleListener extends ListenerAdapter{
 					e.getGuild().getTextChannelById(channel_id).sendMessage(message2.setDescription("The mute role has been set on someone with higher privileges. Mute role removed!").build()).queue();
 				}
 			}
-			SqlConnect.SQLInsertActionLog("MEMBER_MUTE_ADD", user_id, guild_id, "Mute role assigned");
+			SqlConnect.SQLInsertActionLog("MEMBER_MUTE_ADD", user_id, guild_id, "User Muted");
 			ServerRoles.clearAllVariables();
 			RankingDB.clearAllVariables();
 			SqlConnect.clearAllVariables();
