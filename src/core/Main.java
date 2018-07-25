@@ -11,6 +11,7 @@ import commands.About;
 import commands.Commands;
 import commands.Daily;
 import commands.Display;
+import commands.Filter;
 import commands.Help;
 import commands.Inventory;
 import commands.Meow;
@@ -121,6 +122,7 @@ public class Main {
 		CommandHandler.commands.put("inventory", new Inventory());
 		CommandHandler.commands.put("daily", new Daily());
 		CommandHandler.commands.put("user", new User());
+		CommandHandler.commands.put("filter", new Filter());
 	}
 	
 	public static void addListeners(){
