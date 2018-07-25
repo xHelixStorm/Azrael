@@ -9,13 +9,13 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import sql.RankingDB;
 import sql.ServerRoles;
 import sql.SqlConnect;
-import util.BannedNames;
 
 public class GuildListener extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent e){
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
+		EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
 		
 		long user_id = e.getMember().getUser().getIdLong();
 		String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
@@ -61,22 +61,29 @@ public class GuildListener extends ListenerAdapter {
 			RankingDB.clearAllVariables();
 		}
 		
-		String lc_user_name = user_name.toLowerCase();
-		check: for(String word : BannedNames.listOfBadnames()){
-			if(lc_user_name.contains(word) || lc_user_name.contains("["+word+"]")){
-				String nickname = BannedNames.selectRandomName();
-				e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
-				e.getGuild().getTextChannelById(channel_id).sendMessage("**"+user_name+"** joined this Server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").queue();
-				badName = true;
-				break check;
+		if(IniFileReader.getNameFilter().equals("true")) {
+			String lc_user_name = user_name.toLowerCase();
+			SqlConnect.SQLgetNameFilter();
+			check: for(String word : SqlConnect.getNames()){
+				if(lc_user_name.contains(word) || lc_user_name.contains("["+word+"]")){
+					SqlConnect.SQLgetRandomName();
+					String nickname = SqlConnect.getName();
+					e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
+					e.getGuild().getTextChannelById(channel_id).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this Server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
+					badName = true;
+					break check;
+				}
+				else{
+					badName = false;
+				}
 			}
-			else{
-				badName = false;
+			SqlConnect.clearNames();
+			if(badName == false){
+				SqlConnect.SQLDeleteNickname(user_id, guild_id);
 			}
 		}
-		if(badName == false){
-			SqlConnect.SQLDeleteNickname(user_id, guild_id);
-		}
+		
 		SqlConnect.SQLInsertActionLog("GUILD_MEMBER_JOIN", user_id, guild_id, user_name);
+		SqlConnect.clearAllVariables();
 	}
 }

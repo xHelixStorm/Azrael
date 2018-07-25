@@ -15,7 +15,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import sql.ServerRoles;
 import sql.SqlConnect;
 import threads.DelayDelete;
-import util.BannedWords;
+import util.CharacterReplacer;
 
 public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 	
@@ -41,11 +41,11 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 			String filename = e.getMember().getUser().getId();
 			String report;
 			
-			parseMessage = BannedWords.replace(getMessage);
+			parseMessage = CharacterReplacer.replace(getMessage);
 			parseMessage = parseMessage.toLowerCase();
 			int letterCounter = parseMessage.length();
 			
-			for(String exceptions : BannedWords.getExceptions()){
+			for(String exceptions : CharacterReplacer.getExceptions()){
 				if(parseMessage.equals(exceptions) || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+exceptions+"(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + exceptions + "(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + exceptions + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || parseMessage.matches(exceptions+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+exceptions+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.contains(" "+exceptions+" ")){
 					exceptionFound = true;
 				}
