@@ -13,7 +13,7 @@ public class HelpText {
 		boolean entertainment = false;
 		boolean other = false;
 		
-		if(IniFileReader.getShutDownCommand().equals("true") || IniFileReader.getRebootCommand().equals("true") || IniFileReader.getRegisterCommand().equals("true") || IniFileReader.getSetCommand().equals("true")){
+		if(IniFileReader.getShutDownCommand().equals("true") || IniFileReader.getRebootCommand().equals("true") || IniFileReader.getRegisterCommand().equals("true") || IniFileReader.getSetCommand().equals("true") || IniFileReader.getUserCommand().equals("true") || IniFileReader.getFilterCommand().equals("true")){
 			administration = true;
 		}
 		
@@ -30,6 +30,8 @@ public class HelpText {
 		if(IniFileReader.getRebootCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"reboot**\nrestarts the Bot(can be used only from a GS or GM)\n\n");
 		if(IniFileReader.getRegisterCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"register**\nregister channel, role, ranking role or users with the database\n\n");
 		if(IniFileReader.getSetCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"set**\nset set specific paramater to configure your bot and server\n\n");
+		if(IniFileReader.getUserCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"user**\nchoose between various actions that you can take against a user\n\n");
+		if(IniFileReader.getFilterCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"filter**\ndecide to view, add or remove words/names from various filters or funky names\n\n");
 		if(entertainment == true)textCollector.add("**_Entertainment:_**\n");
 		if(IniFileReader.getPugCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"pug**\nshows a pug picture. Use help as a parameter to get a list of all parameters\n\n");
 		if(IniFileReader.getMeowCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"meow**\nshows a cat picture. Use help as a parameter to get a list of all parameters\n\n");

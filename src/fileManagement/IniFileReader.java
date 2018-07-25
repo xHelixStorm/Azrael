@@ -217,4 +217,8 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Commands", "User");
 	}
+	public static String getFilterCommand(){
+		readConfig();
+		return ini.get("Commands", "Filter");
+	}
 }
