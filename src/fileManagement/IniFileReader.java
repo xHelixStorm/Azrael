@@ -25,6 +25,14 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Bot", "Admin");
 	}
+	public static String getNameFilter(){
+		readConfig();
+		return ini.get("Bot", "NameFilter");
+	}
+	public static String getActionLog(){
+		readConfig();
+		return ini.get("Bot", "ActionLog");
+	}
 	public static String getCommandPrefix(){
 		readConfig();
 		return ini.get("Bot", "CommandPrefix");
@@ -124,6 +132,14 @@ public class IniFileReader {
 	public static String getKickThumbnail() {
 		readConfig();
 		return ini.get("Thumbnails", "Kick");
+	}
+	public static String getCatchedThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "Catched");
+	}
+	public static String getFalseAlarmThumbnail() {
+		readConfig();
+		return ini.get("Thumbnails", "FalseAlarm");
 	}
 	public static String getAboutCommand(){
 		readConfig();
