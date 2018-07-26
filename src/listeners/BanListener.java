@@ -24,7 +24,7 @@ public class BanListener extends ListenerAdapter{
 		first_entry: for (AuditLogEntry entry : logs)
 		{
 			ServerRoles.SQLgetRole(e.getGuild().getIdLong(), "mut");
-			if(entry.getType().toString().equals("MEMBER_BAN_ADD") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {
+			if(entry.getType().toString().equals("BAN") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {
 				trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 				ban_reason = entry.getReason();
 				ban_reason = !ban_reason.equals("") ? "\nReason: "+ban_reason : "";
