@@ -2,7 +2,7 @@
 Discord Bot for moderation purposes with entertainment features
 
 ### Config.ini
-choose commands that you want to enable, implement links to thumbnails for various features, include your user id to show that you are the admin of the bot, insert your secret token after you have created a new Bot user, insert your login credentials for the mysql databases and more!
+choose commands that you want to enable, implement links to thumbnails for various features, include your user id to show that you are the admin of the bot, insert your secret token after you have created a new Bot user, insert your login credentials for the mysql databases, include your Pastebin account and more!
 
 ### Register the server
 - Let the bot know the hierarchy of your Discord server by using the register command. Set which role belongs to an admin, which to a moderator, to a normal community member and to the bots.
