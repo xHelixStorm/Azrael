@@ -74,7 +74,7 @@ public class RankingMethods extends ListenerAdapter{
 		}
 	}
 	
-	public static void getRank(MessageReceivedEvent e, int _experience, int _level, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
+	public static void getRank(MessageReceivedEvent e, String _name, String _avatar, int _experience, int _level, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
 		try{
 			STATIC.allowCertificates();
 			
@@ -82,15 +82,14 @@ public class RankingMethods extends ListenerAdapter{
 			BufferedImage experienceBar = ImageIO.read(new File("./pictures/RankingSystem/S4League/ExperienceBar/exp"+_bar_color+"_"+_experience+".png"));
 			BufferedImage level = ImageIO.read(new File("./pictures/RankingSystem/S4League/Rank/level_"+_icon_skin+"_"+_level+".jpg"));
 			
-			final String urlStr = e.getMember().getUser().getEffectiveAvatarUrl();
-			final URL url = new URL(urlStr);
+			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestProperty(
 			    "User-Agent",
 			    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.65 Safari/537.31");
 			final BufferedImage avatarPicture = ImageIO.read(connection.getInputStream());
 			
-			String name = e.getMember().getEffectiveName();
+			String name = _name;
 			int characterCounter = name.length();
 			int levelT = _experience;
 			
@@ -128,7 +127,7 @@ public class RankingMethods extends ListenerAdapter{
 		}
 	}
 	
-	public static void getProfile(MessageReceivedEvent e, int _experiencePercentage, int _level, float _currentExperience, float _rankUpExperience, long _experience, long _currency, int _rank, int _profile_skin, int _icon_skin, int _bar_color, boolean _additional_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
+	public static void getProfile(MessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _level, float _currentExperience, float _rankUpExperience, long _experience, long _currency, int _rank, int _profile_skin, int _icon_skin, int _bar_color, boolean _additional_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
 		try{
 			STATIC.allowCertificates();
 			
@@ -136,14 +135,14 @@ public class RankingMethods extends ListenerAdapter{
 			BufferedImage experienceBar = ImageIO.read(new File("./pictures/RankingSystem/S4League/ExperienceBar/exp"+_bar_color+"_"+_experiencePercentage+".png"));
 			BufferedImage level = ImageIO.read(new File("./pictures/RankingSystem/S4League/Rank/level_"+_icon_skin+"_"+_level+".jpg"));
 			
-			final URL url = new URL(e.getMember().getUser().getEffectiveAvatarUrl());
+			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestProperty(
 			    "User-Agent",
 			    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.65 Safari/537.31");
 			final BufferedImage avatarPicture = ImageIO.read(connection.getInputStream());
 			
-			String name = e.getMember().getEffectiveName();
+			String name = _name;
 			int characterCounter = name.length();
 			int levelT = _experiencePercentage;
 			int currentExperience = (int) _currentExperience;
