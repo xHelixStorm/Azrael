@@ -94,7 +94,7 @@ public class RankingDB {
 	private static ArrayList<Dailies> dailies = new ArrayList<Dailies>();
 	
 	private static String username = IniFileReader.getSQLUsername2();
-	private static String password = IniFileReader.getSQLPassword2();
+	private static String password = IniFileReader.getSQLPassword2().equals("null") ? null : IniFileReader.getSQLPassword2();
 	
 	public static void SQLconnection(){
 		try {

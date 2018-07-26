@@ -39,10 +39,11 @@ public class SqlConnect {
 	private static ArrayList<Channels> channels = new ArrayList<Channels>();
 	private static ArrayList<String> filter_lang = new ArrayList<String>();
 	private static ArrayList<String> filter_words = new ArrayList<String>();
+	private static ArrayList<String> names = new ArrayList<String>();
 	private static ArrayList<String> descriptions = new ArrayList<String>();
 	
 	private static String username = IniFileReader.getSQLUsername();
-	private static String password = IniFileReader.getSQLPassword();
+	private static String password = IniFileReader.getSQLPassword().equals("null") ? null : IniFileReader.getSQLPassword();
 	
 	
 	public static void SQLconnection(){
@@ -54,24 +55,26 @@ public class SqlConnect {
 	}
 	
 	public static synchronized void SQLInsertActionLog(String _event, long _target_id, long _guild_id, String _description) {
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO action_log (log_id, event, target_id, guild_id, description, timestamp) VALUES(null, ?, ?, ?, ?, ?)");
-			Timestamp action_time = new Timestamp(System.currentTimeMillis());
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _event);
-			stmt.setLong(2, _target_id);
-			stmt.setLong(3, _guild_id);
-			stmt.setString(4, _description);
-			stmt.setTimestamp(5, action_time);
-			stmt.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		if(IniFileReader.getActionLog().equals("true")) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("INSERT INTO action_log (log_id, event, target_id, guild_id, description, timestamp) VALUES(null, ?, ?, ?, ?, ?)");
+				Timestamp action_time = new Timestamp(System.currentTimeMillis());
+				stmt = myConn.prepareStatement(sql);
+				stmt.setString(1, _event);
+				stmt.setLong(2, _target_id);
+				stmt.setLong(3, _guild_id);
+				stmt.setString(4, _description);
+				stmt.setTimestamp(5, action_time);
+				stmt.executeUpdate();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
 		}
 	}
 	
@@ -839,6 +842,59 @@ public class SqlConnect {
 		}
 	}
 	
+	public static void SQLInsertWordFilter(String _lang, String _word) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE word=VALUES(word)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _word);
+			stmt.setString(2, _lang);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLDeleteWordFilter(String _lang, String _word) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM filter WHERE word LIKE ? && fk_lang_abbrv LIKE ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _word);
+			stmt.setString(2, _lang);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLDeleteLangWordFilter(String _lang) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM filter WHERE fk_lang_abbrv LIKE ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _lang);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static void SQLInsertChannel_Filter(long _channel_id, String _filter_lang){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -874,6 +930,190 @@ public class SqlConnect {
 		}
 	}
 	
+	public static void SQLgetNameFilter() {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT word FROM name_filter");
+			stmt = myConn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				names.add(rs.getString(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLInsertNameFilter(String _word) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO name_filter (word_id, word) VALUES(NULL, ?) ON DUPLICATE KEY UPDATE word=VALUES(word)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _word);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLDeleteNameFilter(String _word) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM name_filter WHERE word LIKE ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _word);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLDeleteWholeNameFilter() {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM name_filter");
+			stmt = myConn.prepareStatement(sql);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLgetFunnyNames() {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT name FROM names");
+			stmt = myConn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				names.add(rs.getString(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLInsertFunnyNames(String _word) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO names (name_id, name) VALUES(NULL, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _word);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLDeleteFunnyNames(String _word) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM names WHERE name LIKE ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _word);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLDeleteWholeFunnyNames() {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM names");
+			stmt = myConn.prepareStatement(sql);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLgetRandomName() {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT name FROM names ORDER BY RAND() LIMIT 1");
+			stmt = myConn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				setName(rs.getString(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLgetFilterLanguages() {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv NOT LIKE \"all\"");
+			stmt = myConn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				filter_lang.add(rs.getString(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	//Transactions
 	@SuppressWarnings("resource")
 	public static void SQLLowerTotalWarning(long _guild_id, int _warning_id){
@@ -893,6 +1133,88 @@ public class SqlConnect {
 			stmt = myConn.prepareStatement(sql2);
 			stmt.setInt(1, _warning_id);
 			stmt.executeUpdate();
+			myConn.commit();	
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				myConn.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLReplaceWordFilter(String _lang, ArrayList<String> _words){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false);
+			
+			for(String word : _words) {
+				String sql2 = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv) VALUES(NULL, ?, ?)");
+				stmt = myConn.prepareStatement(sql2);
+				stmt.setString(1, word);
+				stmt.setString(2, _lang);
+				stmt.executeUpdate();
+			}
+			myConn.commit();	
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				myConn.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLReplaceNameFilter(ArrayList<String> _words){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false);
+			
+			for(String word : _words) {
+				String sql2 = ("INSERT INTO name_filter (word_id, word) VALUES(NULL, ?)");
+				stmt = myConn.prepareStatement(sql2);
+				stmt.setString(1, word);
+				stmt.executeUpdate();
+			}
+			myConn.commit();	
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				myConn.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLReplaceFunnyNames(ArrayList<String> _words){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Test?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false);
+			
+			for(String word : _words) {
+				String sql2 = ("INSERT INTO names (name_id, name) VALUES(NULL, ?)");
+				stmt = myConn.prepareStatement(sql2);
+				stmt.setString(1, word);
+				stmt.executeUpdate();
+			}
 			myConn.commit();	
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1041,6 +1363,9 @@ public class SqlConnect {
 	public static ArrayList<String> getDescriptions(){
 		return descriptions;
 	}
+	public static ArrayList<String> getNames(){
+		return names;
+	}
 	public static Date getTimestamp(){
 		return timestamp;
 	}
@@ -1065,6 +1390,9 @@ public class SqlConnect {
 	}
 	public static void clearDescriptions() {
 		descriptions.clear();
+	}
+	public static void clearNames() {
+		names.clear();
 	}
 	public static void clearAllVariables(){
 		setUser_id(0);

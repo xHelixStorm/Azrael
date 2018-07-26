@@ -22,7 +22,7 @@ public class ServerRoles {
 	private static ArrayList<Roles> roles = new ArrayList<Roles>();
 	
 	private static String username = IniFileReader.getSQLUsername3();
-	private static String password = IniFileReader.getSQLPassword3();
+	private static String password = IniFileReader.getSQLPassword3().equals("null") ? null : IniFileReader.getSQLPassword3();
 	
 	public static void SQLconnection(){
 		try {
