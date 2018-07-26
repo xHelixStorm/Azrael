@@ -83,19 +83,19 @@ public class IniFileReader {
 	}
 	public static String getSQLUsername(){
 		readConfig();
-		return ini.get("SqlConnect", "Username");
+		return ini.get("Azrael", "Username");
 	}
 	public static String getSQLPassword(){
 		readConfig();
-		return ini.get("SqlConnect", "Password");
+		return ini.get("Azrael", "Password");
 	}
 	public static String getSQLUsername2(){
 		readConfig();
-		return ini.get("RankingDB", "Username");
+		return ini.get("RankingSystem", "Username");
 	}
 	public static String getSQLPassword2(){
 		readConfig();
-		return ini.get("RankingDB", "Password");
+		return ini.get("RankingSystem", "Password");
 	}
 	public static String getSQLUsername3(){
 		readConfig();
