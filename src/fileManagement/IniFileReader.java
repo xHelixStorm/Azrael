@@ -69,29 +69,41 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Messages", "CacheLog");
 	}
+	public static String getPastebinKey() {
+		readConfig();
+		return ini.get("Pastebin", "Key");
+	}
+	public static String getPastebinUsername() {
+		readConfig();
+		return ini.get("Pastebin", "Username");
+	}
+	public static String getPastebinPassword() {
+		readConfig();
+		return ini.get("Pastebin", "Password");
+	}
 	public static String getSQLUsername(){
 		readConfig();
-		return ini.get("SqlConnect", "username");
+		return ini.get("SqlConnect", "Username");
 	}
 	public static String getSQLPassword(){
 		readConfig();
-		return ini.get("SqlConnect", "password");
+		return ini.get("SqlConnect", "Password");
 	}
 	public static String getSQLUsername2(){
 		readConfig();
-		return ini.get("RankingDB", "username");
+		return ini.get("RankingDB", "Username");
 	}
 	public static String getSQLPassword2(){
 		readConfig();
-		return ini.get("RankingDB", "password");
+		return ini.get("RankingDB", "Password");
 	}
 	public static String getSQLUsername3(){
 		readConfig();
-		return ini.get("DiscordRoles", "username");
+		return ini.get("DiscordRoles", "Username");
 	}
 	public static String getSQLPassword3(){
 		readConfig();
-		return ini.get("DiscordRoles", "password");
+		return ini.get("DiscordRoles", "Password");
 	}
 	public static String getPugThumbnail() {
 		readConfig();
