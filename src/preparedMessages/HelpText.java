@@ -37,14 +37,14 @@ public class HelpText {
 		if(IniFileReader.getMeowCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"meow**\nshows a cat picture. Use help as a parameter to get a list of all parameters\n\n");
 		if(IniFileReader.getRankCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"rank**\nshows the players actual rank\n\n");
 		if(IniFileReader.getProfileCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"profile**\nshows the players actual rank with more informations\n\n");
-		if(IniFileReader.getTopCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"top**\nshows the top 10 ranking (still in beta phase\n\n");
+		if(IniFileReader.getTopCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"top**\nshows the top 10 ranking\n\n");
 		if(IniFileReader.getUseCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"use**\nto use an item from your inventory\n\n");
-		if(IniFileReader.getShopCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"shop**\ndisplay the content of the shop\n\n");
-		if(IniFileReader.getInventoryCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"inventory**\ndisplays the content in your inventory\n\n");
+		if(IniFileReader.getShopCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"shop**\ndisplay the content in the shop\n\n");
+		if(IniFileReader.getInventoryCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"inventory**\ndisplays the content inside your inventory\n\n");
 		if(IniFileReader.getPurchaseCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"purchase**\nto purchase and item or skin from the shop\n\n");
 		if(IniFileReader.getDailyCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"daily**\nto get a daily reward\n\n");
 		if(other == true)textCollector.add("**_Other:_**\n");
-		if(IniFileReader.getAboutCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"about**\nshows all informations regarding this Bot\n\n");
+		if(IniFileReader.getAboutCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"about**\nshows all information regarding this Bot\n\n");
 		if(IniFileReader.getHelpCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"help**\nshows a link to our tech thread on forum\n\n");
 		if(IniFileReader.getDisplayCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"display**\nshows details of registered roles, rank level, channel filter, etc. (few parameters may be restricted)\n\n");
 		
