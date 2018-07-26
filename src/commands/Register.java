@@ -55,7 +55,7 @@ public class Register implements Command{
 								+ "**"+IniFileReader.getCommandPrefix()+"register -role**\n\n"
 							+ "Description to register a channel:\n"
 								+ "**"+IniFileReader.getCommandPrefix()+"register -text-channel**\n\n"
-							+ "Description to register all channels:\n"
+							+ "Syntax to register all channels:\n"
 								+ "**"+IniFileReader.getCommandPrefix()+"register -text-channels**\n\n"
 							+ "Description to register a ranking role:\n"
 								+ "**"+IniFileReader.getCommandPrefix()+"register -ranking-role**\n\n"
