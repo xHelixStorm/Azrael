@@ -32,3 +32,16 @@ Actions can be taken for the
 - funny-names: List with names that a user will receive when the a word from the name-filter list is included in the name.
 
 After choosing a list, four different actions can be taken. To display the current list by uploading it on pastebin as unlisted with a 24 hours expiration date, to insert or remove a word/name and to load all words or names from a txt file into the database. While loading from the file, all old entries will be removed.
+
+### Ranking system
+Create and bind roles with the ranking system and combine it with levels to unlock them. The highest unlocked role will be automatically assigned and can be used to give more privileges to those that have unlocked an higher role (as example). Use the profile and rank command to display your current level and experience points needed to rank up. Use the shop to purchase different skins and items and see them in your inventory. 
+
+### Pugs and Cats
+Use the dedicated commands to bring up pictures of pugs or cats into the chat.
+
+### Requirements
+- Java Runtime Environment 8 required
+- To use only on one server at the same time (will make it compatible to multiple servers at the same time shortly)
+- At least 2gb free ram recommended for long up times and busy servers (minimum 1gb)
+- MySQL databases (personally used Xampp on windows, mysql with apache and phpmyadmin on Raspberry Pi and Plesk )
+  Needed databases with sql files can be found above in the mysql folder
