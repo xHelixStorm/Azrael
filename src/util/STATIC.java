@@ -10,7 +10,7 @@ import fileManagement.FileSetting;
 public class STATIC {
 	
 	private static final String VERSION_OLD = FileSetting.readFile("./files/version.azr");
-	private static final String VERSION_NEW = "9.0.0";
+	private static final String VERSION_NEW = "12.0.1";
 	
 	public static void allowCertificates(){	
 		TrustManager[] trustAllCerts = new TrustManager[]{
