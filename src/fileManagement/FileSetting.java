@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 public class FileSetting {
 private static PrintWriter pw;
@@ -47,6 +48,35 @@ private static PrintWriter pw;
 					line = br.readLine();
 				}
 				String content = sb.toString();
+				return content;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}finally {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static ArrayList<String> readFileIntoArray(String _name){
+		ArrayList<String> content = new ArrayList<String>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(_name));
+			try {
+				StringBuilder sb = new StringBuilder();
+				String line = br.readLine();
+				
+				while(line != null){
+					content.add(line);
+					sb.append(System.lineSeparator());
+					line = br.readLine();
+				}
 				return content;
 			} catch (IOException e) {
 				e.printStackTrace();
