@@ -20,6 +20,7 @@ public class GuildLeaveListener extends ListenerAdapter{
 		
 		String trigger_user_name = "";
 		String kick_reason = "";
+		boolean banned = false;
 		AuditLogPaginationAction logs = e.getGuild().getAuditLogs();
 		first_entry: for (AuditLogEntry entry : logs)
 		{
@@ -27,6 +28,9 @@ public class GuildLeaveListener extends ListenerAdapter{
 				trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 				kick_reason = entry.getReason();
 				kick_reason = !kick_reason.equals("") ? "\nReason: "+kick_reason : "";
+			}
+			else if(entry.getType().toString().equals("BAN") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {
+				banned = true;
 			}
 			break first_entry;
 		}
@@ -51,7 +55,7 @@ public class GuildLeaveListener extends ListenerAdapter{
 			else if(trigger_user_name.length() > 0) {
 				e.getGuild().getTextChannelById(channel_id).sendMessage(kick.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** kicked **"+user_name+"** from **"+guild_name+"**"+kick_reason).build()).queue();
 			}
-			else if(IniFileReader.getLeaveMessage().equals("true")){
+			else if(IniFileReader.getLeaveMessage().equals("true") && banned == false){
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from **"+guild_name+"**").build()).queue();
 			}
 		}
