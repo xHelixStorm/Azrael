@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import commandsContainer.FilterExecution;
 import commandsContainer.SetWarning;
 import commandsContainer.UserExecution;
 import core.Hashes;
@@ -30,6 +31,7 @@ public class MessageListener extends ListenerAdapter{
 		try {
 			File warning = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
 			File user = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
+			File filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
 			
 			long user_id = e.getMember().getUser().getIdLong();
 			long guild_id = e.getGuild().getIdLong();
@@ -56,6 +58,10 @@ public class MessageListener extends ListenerAdapter{
 			
 			if(warning.exists()) {
 				SetWarning.performUpdate(e, message);
+			}
+			
+			if(filter.exists()) {
+				FilterExecution.performAction(e, message);
 			}
 			
 			if(user.exists()){
