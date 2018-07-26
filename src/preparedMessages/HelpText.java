@@ -26,8 +26,8 @@ public class HelpText {
 		}
 		
 		if(administration == true)textCollector.add("**_Administration:_**\n");
-		if(IniFileReader.getShutDownCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"shutdown**\nturns the bot off (can be used only from a GS or GM)\n\n");
-		if(IniFileReader.getRebootCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"reboot**\nrestarts the Bot(can be used only from a GS or GM)\n\n");
+		if(IniFileReader.getShutDownCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"shutdown**\nturns the bot off (can be used only from an admin or mod)\n\n");
+		if(IniFileReader.getRebootCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"reboot**\nrestarts the Bot(can be used only from an admin or mod)\n\n");
 		if(IniFileReader.getRegisterCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"register**\nregister channel, role, ranking role or users with the database\n\n");
 		if(IniFileReader.getSetCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"set**\nset set specific paramater to configure your bot and server\n\n");
 		if(IniFileReader.getUserCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"user**\nchoose between various actions that you can take against a user\n\n");
