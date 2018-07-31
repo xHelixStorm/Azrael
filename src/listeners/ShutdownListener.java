@@ -1,7 +1,9 @@
 package listeners;
 
+import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import fileManagement.FileSetting;
@@ -16,15 +18,13 @@ public class ShutdownListener extends ListenerAdapter{
 	public void onShutdown(ShutdownEvent e){
 		String filecontent = FileSetting.readFile("./files/reboot.azr");
 		
+		try {
+			FileUtils.forceDelete(new File(IniFileReader.getTempDirectory()));
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
+		
 		if(SystemUtils.IS_OS_LINUX) {
-			try {
-				Process proc;
-				proc = Runtime.getRuntime().exec("rm -rf "+IniFileReader.getTempDirectory());
-				proc.waitFor();
-			} catch (InterruptedException | IOException e1) {
-				e1.printStackTrace();
-			}
-			
 			if(filecontent.contains("1")){
 				try {
 					Process proc;
@@ -35,15 +35,7 @@ public class ShutdownListener extends ListenerAdapter{
 				}
 			}
 		}
-		else if(SystemUtils.IS_OS_WINDOWS) {
-			try {
-				Process proc;
-				proc = Runtime.getRuntime().exec("rd /s /q "+IniFileReader.getTempDirectory());
-				proc.waitFor();
-			} catch (InterruptedException | IOException e1) {
-				e1.printStackTrace();
-			}
-			
+		else if(SystemUtils.IS_OS_WINDOWS) {			
 			if(filecontent.contains("1")){
 				try {
 					Process proc;
