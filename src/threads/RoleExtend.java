@@ -39,7 +39,7 @@ public class RoleExtend implements Runnable{
 				SqlConnect.SQLgetData(member.getUser().getIdLong(), guild_id);
 				long unmute = (SqlConnect.getUnmute().getTime() - System.currentTimeMillis());
 				if(unmute < 0){unmute = 0;}
-				RankingDB.SQLgetUserDetails(member.getUser().getIdLong(), guild_id);
+				RankingDB.SQLgetUserDetails(member.getUser().getIdLong());
 				long assignedRole = RankingDB.getAssignedRole();
 				users.add(member);
 				banHammerFound = true;

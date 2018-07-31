@@ -54,8 +54,8 @@ public class GuildListener extends ListenerAdapter {
 			RankingDB.SQLgetGuild(guild_id);
 			if(RankingDB.getRankingState() == true){
 				RankingDB.SQLInsertUser(user_id, user_name, RankingDB.getRankingLevel(), RankingDB.getRankingRank(), RankingDB.getRankingProfile(), RankingDB.getRankingIcon());
-				RankingDB.SQLgetUserDetails(user_id, guild_id);
-				if(RankingDB.getUserID() == 0){RankingDB.SQLInsertUserDetails(user_id, guild_id, 0, 0, 300, 0, 50000, 0);}
+				RankingDB.SQLgetUserDetails(user_id);
+				if(RankingDB.getUserID() == 0){RankingDB.SQLInsertUserDetails(user_id, 0, 0, 300, 0, 50000, 0);}
 				if(RankingDB.getAssignedRole() != 0){e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(RankingDB.getAssignedRole())).queue();}
 			}
 			RankingDB.clearAllVariables();

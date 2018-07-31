@@ -37,7 +37,8 @@ public class Rank implements Command{
 					String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_rank.azr";
 					File file = new File(fileName);
 					
-					RankingDB.SQLgetUserUserDetailsGuildRanking(user_id, guild_id);
+					RankingDB.SQLgetUserUserDetailsRanking(user_id);
+					RankingDB.SQLgetGuild(guild_id);
 					boolean ranking_state = RankingDB.getRankingState();
 					
 					if(ranking_state == true){				

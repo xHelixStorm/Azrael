@@ -54,7 +54,7 @@ public class Top implements Command{
 			
 			if(runTopList == true){
 				if(channel_id == channel){
-					RankingDB.SQLRanking(guild_id);
+					RankingDB.SQLRanking();
 					search: for(rankingSystem.Rank ranking1 : RankingDB.getRankList()){
 						if(member_id == ranking1.getUser_id()){
 							rank = ranking1.getRank();
@@ -65,7 +65,7 @@ public class Top implements Command{
 					}
 					
 					RankingDB.clearArrayList();
-					RankingDB.SQLTopRanking(guild_id, page);
+					RankingDB.SQLTopRanking(page);
 					if(RankingDB.getRankList().size() < 10){
 						e.getTextChannel().sendMessage("There aren't at least 10 people on this page and hence it can not be displayed!").queue();
 					}

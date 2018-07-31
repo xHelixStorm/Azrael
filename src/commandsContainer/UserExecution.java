@@ -77,7 +77,7 @@ public class UserExecution {
 						message.addField("JOIN DATE", "**"+_e.getGuild().getMemberById(file_value).getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE)+"**", true);
 						RankingDB.SQLgetGuild(_e.getGuild().getIdLong());
 						if(RankingDB.getRankingState()) {
-							RankingDB.SQLgetUserDetails(Long.parseLong(file_value), _e.getGuild().getIdLong());
+							RankingDB.SQLgetUserDetails(Long.parseLong(file_value));
 							message.addField("LEVEL", "**"+RankingDB.getLevel()+"**/**"+RankingDB.getMaxLevel()+"**", true);
 							message.addField("EXPERIENCE", "**"+RankingDB.getCurrentExperience()+"**/**"+RankingDB.getRankUpExperience()+"**", true);
 							message.addBlankField(false);
@@ -303,8 +303,8 @@ public class UserExecution {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					long experience = Long.parseLong(_message);
 					if(experience <= 2147483647) {
-						RankingDB.SQLgetUserDetails(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
-						RankingDB.SQLUpdateExperience(Long.parseLong(file_value.replaceAll("[^0-9]*", "")),  _e.getGuild().getIdLong(), (RankingDB.getCurrentExperience()+(int) experience), (RankingDB.getExperience()+experience));
+						RankingDB.SQLgetUserDetails(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
+						RankingDB.SQLUpdateExperience(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), (RankingDB.getCurrentExperience()+(int) experience), (RankingDB.getExperience()+experience));
 						_e.getTextChannel().sendMessage("Experience points have been updated!").queue();
 						FileSetting.deleteFile(file_path);
 					}
@@ -317,8 +317,8 @@ public class UserExecution {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					long experience = Long.parseLong(_message);
 					if(experience <= 2147483647) {
-						RankingDB.SQLgetUserDetails(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
-						RankingDB.SQLUpdateExperience(Long.parseLong(file_value.replaceAll("[^0-9]*", "")),  _e.getGuild().getIdLong(), (int) experience, (RankingDB.getExperience()-RankingDB.getCurrentExperience()+experience));
+						RankingDB.SQLgetUserDetails(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
+						RankingDB.SQLUpdateExperience(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), (int) experience, (RankingDB.getExperience()-RankingDB.getCurrentExperience()+experience));
 						_e.getTextChannel().sendMessage("Experience points have been updated!").queue();
 						FileSetting.deleteFile(file_path);
 					}
@@ -332,9 +332,9 @@ public class UserExecution {
 					int level = Integer.parseInt(_message);
 					RankingDB.SQLgetGuild(_e.getGuild().getIdLong());
 					if(level <= RankingDB.getMaxLevel()) {
-						RankingDB.SQLgetUserDetails(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
+						RankingDB.SQLgetUserDetails(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
 						RankingDB.SQLgetRole(level);
-						RankingDB.SQLUpdateLevel(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), level, 0, RankingSystemPreferences.getExperienceForRankUp(level), RankingDB.getRoleID());
+						RankingDB.SQLUpdateLevel(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), level, 0, RankingSystemPreferences.getExperienceForRankUp(level), RankingDB.getRoleID());
 						_e.getTextChannel().sendMessage("The level has been updated!").queue();
 						FileSetting.deleteFile(file_path);
 					}

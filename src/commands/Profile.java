@@ -38,7 +38,8 @@ public class Profile implements Command{
 					String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_profile.azr";
 					File file = new File(fileName);
 					
-					RankingDB.SQLgetUserUserDetailsGuildRanking(user_id, guild_id);
+					RankingDB.SQLgetUserUserDetailsRanking(user_id);
+					RankingDB.SQLgetGuild(guild_id);
 					boolean ranking_state = RankingDB.getRankingState();
 					
 					if(ranking_state == true){				
@@ -82,7 +83,7 @@ public class Profile implements Command{
 								convertedExperience = 100;
 							}
 							
-							RankingDB.SQLRanking(guild_id);
+							RankingDB.SQLRanking();
 							search: for(rankingSystem.Rank ranking : RankingDB.getRankList()){
 								if(user_id == ranking.getUser_id()){
 									rank = ranking.getRank();

@@ -104,7 +104,7 @@ public class RankingThreadExecution implements Runnable{
 		experience = RankingSystemPreferences.getTotalExperience(level)+currentExperience;
 		
 		if(max_experience_enabled == true){
-			RankingDB.SQLgetDailyExperience(user_id, guild_id);
+			RankingDB.SQLgetDailyExperience(user_id);
 			daily_experience = RankingDB.getDailyExperience();
 			LocalTime midnight = LocalTime.MIDNIGHT;
 			LocalDate today = LocalDate.now();
@@ -113,7 +113,7 @@ public class RankingThreadExecution implements Runnable{
 			
 			try{
 				if(reset.getTime() - RankingDB.getDailyReset().getTime() != 0){
-					RankingDB.SQLDeleteDailyExperience(user_id, guild_id);
+					RankingDB.SQLDeleteDailyExperience(user_id);
 					daily_experience = 0;
 				}
 			} catch(NullPointerException npe){
@@ -160,13 +160,13 @@ public class RankingThreadExecution implements Runnable{
 					e1.printStackTrace();
 				}
 			}
-			RankingDB.SQLsetLevelUp(user_id, guild_id, level, currentExperience, rankUpExperience, experience, currency, role_id);
-			RankingDB.SQLInsertDailyExperience(daily_experience, user_id, guild_id, reset);
+			RankingDB.SQLsetLevelUp(user_id, level, currentExperience, rankUpExperience, experience, currency, role_id);
+			RankingDB.SQLInsertDailyExperience(daily_experience, user_id, reset);
 			RankingMethods.getRankUp(e, level, level_skin, icon_skin, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
 		}
 		else{
-			RankingDB.SQLUpdateExperience(user_id, guild_id, currentExperience, experience);
-			RankingDB.SQLInsertDailyExperience(daily_experience, user_id, guild_id, reset);
+			RankingDB.SQLUpdateExperience(user_id, currentExperience, experience);
+			RankingDB.SQLInsertDailyExperience(daily_experience, user_id, reset);
 		}
 	}
 	
@@ -196,11 +196,11 @@ public class RankingThreadExecution implements Runnable{
 				}
 			}
 			
-			RankingDB.SQLsetLevelUp(user_id, guild_id, level, currentExperience, rankUpExperience, experience, currency, role_id);
+			RankingDB.SQLsetLevelUp(user_id, level, currentExperience, rankUpExperience, experience, currency, role_id);
 			RankingMethods.getRankUp(e, level, level_skin, icon_skin, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
 		}
 		else{
-			RankingDB.SQLUpdateExperience(user_id, guild_id, currentExperience, experience);
+			RankingDB.SQLUpdateExperience(user_id, currentExperience, experience);
 		}
 	}
 }

@@ -17,7 +17,8 @@ public class Use implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getUseCommand().equals("true")){
-			RankingDB.SQLgetUserUserDetailsGuildRanking(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+			RankingDB.SQLgetUserUserDetailsRanking(e.getMember().getUser().getIdLong());
+			RankingDB.SQLgetGuild(e.getGuild().getIdLong());
 			if(RankingDB.getRankingState() == true){
 				SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 				if(e.getTextChannel().getIdLong() == SqlConnect.getChannelID()){

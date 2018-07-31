@@ -29,8 +29,8 @@ public class CollectUsers implements Runnable{
 			SqlConnect.SQLInsertUser(user_id, name);
 			if(ranking_state == true){
 				RankingDB.SQLInsertUser(user_id, name, RankingDB.getRankingLevel(), RankingDB.getRankingRank(), RankingDB.getRankingProfile(), RankingDB.getRankingIcon());
-				RankingDB.SQLgetUserDetails(user_id, guild_id);
-				RankingDB.SQLInsertUserDetails(user_id, guild_id, 0, 0, 300, 0, 50000, 0);
+				RankingDB.SQLgetUserDetails(user_id);
+				RankingDB.SQLInsertUserDetails(user_id, 0, 0, 300, 0, 50000, 0);
 			}
 		}
 		e.getTextChannel().sendMessage(message.setDescription("User registration is complete!").build()).queue();

@@ -73,8 +73,8 @@ public class Daily implements Command{
 							LocalDateTime tomorrowMidnight = LocalDateTime.of(today, midnight).plusDays(1);
 							Timestamp timestamp2 = Timestamp.valueOf(tomorrowMidnight);
 							if(list.get(random).getType().equals("cur")){
-								RankingDB.SQLgetUserDetails(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
-								RankingDB.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), RankingDB.getCurrency()+Long.parseLong(list.get(random).getDescription().replaceAll("[^0-9]*", "")));
+								RankingDB.SQLgetUserDetails(e.getMember().getUser().getIdLong());
+								RankingDB.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), RankingDB.getCurrency()+Long.parseLong(list.get(random).getDescription().replaceAll("[^0-9]*", "")));
 							}
 							else if(list.get(random).getType().equals("exp")){
 								RankingDB.SQLgetItemIDFromShopContent(list.get(random).getDescription());

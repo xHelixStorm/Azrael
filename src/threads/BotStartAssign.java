@@ -37,7 +37,7 @@ public class BotStartAssign implements Runnable{
 				for(Member member : e.getJDA().getGuildById(guild_id).getMembers()){
 					if(!UserPrivs.isUserBot(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong()) && !UserPrivs.isUserMuted(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong()) && !UserPrivs.isUserCommunity(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong()) && ranking_state == true){
 						RankingDB.SQLInsertUser(member.getUser().getIdLong(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), RankingDB.getRankingLevel(), RankingDB.getRankingRank(), RankingDB.getRankingProfile(), RankingDB.getRankingIcon());
-						RankingDB.SQLgetUserDetails(member.getUser().getIdLong(), guild_id);
+						RankingDB.SQLgetUserDetails(member.getUser().getIdLong());
 						if(RankingDB.getAssignedRole() != 0){
 							roleCheck: for(Role role : member.getRoles()){
 								if(role.getIdLong() == RankingDB.getAssignedRole()){

@@ -65,7 +65,7 @@ public class RoleListener extends ListenerAdapter{
 					long time = System.currentTimeMillis();
 					int warning_id=SqlConnect.getWarningID();
 					
-					RankingDB.SQLgetUserDetails(user_id, guild_id);
+					RankingDB.SQLgetUserDetails(user_id);
 					long assignedRole = RankingDB.getAssignedRole();
 					
 					if(SqlConnect.getCustomTime()) {

@@ -37,7 +37,8 @@ public class MessageListener extends ListenerAdapter{
 			long guild_id = e.getGuild().getIdLong();
 			String message = e.getMessage().getContentRaw();
 			
-			RankingDB.SQLgetUserUserDetailsGuildRanking(user_id, guild_id);
+			RankingDB.SQLgetUserUserDetailsRanking(user_id);
+			RankingDB.SQLgetGuild(guild_id);
 			boolean ranking_state = RankingDB.getRankingState();
 			long channel_id = e.getTextChannel().getIdLong();
 			
