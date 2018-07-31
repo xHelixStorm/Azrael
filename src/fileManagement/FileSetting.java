@@ -26,7 +26,7 @@ private static PrintWriter pw;
 	public static void appendFile(String name, String content){
 		try
 		{
-		    FileWriter fw = new FileWriter(name+".azr", true);
+		    FileWriter fw = new FileWriter(name, true);
 		    fw.write(content);
 		    fw.close();
 		}
