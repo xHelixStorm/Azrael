@@ -545,7 +545,7 @@ public class RankingDB {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO user_details (`fk_user_id`, `level`, `current_experience`, `rank_up_experience`, `total_experience`, `currency`, `current_role`) VALUES (?, ?, ?, ?, ?, ?, ?)");
+			String sql = ("INSERT INTO user_details (`fk_user_id`, `level`, `current_experience`, `rank_up_experience`, `total_experience`, `currency`, `current_role`) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE fk_user_id=VALUES(fk_user_id)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _level);
@@ -650,7 +650,7 @@ public class RankingDB {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT `fk_user_id`, `Level`, `total_experience`, @curRank := @curRank + 1 AS Rank FROM `user_details`, (SELECT @curRank := 0) r WHERE fk_guild_id = ? ORDER BY `total_experience` DESC");
+			String sql = ("SELECT `fk_user_id`, `Level`, `total_experience`, @curRank := @curRank + 1 AS Rank FROM `user_details`, (SELECT @curRank := 0) r ORDER BY `total_experience` DESC");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
 			while(rs.next()){
@@ -679,7 +679,7 @@ public class RankingDB {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT `fk_user_id`, `Level`, `total_experience`, @curRank := @curRank + 1 AS `Rank` FROM `user_details`, (SELECT @curRank := 0) r ORDER BY `total_experience` DESC LIMIT ?, 10");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(2, page);
+			stmt.setInt(1, page);
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				Rank rank = new Rank();
@@ -1244,6 +1244,24 @@ public class RankingDB {
 			stmt.setLong(1, _user_id);
 			stmt.setTimestamp(2, _opened);
 			stmt.setTimestamp(3, _next_daily);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLInsertUserGuild(long _user_id, long _guild_id) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO user_guild (fk_user_id, fk_guild_id) VALUES(?, ?) ON DUPLICATE KEY UPDATE fk_guild_id=VALUES(fk_guild_id)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();

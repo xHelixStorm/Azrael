@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 26. Jul 2018 um 19:07
+-- Erstellungszeit: 31. Jul 2018 um 22:15
 -- Server-Version: 10.1.32-MariaDB
 -- PHP-Version: 5.6.36
 
@@ -42,7 +42,6 @@ CREATE TABLE `dailies_usage` (
 
 CREATE TABLE `daily_experience` (
   `user_id` bigint(20) NOT NULL,
-  `guild_id` bigint(20) NOT NULL,
   `experience` bigint(20) NOT NULL,
   `reset` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -389,13 +388,23 @@ CREATE TABLE `users` (
 
 CREATE TABLE `user_details` (
   `fk_user_id` bigint(20) NOT NULL,
-  `fk_guild_id` bigint(20) NOT NULL,
   `level` int(11) NOT NULL,
   `current_experience` int(11) NOT NULL,
   `rank_up_experience` int(11) NOT NULL,
   `total_experience` bigint(20) NOT NULL,
   `currency` bigint(20) NOT NULL,
   `current_role` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `user_guild`
+--
+
+CREATE TABLE `user_guild` (
+  `fk_user_id` bigint(20) NOT NULL,
+  `fk_guild_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -412,7 +421,7 @@ ALTER TABLE `dailies_usage`
 -- Indizes für die Tabelle `daily_experience`
 --
 ALTER TABLE `daily_experience`
-  ADD PRIMARY KEY (`user_id`,`guild_id`);
+  ADD PRIMARY KEY (`user_id`);
 
 --
 -- Indizes für die Tabelle `daily_items`
@@ -525,6 +534,12 @@ ALTER TABLE `users`
 -- Indizes für die Tabelle `user_details`
 --
 ALTER TABLE `user_details`
+  ADD PRIMARY KEY (`fk_user_id`);
+
+--
+-- Indizes für die Tabelle `user_guild`
+--
+ALTER TABLE `user_guild`
   ADD PRIMARY KEY (`fk_user_id`,`fk_guild_id`),
   ADD KEY `fk_guild_id` (`fk_guild_id`);
 
@@ -606,8 +621,14 @@ ALTER TABLE `users`
 -- Constraints der Tabelle `user_details`
 --
 ALTER TABLE `user_details`
-  ADD CONSTRAINT `user_details_ibfk_1` FOREIGN KEY (`fk_user_id`) REFERENCES `users` (`user_id`),
-  ADD CONSTRAINT `user_details_ibfk_2` FOREIGN KEY (`fk_guild_id`) REFERENCES `guilds` (`guild_id`);
+  ADD CONSTRAINT `user_details_ibfk_1` FOREIGN KEY (`fk_user_id`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints der Tabelle `user_guild`
+--
+ALTER TABLE `user_guild`
+  ADD CONSTRAINT `user_guild_ibfk_1` FOREIGN KEY (`fk_user_id`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `user_guild_ibfk_2` FOREIGN KEY (`fk_guild_id`) REFERENCES `guilds` (`guild_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
