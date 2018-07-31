@@ -1,5 +1,6 @@
 package core;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -54,6 +55,10 @@ public class Main {
 	public static JDABuilder builder;
 	
 	public static void main(String [] args){
+		boolean [] dir = new boolean[2];
+		dir[0] = (new File("./log")).mkdirs();
+		dir[1] = (new File("./message_log")).mkdirs();
+		
 		long time = System.currentTimeMillis();
 		Timestamp timestamp = new Timestamp(time);
 		
