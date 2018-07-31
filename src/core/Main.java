@@ -57,12 +57,13 @@ public class Main {
 		long time = System.currentTimeMillis();
 		Timestamp timestamp = new Timestamp(time);
 		
+		PrintStream out;
 		try {
-			PrintStream out = new PrintStream(new FileOutputStream("log/log"+timestamp.toString()+".txt"));
+			out = new PrintStream(new FileOutputStream("log/log"+timestamp.toString()+".txt"));
 			System.setOut(out);
 			System.setErr(out);
-		} catch (FileNotFoundException e2) {
-			e2.printStackTrace();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
 		}
 		
 		String token = IniFileReader.getToken();

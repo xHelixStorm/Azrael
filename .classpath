@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="lib/slf4j-simple-1.7.25.jar"/>
 	<classpathentry kind="lib" path="lib/JDA-3.7.1_386-withDependencies.jar"/>
 	<classpathentry kind="lib" path="lib/JPastebin.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
