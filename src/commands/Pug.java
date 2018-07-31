@@ -24,7 +24,7 @@ public class Pug implements Command{
 				long channel = e.getTextChannel().getIdLong();
 				long guild_id = e.getGuild().getIdLong();
 				String variable = e.getMessage().getContentRaw();
-				String path = "./pictures/Pug/";
+				String path = "./files/Pug/";
 				
 				SqlConnect.SQLgetChannelID(guild_id, "bot");
 				long channel_id = SqlConnect.getChannelID();

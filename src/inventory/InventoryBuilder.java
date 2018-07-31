@@ -16,8 +16,8 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 public class InventoryBuilder{
 	public static void DrawInventory(MessageReceivedEvent _e, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page){		
 		try{
-			BufferedImage blank_inventory = ImageIO.read(new File("./pictures/RankingSystem/Inventory/inventory_blank.png"));
-			BufferedImage inventory_tab = ImageIO.read(new File("./pictures/RankingSystem/Inventory/inventory_"+_inventory_tab+"_"+_sub_tab+".png"));
+			BufferedImage blank_inventory = ImageIO.read(new File("./files/RankingSystem/Inventory/inventory_blank.png"));
+			BufferedImage inventory_tab = ImageIO.read(new File("./files/RankingSystem/Inventory/inventory_"+_inventory_tab+"_"+_sub_tab+".png"));
 			
 			int startX = 32;
 			int startY = 198;
@@ -36,7 +36,7 @@ public class InventoryBuilder{
 			for(InventoryContent inventory : _items){
 				int x = getDrawPositionX(i);
 				int y = getDrawPositionY(i);
-				BufferedImage item = ImageIO.read(new File("./pictures/RankingSystem/Inventory/items/"+inventory.getDescription()+".png"));
+				BufferedImage item = ImageIO.read(new File("./files/RankingSystem/Inventory/items/"+inventory.getDescription()+".png"));
 				g.drawImage(item, startX+289-(item.getWidth()/2)+x, startY+243-(item.getHeight()/2)+y, null);
 				g.drawString(inventory.getDescription(), startX+getCenteredString(inventory.getDescription(), 288, g)+x, startY+243+180+y);
 				if(inventory.getType().equals("ite")){

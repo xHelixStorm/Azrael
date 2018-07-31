@@ -24,7 +24,7 @@ public class Meow implements Command{
 				long channel = e.getTextChannel().getIdLong();
 				long guild_id = e.getGuild().getIdLong();
 				String variable = e.getMessage().getContentRaw();
-				String path = "./pictures/Cat/";
+				String path = "./files/Cat/";
 				
 				SqlConnect.SQLgetChannelID(guild_id, "bot");
 				long channel_id = SqlConnect.getChannelID();
