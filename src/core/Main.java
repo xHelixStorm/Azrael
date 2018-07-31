@@ -64,7 +64,7 @@ public class Main {
 		
 		PrintStream out;
 		try {
-			out = new PrintStream(new FileOutputStream("log/log"+timestamp.toString()+".txt"));
+			out = new PrintStream(new FileOutputStream("log/log"+timestamp.toString().replaceAll(":", "-")+".txt"));
 			System.setOut(out);
 			System.setErr(out);
 		} catch (FileNotFoundException e1) {
