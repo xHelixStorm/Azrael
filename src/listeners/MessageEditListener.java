@@ -12,7 +12,6 @@ import sql.SqlConnect;
 public class MessageEditListener extends ListenerAdapter{
 	
 	@Override
-	@SuppressWarnings("unlikely-arg-type")
 	public void onMessageUpdate(MessageUpdateEvent e){
 		long channel_id = e.getTextChannel().getIdLong();
 		SqlConnect.SQLgetChannel_Filter(channel_id);;

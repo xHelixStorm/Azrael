@@ -24,7 +24,6 @@ import sql.SqlConnect;
 public class MessageListener extends ListenerAdapter{
 	
 	@Override
-	@SuppressWarnings("unlikely-arg-type")
 	public void onMessageReceived(MessageReceivedEvent e){
 		ExecutorService executor = Executors.newFixedThreadPool(2);
 		
