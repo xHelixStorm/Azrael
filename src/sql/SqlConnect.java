@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import core.Channels;
+import core.Hashes;
 import fileManagement.IniFileReader;
 
 public class SqlConnect {
@@ -814,31 +815,37 @@ public class SqlConnect {
 	}
 	
 	public synchronized static void SQLgetFilter(String _filter_lang){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql;
-			if(_filter_lang.equals("all")){
-				sql = ("SELECT word FROM filter");
-				stmt = myConn.prepareStatement(sql);
+		if(Hashes.getQuerryResult(_filter_lang).isEmpty()) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				String sql;
+				if(_filter_lang.equals("all")){
+					sql = ("SELECT word FROM filter");
+					stmt = myConn.prepareStatement(sql);
+				}
+				else{
+					sql = ("SELECT word FROM filter WHERE fk_lang_abbrv LIKE ?");
+					stmt = myConn.prepareStatement(sql);
+					stmt.setString(1, _filter_lang);
+				}
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					filter_words.add(rs.getString(1));
+				}
+				Hashes.addQuerryResult(_filter_lang, filter_words);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-			else{
-				sql = ("SELECT word FROM filter WHERE fk_lang_abbrv LIKE ?");
-				stmt = myConn.prepareStatement(sql);
-				stmt.setString(1, _filter_lang);
-			}
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				filter_words.add(rs.getString(1));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+		else {
+			filter_words = Hashes.getQuerryResult(_filter_lang);
 		}
 	}
 	
@@ -931,23 +938,29 @@ public class SqlConnect {
 	}
 	
 	public static void SQLgetNameFilter() {
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT word FROM name_filter");
-			stmt = myConn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				names.add(rs.getString(1));
+		if(Hashes.getQuerryResult("bad-name").isEmpty()) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT word FROM name_filter");
+				stmt = myConn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					names.add(rs.getString(1));
+				}
+				Hashes.addQuerryResult("bad-name", names);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+		else {
+			names = Hashes.getQuerryResult("bad-name");
 		}
 	}
 	
@@ -1002,23 +1015,29 @@ public class SqlConnect {
 	}
 	
 	public static void SQLgetFunnyNames() {
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT name FROM names");
-			stmt = myConn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				names.add(rs.getString(1));
+		if(Hashes.getQuerryResult("funny-names").isEmpty()) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT name FROM names");
+				stmt = myConn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					names.add(rs.getString(1));
+				}
+				Hashes.addQuerryResult("funny-names", names);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+		else {
+			names = Hashes.getQuerryResult("funny-names");
 		}
 	}
 	

@@ -1175,7 +1175,7 @@ public class RankingDB {
 			stmt.setLong(1, _user_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setItemNumber((rs.getInt(1)-1)/12);
+				setItemNumber(rs.getInt(1)/12);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

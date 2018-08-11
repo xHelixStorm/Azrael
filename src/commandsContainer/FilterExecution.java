@@ -3,6 +3,7 @@ package commandsContainer;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import core.Hashes;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -256,30 +257,35 @@ public class FilterExecution {
 					SqlConnect.SQLInsertWordFilter("eng", _message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the english word filter!").build()).queue();
+					Hashes.removeQuerryResult("eng");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "german-insert-word-filter":
 					SqlConnect.SQLInsertWordFilter("ger", _message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the german word filter!").build()).queue();
+					Hashes.removeQuerryResult("ger");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "french-insert-word-filter":
 					SqlConnect.SQLInsertWordFilter("fre", _message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the french word filter!").build()).queue();
+					Hashes.removeQuerryResult("fre");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "turkish-insert-word-filter":
 					SqlConnect.SQLInsertWordFilter("tur", _message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the turkish word filter!").build()).queue();
+					Hashes.removeQuerryResult("tur");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "russian-insert-word-filter":
 					SqlConnect.SQLInsertWordFilter("rus", _message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the russian word filter!").build()).queue();
+					Hashes.removeQuerryResult("rus");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "remove-word-filter":
@@ -313,30 +319,35 @@ public class FilterExecution {
 					SqlConnect.SQLDeleteWordFilter("eng", _message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the english word filter!").build()).queue();
+					Hashes.removeQuerryResult("eng");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "german-remove-word-filter":
 					SqlConnect.SQLDeleteWordFilter("ger", _message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the german word filter!").build()).queue();
+					Hashes.removeQuerryResult("ger");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "french-remove-word-filter":
 					SqlConnect.SQLDeleteWordFilter("fre", _message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the french word filter!").build()).queue();
+					Hashes.removeQuerryResult("fre");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "turkish-remove-word-filter":
 					SqlConnect.SQLDeleteWordFilter("tur", _message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the turkish word filter!").build()).queue();
+					Hashes.removeQuerryResult("tur");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "russian-remove-word-filter":
 					SqlConnect.SQLDeleteWordFilter("rus", _message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the russian word filter!").build()).queue();
+					Hashes.removeQuerryResult("rus");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "load-word-filter":
@@ -374,6 +385,7 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("eng", words);
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
+						Hashes.removeQuerryResult("eng");
 						FileSetting.deleteFile(file_path);
 					}
 					break;
@@ -385,6 +397,7 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("ger", words);
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
+						Hashes.removeQuerryResult("ger");
 						FileSetting.deleteFile(file_path);
 					}
 					break;
@@ -396,6 +409,7 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("fre", words);
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
+						Hashes.removeQuerryResult("fre");
 						FileSetting.deleteFile(file_path);
 					}
 					break;
@@ -407,6 +421,7 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("tur", words);
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
+						Hashes.removeQuerryResult("tur");
 						FileSetting.deleteFile(file_path);
 					}
 					break;
@@ -418,6 +433,7 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("rus", words);
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
+						Hashes.removeQuerryResult("rus");
 						FileSetting.deleteFile(file_path);
 					}
 					break;
@@ -425,12 +441,14 @@ public class FilterExecution {
 					SqlConnect.SQLInsertNameFilter(_message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into name filter!").build()).queue();
+					Hashes.removeQuerryResult("bad-name");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "remove-name-filter":
 					SqlConnect.SQLDeleteNameFilter(_message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the name filter!").build()).queue();
+					Hashes.removeQuerryResult("bad-name");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "load-name-filter":
@@ -440,18 +458,21 @@ public class FilterExecution {
 					SqlConnect.SQLReplaceNameFilter(words);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
+					Hashes.removeQuerryResult("bad-name");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "insert-funny-names":
 					SqlConnect.SQLInsertFunnyNames(_message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The name has been inserted into the funny names list!").build()).queue();
+					Hashes.removeQuerryResult("funny-names");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "remove-funny-names":
 					SqlConnect.SQLDeleteFunnyNames(_message);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The name has been removed from the funny names list!").build()).queue();
+					Hashes.removeQuerryResult("funny-names");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "load-funny-names":
@@ -461,6 +482,7 @@ public class FilterExecution {
 					SqlConnect.SQLReplaceFunnyNames(names);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("Names have been inserted!").build()).queue();
+					Hashes.removeQuerryResult("funny-names");
 					FileSetting.deleteFile(file_path);
 					break;
 					
