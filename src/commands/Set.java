@@ -41,7 +41,7 @@ public class Set implements Command{
 							+ "**-commands**: To disable, enable or limit specific commands to a bot channel or for the whole server\n\n"
 							+ "**-ranking**: To enable or disable the rankiing system\n\n"
 							+ "**-max-experience**: To enable/disable the max experience limiter and to set the limit in experience\n\n"
-							+ "**-max_level**: To define the max level that can be reached with the ranking system\n\n"
+							+ "**-max-level**: To define the max level that can be reached with the ranking system\n\n"
 							+ "**-default-level-skin**: To define the default skin for level ups\n\n"
 							+ "**-default-rank-skin**: To define the default skin for rank commands like "+IniFileReader.getCommandPrefix()+"rank\n\n"
 							+ "**-default-profile-skin**: To define the default skin for profile commands like "+IniFileReader.getCommandPrefix()+"profile\n\n"

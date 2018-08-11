@@ -72,39 +72,46 @@ public class MessageListener extends ListenerAdapter{
 					Thread.sleep(100);
 					SqlConnect.SQLgetChannelID(guild_id, "bot");
 					long bot_channel = SqlConnect.getChannelID();
-					if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && ranking_state == true && e.getTextChannel().getIdLong() != bot_channel){
-						int rankUpExperience = RankingDB.getRankUpExperience();
-						int max_level = RankingDB.getMaxLevel();
-						int level = RankingDB.getLevel();
-						int currentExperience = RankingDB.getCurrentExperience();
-						long currency = RankingDB.getCurrency();
-						int level_skin = RankingDB.getLevelSkin();
-						int icon_skin = RankingDB.getIconSkin();
-						int color_r = RankingDB.getTextColorRLevel();
-						int color_g = RankingDB.getTextColorGLevel();
-						int color_b = RankingDB.getTextColorBLevel();
-						int rankx = RankingDB.getRankXLevel();
-						int ranky = RankingDB.getRankYLevel();
-						int rank_width = RankingDB.getRankWidthLevel();
-						int rank_height = RankingDB.getRankHeightLevel();
-						
-						RankingDB.SQLgetMaxExperience(guild_id);
-						long max_experience = RankingDB.getMaxExperience();
-						boolean max_experience_enabled = RankingDB.getEnabled();
-						
-						RankingDB.SQLgetRole(level+1);
-						int roleAssignLevel = RankingDB.getRoleLevelRequirement();
-						long role_id = RankingDB.getRoleID();
-						int percent_multiplier;
-						
-						try {
-							RankingDB.SQLExpBoosterExistsInInventory();
-							percent_multiplier = Integer.parseInt(RankingDB.getDescription().replaceAll("[^0-9]*", ""));
-						} catch(NumberFormatException nfe){
-							percent_multiplier = 0;
+					if(RankingDB.getUserID() == 0 && RankingDB.getLevel() == 0 && RankingDB.getCurrentExperience() == 0 && RankingDB.getRankUpExperience() == 0 && RankingDB.getExperience() == 0 && RankingDB.getCurrency() == 0){
+						RankingDB.SQLInsertUser(user_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), RankingDB.getRankingLevel(), RankingDB.getRankingRank(), RankingDB.getRankingProfile(), RankingDB.getRankingIcon());
+						RankingDB.SQLInsertUserDetails(user_id, 0, 0, 300, 0, 50000, 0);
+						RankingDB.SQLInsertUserGuild(user_id, guild_id);
+					}
+					else{
+						if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && ranking_state == true && e.getTextChannel().getIdLong() != bot_channel){
+							int rankUpExperience = RankingDB.getRankUpExperience();
+							int max_level = RankingDB.getMaxLevel();
+							int level = RankingDB.getLevel();
+							int currentExperience = RankingDB.getCurrentExperience();
+							long currency = RankingDB.getCurrency();
+							int level_skin = RankingDB.getLevelSkin();
+							int icon_skin = RankingDB.getIconSkin();
+							int color_r = RankingDB.getTextColorRLevel();
+							int color_g = RankingDB.getTextColorGLevel();
+							int color_b = RankingDB.getTextColorBLevel();
+							int rankx = RankingDB.getRankXLevel();
+							int ranky = RankingDB.getRankYLevel();
+							int rank_width = RankingDB.getRankWidthLevel();
+							int rank_height = RankingDB.getRankHeightLevel();
+							
+							RankingDB.SQLgetMaxExperience(guild_id);
+							long max_experience = RankingDB.getMaxExperience();
+							boolean max_experience_enabled = RankingDB.getEnabled();
+							
+							RankingDB.SQLgetRole(level+1);
+							int roleAssignLevel = RankingDB.getRoleLevelRequirement();
+							long role_id = RankingDB.getRoleID();
+							int percent_multiplier;
+							
+							try {
+								RankingDB.SQLExpBoosterExistsInInventory();
+								percent_multiplier = Integer.parseInt(RankingDB.getDescription().replaceAll("[^0-9]*", ""));
+							} catch(NumberFormatException nfe){
+								percent_multiplier = 0;
+							}
+							
+							executor.execute(new RankingThreadExecution(e, user_id, guild_id, message, rankUpExperience, max_level, level, currentExperience, currency, max_experience, max_experience_enabled, roleAssignLevel, role_id, level_skin, icon_skin, percent_multiplier, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height));
 						}
-						
-						executor.execute(new RankingThreadExecution(e, user_id, guild_id, message, rankUpExperience, max_level, level, currentExperience, currency, max_experience, max_experience_enabled, roleAssignLevel, role_id, level_skin, icon_skin, percent_multiplier, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height));
 					}
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
@@ -113,11 +120,10 @@ public class MessageListener extends ListenerAdapter{
 		} catch(NullPointerException npe){
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			System.out.println("["+timestamp+"] The mute role has been assigned!");
-		} finally {
-			RankingDB.clearAllVariables();
-			SqlConnect.clearAllVariables();
-			SqlConnect.clearFilter_Lang();
-			executor.shutdown();
 		}
+		RankingDB.clearAllVariables();
+		SqlConnect.clearAllVariables();
+		SqlConnect.clearFilter_Lang();
+		executor.shutdown();
 	}
 }

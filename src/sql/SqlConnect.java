@@ -44,7 +44,7 @@ public class SqlConnect {
 	private static ArrayList<String> descriptions = new ArrayList<String>();
 	
 	private static String username = IniFileReader.getSQLUsername();
-	private static String password = IniFileReader.getSQLPassword().equals("null") ? null : IniFileReader.getSQLPassword();
+	private static String password = IniFileReader.getSQLPassword();
 	
 	
 	public static void SQLconnection(){
@@ -815,7 +815,7 @@ public class SqlConnect {
 	}
 	
 	public synchronized static void SQLgetFilter(String _filter_lang){
-		if(Hashes.getQuerryResult(_filter_lang).isEmpty()) {
+		if(Hashes.getQuerryResult(_filter_lang) == null || Hashes.getQuerryResult(_filter_lang).isEmpty()) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -938,7 +938,7 @@ public class SqlConnect {
 	}
 	
 	public static void SQLgetNameFilter() {
-		if(Hashes.getQuerryResult("bad-name").isEmpty()) {
+		if(Hashes.getQuerryResult("bad-name") == null || Hashes.getQuerryResult("bad-name").isEmpty()) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -1015,7 +1015,7 @@ public class SqlConnect {
 	}
 	
 	public static void SQLgetFunnyNames() {
-		if(Hashes.getQuerryResult("funny-names").isEmpty()) {
+		if(Hashes.getQuerryResult("funny-names") == null || Hashes.getQuerryResult("funny-names").isEmpty()) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
