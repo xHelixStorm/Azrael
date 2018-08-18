@@ -6,12 +6,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import core.Channels;
 import core.Hashes;
 import fileManagement.IniFileReader;
+import net.dv8tion.jda.core.entities.Member;
 
 public class SqlConnect {
 	
@@ -188,6 +191,31 @@ public class SqlConnect {
 			stmt.setString(3, _avatar);
 			stmt.setString(4, _join_date);
 			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLBulkInsertUsers(List<Member> members){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false); 
+			String sql = ("INSERT INTO users (user_id, name, avatar_url, join_date) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
+			stmt = myConn.prepareStatement(sql);
+			for(Member member : members){
+				stmt.setLong(1, member.getUser().getIdLong());
+				stmt.setString(2, member.getUser().getName()+"#"+member.getUser().getDiscriminator());
+				stmt.setString(3, member.getUser().getEffectiveAvatarUrl());
+				stmt.setString(4, member.getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			myConn.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
