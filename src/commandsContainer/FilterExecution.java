@@ -51,7 +51,6 @@ public class FilterExecution {
 			switch(file_value) {
 				case "word-filter":
 					if(_message.equalsIgnoreCase("display")) {
-						SqlConnect.clearFilter_Lang();
 						message.setTitle("You chose to display the current word filter!");
 						StringBuilder out = new StringBuilder();
 						SqlConnect.SQLgetFilterLanguages();
@@ -64,7 +63,6 @@ public class FilterExecution {
 						FileSetting.createFile(file_path, "display-word-filter");
 					}
 					else if(_message.equalsIgnoreCase("insert")) {
-						SqlConnect.clearFilter_Lang();
 						message.setTitle("You chose to insert a new word into the filter!");
 						StringBuilder out = new StringBuilder();
 						SqlConnect.SQLgetFilterLanguages();
@@ -77,7 +75,6 @@ public class FilterExecution {
 						FileSetting.createFile(file_path, "insert-word-filter");
 					}
 					else if(_message.equalsIgnoreCase("remove")) {
-						SqlConnect.clearFilter_Lang();
 						message.setTitle("You chose to remove a word from the filter!");
 						StringBuilder out = new StringBuilder();
 						SqlConnect.SQLgetFilterLanguages();
@@ -90,7 +87,6 @@ public class FilterExecution {
 						FileSetting.createFile(file_path, "remove-word-filter");
 					}
 					else if(_message.equalsIgnoreCase("load-file")) {
-						SqlConnect.clearFilter_Lang();
 						message.setTitle("You chose to load a file which contains filter words!");
 						StringBuilder out = new StringBuilder();
 						SqlConnect.SQLgetFilterLanguages();

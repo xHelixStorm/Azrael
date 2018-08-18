@@ -43,10 +43,10 @@ public class MessageListener extends ListenerAdapter{
 			
 			SqlConnect.SQLgetChannel_Filter(channel_id);;
 			ArrayList<String> filter_lang = SqlConnect.getFilter_Lang();
-			
 			if(!filter_lang.equals("")){
 				executor.execute(new LanguageFilter(e, filter_lang));
 			}
+			SqlConnect.clearFilter_Lang();
 			
 			if(IniFileReader.getChannelLog().equals("true")){
 				LocalDateTime time = LocalDateTime.now();
@@ -123,7 +123,6 @@ public class MessageListener extends ListenerAdapter{
 		}
 		RankingDB.clearAllVariables();
 		SqlConnect.clearAllVariables();
-		SqlConnect.clearFilter_Lang();
 		executor.shutdown();
 	}
 }
