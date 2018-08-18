@@ -23,7 +23,7 @@ public class UnbanListener extends ListenerAdapter{
 		first_entry: for (AuditLogEntry entry : logs)
 		{
 			ServerRoles.SQLgetRole(e.getGuild().getIdLong(), "mut");
-			if(entry.getType().toString().equals("MEMBER_BAN_REMOVE") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {
+			if(entry.getType().toString().equals("UNBAN") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {
 				trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 			}
 			break first_entry;
@@ -37,7 +37,7 @@ public class UnbanListener extends ListenerAdapter{
 		String user_name = e.getUser().getName()+"#"+e.getUser().getDiscriminator();
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		
-		if(channel_id != 0){e.getJDA().getGuildById(e.getGuild().getIdLong()).getTextChannelById(channel_id).sendMessage(message.setDescription("**["+timestamp+"] **"+trigger_user_name+"** has unbanned **" + user_name + "** with the ID number **" + user_id + "**!**").build()).queue();}
+		if(channel_id != 0){e.getJDA().getGuildById(e.getGuild().getIdLong()).getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp+"] **"+trigger_user_name+"** has unbanned **" + user_name + "** with the ID number **" + user_id + "**!").build()).queue();}
 		SqlConnect.SQLDeleteData(user_id, guild_id);
 		SqlConnect.SQLInsertActionLog("MEMBER_BAN_REMOVE", user_id, guild_id, "User Unbanned");
 		SqlConnect.clearAllVariables();

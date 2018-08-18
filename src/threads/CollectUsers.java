@@ -1,6 +1,7 @@
 package threads;
 
 import java.awt.Color;
+import java.time.format.DateTimeFormatter;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
@@ -26,7 +27,7 @@ public class CollectUsers implements Runnable{
 		for(Member m : e.getJDA().getGuildById(guild_id).getMembers()){
 			long user_id = m.getUser().getIdLong();
 			String name = m.getUser().getName()+"#"+m.getUser().getDiscriminator();
-			SqlConnect.SQLInsertUser(user_id, name);
+			SqlConnect.SQLInsertUser(user_id, name, m.getUser().getEffectiveAvatarUrl(), m.getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
 			if(ranking_state == true){
 				RankingDB.SQLInsertUser(user_id, name, RankingDB.getRankingLevel(), RankingDB.getRankingRank(), RankingDB.getRankingProfile(), RankingDB.getRankingIcon());
 				RankingDB.SQLInsertUserGuild(user_id, guild_id);

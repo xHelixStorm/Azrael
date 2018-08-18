@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.time.format.DateTimeFormatter;
 
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -50,7 +51,7 @@ public class GuildListener extends ListenerAdapter {
 			ServerRoles.clearAllVariables();
 		}
 		else{
-			SqlConnect.SQLInsertUser(user_id, user_name);
+			SqlConnect.SQLInsertUser(user_id, user_name, e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
 			if(RankingDB.getRankingState() == true){
 				RankingDB.SQLgetUserDetails(user_id);
 				if(RankingDB.getAssignedRole() != 0){e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(RankingDB.getAssignedRole())).queue();}

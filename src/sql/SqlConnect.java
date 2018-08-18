@@ -34,6 +34,8 @@ public class SqlConnect {
 	private static double timer = 0;
 	private static String description = "";
 	private static int count = 0;
+	private static String avatar = null;
+	private static String join_date = null;
 	
 	private static Date timestamp;
 	private static Date unmute;
@@ -174,16 +176,84 @@ public class SqlConnect {
 		}
 	}
 	
-	public static void SQLInsertUser(long _user_id, String _name){
+	public static void SQLInsertUser(long _user_id, String _name, String _avatar, String _join_date){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO users (user_id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			String sql = ("INSERT INTO users (user_id, name, avatar_url, join_date) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _name);
+			stmt.setString(3, _avatar);
+			stmt.setString(4, _join_date);
 			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLUpdateAvatar(long _user_id, String _avatar){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE users SET avatar_url = ? WHERE user_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _avatar);
+			stmt.setLong(2, _user_id);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLgetUser(String _name){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT * FROM users WHERE name LIKE ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _name);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				setUser_id(rs.getLong(1));
+				setName(rs.getString(2));
+				setAvatar(rs.getString(3));
+				setJoinDate(rs.getString(4));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLgetUserThroughID(String _user_id){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT * FROM users WHERE user_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _user_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				setUser_id(rs.getLong(1));
+				setName(rs.getString(2));
+				setAvatar(rs.getString(3));
+				setJoinDate(rs.getString(4));
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -590,31 +660,6 @@ public class SqlConnect {
 		}
 	}
 	
-	public static void SQLgetChannel(long _channel_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT channels.channel_id, channels.name, channel_conf.fk_channel_type, channel_conf.fk_guild_id FROM channels INNER JOIN channel_conf ON channels.channel_id = channel_conf.fk_channel_id WHERE channel_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _channel_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setChannelID(rs.getLong(1));
-				setChannelName(rs.getString(2));
-				setChannelType(rs.getString(3));
-				setCH_GuildID(rs.getLong(4));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static void SQLInsertChannels(long _channel_id, String _channel_name){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -703,7 +748,7 @@ public class SqlConnect {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT channels.channel_id, channels.name, channeltypes.channel_type, channeltypes.channel, guild.guild_id, guild.name, filter_languages.language FROM channels INNER JOIN channel_conf ON channels.channel_id = channel_conf.fk_channel_id INNER JOIN channeltypes ON channel_conf.fk_channel_type = channeltypes.channel_type INNER JOIN guild ON channel_conf.fk_guild_id = guild.guild_id LEFT JOIN channel_filter ON channels.channel_id = channel_filter.fk_channel_id LEFT JOIN filter_languages ON channel_filter.fk_lang_abbrv = filter_languages.lang_abbrv WHERE guild.guild_id = ?");
+			String sql = ("SELECT * FROM all_channels WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
@@ -1311,6 +1356,12 @@ public class SqlConnect {
 	public static void setUnmute(Date _unmute){
 		unmute = _unmute;
 	}
+	public static void setAvatar(String _avatar){
+		avatar = _avatar;
+	}
+	public static void setJoinDate(String _join_date){
+		join_date = _join_date;
+	}
 	
 	
 	public static long getUser_id(){
@@ -1391,6 +1442,12 @@ public class SqlConnect {
 	public static Date getUnmute(){
 		return unmute;
 	}
+	public static String getAvatar(){
+		return avatar;
+	}
+	public static String getJoinDate(){
+		return join_date;
+	}
 	
 	public static void clearTimestamp() {
 		timestamp = null;
@@ -1433,5 +1490,7 @@ public class SqlConnect {
 		setCustomTime(false);
 		setDescription("");
 		setCount(0);
+		setAvatar("");
+		setJoinDate("");
 	}
 }

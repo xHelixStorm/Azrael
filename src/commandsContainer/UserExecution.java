@@ -2,7 +2,6 @@ package commandsContainer;
 
 import java.awt.Color;
 import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
 
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
@@ -21,16 +20,30 @@ public class UserExecution {
 		_e.getTextChannel().sendMessage(message.setDescription("Mention a user right after the command and then choose an action to take. For example to display information, to mute, to ban, to set a warning value, to set a level or to gift experience points for the ranking system").build()).queue();
 	}
 	
-	public static void runTask(MessageReceivedEvent _e, String _input) {
+	public static void runTask(MessageReceivedEvent _e, String _input, String _displayed_input) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle("Choose the desired action");
-		if(_input.length() == 18) {
-			String user_name = "";
-			try {
-				user_name = _e.getGuild().getMemberById(_input).getUser().getName()+"#"+_e.getGuild().getMemberById(_input).getUser().getDiscriminator();
-			} catch(NullPointerException npe) {
-				//do nothing
+		String name = _displayed_input.replaceAll("@", "");
+		String raw_input = _input;
+		String user_name = "";
+		
+		if(raw_input.length() != 18){
+			SqlConnect.SQLgetUser(name);
+			if(SqlConnect.getUser_id() != 0){
+				raw_input = ""+SqlConnect.getUser_id();
 			}
-			if(user_name.length() > 0) {
+			if(SqlConnect.getName() != null){
+				user_name = SqlConnect.getName();
+			}
+		}
+		else{
+			SqlConnect.SQLgetUserThroughID(raw_input);
+			if(SqlConnect.getName() != null){
+				user_name = SqlConnect.getName();
+			}
+		}
+		
+		if(raw_input != null && raw_input.length() == 18) {
+			if(user_name != null && user_name.length() > 0) {
 				_e.getTextChannel().sendMessage(message.setDescription("The user has been found in this guild! Now type one of the following words within 3 minutes to execute an action!\n\n"
 						+ "**information**: To display all details of the selected user\n"
 						+ "**warning**: To change the current warning value\n"
@@ -40,7 +53,7 @@ public class UserExecution {
 						+ "**gift-experience**: To gift experience points\n"
 						+ "**set-experience**: To set an experience value\n"
 						+ "**set-level**: To assign a level").build()).queue();
-				FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", _input);
+				FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", raw_input);
 				new Thread(new DelayDelete(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", 180000, true)).start();
 			}
 			else {
@@ -61,9 +74,10 @@ public class UserExecution {
 			if(_message.equals("information") || _message.equals("warning") || _message.equals("mute") || _message.equals("ban") || _message.equals("kick") || _message.equals("gift-experience") || _message.equals("set-experience") || _message.equals("set-level")) {
 				switch(_message) {
 					case "information": 
+						SqlConnect.SQLgetUserThroughID(file_value);
 						message.setTitle("Here the requested information!");
-						message.setThumbnail(_e.getGuild().getMemberById(file_value).getUser().getEffectiveAvatarUrl());
-						message.setAuthor(_e.getGuild().getMemberById(file_value).getUser().getName()+"#"+_e.getGuild().getMemberById(file_value).getUser().getDiscriminator());
+						message.setThumbnail(SqlConnect.getAvatar());
+						message.setAuthor(SqlConnect.getName());
 						message.setDescription("Here you can inspect all current information for this user!");
 						message.addBlankField(false);
 						SqlConnect.SQLgetData(Long.parseLong(file_value), _e.getGuild().getIdLong());
@@ -74,16 +88,14 @@ public class UserExecution {
 						message.addField("TOTAL WARNINGS", "**"+SqlConnect.getCount()+"**", true);
 						SqlConnect.SQLgetSingleActionEventCount("MEMBER_BAN_ADD", Long.parseLong(file_value), _e.getGuild().getIdLong());
 						message.addField("TOTAL BANS", "**"+SqlConnect.getCount()+"**", true);
-						message.addField("JOIN DATE", "**"+_e.getGuild().getMemberById(file_value).getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE)+"**", true);
+						message.addField("BANNED", SqlConnect.getBanID() == 2 ? "**YES**" : "**NO**", true);
+						message.addField("JOIN DATE", "**"+SqlConnect.getJoinDate()+"**", false);
+						message.addBlankField(false);
 						RankingDB.SQLgetGuild(_e.getGuild().getIdLong());
 						if(RankingDB.getRankingState()) {
 							RankingDB.SQLgetUserDetails(Long.parseLong(file_value));
 							message.addField("LEVEL", "**"+RankingDB.getLevel()+"**/**"+RankingDB.getMaxLevel()+"**", true);
 							message.addField("EXPERIENCE", "**"+RankingDB.getCurrentExperience()+"**/**"+RankingDB.getRankUpExperience()+"**", true);
-							message.addBlankField(false);
-						}
-						else {
-							message.addBlankField(false);
 						}
 						StringBuilder out = new StringBuilder();
 						SqlConnect.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", Long.parseLong(file_value), _e.getGuild().getIdLong());

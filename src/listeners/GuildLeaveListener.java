@@ -27,7 +27,7 @@ public class GuildLeaveListener extends ListenerAdapter{
 			if(entry.getType().toString().equals("KICK") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {
 				trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 				kick_reason = entry.getReason();
-				kick_reason = !kick_reason.equals("") ? "\nReason: "+kick_reason : "";
+				kick_reason = kick_reason != null ? "\nReason: "+kick_reason : "";
 			}
 			else if(entry.getType().toString().equals("BAN") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {
 				banned = true;

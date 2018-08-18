@@ -28,7 +28,7 @@ public class User implements Command{
 						UserExecution.getHelp(e);
 					}
 					else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"user ")) {
-						UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]", ""));
+						UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]", ""), e.getMessage().getContentDisplay().substring(IniFileReader.getCommandPrefix().length()+5));
 					}
 				}
 				else {

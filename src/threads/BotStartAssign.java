@@ -1,6 +1,7 @@
 package threads;
 
 import java.awt.Color;
+import java.time.format.DateTimeFormatter;
 
 import core.UserPrivs;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -52,7 +53,7 @@ public class BotStartAssign implements Runnable{
 						
 						if(roleExists == false && RankingDB.getAssignedRole() != 0){
 							e.getJDA().getGuildById(guild_id).getController().addSingleRoleToMember(member, e.getJDA().getGuildById(guild_id).getRoleById(RankingDB.getAssignedRole())).queue();
-							SqlConnect.SQLInsertUser(member.getUser().getIdLong(), member.getUser().getName()+"#"+member.getUser().getDiscriminator());
+							SqlConnect.SQLInsertUser(member.getUser().getIdLong(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getUser().getEffectiveAvatarUrl(), member.getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
 							updatedUsers = true;
 							i++;
 						}

@@ -29,6 +29,7 @@ import commands.Top;
 import commands.Use;
 import commands.User;
 import fileManagement.IniFileReader;
+import listeners.AvatarUpdateListener;
 import listeners.BanListener;
 import listeners.CommandListener;
 import listeners.GuildJoinListener;
@@ -148,5 +149,6 @@ public class Main {
 		builder.addEventListener(new RoleRemovedListener());
 		builder.addEventListener(new NicknameListener());
 		builder.addEventListener(new MessageRemovedListener());
+		builder.addEventListener(new AvatarUpdateListener());
 	}
 }
