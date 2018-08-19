@@ -53,7 +53,7 @@ public class LanguageFilter extends ListenerAdapter implements Runnable{
 			
 			if(exceptionFound == false){
 				find: for(String filter : filter_lang){
-					SqlConnect.SQLgetFilter(filter);
+					SqlConnect.SQLgetFilter(filter, e.getGuild().getIdLong());
 					for(String word : SqlConnect.getFilter_Words()){
 						if(wordFound == false && letterCounter > 1){
 							if(parseMessage.equals(word) || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || parseMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.contains(" "+word+" ")){

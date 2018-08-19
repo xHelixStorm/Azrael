@@ -52,6 +52,7 @@ public class GuildListener extends ListenerAdapter {
 		}
 		else{
 			SqlConnect.SQLInsertUser(user_id, user_name, e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
+			RankingDB.SQLgetGuild(guild_id);
 			if(RankingDB.getRankingState() == true){
 				RankingDB.SQLgetUserDetails(user_id);
 				if(RankingDB.getAssignedRole() != 0){e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(RankingDB.getAssignedRole())).queue();}
@@ -61,21 +62,32 @@ public class GuildListener extends ListenerAdapter {
 		
 		if(IniFileReader.getNameFilter().equals("true")) {
 			String lc_user_name = user_name.toLowerCase();
-			SqlConnect.SQLgetNameFilter();
-			check: for(String word : SqlConnect.getNames()){
-				if(lc_user_name.contains(word) || lc_user_name.contains("["+word+"]")){
-					SqlConnect.SQLgetRandomName();
+			SqlConnect.SQLgetStaffNames(guild_id);
+			check: for(String name : SqlConnect.getStaffNames()){
+				if(lc_user_name.matches(name+"#[0-9]{4}")){
+					SqlConnect.SQLgetRandomName(e.getGuild().getIdLong());
 					String nickname = SqlConnect.getName();
 					e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
-					e.getGuild().getTextChannelById(channel_id).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this Server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
+					e.getGuild().getTextChannelById(channel_id).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server and tried to impersonate a staff member. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
 					badName = true;
 					break check;
 				}
-				else{
-					badName = false;
-				}
 			}
-			SqlConnect.clearNames();
+			SqlConnect.clearStaffNames();
+			if(badName == false){
+				SqlConnect.SQLgetNameFilter(e.getGuild().getIdLong());
+				check: for(String word : SqlConnect.getNames()){
+					if(lc_user_name.contains(word)){
+						SqlConnect.SQLgetRandomName(e.getGuild().getIdLong());
+						String nickname = SqlConnect.getName();
+						e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
+						e.getGuild().getTextChannelById(channel_id).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this Server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
+						badName = true;
+						break check;
+					}
+				}
+				SqlConnect.clearNames();
+			}
 			if(badName == false){
 				SqlConnect.SQLDeleteNickname(user_id, guild_id);
 			}

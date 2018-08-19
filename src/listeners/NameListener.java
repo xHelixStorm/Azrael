@@ -15,39 +15,69 @@ public class NameListener extends ListenerAdapter{
 	
 	@Override
 	public void onUserUpdateName(UserUpdateNameEvent e){
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE);
+		EmbedBuilder message = new EmbedBuilder();
 		if(IniFileReader.getNameFilter().equals("true")) {
 			String oldname = e.getOldName()+"#"+e.getUser().getDiscriminator();
 			String newname = e.getUser().getName()+"#"+e.getUser().getDiscriminator();
 			long user_id = e.getUser().getIdLong();
-			SqlConnect.SQLgetRandomName();
-			String nickname = SqlConnect.getName();
 			String nameCheck = newname.toLowerCase();
+			boolean staff_name = false;
 			
 			SqlConnect.SQLUpdateUser(user_id, newname);
-			SqlConnect.SQLgetNameFilter();
-			for(String word : SqlConnect.getNames()){
-				if(nameCheck.contains(word)|| nameCheck.contains("["+word+"]")){
-					for(Guild guild : e.getJDA().getGuilds()){
-						long guild_id = guild.getIdLong();
-						Member user = e.getJDA().getGuildById(guild_id).getMemberById(user_id);
-						
-						if(user.getUser().getIdLong() != 0){
-							SqlConnect.SQLgetChannelID(guild_id, "log");
-							long channel_id = SqlConnect.getChannelID();
-							try {
-								e.getJDA().getGuildById(guild_id).getController().setNickname(user, nickname).queue();
-								message.setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
-								e.getJDA().getTextChannelById(channel_id).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
-							} catch (HierarchyException hye){
-								message.setThumbnail(IniFileReader.getFalseAlarmThumbnail()).setTitle("You know that you shouldn't do it :/");
-								e.getJDA().getTextChannelById(channel_id).sendMessage("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** but had a higher role than myself. Hence, name won't be changed").queue();
+			for(Guild g : e.getJDA().getGuilds()){
+				SqlConnect.SQLgetStaffNames(g.getIdLong());
+				check: for(String name : SqlConnect.getStaffNames()){
+					if(nameCheck.matches(name+"#[0-9]{4}")){
+						message.setColor(Color.RED);
+						Member member = e.getJDA().getGuildById(g.getIdLong()).getMemberById(user_id);
+						SqlConnect.SQLgetChannelID(g.getIdLong(), "log");
+						long channel_id = SqlConnect.getChannelID();
+						try {
+							SqlConnect.SQLgetRandomName(g.getIdLong());
+							String nickname = SqlConnect.getName();
+							e.getJDA().getGuildById(g.getIdLong()).getController().setNickname(member, nickname).queue();
+							message.setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Impersonation attempt found!");
+							e.getJDA().getTextChannelById(channel_id).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**\nPlease take action as soon as possible!").build()).queue();
+							staff_name = true;
+							break check;
+						} catch(HierarchyException hye){
+							break check;
+						}
+					}
+				}
+				SqlConnect.clearStaffNames();
+			}
+			
+			if(staff_name == false){
+				for(Guild guild : e.getJDA().getGuilds()){
+					long guild_id = guild.getIdLong();
+					SqlConnect.SQLgetNameFilter(guild_id);
+					check: for(String word : SqlConnect.getNames()){
+						if(nameCheck.contains(word)){
+							message.setColor(Color.ORANGE);
+							Member user = e.getJDA().getGuildById(guild_id).getMemberById(user_id);
+							
+							if(user.getUser().getIdLong() != 0){
+								SqlConnect.SQLgetChannelID(guild_id, "log");
+								long channel_id = SqlConnect.getChannelID();
+								try {
+									SqlConnect.SQLgetRandomName(guild_id);
+									String nickname = SqlConnect.getName();
+									e.getJDA().getGuildById(guild_id).getController().setNickname(user, nickname).queue();
+									message.setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
+									e.getJDA().getTextChannelById(channel_id).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
+									break check;
+								} catch (HierarchyException hye){
+									message.setThumbnail(IniFileReader.getFalseAlarmThumbnail()).setTitle("You know that you shouldn't do it :/");
+									e.getJDA().getTextChannelById(channel_id).sendMessage("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** but had a higher role than myself. Hence, name won't be changed").queue();
+									break check;
+								}
 							}
 						}
 					}
 				}
+				SqlConnect.clearNames();
 			}
-			SqlConnect.clearNames();
 			SqlConnect.clearAllVariables();
 		}
 		SqlConnect.SQLInsertActionLog("MEMBER_NAME_UPDATE", e.getUser().getIdLong(), 0, e.getUser().getName()+"#"+e.getUser().getDiscriminator());

@@ -101,7 +101,7 @@ public class FilterExecution {
 					break;
 				case "name-filter":
 					if(_message.equalsIgnoreCase("display")) {
-						SqlConnect.SQLgetNameFilter();
+						SqlConnect.SQLgetNameFilter(_e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
 						for(String word : SqlConnect.getNames()) {
 							out.append(word+"\n");
@@ -131,7 +131,7 @@ public class FilterExecution {
 					break;
 				case "funny-names":
 					if(_message.equalsIgnoreCase("display")) {
-						SqlConnect.SQLgetFunnyNames();
+						SqlConnect.SQLgetFunnyNames(_e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
 						for(String word : SqlConnect.getNames()) {
 							out.append(word+"\n");
@@ -161,7 +161,7 @@ public class FilterExecution {
 					break;
 				case "display-word-filter":
 					if(_message.equalsIgnoreCase("english")) {
-						SqlConnect.SQLgetFilter("eng");
+						SqlConnect.SQLgetFilter("eng", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
 						for(String word : SqlConnect.getFilter_Words()) {
 							out.append(word+"\n");
@@ -174,7 +174,7 @@ public class FilterExecution {
 						FileSetting.deleteFile(file_path);
 					}
 					else if(_message.equalsIgnoreCase("german")) {
-						SqlConnect.SQLgetFilter("ger");
+						SqlConnect.SQLgetFilter("ger", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
 						for(String word : SqlConnect.getFilter_Words()) {
 							out.append(word+"\n");
@@ -187,7 +187,7 @@ public class FilterExecution {
 						FileSetting.deleteFile(file_path);
 					}
 					else if(_message.equalsIgnoreCase("french")) {
-						SqlConnect.SQLgetFilter("fre");
+						SqlConnect.SQLgetFilter("fre", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
 						for(String word : SqlConnect.getFilter_Words()) {
 							out.append(word+"\n");
@@ -200,7 +200,7 @@ public class FilterExecution {
 						FileSetting.deleteFile(file_path);
 					}
 					else if(_message.equalsIgnoreCase("turkish")) {
-						SqlConnect.SQLgetFilter("tur");
+						SqlConnect.SQLgetFilter("tur", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
 						for(String word : SqlConnect.getFilter_Words()) {
 							out.append(word+"\n");
@@ -213,7 +213,7 @@ public class FilterExecution {
 						FileSetting.deleteFile(file_path);
 					}
 					else if(_message.equalsIgnoreCase("russian")) {
-						SqlConnect.SQLgetFilter("rus");
+						SqlConnect.SQLgetFilter("rus", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
 						for(String word : SqlConnect.getFilter_Words()) {
 							out.append(word+"\n");
@@ -254,35 +254,35 @@ public class FilterExecution {
 					}
 					break;
 				case "english-insert-word-filter":
-					SqlConnect.SQLInsertWordFilter("eng", _message);
+					SqlConnect.SQLInsertWordFilter("eng", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the english word filter!").build()).queue();
 					Hashes.removeQuerryResult("eng");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "german-insert-word-filter":
-					SqlConnect.SQLInsertWordFilter("ger", _message);
+					SqlConnect.SQLInsertWordFilter("ger", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the german word filter!").build()).queue();
 					Hashes.removeQuerryResult("ger");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "french-insert-word-filter":
-					SqlConnect.SQLInsertWordFilter("fre", _message);
+					SqlConnect.SQLInsertWordFilter("fre", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the french word filter!").build()).queue();
 					Hashes.removeQuerryResult("fre");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "turkish-insert-word-filter":
-					SqlConnect.SQLInsertWordFilter("tur", _message);
+					SqlConnect.SQLInsertWordFilter("tur", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the turkish word filter!").build()).queue();
 					Hashes.removeQuerryResult("tur");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "russian-insert-word-filter":
-					SqlConnect.SQLInsertWordFilter("rus", _message);
+					SqlConnect.SQLInsertWordFilter("rus", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the russian word filter!").build()).queue();
 					Hashes.removeQuerryResult("rus");
@@ -316,35 +316,35 @@ public class FilterExecution {
 					}
 					break;
 				case "english-remove-word-filter":
-					SqlConnect.SQLDeleteWordFilter("eng", _message);
+					SqlConnect.SQLDeleteWordFilter("eng", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the english word filter!").build()).queue();
 					Hashes.removeQuerryResult("eng");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "german-remove-word-filter":
-					SqlConnect.SQLDeleteWordFilter("ger", _message);
+					SqlConnect.SQLDeleteWordFilter("ger", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the german word filter!").build()).queue();
 					Hashes.removeQuerryResult("ger");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "french-remove-word-filter":
-					SqlConnect.SQLDeleteWordFilter("fre", _message);
+					SqlConnect.SQLDeleteWordFilter("fre", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the french word filter!").build()).queue();
 					Hashes.removeQuerryResult("fre");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "turkish-remove-word-filter":
-					SqlConnect.SQLDeleteWordFilter("tur", _message);
+					SqlConnect.SQLDeleteWordFilter("tur", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the turkish word filter!").build()).queue();
 					Hashes.removeQuerryResult("tur");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "russian-remove-word-filter":
-					SqlConnect.SQLDeleteWordFilter("rus", _message);
+					SqlConnect.SQLDeleteWordFilter("rus", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the russian word filter!").build()).queue();
 					Hashes.removeQuerryResult("rus");
@@ -381,7 +381,7 @@ public class FilterExecution {
 					if(_message.equalsIgnoreCase("continue")) {
 						ArrayList<String> words = new ArrayList<String>();
 						words = FileSetting.readFileIntoArray("./files/words.txt");
-						SqlConnect.SQLDeleteLangWordFilter("eng");
+						SqlConnect.SQLDeleteLangWordFilter("eng", _e.getGuild().getIdLong());
 						SqlConnect.SQLReplaceWordFilter("eng", words);
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
@@ -393,7 +393,7 @@ public class FilterExecution {
 					if(_message.equalsIgnoreCase("continue")) {
 						ArrayList<String> words = new ArrayList<String>();
 						words = FileSetting.readFileIntoArray("./files/words.txt");
-						SqlConnect.SQLDeleteLangWordFilter("ger");
+						SqlConnect.SQLDeleteLangWordFilter("ger", _e.getGuild().getIdLong());
 						SqlConnect.SQLReplaceWordFilter("ger", words);
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
@@ -405,7 +405,7 @@ public class FilterExecution {
 					if(_message.equalsIgnoreCase("continue")) {
 						ArrayList<String> words = new ArrayList<String>();
 						words = FileSetting.readFileIntoArray("./files/words.txt");
-						SqlConnect.SQLDeleteLangWordFilter("fre");
+						SqlConnect.SQLDeleteLangWordFilter("fre", _e.getGuild().getIdLong());
 						SqlConnect.SQLReplaceWordFilter("fre", words);
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
@@ -417,7 +417,7 @@ public class FilterExecution {
 					if(_message.equalsIgnoreCase("continue")) {
 						ArrayList<String> words = new ArrayList<String>();
 						words = FileSetting.readFileIntoArray("./files/words.txt");
-						SqlConnect.SQLDeleteLangWordFilter("tur");
+						SqlConnect.SQLDeleteLangWordFilter("tur", _e.getGuild().getIdLong());
 						SqlConnect.SQLReplaceWordFilter("tur", words);
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
@@ -429,7 +429,7 @@ public class FilterExecution {
 					if(_message.equalsIgnoreCase("continue")) {
 						ArrayList<String> words = new ArrayList<String>();
 						words = FileSetting.readFileIntoArray("./files/words.txt");
-						SqlConnect.SQLDeleteLangWordFilter("rus");
+						SqlConnect.SQLDeleteLangWordFilter("rus", _e.getGuild().getIdLong());
 						SqlConnect.SQLReplaceWordFilter("rus", words);
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
@@ -438,14 +438,14 @@ public class FilterExecution {
 					}
 					break;
 				case "insert-name-filter":
-					SqlConnect.SQLInsertNameFilter(_message);
+					SqlConnect.SQLInsertNameFilter(_message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into name filter!").build()).queue();
 					Hashes.removeQuerryResult("bad-name");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "remove-name-filter":
-					SqlConnect.SQLDeleteNameFilter(_message);
+					SqlConnect.SQLDeleteNameFilter(_message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the name filter!").build()).queue();
 					Hashes.removeQuerryResult("bad-name");
@@ -454,7 +454,7 @@ public class FilterExecution {
 				case "load-name-filter":
 					ArrayList<String> words = new ArrayList<String>();
 					words = FileSetting.readFileIntoArray("./files/words.txt");
-					SqlConnect.SQLDeleteWholeNameFilter();
+					SqlConnect.SQLDeleteWholeNameFilter(_e.getGuild().getIdLong());
 					SqlConnect.SQLReplaceNameFilter(words);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
@@ -462,14 +462,14 @@ public class FilterExecution {
 					FileSetting.deleteFile(file_path);
 					break;
 				case "insert-funny-names":
-					SqlConnect.SQLInsertFunnyNames(_message);
+					SqlConnect.SQLInsertFunnyNames(_message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The name has been inserted into the funny names list!").build()).queue();
 					Hashes.removeQuerryResult("funny-names");
 					FileSetting.deleteFile(file_path);
 					break;
 				case "remove-funny-names":
-					SqlConnect.SQLDeleteFunnyNames(_message);
+					SqlConnect.SQLDeleteFunnyNames(_message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The name has been removed from the funny names list!").build()).queue();
 					Hashes.removeQuerryResult("funny-names");
@@ -478,7 +478,7 @@ public class FilterExecution {
 				case "load-funny-names":
 					ArrayList<String> names = new ArrayList<String>();
 					names = FileSetting.readFileIntoArray("./files/words.txt");
-					SqlConnect.SQLDeleteWholeFunnyNames();
+					SqlConnect.SQLDeleteWholeFunnyNames(_e.getGuild().getIdLong());
 					SqlConnect.SQLReplaceFunnyNames(names);
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("Names have been inserted!").build()).queue();
