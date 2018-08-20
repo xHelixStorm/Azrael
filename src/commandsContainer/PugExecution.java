@@ -24,7 +24,7 @@ public class PugExecution {
 		if(!file.exists()){
 			try {
 				file.createNewFile();
-				new Thread(new DelayDelete(fileName, 20000, false)).start();
+				new Thread(new DelayDelete(fileName, 20000)).start();
 			} catch (IOException e2) {
 				e2.printStackTrace();
 			}

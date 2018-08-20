@@ -36,7 +36,7 @@ public class SetWarning {
 			_e.getTextChannel().sendMessage("The system has been set to warn "+warning_value+" time(s) before banning").queue();
 			
 			FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", "1");
-			new Thread(new DelayDelete(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", 600000, true)).start();
+			new Thread(new DelayDelete(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", 600000)).start();
 			_e.getTextChannel().sendMessage("To complete the warning setup, you'll be asked to enter the time in minutes for every single warning. You have a total time of 10 minutes for the final setup.\n\nPlease insert the time in minutes for warning 1.").queueAfter(3, TimeUnit.SECONDS);
 		}
 		else {

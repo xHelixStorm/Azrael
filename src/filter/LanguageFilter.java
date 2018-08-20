@@ -77,7 +77,7 @@ public class LanguageFilter extends ListenerAdapter implements Runnable{
 				if(Files.notExists(path)){
 					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" Message has been removed due to bad behaviour!").queue();
 					FileSetting.createFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr", "1");
-					new Thread(new DelayDelete(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr", 300000, false)).start();
+					new Thread(new DelayDelete(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr", 300000)).start();
 				}
 				else if (Files.exists(path)){
 					report = FileSetting.readFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");

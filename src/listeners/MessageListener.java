@@ -30,7 +30,7 @@ public class MessageListener extends ListenerAdapter{
 		try {
 			File warning = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
 			File user = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
-			File filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
+			File filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
 			
 			long user_id = e.getMember().getUser().getIdLong();
 			long guild_id = e.getGuild().getIdLong();
@@ -61,7 +61,21 @@ public class MessageListener extends ListenerAdapter{
 			}
 			
 			if(filter.exists()) {
-				FilterExecution.performAction(e, message);
+				filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_1.azr");
+				String file_name = IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr";
+				int filter_counter = 1;
+				boolean break_while = false;
+				while(filter_counter < 20 && break_while == false){
+					if(filter.exists()){
+						filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_"+(filter_counter+1)+".azr");
+						file_name = IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_"+filter_counter+".azr";
+					}
+					else{
+						break_while = true;
+					}
+					filter_counter++;
+				}
+				FilterExecution.performAction(e, message, file_name);
 			}
 			
 			if(user.exists()){

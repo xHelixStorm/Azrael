@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.sql.Timestamp;
 
 import core.Hashes;
 import core.UserPrivs;
@@ -23,7 +24,10 @@ public class MessageRemovedListener extends ListenerAdapter{
 		AuditLogPaginationAction logs = e.getGuild().getAuditLogs();
 		first_entry: for (AuditLogEntry entry : logs)
 		{
-			if(entry.getType().toString().equals("MESSAGE_DELETE") && entry.getGuild().getIdLong() == e.getGuild().getIdLong()) {
+			long audit = Timestamp.valueOf(entry.getCreationTime().toLocalDateTime()).getTime();
+			long now = new Timestamp(System.currentTimeMillis()).getTime();
+			
+			if(entry.getType().toString().equals("MESSAGE_DELETE") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && (now - audit) < 2000) {
 				trigger_user_id = entry.getUser().getId();
 				trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 				removed_from = entry.getTargetId();
