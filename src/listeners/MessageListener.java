@@ -81,7 +81,7 @@ public class MessageListener extends ListenerAdapter{
 			if(user.exists()){
 				UserExecution.performAction(e, message);
 			}
-			else{
+			else if(ranking_state == true){
 				try {
 					Thread.sleep(100);
 					SqlConnect.SQLgetChannelID(guild_id, "bot");
@@ -92,7 +92,7 @@ public class MessageListener extends ListenerAdapter{
 						RankingDB.SQLInsertUserGuild(user_id, guild_id);
 					}
 					else{
-						if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && ranking_state == true && e.getTextChannel().getIdLong() != bot_channel){
+						if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && e.getTextChannel().getIdLong() != bot_channel){
 							int rankUpExperience = RankingDB.getRankUpExperience();
 							int max_level = RankingDB.getMaxLevel();
 							int level = RankingDB.getLevel();
