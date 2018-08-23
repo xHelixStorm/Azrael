@@ -16,7 +16,7 @@ public class GuildListener extends ListenerAdapter {
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent e){
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
-		EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
+		EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name found!");
 		
 		long user_id = e.getMember().getUser().getIdLong();
 		String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
@@ -65,6 +65,7 @@ public class GuildListener extends ListenerAdapter {
 			SqlConnect.SQLgetStaffNames(guild_id);
 			check: for(String name : SqlConnect.getStaffNames()){
 				if(lc_user_name.matches(name+"#[0-9]{4}")){
+					nick_assign.setColor(Color.RED).setTitle("Impersonation attempt found!").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
 					SqlConnect.SQLgetRandomName(e.getGuild().getIdLong());
 					String nickname = SqlConnect.getName();
 					e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
