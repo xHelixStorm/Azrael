@@ -277,6 +277,45 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
 						FileSetting.createFile(file_path, "complete");
 					}
+					else if(_message.equalsIgnoreCase("spanish")) {
+						SqlConnect.SQLgetFilter("spa", _e.getGuild().getIdLong());
+						StringBuilder out = new StringBuilder();
+						for(String word : SqlConnect.getFilter_Words()) {
+							out.append(word+"\n");
+						}
+						SqlConnect.clearFilter_Words();
+						String paste_link = Pastebin.unlistedPaste("Spanish word filter", out.toString());
+						message.setTitle("Spanish word filter!");
+						out.setLength(0);
+						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
+						FileSetting.createFile(file_path, "complete");
+					}
+					else if(_message.equalsIgnoreCase("portuguese")) {
+						SqlConnect.SQLgetFilter("por", _e.getGuild().getIdLong());
+						StringBuilder out = new StringBuilder();
+						for(String word : SqlConnect.getFilter_Words()) {
+							out.append(word+"\n");
+						}
+						SqlConnect.clearFilter_Words();
+						String paste_link = Pastebin.unlistedPaste("Portuguese word filter", out.toString());
+						message.setTitle("Portuguese word filter!");
+						out.setLength(0);
+						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
+						FileSetting.createFile(file_path, "complete");
+					}
+					else if(_message.equalsIgnoreCase("italian")) {
+						SqlConnect.SQLgetFilter("ita", _e.getGuild().getIdLong());
+						StringBuilder out = new StringBuilder();
+						for(String word : SqlConnect.getFilter_Words()) {
+							out.append(word+"\n");
+						}
+						SqlConnect.clearFilter_Words();
+						String paste_link = Pastebin.unlistedPaste("Italian word filter", out.toString());
+						message.setTitle("Italian word filter!");
+						out.setLength(0);
+						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
+						FileSetting.createFile(file_path, "complete");
+					}
 					break;
 				case "insert-word-filter":
 					if(_message.equalsIgnoreCase("english")) {
@@ -303,6 +342,21 @@ public class FilterExecution {
 						message.setTitle("You chose to insert an russian word!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
 						FileSetting.createFile(file_path, "russian-insert-word-filter");
+					}
+					else if(_message.equalsIgnoreCase("spanish")) {
+						message.setTitle("You chose to insert an spanish word!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
+						FileSetting.createFile(file_path, "spanish-insert-word-filter");
+					}
+					else if(_message.equalsIgnoreCase("portuguese")) {
+						message.setTitle("You chose to insert an portuguese word!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
+						FileSetting.createFile(file_path, "portuguese-insert-word-filter");
+					}
+					else if(_message.equalsIgnoreCase("italian")) {
+						message.setTitle("You chose to insert an italian word!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
+						FileSetting.createFile(file_path, "italian-insert-word-filter");
 					}
 					break;
 				case "english-insert-word-filter":
@@ -340,6 +394,27 @@ public class FilterExecution {
 					Hashes.removeQuerryResult("rus");
 					FileSetting.createFile(file_path, "complete");
 					break;
+				case "spanish-insert-word-filter":
+					SqlConnect.SQLInsertWordFilter("spa", _message, _e.getGuild().getIdLong());
+					message.setTitle("Success!");
+					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the spanish word filter!").build()).queue();
+					Hashes.removeQuerryResult("spa");
+					FileSetting.createFile(file_path, "complete");
+					break;
+				case "portuguese-insert-word-filter":
+					SqlConnect.SQLInsertWordFilter("por", _message, _e.getGuild().getIdLong());
+					message.setTitle("Success!");
+					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the portuguese word filter!").build()).queue();
+					Hashes.removeQuerryResult("por");
+					FileSetting.createFile(file_path, "complete");
+					break;
+				case "italian-insert-word-filter":
+					SqlConnect.SQLInsertWordFilter("ita", _message, _e.getGuild().getIdLong());
+					message.setTitle("Success!");
+					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the italian word filter!").build()).queue();
+					Hashes.removeQuerryResult("ita");
+					FileSetting.createFile(file_path, "complete");
+					break;
 				case "remove-word-filter":
 					if(_message.equalsIgnoreCase("english")) {
 						message.setTitle("You chose to remove an english word!");
@@ -365,6 +440,21 @@ public class FilterExecution {
 						message.setTitle("You chose to remove an russian word!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
 						FileSetting.createFile(file_path, "russian-remove-word-filter");
+					}
+					else if(_message.equalsIgnoreCase("spanish")) {
+						message.setTitle("You chose to remove an spanish word!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
+						FileSetting.createFile(file_path, "spanish-remove-word-filter");
+					}
+					else if(_message.equalsIgnoreCase("portuguese")) {
+						message.setTitle("You chose to remove an portuguese word!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
+						FileSetting.createFile(file_path, "portuguese-remove-word-filter");
+					}
+					else if(_message.equalsIgnoreCase("italian")) {
+						message.setTitle("You chose to remove an italian word!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
+						FileSetting.createFile(file_path, "italian-remove-word-filter");
 					}
 					break;
 				case "english-remove-word-filter":
@@ -402,6 +492,27 @@ public class FilterExecution {
 					Hashes.removeQuerryResult("rus");
 					FileSetting.createFile(file_path, "complete");
 					break;
+				case "spanish-remove-word-filter":
+					SqlConnect.SQLDeleteWordFilter("spa", _message, _e.getGuild().getIdLong());
+					message.setTitle("Success!");
+					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the spanish word filter!").build()).queue();
+					Hashes.removeQuerryResult("spa");
+					FileSetting.createFile(file_path, "complete");
+					break;
+				case "portuguese-remove-word-filter":
+					SqlConnect.SQLDeleteWordFilter("por", _message, _e.getGuild().getIdLong());
+					message.setTitle("Success!");
+					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the portuguese word filter!").build()).queue();
+					Hashes.removeQuerryResult("por");
+					FileSetting.createFile(file_path, "complete");
+					break;
+				case "italian-remove-word-filter":
+					SqlConnect.SQLDeleteWordFilter("ita", _message, _e.getGuild().getIdLong());
+					message.setTitle("Success!");
+					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the italian word filter!").build()).queue();
+					Hashes.removeQuerryResult("ita");
+					FileSetting.createFile(file_path, "complete");
+					break;
 				case "load-word-filter":
 					if(_message.equalsIgnoreCase("english")) {
 						message.setTitle("You chose to add english words!");
@@ -427,6 +538,21 @@ public class FilterExecution {
 						message.setTitle("You chose to add russian words!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\\nType **continue** if you're done.").build()).queue();
 						FileSetting.createFile(file_path, "russian-load-word-filter");
+					}
+					else if(_message.equalsIgnoreCase("spanish")) {
+						message.setTitle("You chose to add spanish words!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\\nType **continue** if you're done.").build()).queue();
+						FileSetting.createFile(file_path, "spanish-load-word-filter");
+					}
+					else if(_message.equalsIgnoreCase("portuguese")) {
+						message.setTitle("You chose to add portuguese words!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\\nType **continue** if you're done.").build()).queue();
+						FileSetting.createFile(file_path, "portuguese-load-word-filter");
+					}
+					else if(_message.equalsIgnoreCase("italian")) {
+						message.setTitle("You chose to add italian words!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\\nType **continue** if you're done.").build()).queue();
+						FileSetting.createFile(file_path, "italian-load-word-filter");
 					}
 					break;
 				case "english-load-word-filter":
@@ -486,6 +612,42 @@ public class FilterExecution {
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
 						Hashes.removeQuerryResult("rus");
+						FileSetting.createFile(file_path, "complete");
+					}
+					break;
+				case "spanish-load-word-filter":
+					if(_message.equalsIgnoreCase("continue")) {
+						ArrayList<String> words = new ArrayList<String>();
+						words = FileSetting.readFileIntoArray("./files/words.txt");
+						SqlConnect.SQLDeleteLangWordFilter("spa", _e.getGuild().getIdLong());
+						SqlConnect.SQLReplaceWordFilter("spa", words, _e.getGuild().getIdLong());
+						message.setTitle("Success!");
+						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
+						Hashes.removeQuerryResult("spa");
+						FileSetting.createFile(file_path, "complete");
+					}
+					break;
+				case "portuguese-load-word-filter":
+					if(_message.equalsIgnoreCase("continue")) {
+						ArrayList<String> words = new ArrayList<String>();
+						words = FileSetting.readFileIntoArray("./files/words.txt");
+						SqlConnect.SQLDeleteLangWordFilter("por", _e.getGuild().getIdLong());
+						SqlConnect.SQLReplaceWordFilter("por", words, _e.getGuild().getIdLong());
+						message.setTitle("Success!");
+						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
+						Hashes.removeQuerryResult("por");
+						FileSetting.createFile(file_path, "complete");
+					}
+					break;
+				case "italian-load-word-filter":
+					if(_message.equalsIgnoreCase("continue")) {
+						ArrayList<String> words = new ArrayList<String>();
+						words = FileSetting.readFileIntoArray("./files/words.txt");
+						SqlConnect.SQLDeleteLangWordFilter("ita", _e.getGuild().getIdLong());
+						SqlConnect.SQLReplaceWordFilter("ita", words, _e.getGuild().getIdLong());
+						message.setTitle("Success!");
+						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
+						Hashes.removeQuerryResult("ita");
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;

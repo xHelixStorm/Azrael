@@ -26,7 +26,7 @@ public class UserExecution {
 		String raw_input = _input;
 		String user_name = "";
 		
-		if(raw_input.length() != 18){
+		if(raw_input.length() != 18 && raw_input.length() != 17){
 			SqlConnect.SQLgetUser(name);
 			if(SqlConnect.getUser_id() != 0){
 				raw_input = ""+SqlConnect.getUser_id();
@@ -42,7 +42,7 @@ public class UserExecution {
 			}
 		}
 		
-		if(raw_input != null && raw_input.length() == 18) {
+		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17)) {
 			if(user_name != null && user_name.length() > 0) {
 				_e.getTextChannel().sendMessage(message.setDescription("The user has been found in this guild! Now type one of the following words within 3 minutes to execute an action!\n\n"
 						+ "**information**: To display all details of the selected user\n"
@@ -199,7 +199,11 @@ public class UserExecution {
 						SqlConnect.SQLgetMaxWarning(_e.getGuild().getIdLong());
 						int warning_id = Integer.parseInt(_message.replaceAll("[^0-9]*", ""));
 						int max_warning_id = SqlConnect.getWarningID();
-						if(warning_id <= max_warning_id) {
+						if(warning_id == 0){
+							SqlConnect.SQLDeleteData(Long.parseLong(file_value.replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong());
+							_e.getTextChannel().sendMessage("The warnings of this user has been cleared!").queue();
+						}
+						else if(warning_id <= max_warning_id) {
 							SqlConnect.SQLUpdateWarning(Long.parseLong(file_value.replaceAll("[^0-9]", "")), _e.getGuild().getIdLong(), warning_id);
 							_e.getTextChannel().sendMessage("Warning value "+warning_id+" has been set!").queue();
 						}
