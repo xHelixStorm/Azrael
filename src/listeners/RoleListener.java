@@ -120,7 +120,9 @@ public class RoleListener extends ListenerAdapter{
 					e.getGuild().getTextChannelById(channel_id).sendMessage(message2.setDescription("The mute role has been set on someone with higher privileges. Mute role removed!").build()).queue();
 				}
 			}
-			SqlConnect.SQLInsertActionLog("MEMBER_MUTE_ADD", user_id, guild_id, "User Muted");
+			if(unmute_time - System.currentTimeMillis() < 0){
+				SqlConnect.SQLInsertActionLog("MEMBER_MUTE_ADD", user_id, guild_id, "User Muted");
+			}
 			ServerRoles.clearAllVariables();
 			RankingDB.clearAllVariables();
 			SqlConnect.clearAllVariables();
