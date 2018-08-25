@@ -422,9 +422,10 @@ public class SqlConnect {
 				setGuild_id(rs.getLong(2));
 				setWarningID(rs.getInt(3));
 				setBanID(rs.getInt(4));
-				setUnmute(rs.getTimestamp(5));
-				setMuted(rs.getBoolean(6));
-				setCustomTime(rs.getBoolean(7));
+				setTimestamp(rs.getTimestamp(5));
+				setUnmute(rs.getTimestamp(6));
+				setMuted(rs.getBoolean(7));
+				setCustomTime(rs.getBoolean(8));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
