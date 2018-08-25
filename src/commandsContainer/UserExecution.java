@@ -89,13 +89,20 @@ public class UserExecution {
 						SqlConnect.SQLgetSingleActionEventCount("MEMBER_BAN_ADD", Long.parseLong(file_value), _e.getGuild().getIdLong());
 						message.addField("TOTAL BANS", "**"+SqlConnect.getCount()+"**", true);
 						message.addField("BANNED", SqlConnect.getBanID() == 2 ? "**YES**" : "**NO**", true);
-						message.addField("JOIN DATE", "**"+SqlConnect.getJoinDate()+"**", false);
+						message.addField("JOIN DATE", "**"+SqlConnect.getJoinDate()+"**", true);
+						message.addField("USER ID", "**"+file_value+"**", true);
 						message.addBlankField(false);
 						RankingDB.SQLgetGuild(_e.getGuild().getIdLong());
 						if(RankingDB.getRankingState()) {
 							RankingDB.SQLgetUserDetails(Long.parseLong(file_value));
 							message.addField("LEVEL", "**"+RankingDB.getLevel()+"**/**"+RankingDB.getMaxLevel()+"**", true);
 							message.addField("EXPERIENCE", "**"+RankingDB.getCurrentExperience()+"**/**"+RankingDB.getRankUpExperience()+"**", true);
+							if(RankingDB.getAssignedRole() != 0){
+								message.addField("UNLOCKED ROLE", _e.getGuild().getRoleById(RankingDB.getAssignedRole()).getAsMention(), false);
+							}
+							else{
+								message.addField("UNLOCKED ROLE", "**N/A**", false);
+							}
 						}
 						StringBuilder out = new StringBuilder();
 						SqlConnect.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", Long.parseLong(file_value), _e.getGuild().getIdLong());
