@@ -12,7 +12,7 @@ private static String parseMessage;
 			message = message.replaceAll("[ĆćĈĉĊċČčϹСⅭϲсⅽ]", "c");
 			message = message.replaceAll("[çÇ]", "ch");
 			message = message.replaceAll("[ÐĎďĐđƉƊԁⅾ]", "d");
-			message = message.replaceAll("[ÈÉÊËèéêëĚěĒēĔĕĖėΕЕе]", "e");
+			message = message.replaceAll("[3ÈÉÊËèéêëĚěĒēĔĕĖėΕЕе]", "e");
 			message = message.replaceAll("[Ęę]", "eh");
 			message = message.replaceAll("[Ϝ]", "f");
 			message = message.replaceAll("[ĜĝĞğĠġģԌ]", "g");
