@@ -53,7 +53,7 @@ public class GuildLeaveListener extends ListenerAdapter{
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from "+guild_name+" while being muted!").build()).queue();
 			}
 			else if(trigger_user_name.length() > 0) {
-				e.getGuild().getTextChannelById(channel_id).sendMessage(kick.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** kicked **"+user_name+"** from **"+guild_name+"**"+kick_reason).build()).queue();
+				e.getGuild().getTextChannelById(channel_id).sendMessage(kick.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** kicked **"+user_name+"** with the id number **"+e.getUser().getId()+"** from **"+guild_name+"**"+kick_reason).build()).queue();
 			}
 			else if(IniFileReader.getLeaveMessage().equals("true") && banned == false){
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from **"+guild_name+"**").build()).queue();

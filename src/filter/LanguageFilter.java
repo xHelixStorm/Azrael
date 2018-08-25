@@ -57,7 +57,7 @@ public class LanguageFilter extends ListenerAdapter implements Runnable{
 					for(String word : SqlConnect.getFilter_Words()){
 						if(wordFound == false && letterCounter > 1){
 							if(parseMessage.equals(word) || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || parseMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.contains(" "+word+" ")){
-								e.getMessage().delete().queue();
+								e.getMessage().delete().reason("Message removed due to bad manner!").queue();
 								long guild_id = e.getGuild().getIdLong();
 								SqlConnect.SQLgetChannelID(guild_id, "tra");
 								long channel_id = SqlConnect.getChannelID();
@@ -70,6 +70,7 @@ public class LanguageFilter extends ListenerAdapter implements Runnable{
 					SqlConnect.clearFilter_Words();
 				}
 			}
+			SqlConnect.clearFilter_Lang();
 			
 			if(wordFound == true){
 				Path path = Paths.get(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");

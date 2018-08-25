@@ -41,13 +41,6 @@ public class MessageListener extends ListenerAdapter{
 			boolean ranking_state = RankingDB.getRankingState();
 			long channel_id = e.getTextChannel().getIdLong();
 			
-			SqlConnect.SQLgetChannel_Filter(channel_id);;
-			ArrayList<String> filter_lang = SqlConnect.getFilter_Lang();
-			if(!filter_lang.equals("")){
-				executor.execute(new LanguageFilter(e, filter_lang));
-			}
-			SqlConnect.clearFilter_Lang();
-			
 			if(IniFileReader.getChannelLog().equals("true")){
 				LocalDateTime time = LocalDateTime.now();
 				FileSetting.appendFile("./message_log/"+e.getTextChannel().getName()+".txt", "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw()+"\n");
@@ -130,6 +123,12 @@ public class MessageListener extends ListenerAdapter{
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
+			}
+			
+			SqlConnect.SQLgetChannel_Filter(channel_id);;
+			ArrayList<String> filter_lang = SqlConnect.getFilter_Lang();
+			if(!filter_lang.isEmpty()){
+				executor.execute(new LanguageFilter(e, filter_lang));
 			}
 		} catch(NullPointerException npe){
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());

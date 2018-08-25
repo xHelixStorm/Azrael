@@ -70,6 +70,7 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 					SqlConnect.clearFilter_Words();
 				}
 			}
+			SqlConnect.clearFilter_Lang();
 			
 			if(wordFound == true){
 				Path path = Paths.get(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");

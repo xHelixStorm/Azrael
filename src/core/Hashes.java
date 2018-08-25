@@ -43,4 +43,7 @@ public class Hashes {
 	public static void removeQuerryResult(String _key) {
 		querry_result.remove(_key);
 	}
+	public static void removeMessageRemoved(long _key){
+		message_removed.remove(_key);
+	}
 }
