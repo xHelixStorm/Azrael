@@ -74,7 +74,8 @@ public class MessageListener extends ListenerAdapter{
 			if(user.exists()){
 				UserExecution.performAction(e, message);
 			}
-			else if(ranking_state == true){
+			
+			if(ranking_state == true && !e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"profile") && !e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"rank")){
 				try {
 					Thread.sleep(100);
 					SqlConnect.SQLgetChannelID(guild_id, "bot");
