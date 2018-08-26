@@ -2,16 +2,24 @@ package commandsContainer;
 
 import java.awt.Color;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
+import core.Hashes;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageHistory;
 import net.dv8tion.jda.core.entities.PrivateChannel;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingDB;
 import sql.ServerRoles;
 import sql.SqlConnect;
 import threads.DelayDelete;
+import util.Pastebin;
 import util.RankingSystemPreferences;
 
 public class UserExecution {
@@ -46,6 +54,7 @@ public class UserExecution {
 			if(user_name != null && user_name.length() > 0) {
 				_e.getTextChannel().sendMessage(message.setDescription("The user has been found in this guild! Now type one of the following words within 3 minutes to execute an action!\n\n"
 						+ "**information**: To display all details of the selected user\n"
+						+ "**delete-messages**: To remove up to 100 messages from the selected user\n"
 						+ "**warning**: To change the current warning value\n"
 						+ "**mute**: To assign the mute role\n"
 						+ "**ban**: To ban the user\n"
@@ -71,7 +80,7 @@ public class UserExecution {
 		String file_path = IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr";
 		String file_value = FileSetting.readFile(file_path);
 		if(!file_value.equals("expired")) {
-			if(_message.equals("information") || _message.equals("warning") || _message.equals("mute") || _message.equals("ban") || _message.equals("kick") || _message.equals("gift-experience") || _message.equals("set-experience") || _message.equals("set-level")) {
+			if(_message.equals("information") || _message.equals("delete-messages") || _message.equals("warning") || _message.equals("mute") || _message.equals("ban") || _message.equals("kick") || _message.equals("gift-experience") || _message.equals("set-experience") || _message.equals("set-level")) {
 				switch(_message) {
 					case "information": 
 						SqlConnect.SQLgetUserThroughID(file_value);
@@ -133,6 +142,11 @@ public class UserExecution {
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.build()).queue();
 						FileSetting.deleteFile(file_path);
+						break;
+					case "delete-messages":
+						message.setTitle("You choose to delete a number of messages!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
+						FileSetting.createFile(file_path, "delete-messages"+file_value);
 						break;
 					case "warning":
 						message.setTitle("You chose to set a warning value!");
@@ -196,6 +210,60 @@ public class UserExecution {
 							_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
 						}
 						break;
+				}
+			}
+			else if(file_value.replaceAll("[0-9]*", "").equals("delete-messages")){
+				if(_message.replaceAll("[0-9]*", "").length() == 0){
+					int value = Integer.parseInt(_message);
+					if(value == 0){
+						_e.getTextChannel().sendMessage("You chose to not remove any messages at all!").queue();
+					}
+					else if(value > 100){
+						_e.getTextChannel().sendMessage("Please choose a number between 1 and 100!").queue();
+					}
+					else{
+						SqlConnect.SQLgetUserThroughID(file_value.replaceAll("[^0-9]*", ""));
+						ArrayList<Long> message_ids = new ArrayList<Long>();
+						Set<Long> message_pool_key = Hashes.getWholeMessagePool().keySet();
+						for(Long key : message_pool_key){
+							message_ids.add(key);
+						}
+						int hash_counter = 0;
+						StringBuilder collected_messages = new StringBuilder();
+						search: for(int count = message_ids.size()-1; count >= 0; count--){
+							if(hash_counter < value){
+								if(Hashes.getMessagePool(message_ids.get(count)).contains(SqlConnect.getName().substring(0, SqlConnect.getName().length()-5))){
+									inspect: for(TextChannel tc : _e.getGuild().getTextChannels()){
+										MessageHistory history = new MessageHistory(tc);
+										List<Message> retrieved_message = history.retrievePast(100).complete();
+										for(Message msg : retrieved_message){
+											String author_name = msg.getAuthor().getName()+"#"+msg.getAuthor().getDiscriminator();
+											if(msg.getIdLong() == message_ids.get(count) && author_name.equals(SqlConnect.getName())){
+												msg.delete().queue();
+												if(!collected_messages.toString().contains(collected_messages+""+Hashes.getMessagePool(message_ids.get(count)))){
+													collected_messages.append(Hashes.getMessagePool(message_ids.get(count))+"\n");
+												}
+												Hashes.removeMessagePool(message_ids.get(count));
+												hash_counter++;
+												break inspect;
+											}
+										}
+									}
+								}
+							}
+							else{
+								break search;
+							}
+						}
+						if(collected_messages.length() > 0){
+							String paste_link = Pastebin.unlistedPaste("Found words have been succesfully removed!", collected_messages.toString());
+							_e.getTextChannel().sendMessage(message.setDescription("The comments of the selected user have been succesfully removed: "+paste_link).build()).queue();
+							collected_messages.setLength(0);
+						}
+						else{
+							_e.getTextChannel().sendMessage(message.setDescription("Nothing has been found to delete....").build()).queue();
+						}
+					}
 				}
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equals("warning")) {

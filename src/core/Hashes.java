@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Hashes {
-	private static final int max_message_pool_size = 10000;
+	private static final int max_message_pool_size = 1000;
 	private static final LinkedHashMap<Long, String> message_pool = new LinkedHashMap<Long, String>(){
 		private static final long serialVersionUID = 7505333508062985903L;
 		@Override
@@ -30,6 +30,9 @@ public class Hashes {
 	}
 	public static String getMessagePool(long _message_id) {
 		return message_pool.get(_message_id);
+	}
+	public static LinkedHashMap<Long, String> getWholeMessagePool(){
+		return message_pool;
 	}
 	public static ArrayList<String> getQuerryResult(String _key) {
 		return querry_result.get(_key);
