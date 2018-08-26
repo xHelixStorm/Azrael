@@ -16,7 +16,7 @@ public class SetChannelFilter {
 		if(channel.length() == 18){
 			long channel_id = Long.parseLong(channel);
 			SqlConnect.SQLDeleteChannel_Filter(channel_id);
-			Pattern pattern = Pattern.compile("(all|eng|fre|ger|tur|rus)");
+			Pattern pattern = Pattern.compile("(all|eng|fre|ger|tur|rus|spa|por|ita)");
 			Matcher matcher = pattern.matcher(_input);
 			while(matcher.find()){
 				filter_lang.add(matcher.group());
@@ -31,6 +31,9 @@ public class SetChannelFilter {
 					case "fre":
 					case "tur":
 					case "rus":
+					case "spa":
+					case "por":
+					case "ita":
 						languageError = false;
 						break;
 					default:
