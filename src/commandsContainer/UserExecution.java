@@ -15,6 +15,7 @@ import net.dv8tion.jda.core.entities.MessageHistory;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import sql.RankingDB;
 import sql.ServerRoles;
 import sql.SqlConnect;
@@ -234,19 +235,23 @@ public class UserExecution {
 							if(hash_counter < value){
 								if(Hashes.getMessagePool(message_ids.get(count)).contains(SqlConnect.getName().substring(0, SqlConnect.getName().length()-5))){
 									inspect: for(TextChannel tc : _e.getGuild().getTextChannels()){
-										MessageHistory history = new MessageHistory(tc);
-										List<Message> retrieved_message = history.retrievePast(100).complete();
-										for(Message msg : retrieved_message){
-											String author_name = msg.getAuthor().getName()+"#"+msg.getAuthor().getDiscriminator();
-											if(msg.getIdLong() == message_ids.get(count) && author_name.equals(SqlConnect.getName())){
-												msg.delete().queue();
-												if(!collected_messages.toString().contains(collected_messages+""+Hashes.getMessagePool(message_ids.get(count)))){
-													collected_messages.append(Hashes.getMessagePool(message_ids.get(count))+"\n");
+										try{
+											MessageHistory history = new MessageHistory(tc);
+											List<Message> retrieved_message = history.retrievePast(100).complete();
+											for(Message msg : retrieved_message){
+												String author_name = msg.getAuthor().getName()+"#"+msg.getAuthor().getDiscriminator();
+												if(msg.getIdLong() == message_ids.get(count) && author_name.equals(SqlConnect.getName())){
+													msg.delete().queue();
+													if(!collected_messages.toString().contains(collected_messages+""+Hashes.getMessagePool(message_ids.get(count)))){
+														collected_messages.append(Hashes.getMessagePool(message_ids.get(count))+"\n");
+													}
+													Hashes.removeMessagePool(message_ids.get(count));
+													hash_counter++;
+													break inspect;
 												}
-												Hashes.removeMessagePool(message_ids.get(count));
-												hash_counter++;
-												break inspect;
 											}
+										} catch(InsufficientPermissionException ipe){
+											//jump to next channel
 										}
 									}
 								}
