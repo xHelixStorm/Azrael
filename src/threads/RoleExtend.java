@@ -37,7 +37,12 @@ public class RoleExtend implements Runnable{
 		for(Member member : e.getJDA().getGuildById(guild_id).getMembers()){
 			if(UserPrivs.isUserMuted(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong())){
 				SqlConnect.SQLgetData(member.getUser().getIdLong(), guild_id);
-				long unmute = (SqlConnect.getUnmute().getTime() - System.currentTimeMillis());
+				long unmute;
+				try{
+					unmute = (SqlConnect.getUnmute().getTime() - System.currentTimeMillis());
+				} catch(NullPointerException npe){
+					unmute = 0;
+				}
 				if(unmute < 0){unmute = 0;}
 				RankingDB.SQLgetUserDetails(member.getUser().getIdLong());
 				long assignedRole = RankingDB.getAssignedRole();
