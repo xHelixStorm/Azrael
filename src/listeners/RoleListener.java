@@ -46,7 +46,7 @@ public class RoleListener extends ListenerAdapter{
 			} catch(NullPointerException npe) {
 				unmute_time = -1;
 			}
-			if(unmute_time - System.currentTimeMillis() > 0){
+			if(unmute_time - System.currentTimeMillis() > 0 && SqlConnect.getMuted() == true){
 				if(channel_id != 0){
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned before the mute time elapsed! Reason may be due to rejoining or manual role reassignment!").build()).queue();
