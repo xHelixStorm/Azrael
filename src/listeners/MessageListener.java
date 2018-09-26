@@ -29,7 +29,7 @@ public class MessageListener extends ListenerAdapter{
 		
 		try {
 			File warning = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
-			File user = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
+			File user = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
 			File filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
 			
 			long user_id = e.getMember().getUser().getIdLong();
@@ -54,25 +54,13 @@ public class MessageListener extends ListenerAdapter{
 			}
 			
 			if(filter.exists()) {
-				filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_1.azr");
-				String file_name = IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr";
-				int filter_counter = 1;
-				boolean break_while = false;
-				while(filter_counter < 20 && break_while == false){
-					if(filter.exists()){
-						filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_"+(filter_counter+1)+".azr");
-						file_name = IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_"+filter_counter+".azr";
-					}
-					else{
-						break_while = true;
-					}
-					filter_counter++;
-				}
+				String file_name = getFileName(new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_1.azr"), 20, "filter", e);
 				FilterExecution.performAction(e, message, file_name);
 			}
 			
 			if(user.exists()){
-				UserExecution.performAction(e, message);
+				String file_name = getFileName(new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_1.azr"), 20, "user", e);
+				UserExecution.performAction(e, message, file_name);
 			}
 			
 			if(ranking_state == true && !e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"profile") && !e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"rank")){
@@ -138,5 +126,22 @@ public class MessageListener extends ListenerAdapter{
 		RankingDB.clearAllVariables();
 		SqlConnect.clearAllVariables();
 		executor.shutdown();
+	}
+	
+	private String getFileName(File file, int max_count, String name, MessageReceivedEvent e) {
+		String file_name = IniFileReader.getTempDirectory()+"AutoDelFiles/"+name+"_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr";
+		int counter = 1;
+		boolean break_while = false;
+		while(counter < max_count && break_while == false){
+			if(file.exists()){
+				file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/"+name+"_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_"+(counter+1)+".azr");
+				file_name = IniFileReader.getTempDirectory()+"AutoDelFiles/"+name+"_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_"+counter+".azr";
+			}
+			else{
+				break_while = true;
+			}
+			counter++;
+		}
+		return file_name;
 	}
 }

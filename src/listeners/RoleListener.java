@@ -69,6 +69,7 @@ public class RoleListener extends ListenerAdapter{
 					long assignedRole = RankingDB.getAssignedRole();
 					
 					if(SqlConnect.getCustomTime()) {
+						SqlConnect.SQLUpdateMuted(e.getUser().getIdLong(), e.getGuild().getIdLong(), true, true);;
 						mute_time = Long.parseLong(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/mute_time_"+e.getMember().getUser().getId()));
 						long hours = (mute_time/1000/60/60);
 						long minutes = (mute_time/1000/60%60);

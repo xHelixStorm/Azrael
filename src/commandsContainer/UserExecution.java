@@ -1,6 +1,7 @@
 package commandsContainer;
 
 import java.awt.Color;
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,22 @@ public class UserExecution {
 	
 	public static void runTask(MessageReceivedEvent _e, String _input, String _displayed_input) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle("Choose the desired action");
+		File file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+"_0.azr");
+		String file_name = IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+"_0.azr";
+		boolean break_while = false;
+		int i = 0;
+		
+		while(i < 19 && break_while == false){
+			if(file.exists()){
+				file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+"_"+(i+1)+".azr");
+				file_name = IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+"_"+(i+1)+".azr";
+			}
+			else{
+				break_while = true;
+			}
+			i++;
+		}
+		
 		String name = _displayed_input.replaceAll("@", "");
 		String raw_input = _input;
 		String user_name = "";
@@ -63,8 +80,8 @@ public class UserExecution {
 						+ "**gift-experience**: To gift experience points\n"
 						+ "**set-experience**: To set an experience value\n"
 						+ "**set-level**: To assign a level").build()).queue();
-				FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", raw_input);
-				new Thread(new DelayDelete(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", 180000)).start();
+				FileSetting.createFile(file_name, raw_input);
+				new Thread(new DelayDelete(file_name, 180000)).start();
 			}
 			else {
 				_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Error, user doesn't exist. Please try again!").queue();
@@ -75,13 +92,13 @@ public class UserExecution {
 		}
 	}
 	
-	public static void performAction(MessageReceivedEvent _e, String _message) {
+	public static void performAction(MessageReceivedEvent _e, String _message, String _file_name) {
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Session Expired!");
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
-		String file_path = IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr";
+		String file_path = _file_name;
 		String file_value = FileSetting.readFile(file_path);
-		if(!file_value.equals("expired")) {
-			if(_message.equals("information") || _message.equals("delete-messages") || _message.equals("warning") || _message.equals("mute") || _message.equals("ban") || _message.equals("kick") || _message.equals("gift-experience") || _message.equals("set-experience") || _message.equals("set-level")) {
+		if(!file_value.equals("complete")) {
+			if(_message.equalsIgnoreCase("information") || _message.equalsIgnoreCase("delete-messages") || _message.equalsIgnoreCase("warning") || _message.equalsIgnoreCase("mute") || _message.equalsIgnoreCase("ban") || _message.equalsIgnoreCase("kick") || _message.equalsIgnoreCase("gift-experience") || _message.equalsIgnoreCase("set-experience") || _message.equalsIgnoreCase("set-level")) {
 				switch(_message) {
 					case "information": 
 						SqlConnect.SQLgetUserThroughID(file_value);
