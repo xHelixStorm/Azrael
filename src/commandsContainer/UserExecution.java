@@ -158,7 +158,7 @@ public class UserExecution {
 						message.setTitle("You chose to mute!");
 						message.addField("YES", "Provide a mute time", true);
 						message.addField("NO", "Don't provide a mute time", true);
-						_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a self chosen mute time in minutes? By providing a self chosen mute timer, the warning value won't increment!").build()).queue();
+						_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a self chosen mute timer? By providing a self chosen mute timer, the warning value won't increment unless the user has been never warned before!").build()).queue();
 						FileSetting.createFile(file_path, "mute"+file_value);
 						break;
 					case "ban":
@@ -301,7 +301,10 @@ public class UserExecution {
 			else if(file_value.replaceAll("[0-9]*", "").equals("mute")) {
 				if(_message.equalsIgnoreCase("yes")) {
 					message.setTitle("You chose to provide a mute time!");
-					_e.getTextChannel().sendMessage(message.setDescription("Please provide a mute time in minutes!").build()).queue();
+					_e.getTextChannel().sendMessage(message.setDescription("Please provide a mute time in the following format:\n\n"
+							+ "to set the time in minutes: eg. **1m**\n"
+							+ "to set the time in hours: eg.**1h**\n"
+							+ "to set the time in days: eg. **1d**").build()).queue();
 					FileSetting.createFile(file_path, "mute-time"+file_value.replaceAll("[^0-9]*", ""));
 				}
 				else if(_message.equalsIgnoreCase("no")) {
@@ -312,8 +315,17 @@ public class UserExecution {
 				}
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equals("mute-time")) {
-				if(_message.replaceAll("[0-9]*", "").length() == 0) {					
-					long mute_time = (Long.parseLong(_message)*60*1000);
+				if(_message.replaceAll("[0-9]*", "").length() == 1 && (_message.endsWith("m") || _message.endsWith("h") || _message.endsWith("d"))) {					
+					long mute_time = (Long.parseLong(_message.replaceAll("[^0-9]*", ""))*1000);
+					if(_message.endsWith("m")) {
+						mute_time *= 60;
+					}
+					else if(_message.endsWith("h")) {
+						mute_time = mute_time*60*60;
+					}
+					else if(_message.endsWith("d")) {
+						mute_time = mute_time*60*60*24;
+					}
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
 					
