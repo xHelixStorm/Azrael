@@ -15,6 +15,7 @@ import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import filter.LanguageFilter;
+import net.dv8tion.jda.core.entities.Message.Attachment;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import rankingSystem.RankingThreadExecution;
@@ -43,9 +44,13 @@ public class MessageListener extends ListenerAdapter{
 			
 			if(IniFileReader.getChannelLog().equals("true")){
 				LocalDateTime time = LocalDateTime.now();
-				FileSetting.appendFile("./message_log/"+e.getTextChannel().getName()+".txt", "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw()+"\n");
+				String image_url = "";
+				for(Attachment attch : e.getMessage().getAttachments()){
+					image_url = (e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? image_url+"IMMAGE "+attch.getFileName()+" ("+attch.getUrl()+")" : image_url+"\nIMMAGE "+attch.getFileName()+" ("+attch.getUrl()+")";
+				}
+				FileSetting.appendFile("./message_log/"+e.getTextChannel().getName()+".txt", "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw()+image_url+"\n");
 				if(IniFileReader.getCacheLog().equals("true")) {
-					Hashes.addMessagePool(e.getMessageIdLong(), "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw());
+					Hashes.addMessagePool(e.getMessageIdLong(), "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw()+image_url);
 				}
 			}
 			
