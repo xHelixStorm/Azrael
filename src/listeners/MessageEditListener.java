@@ -17,7 +17,7 @@ public class MessageEditListener extends ListenerAdapter{
 		SqlConnect.SQLgetChannel_Filter(channel_id);;
 		ArrayList<String> filter_lang = SqlConnect.getFilter_Lang();
 		
-		if(!filter_lang.equals("")){
+		if(filter_lang.size() > 0){
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(new LanguageEditFilter(e, filter_lang));
 			executor.shutdown();
