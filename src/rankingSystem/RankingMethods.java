@@ -16,7 +16,6 @@ import javax.imageio.ImageIO;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import util.STATIC;
 
 public class RankingMethods extends ListenerAdapter{
 	public static void getRankUp(MessageReceivedEvent e , int _level, int _level_skin, int _icon_skin, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
@@ -76,8 +75,6 @@ public class RankingMethods extends ListenerAdapter{
 	
 	public static void getRank(MessageReceivedEvent e, String _name, String _avatar, int _experience, int _level, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
 		try{
-			STATIC.allowCertificates();
-			
 			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/rank"+_rank_skin+"_blank.png"));
 			BufferedImage experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+_bar_color+"_"+_experience+".png"));
 			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".jpg"));
@@ -129,8 +126,6 @@ public class RankingMethods extends ListenerAdapter{
 	
 	public static void getProfile(MessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _level, float _currentExperience, float _rankUpExperience, long _experience, long _currency, int _rank, int _profile_skin, int _icon_skin, int _bar_color, boolean _additional_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
 		try{
-			STATIC.allowCertificates();
-			
 			BufferedImage profile = ImageIO.read(new File("./files/RankingSystem/profile"+_profile_skin+"_blank.png"));
 			BufferedImage experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+_bar_color+"_"+_experiencePercentage+".png"));
 			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".jpg"));

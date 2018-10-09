@@ -9,10 +9,13 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
+import core.Guilds;
+import core.Hashes;
 import fileManagement.IniFileReader;
 import inventory.Dailies;
 import inventory.InventoryContent;
 import rankingSystem.Rank;
+import rankingSystem.Ranks;
 import rankingSystem.Skins;
 
 public class RankingDB {
@@ -231,35 +234,6 @@ public class RankingDB {
 	}
 	
 	//guilds table 
-	public static void SQLgetGuild(long _guild_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM guilds WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setGuildID(rs.getLong(1));
-				setGuildName(rs.getString(2));
-				setMaxLevel(rs.getInt(3));
-				setRankingLevel(rs.getInt(4));
-				setRankingRank(rs.getInt(5));
-				setRankingProfile(rs.getInt(6));
-				setRankingIcon(rs.getInt(7));
-				setRankingState(rs.getBoolean(8));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static void SQLInsertGuild(long _guild_id, String _name, int _max_level, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin, boolean _enabled){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -500,7 +474,9 @@ public class RankingDB {
 				ranks.setRoleID(rs.getLong(1));
 				ranks.setRole_Name(rs.getString(2));
 				ranks.setLevel_Requirement(rs.getInt(3));
-				rankList.add(ranks);
+				ranks.setGuildID(rs.getLong(4));
+				//rankList.add(ranks);
+				Hashes.addRankingRoles(_guild_id+"_"+ranks.getLevel_Requirement(), ranks);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -512,48 +488,18 @@ public class RankingDB {
 	}
 	
 	//user_details table
-	public static void SQLgetUserDetails(long _user_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM user_details WHERE fk_user_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setUserID(rs.getLong(1));
-				setLevel(rs.getInt(2));
-				setCurrentExperience(rs.getInt(3));
-				setRankUpExperience(rs.getInt(4));
-				setExperience(rs.getLong(5));
-				setCurrency(rs.getLong(6));
-				setAssignedRole(rs.getLong(7));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static void SQLInsertUserDetails(long _user_id, int _level, int _current_experience, int _rank_up_experience, long _experience, long _currency, long _assigned_role){
+	public static void SQLInsertUserDetails(long _user_id, int _level, long _experience, long _currency, long _assigned_role){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO user_details (`fk_user_id`, `level`, `current_experience`, `rank_up_experience`, `total_experience`, `currency`, `current_role`) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE fk_user_id=VALUES(fk_user_id)");
+			String sql = ("INSERT INTO user_details (`fk_user_id`, `level`, `experience`, `currency`, `current_role`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE fk_user_id=VALUES(fk_user_id)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _level);
-			stmt.setInt(3, _current_experience);
-			stmt.setInt(4, _rank_up_experience);
-			stmt.setLong(5, _experience);
-			stmt.setLong(6, _currency);
-			stmt.setLong(7, _assigned_role);
+			stmt.setLong(3, _experience);
+			stmt.setLong(4, _currency);
+			stmt.setLong(5, _assigned_role);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -563,16 +509,15 @@ public class RankingDB {
 		}
 	}
 	
-	public synchronized static void SQLUpdateExperience(long _user_id, int _current_experience, long _experience){
+	public static void SQLUpdateExperience(long _user_id, long _experience){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE user_details SET `current_experience` = ?, `total_experience` = ? WHERE `fk_user_id` = ?");
+			String sql = ("UPDATE user_details SET `experience` = ? WHERE `fk_user_id` = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _current_experience);
-			stmt.setLong(2, _experience);
-			stmt.setLong(3, _user_id);
+			stmt.setLong(1, _experience);
+			stmt.setLong(2, _user_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -582,20 +527,18 @@ public class RankingDB {
 		}
 	}
 	
-	public synchronized static void SQLsetLevelUp(long _user_id, int _level, int _current_experience, int _rank_up_experience, long _experience, long _currency, long _assigned_role){
+	public static void SQLsetLevelUp(long _user_id, int _level, long _experience, long _currency, long _assigned_role){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE user_details SET `Level` = ?, `current_experience` = ?, `rank_up_experience` = ?, `total_experience` = ?, `currency` = ?, `current_role` = ? WHERE `fk_user_id` = ?");
+			String sql = ("UPDATE user_details SET `level` = ?, `experience` = ?, `currency` = ?, `current_role` = ? WHERE `fk_user_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _level);
-			stmt.setInt(2, _current_experience);
-			stmt.setInt(3, _rank_up_experience);
-			stmt.setLong(4, _experience);
-			stmt.setLong(5, _currency);
-			stmt.setLong(6, _assigned_role);
-			stmt.setLong(7, _user_id);
+			stmt.setLong(2, _experience);
+			stmt.setLong(3, _currency);
+			stmt.setLong(4, _assigned_role);
+			stmt.setLong(5, _user_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -650,12 +593,12 @@ public class RankingDB {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT `fk_user_id`, `Level`, `total_experience`, @curRank := @curRank + 1 AS Rank FROM `user_details`, (SELECT @curRank := 0) r ORDER BY `total_experience` DESC");
+			String sql = ("SELECT `fk_user_id`, `Level`, `experience`, @curRank := @curRank + 1 AS Rank FROM `user_details`, (SELECT @curRank := 0) r ORDER BY `experience` DESC");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				Rank rank = new Rank();
-				rank.setUser_id(rs.getLong(1));
+				rank.setUser_ID(rs.getLong(1));
 				rank.setLevel(rs.getInt(2));
 				rank.setExperience(rs.getLong(3));
 				rank.setRank(rs.getInt(4));
@@ -677,13 +620,13 @@ public class RankingDB {
 		int page = (_page -1)*10;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT `fk_user_id`, `Level`, `total_experience`, @curRank := @curRank + 1 AS `Rank` FROM `user_details`, (SELECT @curRank := 0) r ORDER BY `total_experience` DESC LIMIT ?, 10");
+			String sql = ("SELECT `fk_user_id`, `Level`, `experience`, @curRank := @curRank + 1 AS `Rank` FROM `user_details`, (SELECT @curRank := 0) r ORDER BY `experience` DESC LIMIT ?, 10");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, page);
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				Rank rank = new Rank();
-				rank.setUser_id(rs.getLong(1));
+				rank.setUser_ID(rs.getLong(1));
 				rank.setLevel(rs.getInt(2));
 				rank.setExperience(rs.getLong(3));
 				rank.setRank(rs.getInt(4));
@@ -816,7 +759,7 @@ public class RankingDB {
 			while(rs.next()){
 				Rank rankingSystem = new Rank();
 				rankingSystem.setRankingLevel(rs.getInt(1));
-				rankingSystem.setDescription(rs.getString(2));
+				rankingSystem.setLevelDescription(rs.getString(2));
 				rankList.add(rankingSystem);
 			}
 		} catch (SQLException e) {
@@ -828,18 +771,26 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLgetRankingLevelID(String _description){
+	public static void SQLgetRankingLevelByDesc(String _description){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT level_id FROM ranking_level WHERE description LIKE ?");
+			String sql = ("SELECT * FROM ranking_level WHERE description LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _description);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				setLevelSkin(rs.getInt(1));
+				setLevelDescription(rs.getString(2));
+				setTextColorRLevel(rs.getInt(3));
+				setTextColorGLevel(rs.getInt(4));
+				setTextColorBLevel(rs.getInt(5));
+				setRankXLevel(rs.getInt(6));
+				setRankYLevel(rs.getInt(7));
+				setRankWidthLevel(rs.getInt(8));
+				setRankHeightLevel(rs.getInt(9));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -863,7 +814,7 @@ public class RankingDB {
 			while(rs.next()){
 				Rank rankingSystem = new Rank();
 				rankingSystem.setRankingRank(rs.getInt(1));
-				rankingSystem.setDescription(rs.getString(2));
+				rankingSystem.setRankDescription(rs.getString(2));
 				rankList.add(rankingSystem);
 			}
 		} catch (SQLException e) {
@@ -875,18 +826,28 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLgetRankingRankID(String _description){
+	public static void SQLgetRankingRankByDesc(String _description){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT rank_id FROM ranking_rank WHERE description LIKE ?");
+			String sql = ("SELECT * FROM ranking_rank WHERE description LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _description);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				setRankSkin(rs.getInt(1));
+				setRankDescription(rs.getString(2));
+				setColorRank(rs.getInt(3));
+				setExpAndPercentRankAllowed(rs.getBoolean(4));
+				setTextColorRRank(rs.getInt(5));
+				setTextColorGRank(rs.getInt(6));
+				setTextColorBRank(rs.getInt(7));
+				setRankXRank(rs.getInt(8));
+				setRankYRank(rs.getInt(9));
+				setRankWidthRank(rs.getInt(10));
+				setRankHeightRank(rs.getInt(11));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -910,7 +871,7 @@ public class RankingDB {
 			while(rs.next()){
 				Rank rankingSystem = new Rank();
 				rankingSystem.setRankingProfile(rs.getInt(1));
-				rankingSystem.setDescription(rs.getString(2));
+				rankingSystem.setProfileDescription(rs.getString(2));
 				rankList.add(rankingSystem);
 			}
 		} catch (SQLException e) {
@@ -922,18 +883,28 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLgetRankingProfileID(String _description){
+	public static void SQLgetRankingProfileByDesc(String _description){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT profile_id FROM ranking_profile WHERE description LIKE ?");
+			String sql = ("SELECT * FROM ranking_profile WHERE description LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _description);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				setProfileSkin(rs.getInt(1));
+				setProfileDescription(rs.getString(2));
+				setColorProfile(rs.getInt(3));
+				setExpAndPercentProfileAllowed(rs.getBoolean(4));
+				setTextColorRProfile(rs.getInt(5));
+				setTextColorGProfile(rs.getInt(6));
+				setTextColorBProfile(rs.getInt(7));
+				setRankXProfile(rs.getInt(8));
+				setRankYProfile(rs.getInt(9));
+				setRankWidthProfile(rs.getInt(10));
+				setRankHeightProfile(rs.getInt(11));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -957,7 +928,7 @@ public class RankingDB {
 			while(rs.next()){
 				Rank rankingSystem = new Rank();
 				rankingSystem.setRankingIcon(rs.getInt(1));
-				rankingSystem.setDescription(rs.getString(2));
+				rankingSystem.setIconDescription(rs.getString(2));
 				rankList.add(rankingSystem);
 			}
 		} catch (SQLException e) {
@@ -969,18 +940,19 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLgetRankingIconsID(String _description){
+	public static void SQLgetRankingIconsByDesc(String _description){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT icon_id FROM ranking_level WHERE description LIKE ?");
+			String sql = ("SELECT * FROM ranking_level WHERE description LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _description);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				setIconSkin(rs.getInt(1));
+				setIconDescription(rs.getString(2));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1272,57 +1244,125 @@ public class RankingDB {
 	}
 	
 	//JOINS
-	public synchronized static void SQLgetUserUserDetailsRanking(long _user_id){
+	public synchronized static void SQLgetWholeRankView(long _user_id){
+		if(Hashes.getRanking(_user_id) == null){
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT user_details.fk_user_id, user_details.level, (SELECT (user_details.experience - level_list.experience) FROM level_list WHERE level_list.level = user_details.level) AS `current_experience`, (SELECT (level_list.experience - (SELECT level_list.experience FROM level_list WHERE level_list.level = user_details.level)) FROM level_list WHERE level_list.level = (user_details.level+1)) AS `rank_up_experience`, user_details.experience, user_details.currency, user_details.current_role, users.level_skin, ranking_level.description, users.rank_skin, ranking_rank.description, users.profile_skin, ranking_profile.description, users.icon_skin, ranking_icons.description, ranking_profile.fk_bar_id, ranking_rank.fk_bar_id, ranking_profile.exp_percent_txt, ranking_rank.exp_percent_txt, ranking_profile.tcolor_r, ranking_rank.tcolor_r, ranking_level.tcolor_r, ranking_profile.tcolor_g, ranking_rank.tcolor_g, ranking_level.tcolor_g, ranking_profile.tcolor_b, ranking_rank.tcolor_b, ranking_level.tcolor_b, ranking_level.rankx, ranking_level.ranky, ranking_level.rank_width, ranking_level.rank_height, ranking_rank.rankx, ranking_rank.ranky, ranking_rank.rank_width, ranking_rank.rank_height, ranking_profile.rankx, ranking_profile.ranky, ranking_profile.rank_width, ranking_profile.rank_height, daily_experience.experience, daily_experience.reset FROM user_details INNER JOIN users ON user_details.fk_user_id = users.user_id INNER JOIN ranking_level ON level_skin = level_id INNER JOIN ranking_rank ON rank_skin = rank_id INNER JOIN ranking_profile ON profile_skin = profile_id INNER JOIN ranking_icons ON icon_skin = icon_id LEFT JOIN daily_experience ON users.user_id = daily_experience.user_id WHERE users.user_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _user_id);
+				rs = stmt.executeQuery();
+				if(rs.next()){
+					Rank rank = new Rank();
+					rank.setUser_ID(rs.getLong(1));
+					rank.setLevel(rs.getInt(2));
+					rank.setCurrentExperience(rs.getInt(3));
+					rank.setRankUpExperience(rs.getInt(4));
+					rank.setExperience(rs.getLong(5));
+					rank.setCurrency(rs.getLong(6));
+					rank.setCurrentRole(rs.getLong(7));
+					rank.setRankingLevel(rs.getInt(8));
+					rank.setLevelDescription(rs.getString(9));
+					rank.setRankingRank(rs.getInt(10));
+					rank.setRankDescription(rs.getString(11));
+					rank.setRankingProfile(rs.getInt(12));
+					rank.setProfileDescription(rs.getString(13));
+					rank.setRankingIcon(rs.getInt(14));
+					rank.setIconDescription(rs.getString(15));
+					rank.setBarColorProfile(rs.getInt(16));
+					rank.setBarColorRank(rs.getInt(17));
+					rank.setAdditionalTextProfile(rs.getBoolean(18));
+					rank.setAdditionalTextRank(rs.getBoolean(19));
+					rank.setColorRProfile(rs.getInt(20));
+					rank.setColorRRank(rs.getInt(21));
+					rank.setColorRLevel(rs.getInt(22));
+					rank.setColorGProfile(rs.getInt(23));
+					rank.setColorGRank(rs.getInt(24));
+					rank.setColorGLevel(rs.getInt(25));
+					rank.setColorBProfile(rs.getInt(26));
+					rank.setColorBRank(rs.getInt(27));
+					rank.setColorBLevel(rs.getInt(28));
+					rank.setRankXLevel(rs.getInt(29));
+					rank.setRankYLevel(rs.getInt(30));
+					rank.setRankWidthLevel(rs.getInt(31));
+					rank.setRankHeightLevel(rs.getInt(32));
+					rank.setRankXRank(rs.getInt(33));
+					rank.setRankYRank(rs.getInt(34));
+					rank.setRankWidthRank(rs.getInt(35));
+					rank.setRankHeightRank(rs.getInt(36));
+					rank.setRankXProfile(rs.getInt(37));
+					rank.setRankYProfile(rs.getInt(38));
+					rank.setRankWidthProfile(rs.getInt(39));
+					rank.setRankHeightProfile(rs.getInt(40));
+					rank.setDailyExperience(rs.getInt(41));
+					rank.setDailyReset(rs.getTimestamp(42));
+					Hashes.addRanking(_user_id, rank);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+	}
+	
+	public static void SQLgetGuild(long _guild_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT user_details.fk_user_id, user_details.level, user_details.current_experience, user_details.rank_up_experience, user_details.total_experience, user_details.currency, user_details.current_role, users.level_skin, ranking_level.description, users.rank_skin, ranking_rank.description, users.profile_skin, ranking_profile.description, users.icon_skin, ranking_icons.description, ranking_profile.fk_bar_id, ranking_rank.fk_bar_id, ranking_profile.exp_percent_txt, ranking_rank.exp_percent_txt, ranking_profile.tcolor_r, ranking_rank.tcolor_r, ranking_level.tcolor_r, ranking_profile.tcolor_g, ranking_rank.tcolor_g, ranking_level.tcolor_g, ranking_profile.tcolor_b, ranking_rank.tcolor_b, ranking_level.tcolor_b, ranking_level.rankx, ranking_level.ranky, ranking_level.rank_width, ranking_level.rank_height, ranking_rank.rankx, ranking_rank.ranky, ranking_rank.rank_width, ranking_rank.rank_height, ranking_profile.rankx, ranking_profile.ranky, ranking_profile.rank_width, ranking_profile.rank_height FROM user_details INNER JOIN users ON user_details.fk_user_id = users.user_id INNER JOIN ranking_level ON level_skin = level_id INNER JOIN ranking_rank ON rank_skin = rank_id INNER JOIN ranking_profile ON profile_skin = profile_id INNER JOIN ranking_icons ON icon_skin = icon_id WHERE users.user_id = ?");
+			String sql = ("SELECT guild_id, name, max_level, fk_level_id, ranking_level.description, fk_rank_id, ranking_rank.description, fk_profile_id, ranking_profile.description, fk_icon_id, ranking_icons.description, ranking_state, max_exp.experience, max_exp.enabled FROM guilds INNER JOIN ranking_level ON fk_level_id = level_id INNER JOIN ranking_rank ON fk_rank_id = rank_id INNER JOIN ranking_profile ON fk_profile_id = profile_id INNER JOIN ranking_icons ON fk_icon_id = icon_id Inner JOIN max_exp ON guild_id = fk_guild_id WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
+			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setUserID(rs.getLong(1));
-				setLevel(rs.getInt(2));
-				setCurrentExperience(rs.getInt(3));
-				setRankUpExperience(rs.getInt(4));
-				setExperience(rs.getLong(5));
-				setCurrency(rs.getLong(6));
-				setAssignedRole(rs.getLong(7));
-				setLevelSkin(rs.getInt(8));
-				setLevelDescription(rs.getString(9));
-				setRankSkin(rs.getInt(10));
-				setRankDescription(rs.getString(11));
-				setProfileSkin(rs.getInt(12));
-				setProfileDescription(rs.getString(13));
-				setIconSkin(rs.getInt(14));
-				setIconDescription(rs.getString(15));
-				setColorProfile(rs.getInt(16));
-				setColorRank(rs.getInt(17));
-				setExpAndPercentProfileAllowed(rs.getBoolean(18));
-				setExpAndPercentRankAllowed(rs.getBoolean(19));
-				setTextColorRProfile(rs.getInt(20));
-				setTextColorRRank(rs.getInt(21));
-				setTextColorRLevel(rs.getInt(22));
-				setTextColorGProfile(rs.getInt(23));
-				setTextColorGRank(rs.getInt(24));
-				setTextColorGLevel(rs.getInt(25));
-				setTextColorBProfile(rs.getInt(26));
-				setTextColorBRank(rs.getInt(27));
-				setTextColorBLevel(rs.getInt(28));
-				setRankXLevel(rs.getInt(29));
-				setRankYLevel(rs.getInt(30));
-				setRankWidthLevel(rs.getInt(31));
-				setRankHeightLevel(rs.getInt(32));
-				setRankXRank(rs.getInt(33));
-				setRankYRank(rs.getInt(34));
-				setRankWidthRank(rs.getInt(35));
-				setRankHeightRank(rs.getInt(36));
-				setRankXProfile(rs.getInt(37));
-				setRankYProfile(rs.getInt(38));
-				setRankWidthProfile(rs.getInt(39));
-				setRankHeightProfile(rs.getInt(40));
+				Guilds guild = new Guilds();
+				guild.setName(rs.getString(2));
+				guild.setMaxLevel(rs.getInt(3));
+				guild.setLevelID(rs.getInt(4));
+				guild.setLevelDescription(rs.getString(5));
+				guild.setRankID(rs.getInt(6));
+				guild.setRankDescription(rs.getString(7));
+				guild.setProfileID(rs.getInt(8));
+				guild.setProfileDescription(rs.getString(9));
+				guild.setIconID(rs.getInt(10));
+				guild.setIconDescription(rs.getString(11));
+				guild.setRankingState(rs.getBoolean(12));
+				guild.setMaxExperience(rs.getLong(13));
+				guild.setMaxExpEnabled(rs.getBoolean(14));
+				Hashes.addStatus(_guild_id, guild);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLgetLevels(){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT level, experience, currency, role_id FROM level_list LEFT JOIN roles ON level = level_requirement ORDER BY level");
+			stmt = myConn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				Ranks ranks = new Ranks();
+				ranks.setLevel(rs.getInt(1));
+				ranks.setExperience(rs.getInt(2));
+				ranks.setCurrency(rs.getInt(3));
+				ranks.setAssignRole(rs.getLong(4));
+				Hashes.addRankingLevels(rs.getInt(1), ranks);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

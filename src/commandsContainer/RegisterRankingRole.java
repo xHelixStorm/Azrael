@@ -46,12 +46,13 @@ public class RegisterRankingRole {
 						level = matcher.group().substring(7);
 						level_requirement = Integer.parseInt(level);
 					}
-					if(level.length() < 1 || level.length() > 4){
+					if(level.length() < 1 || level.length() > 10000){
 						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a level between 1 and 9999 and don't forget the -level parameter!").queue();
 					}
 					else{
 						RankingDB.SQLInsertRoles(role_id, role_name, level_requirement, guild_id);
 						_e.getTextChannel().sendMessage("**The role named "+role_name+" can now be unlocked by reaching level "+level_requirement+"**").queue();
+						RankingDB.SQLgetLevels();
 					}
 				} catch(NullPointerException npe){
 					_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();

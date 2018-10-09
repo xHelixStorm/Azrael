@@ -9,6 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import core.Hashes;
 import fileManagement.FileSetting;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.events.ReadyEvent;
@@ -28,7 +29,6 @@ public class DoubleExperienceStart extends TimerTask{
 		Path path = Paths.get("./files/double.azr");
 		long guild_id;
 		long channel_id;
-		boolean ranking_state;
 		
 		if(Files.exists(path)){
 			System.out.println("Double experience event is running!");
@@ -39,10 +39,7 @@ public class DoubleExperienceStart extends TimerTask{
 			for(Guild g : e.getJDA().getGuilds()){
 				guild_id = g.getIdLong();
 				
-				RankingDB.SQLgetGuild(guild_id);
-				ranking_state = RankingDB.getRankingState();
-				
-				if(ranking_state == true){
+				if(Hashes.getStatus(guild_id).getRankingState()){
 					SqlConnect.SQLgetChannelID(guild_id, "bot");
 					channel_id = SqlConnect.getChannelID();
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendFile(doubleEvent, "doubleweekend.jpg", null).complete();

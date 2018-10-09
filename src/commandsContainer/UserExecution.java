@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import core.Guilds;
 import core.Hashes;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
@@ -14,15 +15,17 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageHistory;
 import net.dv8tion.jda.core.entities.PrivateChannel;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
+import rankingSystem.Rank;
+import rankingSystem.Ranks;
 import sql.RankingDB;
 import sql.ServerRoles;
 import sql.SqlConnect;
 import threads.DelayDelete;
 import util.Pastebin;
-import util.RankingSystemPreferences;
 
 public class UserExecution {
 	public static void getHelp(MessageReceivedEvent _e) {
@@ -70,6 +73,7 @@ public class UserExecution {
 		
 		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17)) {
 			if(user_name != null && user_name.length() > 0) {
+				RankingDB.SQLgetWholeRankView(Long.parseLong(raw_input));
 				_e.getTextChannel().sendMessage(message.setDescription("The user has been found in this guild! Now type one of the following words within 3 minutes to execute an action!\n\n"
 						+ "**information**: To display all details of the selected user\n"
 						+ "**delete-messages**: To remove up to 100 messages from the selected user\n"
@@ -119,13 +123,13 @@ public class UserExecution {
 						message.addField("JOIN DATE", "**"+SqlConnect.getJoinDate()+"**", true);
 						message.addField("USER ID", "**"+file_value+"**", true);
 						message.addBlankField(false);
-						RankingDB.SQLgetGuild(_e.getGuild().getIdLong());
-						if(RankingDB.getRankingState()) {
-							RankingDB.SQLgetUserDetails(Long.parseLong(file_value));
-							message.addField("LEVEL", "**"+RankingDB.getLevel()+"**/**"+RankingDB.getMaxLevel()+"**", true);
-							message.addField("EXPERIENCE", "**"+RankingDB.getCurrentExperience()+"**/**"+RankingDB.getRankUpExperience()+"**", true);
-							if(RankingDB.getAssignedRole() != 0){
-								message.addField("UNLOCKED ROLE", _e.getGuild().getRoleById(RankingDB.getAssignedRole()).getAsMention(), false);
+						Rank user_details = Hashes.getRanking(Long.parseLong(file_value));
+						Guilds guild_settings = Hashes.getStatus(_e.getGuild().getIdLong());
+						if(guild_settings.getRankingState() == true) {
+							message.addField("LEVEL", "**"+user_details.getLevel()+"**/**"+guild_settings.getMaxLevel()+"**", true);
+							message.addField("EXPERIENCE", "**"+user_details.getCurrentExperience()+"**/**"+user_details.getRankUpExperience()+"**", true);
+							if(user_details.getCurrentRole() != 0){
+								message.addField("UNLOCKED ROLE", _e.getGuild().getRoleById(user_details.getCurrentRole()).getAsMention(), false);
 							}
 							else{
 								message.addField("UNLOCKED ROLE", "**N/A**", false);
@@ -193,8 +197,7 @@ public class UserExecution {
 						FileSetting.createFile(file_path, "kick"+file_value);
 						break;
 					case "gift-experience":
-						RankingDB.SQLgetGuild(_e.getGuild().getIdLong());
-						if(RankingDB.getRankingState()) {
+						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
 							message.setTitle("You choose to gift experience points!");
 							_e.getTextChannel().sendMessage(message.setDescription("Choose a number of experience points to add to the total number of experience points").build()).queue();
 							FileSetting.createFile(file_path, "gift-experience"+file_value);
@@ -205,8 +208,7 @@ public class UserExecution {
 						}
 						break;
 					case "set-experience":
-						RankingDB.SQLgetGuild(_e.getGuild().getIdLong());
-						if(RankingDB.getRankingState()) {
+						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
 							message.setTitle("You choose to set experience points!");
 							_e.getTextChannel().sendMessage(message.setDescription("Choose a number of experience points to set for the user").build()).queue();
 							FileSetting.createFile(file_path, "set-experience"+file_value);
@@ -217,8 +219,7 @@ public class UserExecution {
 						}
 						break;
 					case "set-level":
-						RankingDB.SQLgetGuild(_e.getGuild().getIdLong());
-						if(RankingDB.getRankingState()) {
+						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
 							message.setTitle("You choose to set a level!");
 							_e.getTextChannel().sendMessage(message.setDescription("Choose a level to assign the user").build()).queue();
 							FileSetting.createFile(file_path, "set-level"+file_value);
@@ -426,45 +427,119 @@ public class UserExecution {
 			}
 			else if(file_value.replaceAll("[0-9]*",	"").equals("gift-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					long experience = Long.parseLong(_message);
-					if(experience <= 2147483647) {
-						RankingDB.SQLgetUserDetails(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
-						RankingDB.SQLUpdateExperience(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), (RankingDB.getCurrentExperience()+(int) experience), (RankingDB.getExperience()+experience));
-						_e.getTextChannel().sendMessage("Experience points have been updated!").queue();
-						FileSetting.deleteFile(file_path);
+					Rank user_details = Hashes.getRanking(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
+					long experience = Integer.parseInt(_message);
+					long currentExperience = 0;
+					int level = 0;
+					long assign_role = 0;
+					for(Ranks ranks : Hashes.getMapOfRankingLevels().values()){
+						if((user_details.getExperience() + experience) > ranks.getExperience()){
+							level = ranks.getLevel();
+							currentExperience = (user_details.getExperience() + experience) - ranks.getExperience();
+							if(ranks.getAssignRole() != 0){
+								assign_role = ranks.getAssignRole();
+							}
+						}
+						else{
+							break;
+						}
 					}
-					else {
-						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please choose a number that is lower than 2147483648").queue();
+					user_details.setCurrentExperience((int) currentExperience);
+					user_details.setExperience(user_details.getExperience()+experience);
+					user_details.setLevel(level);
+					user_details.setCurrentRole(assign_role);
+					RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
+					Hashes.addRanking(user_details.getUser_ID(), user_details);
+					for(Role r : _e.getMember().getRoles()){
+						for(Rank role : Hashes.getMapOfRankingRoles().values()){
+							if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()){
+								_e.getGuild().getController().removeSingleRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
+							}
+						}
 					}
+					if(assign_role != 0){
+						_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
+					}
+					_e.getTextChannel().sendMessage("Experience points have been updated!").queue();
+					FileSetting.deleteFile(file_path);
 				}
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equals("set-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
+					Rank user_details = Hashes.getRanking(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
 					long experience = Long.parseLong(_message);
-					if(experience <= 2147483647) {
-						RankingDB.SQLgetUserDetails(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
-						RankingDB.SQLUpdateExperience(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), (int) experience, (RankingDB.getExperience()-RankingDB.getCurrentExperience()+experience));
-						_e.getTextChannel().sendMessage("Experience points have been updated!").queue();
-						FileSetting.deleteFile(file_path);
+					long currentExperience = 0;
+					int level = 0;
+					long assign_role = 0;
+					for(Ranks ranks : Hashes.getMapOfRankingLevels().values()){
+						if(experience > ranks.getExperience()){
+							level = ranks.getLevel();
+							currentExperience = experience - ranks.getExperience();
+							if(ranks.getAssignRole() != 0){
+								assign_role = ranks.getAssignRole();
+							}
+						}
+						else{
+							break;
+						}
 					}
-					else {
-						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please choose a number that is lower than 2147483648").queue();
+					user_details.setExperience(experience);
+					user_details.setCurrentExperience((int) currentExperience);
+					user_details.setLevel(level);
+					user_details.setCurrentRole(assign_role);
+					RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
+					Hashes.addRanking(user_details.getUser_ID(), user_details);
+					for(Role r : _e.getMember().getRoles()){
+						for(Rank role : Hashes.getMapOfRankingRoles().values()){
+							if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()){
+								_e.getGuild().getController().removeSingleRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
+							}
+						}
 					}
+					if(assign_role != 0){
+						_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
+					}
+					_e.getTextChannel().sendMessage("Experience points have been updated!").queue();
+					FileSetting.deleteFile(file_path);
 				}
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equals("set-level")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					int level = Integer.parseInt(_message);
-					RankingDB.SQLgetGuild(_e.getGuild().getIdLong());
-					if(level <= RankingDB.getMaxLevel()) {
-						RankingDB.SQLgetUserDetails(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
-						RankingDB.SQLgetRole(level);
-						RankingDB.SQLUpdateLevel(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), level, 0, RankingSystemPreferences.getExperienceForRankUp(level), RankingDB.getRoleID());
+					if(level <= Hashes.getStatus(_e.getGuild().getIdLong()).getMaxLevel()) {
+						Rank user_details = Hashes.getRanking(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
+						long experience = 0;
+						long assign_role = 0;
+						for(Ranks ranks : Hashes.getMapOfRankingLevels().values()){
+							if(ranks.getAssignRole() != 0){
+								assign_role = ranks.getAssignRole();
+							}
+							if(level == ranks.getLevel()){
+								experience = ranks.getExperience();
+								break;
+							}
+						}
+						user_details.setLevel(level);
+						user_details.setExperience(experience);
+						user_details.setCurrentExperience(0);
+						user_details.setCurrentRole(assign_role);
+						RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
+						Hashes.addRanking(user_details.getUser_ID(), user_details);
+						for(Role r : _e.getMember().getRoles()){
+							for(Rank role : Hashes.getMapOfRankingRoles().values()){
+								if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()){
+									_e.getGuild().getController().removeSingleRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
+								}
+							}
+						}
+						if(assign_role != 0){
+							_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
+						}
 						_e.getTextChannel().sendMessage("The level has been updated!").queue();
 						FileSetting.deleteFile(file_path);
 					}
 					else {
-						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please choose a level that is lower or equal to "+RankingDB.getMaxLevel()).queue();
+						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please choose a level that is lower or equal to "+Hashes.getStatus(_e.getGuild().getIdLong()).getMaxLevel()).queue();
 					}
 				}
 			}

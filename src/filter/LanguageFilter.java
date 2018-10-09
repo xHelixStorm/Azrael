@@ -37,7 +37,7 @@ public class LanguageFilter extends ListenerAdapter implements Runnable{
 		if(filter_lang.size() == 1){
 			switch(filter_lang.get(0)){
 				case "ger": 
-					output[0] = " Die Nachricht wurde wegen schlechtes benehmen entfernt!";
+					output[0] = " Die Nachricht wurde wegen schlechten Benehmens entfernt!";
 					output[1] = " Dies ist deine zweite Warnung. Eine weitere entfernte Nachricht und du wirst auf diesem Server **stumm geschaltet**!";
 					break;
 				case "fre":

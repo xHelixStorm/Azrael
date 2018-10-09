@@ -1,6 +1,7 @@
 package commands;
 
 import commandsContainer.ShopExecution;
+import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingDB;
@@ -17,15 +18,10 @@ public class Shop implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getShopCommand().equals("true")){
 			String input = e.getMessage().getContentRaw();
-			RankingDB.SQLgetGuild(e.getGuild().getIdLong());
-			if(RankingDB.getRankingState()){
+			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
 				SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
-				if(SqlConnect.getChannelID() != 0 && e.getTextChannel().getIdLong() != SqlConnect.getChannelID()){
-					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+SqlConnect.getChannelID()+">").queue();
-				}
-				else{
+				if(SqlConnect.getChannelID() == 0 || e.getTextChannel().getIdLong() == SqlConnect.getChannelID()){
 					RankingDB.SQLgetDefaultSkins(e.getGuild().getIdLong());
-					
 					if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP LEVEL UPS")){
 						ShopExecution.displayPartOfShop(e, "lev", RankingDB.getLevelDescription());
 					}
@@ -44,6 +40,9 @@ public class Shop implements Command{
 					else{
 						ShopExecution.displayWholeShop(e, RankingDB.getLevelDescription(), RankingDB.getRankDescription(), RankingDB.getProfileDescription(), RankingDB.getIconDescription());
 					}
+				}
+				else{
+					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+SqlConnect.getChannelID()+">").queue();
 				}
 			}
 			else{

@@ -24,8 +24,10 @@ public class RoleRemovedListener extends ListenerAdapter{
 		first_entry: for (AuditLogEntry entry : logs)
 		{
 			ServerRoles.SQLgetRole(e.getGuild().getIdLong(), "mut");
-			if(entry.getChangeByKey(AuditLogKey.MEMBER_ROLES_REMOVE).toString().contains(""+ServerRoles.getRole_ID()) && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getMember().getUser().getIdLong()) {
-				trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
+			if(entry.getChangeByKey(AuditLogKey.MEMBER_ROLES_REMOVE) != null){
+				if(entry.getChangeByKey(AuditLogKey.MEMBER_ROLES_REMOVE).toString().contains(""+ServerRoles.getRole_ID()) && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getMember().getUser().getIdLong()) {
+					trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
+				}
 			}
 			break first_entry;
 		}

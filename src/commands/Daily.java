@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
+import core.Hashes;
 import fileManagement.IniFileReader;
 import inventory.Dailies;
 import inventory.DrawDaily;
@@ -42,7 +43,7 @@ public class Daily implements Command{
 				ExecutorService executor = Executors.newSingleThreadExecutor();
 				executor.execute(() -> {
 					SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
-					if(SqlConnect.getChannelID() == e.getTextChannel().getIdLong()){
+					if(SqlConnect.getChannelID() == e.getTextChannel().getIdLong() || SqlConnect.getChannelID() == 0){
 						RankingDB.SQLgetDailiesUsage(e.getMember().getUser().getIdLong());
 						long time_for_daily = 0;
 						try {
@@ -73,8 +74,10 @@ public class Daily implements Command{
 							LocalDateTime tomorrowMidnight = LocalDateTime.of(today, midnight).plusDays(1);
 							Timestamp timestamp2 = Timestamp.valueOf(tomorrowMidnight);
 							if(list.get(random).getType().equals("cur")){
-								RankingDB.SQLgetUserDetails(e.getMember().getUser().getIdLong());
-								RankingDB.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), RankingDB.getCurrency()+Long.parseLong(list.get(random).getDescription().replaceAll("[^0-9]*", "")));
+								rankingSystem.Rank user_details = Hashes.getRanking(e.getMember().getUser().getIdLong());
+								user_details.setCurrency(user_details.getCurrency()+Long.parseLong(list.get(random).getDescription().replaceAll("[^0-9]*", "")));
+								RankingDB.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), user_details.getCurrency());
+								Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 							}
 							else if(list.get(random).getType().equals("exp")){
 								RankingDB.SQLgetItemIDFromShopContent(list.get(random).getDescription());
@@ -88,7 +91,8 @@ public class Daily implements Command{
 										Timestamp timestamp3 = new Timestamp(RankingDB.getExpiration().getTime()+1000*60*60*24);
 										RankingDB.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), RankingDB.getItemID(), timestamp, RankingDB.getNumber()+1, "limit", timestamp3);
 									} catch(NullPointerException npe){
-										RankingDB.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), RankingDB.getItemID(), timestamp, RankingDB.getNumber()+1, "limit", timestamp2);
+										Timestamp timestamp4 = new Timestamp(time+1000*60*60*24);
+										RankingDB.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), RankingDB.getItemID(), timestamp, RankingDB.getNumber()+1, "limit", timestamp4);
 									}
 								}
 							}

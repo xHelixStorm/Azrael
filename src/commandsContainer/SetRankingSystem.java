@@ -1,5 +1,7 @@
 package commandsContainer;
 
+import core.Guilds;
+import core.Hashes;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingDB;
 
@@ -26,6 +28,10 @@ public class SetRankingSystem {
 		
 		if(wrongInput == false){
 			RankingDB.SQLUpdateRankingSystem(_e.getGuild().getIdLong(), _e.getGuild().getName(), ranking_state);
+			Guilds guild = Hashes.getStatus(_e.getGuild().getIdLong());
+			guild.setRankingState(ranking_state);
+			
+			Hashes.addStatus(_e.getGuild().getIdLong(), guild);
 			_e.getTextChannel().sendMessage(message).queue();
 		}
 		else{

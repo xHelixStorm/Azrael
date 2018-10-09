@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import rankingSystem.RankingMethods;
@@ -38,11 +39,10 @@ public class Profile implements Command{
 					String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_profile.azr";
 					File file = new File(fileName);
 					
-					RankingDB.SQLgetUserUserDetailsRanking(user_id);
-					RankingDB.SQLgetGuild(guild_id);
-					boolean ranking_state = RankingDB.getRankingState();
+					RankingDB.SQLgetWholeRankView(user_id);
+					rankingSystem.Rank user_details = Hashes.getRanking(user_id);
 					
-					if(ranking_state == true){				
+					if(Hashes.getStatus(guild_id).getRankingState() == true){				
 						if(!file.exists()){
 							try {
 								file.createNewFile();
@@ -57,23 +57,23 @@ public class Profile implements Command{
 							
 							String name = e.getGuild().getMemberById(user_id).getEffectiveName();
 							String avatar = e.getGuild().getMemberById(user_id).getUser().getEffectiveAvatarUrl();
-							int level = RankingDB.getLevel();
-							float currentExperience = RankingDB.getCurrentExperience();
-							float rankUpExperience = RankingDB.getRankUpExperience();
-							long experience = RankingDB.getExperience();
-							long currency = RankingDB.getCurrency();
-							int max_level = RankingDB.getMaxLevel();
-							int profile_skin = RankingDB.getProfileSkin();
-							int icon_skin = RankingDB.getIconSkin();
-							int bar_color = RankingDB.getColorProfile();
-							boolean additional_text = RankingDB.getExpAndPercentAllowedProfile();
-							int color_r = RankingDB.getTextColorRProfile();
-							int color_g = RankingDB.getTextColorGProfile();
-							int color_b = RankingDB.getTextColorBProfile();
-							int rankx = RankingDB.getRankXProfile();
-							int ranky = RankingDB.getRankYProfile();
-							int rank_width = RankingDB.getRankWidthProfile();
-							int rank_height = RankingDB.getRankHeightProfile();
+							int level = user_details.getLevel();
+							float currentExperience = user_details.getCurrentExperience();
+							float rankUpExperience = user_details.getRankUpExperience();
+							long experience = user_details.getExperience();
+							long currency = user_details.getCurrency();
+							int max_level = Hashes.getStatus(guild_id).getMaxLevel();
+							int profile_skin = user_details.getRankingProfile();
+							int icon_skin = user_details.getRankingIcon();
+							int bar_color = user_details.getBarColorProfile();
+							boolean additional_text = user_details.getAdditionalTextProfile();
+							int color_r = user_details.getColorRProfile();
+							int color_g = user_details.getColorGProfile();
+							int color_b = user_details.getColorBProfile();
+							int rankx = user_details.getRankXProfile();
+							int ranky = user_details.getRankYProfile();
+							int rank_width = user_details.getRankWidthProfile();
+							int rank_height = user_details.getRankHeightProfile();
 							
 							if(level == max_level){currentExperience = 999999; rankUpExperience = 999999;}
 							
@@ -85,7 +85,7 @@ public class Profile implements Command{
 							
 							RankingDB.SQLRanking();
 							search: for(rankingSystem.Rank ranking : RankingDB.getRankList()){
-								if(user_id == ranking.getUser_id()){
+								if(user_id == ranking.getUser_ID()){
 									rank = ranking.getRank();
 									RankingDB.clearArrayList();
 									break search;

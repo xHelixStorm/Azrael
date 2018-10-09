@@ -3,6 +3,7 @@ package threads;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import core.Hashes;
 import core.UserPrivs;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
@@ -30,12 +31,11 @@ public class RoleExtend implements Runnable{
 		Role mute_role = e.getJDA().getGuildById(guild_id).getRoleById(ServerRoles.getRole_ID());
 		SqlConnect.SQLgetChannelID(guild_id, "log");
 		long channel_id = SqlConnect.getChannelID();
-		RankingDB.SQLgetGuild(guild_id);
-		boolean ranking_state = RankingDB.getRankingState();
 		int i = 0;
 		
 		for(Member member : e.getJDA().getGuildById(guild_id).getMembers()){
 			if(UserPrivs.isUserMuted(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong())){
+				RankingDB.SQLgetWholeRankView(member.getUser().getIdLong());
 				SqlConnect.SQLgetData(member.getUser().getIdLong(), guild_id);
 				long unmute;
 				try{
@@ -44,11 +44,10 @@ public class RoleExtend implements Runnable{
 					unmute = 0;
 				}
 				if(unmute < 0){unmute = 0;}
-				RankingDB.SQLgetUserDetails(member.getUser().getIdLong());
-				long assignedRole = RankingDB.getAssignedRole();
+				long assignedRole = Hashes.getRanking(member.getUser().getIdLong()).getCurrentRole();
 				users.add(member);
 				banHammerFound = true;
-				new Thread(new MuteRestart(e, member, guild_id, channel_id, mute_role, unmute, assignedRole, ranking_state)).start();
+				new Thread(new MuteRestart(e, member, guild_id, channel_id, mute_role, unmute, assignedRole, Hashes.getStatus(guild_id).getRankingState())).start();
 				SqlConnect.clearUnmute();
 				i++;
 			}

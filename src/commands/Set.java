@@ -12,6 +12,7 @@ import commandsContainer.SetProfileDefaultSkin;
 import commandsContainer.SetRankDefaultSkin;
 import commandsContainer.SetRankingSystem;
 import commandsContainer.SetWarning;
+import core.Hashes;
 import core.UserPrivs;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -74,7 +75,7 @@ public class Set implements Command{
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -ranking ")){
 					RankingDB.SQLgetGuild(e.getGuild().getIdLong());
-					if(RankingDB.getMaxLevel() != 0){
+					if(Hashes.getStatus(e.getGuild().getIdLong()).getMaxLevel() != 0){
 						input = input.substring(13+IniFileReader.getCommandPrefix().length());
 						SetRankingSystem.runTask(e, input);
 					}
@@ -83,9 +84,9 @@ public class Set implements Command{
 					}
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -max-experience")){
-					e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, type one of the following parameters after the syntax:\n\n**"+IniFileReader.getCommandPrefix()+"set max-experience <experience>**: To set an experience limit per day\n"
-							+ "**"+IniFileReader.getCommandPrefix()+"set max-experience enable**: To enable the experience limit\n"
-							+ "**"+IniFileReader.getCommandPrefix()+"set max-experience disable**: To disable the experience limit").build()).queue();
+					e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, type one of the following parameters after the syntax:\n\n**"+IniFileReader.getCommandPrefix()+"set -max-experience <experience>**: To set an experience limit per day\n"
+							+ "**"+IniFileReader.getCommandPrefix()+"set -max-experience enable**: To enable the experience limit\n"
+							+ "**"+IniFileReader.getCommandPrefix()+"set -max-experience disable**: To disable the experience limit").build()).queue();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -max-experience")){
 					input = input.substring(19+IniFileReader.getCommandPrefix().length());
@@ -104,7 +105,7 @@ public class Set implements Command{
 					RankingDB.SQLgetRankingLevel();
 					String out = "";
 					for(rankingSystem.Rank rankingSystem : RankingDB.getRankList()){
-						out+= "Setup: "+rankingSystem.getRankingLevel()+"\tTheme: "+rankingSystem.getDescription()+"\n";
+						out+= "Theme "+rankingSystem.getRankingLevel()+":\t"+rankingSystem.getLevelDescription()+"\n";
 					}
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-level-skin and then the digit for the desired skin. These skins are available for the level up pop ups:\n\n"+out).build()).queue();
 					RankingDB.clearArrayList();
@@ -120,7 +121,7 @@ public class Set implements Command{
 					RankingDB.SQLgetRankingRank();
 					String out = "";
 					for(rankingSystem.Rank rankingSystem : RankingDB.getRankList()){
-						out+= "Setup: "+rankingSystem.getRankingRank()+"\tTheme: "+rankingSystem.getDescription()+"\n";
+						out+= "Theme "+rankingSystem.getRankingRank()+":\t"+rankingSystem.getRankDescription()+"\n";
 					}
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-rank-skin and then the digit for the desired skin. These skins are available for the rank command:\n\n"+out).build()).queue();
 					RankingDB.clearArrayList();
@@ -136,7 +137,7 @@ public class Set implements Command{
 					RankingDB.SQLgetRankingProfile();
 					String out = "";
 					for(rankingSystem.Rank rankingSystem : RankingDB.getRankList()){
-						out+= "Setup: "+rankingSystem.getRankingProfile()+"\tTheme: "+rankingSystem.getDescription()+"\n";
+						out+= "Theme "+rankingSystem.getRankingProfile()+":\t"+rankingSystem.getProfileDescription()+"\n";
 					}
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-profile-skin and then the digit for the desired skin. These skins are available for the profile command:\n\n"+out).build()).queue();
 					RankingDB.clearArrayList();
@@ -152,7 +153,7 @@ public class Set implements Command{
 					RankingDB.SQLgetRankingIcons();
 					String out = "";
 					for(rankingSystem.Rank rankingSystem : RankingDB.getRankList()){
-						out+= "Setup: "+rankingSystem.getRankingIcon()+"\tTheme: "+rankingSystem.getDescription()+"\n";
+						out+= "Theme "+rankingSystem.getRankingIcon()+":\t"+rankingSystem.getIconDescription()+"\n";
 					}
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-icon-skin and then the digit for the desired level up icons. These level up icons are available:\n\n"+out).build()).queue();
 					RankingDB.clearArrayList();

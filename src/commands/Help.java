@@ -13,7 +13,7 @@ public class Help implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getHelpCommand().equals("true")){
-			e.getTextChannel().sendMessage("Here all listed issues about S4. If you got something to add or to ask about a specific point, poke a GM\n http://www.aeriagames.com/forums/en/viewtopic.php?t=2560215").queue();
+			e.getTextChannel().sendMessage("Here all listed issues about S4. If you got something to add or to ask about a specific point, poke a GM\nhttps://s4league.aeriagames.com/forum/index.php?thread/52-guide-general-technical-issues/").queue();
 		}
 	}
 

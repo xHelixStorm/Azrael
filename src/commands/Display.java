@@ -3,6 +3,7 @@ package commands;
 import java.awt.Color;
 
 import core.Channels;
+import core.Hashes;
 import core.Roles;
 import core.UserPrivs;
 import fileManagement.IniFileReader;
@@ -58,13 +59,12 @@ public class Display implements Command{
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -ranking-roles")){
-				RankingDB.SQLgetGuild(guild_id);
-				if(RankingDB.getRankingState() == true){
-					RankingDB.SQLgetRoles(guild_id);
-					for(rankingSystem.Rank r : RankingDB.getRankList()){
-						out += r.getRole_Name() + " (" + r.getRoleID() + ") \nlevel to unlock: " + r.getLevel_Requirement() + "\n";
+				if(Hashes.getStatus(guild_id).getRankingState()){
+					for(rankingSystem.Rank r : Hashes.getMapOfRankingRoles().values()){
+						if(r.getGuildID() == guild_id){
+							out += r.getRole_Name() + " (" + r.getRoleID() + ") \nlevel to unlock: " + r.getLevel_Requirement() + "\n";
+						}
 					}
-					RankingDB.clearArrayList();
 				}
 				else{
 					out = "The ranking system isn't enabled and hence no role can be displayed!";
@@ -72,7 +72,7 @@ public class Display implements Command{
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -textchannels")){
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong())) {
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getId().equals(IniFileReader.getAdmin())) {
 					for(TextChannel tc : e.getGuild().getTextChannels()){
 						out += tc.getName() + " (" + tc.getId() + ") \n";
 					}
@@ -83,7 +83,7 @@ public class Display implements Command{
 				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -voicechannels")){
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong())) {
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getId().equals(IniFileReader.getAdmin())) {
 					for(VoiceChannel vc : e.getGuild().getVoiceChannels()){
 						out += vc.getName() + " (" + vc.getId() + ") \n";
 					}

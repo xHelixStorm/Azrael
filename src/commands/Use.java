@@ -2,6 +2,7 @@ package commands;
 
 import java.sql.Timestamp;
 
+import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingDB;
@@ -17,32 +18,70 @@ public class Use implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getUseCommand().equals("true")){
-			RankingDB.SQLgetUserUserDetailsRanking(e.getMember().getUser().getIdLong());
-			RankingDB.SQLgetGuild(e.getGuild().getIdLong());
-			if(RankingDB.getRankingState() == true){
+			RankingDB.SQLgetWholeRankView(e.getMember().getUser().getIdLong());
+			rankingSystem.Rank user_details = Hashes.getRanking(e.getMember().getUser().getIdLong());
+			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState()){
 				SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
-				if(e.getTextChannel().getIdLong() == SqlConnect.getChannelID()){
-					RankingDB.SQLgetGuild(e.getGuild().getIdLong());
+				if(e.getTextChannel().getIdLong() == SqlConnect.getChannelID() || SqlConnect.getChannelID() == 0){
 					String input = e.getMessage().getContentRaw();
 					if(input.equals(IniFileReader.getCommandPrefix()+"use")){
 						e.getTextChannel().sendMessage("write the description of the item/skin together with this command to use it!\nTo reset your choice use either default-level, default-rank, default-profile or default-icons to reset your settings!").queue();
 					}
 					else if(input.equals(IniFileReader.getCommandPrefix()+"use default-level")){
-						//to reset the level skin from guild!
-						RankingDB.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), RankingDB.getRankingLevel());
+						RankingDB.SQLgetRankingLevelByDesc(Hashes.getStatus(e.getGuild().getIdLong()).getLevelDescription());
+						user_details.setRankingLevel(RankingDB.getLevelSkin());
+						user_details.setLevelDescription(RankingDB.getLevelDescription());
+						user_details.setColorRLevel(RankingDB.getTextColorRLevel());
+						user_details.setColorGLevel(RankingDB.getTextColorGLevel());
+						user_details.setColorBLevel(RankingDB.getTextColorBLevel());
+						user_details.setRankXLevel(RankingDB.getRankXLevel());
+						user_details.setRankYLevel(RankingDB.getRankYLevel());
+						user_details.setRankWidthLevel(RankingDB.getRankWidthLevel());
+						user_details.setRankHeightLevel(RankingDB.getRankHeightLevel());
+						RankingDB.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel());
+						Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 						e.getTextChannel().sendMessage("Level skin has been resetted to the server default skin!").queue();
 					}
 					else if(input.equals(IniFileReader.getCommandPrefix()+"use default-rank")){
-						//to reset the rank skin from guild!
-						RankingDB.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), RankingDB.getRankingRank());
+						RankingDB.SQLgetRankingRankByDesc(Hashes.getStatus(e.getGuild().getIdLong()).getRankDescription());
+						user_details.setRankingRank(RankingDB.getRankSkin());
+						user_details.setRankDescription(RankingDB.getRankDescription());
+						user_details.setBarColorRank(RankingDB.getColorRank());
+						user_details.setAdditionalTextRank(RankingDB.getExpAndPercentAllowedRank());
+						user_details.setColorRRank(RankingDB.getTextColorRRank());
+						user_details.setColorGRank(RankingDB.getTextColorGRank());
+						user_details.setColorBRank(RankingDB.getTextColorBRank());
+						user_details.setRankXRank(RankingDB.getRankXRank());
+						user_details.setRankYRank(RankingDB.getRankYRank());
+						user_details.setRankWidthRank(RankingDB.getRankWidthRank());
+						user_details.setRankHeightRank(RankingDB.getRankHeightRank());
+						RankingDB.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank());
+						Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 						e.getTextChannel().sendMessage("Rank skin has been resetted to the server default skin!").queue();
 					}
 					else if(input.equals(IniFileReader.getCommandPrefix()+"use default-profile")){
-						RankingDB.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), RankingDB.getRankingProfile());
+						RankingDB.SQLgetRankingProfileByDesc(Hashes.getStatus(e.getGuild().getIdLong()).getProfileDescription());
+						user_details.setRankingProfile(RankingDB.getProfileSkin());
+						user_details.setProfileDescription(RankingDB.getProfileDescription());
+						user_details.setBarColorProfile(RankingDB.getColorProfile());
+						user_details.setAdditionalTextProfile(RankingDB.getExpAndPercentAllowedProfile());
+						user_details.setColorRProfile(RankingDB.getTextColorRProfile());
+						user_details.setColorGProfile(RankingDB.getTextColorGProfile());
+						user_details.setColorBProfile(RankingDB.getTextColorBProfile());
+						user_details.setRankXProfile(RankingDB.getRankXProfile());
+						user_details.setRankYProfile(RankingDB.getRankYProfile());
+						user_details.setRankWidthProfile(RankingDB.getRankWidthProfile());
+						user_details.setRankHeightProfile(RankingDB.getRankHeightProfile());
+						RankingDB.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile());
+						Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 						e.getTextChannel().sendMessage("Profile skin has been resetted to the server default skin!").queue();
 					}
 					else if(input.equals(IniFileReader.getCommandPrefix()+"use default-icons")){
-						RankingDB.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), RankingDB.getRankingIcon());
+						RankingDB.SQLgetRankingIconsByDesc(Hashes.getStatus(e.getGuild().getIdLong()).getIconDescription());
+						user_details.setRankingIcon(RankingDB.getIconSkin());
+						user_details.setIconDescription(RankingDB.getIconDescription());
+						RankingDB.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon());
+						Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 						e.getTextChannel().sendMessage("Icon skins has been resetted to the server default skin!").queue();
 					}
 					else if(input.contains(IniFileReader.getCommandPrefix()+"use ")){
@@ -50,23 +89,60 @@ public class Use implements Command{
 						RankingDB.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), input);
 						if(RankingDB.getItemID() != 0 && RankingDB.getStatus().equals("perm")){
 							if(RankingDB.getSkinType().equals("lev")){
-								RankingDB.SQLgetRankingLevelID(input);
+								RankingDB.SQLgetRankingLevelByDesc(input);
 								RankingDB.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), RankingDB.getLevelSkin());
+								user_details.setRankingLevel(RankingDB.getLevelSkin());
+								user_details.setLevelDescription(RankingDB.getLevelDescription());
+								user_details.setColorRLevel(RankingDB.getTextColorRLevel());
+								user_details.setColorGLevel(RankingDB.getTextColorGLevel());
+								user_details.setColorBLevel(RankingDB.getTextColorBLevel());
+								user_details.setRankXLevel(RankingDB.getRankXLevel());
+								user_details.setRankYLevel(RankingDB.getRankYLevel());
+								user_details.setRankWidthLevel(RankingDB.getRankWidthLevel());
+								user_details.setRankHeightLevel(RankingDB.getRankHeightLevel());
+								Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 								e.getTextChannel().sendMessage("**"+input+"** will be used from now on!").queue();
 							}
 							else if(RankingDB.getSkinType().equals("ran")){
-								RankingDB.SQLgetRankingRankID(input);
+								RankingDB.SQLgetRankingRankByDesc(input);
 								RankingDB.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), RankingDB.getRankSkin());
+								user_details.setRankingRank(RankingDB.getRankSkin());
+								user_details.setRankDescription(RankingDB.getRankDescription());
+								user_details.setBarColorRank(RankingDB.getColorRank());
+								user_details.setAdditionalTextRank(RankingDB.getExpAndPercentAllowedRank());
+								user_details.setColorRRank(RankingDB.getTextColorRRank());
+								user_details.setColorGRank(RankingDB.getTextColorGRank());
+								user_details.setColorBRank(RankingDB.getTextColorBRank());
+								user_details.setRankXRank(RankingDB.getRankXRank());
+								user_details.setRankYRank(RankingDB.getRankYRank());
+								user_details.setRankWidthRank(RankingDB.getRankWidthRank());
+								user_details.setRankHeightRank(RankingDB.getRankHeightRank());
+								Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 								e.getTextChannel().sendMessage("**"+input+"** will be used from now on!").queue();
 							}
 							else if(RankingDB.getSkinType().equals("pro")){
-								RankingDB.SQLgetRankingProfileID(input);
+								RankingDB.SQLgetRankingProfileByDesc(input);
 								RankingDB.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), RankingDB.getProfileSkin());
+								user_details.setRankingProfile(RankingDB.getProfileSkin());
+								user_details.setProfileDescription(RankingDB.getProfileDescription());
+								user_details.setBarColorProfile(RankingDB.getColorProfile());
+								user_details.setAdditionalTextProfile(RankingDB.getExpAndPercentAllowedProfile());
+								user_details.setColorRProfile(RankingDB.getTextColorRProfile());
+								user_details.setColorGProfile(RankingDB.getTextColorGProfile());
+								user_details.setColorBProfile(RankingDB.getTextColorBProfile());
+								user_details.setRankXProfile(RankingDB.getRankXProfile());
+								user_details.setRankYProfile(RankingDB.getRankYProfile());
+								user_details.setRankWidthProfile(RankingDB.getRankWidthProfile());
+								user_details.setRankHeightProfile(RankingDB.getRankHeightProfile());
+								Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 								e.getTextChannel().sendMessage("**"+input+"** will be used from now on!").queue();
 							}
 							else if(RankingDB.getSkinType().equals("ico")){
-								RankingDB.SQLgetRankingIconsID(input);
+								RankingDB.SQLgetRankingIconsByDesc(input);
 								RankingDB.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), RankingDB.getIconSkin());
+								user_details.setRankingIcon(RankingDB.getIconSkin());
+								user_details.setIconDescription(RankingDB.getIconDescription());
+								Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 								e.getTextChannel().sendMessage("**"+input+"** will be used from now on!").queue();
 							}
 							else if(RankingDB.getSkinType().equals("ite")){

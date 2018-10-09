@@ -56,7 +56,7 @@ public class Top implements Command{
 				if(channel_id == channel){
 					RankingDB.SQLRanking();
 					search: for(rankingSystem.Rank ranking1 : RankingDB.getRankList()){
-						if(member_id == ranking1.getUser_id()){
+						if(member_id == ranking1.getUser_ID()){
 							rank = ranking1.getRank();
 							user_experience = ranking1.getExperience();
 							user_level = ranking1.getLevel();
@@ -73,7 +73,7 @@ public class Top implements Command{
 						for(rankingSystem.Rank ranking : RankingDB.getRankList()){
 							i = i + 1;
 							try {
-								name = e.getGuild().getMemberById(ranking.getUser_id()).getUser().getName();
+								name = e.getGuild().getMemberById(ranking.getUser_ID()).getUser().getName();
 							} catch (NullPointerException | ConcurrentModificationException e1){
 								name = "'user has left the guild'";
 							}

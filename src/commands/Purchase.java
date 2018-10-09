@@ -2,6 +2,8 @@ package commands;
 
 import java.sql.Timestamp;
 
+import core.Guilds;
+import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingDB;
@@ -17,11 +19,11 @@ public class Purchase implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getPurchaseCommand().equals("true")){
-			RankingDB.SQLgetUserUserDetailsRanking(e.getMember().getUser().getIdLong());
-			RankingDB.SQLgetGuild(e.getGuild().getIdLong());
-			if(RankingDB.getRankingState() == true){
+			RankingDB.SQLgetWholeRankView(e.getMember().getUser().getIdLong());
+			Guilds setting = Hashes.getStatus(e.getGuild().getIdLong());
+			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState()){
 				SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
-				if(e.getTextChannel().getIdLong() == SqlConnect.getChannelID()){
+				if(e.getTextChannel().getIdLong() == SqlConnect.getChannelID() || SqlConnect.getChannelID() == 0){
 					String input = e.getMessage().getContentRaw();
 					if(input.equals(IniFileReader.getCommandPrefix()+"purchase")){
 						e.getTextChannel().sendMessage("To purchase an item or skin, use the **"+IniFileReader.getCommandPrefix()+"purchase** command together with the description name of the item you want to purchase. Items to purchase can be found with the **"+IniFileReader.getCommandPrefix()+"shop** command").queue();
@@ -30,15 +32,19 @@ public class Purchase implements Command{
 						input = input.substring(IniFileReader.getCommandPrefix().length()+9);
 						RankingDB.SQLgetShopContent(input);
 						int item_id = RankingDB.getItemID();
-						if(!RankingDB.getDescription().equals("")){
-							if(!input.toUpperCase().equals(RankingDB.getLevelDescription().toUpperCase()) && !input.toUpperCase().equals(RankingDB.getRankDescription().toUpperCase()) && !input.toUpperCase().equals(RankingDB.getProfileDescription().toUpperCase()) && !input.toUpperCase().equals(RankingDB.getIconDescription().toUpperCase())){
+						if(RankingDB.getDescription().length() > 0){
+							if(!input.equalsIgnoreCase(setting.getLevelDescription()) && !input.equalsIgnoreCase(setting.getRankDescription()) && !input.equalsIgnoreCase(setting.getProfileDescription()) && !input.equalsIgnoreCase(setting.getIconDescription())){
 								RankingDB.setItemID(0);
 								RankingDB.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), input);
 								if(RankingDB.getItemID() == 0 || RankingDB.getSkinType().equals("ite")){
-									if(RankingDB.getCurrency() >= RankingDB.getPrice()){
+									rankingSystem.Rank user_details = Hashes.getRanking(e.getMember().getUser().getIdLong());
+									if(user_details.getCurrency() >= RankingDB.getPrice()){
+										long new_currency = user_details.getCurrency() - RankingDB.getPrice();
 										RankingDB.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), RankingDB.getDescription(), "perm");
 										Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-										RankingDB.SQLUpdateCurrencyAndInsertInventory(e.getMember().getUser().getIdLong(), RankingDB.getCurrency()-RankingDB.getPrice(), item_id, timestamp, RankingDB.getNumber()+1);
+										RankingDB.SQLUpdateCurrencyAndInsertInventory(e.getMember().getUser().getIdLong(), new_currency, item_id, timestamp, RankingDB.getNumber()+1);
+										user_details.setCurrency(new_currency);
+										Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 										e.getTextChannel().sendMessage("You have successfully purchased **"+input+"**").queue();
 									}
 									else{

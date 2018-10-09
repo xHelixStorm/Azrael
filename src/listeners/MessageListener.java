@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import commandsContainer.FilterExecution;
 import commandsContainer.SetWarning;
 import commandsContainer.UserExecution;
+import core.Guilds;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.FileSetting;
@@ -18,6 +19,7 @@ import filter.LanguageFilter;
 import net.dv8tion.jda.core.entities.Message.Attachment;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import rankingSystem.Rank;
 import rankingSystem.RankingThreadExecution;
 import sql.RankingDB;
 import sql.SqlConnect;
@@ -36,17 +38,13 @@ public class MessageListener extends ListenerAdapter{
 			long user_id = e.getMember().getUser().getIdLong();
 			long guild_id = e.getGuild().getIdLong();
 			String message = e.getMessage().getContentRaw();
-			
-			RankingDB.SQLgetUserUserDetailsRanking(user_id);
-			RankingDB.SQLgetGuild(guild_id);
-			boolean ranking_state = RankingDB.getRankingState();
 			long channel_id = e.getTextChannel().getIdLong();
 			
 			if(IniFileReader.getChannelLog().equals("true")){
 				LocalDateTime time = LocalDateTime.now();
 				String image_url = "";
 				for(Attachment attch : e.getMessage().getAttachments()){
-					image_url = (e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? image_url+"IMMAGE "+attch.getFileName()+" ("+attch.getUrl()+")" : image_url+"\nIMMAGE "+attch.getFileName()+" ("+attch.getUrl()+")";
+					image_url = (e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? image_url+"IMMAGE "+attch.getFileName()+" ("+attch.getProxyUrl()+")" : image_url+"\nIMMAGE "+attch.getFileName()+" ("+attch.getProxyUrl()+")";
 				}
 				FileSetting.appendFile("./message_log/"+e.getTextChannel().getName()+".txt", "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw()+image_url+"\n");
 				if(IniFileReader.getCacheLog().equals("true")) {
@@ -68,54 +66,39 @@ public class MessageListener extends ListenerAdapter{
 				UserExecution.performAction(e, message, file_name);
 			}
 			
-			if(ranking_state == true && !e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"profile") && !e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"rank")){
-				try {
-					Thread.sleep(100);
+			Guilds guild_settings = Hashes.getStatus(guild_id);
+			if(guild_settings.getRankingState() == true){
+				RankingDB.SQLgetWholeRankView(user_id);
+				Rank user_details = Hashes.getRanking(user_id);
+				if(user_details == null){
+					RankingDB.SQLInsertUser(user_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
+					RankingDB.SQLInsertUserDetails(user_id, 0, 0, 50000, 0);
+					RankingDB.SQLInsertUserGuild(user_id, guild_id);
+				}
+				else{
 					SqlConnect.SQLgetChannelID(guild_id, "bot");
 					long bot_channel = SqlConnect.getChannelID();
-					if(RankingDB.getUserID() == 0 && RankingDB.getLevel() == 0 && RankingDB.getCurrentExperience() == 0 && RankingDB.getRankUpExperience() == 0 && RankingDB.getExperience() == 0 && RankingDB.getCurrency() == 0){
-						RankingDB.SQLInsertUser(user_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), RankingDB.getRankingLevel(), RankingDB.getRankingRank(), RankingDB.getRankingProfile(), RankingDB.getRankingIcon());
-						RankingDB.SQLInsertUserDetails(user_id, 0, 0, 300, 0, 50000, 0);
-						RankingDB.SQLInsertUserGuild(user_id, guild_id);
-					}
-					else{
-						if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && e.getTextChannel().getIdLong() != bot_channel){
-							int rankUpExperience = RankingDB.getRankUpExperience();
-							int max_level = RankingDB.getMaxLevel();
-							int level = RankingDB.getLevel();
-							int currentExperience = RankingDB.getCurrentExperience();
-							long currency = RankingDB.getCurrency();
-							int level_skin = RankingDB.getLevelSkin();
-							int icon_skin = RankingDB.getIconSkin();
-							int color_r = RankingDB.getTextColorRLevel();
-							int color_g = RankingDB.getTextColorGLevel();
-							int color_b = RankingDB.getTextColorBLevel();
-							int rankx = RankingDB.getRankXLevel();
-							int ranky = RankingDB.getRankYLevel();
-							int rank_width = RankingDB.getRankWidthLevel();
-							int rank_height = RankingDB.getRankHeightLevel();
-							
-							RankingDB.SQLgetMaxExperience(guild_id);
-							long max_experience = RankingDB.getMaxExperience();
-							boolean max_experience_enabled = RankingDB.getEnabled();
-							
-							RankingDB.SQLgetRole(level+1);
-							int roleAssignLevel = RankingDB.getRoleLevelRequirement();
-							long role_id = RankingDB.getRoleID();
-							int percent_multiplier;
-							
-							try {
-								RankingDB.SQLExpBoosterExistsInInventory();
-								percent_multiplier = Integer.parseInt(RankingDB.getDescription().replaceAll("[^0-9]*", ""));
-							} catch(NumberFormatException nfe){
-								percent_multiplier = 0;
+					if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && e.getTextChannel().getIdLong() != bot_channel){
+						int roleAssignLevel = 0;
+						long role_id = 0;
+						Rank ranking_levels = Hashes.getRankingRoles(guild_id+"_"+(user_details.getLevel()+1));
+						if(ranking_levels != null){
+							if(ranking_levels.getGuildID() == guild_id){
+								roleAssignLevel = ranking_levels.getLevel_Requirement();
+								role_id = ranking_levels.getRoleID();
 							}
-							
-							executor.execute(new RankingThreadExecution(e, user_id, guild_id, message, rankUpExperience, max_level, level, currentExperience, currency, max_experience, max_experience_enabled, roleAssignLevel, role_id, level_skin, icon_skin, percent_multiplier, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height));
 						}
+						
+						int percent_multiplier;
+						try {
+							RankingDB.SQLExpBoosterExistsInInventory();
+							percent_multiplier = Integer.parseInt(RankingDB.getDescription().replaceAll("[^0-9]*", ""));
+						} catch(NumberFormatException nfe){
+							percent_multiplier = 0;
+						}
+						
+						RankingThreadExecution.setProgress(e, user_id, guild_id, message, roleAssignLevel, role_id, percent_multiplier, user_details, guild_settings);
 					}
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
 				}
 			}
 			

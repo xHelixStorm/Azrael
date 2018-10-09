@@ -15,6 +15,7 @@ import preparedMessages.PatchNotes;
 import preparedMessages.PublicPatchNotes;
 import rankingSystem.DoubleExperienceOff;
 import rankingSystem.DoubleExperienceStart;
+import sql.RankingDB;
 import sql.SqlConnect;
 import threads.BotStartAssign;
 import threads.RoleExtend;
@@ -48,11 +49,13 @@ public class ReadyListener extends ListenerAdapter{
 		FileSetting.createTemp();
 
 		FileSetting.createFile("./files/reboot.azr", "0");
+		RankingDB.SQLgetLevels();
 		for(Guild g : e.getJDA().getGuilds()){
 			long guild_id = g.getIdLong();
+			RankingDB.SQLgetGuild(guild_id);
+			RankingDB.SQLgetRoles(guild_id);
 			SqlConnect.SQLgetChannelID(guild_id, "log");
-			long channel_id = SqlConnect.getChannelID();
-			if(channel_id != 0){e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage("Bot is now operational!").queue();}
+			if(SqlConnect.getChannelID() != 0){e.getJDA().getGuildById(guild_id).getTextChannelById(SqlConnect.getChannelID()).sendMessage("Bot is now operational!").queue();}
 		}
 		SqlConnect.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import rankingSystem.RankingMethods;
@@ -37,11 +38,10 @@ public class Rank implements Command{
 					String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_rank.azr";
 					File file = new File(fileName);
 					
-					RankingDB.SQLgetUserUserDetailsRanking(user_id);
-					RankingDB.SQLgetGuild(guild_id);
-					boolean ranking_state = RankingDB.getRankingState();
+					RankingDB.SQLgetWholeRankView(user_id);
+					rankingSystem.Rank user_details = Hashes.getRanking(user_id);
 					
-					if(ranking_state == true){				
+					if(Hashes.getStatus(guild_id).getRankingState()){				
 						if(!file.exists()){
 							try {
 								file.createNewFile();
@@ -56,21 +56,21 @@ public class Rank implements Command{
 							
 							String name = e.getGuild().getMemberById(user_id).getEffectiveName();
 							String avatar = e.getGuild().getMemberById(user_id).getUser().getEffectiveAvatarUrl();
-							int level = RankingDB.getLevel();
-							float currentExperience = RankingDB.getCurrentExperience();
-							float rankUpExperience = RankingDB.getRankUpExperience();
-							int max_level = RankingDB.getMaxLevel();
-							int rank_skin = RankingDB.getRankSkin();
-							int icon_skin = RankingDB.getIconSkin();
-							int bar_color = RankingDB.getColorRank();
-							boolean additional_text = RankingDB.getExpAndPercentAllowedRank();
-							int color_r = RankingDB.getTextColorRRank();
-							int color_g = RankingDB.getTextColorGRank();
-							int color_b = RankingDB.getTextColorBRank();
-							int rankx = RankingDB.getRankXRank();
-							int ranky = RankingDB.getRankYRank();
-							int rank_width = RankingDB.getRankWidthRank();
-							int rank_height = RankingDB.getRankHeightRank();
+							int level = user_details.getLevel();
+							float currentExperience = user_details.getCurrentExperience();
+							float rankUpExperience = user_details.getRankUpExperience();
+							int max_level = Hashes.getStatus(guild_id).getMaxLevel();
+							int rank_skin = user_details.getRankingRank();
+							int icon_skin = user_details.getRankingIcon();
+							int bar_color = user_details.getBarColorRank();
+							boolean additional_text = user_details.getAdditionalTextRank();
+							int color_r = user_details.getColorRRank();
+							int color_g = user_details.getColorGRank();
+							int color_b = user_details.getColorBRank();
+							int rankx = user_details.getRankXRank();
+							int ranky = user_details.getRankYRank();
+							int rank_width = user_details.getRankWidthRank();
+							int rank_height = user_details.getRankHeightRank();
 							
 							if(level == max_level){currentExperience = 999999; rankUpExperience = 999999;}
 							

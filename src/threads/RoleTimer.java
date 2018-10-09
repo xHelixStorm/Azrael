@@ -58,17 +58,15 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 				}
 				Thread.sleep(timer);
 				
-				e.getJDA().getGuildById(e.getGuild().getIdLong()).getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
-				Thread.sleep(1000);
-				
-				timestamp = new Timestamp(System.currentTimeMillis());
-				if(assignedRole != 0){e.getJDA().getGuildById(e.getGuild().getId()).getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
-				SqlConnect.SQLgetData(Long.parseLong(name_id), guild_id);
-				long unmutedTime = SqlConnect.getUnmute().getTime();
 				SqlConnect.clearUnmute();
-				if(channel_id != 0 && System.currentTimeMillis() > unmutedTime){
+				SqlConnect.SQLgetMuted(Long.parseLong(name_id), guild_id);
+				if(channel_id != 0 && SqlConnect.getMuted() == true){
+					timestamp = new Timestamp(System.currentTimeMillis());
 					e.getGuild().getTextChannelById(channel_id).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted").build()).queue();
 				}
+				e.getJDA().getGuildById(e.getGuild().getIdLong()).getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).complete();
+				if(assignedRole != 0){e.getJDA().getGuildById(e.getGuild().getId()).getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
+				SqlConnect.clearAllVariables();
 			}
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();

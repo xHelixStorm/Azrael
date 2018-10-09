@@ -3,10 +3,13 @@ package listeners;
 import java.awt.Color;
 import java.time.format.DateTimeFormatter;
 
+import core.Guilds;
+import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import rankingSystem.Rank;
 import sql.RankingDB;
 import sql.ServerRoles;
 import sql.SqlConnect;
@@ -26,6 +29,14 @@ public class GuildListener extends ListenerAdapter {
 		long unmute;
 		boolean muted;
 		
+		SqlConnect.SQLInsertUser(user_id, user_name, e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
+		Guilds guild_settings = Hashes.getStatus(guild_id);
+		if(guild_settings.getRankingState() == true){
+			RankingDB.SQLInsertUser(user_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
+			RankingDB.SQLInsertUserDetails(user_id, 0, 0, 50000, 0);
+			RankingDB.SQLInsertUserGuild(user_id, guild_id);
+		}
+		
 		SqlConnect.SQLgetChannelID(guild_id, "log");
 		long channel_id = SqlConnect.getChannelID();
 		SqlConnect.SQLgetData(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
@@ -35,7 +46,6 @@ public class GuildListener extends ListenerAdapter {
 		}
 		
 		try{
-			SqlConnect.SQLgetData(user_id, guild_id);
 			unmute = SqlConnect.getUnmute().getTime();
 		} catch(NullPointerException npe){			
 			unmute = 0;
@@ -44,20 +54,18 @@ public class GuildListener extends ListenerAdapter {
 			SqlConnect.clearUnmute();
 		}
 		
-		if((unmute - currentTime) > 0){
+		if((unmute - currentTime) > 0 && muted == true){
 			ServerRoles.SQLgetRole(e.getGuild().getIdLong(), "mut");
 			long mute_role = ServerRoles.getRole_ID();
 			e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role)).queue();
 			ServerRoles.clearAllVariables();
 		}
 		else{
-			SqlConnect.SQLInsertUser(user_id, user_name, e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
-			RankingDB.SQLgetGuild(guild_id);
-			if(RankingDB.getRankingState() == true){
-				RankingDB.SQLgetUserDetails(user_id);
-				if(RankingDB.getAssignedRole() != 0){e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(RankingDB.getAssignedRole())).queue();}
+			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState()){
+				RankingDB.SQLgetWholeRankView(user_id);
+				Rank user_details = Hashes.getRanking(user_id);
+				if(user_details.getCurrentRole() != 0){e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(user_details.getCurrentRole())).queue();}
 			}
-			RankingDB.clearAllVariables();
 		}
 		
 		if(IniFileReader.getNameFilter().equals("true")) {
