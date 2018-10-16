@@ -121,10 +121,9 @@ public class FilterExecution {
 					if(_message.equalsIgnoreCase("display")) {
 						SqlConnect.SQLgetNameFilter(_e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
-						for(String word : SqlConnect.getNames()) {
+						for(String word : Hashes.getQuerryResult("bad-names_"+_e.getGuild().getId())) {
 							out.append(word+"\n");
 						}
-						SqlConnect.clearNames();
 						String paste_link = Pastebin.unlistedPaste("Name filter", out.toString());
 						message.setTitle("Name filter!");
 						out.setLength(0);
@@ -151,10 +150,9 @@ public class FilterExecution {
 					if(_message.equalsIgnoreCase("display")) {
 						SqlConnect.SQLgetFunnyNames(_e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
-						for(String word : SqlConnect.getNames()) {
+						for(String word : Hashes.getQuerryResult("funny-names_"+_e.getGuild().getId())) {
 							out.append(word+"\n");
 						}
-						SqlConnect.clearNames();
 						String paste_link = Pastebin.unlistedPaste("Funny names for the name filter", out.toString());
 						message.setTitle("Funny names!");
 						out.setLength(0);
@@ -181,10 +179,9 @@ public class FilterExecution {
 					if(_message.equalsIgnoreCase("display")) {
 						SqlConnect.SQLgetStaffNames(_e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
-						for(String word : SqlConnect.getStaffNames()) {
+						for(String word : Hashes.getQuerryResult("staff-names_"+_e.getGuild().getId())) {
 							out.append(word+"\n");
 						}
-						SqlConnect.clearStaffNames();
 						String paste_link = Pastebin.unlistedPaste("Staff names for the name filter", out.toString());
 						message.setTitle("Staff names!");
 						out.setLength(0);
@@ -351,56 +348,64 @@ public class FilterExecution {
 					SqlConnect.SQLInsertWordFilter("eng", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the english word filter!").build()).queue();
-					Hashes.removeQuerryResult("eng");
+					Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "german-insert-word-filter":
 					SqlConnect.SQLInsertWordFilter("ger", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the german word filter!").build()).queue();
-					Hashes.removeQuerryResult("ger");
+					Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "french-insert-word-filter":
 					SqlConnect.SQLInsertWordFilter("fre", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the french word filter!").build()).queue();
-					Hashes.removeQuerryResult("fre");
+					Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "turkish-insert-word-filter":
 					SqlConnect.SQLInsertWordFilter("tur", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the turkish word filter!").build()).queue();
-					Hashes.removeQuerryResult("tur");
+					Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "russian-insert-word-filter":
 					SqlConnect.SQLInsertWordFilter("rus", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the russian word filter!").build()).queue();
-					Hashes.removeQuerryResult("rus");
+					Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "spanish-insert-word-filter":
 					SqlConnect.SQLInsertWordFilter("spa", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the spanish word filter!").build()).queue();
-					Hashes.removeQuerryResult("spa");
+					Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "portuguese-insert-word-filter":
 					SqlConnect.SQLInsertWordFilter("por", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the portuguese word filter!").build()).queue();
-					Hashes.removeQuerryResult("por");
+					Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "italian-insert-word-filter":
 					SqlConnect.SQLInsertWordFilter("ita", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the italian word filter!").build()).queue();
-					Hashes.removeQuerryResult("ita");
+					Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "remove-word-filter":
@@ -449,56 +454,64 @@ public class FilterExecution {
 					SqlConnect.SQLDeleteWordFilter("eng", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the english word filter!").build()).queue();
-					Hashes.removeQuerryResult("eng");
+					Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "german-remove-word-filter":
 					SqlConnect.SQLDeleteWordFilter("ger", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the german word filter!").build()).queue();
-					Hashes.removeQuerryResult("ger");
+					Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "french-remove-word-filter":
 					SqlConnect.SQLDeleteWordFilter("fre", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the french word filter!").build()).queue();
-					Hashes.removeQuerryResult("fre");
+					Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "turkish-remove-word-filter":
 					SqlConnect.SQLDeleteWordFilter("tur", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the turkish word filter!").build()).queue();
-					Hashes.removeQuerryResult("tur");
+					Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "russian-remove-word-filter":
 					SqlConnect.SQLDeleteWordFilter("rus", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the russian word filter!").build()).queue();
-					Hashes.removeQuerryResult("rus");
+					Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "spanish-remove-word-filter":
 					SqlConnect.SQLDeleteWordFilter("spa", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the spanish word filter!").build()).queue();
-					Hashes.removeQuerryResult("spa");
+					Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "portuguese-remove-word-filter":
 					SqlConnect.SQLDeleteWordFilter("por", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the portuguese word filter!").build()).queue();
-					Hashes.removeQuerryResult("por");
+					Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "italian-remove-word-filter":
 					SqlConnect.SQLDeleteWordFilter("ita", _message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the italian word filter!").build()).queue();
-					Hashes.removeQuerryResult("ita");
+					Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
+					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "load-word-filter":
@@ -551,7 +564,8 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("eng", words, _e.getGuild().getIdLong());
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("eng");
+						Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -563,7 +577,8 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("ger", words, _e.getGuild().getIdLong());
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("ger");
+						Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -575,7 +590,8 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("fre", words, _e.getGuild().getIdLong());
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("fre");
+						Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -587,7 +603,8 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("tur", words, _e.getGuild().getIdLong());
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("tur");
+						Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -599,7 +616,8 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("rus", words, _e.getGuild().getIdLong());
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("rus");
+						Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -611,7 +629,8 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("spa", words, _e.getGuild().getIdLong());
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("spa");
+						Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -623,7 +642,8 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("por", words, _e.getGuild().getIdLong());
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("por");
+						Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -635,7 +655,8 @@ public class FilterExecution {
 						SqlConnect.SQLReplaceWordFilter("ita", words, _e.getGuild().getIdLong());
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("ita");
+						Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -643,14 +664,14 @@ public class FilterExecution {
 					SqlConnect.SQLInsertNameFilter(_message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into name filter!").build()).queue();
-					Hashes.removeQuerryResult("bad-name");
+					Hashes.removeQuerryResult("bad-names_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "remove-name-filter":
 					SqlConnect.SQLDeleteNameFilter(_message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the name filter!").build()).queue();
-					Hashes.removeQuerryResult("bad-name");
+					Hashes.removeQuerryResult("bad-names_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "load-name-filter":
@@ -660,21 +681,21 @@ public class FilterExecution {
 					SqlConnect.SQLReplaceNameFilter(words, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-					Hashes.removeQuerryResult("bad-name");
+					Hashes.removeQuerryResult("bad-names_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "insert-funny-names":
 					SqlConnect.SQLInsertFunnyNames(_message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The name has been inserted into the funny names list!").build()).queue();
-					Hashes.removeQuerryResult("funny-names");
+					Hashes.removeQuerryResult("funny-names_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "remove-funny-names":
 					SqlConnect.SQLDeleteFunnyNames(_message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The name has been removed from the funny names list!").build()).queue();
-					Hashes.removeQuerryResult("funny-names");
+					Hashes.removeQuerryResult("funny-names_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "load-funny-names":
@@ -684,21 +705,21 @@ public class FilterExecution {
 					SqlConnect.SQLReplaceFunnyNames(names, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("Names have been inserted!").build()).queue();
-					Hashes.removeQuerryResult("funny-names");
+					Hashes.removeQuerryResult("funny-names_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "insert-staff-names":
 					SqlConnect.SQLInsertStaffName(_message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The name has been inserted into the staff names list!").build()).queue();
-					Hashes.removeQuerryResult("staff-names");
+					Hashes.removeQuerryResult("staff-names_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "remove-staff-names":
 					SqlConnect.SQLDeleteStaffNames(_message, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The name has been removed from the staff names list!").build()).queue();
-					Hashes.removeQuerryResult("staff-names");
+					Hashes.removeQuerryResult("staff-names_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "load-staff-names":
@@ -708,7 +729,7 @@ public class FilterExecution {
 					SqlConnect.SQLBatchInsertStaffNames(staff_names, _e.getGuild().getIdLong());
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("Names have been inserted!").build()).queue();
-					Hashes.removeQuerryResult("funny-names");
+					Hashes.removeQuerryResult("staff-names_"+_e.getGuild().getId());
 					FileSetting.createFile(file_path, "complete");
 					break;
 			}

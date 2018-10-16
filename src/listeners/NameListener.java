@@ -2,6 +2,7 @@ package listeners;
 
 import java.awt.Color;
 
+import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -26,7 +27,7 @@ public class NameListener extends ListenerAdapter{
 			SqlConnect.SQLUpdateUser(user_id, newname);
 			for(Guild g : e.getJDA().getGuilds()){
 				SqlConnect.SQLgetStaffNames(g.getIdLong());
-				check: for(String name : SqlConnect.getStaffNames()){
+				check: for(String name : Hashes.getQuerryResult("staff-names_"+g.getId())){
 					if(nameCheck.matches(name+"#[0-9]{4}")){
 						Member member = e.getJDA().getGuildById(g.getIdLong()).getMemberById(user_id);
 						SqlConnect.SQLgetChannelID(g.getIdLong(), "log");
@@ -44,14 +45,13 @@ public class NameListener extends ListenerAdapter{
 						}
 					}
 				}
-				SqlConnect.clearStaffNames();
 			}
 			
 			if(staff_name == false){
 				for(Guild guild : e.getJDA().getGuilds()){
 					long guild_id = guild.getIdLong();
 					SqlConnect.SQLgetNameFilter(guild_id);
-					check: for(String word : SqlConnect.getNames()){
+					check: for(String word : Hashes.getQuerryResult("bad-names_"+guild_id)){
 						if(nameCheck.contains(word)){
 							Member user = e.getJDA().getGuildById(guild_id).getMemberById(user_id);
 							
@@ -74,7 +74,6 @@ public class NameListener extends ListenerAdapter{
 						}
 					}
 				}
-				SqlConnect.clearNames();
 			}
 			SqlConnect.clearAllVariables();
 		}

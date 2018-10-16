@@ -43,9 +43,7 @@ public class SqlConnect {
 	private static Date timestamp;
 	private static Date unmute;
 	private static ArrayList<Channels> channels = new ArrayList<Channels>();
-	private static ArrayList<String> names = new ArrayList<String>();
 	private static ArrayList<String> descriptions = new ArrayList<String>();
-	private static ArrayList<String> staff_names = new ArrayList<String>();
 	
 	private static String username = IniFileReader.getSQLUsername();
 	private static String password = IniFileReader.getSQLPassword();
@@ -1006,24 +1004,28 @@ public class SqlConnect {
 	}
 	
 	public synchronized static void SQLgetStaffNames(long _guild_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT name FROM staff_name_filter WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				staff_names.add(rs.getString(1));
+		if(Hashes.getQuerryResult("staff-names_"+_guild_id) == null) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				ArrayList<String> staff_names = new ArrayList<String>();
+				String sql = ("SELECT name FROM staff_name_filter WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					staff_names.add(rs.getString(1));
+				}
+				Hashes.addQuerryResult("staff-names_"+_guild_id, staff_names);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
@@ -1139,12 +1141,13 @@ public class SqlConnect {
 	}
 	
 	public static void SQLgetFunnyNames(long _guild_id) {
-		if(Hashes.getQuerryResult("funny-names") == null || Hashes.getQuerryResult("funny-names").isEmpty()) {
+		if(Hashes.getQuerryResult("funny-names_"+_guild_id) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				ArrayList<String> names = new ArrayList<String>();
 				String sql = ("SELECT name FROM names WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -1152,7 +1155,7 @@ public class SqlConnect {
 				while(rs.next()){
 					names.add(rs.getString(1));
 				}
-				Hashes.addQuerryResult("funny-names", names);
+				Hashes.addQuerryResult("funny-names_"+_guild_id, names);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
@@ -1160,9 +1163,6 @@ public class SqlConnect {
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		}
-		else {
-			names = Hashes.getQuerryResult("funny-names");
 		}
 	}
 	
@@ -1220,19 +1220,20 @@ public class SqlConnect {
 	}
 	
 	public static void SQLgetNameFilter(long _guild_id) {
-		if(Hashes.getQuerryResult("bad-name") == null || Hashes.getQuerryResult("bad-name").isEmpty()) {
+		if(Hashes.getQuerryResult("bad-names_"+_guild_id) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				ArrayList<String> names = new ArrayList<String>();
 				String sql = ("SELECT word FROM name_filter");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					names.add(rs.getString(1));
 				}
-				Hashes.addQuerryResult("bad-name", names);
+				Hashes.addQuerryResult("bad-names_"+_guild_id, names);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
@@ -1240,9 +1241,6 @@ public class SqlConnect {
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		}
-		else {
-			names = Hashes.getQuerryResult("bad-name");
 		}
 	}
 	
@@ -1601,9 +1599,6 @@ public class SqlConnect {
 	public static ArrayList<String> getDescriptions(){
 		return descriptions;
 	}
-	public static ArrayList<String> getNames(){
-		return names;
-	}
 	public static Date getTimestamp(){
 		return timestamp;
 	}
@@ -1615,9 +1610,6 @@ public class SqlConnect {
 	}
 	public static String getJoinDate(){
 		return join_date;
-	}
-	public static ArrayList<String> getStaffNames(){
-		return staff_names;
 	}
 	
 	public static void clearTimestamp() {
@@ -1631,12 +1623,6 @@ public class SqlConnect {
 	}
 	public static void clearDescriptions() {
 		descriptions.clear();
-	}
-	public static void clearNames() {
-		names.clear();
-	}
-	public static void clearStaffNames(){
-		staff_names.clear();
 	}
 	
 	public static void clearAllVariables(){

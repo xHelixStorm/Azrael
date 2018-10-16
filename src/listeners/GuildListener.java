@@ -72,7 +72,7 @@ public class GuildListener extends ListenerAdapter {
 		if(IniFileReader.getNameFilter().equals("true")) {
 			String lc_user_name = user_name.toLowerCase();
 			SqlConnect.SQLgetStaffNames(guild_id);
-			check: for(String name : SqlConnect.getStaffNames()){
+			check: for(String name : Hashes.getQuerryResult("staff-names_"+guild_id)){
 				if(lc_user_name.matches(name+"#[0-9]{4}")){
 					nick_assign.setColor(Color.RED).setTitle("Impersonation attempt found!").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
 					SqlConnect.SQLgetRandomName(e.getGuild().getIdLong());
@@ -83,10 +83,9 @@ public class GuildListener extends ListenerAdapter {
 					break check;
 				}
 			}
-			SqlConnect.clearStaffNames();
 			if(badName == false){
 				SqlConnect.SQLgetNameFilter(e.getGuild().getIdLong());
-				check: for(String word : SqlConnect.getNames()){
+				check: for(String word : Hashes.getQuerryResult("bad-names_"+guild_id)){
 					if(lc_user_name.contains(word)){
 						SqlConnect.SQLgetRandomName(e.getGuild().getIdLong());
 						String nickname = SqlConnect.getName();
@@ -96,7 +95,6 @@ public class GuildListener extends ListenerAdapter {
 						break check;
 					}
 				}
-				SqlConnect.clearNames();
 			}
 			if(badName == false){
 				SqlConnect.SQLDeleteNickname(user_id, guild_id);
