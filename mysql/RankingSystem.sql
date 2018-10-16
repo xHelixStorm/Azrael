@@ -1,15 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.0.1
+-- version 4.6.6deb4
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Erstellungszeit: 31. Jul 2018 um 22:15
--- Server-Version: 10.1.32-MariaDB
--- PHP-Version: 5.6.36
+-- Host: localhost:3306
+-- Erstellungszeit: 16. Okt 2018 um 07:08
+-- Server-Version: 10.1.23-MariaDB-9+deb9u1
+-- PHP-Version: 5.6.22-2+b3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -19,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Datenbank: `rankingsystem`
+-- Datenbank: `RankingSystem`
 --
 
 -- --------------------------------------------------------
@@ -66,8 +64,8 @@ CREATE TABLE `daily_items` (
 
 INSERT INTO `daily_items` (`item_id`, `description`, `weight`, `fk_type`, `action`) VALUES
 (1, '200000 PEN', 10, 'cur', 'use'),
-(4, '100000 PEN', 10, 'cur', 'use'),
-(9, 'EXP Plus 100', 80, 'exp', 'use');
+(4, '100000 PEN', 80, 'cur', 'use'),
+(9, 'EXP Plus 100', 10, 'exp', 'use');
 
 -- --------------------------------------------------------
 
@@ -159,6 +157,105 @@ CREATE TABLE `item_status` (
 INSERT INTO `item_status` (`status`, `description`) VALUES
 ('limit', 'Limited Item'),
 ('perm', 'Permanent Item');
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `level_list`
+--
+
+CREATE TABLE `level_list` (
+  `level` int(11) NOT NULL,
+  `experience` bigint(20) NOT NULL,
+  `currency` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Daten für Tabelle `level_list`
+--
+
+INSERT INTO `level_list` (`level`, `experience`, `currency`) VALUES
+(0, 0, 0),
+(1, 300, 30000),
+(2, 600, 20000),
+(3, 900, 1000),
+(4, 1200, 1000),
+(5, 1500, 1000),
+(6, 2200, 1000),
+(7, 2900, 1000),
+(8, 3600, 1000),
+(9, 4300, 1000),
+(10, 5000, 10000),
+(11, 6200, 2000),
+(12, 7400, 2000),
+(13, 8600, 2000),
+(14, 9800, 2000),
+(15, 11000, 10000),
+(16, 12700, 2000),
+(17, 14400, 2000),
+(18, 16100, 2000),
+(19, 17800, 2000),
+(20, 20100, 10000),
+(21, 22400, 3000),
+(22, 24700, 3000),
+(23, 27000, 3000),
+(24, 29300, 3000),
+(25, 33600, 3000),
+(26, 37900, 3000),
+(27, 42200, 3000),
+(28, 46500, 3000),
+(29, 50800, 3000),
+(30, 60600, 10000),
+(31, 70400, 3500),
+(32, 80200, 3500),
+(33, 90000, 3500),
+(34, 99800, 3500),
+(35, 126600, 3500),
+(36, 153400, 3500),
+(37, 180200, 3500),
+(38, 207000, 3500),
+(39, 233800, 3500),
+(40, 264600, 10000),
+(41, 295400, 4000),
+(42, 326200, 4000),
+(43, 357000, 4000),
+(44, 387800, 4000),
+(45, 419600, 4000),
+(46, 451400, 4500),
+(47, 483200, 4500),
+(48, 515000, 4500),
+(49, 546800, 4500),
+(50, 578600, 10000),
+(51, 611400, 5000),
+(52, 644200, 5000),
+(53, 678000, 5000),
+(54, 712800, 5000),
+(55, 748600, 5000),
+(56, 785400, 5500),
+(57, 822200, 5500),
+(58, 859000, 5500),
+(59, 895800, 5500),
+(60, 933600, 10000),
+(61, 971400, 6000),
+(62, 1009200, 6000),
+(63, 1047000, 6000),
+(64, 1087800, 6000),
+(65, 1129600, 6000),
+(66, 1171400, 6500),
+(67, 1213200, 6500),
+(68, 1255000, 6500),
+(69, 1296800, 6500),
+(70, 1339600, 10000),
+(71, 1382400, 7000),
+(72, 1425200, 7000),
+(73, 1468000, 7000),
+(74, 1510800, 7000),
+(75, 1554600, 7000),
+(76, 1604600, 7500),
+(77, 1664600, 7500),
+(78, 1734600, 7500),
+(79, 1814600, 7500),
+(80, 1914600, 100000);
 
 -- --------------------------------------------------------
 
@@ -389,9 +486,7 @@ CREATE TABLE `users` (
 CREATE TABLE `user_details` (
   `fk_user_id` bigint(20) NOT NULL,
   `level` int(11) NOT NULL,
-  `current_experience` int(11) NOT NULL,
-  `rank_up_experience` int(11) NOT NULL,
-  `total_experience` bigint(20) NOT NULL,
+  `experience` bigint(20) NOT NULL,
   `currency` bigint(20) NOT NULL,
   `current_role` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -467,6 +562,12 @@ ALTER TABLE `inventory`
 --
 ALTER TABLE `item_status`
   ADD PRIMARY KEY (`status`);
+
+--
+-- Indizes für die Tabelle `level_list`
+--
+ALTER TABLE `level_list`
+  ADD PRIMARY KEY (`level`);
 
 --
 -- Indizes für die Tabelle `max_exp`
@@ -552,19 +653,16 @@ ALTER TABLE `user_guild`
 --
 ALTER TABLE `daily_items`
   MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
 --
 -- AUTO_INCREMENT für Tabelle `max_exp`
 --
 ALTER TABLE `max_exp`
-  MODIFY `max_exp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
-
+  MODIFY `max_exp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 --
 -- AUTO_INCREMENT für Tabelle `ranking_profile`
 --
 ALTER TABLE `ranking_profile`
   MODIFY `profile_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID of the following template', AUTO_INCREMENT=8;
-
 --
 -- Constraints der exportierten Tabellen
 --
@@ -629,7 +727,6 @@ ALTER TABLE `user_details`
 ALTER TABLE `user_guild`
   ADD CONSTRAINT `user_guild_ibfk_1` FOREIGN KEY (`fk_user_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `user_guild_ibfk_2` FOREIGN KEY (`fk_guild_id`) REFERENCES `guilds` (`guild_id`);
-COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

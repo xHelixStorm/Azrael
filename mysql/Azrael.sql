@@ -1,15 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.0.1
+-- version 4.6.6deb4
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Erstellungszeit: 26. Jul 2018 um 19:05
--- Server-Version: 10.1.32-MariaDB
--- PHP-Version: 5.6.36
+-- Host: localhost:3306
+-- Erstellungszeit: 16. Okt 2018 um 07:08
+-- Server-Version: 10.1.23-MariaDB-9+deb9u1
+-- PHP-Version: 5.6.22-2+b3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -19,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Datenbank: `test`
+-- Datenbank: `Azrael`
 --
 
 -- --------------------------------------------------------
@@ -36,6 +34,22 @@ CREATE TABLE `action_log` (
   `description` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Stellvertreter-Struktur des Views `all_channels`
+-- (Siehe unten für die tatsächliche Ansicht)
+--
+CREATE TABLE `all_channels` (
+`channel_id` bigint(20)
+,`name` varchar(20)
+,`channel_type` varchar(3)
+,`channel` varchar(20)
+,`guild_id` bigint(20)
+,`guild_name` text
+,`language` varchar(10)
+);
 
 -- --------------------------------------------------------
 
@@ -135,6 +149,8 @@ CREATE TABLE `channel_filter` (
   `fk_lang_abbrv` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
 --
 -- Tabellenstruktur für Tabelle `command`
 --
@@ -174,7 +190,8 @@ INSERT INTO `commandexecution` (`execution_id`, `description`) VALUES
 CREATE TABLE `filter` (
   `filter_id` int(11) NOT NULL,
   `word` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fk_lang_abbrv` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL
+  `fk_lang_abbrv` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fk_guild_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -197,7 +214,10 @@ INSERT INTO `filter_languages` (`lang_abbrv`, `language`) VALUES
 ('eng', 'English'),
 ('fre', 'French'),
 ('ger', 'German'),
+('ita', 'Italian'),
+('por', 'Portuguese'),
 ('rus', 'Russian'),
+('spa', 'Spanish'),
 ('tur', 'Turkish');
 
 -- --------------------------------------------------------
@@ -219,7 +239,8 @@ CREATE TABLE `guild` (
 
 CREATE TABLE `names` (
   `name_id` int(11) NOT NULL,
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fk_guild_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -230,7 +251,8 @@ CREATE TABLE `names` (
 
 CREATE TABLE `name_filter` (
   `word_id` int(11) NOT NULL,
-  `word` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
+  `word` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fk_guild_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -248,12 +270,26 @@ CREATE TABLE `nickname` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `staff_name_filter`
+--
+
+CREATE TABLE `staff_name_filter` (
+  `name_id` int(11) NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fk_guild_id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `users`
 --
 
 CREATE TABLE `users` (
   `user_id` bigint(20) NOT NULL,
-  `name` text COLLATE utf8mb4_unicode_ci NOT NULL
+  `name` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `avatar_url` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `join_date` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -269,6 +305,15 @@ CREATE TABLE `warnings` (
   `description` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Struktur des Views `all_channels`
+--
+DROP TABLE IF EXISTS `all_channels`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`cool246812`@`%` SQL SECURITY DEFINER VIEW `all_channels`  AS  select `channels`.`channel_id` AS `channel_id`,`channels`.`name` AS `name`,`channeltypes`.`channel_type` AS `channel_type`,`channeltypes`.`channel` AS `channel`,`guild`.`guild_id` AS `guild_id`,`guild`.`name` AS `guild_name`,`filter_languages`.`language` AS `language` from (((((`channels` join `channel_conf` on((`channels`.`channel_id` = `channel_conf`.`fk_channel_id`))) join `channeltypes` on((`channel_conf`.`fk_channel_type` = `channeltypes`.`channel_type`))) join `guild` on((`channel_conf`.`fk_guild_id` = `guild`.`guild_id`))) left join `channel_filter` on((`channels`.`channel_id` = `channel_filter`.`fk_channel_id`))) left join `filter_languages` on((`channel_filter`.`fk_lang_abbrv` = `filter_languages`.`lang_abbrv`))) ;
+
 --
 -- Indizes der exportierten Tabellen
 --
@@ -277,18 +322,17 @@ CREATE TABLE `warnings` (
 -- Indizes für die Tabelle `action_log`
 --
 ALTER TABLE `action_log`
-  ADD PRIMARY KEY (`log_id`);
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `event` (`event`,`target_id`,`guild_id`);
 
 --
 -- Indizes für die Tabelle `bancollect`
 --
 ALTER TABLE `bancollect`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `fk_user_id` (`fk_user_id`,`fk_guild_id`),
   ADD UNIQUE KEY `fk_user_id_2` (`fk_user_id`,`fk_guild_id`),
-  ADD KEY `warning` (`fk_warning_id`),
-  ADD KEY `ban` (`fk_ban_id`),
-  ADD KEY `id` (`id`);
+  ADD KEY `fk_user_id` (`fk_user_id`,`fk_guild_id`),
+  ADD KEY `fk_guild_id` (`fk_guild_id`,`fk_warning_id`);
 
 --
 -- Indizes für die Tabelle `bans`
@@ -300,7 +344,8 @@ ALTER TABLE `bans`
 -- Indizes für die Tabelle `channels`
 --
 ALTER TABLE `channels`
-  ADD PRIMARY KEY (`channel_id`);
+  ADD PRIMARY KEY (`channel_id`),
+  ADD KEY `channel_id` (`channel_id`);
 
 --
 -- Indizes für die Tabelle `channeltypes`
@@ -312,14 +357,17 @@ ALTER TABLE `channeltypes`
 -- Indizes für die Tabelle `channel_conf`
 --
 ALTER TABLE `channel_conf`
-  ADD PRIMARY KEY (`fk_channel_id`,`fk_guild_id`);
+  ADD PRIMARY KEY (`fk_channel_id`,`fk_guild_id`),
+  ADD KEY `fk_channel_type` (`fk_channel_type`,`fk_guild_id`),
+  ADD KEY `fk_channel_id` (`fk_channel_id`);
 
 --
 -- Indizes für die Tabelle `channel_filter`
 --
 ALTER TABLE `channel_filter`
   ADD PRIMARY KEY (`fk_channel_id`,`fk_lang_abbrv`),
-  ADD KEY `fk_lang_abbrv` (`fk_lang_abbrv`);
+  ADD KEY `fk_lang_abbrv` (`fk_lang_abbrv`),
+  ADD KEY `fk_lang_abbrv_2` (`fk_lang_abbrv`);
 
 --
 -- Indizes für die Tabelle `command`
@@ -342,13 +390,17 @@ ALTER TABLE `commandexecution`
 ALTER TABLE `filter`
   ADD PRIMARY KEY (`filter_id`),
   ADD UNIQUE KEY `word` (`word`,`fk_lang_abbrv`),
-  ADD UNIQUE KEY `word_2` (`word`,`fk_lang_abbrv`);
+  ADD UNIQUE KEY `word_2` (`word`,`fk_lang_abbrv`),
+  ADD KEY `word_3` (`word`,`fk_lang_abbrv`),
+  ADD KEY `fk_lang_abbrv` (`fk_lang_abbrv`),
+  ADD KEY `fk_guild_id` (`fk_guild_id`);
 
 --
 -- Indizes für die Tabelle `filter_languages`
 --
 ALTER TABLE `filter_languages`
-  ADD PRIMARY KEY (`lang_abbrv`);
+  ADD PRIMARY KEY (`lang_abbrv`),
+  ADD KEY `lang_abbrv` (`lang_abbrv`);
 
 --
 -- Indizes für die Tabelle `guild`
@@ -360,31 +412,46 @@ ALTER TABLE `guild`
 -- Indizes für die Tabelle `names`
 --
 ALTER TABLE `names`
-  ADD PRIMARY KEY (`name_id`);
+  ADD PRIMARY KEY (`name_id`),
+  ADD KEY `name` (`name`),
+  ADD KEY `fk_guild_id` (`fk_guild_id`);
 
 --
 -- Indizes für die Tabelle `name_filter`
 --
 ALTER TABLE `name_filter`
-  ADD PRIMARY KEY (`word_id`);
+  ADD PRIMARY KEY (`word_id`),
+  ADD KEY `word` (`word`),
+  ADD KEY `fk_guild_id` (`fk_guild_id`);
 
 --
 -- Indizes für die Tabelle `nickname`
 --
 ALTER TABLE `nickname`
-  ADD PRIMARY KEY (`fk_user_id`,`fk_guild_id`);
+  ADD PRIMARY KEY (`fk_user_id`,`fk_guild_id`),
+  ADD KEY `fk_user_id` (`fk_user_id`,`fk_guild_id`);
+
+--
+-- Indizes für die Tabelle `staff_name_filter`
+--
+ALTER TABLE `staff_name_filter`
+  ADD PRIMARY KEY (`name_id`),
+  ADD KEY `fk_guild_id` (`fk_guild_id`);
 
 --
 -- Indizes für die Tabelle `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`);
+  ADD PRIMARY KEY (`user_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indizes für die Tabelle `warnings`
 --
 ALTER TABLE `warnings`
-  ADD PRIMARY KEY (`fk_guild_id`,`warning_id`);
+  ADD PRIMARY KEY (`fk_guild_id`,`warning_id`),
+  ADD KEY `fk_guild_id` (`fk_guild_id`,`warning_id`),
+  ADD KEY `fk_guild_id_2` (`fk_guild_id`);
 
 --
 -- AUTO_INCREMENT für exportierte Tabellen
@@ -394,42 +461,65 @@ ALTER TABLE `warnings`
 -- AUTO_INCREMENT für Tabelle `action_log`
 --
 ALTER TABLE `action_log`
-  MODIFY `log_id` bigint(20) NOT NULL AUTO_INCREMENT;
-
+  MODIFY `log_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=383;
 --
 -- AUTO_INCREMENT für Tabelle `bancollect`
 --
 ALTER TABLE `bancollect`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 --
 -- AUTO_INCREMENT für Tabelle `filter`
 --
 ALTER TABLE `filter`
-  MODIFY `filter_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1853;
-
+  MODIFY `filter_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=300;
 --
 -- AUTO_INCREMENT für Tabelle `names`
 --
 ALTER TABLE `names`
-  MODIFY `name_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
-
+  MODIFY `name_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT für Tabelle `name_filter`
 --
 ALTER TABLE `name_filter`
-  MODIFY `word_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=687;
-
+  MODIFY `word_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+--
+-- AUTO_INCREMENT für Tabelle `staff_name_filter`
+--
+ALTER TABLE `staff_name_filter`
+  MODIFY `name_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- Constraints der exportierten Tabellen
 --
+
+--
+-- Constraints der Tabelle `filter`
+--
+ALTER TABLE `filter`
+  ADD CONSTRAINT `filter_ibfk_1` FOREIGN KEY (`fk_guild_id`) REFERENCES `guild` (`guild_id`);
+
+--
+-- Constraints der Tabelle `names`
+--
+ALTER TABLE `names`
+  ADD CONSTRAINT `names_ibfk_1` FOREIGN KEY (`fk_guild_id`) REFERENCES `guild` (`guild_id`);
+
+--
+-- Constraints der Tabelle `name_filter`
+--
+ALTER TABLE `name_filter`
+  ADD CONSTRAINT `name_filter_ibfk_1` FOREIGN KEY (`fk_guild_id`) REFERENCES `guild` (`guild_id`);
+
+--
+-- Constraints der Tabelle `staff_name_filter`
+--
+ALTER TABLE `staff_name_filter`
+  ADD CONSTRAINT `staff_name_filter_ibfk_1` FOREIGN KEY (`fk_guild_id`) REFERENCES `guild` (`guild_id`);
 
 --
 -- Constraints der Tabelle `warnings`
 --
 ALTER TABLE `warnings`
   ADD CONSTRAINT `warnings_ibfk_1` FOREIGN KEY (`fk_guild_id`) REFERENCES `guild` (`guild_id`);
-COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
