@@ -106,7 +106,7 @@ public class RankingMethods extends ListenerAdapter{
 			g.setFont(new Font("Nexa Bold", Font.PLAIN, 12));
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			if(_additional_text == true){
-				g.drawString("Exp:", 17, 73);
+				g.drawString("Exp:", 14, 73);
 				g.drawString(levelT+"%", 239, 73);
 			}
 			g.drawString("Rank:  #"+_level, 118, 57);

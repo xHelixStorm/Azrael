@@ -1,0 +1,46 @@
+[2018-10-16T13:40:18.161 - baka master]: H!set
+[2018-10-16T13:40:18.327 - MyPersonalBot2017]: 
+[2018-10-16T13:40:26.783 - baka master]: H!profile
+[2018-10-16T13:40:28.512 - MyPersonalBot2017]: (https://media.discordapp.net/attachments/303940851120209920/501721085826301954/profile.png)
+[2018-10-16T13:41:43.993 - baka master]: H!profile
+[2018-10-16T13:41:45.159 - MyPersonalBot2017]: (https://media.discordapp.net/attachments/303940851120209920/501721406606671892/profile.png)
+[2018-10-16T13:48:51.860 - baka master]: H!shop
+[2018-10-16T13:48:52.086 - MyPersonalBot2017]: 
+[2018-10-16T13:49:06.872 - baka master]: H!purchase Alice Level Up
+[2018-10-16T13:49:07.033 - MyPersonalBot2017]: You have successfully purchased **Alice Level Up**
+[2018-10-16T13:49:13.763 - baka master]: H!purchase Alice Rank
+[2018-10-16T13:49:13.910 - MyPersonalBot2017]: You have successfully purchased **Alice Rank**
+[2018-10-16T13:49:21.261 - baka master]: H!purchase Alice Profile
+[2018-10-16T13:49:21.425 - MyPersonalBot2017]: You have successfully purchased **Alice Profile**
+[2018-10-16T13:49:30.647 - baka master]: H!use Alice Level up
+[2018-10-16T13:49:30.829 - MyPersonalBot2017]: **Alice Level up** will be used from now on!
+[2018-10-16T13:49:37.312 - baka master]: H!use Alice Rank
+[2018-10-16T13:49:37.474 - MyPersonalBot2017]: **Alice Rank** will be used from now on!
+[2018-10-16T13:49:42.018 - baka master]: H!use Alice Profile
+[2018-10-16T13:49:42.156 - MyPersonalBot2017]: **Alice Profile** will be used from now on!
+[2018-10-16T13:49:45.246 - baka master]: H!inventory
+[2018-10-16T13:49:45.418 - MyPersonalBot2017]: to have everything on one page, use the **-list** parameter together with the command!
+Additionally, you can visualize the desired page with the **-page** paramenter.
+[2018-10-16T13:49:47.395 - MyPersonalBot2017]: (https://media.discordapp.net/attachments/303940851120209920/501723429506908171/inventory.png)
+[2018-10-16T13:50:38.978 - baka master]: H!profile
+[2018-10-16T13:50:39.720 - MyPersonalBot2017]: (https://media.discordapp.net/attachments/303940851120209920/501723648323747851/profile.png)
+[2018-10-16T13:52:46.758 - baka master]: H!rank
+[2018-10-16T13:52:47.197 - MyPersonalBot2017]: (https://media.discordapp.net/attachments/303940851120209920/501724184070848512/rank.png)
+[2018-10-16T13:52:58.096 - baka master]: H!profile
+[2018-10-16T13:52:58.585 - MyPersonalBot2017]: (https://media.discordapp.net/attachments/303940851120209920/501724231944634368/profile.png)
+[2018-10-16T13:54:48.892 - baka master]: pizzaaaaaaaaaaaaaaaaaaaaa
+[2018-10-16T13:54:51.310 - baka master]: pizzaaaaaaaaaaaaaaaaaaaaa
+[2018-10-16T13:54:53.196 - baka master]: pizzaaaaaaaaaaaaaaaaaaaaa
+[2018-10-16T13:54:55.229 - baka master]: pizzaaaaaaaaaaaaaaaaaaaaa
+[2018-10-16T13:54:57.656 - baka master]: pizzaaaaaaaaaaaaaaaaaaaaa
+[2018-10-16T13:54:58.336 - MyPersonalBot2017]: (https://media.discordapp.net/attachments/303940851120209920/501724733713154048/level_up.png)
+[2018-10-16T15:23:01.118 - baka master]: H!profile
+[2018-10-16T15:23:03.160 - MyPersonalBot2017]: (https://media.discordapp.net/attachments/303940851120209920/501746900060340254/profile.png)
+[2018-10-16T15:23:21.958 - baka master]: pizAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+[2018-10-16T15:23:23.709 - baka master]: pizAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+[2018-10-16T15:23:29.353 - baka master]: H!rank
+[2018-10-16T15:23:29.910 - MyPersonalBot2017]: (https://media.discordapp.net/attachments/303940851120209920/501747012383801345/rank.png)
+[2018-10-16T15:23:50.749 - baka master]: H!profile
+[2018-10-16T15:23:51.308 - MyPersonalBot2017]: (https://media.discordapp.net/attachments/303940851120209920/501747101789716481/profile.png)
+[2018-10-16T15:24:50.857 - baka master]: H!rank
+[2018-10-16T15:24:52.098 - MyPersonalBot2017]: (https://media.discordapp.net/attachments/303940851120209920/501747356795011073/rank.png)
