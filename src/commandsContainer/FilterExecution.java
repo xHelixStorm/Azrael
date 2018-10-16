@@ -76,10 +76,9 @@ public class FilterExecution {
 						message.setTitle("You chose to display the current word filter!");
 						StringBuilder out = new StringBuilder();
 						SqlConnect.SQLgetFilterLanguages();
-						for(String lang : SqlConnect.getFilter_Lang()) {
+						for(String lang : Hashes.getFilterLang(0)) {
 							out.append(lang+"\n");
 						}
-						SqlConnect.clearFilter_Lang();
 						_e.getTextChannel().sendMessage(message.setDescription("Please choose one of the available languages to display the filter!\n\n**"+out.toString()+"**").build()).queue();
 						out.setLength(0);
 						FileSetting.createFile(file_path, "display-word-filter");
@@ -88,10 +87,9 @@ public class FilterExecution {
 						message.setTitle("You chose to insert a new word into the filter!");
 						StringBuilder out = new StringBuilder();
 						SqlConnect.SQLgetFilterLanguages();
-						for(String lang : SqlConnect.getFilter_Lang()) {
+						for(String lang : Hashes.getFilterLang(0)) {
 							out.append(lang+"\n");
 						}
-						SqlConnect.clearFilter_Lang();
 						_e.getTextChannel().sendMessage(message.setDescription("Please choose a language for the new word!\n\n**"+out.toString()+"**").build()).queue();
 						out.setLength(0);
 						FileSetting.createFile(file_path, "insert-word-filter");
@@ -100,10 +98,9 @@ public class FilterExecution {
 						message.setTitle("You chose to remove a word from the filter!");
 						StringBuilder out = new StringBuilder();
 						SqlConnect.SQLgetFilterLanguages();
-						for(String lang : SqlConnect.getFilter_Lang()) {
+						for(String lang : Hashes.getFilterLang(0)) {
 							out.append(lang+"\n");
 						}
-						SqlConnect.clearFilter_Lang();
 						_e.getTextChannel().sendMessage(message.setDescription("Please choose a language for the word you want to remove!\n\n**"+out.toString()+"**").build()).queue();
 						out.setLength(0);
 						FileSetting.createFile(file_path, "remove-word-filter");
@@ -112,10 +109,9 @@ public class FilterExecution {
 						message.setTitle("You chose to load a file which contains filter words!");
 						StringBuilder out = new StringBuilder();
 						SqlConnect.SQLgetFilterLanguages();
-						for(String lang : SqlConnect.getFilter_Lang()) {
+						for(String lang : Hashes.getFilterLang(0)) {
 							out.append(lang+"\n");
 						}
-						SqlConnect.clearFilter_Lang();
 						_e.getTextChannel().sendMessage(message.setDescription("Please choose a language for the words in the file you want to add!\n\n**"+out.toString()+"**").build()).queue();
 						out.setLength(0);
 						FileSetting.createFile(file_path, "load-word-filter");
@@ -215,10 +211,9 @@ public class FilterExecution {
 					if(_message.equalsIgnoreCase("english")) {
 						SqlConnect.SQLgetFilter("eng", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
-						for(String word : SqlConnect.getFilter_Words()) {
+						for(String word : Hashes.getQuerryResult("eng_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						SqlConnect.clearFilter_Words();
 						String paste_link = Pastebin.unlistedPaste("English word filter", out.toString());
 						message.setTitle("English word filter!");
 						out.setLength(0);
@@ -228,10 +223,9 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase("german")) {
 						SqlConnect.SQLgetFilter("ger", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
-						for(String word : SqlConnect.getFilter_Words()) {
+						for(String word : Hashes.getQuerryResult("ger_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						SqlConnect.clearFilter_Words();
 						String paste_link = Pastebin.unlistedPaste("German word filter", out.toString());
 						message.setTitle("German word filter!");
 						out.setLength(0);
@@ -241,10 +235,9 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase("french")) {
 						SqlConnect.SQLgetFilter("fre", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
-						for(String word : SqlConnect.getFilter_Words()) {
+						for(String word : Hashes.getQuerryResult("fre_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						SqlConnect.clearFilter_Words();
 						String paste_link = Pastebin.unlistedPaste("French word filter", out.toString());
 						message.setTitle("French word filter!");
 						out.setLength(0);
@@ -254,10 +247,9 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase("turkish")) {
 						SqlConnect.SQLgetFilter("tur", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
-						for(String word : SqlConnect.getFilter_Words()) {
+						for(String word : Hashes.getQuerryResult("tur_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						SqlConnect.clearFilter_Words();
 						String paste_link = Pastebin.unlistedPaste("Turkish word filter", out.toString());
 						message.setTitle("Turkish word filter!");
 						out.setLength(0);
@@ -267,10 +259,9 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase("russian")) {
 						SqlConnect.SQLgetFilter("rus", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
-						for(String word : SqlConnect.getFilter_Words()) {
+						for(String word : Hashes.getQuerryResult("rus_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						SqlConnect.clearFilter_Words();
 						String paste_link = Pastebin.unlistedPaste("Russian word filter", out.toString());
 						message.setTitle("Russian word filter!");
 						out.setLength(0);
@@ -280,10 +271,9 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase("spanish")) {
 						SqlConnect.SQLgetFilter("spa", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
-						for(String word : SqlConnect.getFilter_Words()) {
+						for(String word : Hashes.getQuerryResult("eng_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						SqlConnect.clearFilter_Words();
 						String paste_link = Pastebin.unlistedPaste("Spanish word filter", out.toString());
 						message.setTitle("Spanish word filter!");
 						out.setLength(0);
@@ -293,10 +283,9 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase("portuguese")) {
 						SqlConnect.SQLgetFilter("por", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
-						for(String word : SqlConnect.getFilter_Words()) {
+						for(String word : Hashes.getQuerryResult("por_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						SqlConnect.clearFilter_Words();
 						String paste_link = Pastebin.unlistedPaste("Portuguese word filter", out.toString());
 						message.setTitle("Portuguese word filter!");
 						out.setLength(0);
@@ -306,10 +295,9 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase("italian")) {
 						SqlConnect.SQLgetFilter("ita", _e.getGuild().getIdLong());
 						StringBuilder out = new StringBuilder();
-						for(String word : SqlConnect.getFilter_Words()) {
+						for(String word : Hashes.getQuerryResult("ita_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						SqlConnect.clearFilter_Words();
 						String paste_link = Pastebin.unlistedPaste("Italian word filter", out.toString());
 						message.setTitle("Italian word filter!");
 						out.setLength(0);

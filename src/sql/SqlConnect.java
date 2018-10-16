@@ -43,8 +43,6 @@ public class SqlConnect {
 	private static Date timestamp;
 	private static Date unmute;
 	private static ArrayList<Channels> channels = new ArrayList<Channels>();
-	private static ArrayList<String> filter_lang = new ArrayList<String>();
-	private static ArrayList<String> filter_words = new ArrayList<String>();
 	private static ArrayList<String> names = new ArrayList<String>();
 	private static ArrayList<String> descriptions = new ArrayList<String>();
 	private static ArrayList<String> staff_names = new ArrayList<String>();
@@ -891,34 +889,39 @@ public class SqlConnect {
 	}
 	
 	public synchronized static void SQLgetChannel_Filter(long _channel_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM channel_filter WHERE fk_channel_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _channel_id);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				filter_lang.add(rs.getString(2));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public synchronized static void SQLgetFilter(String _filter_lang, long _guild_id){
-		if(Hashes.getQuerryResult(_filter_lang) == null || Hashes.getQuerryResult(_filter_lang).isEmpty()) {
+		if(Hashes.getFilterLang(_channel_id) == null){
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT * FROM channel_filter WHERE fk_channel_id = ?");
+				ArrayList<String> filter_lang = new ArrayList<String>();
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _channel_id);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					filter_lang.add(rs.getString(2));
+				}
+				Hashes.addFilterLang(_channel_id, filter_lang);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+	}
+	
+	public synchronized static void SQLgetFilter(String _filter_lang, long _guild_id){
+		if(Hashes.getQuerryResult(_filter_lang+"_"+_guild_id) == null) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				ArrayList<String> filter_words = new ArrayList<String>();
 				String sql;
 				if(_filter_lang.equals("all")){
 					sql = ("SELECT word FROM filter WHERE fk_guild_id = ?");
@@ -935,7 +938,7 @@ public class SqlConnect {
 				while(rs.next()){
 					filter_words.add(rs.getString(1));
 				}
-				Hashes.addQuerryResult(_filter_lang, filter_words);
+				Hashes.addQuerryResult(_filter_lang+"_"+_guild_id, filter_words);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
@@ -943,9 +946,6 @@ public class SqlConnect {
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		}
-		else {
-			filter_words = Hashes.getQuerryResult(_filter_lang);
 		}
 	}
 	
@@ -1147,7 +1147,7 @@ public class SqlConnect {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT name FROM names WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setLong(2, _guild_id);
+				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					names.add(rs.getString(1));
@@ -1322,23 +1322,27 @@ public class SqlConnect {
 	}
 	
 	public static void SQLgetFilterLanguages() {
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv NOT LIKE \"all\"");
-			stmt = myConn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				filter_lang.add(rs.getString(1));
+		if(Hashes.getFilterLang(0) == null){
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv NOT LIKE \"all\"");
+				ArrayList<String> filter_lang = new ArrayList<String>();
+				stmt = myConn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					filter_lang.add(rs.getString(1));
+				}
+				Hashes.addFilterLang(0, filter_lang);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
@@ -1594,12 +1598,6 @@ public class SqlConnect {
 	public static ArrayList<Channels> getChannels(){
 		return channels;
 	}
-	public synchronized static ArrayList<String> getFilter_Lang(){
-		return filter_lang;
-	}
-	public static ArrayList<String> getFilter_Words(){
-		return filter_words;
-	}
 	public static ArrayList<String> getDescriptions(){
 		return descriptions;
 	}
@@ -1630,12 +1628,6 @@ public class SqlConnect {
 	}
 	public static void clearChannelsArray(){
 		channels.clear();
-	}
-	public synchronized static void clearFilter_Lang(){
-		filter_lang.clear();
-	}
-	public synchronized static void clearFilter_Words(){
-		filter_words.clear();
 	}
 	public static void clearDescriptions() {
 		descriptions.clear();

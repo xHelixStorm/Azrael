@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import rankingSystem.Rank;
 import rankingSystem.Ranks;
@@ -19,7 +21,8 @@ public class Hashes {
         }
     };
     
-    private static final Map<String, ArrayList<String>> querry_result = new HashMap<String, ArrayList<String>>();
+    private static final ConcurrentMap<String, ArrayList<String>> querry_result = new ConcurrentHashMap<String, ArrayList<String>>();
+    private static final Map<Long, ArrayList<String>> filter_lang = new HashMap<Long, ArrayList<String>>();
     private static final Map<Long, Integer> message_removed = new HashMap<Long, Integer>();
     private static final Map<Long, Guilds> status = new HashMap<Long, Guilds>();
     private static final Map<Long, Rank> ranking = new HashMap<Long, Rank>();
@@ -28,6 +31,9 @@ public class Hashes {
 	
 	public static void addMessagePool(long _message_id, String _message) {
 		message_pool.put(_message_id, _message);
+	}
+	public static void addFilterLang(long _channel_id, ArrayList<String> _filter_lang){
+		filter_lang.put(_channel_id, _filter_lang);
 	}
 	public static void addQuerryResult(String _key, ArrayList<String> _result) {
 		querry_result.put(_key, _result);
@@ -49,6 +55,9 @@ public class Hashes {
 	}
 	public static String getMessagePool(long _message_id) {
 		return message_pool.get(_message_id);
+	}
+	public static ArrayList<String> getFilterLang(long _channel_id){
+		return filter_lang.get(_channel_id);
 	}
 	public static LinkedHashMap<Long, String> getWholeMessagePool(){
 		return message_pool;

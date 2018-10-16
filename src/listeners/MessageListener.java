@@ -3,7 +3,6 @@ package listeners;
 import java.io.File;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -44,10 +43,10 @@ public class MessageListener extends ListenerAdapter{
 				LocalDateTime time = LocalDateTime.now();
 				String image_url = "";
 				for(Attachment attch : e.getMessage().getAttachments()){
-					image_url = (e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? image_url+"IMMAGE "+attch.getFileName()+" ("+attch.getProxyUrl()+")" : image_url+"\nIMMAGE "+attch.getFileName()+" ("+attch.getProxyUrl()+")";
+					image_url = (e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? image_url+"("+attch.getProxyUrl()+")" : image_url+"\n("+attch.getProxyUrl()+")";
 				}
 				FileSetting.appendFile("./message_log/"+e.getTextChannel().getName()+".txt", "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw()+image_url+"\n");
-				if(IniFileReader.getCacheLog().equals("true")) {
+				if(IniFileReader.getCacheLog().equals("true") && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
 					Hashes.addMessagePool(e.getMessageIdLong(), "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw()+image_url);
 				}
 			}
@@ -102,10 +101,9 @@ public class MessageListener extends ListenerAdapter{
 				}
 			}
 			
-			SqlConnect.SQLgetChannel_Filter(channel_id);;
-			ArrayList<String> filter_lang = SqlConnect.getFilter_Lang();
-			if(!filter_lang.isEmpty()){
-				executor.execute(new LanguageFilter(e, filter_lang));
+			SqlConnect.SQLgetChannel_Filter(channel_id);
+			if(Hashes.getFilterLang(channel_id).size() > 0){
+				executor.execute(new LanguageFilter(e, Hashes.getFilterLang(channel_id)));
 			}
 		} catch(NullPointerException npe){
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());

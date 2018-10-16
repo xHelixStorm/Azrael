@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import core.Hashes;
 import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
@@ -75,7 +76,7 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 			if(exceptionFound == false){
 				find: for(String filter : filter_lang){
 					SqlConnect.SQLgetFilter(filter, e.getGuild().getIdLong());
-					for(String word : SqlConnect.getFilter_Words()){
+					for(String word : Hashes.getQuerryResult(filter+"_"+e.getGuild().getIdLong())){
 						if(wordFound == false && letterCounter > 1){
 							if(parseMessage.equals(word) || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || parseMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.contains(" "+word+" ")){
 								e.getMessage().delete().queue();
@@ -88,10 +89,8 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 							}
 						}	
 					}
-					SqlConnect.clearFilter_Words();
 				}
 			}
-			SqlConnect.clearFilter_Lang();
 			
 			if(wordFound == true){
 				Path path = Paths.get(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");

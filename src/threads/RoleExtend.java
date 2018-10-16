@@ -44,10 +44,15 @@ public class RoleExtend implements Runnable{
 					unmute = 0;
 				}
 				if(unmute < 0){unmute = 0;}
-				long assignedRole = Hashes.getRanking(member.getUser().getIdLong()).getCurrentRole();
+				long assignedRole = 0;
+				boolean rankingState = false;
+				if(Hashes.getRanking(member.getUser().getIdLong()) != null){
+					assignedRole = Hashes.getRanking(member.getUser().getIdLong()).getCurrentRole();
+					rankingState = Hashes.getStatus(guild_id).getRankingState();
+				}
 				users.add(member);
 				banHammerFound = true;
-				new Thread(new MuteRestart(e, member, guild_id, channel_id, mute_role, unmute, assignedRole, Hashes.getStatus(guild_id).getRankingState())).start();
+				new Thread(new MuteRestart(e, member, guild_id, channel_id, mute_role, unmute, assignedRole, rankingState)).start();
 				SqlConnect.clearUnmute();
 				i++;
 			}

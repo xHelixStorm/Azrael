@@ -25,7 +25,6 @@ public class RoleListener extends ListenerAdapter{
 		RankingDB.SQLgetWholeRankView(e.getMember().getUser().getIdLong());
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setTitle("A user has been muted!");
 		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN).setTitle("Mute Retracted!");
-		EmbedBuilder message3 = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getBanThumbnail()).setTitle("User banned!");
 		
 		long user_id = e.getMember().getUser().getIdLong();
 		long guild_id = e.getMember().getGuild().getIdLong();
@@ -66,7 +65,10 @@ public class RoleListener extends ListenerAdapter{
 					
 					long time = System.currentTimeMillis();
 					int warning_id=SqlConnect.getWarningID();
-					long assignedRole = Hashes.getRanking(user_id).getCurrentRole();
+					long assignedRole = 0;
+					if(Hashes.getRanking(user_id) != null){
+						assignedRole = Hashes.getRanking(user_id).getCurrentRole();
+					}
 					
 					if(SqlConnect.getCustomTime()) {
 						SqlConnect.SQLUpdateMuted(e.getUser().getIdLong(), e.getGuild().getIdLong(), true, true);;
@@ -109,10 +111,9 @@ public class RoleListener extends ListenerAdapter{
 						else if((warning_id+1) > max_warning) {
 							PrivateChannel pc = e.getUser().openPrivateChannel().complete();
 							pc.sendMessage("You have been banned from "+e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
-									+ "On a important note, this is an automated reply. You'll receive no reply in any way.").queue();
+									+ "On a important note, this is an automated reply. You'll receive no reply in any way.").complete();
 							pc.close();
-							e.getJDA().getGuildById(guild_id).getController().ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").queue();
-							if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message3.setDescription("["+timestamp.toString()+"] **" + user_name + " with the ID Number " + user_id + " Has been banned after reaching the limit of allowed mutes on this server!**").build()).queue();}
+							e.getJDA().getGuildById(guild_id).getController().ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").complete();
 						}
 					}
 				} catch (HierarchyException hye) {

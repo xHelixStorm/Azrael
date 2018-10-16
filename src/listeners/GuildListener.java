@@ -41,6 +41,7 @@ public class GuildListener extends ListenerAdapter {
 		long channel_id = SqlConnect.getChannelID();
 		SqlConnect.SQLgetData(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		muted = SqlConnect.getMuted();
+		boolean custom_time = SqlConnect.getCustomTime();
 		if(IniFileReader.getJoinMessage().equals("true")){
 			if(channel_id != 0 && muted == false){e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription(":warning: The user **" + user_name + "** with the ID Number **" + user_id + "** joined **" + e.getGuild().getName() + "**").build()).queue();}
 		}
@@ -54,7 +55,7 @@ public class GuildListener extends ListenerAdapter {
 			SqlConnect.clearUnmute();
 		}
 		
-		if((unmute - currentTime) > 0 && muted == true){
+		if((unmute - currentTime) > 0 && (muted == true || custom_time == true)){
 			ServerRoles.SQLgetRole(e.getGuild().getIdLong(), "mut");
 			long mute_role = ServerRoles.getRole_ID();
 			e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role)).queue();

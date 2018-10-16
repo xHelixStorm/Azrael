@@ -1,9 +1,9 @@
 package listeners;
 
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import core.Hashes;
 import filter.LanguageEditFilter;
 import net.dv8tion.jda.core.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -15,11 +15,10 @@ public class MessageEditListener extends ListenerAdapter{
 	public void onMessageUpdate(MessageUpdateEvent e){
 		long channel_id = e.getTextChannel().getIdLong();
 		SqlConnect.SQLgetChannel_Filter(channel_id);;
-		ArrayList<String> filter_lang = SqlConnect.getFilter_Lang();
 		
-		if(filter_lang.size() > 0){
+		if(Hashes.getFilterLang(channel_id).size() > 0){
 			ExecutorService executor = Executors.newSingleThreadExecutor();
-			executor.execute(new LanguageEditFilter(e, filter_lang));
+			executor.execute(new LanguageEditFilter(e, Hashes.getFilterLang(channel_id)));
 			executor.shutdown();
 		}
 		SqlConnect.clearAllVariables();
