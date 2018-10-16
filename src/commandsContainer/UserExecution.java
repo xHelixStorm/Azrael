@@ -231,7 +231,7 @@ public class UserExecution {
 						break;
 				}
 			}
-			else if(file_value.replaceAll("[0-9]*", "").equals("delete-messages")){
+			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("delete-messages")){
 				if(_message.replaceAll("[0-9]*", "").length() == 0){
 					int value = Integer.parseInt(_message);
 					if(value == 0){
@@ -289,7 +289,7 @@ public class UserExecution {
 					}
 				}
 			}
-			else if(file_value.replaceAll("[0-9]*", "").equals("warning")) {
+			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("warning")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					SqlConnect.SQLgetData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
 					int db_warning = SqlConnect.getWarningID();
@@ -316,7 +316,7 @@ public class UserExecution {
 					FileSetting.deleteFile(file_path);
 				}
 			}
-			else if(file_value.replaceAll("[0-9]*", "").equals("mute")) {
+			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("mute")) {
 				if(_message.equalsIgnoreCase("yes")) {
 					message.setTitle("You chose to provide a mute time!");
 					_e.getTextChannel().sendMessage(message.setDescription("Please provide a mute time in the following format:\n\n"
@@ -332,7 +332,7 @@ public class UserExecution {
 					ServerRoles.clearAllVariables();
 				}
 			}
-			else if(file_value.replaceAll("[0-9]*", "").equals("mute-time")) {
+			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("mute-time")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 1 && (_message.endsWith("m") || _message.endsWith("h") || _message.endsWith("d"))) {					
 					long mute_time = (Long.parseLong(_message.replaceAll("[^0-9]*", ""))*1000);
 					if(_message.endsWith("m")) {
@@ -367,7 +367,7 @@ public class UserExecution {
 					_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a numerical value in minutes!").queue();
 				}
 			}
-			else if(file_value.replaceAll("[0-9]*", "").equals("ban")) {
+			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("ban")) {
 				if(_message.equalsIgnoreCase("yes")) {
 					message.setTitle("You chose to provide a reason!");
 					_e.getTextChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
@@ -392,7 +392,7 @@ public class UserExecution {
 					FileSetting.deleteFile(file_path);
 				}
 			}
-			else if(file_value.replaceAll("[0-9]*", "").equals("ban-reason")) {
+			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("ban-reason")) {
 				SqlConnect.SQLgetData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
 				int warning_id = SqlConnect.getWarningID();
 				SqlConnect.SQLgetMaxWarning(_e.getGuild().getIdLong());
@@ -410,7 +410,7 @@ public class UserExecution {
 				_e.getGuild().getController().ban(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")), 0).reason(_message).queue();
 				FileSetting.deleteFile(file_path);
 			}
-			else if(file_value.replaceAll("[0-9]*", "").equals("kick")) {
+			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("kick")) {
 				if(_message.equalsIgnoreCase("yes")) {
 					message.setTitle("You chose to provide a reason!");
 					_e.getTextChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
@@ -421,11 +421,11 @@ public class UserExecution {
 					FileSetting.deleteFile(file_path);
 				}
 			}
-			else if(file_value.replaceAll("[0-9]*", "").equals("kick-reason")) {
+			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("kick-reason")) {
 				_e.getGuild().getController().kick(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", ""))).reason(_message).queue();
 				FileSetting.deleteFile(file_path);
 			}
-			else if(file_value.replaceAll("[0-9]*",	"").equals("gift-experience")) {
+			else if(file_value.replaceAll("[0-9]*",	"").equalsIgnoreCase("gift-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					Rank user_details = Hashes.getRanking(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
 					long experience = Integer.parseInt(_message);
@@ -464,7 +464,7 @@ public class UserExecution {
 					FileSetting.deleteFile(file_path);
 				}
 			}
-			else if(file_value.replaceAll("[0-9]*", "").equals("set-experience")) {
+			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("set-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					Rank user_details = Hashes.getRanking(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
 					long experience = Long.parseLong(_message);
@@ -503,7 +503,7 @@ public class UserExecution {
 					FileSetting.deleteFile(file_path);
 				}
 			}
-			else if(file_value.replaceAll("[0-9]*", "").equals("set-level")) {
+			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("set-level")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					int level = Integer.parseInt(_message);
 					if(level <= Hashes.getStatus(_e.getGuild().getIdLong()).getMaxLevel()) {
