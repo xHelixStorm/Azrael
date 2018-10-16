@@ -21,7 +21,7 @@ public class RankingMethods extends ListenerAdapter{
 	public static void getRankUp(MessageReceivedEvent e , int _level, int _level_skin, int _icon_skin, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
 		try {
 			BufferedImage rankUp = ImageIO.read(new File("./files/RankingSystem/levelup"+_level_skin+"_blank.png"));
-			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".jpg"));
+			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".png"));
 			String name = e.getMember().getEffectiveName();
 			int characterCounter = name.length();
 			int level = _level;
@@ -77,7 +77,7 @@ public class RankingMethods extends ListenerAdapter{
 		try{
 			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/rank"+_rank_skin+"_blank.png"));
 			BufferedImage experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+_bar_color+"_"+_experience+".png"));
-			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".jpg"));
+			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".png"));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -128,7 +128,7 @@ public class RankingMethods extends ListenerAdapter{
 		try{
 			BufferedImage profile = ImageIO.read(new File("./files/RankingSystem/profile"+_profile_skin+"_blank.png"));
 			BufferedImage experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+_bar_color+"_"+_experiencePercentage+".png"));
-			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".jpg"));
+			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".png"));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
