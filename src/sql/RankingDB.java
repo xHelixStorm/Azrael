@@ -21,16 +21,11 @@ import rankingSystem.Skins;
 public class RankingDB {
 	
 	private static long user_id = 0;
-	private static String user_name = null;
 	private static int level_skin = 0;
 	private static int rank_skin = 0;
 	private static int profile_skin = 0;
 	private static int icon_skin = 0;
 	private static long guild_id = 0;
-	private static String guild_name = null;
-	private static long role_id = 0;
-	private static String role_name = null;
-	private static int role_level_requirement = 0;
 	private static int ranking_level = 0;
 	private static int ranking_rank = 0;
 	private static int ranking_profile = 0;
@@ -42,8 +37,6 @@ public class RankingDB {
 	private static int current_experience = 0;
 	private static int rank_up_experience = 0;
 	private static long experience = 0;
-	private static long currency = 0;
-	private static long assigned_role = 0;
 	private static boolean enabled = false;
 	private static long max_experience = 0;
 	private static long daily_experience = 0;
@@ -108,33 +101,6 @@ public class RankingDB {
 	}
 	
 	//users table
-	public static void SQLgetUser(long _user_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM users WHERE user_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setUserID(rs.getLong(1));
-				setUserName(rs.getString(2));
-				setLevelSkin(rs.getInt(3));
-				setRankSkin(rs.getInt(4));
-				setProfileSkin(rs.getInt(5));
-				setIconSkin(rs.getInt(6));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static void SQLInsertUser(long _user_id, String _name, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -373,55 +339,6 @@ public class RankingDB {
 	}
 	
 	//roles table
-	public static void SQLgetRole(int _role_level_requirement){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM roles WHERE level_requirement <= ? ORDER BY level_requirement DESC LIMIT 1");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _role_level_requirement);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setRoleID(rs.getLong(1));
-				setRoleName(rs.getString(2));
-				setRoleLevelRequirement(rs.getInt(3));
-				setGuildID(rs.getLong(4));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static void SQLgetSingleRole(){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM roles ORDER BY level_requirement LIMIT 1");
-			stmt = myConn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setRoleID(rs.getLong(1));
-				setRoleName(rs.getString(2));
-				setRoleLevelRequirement(rs.getInt(3));
-				setGuildID(rs.getLong(4));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static void SQLInsertRoles(long _role_id, String _name, int _role_level_requirement, long _guild_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -537,27 +454,6 @@ public class RankingDB {
 			stmt.setInt(1, _level);
 			stmt.setLong(2, _experience);
 			stmt.setLong(3, _currency);
-			stmt.setLong(4, _assigned_role);
-			stmt.setLong(5, _user_id);
-			stmt.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public synchronized static void SQLUpdateLevel(long _user_id, int _level, int _current_experience, int _rank_up_experience, long _assigned_role){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE user_details SET `Level` = ?, `current_experience` = ?, `rank_up_experience` = ?, `current_role` = ? WHERE `fk_user_id` = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _level);
-			stmt.setInt(2, _current_experience);
-			stmt.setInt(3, _rank_up_experience);
 			stmt.setLong(4, _assigned_role);
 			stmt.setLong(5, _user_id);
 			stmt.executeUpdate();
@@ -686,31 +582,7 @@ public class RankingDB {
 	}
 	
 	//daily_experience table
-	public synchronized static void SQLgetDailyExperience(long _user_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM daily_experience WHERE user_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setUserID(rs.getLong(1));
-				setDailyExperience(rs.getLong(2));
-				setDailyReset(rs.getTimestamp(3));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public synchronized static void SQLInsertDailyExperience(long _experience, long _user_id, Timestamp _reset){
+	public static void SQLInsertDailyExperience(long _experience, long _user_id, Timestamp _reset){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -729,7 +601,7 @@ public class RankingDB {
 		}
 	}
 	
-	public synchronized static void SQLDeleteDailyExperience(long _user_id){
+	public static void SQLDeleteDailyExperience(long _user_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1740,11 +1612,8 @@ public class RankingDB {
 		}
 	}
 	
-	public synchronized static void setUserID(long _user_id){
+	public static void setUserID(long _user_id){
 		user_id = _user_id;
-	}
-	public static void setUserName(String _user_name){
-		user_name = _user_name;
 	}
 	public static void setLevelSkin(int _level_skin){
 		level_skin = _level_skin;
@@ -1758,20 +1627,8 @@ public class RankingDB {
 	public static void setIconSkin(int _icon_skin){
 		icon_skin = _icon_skin;
 	}
-	public synchronized static void setGuildID(long _guild_id){
+	public static void setGuildID(long _guild_id){
 		guild_id = _guild_id;
-	}
-	public static void setGuildName(String _guild_name){
-		guild_name = _guild_name;
-	}
-	public static void setRoleID(long _role_id){
-		role_id = _role_id;
-	}
-	public static void setRoleName(String _role_name){
-		role_name = _role_name;
-	}
-	public static void setRoleLevelRequirement(int _role_level_requirement){
-		role_level_requirement = _role_level_requirement;
 	}
 	public static void setRankingLevel(int _ranking_level){
 		ranking_level = _ranking_level;
@@ -1794,7 +1651,7 @@ public class RankingDB {
 	public static void setDescription(String _description){
 		description = _description;
 	}
-	public synchronized static void setLevel(int _level){
+	public static void setLevel(int _level){
 		level = _level;
 	}
 	public synchronized static void setCurrentExperience(int _current_experience){
@@ -1806,22 +1663,16 @@ public class RankingDB {
 	public synchronized static void setExperience(long _experience){
 		experience = _experience;
 	}
-	public synchronized static void setCurrency(long _currency){
-		currency = _currency;
-	}
-	public synchronized static void setAssignedRole(long _assigned_role){
-		assigned_role = _assigned_role;
-	}
 	public static void setEnabled(boolean _enabled){
 		enabled = _enabled;
 	}
 	public static void setMaxExperience(long _max_experience){
 		max_experience = _max_experience;
 	}
-	public synchronized static void setDailyExperience(long _daily_experience){
+	public static void setDailyExperience(long _daily_experience){
 		daily_experience = _daily_experience;
 	}
-	public synchronized static void setDailyReset(Date _daily_reset){
+	public static void setDailyReset(Date _daily_reset){
 		daily_reset = _daily_reset;
 	}
 	public static void setItemID(int _item_id){
@@ -1948,11 +1799,8 @@ public class RankingDB {
 		icon_description = _icon_description;
 	}
 	
-	public synchronized static long getUserID(){
+	public static long getUserID(){
 		return user_id;
-	}
-	public static String getUserName(){
-		return user_name;
 	}
 	public static int getLevelSkin(){
 		return level_skin;
@@ -1966,20 +1814,8 @@ public class RankingDB {
 	public static int getIconSkin(){
 		return icon_skin;
 	}
-	public synchronized static long getGuildID(){
+	public static long getGuildID(){
 		return guild_id;
-	}
-	public static String getGuildName(){
-		return guild_name;
-	}
-	public static long getRoleID(){
-		return role_id;
-	}
-	public static String getRoleName(){
-		return role_name;
-	}
-	public static int getRoleLevelRequirement(){
-		return role_level_requirement;
 	}
 	public static int getRankingLevel(){
 		return ranking_level;
@@ -2002,23 +1838,17 @@ public class RankingDB {
 	public static String getDescription(){
 		return description;
 	}
-	public synchronized static int getLevel(){
+	public static int getLevel(){
 		return level;
 	}
-	public synchronized static int getCurrentExperience(){
+	public static int getCurrentExperience(){
 		return current_experience;
 	}
-	public synchronized static int getRankUpExperience(){
+	public static int getRankUpExperience(){
 		return rank_up_experience;
 	}
-	public synchronized static long getExperience(){
+	public static long getExperience(){
 		return experience;
-	}
-	public synchronized static long getCurrency(){
-		return currency;
-	}
-	public synchronized static long getAssignedRole(){
-		return assigned_role;
 	}
 	public static boolean getEnabled(){
 		return enabled;
@@ -2026,10 +1856,10 @@ public class RankingDB {
 	public static long getMaxExperience(){
 		return max_experience;
 	}
-	public synchronized static long getDailyExperience(){
+	public static long getDailyExperience(){
 		return daily_experience;
 	}
-	public synchronized static Date getDailyReset(){
+	public static Date getDailyReset(){
 		return daily_reset;
 	}
 	public static int getItemID(){
@@ -2182,16 +2012,11 @@ public class RankingDB {
 	
 	public static void clearAllVariables(){
 		setUserID(0);
-		setUserName("");
 		setLevelSkin(0);
 		setRankSkin(0);
 		setProfileSkin(0);
 		setIconSkin(0);
 		setGuildID(0);
-		setGuildName("");
-		setRoleID(0);
-		setRoleName("");
-		setRoleLevelRequirement(0);
 		setRankingLevel(0);
 		setRankingRank(0);
 		setRankingProfile(0);
@@ -2203,8 +2028,6 @@ public class RankingDB {
 		setCurrentExperience(0);
 		setRankUpExperience(0);
 		setExperience(0);
-		setCurrency(0);
-		setAssignedRole(0);
 		setEnabled(false);
 		setMaxExperience(0);
 		setDailyExperience(0);
