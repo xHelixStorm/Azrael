@@ -83,7 +83,9 @@ public class UserExecution {
 						+ "**kick**: To kick the user\n"
 						+ "**gift-experience**: To gift experience points\n"
 						+ "**set-experience**: To set an experience value\n"
-						+ "**set-level**: To assign a level").build()).queue();
+						+ "**set-level**: To assign a level\n"
+						+ "**gift-currency**: To gift money\n"
+						+ "**set-currency**: To se a money value").build()).queue();
 				FileSetting.createFile(file_name, raw_input);
 				new Thread(new DelayDelete(file_name, 180000)).start();
 			}
@@ -102,7 +104,7 @@ public class UserExecution {
 		String file_path = _file_name;
 		String file_value = FileSetting.readFile(file_path);
 		if(!file_value.equals("complete")) {
-			if(_message.equalsIgnoreCase("information") || _message.equalsIgnoreCase("delete-messages") || _message.equalsIgnoreCase("warning") || _message.equalsIgnoreCase("mute") || _message.equalsIgnoreCase("ban") || _message.equalsIgnoreCase("kick") || _message.equalsIgnoreCase("gift-experience") || _message.equalsIgnoreCase("set-experience") || _message.equalsIgnoreCase("set-level")) {
+			if(_message.equalsIgnoreCase("information") || _message.equalsIgnoreCase("delete-messages") || _message.equalsIgnoreCase("warning") || _message.equalsIgnoreCase("mute") || _message.equalsIgnoreCase("ban") || _message.equalsIgnoreCase("kick") || _message.equalsIgnoreCase("gift-experience") || _message.equalsIgnoreCase("set-experience") || _message.equalsIgnoreCase("set-level") || _message.equalsIgnoreCase("gift-currency") || _message.equalsIgnoreCase("set-currency")) {
 				switch(_message) {
 					case "information": 
 						SqlConnect.SQLgetUserThroughID(file_value);
@@ -166,7 +168,7 @@ public class UserExecution {
 						FileSetting.deleteFile(file_path);
 						break;
 					case "delete-messages":
-						message.setTitle("You choose to delete a number of messages!");
+						message.setTitle("You chose to delete a number of messages!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
 						FileSetting.createFile(file_path, "delete-messages"+file_value);
 						break;
@@ -198,7 +200,7 @@ public class UserExecution {
 						break;
 					case "gift-experience":
 						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
-							message.setTitle("You choose to gift experience points!");
+							message.setTitle("You chose to gift experience points!");
 							_e.getTextChannel().sendMessage(message.setDescription("Choose a number of experience points to add to the total number of experience points").build()).queue();
 							FileSetting.createFile(file_path, "gift-experience"+file_value);
 						}
@@ -209,7 +211,7 @@ public class UserExecution {
 						break;
 					case "set-experience":
 						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
-							message.setTitle("You choose to set experience points!");
+							message.setTitle("You chose to set experience points!");
 							_e.getTextChannel().sendMessage(message.setDescription("Choose a number of experience points to set for the user").build()).queue();
 							FileSetting.createFile(file_path, "set-experience"+file_value);
 						}
@@ -220,9 +222,31 @@ public class UserExecution {
 						break;
 					case "set-level":
 						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
-							message.setTitle("You choose to set a level!");
+							message.setTitle("You chose to set a level!");
 							_e.getTextChannel().sendMessage(message.setDescription("Choose a level to assign the user").build()).queue();
 							FileSetting.createFile(file_path, "set-level"+file_value);
+						}
+						else {
+							denied.setTitle("Access Denied!");
+							_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+						}
+						break;
+					case "gift-currency":
+						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
+							message.setTitle("You chose to gift money!");
+							_e.getTextChannel().sendMessage(message.setDescription("Choose the amount of money to gift the user").build()).queue();
+							FileSetting.createFile(file_path, "gift-currency"+file_value);
+						}
+						else {
+							denied.setTitle("Access Denied!");
+							_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+						}
+						break;
+					case "set-currency":
+						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
+							message.setTitle("You chose to set money!");
+							_e.getTextChannel().sendMessage(message.setDescription("Choose the amount of money to set for the user").build()).queue();
+							FileSetting.createFile(file_path, "set-currency"+file_value);
 						}
 						else {
 							denied.setTitle("Access Denied!");
@@ -449,6 +473,7 @@ public class UserExecution {
 					user_details.setLevel(level);
 					user_details.setCurrentRole(assign_role);
 					RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
+					RankingDB.SQLInsertActionLog("low", user_details.getUser_ID(), "Experience points gifted", "User received "+experience+" experience points");
 					Hashes.addRanking(user_details.getUser_ID(), user_details);
 					for(Role r : _e.getMember().getRoles()){
 						for(Rank role : Hashes.getMapOfRankingRoles().values()){
@@ -488,6 +513,7 @@ public class UserExecution {
 					user_details.setLevel(level);
 					user_details.setCurrentRole(assign_role);
 					RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
+					RankingDB.SQLInsertActionLog("low", user_details.getUser_ID(), "Experience points edited", "User has been set to "+experience+" experience points");
 					Hashes.addRanking(user_details.getUser_ID(), user_details);
 					for(Role r : _e.getMember().getRoles()){
 						for(Rank role : Hashes.getMapOfRankingRoles().values()){
@@ -524,6 +550,7 @@ public class UserExecution {
 						user_details.setCurrentExperience(0);
 						user_details.setCurrentRole(assign_role);
 						RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
+						RankingDB.SQLInsertActionLog("low", user_details.getUser_ID(), "Level changed", "User is now level "+user_details.getLevel());
 						Hashes.addRanking(user_details.getUser_ID(), user_details);
 						for(Role r : _e.getMember().getRoles()){
 							for(Rank role : Hashes.getMapOfRankingRoles().values()){
@@ -541,6 +568,30 @@ public class UserExecution {
 					else {
 						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please choose a level that is lower or equal to "+Hashes.getStatus(_e.getGuild().getIdLong()).getMaxLevel()).queue();
 					}
+				}
+			}
+			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("gift-currency")) {
+				if(_message.replaceAll("[0-9]*", "").length() == 0) {
+					Rank user_details = Hashes.getRanking(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
+					long currency = Long.parseLong(_message);
+					user_details.setCurrency(user_details.getCurrency()+currency);
+					RankingDB.SQLUpdateCurrency(user_details.getUser_ID(), user_details.getCurrency());
+					RankingDB.SQLInsertActionLog("low", user_details.getUser_ID(), "Money gifted", "User received money in value of "+currency+" PEN");
+					Hashes.addRanking(user_details.getUser_ID(), user_details);
+					_e.getTextChannel().sendMessage("Currency has been updated!").queue();
+					FileSetting.deleteFile(file_path);
+				}
+			}
+			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("set-currency")) {
+				if(_message.replaceAll("[0-9]*", "").length() == 0) {
+					Rank user_details = Hashes.getRanking(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
+					long currency = Long.parseLong(_message);
+					user_details.setCurrency(currency);
+					RankingDB.SQLUpdateCurrency(user_details.getUser_ID(), user_details.getCurrency());
+					RankingDB.SQLInsertActionLog("low", user_details.getUser_ID(), "Money set", "Currency value for the user has been changed to "+currency+" PEN");
+					Hashes.addRanking(user_details.getUser_ID(), user_details);
+					_e.getTextChannel().sendMessage("Currency has been updated!").queue();
+					FileSetting.deleteFile(file_path);
 				}
 			}
 		}

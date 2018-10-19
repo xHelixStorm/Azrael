@@ -97,6 +97,7 @@ public class Daily implements Command{
 								}
 							}
 							RankingDB.SQLInsertDailiesUsage(e.getMember().getUser().getIdLong(), timestamp, timestamp2);
+							RankingDB.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), "Daily retrieved", list.get(random).getDescription());
 							list.clear();
 						}
 						else{

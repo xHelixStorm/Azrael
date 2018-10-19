@@ -100,6 +100,27 @@ public class RankingDB {
 		}
 	}
 	
+	//action_log
+	public static void SQLInsertActionLog(String _warning_level, long _entity, String _event, String _notes){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO action_log (warning_level, affected_entity, event, notes) VALUES (?, ?, ?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _warning_level);
+			stmt.setLong(2, _entity);
+			stmt.setString(3, _event);
+			stmt.setString(4, _notes);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	//users table
 	public static void SQLInsertUser(long _user_id, String _name, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin){
 		Connection myConn = null;
