@@ -946,7 +946,7 @@ public class RankingDB {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM ranking_level WHERE description LIKE ?");
+			String sql = ("SELECT * FROM ranking_icons WHERE description LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _description);
 			rs = stmt.executeQuery();

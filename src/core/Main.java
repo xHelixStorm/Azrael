@@ -102,8 +102,8 @@ public class Main {
 		
 		try {
 			@SuppressWarnings("unused")
-			JDA jda = builder.buildBlocking();
-		} catch (LoginException | IllegalArgumentException | InterruptedException e) {
+			JDA jda = builder.build();
+		} catch (LoginException | IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 	}

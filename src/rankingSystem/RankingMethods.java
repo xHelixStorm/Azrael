@@ -6,10 +6,15 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -76,7 +81,14 @@ public class RankingMethods extends ListenerAdapter{
 	public static void getRank(MessageReceivedEvent e, String _name, String _avatar, int _experience, int _level, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
 		try{
 			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/rank"+_rank_skin+"_blank.png"));
-			BufferedImage experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+_bar_color+"_"+_experience+".png"));
+			BufferedImage experienceBar;
+			if(_experience != 0) {
+				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+_bar_color+"_"+100+".png"));
+				experienceBar = experienceBar.getSubimage(0, 0, 2*_experience, experienceBar.getHeight());
+			}
+			else {
+				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+0+"_"+0+".png"));
+			}
 			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".png"));
 			
 			final URL url = new URL(_avatar);
@@ -99,6 +111,7 @@ public class RankingMethods extends ListenerAdapter{
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			g.drawImage(rank, 0, 0, null);
 			g.drawImage(experienceBar, 38, 64, null);
+			level = blurImage(level);
 			g.drawImage(level, _rankx, _ranky, _rank_width, _rank_height, null);
 			g.drawImage(avatarPicture, 19, 19, 40, 40, null);
 			Color color = new Color(_color_r, _color_g, _color_b);
@@ -127,7 +140,14 @@ public class RankingMethods extends ListenerAdapter{
 	public static void getProfile(MessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _level, float _currentExperience, float _rankUpExperience, long _experience, long _currency, int _rank, int _profile_skin, int _icon_skin, int _bar_color, boolean _additional_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
 		try{
 			BufferedImage profile = ImageIO.read(new File("./files/RankingSystem/profile"+_profile_skin+"_blank.png"));
-			BufferedImage experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+_bar_color+"_"+_experiencePercentage+".png"));
+			BufferedImage experienceBar;
+			if(_experiencePercentage != 0) {
+				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+_bar_color+"_"+100+".png"));
+				experienceBar = experienceBar.getSubimage(0, 0, 2*_experiencePercentage, experienceBar.getHeight());
+			}
+			else {
+				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+0+"_"+0+".png"));
+			}
 			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".png"));
 			
 			final URL url = new URL(_avatar);
@@ -154,12 +174,14 @@ public class RankingMethods extends ListenerAdapter{
 			Graphics2D g = overlay.createGraphics();
 			g.drawImage(profile, 0, 0, null);
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.drawImage(experienceBar, 42, 100, null);
+			level = blurImage(level);
 			g.drawImage(level, _rankx, _ranky, _rank_width, _rank_height, null);
 			g.drawImage(avatarPicture, 20, 20, 55, 55, null);
 			Color color = new Color(_color_r, _color_g, _color_b);
 			g.setColor(color);
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setFont(new Font("Nexa Bold", Font.PLAIN, 13));
 			if(_additional_text == true){
 				g.drawString("Exp:", 15, 109);
@@ -194,5 +216,22 @@ public class RankingMethods extends ListenerAdapter{
 	    FontMetrics fm = g.getFontMetrics();
 	    int x = w - (fm.stringWidth(s)/2);
 	    return x;
+	}
+	
+	private static BufferedImage blurImage(BufferedImage image) {
+		float ninth = 1.0f/9.0f;
+		float[] blurKernel = {
+				ninth, ninth, ninth,
+				ninth, ninth, ninth,
+				ninth, ninth, ninth
+		};
+
+		Map<RenderingHints.Key, Object> map = new HashMap<RenderingHints.Key, Object>();
+		map.put(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		map.put(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+		map.put(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		RenderingHints hints = new RenderingHints(map);
+		BufferedImageOp op = new ConvolveOp(new Kernel(3, 3, blurKernel), ConvolveOp.EDGE_NO_OP, hints);
+		return op.filter(image, null);
 	}
 }
