@@ -19,7 +19,7 @@ public class MessageRemovedListener extends ListenerAdapter{
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE);
 		
 		int audit_counter = 0;
-		String trigger_user_id = "";
+		long trigger_user_id = 0;
 		String trigger_user_name = "";
 		long removed_from = 0;
 		boolean send_message = false;
@@ -39,7 +39,7 @@ public class MessageRemovedListener extends ListenerAdapter{
 						removed_from = entry.getTargetIdLong();
 						if(Hashes.getMessagePool(e.getMessageIdLong()).getUserID() == removed_from){
 							if(!UserPrivs.isUserBot(e.getGuild().getMemberById(removed_from).getUser(), e.getGuild().getIdLong())){
-								trigger_user_id = entry.getUser().getId();
+								trigger_user_id = entry.getUser().getIdLong();
 								trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 								audit_id = entry.getIdLong();
 								Hashes.addMessageRemoved(audit_id, Integer.parseInt(entry.getOptionByName("count")));
@@ -62,10 +62,10 @@ public class MessageRemovedListener extends ListenerAdapter{
 		Messages removed_message = Hashes.getMessagePool(message_id);
 		
 		if(send_message == true && removed_from != 0){
-			if(!trigger_user_id.equals(removed_from)){
+			if(trigger_user_id != removed_from){
 				if(removed_message != null && removed_message.getMessage().length() > 0) {
 					Hashes.removeMessagePool(message_id);
-					if(trigger_user_id.length() > 0) {
+					if(trigger_user_id > 0) {
 						message.setTitle(trigger_user_name+" has removed a message from #"+e.getTextChannel().getName()+"!");
 						SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "tra");
 						if(removed_message.getMessage().length() > 0) {
