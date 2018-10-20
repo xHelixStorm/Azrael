@@ -11,6 +11,7 @@ import commandsContainer.SetWarning;
 import commandsContainer.UserExecution;
 import core.Guilds;
 import core.Hashes;
+import core.Messages;
 import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
@@ -45,9 +46,18 @@ public class MessageListener extends ListenerAdapter{
 				for(Attachment attch : e.getMessage().getAttachments()){
 					image_url = (e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? image_url+"("+attch.getProxyUrl()+")" : image_url+"\n("+attch.getProxyUrl()+")";
 				}
-				FileSetting.appendFile("./message_log/"+e.getTextChannel().getName()+".txt", "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw()+image_url+"\n");
+				Messages collectedMessage = new Messages();
+				collectedMessage.setUserID(user_id);
+				collectedMessage.setUsername(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
+				collectedMessage.setGuildID(guild_id);
+				collectedMessage.setChannelID(channel_id);
+				collectedMessage.setChannelName(e.getTextChannel().getName());
+				collectedMessage.setMessage(message+image_url+"\n");
+				collectedMessage.setMessageID(e.getMessageIdLong());
+				collectedMessage.setTime(time);
+				FileSetting.appendFile("./message_log/"+e.getTextChannel().getName()+".txt", "["+collectedMessage.getTime().toString()+" - "+collectedMessage.getUserName()+"]: "+collectedMessage.getMessage());
 				if(IniFileReader.getCacheLog().equals("true") && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
-					Hashes.addMessagePool(e.getMessageIdLong(), "["+time.toString()+" - "+e.getMember().getEffectiveName()+"]: "+e.getMessage().getContentRaw()+image_url);
+					Hashes.addMessagePool(e.getMessageIdLong(), collectedMessage);
 				}
 			}
 			

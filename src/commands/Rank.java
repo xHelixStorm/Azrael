@@ -1,5 +1,6 @@
 package commands;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -7,6 +8,7 @@ import java.util.concurrent.Executors;
 
 import core.Hashes;
 import fileManagement.IniFileReader;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import rankingSystem.RankingMethods;
 import sql.RankingDB;
@@ -80,7 +82,14 @@ public class Rank implements Command{
 								convertedExperience = 100;
 							}
 							
-							RankingMethods.getRank(e, name, avatar, convertedExperience, level, rank_skin, icon_skin, bar_color, additional_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
+							if(currentExperience >= 0) {
+								RankingMethods.getRank(e, name, avatar, convertedExperience, level, rank_skin, icon_skin, bar_color, additional_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
+							}
+							else {
+								EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
+								e.getTextChannel().sendMessage(error.setDescription("An error occured on use. Please contact an administrator or moderator!").build()).queue();
+								RankingDB.SQLInsertActionLog("critical", user_id, "negative experience value", "The user has less experience points in proportion to his level: "+currentExperience);
+							}
 						}
 						else{
 							e.getTextChannel().sendMessage("This command is currently having a cooldown, please try again later").queue();

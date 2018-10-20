@@ -11,8 +11,8 @@ import rankingSystem.Rank;
 import rankingSystem.Ranks;
 
 public class Hashes {
-	private static final int max_message_pool_size = 1000;
-	private static final LinkedHashMap<Long, String> message_pool = new LinkedHashMap<Long, String>(){
+	private static final int max_message_pool_size = 1500;
+	private static final LinkedHashMap<Long, Messages> message_pool = new LinkedHashMap<Long, Messages>(){
 		private static final long serialVersionUID = 7505333508062985903L;
 		@Override
 		@SuppressWarnings("rawtypes")
@@ -20,16 +20,24 @@ public class Hashes {
             return size() > max_message_pool_size;
         }
     };
+    private static final int max_ranking_pool_size = 500;
+    private static final LinkedHashMap<Long, Rank> ranking = new LinkedHashMap<Long, Rank>(){
+		private static final long serialVersionUID = 7054847678737381845L;
+		@Override
+		@SuppressWarnings("rawtypes")
+    	protected boolean removeEldestEntry(final Map.Entry eldest) {
+    		return size() > max_ranking_pool_size;
+    	}
+    };
     
     private static final ConcurrentMap<String, ArrayList<String>> querry_result = new ConcurrentHashMap<String, ArrayList<String>>();
     private static final Map<Long, ArrayList<String>> filter_lang = new HashMap<Long, ArrayList<String>>();
     private static final Map<Long, Integer> message_removed = new HashMap<Long, Integer>();
     private static final Map<Long, Guilds> status = new HashMap<Long, Guilds>();
-    private static final Map<Long, Rank> ranking = new HashMap<Long, Rank>();
     private static final Map<String, Rank> ranking_roles = new HashMap<String, Rank>();
     private static final Map<Integer, Ranks> ranking_levels = new HashMap<Integer, Ranks>();
 	
-	public static void addMessagePool(long _message_id, String _message) {
+	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
 	}
 	public static void addFilterLang(long _channel_id, ArrayList<String> _filter_lang){
@@ -53,13 +61,13 @@ public class Hashes {
 	public static void addRankingLevels(Integer _key, Ranks _levels){
 		ranking_levels.put(_key, _levels);
 	}
-	public static String getMessagePool(long _message_id) {
+	public static Messages getMessagePool(long _message_id) {
 		return message_pool.get(_message_id);
 	}
 	public static ArrayList<String> getFilterLang(long _channel_id){
 		return filter_lang.get(_channel_id);
 	}
-	public static LinkedHashMap<Long, String> getWholeMessagePool(){
+	public static LinkedHashMap<Long, Messages> getWholeMessagePool(){
 		return message_pool;
 	}
 	public static ArrayList<String> getQuerryResult(String _key) {

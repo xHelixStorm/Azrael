@@ -4,19 +4,16 @@ import java.awt.Color;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 import core.Guilds;
 import core.Hashes;
+import core.Messages;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageHistory;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import rankingSystem.Rank;
@@ -257,6 +254,7 @@ public class UserExecution {
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("delete-messages")){
 				if(_message.replaceAll("[0-9]*", "").length() == 0){
+					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 					int value = Integer.parseInt(_message);
 					if(value == 0){
 						_e.getTextChannel().sendMessage("You chose to not remove any messages at all!").queue();
@@ -265,49 +263,43 @@ public class UserExecution {
 						_e.getTextChannel().sendMessage("Please choose a number between 1 and 100!").queue();
 					}
 					else{
-						SqlConnect.SQLgetUserThroughID(file_value.replaceAll("[^0-9]*", ""));
-						ArrayList<Long> message_ids = new ArrayList<Long>();
-						Set<Long> message_pool_key = Hashes.getWholeMessagePool().keySet();
-						for(Long key : message_pool_key){
-							message_ids.add(key);
+						ArrayList<Messages> messages = new ArrayList<Messages>();
+						for(Messages collectedMessage : Hashes.getWholeMessagePool().values()) {
+							if(collectedMessage.getUserID() == Long.parseLong(file_value.replaceAll("[^0-9]*", "")) && collectedMessage.getGuildID() == _e.getGuild().getIdLong()) {
+								messages.add(collectedMessage);
+							}
 						}
+						
 						int hash_counter = 0;
 						StringBuilder collected_messages = new StringBuilder();
-						search: for(int count = message_ids.size()-1; count >= 0; count--){
-							if(hash_counter < value){
-								if(Hashes.getMessagePool(message_ids.get(count)).contains(SqlConnect.getName().substring(0, SqlConnect.getName().length()-5))){
-									inspect: for(TextChannel tc : _e.getGuild().getTextChannels()){
-										try{
-											MessageHistory history = new MessageHistory(tc);
-											List<Message> retrieved_message = history.retrievePast(100).complete();
-											for(Message msg : retrieved_message){
-												String author_name = msg.getAuthor().getName()+"#"+msg.getAuthor().getDiscriminator();
-												if(msg.getIdLong() == message_ids.get(count) && author_name.equals(SqlConnect.getName())){
-													msg.delete().queue();
-													if(!collected_messages.toString().contains(collected_messages+""+Hashes.getMessagePool(message_ids.get(count)))){
-														collected_messages.append(Hashes.getMessagePool(message_ids.get(count))+"\n");
-													}
-													Hashes.removeMessagePool(message_ids.get(count));
-													hash_counter++;
-													break inspect;
-												}
-											}
-										} catch(InsufficientPermissionException ipe){
-											//jump to next channel
-										}
-									}
+						for(int i = messages.size()-1; i >= 0; i--) {
+							hash_counter++;
+							try {
+								Message m = _e.getGuild().getTextChannelById(messages.get(i).getChannelID()).getMessageById(messages.get(i).getMessageID()).complete();
+								collected_messages.append("["+messages.get(i).getTime().toString()+"]: "+messages.get(i).getMessage());
+								Hashes.removeMessagePool(messages.get(i).getMessageID());
+								m.delete().queue();
+								if(i == 0 || hash_counter == value) {
+									break;
 								}
-							}
-							else{
-								break search;
+							}catch(InsufficientPermissionException ipe) {
+								error.setTitle("Message couldn't be removed");
+								_e.getTextChannel().sendMessage(error.setDescription("Message couldn't be removed from <#"+messages.get(i).getChannelID()+"> due to lack of permissions: **"+ipe.getPermission().getName()+"**").build()).queue();
+								hash_counter--;
 							}
 						}
-						if(collected_messages.length() > 0){
-							String paste_link = Pastebin.unlistedPaste("Found words have been succesfully removed!", collected_messages.toString());
-							_e.getTextChannel().sendMessage(message.setDescription("The comments of the selected user have been succesfully removed: "+paste_link).build()).queue();
-							collected_messages.setLength(0);
+						
+						if(messages.size() > 0) {
+							String paste_link = Pastebin.unlistedPaste("Found comments have been succesfully removed!", hash_counter+" messages from "+messages.get(0).getUserName()+" have been removed:\n\n"+collected_messages.toString());
+							if(!paste_link.equals("Creating paste failed!")) {
+								_e.getTextChannel().sendMessage(message.setDescription("The comments of the selected user have been succesfully removed: "+paste_link).build()).queue();
+							}
+							else {
+								error.setTitle("New Paste couldn't be created!");
+								_e.getTextChannel().sendMessage(error.setDescription("A new Paste couldn't be created. Please ensure that valid login credentials and a valid Pastebing API key has been inserted into the config.ini file!").build()).queue();
+							}
 						}
-						else{
+						else {
 							_e.getTextChannel().sendMessage(message.setDescription("Nothing has been found to delete....").build()).queue();
 						}
 					}

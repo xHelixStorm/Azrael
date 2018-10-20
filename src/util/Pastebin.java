@@ -35,7 +35,6 @@ public class Pastebin {
 			PastebinLink link = paste.paste();
 			return_link = link.getLink().toString();
 		} catch (LoginException | PasteException e) {
-			e.printStackTrace();
 			return_link = "Creating paste failed!";
 		}
 		return return_link;
