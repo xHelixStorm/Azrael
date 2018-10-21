@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import core.Hashes;
 import core.Roles;
 import fileManagement.IniFileReader;
 
@@ -144,6 +145,40 @@ public class ServerRoles {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLgetRolesByCategory(long _guild_id, String channel_type){
+		if(Hashes.getRoles(1+"_"+_guild_id) == null) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT guilds.guild_id, guilds.name, roles.role_id, roles.name, role_category.category_abv, role_category.rank FROM guilds INNER JOIN roles ON guilds.guild_id = roles.fk_guild_id INNER JOIN role_category ON roles.fk_category_abv = role_category.category_abv WHERE guild_id = ? AND role_category.category_abv LIKE ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				stmt.setString(2, channel_type);
+				rs = stmt.executeQuery();
+				int i = 1;
+				while(rs.next()){
+					Roles roleDetails = new Roles();
+					roleDetails.setGuild_ID(rs.getLong(1));
+					roleDetails.setGuild_Name(rs.getString(2));
+					roleDetails.setRole_ID(rs.getLong(3));
+					roleDetails.setRole_Name(rs.getString(4));
+					roleDetails.setCategory_ABV(rs.getString(5));
+					roleDetails.setCategory_Name(rs.getString(6));
+					Hashes.addRoles(i+"_"+_guild_id, roleDetails);
+					i++;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
 		}
 	}
 	

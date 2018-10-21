@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import core.Hashes;
 import core.Roles;
 import core.UserPrivs;
 import fileManagement.IniFileReader;
@@ -60,7 +61,7 @@ public class RegisterRole {
 		long role_id;
 		
 		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getId().equals(IniFileReader.getAdmin())){
-			Pattern pattern = Pattern.compile("(adm|mod|com|bot|mut)");
+			Pattern pattern = Pattern.compile("(adm|mod|com|bot|mut|rea)");
 			Matcher matcher = pattern.matcher(_message);
 			if(matcher.find()){
 				category_abv = matcher.group();
@@ -71,6 +72,9 @@ public class RegisterRole {
 						role_name = _e.getGuild().getRoleById(role_id).getName();
 						ServerRoles.SQLInsertRole(_guild_id, role_id, role_name, category_abv);
 						_e.getTextChannel().sendMessage("**The role has been registered!**").queue();
+						if(category_abv.equals("rea")) {
+							Hashes.removeRoles();
+						}
 					} catch(NullPointerException npe){
 						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();
 					}

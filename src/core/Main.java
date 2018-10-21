@@ -35,6 +35,8 @@ import listeners.CommandListener;
 import listeners.GuildJoinListener;
 import listeners.GuildLeaveListener;
 import listeners.GuildListener;
+import listeners.GuildMessageReactionAddListener;
+import listeners.GuildMessageReactionRemoveListener;
 import listeners.MessageEditListener;
 import listeners.MessageListener;
 import listeners.MessageRemovedListener;
@@ -150,5 +152,7 @@ public class Main {
 		builder.addEventListener(new NicknameListener());
 		builder.addEventListener(new MessageRemovedListener());
 		builder.addEventListener(new AvatarUpdateListener());
+		builder.addEventListener(new GuildMessageReactionAddListener());
+		builder.addEventListener(new GuildMessageReactionRemoveListener());
 	}
 }

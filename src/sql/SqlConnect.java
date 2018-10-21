@@ -791,6 +791,23 @@ public class SqlConnect {
 		}
 	}
 	
+	public static void SQLDeleteChannelType(String _channel_type) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM channel_conf WHERE fk_channel_type = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _channel_type);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static void SQLgetChannels(long _guild_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;

@@ -36,6 +36,7 @@ public class Hashes {
     private static final Map<Long, Guilds> status = new HashMap<Long, Guilds>();
     private static final Map<String, Rank> ranking_roles = new HashMap<String, Rank>();
     private static final Map<Integer, Ranks> ranking_levels = new HashMap<Integer, Ranks>();
+    private static final Map<String, Roles> roles = new HashMap<String, Roles>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -60,6 +61,9 @@ public class Hashes {
 	}
 	public static void addRankingLevels(Integer _key, Ranks _levels){
 		ranking_levels.put(_key, _levels);
+	}
+	public static void addRoles(String _key, Roles _roles) {
+		roles.put(_key, _roles);
 	}
 	public static Messages getMessagePool(long _message_id) {
 		return message_pool.get(_message_id);
@@ -94,6 +98,9 @@ public class Hashes {
 	public static Ranks getRankingLevels(int _key){
 		return ranking_levels.get(_key);
 	}
+	public static Roles getRoles(String _key) {
+		return roles.get(_key);
+	}
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
 	}
@@ -105,5 +112,8 @@ public class Hashes {
 	}
 	public static void removeRanking(long _key){
 		ranking.remove(_key);
+	}
+	public static void removeRoles() {
+		roles.clear();
 	}
 }

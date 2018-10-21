@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.vdurmont.emoji.EmojiManager;
+
 import commandsContainer.FilterExecution;
 import commandsContainer.SetWarning;
 import commandsContainer.UserExecution;
@@ -16,9 +18,11 @@ import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import filter.LanguageFilter;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.Message.Attachment;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import preparedMessages.ReactionMessage;
 import rankingSystem.Rank;
 import rankingSystem.RankingThreadExecution;
 import sql.RankingDB;
@@ -34,6 +38,7 @@ public class MessageListener extends ListenerAdapter{
 			File warning = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
 			File user = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
 			File filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
+			File reaction = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getIdLong()+"ch"+e.getTextChannel().getId()+".azr");
 			
 			long user_id = e.getMember().getUser().getIdLong();
 			long guild_id = e.getGuild().getIdLong();
@@ -73,6 +78,25 @@ public class MessageListener extends ListenerAdapter{
 			if(user.exists()){
 				String file_name = getFileName(new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_1.azr"), 20, "user", e);
 				UserExecution.performAction(e, message, file_name);
+			}
+			if(reaction.exists() && UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
+				int counter = Integer.parseInt(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getIdLong()+"ch"+e.getTextChannel().getId()+".azr"));
+				Message m = e.getMessage();
+				String [] reactions = IniFileReader.getReactions();
+				for(int i = 1; i <= counter; i++) {
+					if(!reactions[0].equals("true")) {
+						m.addReaction(EmojiManager.getForAlias(ReactionMessage.getReaction(i)).getUnicode()).complete();
+					}
+					else {
+						if(reactions[i].length() > 0) {
+							m.addReaction(e.getGuild().getEmotesByName(reactions[i], false).get(0)).complete();
+						}
+						else {
+							m.addReaction(EmojiManager.getForAlias(ReactionMessage.getReaction(i)).getUnicode()).complete();
+						}
+					}
+				}
+				reaction.delete();
 			}
 			
 			Guilds guild_settings = Hashes.getStatus(guild_id);
