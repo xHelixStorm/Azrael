@@ -17,7 +17,7 @@ public class HelpText {
 			administration = true;
 		}
 		
-		if(IniFileReader.getPugCommand().equals("true") || IniFileReader.getMeowCommand().equals("true") || IniFileReader.getRankCommand().equals("true") || IniFileReader.getProfileCommand().equals("true") || IniFileReader.getTopCommand().equals("true") || IniFileReader.getUseCommand().equals("true") || IniFileReader.getShopCommand().equals("true") || IniFileReader.getInventoryCommand().equals("true") || IniFileReader.getPurchaseCommand().equals("true") || IniFileReader.getDailyCommand().equals("true")){
+		if(IniFileReader.getPugCommand().equals("true") || IniFileReader.getMeowCommand().equals("true") || IniFileReader.getRankCommand().equals("true") || IniFileReader.getProfileCommand().equals("true") || IniFileReader.getTopCommand().equals("true") || IniFileReader.getUseCommand().equals("true") || IniFileReader.getShopCommand().equals("true") || IniFileReader.getInventoryCommand().equals("true") || IniFileReader.getPurchaseCommand().equals("true") || IniFileReader.getDailyCommand().equals("true") || IniFileReader.getQuizCommand().equals("true")){
 			entertainment = true;
 		}
 		
@@ -43,6 +43,7 @@ public class HelpText {
 		if(IniFileReader.getInventoryCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"inventory**\ndisplays the content inside your inventory\n\n");
 		if(IniFileReader.getPurchaseCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"purchase**\nto purchase and item or skin from the shop\n\n");
 		if(IniFileReader.getDailyCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"daily**\nto get a daily reward\n\n");
+		if(IniFileReader.getQuizCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"quiz**\nto initialize a question and answer session with rewards\n\n");
 		if(other == true)textCollector.add("**_Other:_**\n");
 		if(IniFileReader.getAboutCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"about**\nshows all information regarding this Bot\n\n");
 		if(IniFileReader.getHelpCommand().equals("true"))textCollector.add("**-"+IniFileReader.getCommandPrefix()+"help**\nshows a link to our tech thread on forum\n\n");

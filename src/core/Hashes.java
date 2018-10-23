@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import net.dv8tion.jda.core.entities.Member;
 import rankingSystem.Rank;
 import rankingSystem.Ranks;
 
@@ -37,6 +38,8 @@ public class Hashes {
     private static final Map<String, Rank> ranking_roles = new HashMap<String, Rank>();
     private static final Map<Integer, Ranks> ranking_levels = new HashMap<Integer, Ranks>();
     private static final Map<String, Roles> roles = new HashMap<String, Roles>();
+    private static final Map<Integer, Quizes> quiz = new HashMap<Integer, Quizes>();
+    private static final Map<Member, Integer> quiz_winners = new HashMap<Member, Integer>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -65,6 +68,13 @@ public class Hashes {
 	public static void addRoles(String _key, Roles _roles) {
 		roles.put(_key, _roles);
 	}
+	public static void addQuiz(Integer _key, Quizes _quiz) {
+		quiz.put(_key, _quiz);
+	}
+	public static void addQuizWinners(Member _key, Integer _threshold) {
+		quiz_winners.put(_key, _threshold);
+	}
+	
 	public static Messages getMessagePool(long _message_id) {
 		return message_pool.get(_message_id);
 	}
@@ -101,6 +111,16 @@ public class Hashes {
 	public static Roles getRoles(String _key) {
 		return roles.get(_key);
 	}
+	public static Quizes getQuiz(int _key) {
+		return quiz.get(_key);
+	}
+	public static Map<Integer, Quizes> getWholeQuiz(){
+		return quiz;
+	}
+	public static int getQuizWinners(Member _key) {
+		return quiz_winners.get(_key);
+	}
+	
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
 	}
@@ -116,4 +136,21 @@ public class Hashes {
 	public static void removeRoles() {
 		roles.clear();
 	}
+	public static void removeQuiz(int _key) {
+		quiz.remove(_key);
+	}
+	public static void clearQuiz() {
+		quiz.clear();
+	}
+	public static void removeQuizWinners() {
+		for(Member member : quiz_winners.keySet()) {
+			if(quiz_winners.get(member) == 1) {
+				quiz_winners.remove(member);
+			}
+			else {
+				quiz_winners.put(member, (quiz_winners.get(member)-1));
+			}
+		}
+	}
+	
 }

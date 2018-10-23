@@ -55,7 +55,6 @@ public class Pastebin {
 			PastebinPaste paste = new PastebinPaste(account);
 			PastebinLink link = new PastebinLink(paste, url);
 			link.fetchContent();
-			
 			content = link.getPaste().getContents();
 		} catch (MalformedURLException e) {
 			content = "Reading paste failed!";
