@@ -1,5 +1,8 @@
 package util;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.jpaste.exceptions.PasteException;
 import org.jpaste.pastebin.PasteExpireDate;
 import org.jpaste.pastebin.PastebinLink;
@@ -38,5 +41,25 @@ public class Pastebin {
 			return_link = "Creating paste failed!";
 		}
 		return return_link;
+	}
+	
+	public static String readPublicPasteLink(String _link) {
+		String content = "";
+		try {
+			//read the developerKey into account
+			String developerKey = IniFileReader.getPastebinKey();			
+			PastebinAccount account = new PastebinAccount(developerKey);
+			
+			//convert String URL and fetch the content of the link
+			URL url = new URL(_link);
+			PastebinPaste paste = new PastebinPaste(account);
+			PastebinLink link = new PastebinLink(paste, url);
+			link.fetchContent();
+			
+			content = link.getPaste().getContents();
+		} catch (MalformedURLException e) {
+			content = "Reading paste failed!";
+		}
+		return content;
 	}
 }
