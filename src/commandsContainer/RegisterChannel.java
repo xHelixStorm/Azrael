@@ -37,7 +37,7 @@ public class RegisterChannel {
 		String channel_type;
 		
 		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getId().equals(IniFileReader.getAdmin())){
-			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea)");
+			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui)");
 			Matcher matcher = pattern.matcher(_message);
 			if(matcher.find()){
 				channel_type = matcher.group();
@@ -67,6 +67,7 @@ public class RegisterChannel {
 						case "log":
 						case "tra":
 						case "rea":
+						case "qui":
 							SqlConnect.SQLDeleteChannelType(channel_type);
 							SqlConnect.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
 							break;

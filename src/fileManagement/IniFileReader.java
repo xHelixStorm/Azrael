@@ -248,4 +248,8 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Commands", "Filter");
 	}
+	public static String getQuizCommand(){
+		readConfig();
+		return ini.get("Commands", "Quiz");
+	}
 }
