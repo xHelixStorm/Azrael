@@ -85,7 +85,7 @@ public class Quiz implements Command{
 						}
 					}
 					else {
-						e.getTextChannel().sendMessage("Please register questions and rewards before this parameter can be used!").queue();
+						e.getTextChannel().sendMessage("Please register questions and rewards before this parameter is used!").queue();
 					}
 				}
 				else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"quiz -save")) {
@@ -94,7 +94,7 @@ public class Quiz implements Command{
 						QuizExecution.saveQuestions(e);
 					}
 					else {
-						e.getTextChannel().sendMessage("There is nothing to save. Please use register-rewards and register-questions before this parameter can be used.").queue();
+						e.getTextChannel().sendMessage("There is nothing to save. Please use register-rewards and register-questions before this parameter is used.").queue();
 					}
 				}
 				else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"quiz -load")) {

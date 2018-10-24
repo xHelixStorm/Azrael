@@ -34,14 +34,15 @@ public class QuizExecution {
 				}
 				//if the HashMap is bigger than the current index, then either clear the rest of the HashMap
 				//or set the reward field to blank in case questions exist
-				for(int i = index; i < Hashes.getWholeQuiz().size(); i++) {
-					quiz = Hashes.getQuiz(i);
-					if(quiz.getQuestion().length() > 0) {
+				for(int i = index-1; i <= Hashes.getWholeQuiz().size()+1; i++) {
+					quiz = Hashes.getQuiz(index);
+					if(quiz != null && quiz.getQuestion().length() > 0) {
 						quiz.setReward("");
 					}
 					else {
 						Hashes.removeQuiz(index);
 					}
+					index++;
 				}
 				
 				//print message that it either worked or that an error occurred. Print error if there's any
@@ -86,21 +87,22 @@ public class QuizExecution {
 				Quizes quiz;
 				//Insert questions, answers and hints into the HashMap
 				for(String line : content) {
-					if(Hashes.getQuiz(index == 0 ? 1 : index) == null) {
+					index++;
+					if(Hashes.getQuiz(index == 1 ? 1 : index - 1) == null) {
 						quiz = new Quizes();
 					}
 					else {
-						quiz = Hashes.getQuiz(index == 0 ? 1 : index);
+						quiz = Hashes.getQuiz(index == 1 ? 1 : index - 1);
 					}
 					
-					if(line.matches("(1|2|3|4|5|6|7|8|9)[0-9]{0, 2}[.]")) {
-						index++;
+					if(line.replaceAll("[^0-9.]*", "").matches("(1|2|3|4|5|6|7|8|9)[0-9]*[.]")) {
 						quiz.setQuestion(line);
 						answers = 0;
 						hints = 0;
 						rewards = 0;
 					}
 					else if(line.startsWith(":") && answers != 3) {
+						index--;
 						switch(answers) {
 							case 0: quiz.setAnswer1(line.substring(1)); break;
 							case 1: quiz.setAnswer2(line.substring(1)); break;
@@ -109,6 +111,7 @@ public class QuizExecution {
 						answers++;
 					}
 					else if(line.startsWith(";") && hints != 3) {
+						index--;
 						switch(hints) {
 							case 0: quiz.setHint1(line.substring(1)); break;
 							case 1: quiz.setHint2(line.substring(1)); break;
@@ -117,6 +120,7 @@ public class QuizExecution {
 						hints++;
 					}
 					else if(line.startsWith("=") && rewards != 1) {
+						index--;
 						quiz.setReward(line.substring(1));
 						rewards++;
 					}
@@ -124,9 +128,9 @@ public class QuizExecution {
 				}
 				//if the HashMap is bigger than the current index, then either clear the rest of the HashMap
 				//or set the unneeded fields to blank, if they aren't entirely empty
-				for(int i = index+1; i < Hashes.getWholeQuiz().size(); i++) {
+				for(int i = index; i < Hashes.getWholeQuiz().size(); i++) {
 					quiz = Hashes.getQuiz(i);
-					if(quiz.getReward().length() > 0) {
+					if(quiz != null && quiz.getReward().length() > 0) {
 						quiz.setQuestion("");
 						quiz.setAnswer1("");
 						quiz.setAnswer2("");
@@ -176,29 +180,55 @@ public class QuizExecution {
 		//Iterate through the HashMap values and write all information into a file
 		StringBuilder sb = new StringBuilder();
 		for(Quizes quiz : Hashes.getWholeQuiz().values()) {
-			sb.append(quiz.getQuestion());
-			sb.append(":"+quiz.getAnswer1());
+			if(quiz.getQuestion().length() > 0) {
+				sb.append(quiz.getQuestion()+"\n");
+			}
+			else {
+				sb.setLength(0);
+				sb.append("No questions!");
+				break;
+			}
+			if(quiz.getAnswer1().length() > 0) {
+				sb.append(":"+quiz.getAnswer1()+"\n");
+			}
 			if(quiz.getAnswer2().length() > 0) {
-				sb.append(":"+quiz.getAnswer2());
+				sb.append(":"+quiz.getAnswer2()+"\n");
 			}
 			if(quiz.getAnswer3().length() > 0) {
-				sb.append(":"+quiz.getAnswer3());
+				sb.append(":"+quiz.getAnswer3()+"\n");
 			}
 			if(quiz.getHint1().length() > 0) {
-				sb.append(";"+quiz.getHint1());
+				sb.append(";"+quiz.getHint1()+"\n");
 			}
 			if(quiz.getHint2().length() > 0) {
-				sb.append(";"+quiz.getHint2());
+				sb.append(";"+quiz.getHint2()+"\n");
 			}
 			if(quiz.getHint3().length() > 0) {
-				sb.append(";"+quiz.getHint3());
+				sb.append(";"+quiz.getHint3()+"\n");
 			}
-			sb.append("="+quiz.getReward());
+			if(quiz.getReward().length() > 0) {
+				sb.append("="+quiz.getReward()+"\n");
+			}
+			else {
+				sb.setLength(0);
+				sb.append("No rewards!");
+				break;
+			}
 		}
 		
-		new File("./files/QuizBackup").mkdirs();
-		FileSetting.createFile("./files/QuizBackup/quizsettings.azr", sb.toString());
-		e.getTextChannel().sendMessage("Quiz settings have been saved successfully!").queue();
+		if(!sb.toString().equals("No questions!") && !sb.toString().equals("No rewards!")) {
+			new File("./files/QuizBackup").mkdirs();
+			FileSetting.createFile("./files/QuizBackup/quizsettings.azr", sb.toString());
+			e.getTextChannel().sendMessage("Quiz settings have been saved successfully!").queue();
+		}
+		else if(sb.toString().equals("No questions!")){
+			EmbedBuilder error = new EmbedBuilder().setTitle("Questions missing!").setColor(Color.RED);
+			e.getTextChannel().sendMessage(error.setDescription("A backup from the settings couldn't be created because the questions are missing. Please register them first").build()).queue();
+		}
+		else if(sb.toString().equals("No rewards!")) {
+			EmbedBuilder error = new EmbedBuilder().setTitle("Rewards missing!").setColor(Color.RED);
+			e.getTextChannel().sendMessage(error.setDescription("A backup from the settings couldn't be created because the rewards are missing. Please register them first").build()).queue();
+		}
 	}
 	
 	private static String IntegrityCheck() {
@@ -207,13 +237,14 @@ public class QuizExecution {
 		boolean onlyRewardError = true;
 		boolean onlyQuestionsError = true;
 		
-		for(Quizes quiz: Hashes.getWholeQuiz().values()) {
+		for(int i = 0; i < Hashes.getWholeQuiz().size(); i++) {
+			Quizes quiz = Hashes.getQuiz(index);
 			if(index != 1) {
 				sb.append("\n");
 			}
 			//check if questions are inserted and write into the error log when a question
 			//in between is missing. For example question 1 and 3 are there but not 2.
-			if(quiz.getQuestion().length() >= 0) {
+			if(quiz.getQuestion().length() > 0) {
 				onlyQuestionsError = false;
 				if(Integer.parseInt(quiz.getQuestion().replaceAll("[^0-9]", "") ) != index) {
 					sb.append("Question "+index+": Question is missing together with rewards and answers!\n");
@@ -238,10 +269,6 @@ public class QuizExecution {
 			//check if rewards are available and if questions are available but no rewards,
 			//then write into error log.
 			if(quiz.getReward().length() > 0) {
-				onlyRewardError = false;
-			}
-			else if(quiz.getQuestion().length() > 0 && quiz.getReward().length() == 0) {
-				sb.append("Question "+index+": The reward for the question is missing!\n");
 				onlyRewardError = false;
 			}
 			index++;
