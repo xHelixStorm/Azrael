@@ -1,6 +1,7 @@
 package commands;
 
 import java.awt.Color;
+import java.io.File;
 
 import commandsContainer.QuizExecution;
 import core.Hashes;
@@ -8,6 +9,7 @@ import core.UserPrivs;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import sql.SqlConnect;
 
 public class Quiz implements Command{
 
@@ -56,7 +58,7 @@ public class Quiz implements Command{
 							+ "It's also possible to include rewards while registering questions in case it is easier to avoid errors. This can be done by applying the **=** before the reward.").queue();
 				}
 				else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"quiz -register-questions ")) {
-					QuizExecution.registerQuestions(e, e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+25));
+					QuizExecution.registerQuestions(e, e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+25), false);
 				}
 				else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"quiz -clear")) {
 					Hashes.clearQuiz();
@@ -71,7 +73,15 @@ public class Quiz implements Command{
 							e.getTextChannel().sendMessage("Please register the rewards before proceeding!").queue();
 						}
 						else {
-							//finally run this quiz. Hopefully now I can run it....
+							//run the quiz in a thread. 
+							SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "qui");
+							if(SqlConnect.getChannelID() != 0) {
+								e.getTextChannel().sendMessage("The quiz will run shortly in <#"+SqlConnect.getChannelID()+">!").queue();
+							}
+							else {
+								e.getTextChannel().sendMessage("Please register a quiz channel before starting the quiz!").queue();
+							}
+							SqlConnect.setChannelID(0);
 						}
 					}
 					else {
@@ -79,12 +89,23 @@ public class Quiz implements Command{
 					}
 				}
 				else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"quiz -save")) {
-					
+					if(Hashes.getWholeQuiz().size() > 0) {
+						//save all settings
+						QuizExecution.saveQuestions(e);
+					}
+					else {
+						e.getTextChannel().sendMessage("There is nothing to save. Please use register-rewards and register-questions before this parameter can be used.").queue();
+					}
 				}
 				else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"quiz -load")) {
-					
+					File file = new File("./files/QuizBackup/quizsettings.azr");
+					if(file.exists()) {
+						QuizExecution.registerQuestions(e, "", true);
+					}
+					else {
+						e.getTextChannel().sendMessage("No saved settings have been found. Please save them first.").queue();
+					}
 				}
-				
 			}
 			else {
 				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();

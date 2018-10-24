@@ -1,9 +1,11 @@
 package commandsContainer;
 
 import java.awt.Color;
+import java.io.File;
 
 import core.Hashes;
 import core.Quizes;
+import fileManagement.FileSetting;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import util.Pastebin;
@@ -63,13 +65,20 @@ public class QuizExecution {
 		}
 	}
 	
-	public static void registerQuestions(MessageReceivedEvent e, String _link) {
+	public static void registerQuestions(MessageReceivedEvent e, String _link, boolean _readFile) {
 		//check if it is a link that was inserted and if yes call readPublicPasteLink and then
-		//split the returned String in an array
-		if(_link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _link.startsWith("http")) {
-			String [] content = Pastebin.readPublicPasteLink(_link).split("[\\r\\n]+");
+		//split the returned String in an array. Or if it's being registered from a file, the file should be checked
+		if((_link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _link.startsWith("http") && _readFile == false)
+				|| (new File("./files/QuizBackup/quizsettings.azr").exists() && _readFile == true)) {
+			String [] content;
+			if(_readFile == false) {
+				content = Pastebin.readPublicPasteLink(_link).split("[\\r\\n]+");
+			}
+			else {
+				content = FileSetting.readFile(".files/QuizBackup/quizsetting.azr").split("[\\r\\n]+");
+			}
 			
-			if(!content[0].equals("Reading paste failed!")) {
+			if(!content[0].equals("Reading paste failed!") || content.length == 0) {
 				int index = 0;
 				int answers = 0;
 				int hints = 0;
@@ -141,14 +150,55 @@ public class QuizExecution {
 				}
 			}
 			else {
-				EmbedBuilder error = new EmbedBuilder().setTitle(content[0]).setColor(Color.RED);
-				e.getTextChannel().sendMessage(error.setDescription("Please ensure that a valid Pastebin link has been inserted and that the API key inside the config.ini file is correct").build()).queue();
+				if(_readFile == false) {
+					EmbedBuilder error = new EmbedBuilder().setTitle(content[0]).setColor(Color.RED);
+					e.getTextChannel().sendMessage(error.setDescription("Please ensure that a valid Pastebin link has been inserted and that the API key inside the config.ini file is correct").build()).queue();
+				}
+				else {
+					EmbedBuilder error = new EmbedBuilder().setTitle("An error occurred while reading file!").setColor(Color.RED);
+					e.getTextChannel().sendMessage(error.setDescription("An unexpected error occurred while reading the file. Please check the content or create a new save file.").build()).queue();
+				}
 			}
 		}
 		else {
-			EmbedBuilder error = new EmbedBuilder().setTitle("Invalid url!").setColor(Color.RED);
-			e.getTextChannel().sendMessage(error.setDescription("An invalid url has been inserted. Please insert a Pastebin link").build()).queue();
+			if(_readFile == false) {
+				EmbedBuilder error = new EmbedBuilder().setTitle("Invalid url!").setColor(Color.RED);
+				e.getTextChannel().sendMessage(error.setDescription("An invalid url has been inserted. Please insert a Pastebin link").build()).queue();
+			}
+			else {
+				EmbedBuilder error = new EmbedBuilder().setTitle("File doesn't exist!").setColor(Color.RED);
+				e.getTextChannel().sendMessage(error.setDescription("Please confirm that the settings file exists before continuing .").build()).queue();
+			}
 		}
+	}
+	
+	public static void saveQuestions(MessageReceivedEvent e) {
+		//Iterate through the HashMap values and write all information into a file
+		StringBuilder sb = new StringBuilder();
+		for(Quizes quiz : Hashes.getWholeQuiz().values()) {
+			sb.append(quiz.getQuestion());
+			sb.append(":"+quiz.getAnswer1());
+			if(quiz.getAnswer2().length() > 0) {
+				sb.append(":"+quiz.getAnswer2());
+			}
+			if(quiz.getAnswer3().length() > 0) {
+				sb.append(":"+quiz.getAnswer3());
+			}
+			if(quiz.getHint1().length() > 0) {
+				sb.append(";"+quiz.getHint1());
+			}
+			if(quiz.getHint2().length() > 0) {
+				sb.append(";"+quiz.getHint2());
+			}
+			if(quiz.getHint3().length() > 0) {
+				sb.append(";"+quiz.getHint3());
+			}
+			sb.append("="+quiz.getReward());
+		}
+		
+		new File("./files/QuizBackup").mkdirs();
+		FileSetting.createFile("./files/QuizBackup/quizsettings.azr", sb.toString());
+		e.getTextChannel().sendMessage("Quiz settings have been saved successfully!").queue();
 	}
 	
 	private static String IntegrityCheck() {
