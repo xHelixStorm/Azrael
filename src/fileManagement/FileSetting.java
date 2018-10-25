@@ -93,6 +93,40 @@ private static PrintWriter pw;
 		return null;
 	}
 	
+	public static String [] readFileIntoFixedArray(String _name){
+		ArrayList<String> content = new ArrayList<String>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(_name));
+			try {
+				StringBuilder sb = new StringBuilder();
+				String line = br.readLine();
+				
+				while(line != null){
+					content.add(line);
+					sb.append(System.lineSeparator());
+					line = br.readLine();
+				}
+				
+				String [] contentReturn = new String[content.size()];
+				for(int index = 0; index < content.size(); index++) {
+					contentReturn[index] = content.get(index);
+				}
+				return contentReturn;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}finally {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public static void deleteFile(String name){
 		File file = new File(name);
 		file.delete();

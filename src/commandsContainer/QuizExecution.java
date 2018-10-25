@@ -19,40 +19,49 @@ public class QuizExecution {
 			
 			if(!rewards[0].equals("Reading paste failed!")) {
 				int index = 1;
+				boolean interrupted = false;
 				Quizes quiz;
 				//Insert the rewards into the HashMap
 				for(String reward: rewards) {
-					if(Hashes.getQuiz(index) == null) {
-						quiz = new Quizes();
+					if(reward.length() > 0) {
+						if(!reward.equals("START") && !reward.matches("(1|2|3|4|5|6|7|8|9)[0-9]*[.][\\s\\d\\w?!.\\,/+-]*")) {
+							if(Hashes.getQuiz(index) == null) {
+								quiz = new Quizes();
+							}
+							else {
+								quiz = Hashes.getQuiz(index);
+							}
+							quiz.setReward(reward);
+							Hashes.addQuiz(index, quiz);
+							index++;
+						}
+						else {
+							interrupted = true;
+							break;
+						}
 					}
-					else {
-						quiz = Hashes.getQuiz(index);
-					}
-					quiz.setReward(reward);
-					Hashes.addQuiz(index, quiz);
-					index++;
 				}
 				//if the HashMap is bigger than the current index, then either clear the rest of the HashMap
 				//or set the reward field to blank in case questions exist
-				for(int i = index-1; i <= Hashes.getWholeQuiz().size()+1; i++) {
-					quiz = Hashes.getQuiz(index);
-					if(quiz != null && quiz.getQuestion().length() > 0) {
-						quiz.setReward("");
+				if(interrupted == false) {
+					clearRewards(index);
+				}
+
+				//print message that it either worked or that an error occurred. Print error if there's any
+				if(interrupted == false) {
+					String integrity = IntegrityCheck();
+					if(integrity.equals("0")) {
+						e.getTextChannel().sendMessage("All rewards have been registered successfully!").queue();
 					}
 					else {
-						Hashes.removeQuiz(index);
+						e.getTextChannel().sendMessage("An error occured while registering the rewards. All inserted rewards have been cleared. Please check the error log:\n"
+								+ ""+Pastebin.unlistedPaste("Error on registering rewards", integrity)).queue();
+						clearRewards(1);
 					}
-					index++;
-				}
-				
-				//print message that it either worked or that an error occurred. Print error if there's any
-				String integrity = IntegrityCheck();
-				if(integrity.equals("0")) {
-					e.getTextChannel().sendMessage("All rewards have been registered successfully!").queue();
 				}
 				else {
-					e.getTextChannel().sendMessage("An error occured while registering the rewards. Please check the error log:\n"
-							+ ""+Pastebin.unlistedPaste("Error on registering rewards", integrity)).queue();
+					e.getTextChannel().sendMessage("Please don't try to register questions with this parameter! Please register only rewars!").queue();
+					clearRewards(1);
 				}
 			}
 			else {
@@ -76,81 +85,72 @@ public class QuizExecution {
 				content = Pastebin.readPublicPasteLink(_link).split("[\\r\\n]+");
 			}
 			else {
-				content = FileSetting.readFile(".files/QuizBackup/quizsetting.azr").split("[\\r\\n]+");
+				content = FileSetting.readFileIntoFixedArray("./files/QuizBackup/quizsettings.azr");
 			}
 			
 			if(!content[0].equals("Reading paste failed!") || content.length == 0) {
-				int index = 0;
+				int index = 1;
 				int answers = 0;
 				int hints = 0;
 				int rewards = 0;
-				Quizes quiz;
+				Quizes quiz = new Quizes();
 				//Insert questions, answers and hints into the HashMap
 				for(String line : content) {
-					index++;
-					if(Hashes.getQuiz(index == 1 ? 1 : index - 1) == null) {
-						quiz = new Quizes();
-					}
-					else {
-						quiz = Hashes.getQuiz(index == 1 ? 1 : index - 1);
-					}
-					
-					if(line.replaceAll("[^0-9.]*", "").matches("(1|2|3|4|5|6|7|8|9)[0-9]*[.]")) {
-						quiz.setQuestion(line);
-						answers = 0;
-						hints = 0;
-						rewards = 0;
-					}
-					else if(line.startsWith(":") && answers != 3) {
-						index--;
-						switch(answers) {
-							case 0: quiz.setAnswer1(line.substring(1)); break;
-							case 1: quiz.setAnswer2(line.substring(1)); break;
-							case 2: quiz.setAnswer3(line.substring(1)); break;
+					if(line.length() > 0) {
+						if(line.contains("START")) {
+							if(Hashes.getQuiz(index) == null) {
+								if(index != 1) {
+									quiz = new Quizes();
+								}
+							}
+							else {
+								quiz = Hashes.getQuiz(index);
+							}
 						}
-						answers++;
-					}
-					else if(line.startsWith(";") && hints != 3) {
-						index--;
-						switch(hints) {
-							case 0: quiz.setHint1(line.substring(1)); break;
-							case 1: quiz.setHint2(line.substring(1)); break;
-							case 2: quiz.setHint3(line.substring(1)); break;
+						else if(line.matches("(1|2|3|4|5|6|7|8|9)[0-9]*[.][\\s\\d\\w?!.\\,/+-]*")) {
+							quiz.setQuestion(line);
+							answers = 0;
+							hints = 0;
+							rewards = 0;
 						}
-						hints++;
+						else if(line.startsWith(":") && answers != 3) {
+							switch(answers) {
+								case 0: quiz.setAnswer1(line.substring(1)); break;
+								case 1: quiz.setAnswer2(line.substring(1)); break;
+								case 2: quiz.setAnswer3(line.substring(1)); break;
+							}
+							answers++;
+						}
+						else if(line.startsWith(";") && hints != 3) {
+							switch(hints) {
+								case 0: quiz.setHint1(line.substring(1)); break;
+								case 1: quiz.setHint2(line.substring(1)); break;
+								case 2: quiz.setHint3(line.substring(1)); break;
+							}
+							hints++;
+						}
+						else if(line.startsWith("=") && rewards != 1) {
+							quiz.setReward(line.substring(1));
+							rewards++;
+						}
+						else if(line.contains("END")) {
+							Hashes.addQuiz(index, quiz);
+							index++;
+						}
 					}
-					else if(line.startsWith("=") && rewards != 1) {
-						index--;
-						quiz.setReward(line.substring(1));
-						rewards++;
-					}
-					Hashes.addQuiz(index, quiz);
 				}
 				//if the HashMap is bigger than the current index, then either clear the rest of the HashMap
 				//or set the unneeded fields to blank, if they aren't entirely empty
-				for(int i = index; i < Hashes.getWholeQuiz().size(); i++) {
-					quiz = Hashes.getQuiz(i);
-					if(quiz != null && quiz.getReward().length() > 0) {
-						quiz.setQuestion("");
-						quiz.setAnswer1("");
-						quiz.setAnswer2("");
-						quiz.setAnswer3("");
-						quiz.setHint1("");
-						quiz.setHint2("");
-						quiz.setHint3("");
-					}
-					else {
-						Hashes.removeQuiz(index);
-					}
-				}
+				clearQuestions(index);
 				
 				String integrity = IntegrityCheck();
 				if(integrity.equals("0")) {
 					e.getTextChannel().sendMessage("All questions have been registered successfully!").queue();
 				}
 				else {
-					e.getTextChannel().sendMessage("An error occured while registering the questions. Please check the error log:\n"
+					e.getTextChannel().sendMessage("An error occured while registering the questions. Inserted questions have been cleared. Please check the error log:\n"
 							+ ""+Pastebin.unlistedPaste("Error on registering rewards", integrity)).queue();
+					clearQuestions(1);
 				}
 			}
 			else {
@@ -181,6 +181,7 @@ public class QuizExecution {
 		StringBuilder sb = new StringBuilder();
 		for(Quizes quiz : Hashes.getWholeQuiz().values()) {
 			if(quiz.getQuestion().length() > 0) {
+				sb.append("START\n");
 				sb.append(quiz.getQuestion()+"\n");
 			}
 			else {
@@ -208,6 +209,7 @@ public class QuizExecution {
 			}
 			if(quiz.getReward().length() > 0) {
 				sb.append("="+quiz.getReward()+"\n");
+				sb.append("END\n");
 			}
 			else {
 				sb.setLength(0);
@@ -234,51 +236,89 @@ public class QuizExecution {
 	private static String IntegrityCheck() {
 		int index = 1;
 		StringBuilder sb = new StringBuilder();
-		boolean onlyRewardError = true;
-		boolean onlyQuestionsError = true;
+		boolean errorFound = false;
 		
 		for(int i = 0; i < Hashes.getWholeQuiz().size(); i++) {
 			Quizes quiz = Hashes.getQuiz(index);
-			if(index != 1) {
+			if(errorFound == true) {
 				sb.append("\n");
+				errorFound = false;
 			}
 			//check if questions are inserted and write into the error log when a question
 			//in between is missing. For example question 1 and 3 are there but not 2.
 			if(quiz.getQuestion().length() > 0) {
-				onlyQuestionsError = false;
-				if(Integer.parseInt(quiz.getQuestion().replaceAll("[^0-9]", "") ) != index) {
-					sb.append("Question "+index+": Question is missing together with rewards and answers!\n");
+				if(Integer.parseInt(quiz.getQuestion().replaceAll("[^0-9](.)[\\s\\d\\w?!.\\,/+-]*", "") ) != index) {
+					sb.append("Question "+index+": Question was skipped and hence missing! Please check if the START and END parameters are properly set!\n");
+					errorFound = true;
 				}
 				//check if at least one answer is available for this question. Else throw error
 				if(quiz.getAnswer1().length() == 0 && quiz.getAnswer2().length() == 0 && quiz.getAnswer3().length() == 0) {
 					sb.append("Question "+index+": has no available answer!\n");
+					errorFound = true;
 				}
 			}
 			else if(quiz.getQuestion().length() == 0) {
 				//check if answers and hints are inserted while there's no question
 				if(quiz.getAnswer1().length() > 0 || quiz.getAnswer2().length() > 0 || quiz.getAnswer3().length() > 0) {
 					sb.append("Question "+index+": Has at least one answer but no question!\n");
-					onlyQuestionsError = false;
+					errorFound = true;
 				}
 				if(quiz.getHint1().length() > 0 || quiz.getHint2().length() > 0 || quiz.getHint3().length() > 0) {
 					sb.append("Question "+index+": Has at least one hint but no question!\n");
-					onlyQuestionsError = false;
+					errorFound = true;
 				}
 			}
 			
 			//check if rewards are available and if questions are available but no rewards,
 			//then write into error log.
 			if(quiz.getReward().length() > 0) {
-				onlyRewardError = false;
+				if(Hashes.getQuiz(index-1) != null && Hashes.getQuiz(index-1).getQuestion().length() > 0 && quiz.getQuestion().length() == 0) {
+					sb.append("Question "+index+": Reward has been inserted but the question is missing!\n");
+					errorFound = true;
+				}
 			}
 			index++;
 		}
 		
-		if(onlyQuestionsError == true || onlyRewardError == true) {
+		if(sb.length() == 0) {
 			return "0";
 		}
 		else {
 			return sb.toString();
+		}
+	}
+	
+	private static void clearRewards(int index) {
+		Quizes quiz;
+		for(int i = index-1; i <= Hashes.getWholeQuiz().size()+1; i++) {
+			quiz = Hashes.getQuiz(index);
+			if(quiz != null && quiz.getQuestion().length() > 0) {
+				quiz.setReward("");
+			}
+			else {
+				Hashes.removeQuiz(index);
+			}
+			index++;
+		}
+	}
+	
+	private static void clearQuestions(int index) {
+		Quizes quiz;
+		for(int i = index-1; i < Hashes.getWholeQuiz().size(); i++) {
+			quiz = Hashes.getQuiz(index);
+			if(quiz != null && quiz.getReward().length() > 0) {
+				quiz.setQuestion("");
+				quiz.setAnswer1("");
+				quiz.setAnswer2("");
+				quiz.setAnswer3("");
+				quiz.setHint1("");
+				quiz.setHint2("");
+				quiz.setHint3("");
+			}
+			else {
+				Hashes.removeQuiz(index);
+			}
+			index++;
 		}
 	}
 }

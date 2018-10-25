@@ -39,7 +39,7 @@ public class Quiz implements Command{
 							+ "```\nxxx-xx-xx-0001\n"
 							+ "xxx-xx-xx-0002\n"
 							+ "xxx-xx-xx-0003\n"
-							+ "...```\n"
+							+ "...```"
 							+ "write one reward per line so that the bot can recognize every single reward!").queue();
 				}
 				else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"quiz -register-rewards ")) {
@@ -48,12 +48,15 @@ public class Quiz implements Command{
 				else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"quiz -register-questions")) {
 					e.getTextChannel().sendMessage("To register questions, attach a pastebin link after the full command. The pastebin format should look like this:\n"
 							+ "```\n"
+							+ "START\n"
 							+ "1. Guess my hair color.\n"
 							+ ":black\n"
 							+ ";It's typical south oriental.\n"
+							+ "END\nSTART\n"
 							+ "2. What is the color of a watermelon?\n"
 							+ ":green\n"
-							+ ":red```\n"
+							+ ":red\n"
+							+ "END```"
 							+ "Questions have to be separated by a numerical value. For example 1. and 2.. Solutions to the questions should begin with **:**. The words written after the : doesn't have to be written together but it will be counted as one answer. It's possible to choose up to 3 possible answers for a question. Hints are given with the **;** symbol. Also here maximal 3 hints are allowed."
 							+ "It's also possible to include rewards while registering questions in case it is easier to avoid errors. This can be done by applying the **=** before the reward.").queue();
 				}

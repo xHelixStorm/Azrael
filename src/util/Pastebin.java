@@ -37,7 +37,7 @@ public class Pastebin {
 			// push paste
 			PastebinLink link = paste.paste();
 			return_link = link.getLink().toString();
-		} catch (LoginException | PasteException e) {
+		} catch (LoginException | PasteException | IllegalStateException e) {
 			return_link = "Creating paste failed!";
 		}
 		return return_link;
