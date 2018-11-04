@@ -1,7 +1,6 @@
 package listeners;
 
 import java.io.File;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,6 +26,7 @@ import rankingSystem.Rank;
 import rankingSystem.RankingThreadExecution;
 import sql.RankingDB;
 import sql.SqlConnect;
+import threads.RunQuiz;
 
 public class MessageListener extends ListenerAdapter{
 	
@@ -39,6 +39,8 @@ public class MessageListener extends ListenerAdapter{
 			File user = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
 			File filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
 			File reaction = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getIdLong()+"ch"+e.getTextChannel().getId()+".azr");
+			File quiz = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quizstarter.azr");
+			File runquiz = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr");
 			
 			long user_id = e.getMember().getUser().getIdLong();
 			long guild_id = e.getGuild().getIdLong();
@@ -99,6 +101,51 @@ public class MessageListener extends ListenerAdapter{
 				reaction.delete();
 			}
 			
+			if(quiz.exists()) {
+				String content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quizstarter.azr");
+				if(e.getMember().getUser().getId().equals(content) && (message.equals("1") || message.equals("2") || message.equals("3"))) {
+					//run the quiz in a thread. // retrieve the log channel and quiz channel at the same time and pass them over to the new Thread
+					long log_channel_id;
+					SqlConnect.SQLgetTwoChanneIDs(e.getGuild().getIdLong(), "qui", "log");
+					if(SqlConnect.getChannelID2() != 0) {
+						log_channel_id = SqlConnect.getChannelID();
+					}
+					else {
+						log_channel_id = e.getTextChannel().getIdLong();
+					}
+					e.getTextChannel().sendMessage("The quiz will run shortly in <#"+SqlConnect.getChannelID()+">!").queue();
+					//execute independent Quiz Thread
+					new Thread(new RunQuiz(e, SqlConnect.getChannelID(), log_channel_id, Integer.parseInt(message))).start();
+					//remove the file after starting 
+					quiz.delete();
+				}
+			}
+			
+			if(runquiz.exists()) {
+				String content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr");
+				if(!content.equals("skip-question") || !content.equals("interrupt-questions")) {
+					SqlConnect.SQLgetChannelID(guild_id, "qui");
+					if(SqlConnect.getChannelID() == e.getTextChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
+						if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || IniFileReader.getAdmin().equals(e.getMember().getUser().getId())) {
+							if(message.equals("skip-question") || message.equals("interrupt-questions")) {
+								FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr", message);
+							}
+						}
+						if(!(content.length() == 7) || !(content.length() == 8)) {
+							if(Hashes.getQuiz(Integer.parseInt(content)).getAnswer1().trim().equalsIgnoreCase(message) ||
+							   Hashes.getQuiz(Integer.parseInt(content)).getAnswer2().trim().equalsIgnoreCase(message) ||
+							   Hashes.getQuiz(Integer.parseInt(content)).getAnswer3().trim().equalsIgnoreCase(message)) {
+								Integer hash = Hashes.getQuizWinners(e.getMember());
+								if(hash == null) {
+									FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr", e.getMember().getUser().getId());
+								}
+							}
+						}
+					}
+				}
+				SqlConnect.setChannelID(0);
+			}
+			
 			Guilds guild_settings = Hashes.getStatus(guild_id);
 			if(guild_settings.getRankingState() == true){
 				RankingDB.SQLgetWholeRankView(user_id);
@@ -109,9 +156,8 @@ public class MessageListener extends ListenerAdapter{
 					RankingDB.SQLInsertUserGuild(user_id, guild_id);
 				}
 				else{
-					SqlConnect.SQLgetChannelID(guild_id, "bot");
-					long bot_channel = SqlConnect.getChannelID();
-					if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && e.getTextChannel().getIdLong() != bot_channel){
+					SqlConnect.SQLgetTwoChanneIDs(guild_id, "bot", "qui");
+					if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && e.getTextChannel().getIdLong() != SqlConnect.getChannelID() && e.getTextChannel().getIdLong() != SqlConnect.getChannelID2()){
 						int roleAssignLevel = 0;
 						long role_id = 0;
 						Rank ranking_levels = Hashes.getRankingRoles(guild_id+"_"+(user_details.getLevel()+1));
@@ -140,8 +186,7 @@ public class MessageListener extends ListenerAdapter{
 				executor.execute(new LanguageFilter(e, Hashes.getFilterLang(channel_id)));
 			}
 		} catch(NullPointerException npe){
-			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			System.out.println("["+timestamp+"] The mute role has been assigned!");
+			//play with your thumbs 
 		}
 		RankingDB.clearAllVariables();
 		SqlConnect.clearAllVariables();

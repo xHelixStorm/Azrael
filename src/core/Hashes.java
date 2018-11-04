@@ -117,7 +117,7 @@ public class Hashes {
 	public static Map<Integer, Quizes> getWholeQuiz(){
 		return quiz;
 	}
-	public static int getQuizWinners(Member _key) {
+	public static Integer getQuizWinners(Member _key) {
 		return quiz_winners.get(_key);
 	}
 	
@@ -143,14 +143,19 @@ public class Hashes {
 		quiz.clear();
 	}
 	public static void removeQuizWinners() {
-		for(Member member : quiz_winners.keySet()) {
-			if(quiz_winners.get(member) == 1) {
-				quiz_winners.remove(member);
-			}
-			else {
-				quiz_winners.put(member, (quiz_winners.get(member)-1));
+		if(quiz_winners.size() > 0) {
+			for(Member member : quiz_winners.keySet()) {
+				if(quiz_winners.get(member) == 1) {
+					quiz_winners.remove(member);
+				}
+				else {
+					quiz_winners.put(member, (quiz_winners.get(member)-1));
+				}
 			}
 		}
+	}
+	public static void clearQuizWinners() {
+		quiz_winners.clear();
 	}
 	
 }

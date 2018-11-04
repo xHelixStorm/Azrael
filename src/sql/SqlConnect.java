@@ -26,6 +26,7 @@ public class SqlConnect {
 	private static int warning_id = 0;
 	private static int ban_id = 0;
 	private static long channel_id = 0;
+	private static long channel_id2 = 0;
 	private static String channel_name = null;
 	private static long ch_guild_id = 0;
 	private static String channel_type = null;
@@ -759,6 +760,32 @@ public class SqlConnect {
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				setChannelID(rs.getLong(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLgetTwoChanneIDs(long _guild_id, String _channel_type, String _channel_type2){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT (SELECT fk_channel_id FROM channel_conf WHERE fk_channel_type LIKE ? && fk_guild_id = ?) AS channel1, (SELECT fk_channel_id FROM channel_conf WHERE fk_channel_type = ? && fk_guild_id = ?) AS channel2 FROM channel_conf LIMIT 1");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _channel_type);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, _channel_type2);
+			stmt.setLong(4, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				setChannelID(rs.getLong(1));
+				setChannelID2(rs.getLong(2));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1506,6 +1533,9 @@ public class SqlConnect {
 	public static void setChannelID(long _channel_id){
 		channel_id = _channel_id;
 	}
+	public static void setChannelID2(long _channel_id2) {
+		channel_id2 = _channel_id2;
+	}
 	public static void setChannelName(String _channel_name){
 		channel_name = _channel_name;
 	}
@@ -1576,6 +1606,9 @@ public class SqlConnect {
 	}
 	public static long getChannelID(){
 		return channel_id;
+	}
+	public static long getChannelID2() {
+		return channel_id2;
 	}
 	public static String getChannelName(){
 		return channel_name;
@@ -1651,6 +1684,7 @@ public class SqlConnect {
 		setWarningID(0);
 		setBanID (0);
 		setChannelID(0);
+		setChannelID2(0);
 		setChannelName("");
 		setCH_GuildID(0);
 		setChannelType("");
