@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -902,13 +903,17 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLgetSumWeightFromDailyItems(){
+	public static void SQLgetSumWeightFromDailyItems(boolean _exclude_cod){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT SUM(weight) FROM daily_items");
+			String sql = "";
+			if(_exclude_cod == false)
+				sql = ("SELECT SUM(weight) FROM daily_items");
+			else
+				sql = ("SELECT SUM(weight) FROM daily_items WHERE fk_type NOT LIKE \"cod\"");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
 			if(rs.next()){
@@ -1130,6 +1135,78 @@ public class RankingDB {
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	//giveaway
+	public static boolean SQLBulkInsertGiveawayRewards(String [] rewards, Timestamp timestamp){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false); 
+			String sql = ("INSERT INTO giveaway (code, enabled, used, expires) VALUES (?, ?, ?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			for(String reward : rewards){
+				stmt.setString(1, reward);
+				stmt.setBoolean(2, true);
+				stmt.setBoolean(3, false);
+				stmt.setTimestamp(4, timestamp);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			myConn.commit();
+			return false;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return true;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static String SQLRetrieveGiveawayReward() {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT code FROM giveaway WHERE enabled = 1 && used = 0 && expires >= ? LIMIT 1");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return rs.getString(1);
+			}
+			else
+				return "";
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "";
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateUsedOnReward(String _code) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE giveaway SET used = 1 WHERE code = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _code);
+			int count = stmt.executeUpdate();
+			return count;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }

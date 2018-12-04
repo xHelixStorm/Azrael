@@ -27,7 +27,7 @@ public class DrawDaily {
 			BufferedImage overlay = new BufferedImage(dailyW, dailyH, BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics2D g = overlay.createGraphics();
 			g.drawImage(daily, 0, 0, null);
-			g.drawImage(reward, startX+167-(reward.getWidth()/2), startY+117-(reward.getHeight()/2), null);
+			g.drawImage(reward, startX+181-(reward.getWidth()/2), startY+109-(reward.getHeight()/2), null);
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 			g.setColor(Color.LIGHT_GRAY);
 			g.setFont(new Font("Nexa Bold", Font.PLAIN, 50));

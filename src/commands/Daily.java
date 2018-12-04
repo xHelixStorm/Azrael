@@ -1,5 +1,6 @@
 package commands;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -15,6 +16,8 @@ import core.Hashes;
 import fileManagement.IniFileReader;
 import inventory.Dailies;
 import inventory.DrawDaily;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingDB;
 import sql.SqlConnect;
@@ -52,7 +55,13 @@ public class Daily implements Command{
 							time_for_daily = -1;
 						}
 						if(time_for_daily < 0){
-							RankingDB.SQLgetSumWeightFromDailyItems();
+							// confirm if there are any available rewards to send in private message
+							String cod_reward = RankingDB.SQLRetrieveGiveawayReward();
+							boolean exclude_cod = false;
+							if(cod_reward.length() == 0)
+								exclude_cod = true;
+							//
+							RankingDB.SQLgetSumWeightFromDailyItems(exclude_cod);
 							int random = ThreadLocalRandom.current().nextInt(1, RankingDB.getWeight());
 							ArrayList<Dailies> list = new ArrayList<Dailies>();
 							
@@ -63,7 +72,11 @@ public class Daily implements Command{
 									this_daily.setDescription(daily.getDescription());
 									this_daily.SetType(daily.getType());
 									this_daily.setAction(daily.getAction());
-									list.add(this_daily);
+									if(daily.getType().equals("cod") && cod_reward.length() > 0) 
+										list.add(this_daily);
+									
+									else if(daily.getType().equals("cur") || daily.getType().equals("exp"))
+										list.add(this_daily);
 								}
 							}
 							DrawDaily.draw(e, list.get(random).getDescription());
@@ -95,6 +108,22 @@ public class Daily implements Command{
 										RankingDB.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), RankingDB.getItemID(), timestamp, RankingDB.getNumber()+1, "limit", timestamp4);
 									}
 								}
+							}
+							else if(list.get(random).getType().equals("cod")) {
+								//send a private message
+								PrivateChannel pc = e.getMember().getUser().openPrivateChannel().complete();
+								pc.sendMessage("Congratulations. You have unlocked the following reward:\n"+cod_reward).queue();
+								pc.close();
+								
+								//log the reward in bot channel
+								SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "log");
+								if(SqlConnect.getChannelID() != 0) {
+									EmbedBuilder message = new EmbedBuilder().setColor(Color.getHSBColor(268, 81, 88)).setTitle("Reward was sent to user!");
+									e.getGuild().getTextChannelById(SqlConnect.getChannelID()).sendMessage(message.setDescription("The user "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" has received a rare reward from the daily commands. This is the reward:\n"+cod_reward).build()).queue();
+								}
+								
+								//mark the code as used
+								RankingDB.SQLUpdateUsedOnReward(cod_reward);
 							}
 							RankingDB.SQLInsertDailiesUsage(e.getMember().getUser().getIdLong(), timestamp, timestamp2);
 							RankingDB.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), "Daily retrieved", list.get(random).getDescription());

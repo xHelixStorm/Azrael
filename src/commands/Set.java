@@ -5,6 +5,7 @@ import java.awt.Color;
 import commandsContainer.SetChannelFilter;
 import commandsContainer.SetCommandLevel;
 import commandsContainer.SetDailyItem;
+import commandsContainer.SetGiveawayItems;
 import commandsContainer.SetLevelDefaultSkin;
 import commandsContainer.SetMaxExperience;
 import commandsContainer.SetMaxLevel;
@@ -47,7 +48,8 @@ public class Set implements Command{
 							+ "**-default-rank-skin**: To define the default skin for rank commands like "+IniFileReader.getCommandPrefix()+"rank\n\n"
 							+ "**-default-profile-skin**: To define the default skin for profile commands like "+IniFileReader.getCommandPrefix()+"profile\n\n"
 							+ "**-default-icon-skin**: To define the default skin for level up icons that get displayed on rank and profile commands\n\n"
-							+ "**-daily-item**: To add a item to the list to win every 24 hours\n\n\n"
+							+ "**-daily-item**: To add a item to the list to win every 24 hours\n\n"
+							+ "**-giveaway-items**: To add giveaway rewards in private message when H!daily gets called\n\n\n"
 							+ "Write the full command with one parameter to return more information. E.g **"+IniFileReader.getCommandPrefix()+"set -channel-filter**").build()).queue();
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -channel-filter")){
@@ -166,14 +168,21 @@ public class Set implements Command{
 					RankingDB.clearArrayList();
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -daily-item")){
-					e.getTextChannel().sendMessage(messageBuild.setDescription("Write the name of the daily reward you want to make available for dailies together with the weight and type of the item. For example:\n**"+IniFileReader.getCommandPrefix()+"set -daily-item \"5000 PEN\" -weight 70 -type cur**\nNote that the total weight can't exceed 100 and that the currently available types are **cur** for currency and **exp** for experience enhancement items.").build()).queue();
+					e.getTextChannel().sendMessage(messageBuild.setDescription("Write the name of the daily reward you want to make available for dailies together with the weight and type of the item. For example:\n**"+IniFileReader.getCommandPrefix()+"set -daily-item \"5000 PEN\" -weight 70 -type cur**\nNote that the total weight can't exceed 100 and that the currently available types are **cur** for currency , **exp** for experience enhancement items and **cod** for code giveaways.").build()).queue();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -daily-item ")){
 					input = input.substring(16+IniFileReader.getCommandPrefix().length());
 					RankingDB.SQLgetDailiesAndType();
-					RankingDB.SQLgetSumWeightFromDailyItems();
+					RankingDB.SQLgetSumWeightFromDailyItems(false);
 					SetDailyItem.runTask(e, input, RankingDB.getDailies(), RankingDB.getWeight());
 					RankingDB.clearDailiesArray();
+				}
+				else if(input.equals(IniFileReader.getCommandPrefix()+"set -giveaway-items")) {
+					e.getTextChannel().sendMessage(messageBuild.setDescription("Please past a pastebin link, together with the command, that contains all giveaway codes for the current month").build()).queue();
+				}
+				else if(input.contains(IniFileReader.getCommandPrefix()+"set -giveaway-items ")) {
+					input = input.substring(20+IniFileReader.getCommandPrefix().length());
+					SetGiveawayItems.runTask(e, input);
 				}
 				else{
 					e.getTextChannel().sendMessage("**"+e.getMember().getAsMention()+" Something went wrong. Please recheck the syntax and try again!**").queue();

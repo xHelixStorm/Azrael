@@ -34,7 +34,7 @@ public class SetDailyItem {
 							if(_input.contains("-type ")){
 								_input = _input.substring(6);
 								String type = _input;
-								if(type.equals("cur") || type.equals("exp")){
+								if(type.equals("cur") || type.equals("exp") || type.equals("cod")){
 									if(_weight+Integer.parseInt(weight) <= 100){
 										RankingDB.SQLInsertDailyItems(description.replaceAll("[\"]", ""), Integer.parseInt(weight), type);
 										_e.getTextChannel().sendMessage("New daily item has been set. Your current free weight is **"+(100-_weight-Integer.parseInt(weight))+"** now!").queue();
