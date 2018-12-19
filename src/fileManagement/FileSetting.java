@@ -60,6 +60,7 @@ private static PrintWriter pw;
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			return "";
 		}
 		return null;
 	}

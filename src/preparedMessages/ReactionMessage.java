@@ -3,6 +3,7 @@ package preparedMessages;
 import java.awt.Color;
 
 import core.Hashes;
+import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -33,10 +34,16 @@ public class ReactionMessage {
 				counter ++;
 			}
 		}
-		e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("This channel can be used to assign yourself unique roles to display your main game style in the game. "
-				+ "To assign yourself a role, react with one or more of the available emojis that are below this message. "
-				+ "It can be used to remove the same role as well. These are the currently available emojis to react to with their unique role:\n\n"
-				+ ""+sb.toString()).build()).complete();
+		String reactionMessage = FileSetting.readFile("./files/reactionmessage.txt");
+		if(reactionMessage.length() > 0)
+			e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription(reactionMessage+"\n\n"
+					+ ""+sb.toString()).build()).complete();
+		
+		else
+			e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("This channel can be used to assign yourself unique roles to display your main game style in the game. "
+					+ "To assign yourself a role, react with one or more of the available emojis that are below this message. "
+					+ "It can be used to remove the same role as well. These are the currently available emojis to react to with their unique role:\n\n"
+					+ ""+sb.toString()).build()).complete();
 		
 		return counter;
 	}
