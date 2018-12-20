@@ -91,7 +91,11 @@ public class MessageListener extends ListenerAdapter{
 					}
 					else {
 						if(reactions[i].length() > 0) {
-							m.addReaction(e.getGuild().getEmotesByName(reactions[i], false).get(0)).complete();
+							try {
+								m.addReaction(e.getGuild().getEmotesByName(reactions[i], false).get(0)).complete();
+							} catch(Exception exc) {
+								m.addReaction(EmojiManager.getForAlias(":"+reactions[i]+":").getUnicode()).complete();
+							}
 						}
 						else {
 							m.addReaction(EmojiManager.getForAlias(ReactionMessage.getReaction(i)).getUnicode()).complete();

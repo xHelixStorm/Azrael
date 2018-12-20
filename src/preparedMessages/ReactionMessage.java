@@ -24,7 +24,11 @@ public class ReactionMessage {
 				}
 				else {
 					if(reactions[i].length() > 0) {
-						reaction = e.getGuild().getEmotesByName(reactions[i], false).get(0).getAsMention();
+						try {
+							reaction = e.getGuild().getEmotesByName(reactions[i], false).get(0).getAsMention();
+						} catch(Exception exc) {
+							reaction = ":"+reactions[i]+":";
+						}
 					}
 					else {
 						reaction = getReaction(i);
