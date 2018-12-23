@@ -9,7 +9,7 @@
 	<classpathentry kind="lib" path="lib/commons-lang3-3.7.jar"/>
 	<classpathentry kind="lib" path="lib/commons-io-2.6.jar"/>
 	<classpathentry kind="lib" path="lib/JDA-3.8.1_438-withDependencies.jar"/>
-	<classpathentry kind="lib" path="lib/emoji-java-4.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/emoji-java-4.0.0-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/emoji-java-4.0.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

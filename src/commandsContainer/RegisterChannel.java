@@ -75,6 +75,7 @@ public class RegisterChannel {
 					_e.getTextChannel().sendMessage("**The channel has been registered!**").queue();
 					if(channel_type.equals("rea")) {
 						//create message in the channel and create an auto-delete-file so that the MessageListener can create the needed reactions
+						SqlConnect.SQLInsertCommand(_e.getGuild().getIdLong(), 0, true);
 						String count = ""+ReactionMessage.print(_e, channel_id);
 						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+_e.getGuild().getId()+"ch"+channel+".azr", count);
 					}

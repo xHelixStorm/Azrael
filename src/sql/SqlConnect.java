@@ -40,6 +40,7 @@ public class SqlConnect {
 	private static int count = 0;
 	private static String avatar = null;
 	private static String join_date = null;
+	private static boolean reactions = false;
 	
 	private static Date timestamp;
 	private static Date unmute;
@@ -747,22 +748,26 @@ public class SqlConnect {
 		}
 	}
 	
-	public static void SQLgetChannelID(long _guild_id, String _channel_type){
+	public static boolean SQLgetChannelID(long _guild_id, String _channel_type){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT fk_channel_id FROM channel_conf WHERE fk_channel_type = ? && fk_guild_id = ?");
+			boolean success = false;
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _channel_type);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				setChannelID(rs.getLong(1));
+				success = true;
 			}
+			return success;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -889,22 +894,27 @@ public class SqlConnect {
 		}
 	}
 	
-	public static void SQLgetExecutionID(long _guild_id){
+	public static boolean SQLgetExecutionID(long _guild_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM command WHERE guild_id = ?");
+			boolean success = false;
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				setGuild(rs.getLong(2));
 				setExecutionID(rs.getInt(3));
+				setReactions(rs.getBoolean(4));
+				success = true;
 			}
+			return success;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -917,10 +927,47 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO command (guild_id, execution_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE execution_id=VALUES(execution_id)");
+			String sql = ("INSERT INTO command (guild_id, execution_id, reactions) VALUES (?, ?, 0) ON DUPLICATE KEY UPDATE execution_id=VALUES(execution_id)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _execution_id);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLInsertCommand(long _guild_id, int _execution_id, boolean _reactions){
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO command (guild_id, execution_id, reactions) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE reactions=VALUES(reactions)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setInt(2, _execution_id);
+			stmt.setBoolean(3, _reactions);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLUpdateReaction(long _guild_id, boolean _reactions) {
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE command SET reactions = ? WHERE guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setBoolean(1, _reactions);
+			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1581,6 +1628,9 @@ public class SqlConnect {
 	public static void setJoinDate(String _join_date){
 		join_date = _join_date;
 	}
+	public static void setReactions(boolean _reactions) {
+		reactions = _reactions;
+	}
 	
 	
 	public static long getUser_id(){
@@ -1660,6 +1710,9 @@ public class SqlConnect {
 	}
 	public static String getJoinDate(){
 		return join_date;
+	}
+	public static boolean getReactions() {
+		return reactions;
 	}
 	
 	public static void clearTimestamp() {

@@ -31,7 +31,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter{
 					boolean emoteFound = false;
 					if(reactions[0].equals("true")) {
 						for(int i = 1; i < 10; i++) {
-							if(reactions[i].length() > 0 && reactionName.equals(reactions[i])) {
+							if(reactions[i].length() > 0 && (reactionName.equals(reactions[i]) || EmojiParser.parseToAliases(reactionName).replaceAll(":", "").equals(reactions[i]))) {
 								e.getGuild().getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(i+"_"+e.getGuild().getId()).getRole_ID())).queue();
 								emoteFound = true;
 								break;

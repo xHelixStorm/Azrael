@@ -252,4 +252,8 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Commands", "Quiz");
 	}
+	public static String getRoleReactionCommand() {
+		readConfig();
+		return ini.get("Commands", "RoleReaction");
+	}
 }

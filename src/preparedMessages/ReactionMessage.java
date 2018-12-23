@@ -2,6 +2,8 @@ package preparedMessages;
 
 import java.awt.Color;
 
+import com.vdurmont.emoji.EmojiManager;
+
 import core.Hashes;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
@@ -27,7 +29,7 @@ public class ReactionMessage {
 						try {
 							reaction = e.getGuild().getEmotesByName(reactions[i], false).get(0).getAsMention();
 						} catch(Exception exc) {
-							reaction = ":"+reactions[i]+":";
+							reaction = EmojiManager.getForAlias(":"+reactions[i]+":").getUnicode();
 						}
 					}
 					else {
@@ -40,8 +42,8 @@ public class ReactionMessage {
 		}
 		String reactionMessage = FileSetting.readFile("./files/reactionmessage.txt");
 		if(reactionMessage.length() > 0)
-			e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription(reactionMessage+"\n\n"
-					+ ""+sb.toString()).build()).complete();
+			e.getGuild().getTextChannelById(channel_id).sendMessage(reactionMessage+"\n\n"
+					+ ""+sb.toString()).complete();
 		
 		else
 			e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("This channel can be used to assign yourself unique roles to display your main game style in the game. "
