@@ -79,6 +79,9 @@ public class RegisterRole {
 						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();
 					}
 				}
+				else{
+					_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" The role id has to be 18 digits long. Execution interrupted!").queue();
+				}
 			}
 			else{
 				_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Something went wrong. Please recheck the syntax!").queue();
