@@ -102,6 +102,7 @@ public class MessageListener extends ListenerAdapter{
 						}
 					}
 				}
+				Hashes.addReactionMessage(e.getGuild().getIdLong(), e.getMessage().getIdLong());
 				reaction.delete();
 			}
 			

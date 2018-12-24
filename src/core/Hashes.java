@@ -38,6 +38,7 @@ public class Hashes {
     private static final Map<String, Rank> ranking_roles = new HashMap<String, Rank>();
     private static final Map<Integer, Ranks> ranking_levels = new HashMap<Integer, Ranks>();
     private static final Map<String, Roles> roles = new HashMap<String, Roles>();
+    private static final Map<Long, Long> reaction_message = new HashMap<Long, Long>();
     private static final Map<Integer, Quizes> quiz = new HashMap<Integer, Quizes>();
     private static final Map<Member, Integer> quiz_winners = new HashMap<Member, Integer>();
 	
@@ -67,6 +68,9 @@ public class Hashes {
 	}
 	public static void addRoles(String _key, Roles _roles) {
 		roles.put(_key, _roles);
+	}
+	public static void addReactionMessage(Long _key, Long _message_id) {
+		reaction_message.put(_key, _message_id);
 	}
 	public static void addQuiz(Integer _key, Quizes _quiz) {
 		quiz.put(_key, _quiz);
@@ -110,6 +114,9 @@ public class Hashes {
 	}
 	public static Roles getRoles(String _key) {
 		return roles.get(_key);
+	}
+	public static Long getReactionMessage(Long _key) {
+		return reaction_message.get(_key);
 	}
 	public static Quizes getQuiz(int _key) {
 		return quiz.get(_key);

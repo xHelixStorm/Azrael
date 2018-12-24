@@ -47,6 +47,9 @@ public class RoleReaction implements Command{
 						e.getTextChannel().sendMessage(e.getMember().getUser().getAsMention()+" Role reactions are already disabled!").queue();
 					}
 					else {
+						if(SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "rea")) {
+							e.getGuild().getTextChannelById(SqlConnect.getChannelID()).deleteMessageById(Hashes.getReactionMessage(e.getGuild().getIdLong())).queue();
+						}
 						for(int i = 1; i < 10; i++) {
 							if(Hashes.getRoles(i+"_"+e.getGuild().getId()) != null) {
 								long role_id = Hashes.getRoles(i+"_"+e.getGuild().getId()).getRole_ID();
@@ -60,7 +63,7 @@ public class RoleReaction implements Command{
 					}
 				}
 				else {
-					
+					e.getTextChannel().sendMessage("Write enable or disable together with the the command to make the reaction message appear or to delete it and remove all self assigned roles!").queue();
 				}
 			}
 			else {
