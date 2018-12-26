@@ -1,6 +1,7 @@
 package commands;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 import commandsContainer.SetChannelFilter;
 import commandsContainer.SetCommandLevel;
@@ -16,6 +17,7 @@ import commandsContainer.SetWarning;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.IniFileReader;
+import inventory.Dailies;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingDB;
@@ -90,11 +92,9 @@ public class Set implements Command{
 							+ "**"+IniFileReader.getCommandPrefix()+"set -max-experience enable**: To enable the experience limit\n"
 							+ "**"+IniFileReader.getCommandPrefix()+"set -max-experience disable**: To disable the experience limit").build()).queue();
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -max-experience")){
+				else if(input.contains(IniFileReader.getCommandPrefix()+"set -max-experience ")){
 					input = input.substring(19+IniFileReader.getCommandPrefix().length());
-					RankingDB.SQLgetMaxExperience(e.getGuild().getIdLong());
-					long experience = RankingDB.getMaxExperience();
-					SetMaxExperience.runTask(e, input, experience);
+					SetMaxExperience.runTask(e, input, Hashes.getStatus(e.getGuild().getIdLong()));
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -max-level")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, type **"+IniFileReader.getCommandPrefix()+"set -max-level <level in number>** for defining the max level that can be achieved in this guild").build()).queue();
@@ -106,76 +106,70 @@ public class Set implements Command{
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -default-level-skin")){
 					RankingDB.SQLgetRankingLevel();
 					String out = "";
-					for(rankingSystem.Rank rankingSystem : RankingDB.getRankList()){
+					for(rankingSystem.Rank rankingSystem : Hashes.getRankList("ranking-level")){
 						out+= "Theme "+rankingSystem.getRankingLevel()+":\t"+rankingSystem.getLevelDescription()+"\n";
 					}
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-level-skin and then the digit for the desired skin. These skins are available for the level up pop ups:\n\n"+out).build()).queue();
-					RankingDB.clearArrayList();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -default-level-skin ")){
 					RankingDB.SQLgetRankingLevel();
-					int last_theme = RankingDB.getRankList().size();
+					int last_theme = Hashes.getRankList("ranking-level").size();
 					input = input.substring(24+IniFileReader.getCommandPrefix().length());
-					SetLevelDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
-					RankingDB.clearArrayList();
+					if(input.replaceAll("[0-9]", "").length() == 0)
+						SetLevelDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+					else
+						e.getTextChannel().sendMessage(e.getMember().getUser().getAsMention()+" Please insert a theme digit to set a default level skin!").queue();
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -default-rank-skin")){
 					RankingDB.SQLgetRankingRank();
 					String out = "";
-					for(rankingSystem.Rank rankingSystem : RankingDB.getRankList()){
+					for(rankingSystem.Rank rankingSystem : Hashes.getRankList("ranking-rank")){
 						out+= "Theme "+rankingSystem.getRankingRank()+":\t"+rankingSystem.getRankDescription()+"\n";
 					}
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-rank-skin and then the digit for the desired skin. These skins are available for the rank command:\n\n"+out).build()).queue();
-					RankingDB.clearArrayList();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -default-rank-skin ")){
 					RankingDB.SQLgetRankingRank();
-					int last_theme = RankingDB.getRankList().size();
+					int last_theme = Hashes.getRankList("ranking-rank").size();
 					input = input.substring(23+IniFileReader.getCommandPrefix().length());
 					SetRankDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
-					RankingDB.clearArrayList();
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -default-profile-skin")){
 					RankingDB.SQLgetRankingProfile();
 					String out = "";
-					for(rankingSystem.Rank rankingSystem : RankingDB.getRankList()){
+					for(rankingSystem.Rank rankingSystem : Hashes.getRankList("ranking-profile")){
 						out+= "Theme "+rankingSystem.getRankingProfile()+":\t"+rankingSystem.getProfileDescription()+"\n";
 					}
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-profile-skin and then the digit for the desired skin. These skins are available for the profile command:\n\n"+out).build()).queue();
-					RankingDB.clearArrayList();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -default-profile-skin ")){
 					RankingDB.SQLgetRankingProfile();
-					int last_theme = RankingDB.getRankList().size();
+					int last_theme = Hashes.getRankList("ranking-profile").size();
 					input = input.substring(26+IniFileReader.getCommandPrefix().length());
 					SetProfileDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
-					RankingDB.clearArrayList();
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -default-icon-skin")){
 					RankingDB.SQLgetRankingIcons();
 					String out = "";
-					for(rankingSystem.Rank rankingSystem : RankingDB.getRankList()){
+					for(rankingSystem.Rank rankingSystem : Hashes.getRankList("ranking-icons")){
 						out+= "Theme "+rankingSystem.getRankingIcon()+":\t"+rankingSystem.getIconDescription()+"\n";
 					}
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-icon-skin and then the digit for the desired level up icons. These level up icons are available:\n\n"+out).build()).queue();
-					RankingDB.clearArrayList();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -default-icon-skin ")){
 					RankingDB.SQLgetRankingIcons();
-					int last_theme = RankingDB.getRankList().size();
+					int last_theme = Hashes.getRankList("ranking-icons").size();
 					input = input.substring(23+IniFileReader.getCommandPrefix().length());
 					SetRankDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
-					RankingDB.clearArrayList();
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -daily-item")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Write the name of the daily reward you want to make available for dailies together with the weight and type of the item. For example:\n**"+IniFileReader.getCommandPrefix()+"set -daily-item \"5000 PEN\" -weight 70 -type cur**\nNote that the total weight can't exceed 100 and that the currently available types are **cur** for currency , **exp** for experience enhancement items and **cod** for code giveaways.").build()).queue();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -daily-item ")){
 					input = input.substring(16+IniFileReader.getCommandPrefix().length());
-					RankingDB.SQLgetDailiesAndType();
-					RankingDB.SQLgetSumWeightFromDailyItems(false);
-					SetDailyItem.runTask(e, input, RankingDB.getDailies(), RankingDB.getWeight());
-					RankingDB.clearDailiesArray();
+					ArrayList<Dailies> daily_items = RankingDB.SQLgetDailiesAndType();
+					var tot_weight = daily_items.parallelStream().mapToInt(i -> i.getWeight()).sum();
+					SetDailyItem.runTask(e, input, daily_items, tot_weight);
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -giveaway-items")) {
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Please past a pastebin link, together with the command, that contains all giveaway codes for the current month").build()).queue();

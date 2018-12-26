@@ -78,7 +78,7 @@ public class RankingMethods extends ListenerAdapter{
 		}
 	}
 	
-	public static void getRank(MessageReceivedEvent e, String _name, String _avatar, int _experience, int _level, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
+	public static void getRank(MessageReceivedEvent e, String _name, String _avatar, int _experience, int _level, int _rank, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
 		try{
 			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/rank"+_rank_skin+"_blank.png"));
 			BufferedImage experienceBar;
@@ -122,7 +122,7 @@ public class RankingMethods extends ListenerAdapter{
 				g.drawString("Exp:", 14, 73);
 				g.drawString(levelT+"%", 239, 73);
 			}
-			g.drawString("Rank:  #"+_level, 118, 57);
+			g.drawString("Rank:  #"+_rank, 118, 57);
 			g.setFont(new Font("Nexa Bold", Font.BOLD, 23));
 			g.drawString(name, 117, 38);
 			

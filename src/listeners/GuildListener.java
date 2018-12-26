@@ -20,6 +20,7 @@ public class GuildListener extends ListenerAdapter {
 	public void onGuildMemberJoin(GuildMemberJoinEvent e){
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
 		EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name found!");
+		EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle("An error occurred!");
 		
 		long user_id = e.getMember().getUser().getIdLong();
 		String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
@@ -29,16 +30,32 @@ public class GuildListener extends ListenerAdapter {
 		long unmute;
 		boolean muted;
 		
+		SqlConnect.SQLgetChannelID(guild_id, "log");
+		long channel_id = SqlConnect.getChannelID();
 		SqlConnect.SQLInsertUser(user_id, user_name, e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
 		Guilds guild_settings = Hashes.getStatus(guild_id);
 		if(guild_settings.getRankingState() == true){
-			RankingDB.SQLInsertUser(user_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
-			RankingDB.SQLInsertUserDetails(user_id, 0, 0, 50000, 0);
-			RankingDB.SQLInsertUserGuild(user_id, guild_id);
+			var editedRows = RankingDB.SQLInsertUser(user_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
+			if(editedRows > 0) {
+				var editedRows2 = RankingDB.SQLInsertUserDetails(user_id, 0, 0, 50000, 0);
+				if(editedRows2 > 0) {
+					var editedRows3 = RankingDB.SQLInsertUserGuild(user_id, guild_id);
+					if(editedRows3 == 0) {
+						if(channel_id != 0) e.getGuild().getTextChannelById(channel_id).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **RankingSystem.user_details** table").build()).queue();
+						RankingDB.SQLInsertActionLog("high", user_id, "User wasn't inserted into user_details table", "This user couldn't be inserted into the user_details table. Please verify and eventually insert it manually into the table!");
+					}
+				}
+				else {
+					if(channel_id != 0) e.getGuild().getTextChannelById(channel_id).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **RankingSystem.user_details** table").build()).queue();
+					RankingDB.SQLInsertActionLog("high", user_id, "User wasn't inserted into user_details table", "This user couldn't be inserted into the user_details table. Please verify and eventually insert it manually into the table!");
+				}
+			}
+			else {
+				if(channel_id != 0) e.getGuild().getTextChannelById(channel_id).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **RankingSystem.users** table").build()).queue();
+				RankingDB.SQLInsertActionLog("high", user_id, "User wasn't inserted into user table", "This user couldn't be inserted into the user table. Please verify the name of this user and eventually insert it manually into the table!");
+			}
 		}
 		
-		SqlConnect.SQLgetChannelID(guild_id, "log");
-		long channel_id = SqlConnect.getChannelID();
 		SqlConnect.SQLgetData(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		muted = SqlConnect.getMuted();
 		boolean custom_time = SqlConnect.getCustomTime();

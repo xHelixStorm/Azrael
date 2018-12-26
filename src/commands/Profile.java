@@ -3,6 +3,7 @@ package commands;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -85,12 +86,13 @@ public class Profile implements Command{
 								convertedExperience = 100;
 							}
 							
-							RankingDB.SQLRanking();
-							search: for(rankingSystem.Rank ranking : RankingDB.getRankList()){
-								if(user_id == ranking.getUser_ID()){
-									rank = ranking.getRank();
-									RankingDB.clearArrayList();
-									break search;
+							ArrayList<rankingSystem.Rank> rankList = RankingDB.SQLRanking();
+							if(rankList.size() > 0) {
+								search: for(rankingSystem.Rank ranking : rankList){
+									if(user_id == ranking.getUser_ID()){
+										rank = ranking.getRank();
+										break search;
+									}
 								}
 							}
 							if(currentExperience >= 0) {

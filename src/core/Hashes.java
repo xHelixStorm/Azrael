@@ -7,9 +7,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import inventory.Dailies;
 import net.dv8tion.jda.core.entities.Member;
 import rankingSystem.Rank;
 import rankingSystem.Ranks;
+import rankingSystem.Skins;
 
 public class Hashes {
 	private static final int max_message_pool_size = 1500;
@@ -41,6 +43,9 @@ public class Hashes {
     private static final Map<Long, Long> reaction_message = new HashMap<Long, Long>();
     private static final Map<Integer, Quizes> quiz = new HashMap<Integer, Quizes>();
     private static final Map<Member, Integer> quiz_winners = new HashMap<Member, Integer>();
+    private static final Map<String, ArrayList<Rank>> rankList = new HashMap<String, ArrayList<Rank>>();
+    private static final Map<String, ArrayList<Skins>> shopContent = new HashMap<String, ArrayList<Skins>>();
+    private static final Map<String, ArrayList<Dailies>> daily_items = new HashMap<String, ArrayList<Dailies>>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -77,6 +82,15 @@ public class Hashes {
 	}
 	public static void addQuizWinners(Member _key, Integer _threshold) {
 		quiz_winners.put(_key, _threshold);
+	}
+	public static void addRankList(String _key, ArrayList<Rank> _rankList) {
+		rankList.put(_key, _rankList);
+	}
+	public static void addShopContent(String _key, ArrayList<Skins> _skin_content) {
+		shopContent.put(_key, _skin_content);
+	}
+	public static void addDailyItems(String _key, ArrayList<Dailies> _daily_items) {
+		daily_items.put(_key, _daily_items);
 	}
 	
 	public static Messages getMessagePool(long _message_id) {
@@ -127,6 +141,15 @@ public class Hashes {
 	public static Integer getQuizWinners(Member _key) {
 		return quiz_winners.get(_key);
 	}
+	public static ArrayList<Rank> getRankList(String _key){
+		return rankList.get(_key);
+	}
+	public static ArrayList<Skins> getShopContent(String _key){
+		return shopContent.get(_key);
+	}
+	public static ArrayList<Dailies> getDailyItems(String _key){
+		return daily_items.get(_key);
+	}
 	
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
@@ -142,6 +165,9 @@ public class Hashes {
 	}
 	public static void removeRoles() {
 		roles.clear();
+	}
+	public static void removeRankingRoles() {
+		ranking_roles.clear();
 	}
 	public static void removeQuiz(int _key) {
 		quiz.remove(_key);
@@ -163,6 +189,14 @@ public class Hashes {
 	}
 	public static void clearQuizWinners() {
 		quiz_winners.clear();
+	}	
+	public static void clearRankList() {
+		rankList.clear();
 	}
-	
+	public static void clearShopContent() {
+		shopContent.clear();
+	}
+	public static void clearDailyItems() {
+		daily_items.clear();
+	}
 }

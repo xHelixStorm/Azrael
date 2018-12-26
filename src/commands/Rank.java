@@ -3,6 +3,7 @@ package commands;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,6 +38,7 @@ public class Rank implements Command{
 				
 				if(user_id != 0) {
 					long guild_id = e.getGuild().getIdLong();
+					var rank = 0;
 					String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_rank.azr";
 					File file = new File(fileName);
 					
@@ -82,8 +84,18 @@ public class Rank implements Command{
 								convertedExperience = 100;
 							}
 							
+							ArrayList<rankingSystem.Rank> rankList = RankingDB.SQLRanking();
+							if(rankList.size() > 0) {
+								search: for(rankingSystem.Rank ranking : rankList){
+									if(user_id == ranking.getUser_ID()){
+										rank = ranking.getRank();
+										break search;
+									}
+								}
+							}
+							
 							if(currentExperience >= 0) {
-								RankingMethods.getRank(e, name, avatar, convertedExperience, level, rank_skin, icon_skin, bar_color, additional_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
+								RankingMethods.getRank(e, name, avatar, convertedExperience, level, rank, rank_skin, icon_skin, bar_color, additional_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
 							}
 							else {
 								EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");

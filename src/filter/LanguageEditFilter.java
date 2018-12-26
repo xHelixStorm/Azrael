@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import core.Hashes;
 import core.UserPrivs;
@@ -58,13 +59,13 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 		if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong())){
 			String getMessage = e.getMessage().getContentRaw();
 			String channel = e.getTextChannel().getName();
-			String parseMessage;
+			String thisMessage;
 			String name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
 			String filename = e.getMember().getUser().getId();
 			String report;
 			
-			parseMessage = CharacterReplacer.replace(getMessage);
-			parseMessage = parseMessage.toLowerCase();
+			thisMessage = CharacterReplacer.replace(getMessage);
+			final var parseMessage = thisMessage.toLowerCase();
 			int letterCounter = parseMessage.length();
 			
 			for(String exceptions : CharacterReplacer.getExceptions()){
@@ -76,18 +77,19 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 			if(exceptionFound == false){
 				find: for(String filter : filter_lang){
 					SqlConnect.SQLgetFilter(filter, e.getGuild().getIdLong());
-					for(String word : Hashes.getQuerryResult(filter+"_"+e.getGuild().getIdLong())){
-						if(wordFound == false && letterCounter > 1){
-							if(parseMessage.equals(word) || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || parseMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.contains(" "+word+" ")){
-								e.getMessage().delete().queue();
-								long guild_id = e.getGuild().getIdLong();
-								SqlConnect.SQLgetChannelID(guild_id, "tra");
-								long channel_id = SqlConnect.getChannelID();
-								if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();}
-								wordFound = true;
-								break find;
-							}
-						}	
+					if(wordFound == false && letterCounter > 1) {
+						Optional<String> option = Hashes.getQuerryResult(filter+"_"+e.getGuild().getIdLong()).parallelStream()
+							.filter(word -> parseMessage.equals(word) || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || parseMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.contains(" "+word+" "))
+							.findAny();
+						if(option.isPresent()) {
+							e.getMessage().delete().reason("Message removed due to bad manner!").complete();
+							long guild_id = e.getGuild().getIdLong();
+							SqlConnect.SQLgetChannelID(guild_id, "tra");
+							long channel_id = SqlConnect.getChannelID();
+							if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();}
+							wordFound = true;
+							break find;
+						}
 					}
 				}
 			}

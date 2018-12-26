@@ -85,11 +85,6 @@ public class RankingDB {
 	private static String profile_description = "";
 	private static String icon_description = "";
 	
-	private static ArrayList<Rank> rankList = new ArrayList<Rank>();
-	private static ArrayList<Skins> set_skin = new ArrayList<Skins>();
-	private static ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
-	private static ArrayList<Dailies> dailies = new ArrayList<Dailies>();
-	
 	private static String username = IniFileReader.getSQLUsername2();
 	private static String password = IniFileReader.getSQLPassword2();
 	
@@ -123,7 +118,7 @@ public class RankingDB {
 	}
 	
 	//users table
-	public static void SQLInsertUser(long _user_id, String _name, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin){
+	public static int SQLInsertUser(long _user_id, String _name, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -136,16 +131,17 @@ public class RankingDB {
 			stmt.setInt(4, _rank_skin);
 			stmt.setInt(5, _profile_skin);
 			stmt.setInt(6, _icon_skin);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateUserLevelSkin(long _user_id, String _name, int _skin_id){
+	public static int SQLUpdateUserLevelSkin(long _user_id, String _name, int _skin_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -155,16 +151,18 @@ public class RankingDB {
 			stmt.setInt(1, _skin_id);
 			stmt.setString(2, _name);
 			stmt.setLong(3, _user_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateUserRankSkin(long _user_id, String _name, int _skin_id){
+	public static int SQLUpdateUserRankSkin(long _user_id, String _name, int _skin_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -174,16 +172,17 @@ public class RankingDB {
 			stmt.setInt(1, _skin_id);
 			stmt.setString(2, _name);
 			stmt.setLong(3, _user_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateUserProfileSkin(long _user_id, String _name, int _skin_id){
+	public static int SQLUpdateUserProfileSkin(long _user_id, String _name, int _skin_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -193,16 +192,17 @@ public class RankingDB {
 			stmt.setInt(1, _skin_id);
 			stmt.setString(2, _name);
 			stmt.setLong(3, _user_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateUserIconSkin(long _user_id, String _name, int _skin_id){
+	public static int SQLUpdateUserIconSkin(long _user_id, String _name, int _skin_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -212,9 +212,10 @@ public class RankingDB {
 			stmt.setInt(1, _skin_id);
 			stmt.setString(2, _name);
 			stmt.setLong(3, _user_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -414,7 +415,6 @@ public class RankingDB {
 				ranks.setRole_Name(rs.getString(2));
 				ranks.setLevel_Requirement(rs.getInt(3));
 				ranks.setGuildID(rs.getLong(4));
-				//rankList.add(ranks);
 				Hashes.addRankingRoles(_guild_id+"_"+ranks.getLevel_Requirement(), ranks);
 			}
 		} catch (SQLException e) {
@@ -427,7 +427,7 @@ public class RankingDB {
 	}
 	
 	//user_details table
-	public static void SQLInsertUserDetails(long _user_id, int _level, long _experience, long _currency, long _assigned_role){
+	public static int SQLInsertUserDetails(long _user_id, int _level, long _experience, long _currency, long _assigned_role){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -439,9 +439,10 @@ public class RankingDB {
 			stmt.setLong(3, _experience);
 			stmt.setLong(4, _currency);
 			stmt.setLong(5, _assigned_role);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -505,85 +506,40 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLRanking(){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT `fk_user_id`, `Level`, `experience`, @curRank := @curRank + 1 AS Rank FROM `user_details`, (SELECT @curRank := 0) r ORDER BY `experience` DESC");
-			stmt = myConn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				Rank rank = new Rank();
-				rank.setUser_ID(rs.getLong(1));
-				rank.setLevel(rs.getInt(2));
-				rank.setExperience(rs.getLong(3));
-				rank.setRank(rs.getInt(4));
-				rankList.add(rank);
+	public static ArrayList<Rank> SQLRanking(){
+		if(Hashes.getRankList("ranking") == null) {
+			ArrayList<Rank> rankList = new ArrayList<Rank>();
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT `fk_user_id`, `Level`, `experience`, @curRank := @curRank + 1 AS Rank FROM `user_details`, (SELECT @curRank := 0) r ORDER BY `experience` DESC");
+				stmt = myConn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					Rank rank = new Rank();
+					rank.setUser_ID(rs.getLong(1));
+					rank.setLevel(rs.getInt(2));
+					rank.setExperience(rs.getLong(3));
+					rank.setRank(rs.getInt(4));
+					rankList.add(rank);
+				}
+				Hashes.addRankList("ranking", rankList);
+				return rankList;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return rankList;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+				try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-			try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
-	}
-	
-	public static void SQLTopRanking(int _page){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		int page = (_page -1)*10;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT `fk_user_id`, `Level`, `experience`, @curRank := @curRank + 1 AS `Rank` FROM `user_details`, (SELECT @curRank := 0) r ORDER BY `experience` DESC LIMIT ?, 10");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, page);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				Rank rank = new Rank();
-				rank.setUser_ID(rs.getLong(1));
-				rank.setLevel(rs.getInt(2));
-				rank.setExperience(rs.getLong(3));
-				rank.setRank(rs.getInt(4));
-				rankList.add(rank);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-			try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
+		return Hashes.getRankList("ranking");
 	}
 	
 	//max_exp table
-	public static void SQLgetMaxExperience(long _fk_guild_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT experience, enabled, fk_guild_id FROM max_exp WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _fk_guild_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setMaxExperience(rs.getLong(1));
-				setEnabled(rs.getBoolean(2));
-				setGuildID(rs.getLong(3));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static void SQLInsertMaxExperience(long _experience, boolean _enabled, long _guild_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -641,250 +597,168 @@ public class RankingDB {
 	}
 	
 	//ranking_level
-	public static void SQLgetRankingLevel(){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM ranking_level");
-			stmt = myConn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				Rank rankingSystem = new Rank();
-				rankingSystem.setRankingLevel(rs.getInt(1));
-				rankingSystem.setLevelDescription(rs.getString(2));
-				rankList.add(rankingSystem);
+	public static boolean SQLgetRankingLevel(){
+		if(Hashes.getRankList("ranking-level") == null) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT * FROM ranking_level");
+				ArrayList<Rank> rankList = new ArrayList<Rank>();
+				boolean success = false;
+				stmt = myConn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					Rank rankingSystem = new Rank();
+					rankingSystem.setRankingLevel(rs.getInt(1));
+					rankingSystem.setLevelDescription(rs.getString(2));
+					rankingSystem.setColorRLevel(rs.getInt(3));
+					rankingSystem.setColorGLevel(rs.getInt(4));
+					rankingSystem.setColorBLevel(rs.getInt(5));
+					rankingSystem.setRankXLevel(rs.getInt(6));
+					rankingSystem.setRankYLevel(rs.getInt(7));
+					rankingSystem.setRankWidthLevel(rs.getInt(8));
+					rankingSystem.setRankHeightLevel(rs.getInt(9));
+					rankList.add(rankingSystem);
+					success = true;
+				}
+				Hashes.addRankList("ranking-level", rankList);
+				return success;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return false;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
-	}
-	
-	public static void SQLgetRankingLevelByDesc(String _description){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM ranking_level WHERE description LIKE ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _description);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setLevelSkin(rs.getInt(1));
-				setLevelDescription(rs.getString(2));
-				setTextColorRLevel(rs.getInt(3));
-				setTextColorGLevel(rs.getInt(4));
-				setTextColorBLevel(rs.getInt(5));
-				setRankXLevel(rs.getInt(6));
-				setRankYLevel(rs.getInt(7));
-				setRankWidthLevel(rs.getInt(8));
-				setRankHeightLevel(rs.getInt(9));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
+		return true;
 	}
 	
 	//ranking_rank
-	public static void SQLgetRankingRank(){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM ranking_rank");
-			stmt = myConn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				Rank rankingSystem = new Rank();
-				rankingSystem.setRankingRank(rs.getInt(1));
-				rankingSystem.setRankDescription(rs.getString(2));
-				rankList.add(rankingSystem);
+	public static boolean SQLgetRankingRank(){
+		if(Hashes.getRankList("ranking-rank") == null) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT * FROM ranking_rank");
+				ArrayList<Rank> rankList = new ArrayList<Rank>();
+				boolean success = false;
+				stmt = myConn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					Rank rankingSystem = new Rank();
+					rankingSystem.setRankingRank(rs.getInt(1));
+					rankingSystem.setRankDescription(rs.getString(2));
+					rankingSystem.setBarColorRank(rs.getInt(3));
+					rankingSystem.setAdditionalTextRank(rs.getBoolean(4));
+					rankingSystem.setColorRRank(rs.getInt(5));
+					rankingSystem.setColorGRank(rs.getInt(6));
+					rankingSystem.setColorBRank(rs.getInt(7));
+					rankingSystem.setRankXRank(rs.getInt(8));
+					rankingSystem.setRankYRank(rs.getInt(9));
+					rankingSystem.setRankWidthRank(rs.getInt(10));
+					rankingSystem.setRankHeightRank(rs.getInt(11));
+					rankList.add(rankingSystem);
+					success = true;
+				}
+				Hashes.addRankList("ranking-rank", rankList);
+				return success;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return false;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
-	}
-	
-	public static void SQLgetRankingRankByDesc(String _description){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM ranking_rank WHERE description LIKE ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _description);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setRankSkin(rs.getInt(1));
-				setRankDescription(rs.getString(2));
-				setColorRank(rs.getInt(3));
-				setExpAndPercentRankAllowed(rs.getBoolean(4));
-				setTextColorRRank(rs.getInt(5));
-				setTextColorGRank(rs.getInt(6));
-				setTextColorBRank(rs.getInt(7));
-				setRankXRank(rs.getInt(8));
-				setRankYRank(rs.getInt(9));
-				setRankWidthRank(rs.getInt(10));
-				setRankHeightRank(rs.getInt(11));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
+		return true;
 	}
 	
 	//ranking_profile
-	public static void SQLgetRankingProfile(){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM ranking_profile");
-			stmt = myConn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				Rank rankingSystem = new Rank();
-				rankingSystem.setRankingProfile(rs.getInt(1));
-				rankingSystem.setProfileDescription(rs.getString(2));
-				rankList.add(rankingSystem);
+	public static boolean SQLgetRankingProfile(){
+		if(Hashes.getRankList("ranking-profile") == null) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT * FROM ranking_profile");
+				ArrayList<Rank> rankList = new ArrayList<Rank>();
+				boolean success = false;
+				stmt = myConn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					Rank rankingSystem = new Rank();
+					rankingSystem.setRankingProfile(rs.getInt(1));
+					rankingSystem.setProfileDescription(rs.getString(2));
+					rankingSystem.setBarColorProfile(rs.getInt(3));
+					rankingSystem.setAdditionalTextProfile(rs.getBoolean(4));
+					rankingSystem.setColorRProfile(rs.getInt(5));
+					rankingSystem.setColorGProfile(rs.getInt(6));
+					rankingSystem.setColorBProfile(rs.getInt(7));
+					rankingSystem.setRankXProfile(rs.getInt(8));
+					rankingSystem.setRankYProfile(rs.getInt(9));
+					rankingSystem.setRankWidthProfile(rs.getInt(10));
+					rankingSystem.setRankHeightProfile(rs.getInt(11));
+					rankList.add(rankingSystem);
+					success = true;
+				}
+				Hashes.addRankList("ranking-profile", rankList);
+				return success;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return false;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
-	}
-	
-	public static void SQLgetRankingProfileByDesc(String _description){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM ranking_profile WHERE description LIKE ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _description);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setProfileSkin(rs.getInt(1));
-				setProfileDescription(rs.getString(2));
-				setColorProfile(rs.getInt(3));
-				setExpAndPercentProfileAllowed(rs.getBoolean(4));
-				setTextColorRProfile(rs.getInt(5));
-				setTextColorGProfile(rs.getInt(6));
-				setTextColorBProfile(rs.getInt(7));
-				setRankXProfile(rs.getInt(8));
-				setRankYProfile(rs.getInt(9));
-				setRankWidthProfile(rs.getInt(10));
-				setRankHeightProfile(rs.getInt(11));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
+		return true;
 	}
 	
 	//ranking_icon
-	public static void SQLgetRankingIcons(){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM ranking_icons");
-			stmt = myConn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				Rank rankingSystem = new Rank();
-				rankingSystem.setRankingIcon(rs.getInt(1));
-				rankingSystem.setIconDescription(rs.getString(2));
-				rankList.add(rankingSystem);
+	public static boolean SQLgetRankingIcons(){
+		if(Hashes.getRankList("ranking-icons") == null) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT * FROM ranking_icons");
+				ArrayList<Rank> rankList = new ArrayList<Rank>();
+				boolean success = false;
+				stmt = myConn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					Rank rankingSystem = new Rank();
+					rankingSystem.setRankingIcon(rs.getInt(1));
+					rankingSystem.setIconDescription(rs.getString(2));
+					rankList.add(rankingSystem);
+					success = true;
+				}
+				Hashes.addRankList("ranking-icons", rankList);
+				return success;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return false;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
-	}
-	
-	public static void SQLgetRankingIconsByDesc(String _description){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM ranking_icons WHERE description LIKE ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _description);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setIconSkin(rs.getInt(1));
-				setIconDescription(rs.getString(2));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	//shop_content
-	public static void SQLgetShopContent(String _description){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM shop_content WHERE description LIKE ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _description);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				setItemID(rs.getInt(1));
-				setDescription(rs.getString(2));
-				setPrice(rs.getLong(3));
-				setSkinType(rs.getString(4));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
+		return true;
 	}
 	
 	//daily_items
-	public static void SQLInsertDailyItems(String _description, int _weight, String _type){
+	public static int SQLInsertDailyItems(String _description, int _weight, String _type){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -894,42 +768,18 @@ public class RankingDB {
 			stmt.setString(1, _description);
 			stmt.setInt(2, _weight);
 			stmt.setString(3, _type);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return 0;
 		} finally {
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static void SQLgetSumWeightFromDailyItems(boolean _exclude_cod){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = "";
-			if(_exclude_cod == false)
-				sql = ("SELECT SUM(weight) FROM daily_items");
-			else
-				sql = ("SELECT SUM(weight) FROM daily_items WHERE fk_type NOT LIKE \"cod\"");
-			stmt = myConn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setWeight(rs.getInt(1));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
 	//inventory
-	public static void SQLInsertInventory(long _user_id, int _item_id, Timestamp _position, int _number, String _status){
+	public static int SQLInsertInventory(long _user_id, int _item_id, Timestamp _position, int _number, String _status){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -941,16 +791,17 @@ public class RankingDB {
 			stmt.setTimestamp(3, _position);
 			stmt.setInt(4, _number);
 			stmt.setString(5, _status);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLInsertInventoryWithLimit(long _user_id, int _item_id, Timestamp _position, int _number, String _status, Timestamp _expires){
+	public static int SQLInsertInventoryWithLimit(long _user_id, int _item_id, Timestamp _position, int _number, String _status, Timestamp _expires){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -963,9 +814,10 @@ public class RankingDB {
 			stmt.setInt(4, _number);
 			stmt.setString(5, _status);
 			stmt.setTimestamp(6, _expires);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1056,29 +908,6 @@ public class RankingDB {
 		}
 	}
 	
-	//shop_content
-	public static void SQLgetItemIDFromShopContent(String _description){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT item_id FROM shop_content WHERE description LIKE ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _description);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setItemID(rs.getInt(1));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	//dailies_usage
 	public static void SQLgetDailiesUsage(long _user_id){
 		Connection myConn = null;
@@ -1123,7 +952,7 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLInsertUserGuild(long _user_id, long _guild_id) {
+	public static int SQLInsertUserGuild(long _user_id, long _guild_id) {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1132,9 +961,10 @@ public class RankingDB {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1343,57 +1173,38 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLgetSkinshopContentAndType(String _skin_type){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT item_id, shop_content.description, price, skin, skin_type.description FROM shop_content INNER JOIN skin_type ON fk_skin = skin WHERE skin LIKE ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _skin_type);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				Skins insert_skin = new Skins();
-				insert_skin.setItemID(rs.getInt(1));
-				insert_skin.setShopDescription(rs.getString(2));
-				insert_skin.setPrice(rs.getLong(3));
-				insert_skin.setSkinType(rs.getString(4));
-				insert_skin.setSkinDescription(rs.getString(5));
-				set_skin.add(insert_skin);
+	public static ArrayList<Skins> SQLgetSkinshopContentAndType(){
+		ArrayList<Skins> set_skin = new ArrayList<Skins>();
+		if(Hashes.getShopContent("shop") == null) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT item_id, shop_content.description, price, skin, skin_type.description FROM shop_content INNER JOIN skin_type ON fk_skin = skin");
+				stmt = myConn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					Skins insert_skin = new Skins();
+					insert_skin.setItemID(rs.getInt(1));
+					insert_skin.setShopDescription(rs.getString(2));
+					insert_skin.setPrice(rs.getLong(3));
+					insert_skin.setSkinType(rs.getString(4));
+					insert_skin.setSkinDescription(rs.getString(5));
+					set_skin.add(insert_skin);
+				}
+				Hashes.addShopContent("shop", set_skin);
+				return set_skin;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return set_skin;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
-	}
-	
-	public static void SQLgetDefaultSkins(long _guild_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT ranking_level.description, ranking_rank.description, ranking_profile.description, ranking_icons.description FROM guilds INNER JOIN ranking_level ON fk_level_id = level_id INNER JOIN ranking_rank ON fk_rank_id = rank_id INNER JOIN ranking_profile ON fk_profile_id = profile_id INNER JOIN ranking_icons ON fk_icon_id = icon_id WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setLevelDescription(rs.getString(1));
-				setRankDescription(rs.getString(2));
-				setProfileDescription(rs.getString(3));
-				setIconDescription(rs.getString(4));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
+		return Hashes.getShopContent("shop");
 	}
 	
 	public static void SQLgetItemID(long _user_id, int _item_id){
@@ -1419,13 +1230,14 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLgetItemIDAndSkinType(long _user_id, String _description){
+	public static boolean SQLgetItemIDAndSkinType(long _user_id, String _description){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT item_id, fk_skin, fk_status FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? AND shop_content.description LIKE ?");
+			var success = false;
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _description);
@@ -1434,9 +1246,12 @@ public class RankingDB {
 				setItemID(rs.getInt(1));
 				setSkinType(rs.getString(2));
 				setStatus(rs.getString(3));
+				success = true;
 			}
+			return success;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1472,7 +1287,8 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLgetInventoryAndDescriptions(long _user_id, int _limit){
+	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptions(long _user_id, int _limit){
+		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1494,8 +1310,10 @@ public class RankingDB {
 				setInventory.setType(rs.getString(7));
 				inventory.add(setInventory);
 			}
+			return inventory;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return inventory;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1503,7 +1321,8 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLgetInventoryAndDescriptionWithoutLimit(long _user_id){
+	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionWithoutLimit(long _user_id){
+		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1520,8 +1339,10 @@ public class RankingDB {
 				setInventory.setDescription(rs.getString(3));
 				inventory.add(setInventory);
 			}
+			return inventory;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return inventory;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1529,13 +1350,14 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLgetNumberAndExpirationFromInventory(long _user_id, String _description, String _status){
+	public static boolean SQLgetNumberAndExpirationFromInventory(long _user_id, String _description, String _status){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT number, expires FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? AND description = ? AND fk_status = ?");
+			var success = false;
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _description);
@@ -1544,9 +1366,12 @@ public class RankingDB {
 			while(rs.next()){
 				setNumber(rs.getInt(1));
 				setExpiration(rs.getTimestamp(2));
+				success = true;
 			}
+			return success;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1554,37 +1379,44 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLgetDailiesAndType(){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT item_id, daily_items.description, weight, type, daily_type.description, action FROM daily_items INNER JOIN daily_type ON fk_type = type");
-			stmt = myConn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				Dailies setDaily = new Dailies();
-				setDaily.setItemId(rs.getInt(1));
-				setDaily.setDescription(rs.getString(2));
-				setDaily.setWeight(rs.getInt(3));
-				setDaily.SetType(rs.getString(4));
-				setDaily.setTypeDescription(rs.getString(5));
-				setDaily.setAction(rs.getString(6));
-				dailies.add(setDaily);
+	public static ArrayList<Dailies> SQLgetDailiesAndType(){
+		if(Hashes.getDailyItems("dailies") == null) {
+			ArrayList<Dailies> dailies = new ArrayList<Dailies>();
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT item_id, daily_items.description, weight, type, daily_type.description, action FROM daily_items INNER JOIN daily_type ON fk_type = type");
+				stmt = myConn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					Dailies setDaily = new Dailies();
+					setDaily.setItemId(rs.getInt(1));
+					setDaily.setDescription(rs.getString(2));
+					setDaily.setWeight(rs.getInt(3));
+					setDaily.SetType(rs.getString(4));
+					setDaily.setTypeDescription(rs.getString(5));
+					setDaily.setAction(rs.getString(6));
+					dailies.add(setDaily);
+				}
+				Hashes.addDailyItems("dailies", dailies);
+				return dailies;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return dailies;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
+		return Hashes.getDailyItems("dailies");
 	}
 	
 	//Transaction
 	@SuppressWarnings("resource")
-	public static void SQLUpdateCurrencyAndInsertInventory(long _user_id, long _currency, int _item_id, Timestamp _position, int _number){
+	public static int SQLUpdateCurrencyAndInsertInventory(long _user_id, long _currency, int _item_id, Timestamp _position, int _number){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1602,8 +1434,9 @@ public class RankingDB {
 			stmt.setInt(2, _item_id);
 			stmt.setTimestamp(3, _position);
 			stmt.setInt(4, _number);
-			stmt.executeUpdate();
+			var editedRows = stmt.executeUpdate();
 			myConn.commit();	
+			return editedRows;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
@@ -1611,6 +1444,7 @@ public class RankingDB {
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1618,7 +1452,7 @@ public class RankingDB {
 	}
 	
 	@SuppressWarnings("resource")
-	public static void SQLUpdateAndInsertInventory(long _user_id, int _number, int _number_limit, int _item_id, Timestamp _position, Timestamp _expiration){
+	public static int SQLUpdateAndInsertInventory(long _user_id, int _number, int _number_limit, int _item_id, Timestamp _position, Timestamp _expiration){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1638,8 +1472,9 @@ public class RankingDB {
 			stmt.setTimestamp(3, _position);
 			stmt.setInt(4, _number_limit);
 			stmt.setTimestamp(5, _expiration);
-			stmt.executeUpdate();
-			myConn.commit();	
+			var editedRows = stmt.executeUpdate();
+			myConn.commit();
+			return editedRows;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
@@ -1647,6 +1482,7 @@ public class RankingDB {
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1654,7 +1490,7 @@ public class RankingDB {
 	}
 	
 	@SuppressWarnings("resource")
-	public static void SQLDeleteAndInsertInventory(long _user_id, int _number, int _item_id, Timestamp _position, Timestamp _expiration){
+	public static int SQLDeleteAndInsertInventory(long _user_id, int _number, int _item_id, Timestamp _position, Timestamp _expiration){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1673,8 +1509,9 @@ public class RankingDB {
 			stmt.setTimestamp(3, _position);
 			stmt.setInt(4, _number);
 			stmt.setTimestamp(5, _expiration);
-			stmt.executeUpdate();
-			myConn.commit();	
+			var editedRows = stmt.executeUpdate();
+			myConn.commit();
+			return editedRows;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
@@ -1682,6 +1519,7 @@ public class RankingDB {
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1689,20 +1527,24 @@ public class RankingDB {
 	}
 	
 	//EXISTS
-	public static void SQLExpBoosterExistsInInventory(){
+	public static String SQLExpBoosterExistsInInventory(long _user_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT DISTINCT description FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_status LIKE \"limit\" AND EXISTS (SELECT description FROM daily_items WHERE fk_type LIKE \"exp\")");
+			String sql = ("SELECT DISTINCT description FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_status LIKE \"limit\" AND EXISTS (SELECT description FROM daily_items WHERE fk_type LIKE \"exp\") AND fk_user_id = ?");
+			var description = "0";
 			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setDescription(rs.getString(1));
+				description = rs.getString(1);
 			}
+			return description;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return "0";
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2071,18 +1913,6 @@ public class RankingDB {
 	public static int getRankHeightProfile(){
 		return rank_height_profile;
 	}
-	public static ArrayList<Rank> getRankList(){
-		return rankList;
-	}
-	public static ArrayList<Skins> getSkins(){
-		return set_skin;
-	}
-	public static ArrayList<InventoryContent> getInventory(){
-		return inventory;
-	}
-	public static ArrayList<Dailies> getDailies(){
-		return dailies;
-	}
 	public static String getLevelDescription(){
 		return level_description;
 	}
@@ -2094,18 +1924,6 @@ public class RankingDB {
 	}
 	public static String getIconDescription(){
 		return icon_description;
-	}
-	public static void clearArrayList(){
-		rankList.clear();
-	}
-	public static void clearSkinArray(){
-		set_skin.clear();
-	}
-	public static void clearInventoryArray(){
-		inventory.clear();
-	}
-	public static void clearDailiesArray(){
-		dailies.clear();
 	}
 	
 	public static void clearAllVariables(){

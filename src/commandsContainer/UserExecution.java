@@ -445,11 +445,15 @@ public class UserExecution {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					Rank user_details = Hashes.getRanking(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
 					long experience = Integer.parseInt(_message);
+					long totExperience = 0;
 					long currentExperience = 0;
+					long rankUpExperience = 0;
 					int level = 0;
 					long assign_role = 0;
+					boolean toBreak = false;
 					for(Ranks ranks : Hashes.getMapOfRankingLevels().values()){
-						if((user_details.getExperience() + experience) > ranks.getExperience()){
+						if((user_details.getExperience() + experience) >= ranks.getExperience()){
+							totExperience = ranks.getExperience();
 							level = ranks.getLevel();
 							currentExperience = (user_details.getExperience() + experience) - ranks.getExperience();
 							if(ranks.getAssignRole() != 0){
@@ -457,11 +461,17 @@ public class UserExecution {
 							}
 						}
 						else{
-							break;
+							if(toBreak == false) {
+								rankUpExperience = ranks.getExperience() - totExperience;
+								toBreak = true;
+							}
+							else
+								break;
 						}
 					}
-					user_details.setCurrentExperience((int) currentExperience);
 					user_details.setExperience(user_details.getExperience()+experience);
+					user_details.setCurrentExperience((int) currentExperience);
+					user_details.setRankUpExperience((int) rankUpExperience);
 					user_details.setLevel(level);
 					user_details.setCurrentRole(assign_role);
 					RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
@@ -485,11 +495,15 @@ public class UserExecution {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					Rank user_details = Hashes.getRanking(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
 					long experience = Long.parseLong(_message);
+					long totExperience = 0;
 					long currentExperience = 0;
+					long rankUpExperience = 0;
 					int level = 0;
 					long assign_role = 0;
+					boolean toBreak = false;
 					for(Ranks ranks : Hashes.getMapOfRankingLevels().values()){
-						if(experience > ranks.getExperience()){
+						if(experience >= ranks.getExperience()){
+							totExperience = ranks.getExperience();
 							level = ranks.getLevel();
 							currentExperience = experience - ranks.getExperience();
 							if(ranks.getAssignRole() != 0){
@@ -497,11 +511,17 @@ public class UserExecution {
 							}
 						}
 						else{
-							break;
+							if(toBreak == false) {
+								rankUpExperience = ranks.getExperience() - totExperience;
+								toBreak = true;
+							}
+							else
+								break;
 						}
 					}
 					user_details.setExperience(experience);
 					user_details.setCurrentExperience((int) currentExperience);
+					user_details.setRankUpExperience((int) rankUpExperience);
 					user_details.setLevel(level);
 					user_details.setCurrentRole(assign_role);
 					RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
@@ -527,19 +547,26 @@ public class UserExecution {
 					if(level <= Hashes.getStatus(_e.getGuild().getIdLong()).getMaxLevel()) {
 						Rank user_details = Hashes.getRanking(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
 						long experience = 0;
+						long rankUpExperience = 0;
 						long assign_role = 0;
+						boolean toBreak = false;
 						for(Ranks ranks : Hashes.getMapOfRankingLevels().values()){
-							if(ranks.getAssignRole() != 0){
+							if(ranks.getAssignRole() != 0 && toBreak == false){
 								assign_role = ranks.getAssignRole();
 							}
 							if(level == ranks.getLevel()){
 								experience = ranks.getExperience();
+								toBreak = true;
+							}
+							else if(toBreak == true){
+								rankUpExperience = ranks.getExperience() - experience;
 								break;
 							}
 						}
 						user_details.setLevel(level);
 						user_details.setExperience(experience);
 						user_details.setCurrentExperience(0);
+						user_details.setRankUpExperience((int) rankUpExperience);
 						user_details.setCurrentRole(assign_role);
 						RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
 						RankingDB.SQLInsertActionLog("low", user_details.getUser_ID(), "Level changed", "User is now level "+user_details.getLevel());

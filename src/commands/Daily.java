@@ -8,9 +8,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import core.Hashes;
 import fileManagement.IniFileReader;
@@ -61,12 +63,18 @@ public class Daily implements Command{
 							if(cod_reward.length() == 0)
 								exclude_cod = true;
 							//
-							RankingDB.SQLgetSumWeightFromDailyItems(exclude_cod);
-							int random = ThreadLocalRandom.current().nextInt(1, RankingDB.getWeight());
-							ArrayList<Dailies> list = new ArrayList<Dailies>();
+							List<Dailies> daily_items = RankingDB.SQLgetDailiesAndType();
+							var tot_weight = 0;
+							if(exclude_cod == true) {
+								tot_weight = daily_items.parallelStream().filter(i -> !i.getType().equals("cod")).mapToInt(i -> i.getWeight()).sum();
+								daily_items = daily_items.parallelStream().filter(i -> !i.getType().equals("cod")).collect(Collectors.toList());
+							}
+							else
+								tot_weight = daily_items.parallelStream().mapToInt(i -> i.getWeight()).sum();
+							int random = ThreadLocalRandom.current().nextInt(1, tot_weight);
 							
-							RankingDB.SQLgetDailiesAndType();
-							for(Dailies daily : RankingDB.getDailies()){
+							ArrayList<Dailies> list = new ArrayList<Dailies>();
+							for(Dailies daily : daily_items){
 								for(int i = 1; i <= daily.getWeight(); i++){
 									Dailies this_daily = new Dailies();
 									this_daily.setDescription(daily.getDescription());
@@ -86,6 +94,7 @@ public class Daily implements Command{
 							LocalDate today = LocalDate.now();
 							LocalDateTime tomorrowMidnight = LocalDateTime.of(today, midnight).plusDays(1);
 							Timestamp timestamp2 = Timestamp.valueOf(tomorrowMidnight);
+							var editedRows = 0;
 							if(list.get(random).getType().equals("cur")){
 								rankingSystem.Rank user_details = Hashes.getRanking(e.getMember().getUser().getIdLong());
 								user_details.setCurrency(user_details.getCurrency()+Long.parseLong(list.get(random).getDescription().replaceAll("[^0-9]*", "")));
@@ -93,19 +102,19 @@ public class Daily implements Command{
 								Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 							}
 							else if(list.get(random).getType().equals("exp")){
-								RankingDB.SQLgetItemIDFromShopContent(list.get(random).getDescription());
+								var item_id = RankingDB.SQLgetSkinshopContentAndType().parallelStream().filter(i -> i.getShopDescription().equals(list.get(random).getDescription())).findAny().orElse(null).getItemID();
 								if(list.get(random).getAction().equals("keep")){
 									RankingDB.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), list.get(random).getDescription(), "perm");
-									RankingDB.SQLInsertInventory(e.getMember().getUser().getIdLong(), RankingDB.getItemID(), timestamp, RankingDB.getNumber()+1, "perm");
+									editedRows = RankingDB.SQLInsertInventory(e.getMember().getUser().getIdLong(), item_id, timestamp, RankingDB.getNumber()+1, "perm");
 								}
 								else if(list.get(random).getAction().equals("use")){
 									RankingDB.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), list.get(random).getDescription(), "limit");
 									try {
 										Timestamp timestamp3 = new Timestamp(RankingDB.getExpiration().getTime()+1000*60*60*24);
-										RankingDB.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), RankingDB.getItemID(), timestamp, RankingDB.getNumber()+1, "limit", timestamp3);
+										editedRows = RankingDB.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), item_id, timestamp, RankingDB.getNumber()+1, "limit", timestamp3);
 									} catch(NullPointerException npe){
 										Timestamp timestamp4 = new Timestamp(time+1000*60*60*24);
-										RankingDB.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), RankingDB.getItemID(), timestamp, RankingDB.getNumber()+1, "limit", timestamp4);
+										editedRows = RankingDB.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), item_id, timestamp, RankingDB.getNumber()+1, "limit", timestamp4);
 									}
 								}
 							}
@@ -125,8 +134,14 @@ public class Daily implements Command{
 								//mark the code as used
 								RankingDB.SQLUpdateUsedOnReward(cod_reward);
 							}
-							RankingDB.SQLInsertDailiesUsage(e.getMember().getUser().getIdLong(), timestamp, timestamp2);
-							RankingDB.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), "Daily retrieved", list.get(random).getDescription());
+							if(editedRows > 0) {
+								RankingDB.SQLInsertDailiesUsage(e.getMember().getUser().getIdLong(), timestamp, timestamp2);
+								RankingDB.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), "Daily retrieved", list.get(random).getDescription());
+							}
+							else {
+								e.getTextChannel().sendMessage("Internal error occurred! Daily item couldn't be inserted into your inventory. Please contact an administrator!").queue();
+								RankingDB.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Daily item couldn't be inserted to inventory", "An insert error occurred for the following item "+list.get(random).getDescription());
+							}
 							list.clear();
 						}
 						else{
@@ -148,7 +163,6 @@ public class Daily implements Command{
 	public void executed(boolean success, MessageReceivedEvent e) {
 		RankingDB.clearAllVariables();
 		SqlConnect.clearAllVariables();
-		RankingDB.clearDailiesArray();
 	}
 
 	@Override

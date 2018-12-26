@@ -49,7 +49,7 @@ public class RankingThreadExecution {
 		}
 		
 		multiplier += multiplier*(percent_multiplier/100);
-		adder += adder*(percent_multiplier/100);
+		adder *= multiplier;
 		
 		currentExperience += adder;
 		experience += adder;
@@ -66,7 +66,7 @@ public class RankingThreadExecution {
 				daily_experience = 0;
 			}
 			
-			if(daily_experience < max_experience+multiplier){
+			if(daily_experience < max_experience*multiplier){
 				daily_experience += adder;
 				ExperienceGain(e, user_details,  guild_settings, currentExperience, experience, daily_experience, roleAssignLevel, max_experience_enabled, reset);
 				if(daily_experience > max_experience*multiplier){

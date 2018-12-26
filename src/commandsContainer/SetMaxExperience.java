@@ -9,12 +9,10 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingDB;
 
 public class SetMaxExperience {
-	public static void runTask(MessageReceivedEvent _e, String _input, long _experience){
-		Guilds guild_settings = Hashes.getStatus(_e.getGuild().getIdLong());
+	public static void runTask(MessageReceivedEvent _e, String _input, Guilds guild_settings){
 		Pattern pattern = Pattern.compile("(enable|disable)");
 		Matcher matcher = pattern.matcher(_input);
 		if(matcher.find()){
-			guild_settings.setMaxExperience(_experience);
 			if(matcher.group().equals("enable")){
 				guild_settings.setMaxExpEnabled(true);
 				RankingDB.SQLInsertMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), _e.getGuild().getIdLong());
@@ -29,8 +27,7 @@ public class SetMaxExperience {
 		}
 		else{
 			try{
-				_experience = Long.parseLong(_input.replaceAll("[^0-9]", ""));
-				guild_settings.setMaxExperience(_experience);
+				guild_settings.setMaxExperience(Long.parseLong(_input.replaceAll("[^0-9]", "")));
 				guild_settings.setMaxExpEnabled(true);
 				RankingDB.SQLInsertMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), _e.getGuild().getIdLong());
 				Hashes.addStatus(_e.getGuild().getIdLong(), guild_settings);

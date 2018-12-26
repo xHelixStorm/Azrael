@@ -36,8 +36,13 @@ public class SetDailyItem {
 								String type = _input;
 								if(type.equals("cur") || type.equals("exp") || type.equals("cod")){
 									if(_weight+Integer.parseInt(weight) <= 100){
-										RankingDB.SQLInsertDailyItems(description.replaceAll("[\"]", ""), Integer.parseInt(weight), type);
-										_e.getTextChannel().sendMessage("New daily item has been set. Your current free weight is **"+(100-_weight-Integer.parseInt(weight))+"** now!").queue();
+										var editedRows = RankingDB.SQLInsertDailyItems(description.replaceAll("[\"]", ""), Integer.parseInt(weight), type);
+										if(editedRows > 0)
+											_e.getTextChannel().sendMessage("New daily item has been set. Your current free weight is **"+(100-_weight-Integer.parseInt(weight))+"** now!").queue();
+										else {
+											_e.getTextChannel().sendMessage("Internal error! Daily item couldn't be inserted!").queue();
+											RankingDB.SQLInsertActionLog("high", _e.getMember().getUser().getIdLong(), "Daily item registration error", "daily item couldn't be inserted with weight "+weight+" and item "+description.replaceAll("[\"]", ""));
+										}
 									}
 									else{
 										_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" The total weight of 100 has been exceeded by **"+(_weight+Integer.parseInt(weight)-100)+"**! Your current free weight to distribute is **"+(100-_weight)+"**").queue();

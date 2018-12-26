@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import core.Hashes;
 import core.UserPrivs;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -30,6 +31,7 @@ public class RegisterRankingRole {
 		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getId().equals(IniFileReader.getAdmin())){
 			if(message.equals(IniFileReader.getCommandPrefix()+"register -ranking-role -clear")) {
 				RankingDB.SQLclearRoles(guild_id);
+				Hashes.removeRankingRoles();
 				_e.getTextChannel().sendMessage("All registered ranking roles have been cleared from the database!").queue();
 			}
 			else {
@@ -52,6 +54,7 @@ public class RegisterRankingRole {
 					else{
 						RankingDB.SQLInsertRoles(role_id, role_name, level_requirement, guild_id);
 						_e.getTextChannel().sendMessage("**The role named "+role_name+" can now be unlocked by reaching level "+level_requirement+"**").queue();
+						RankingDB.SQLgetRoles(guild_id);
 						RankingDB.SQLgetLevels();
 					}
 				} catch(NullPointerException npe){

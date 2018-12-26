@@ -6,6 +6,7 @@ import core.Guilds;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import rankingSystem.Skins;
 import sql.RankingDB;
 import sql.SqlConnect;
 
@@ -30,22 +31,32 @@ public class Purchase implements Command{
 					}
 					else if(input.contains(IniFileReader.getCommandPrefix()+"purchase ")){
 						input = input.substring(IniFileReader.getCommandPrefix().length()+9);
-						RankingDB.SQLgetShopContent(input);
-						int item_id = RankingDB.getItemID();
-						if(RankingDB.getDescription().length() > 0){
+						final String filter = input;
+						RankingDB.SQLgetSkinshopContentAndType();
+						Skins skin = Hashes.getShopContent("shop").parallelStream().filter(s -> s.getShopDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+						//RankingDB.SQLgetShopContent(input);
+						int item_id = skin.getItemID();
+						if(skin.getShopDescription().length() > 0){
 							if(!input.equalsIgnoreCase(setting.getLevelDescription()) && !input.equalsIgnoreCase(setting.getRankDescription()) && !input.equalsIgnoreCase(setting.getProfileDescription()) && !input.equalsIgnoreCase(setting.getIconDescription())){
-								RankingDB.setItemID(0);
-								RankingDB.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), input);
-								if(RankingDB.getItemID() == 0 || RankingDB.getSkinType().equals("ite")){
+								if(!RankingDB.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), input) || skin.getSkinType().equals("ite")){
 									rankingSystem.Rank user_details = Hashes.getRanking(e.getMember().getUser().getIdLong());
-									if(user_details.getCurrency() >= RankingDB.getPrice()){
-										long new_currency = user_details.getCurrency() - RankingDB.getPrice();
-										RankingDB.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), RankingDB.getDescription(), "perm");
+									if(user_details.getCurrency() >= skin.getPrice()){
+										long new_currency = user_details.getCurrency() - skin.getPrice();
+										var editedRows = 0;
 										Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-										RankingDB.SQLUpdateCurrencyAndInsertInventory(e.getMember().getUser().getIdLong(), new_currency, item_id, timestamp, RankingDB.getNumber()+1);
-										user_details.setCurrency(new_currency);
-										Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
-										e.getTextChannel().sendMessage("You have successfully purchased **"+input+"**").queue();
+										if(RankingDB.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), skin.getShopDescription(), "perm"))
+											editedRows = RankingDB.SQLUpdateCurrencyAndInsertInventory(e.getMember().getUser().getIdLong(), new_currency, item_id, timestamp, RankingDB.getNumber()+1);
+										else
+											editedRows = RankingDB.SQLUpdateCurrencyAndInsertInventory(e.getMember().getUser().getIdLong(), new_currency, item_id, timestamp, 1);
+										if(editedRows > 0) {
+											user_details.setCurrency(new_currency);
+											Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
+											e.getTextChannel().sendMessage("You have successfully purchased **"+input+"**").queue();
+										}
+										else {
+											e.getTextChannel().sendMessage("An internal error occurred and purchase has been interrupted. Please contact an administrator!").queue();
+											RankingDB.SQLInsertActionLog("critical", e.getMember().getUser().getIdLong(), "purchase interrupted", "An error occurred while purchasing "+input);
+										}
 									}
 									else{
 										e.getTextChannel().sendMessage(e.getMember().getAsMention()+" you don't have enough money to purchase this item/skin!").queue();

@@ -1,5 +1,6 @@
 package commands;
 
+import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 
 import fileManagement.IniFileReader;
@@ -54,23 +55,19 @@ public class Top implements Command{
 			
 			if(runTopList == true){
 				if(channel_id == channel){
-					RankingDB.SQLRanking();
-					search: for(rankingSystem.Rank ranking1 : RankingDB.getRankList()){
-						if(member_id == ranking1.getUser_ID()){
-							rank = ranking1.getRank();
-							user_experience = ranking1.getExperience();
-							user_level = ranking1.getLevel();
-							break search;
-						}
-					}
+					ArrayList<rankingSystem.Rank> rankList = RankingDB.SQLRanking();
+					rankingSystem.Rank ranking1 = rankList.parallelStream().filter(r -> r.getUser_ID() == member_id).findAny().orElse(null);
+					rank = ranking1.getRank();
+					user_experience = ranking1.getExperience();
+					user_level = ranking1.getLevel();
 					
-					RankingDB.clearArrayList();
-					RankingDB.SQLTopRanking(page);
-					if(RankingDB.getRankList().size() < 10){
-						e.getTextChannel().sendMessage("There aren't at least 10 people on this page and hence it can not be displayed!").queue();
-					}
-					else{
-						for(rankingSystem.Rank ranking : RankingDB.getRankList()){
+					try {
+						//try to get the last entry of the page. if entry doesn't exist jump to catch clause
+						rankList.get(((page-1)*10)+9);
+						
+						//display the top ten of the current page
+						for(int iterate = (page-1)*10; iterate < page*10; iterate++) {
+							rankingSystem.Rank ranking = rankList.get(iterate);
 							i = i + 1;
 							try {
 								name = e.getGuild().getMemberById(ranking.getUser_ID()).getUser().getName();
@@ -89,8 +86,9 @@ public class Top implements Command{
 								message.append("["+(ranking.getRank()+(page-1)*10)+"] \t> #"+name+"\n\t\t\t Level: "+level+"\t Experience: "+experience+"\n");
 							}
 						}
+					} catch(IndexOutOfBoundsException ioobe) {
+						e.getTextChannel().sendMessage("There aren't at least 10 people on this page and hence it can not be displayed!").queue();
 					}
-					RankingDB.clearArrayList();
 				}
 				else{
 					e.getTextChannel().sendMessage("Apologies young padawan but I'm not allowed to execute this command in this channel. Please retry in <#"+channel_id+">").queue();

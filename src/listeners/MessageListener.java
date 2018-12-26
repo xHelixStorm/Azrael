@@ -1,5 +1,6 @@
 package listeners;
 
+import java.awt.Color;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
@@ -17,6 +18,7 @@ import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import filter.LanguageFilter;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.Message.Attachment;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -156,9 +158,19 @@ public class MessageListener extends ListenerAdapter{
 				RankingDB.SQLgetWholeRankView(user_id);
 				Rank user_details = Hashes.getRanking(user_id);
 				if(user_details == null){
-					RankingDB.SQLInsertUser(user_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
-					RankingDB.SQLInsertUserDetails(user_id, 0, 0, 50000, 0);
-					RankingDB.SQLInsertUserGuild(user_id, guild_id);
+					var editedRows = RankingDB.SQLInsertUser(user_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
+					if(editedRows > 0) {
+						var editedRows2 = RankingDB.SQLInsertUserDetails(user_id, 0, 0, 50000, 0);
+						if(editedRows2 > 0) {
+							var editedRows3 = RankingDB.SQLInsertUserGuild(user_id, guild_id);
+							if(editedRows3 > 0) {
+								if(channel_id != 0) {
+									EmbedBuilder success = new EmbedBuilder().setColor(Color.GREEN).setTitle("Table insertion successful!");
+									e.getGuild().getTextChannelById(channel_id).sendMessage(success.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** has been successfully inserted into all required ranking system table!").build()).queue();
+								}
+							}
+						}
+					}
 				}
 				else{
 					SqlConnect.SQLgetTwoChanneIDs(guild_id, "bot", "qui");
@@ -175,8 +187,7 @@ public class MessageListener extends ListenerAdapter{
 						
 						int percent_multiplier;
 						try {
-							RankingDB.SQLExpBoosterExistsInInventory();
-							percent_multiplier = Integer.parseInt(RankingDB.getDescription().replaceAll("[^0-9]*", ""));
+							percent_multiplier = Integer.parseInt(RankingDB.SQLExpBoosterExistsInInventory(user_id).replaceAll("[^0-9]*", ""));
 						} catch(NumberFormatException nfe){
 							percent_multiplier = 0;
 						}

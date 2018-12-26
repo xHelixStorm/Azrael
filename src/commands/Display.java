@@ -69,14 +69,14 @@ public class Display implements Command{
 				else{
 					out = "The ranking system isn't enabled and hence no role can be displayed!";
 				}
-				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
+				e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No ranking role has been registered!").build()).queue();
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -textchannels")){
 				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getId().equals(IniFileReader.getAdmin())) {
 					for(TextChannel tc : e.getGuild().getTextChannels()){
 						out += tc.getName() + " (" + tc.getId() + ") \n";
 					}
-					e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
+					e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "Textchannels don't exist in this server!").build()).queue();
 				}
 				else {
 					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden textchannels!**").build()).queue();
@@ -87,7 +87,7 @@ public class Display implements Command{
 					for(VoiceChannel vc : e.getGuild().getVoiceChannels()){
 						out += vc.getName() + " (" + vc.getId() + ") \n";
 					}
-					e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
+					e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "Voicechannels don't exist in this server!").build()).queue();
 				}
 				else {
 					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden voicechannels!**").build()).queue();
@@ -105,19 +105,17 @@ public class Display implements Command{
 						}
 					}
 					SqlConnect.clearChannelsArray();
-					e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
+					e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No channel has been registered!").build()).queue();
 				}
 				else{
 					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden channels!**").build()).queue();
 				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -dailies")){
-				RankingDB.SQLgetDailiesAndType();
-				for(Dailies daily : RankingDB.getDailies()){
+				for(Dailies daily : RankingDB.SQLgetDailiesAndType()){
 					out+= daily.getDescription()+"\nWeight: "+daily.getWeight()+"\n\n";
 				}
-				RankingDB.clearDailiesArray();
-				e.getTextChannel().sendMessage(messageBuild.setDescription("You can receive the following items through dailies:\n\n"+out).build()).queue();
+				e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? "You can receive the following items through dailies:\n\n"+out : "No daily item has been registered!").build()).queue();
 			}
 			else{
 				e.getTextChannel().sendMessage("**"+e.getMember().getAsMention()+" Something went wrong, please recheck the syntax and try again!**").queue();

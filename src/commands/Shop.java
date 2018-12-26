@@ -1,6 +1,7 @@
 package commands;
 
 import commandsContainer.ShopExecution;
+import core.Guilds;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -21,24 +22,25 @@ public class Shop implements Command{
 			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
 				SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 				if(SqlConnect.getChannelID() == 0 || e.getTextChannel().getIdLong() == SqlConnect.getChannelID()){
-					RankingDB.SQLgetDefaultSkins(e.getGuild().getIdLong());
+					//RankingDB.SQLgetDefaultSkins(e.getGuild().getIdLong());
+					Guilds guild_settings = Hashes.getStatus(e.getGuild().getIdLong());
 					if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP LEVEL UPS")){
-						ShopExecution.displayPartOfShop(e, "lev", RankingDB.getLevelDescription());
+						ShopExecution.displayPartOfShop(e, "lev", guild_settings.getLevelDescription());
 					}
 					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP RANKS")){
-						ShopExecution.displayPartOfShop(e, "ran", RankingDB.getRankDescription());
+						ShopExecution.displayPartOfShop(e, "ran", guild_settings.getRankDescription());
 					}
 					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP PROFILES")){
-						ShopExecution.displayPartOfShop(e, "pro", RankingDB.getProfileDescription());
+						ShopExecution.displayPartOfShop(e, "pro", guild_settings.getProfileDescription());
 					}
 					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP ICONS")){
-						ShopExecution.displayPartOfShop(e, "ico", RankingDB.getIconDescription());
+						ShopExecution.displayPartOfShop(e, "ico", guild_settings.getIconDescription());
 					}
 					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP ITEMS")){
-						ShopExecution.displayPartOfShop(e, "ite", RankingDB.getIconDescription());
+						ShopExecution.displayPartOfShop(e, "ite", "");
 					}
 					else{
-						ShopExecution.displayWholeShop(e, RankingDB.getLevelDescription(), RankingDB.getRankDescription(), RankingDB.getProfileDescription(), RankingDB.getIconDescription());
+						ShopExecution.displayWholeShop(e, guild_settings.getLevelDescription(), guild_settings.getRankDescription(), guild_settings.getProfileDescription(), guild_settings.getIconDescription());
 					}
 				}
 				else{

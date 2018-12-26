@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import TimerTask.ClearRankingScore;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -94,6 +95,7 @@ public class ReadyListener extends ListenerAdapter{
 		
 		DoubleExperienceStart.runTask(e);
 		DoubleExperienceOff.runTask();
+		ClearRankingScore.runTask();
 		
 		SqlConnect.clearAllVariables();
 		executor.shutdown();

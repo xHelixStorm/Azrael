@@ -29,19 +29,19 @@ public class Inventory implements Command{
 						//project will be enhanced with more options in the future (e.g distinction of displaying items, weapons, all or kind of weapons. for now only items)
 						if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"inventory -list")){
 							String out = "";
-							RankingDB.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong());
-							for(InventoryContent inventory : RankingDB.getInventory()){
+							for(InventoryContent inventory : RankingDB.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong())){
 								out+= inventory.getDescription()+"\n";
 							}
 							e.getTextChannel().sendMessage("```"+out+"```").queue();
 						}
 						else{
 							int limit = 0;
-							if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"inventory -page ")){
+							RankingDB.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong());
+							int itemNumber = RankingDB.getItemNumber();
+							if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"inventory -page ")){
 								try {
 									limit = Integer.parseInt(e.getMessage().getContentRaw().replaceAll("[^0-9]", ""))-1;
-									RankingDB.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong());
-									if(limit <= RankingDB.getItemNumber()){
+									if(limit <= itemNumber){
 										limit*=12;
 									}
 								} catch(NumberFormatException nfe){
@@ -49,8 +49,7 @@ public class Inventory implements Command{
 								}
 							}
 							e.getTextChannel().sendMessage("to have everything on one page, use the **-list** parameter together with the command!\nAdditionally, you can visualize the desired page with the **-page** paramenter.").queue();
-							RankingDB.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), limit);
-							InventoryBuilder.DrawInventory(e, "total", "total", RankingDB.getInventory(), limit/12+1, RankingDB.getItemNumber()+1);
+							InventoryBuilder.DrawInventory(e, "total", "total", RankingDB.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), limit), limit/12+1, itemNumber+1);
 						}
 					}
 					else{
@@ -69,7 +68,6 @@ public class Inventory implements Command{
 	public void executed(boolean success, MessageReceivedEvent e) {
 		RankingDB.clearAllVariables();
 		SqlConnect.clearAllVariables();
-		RankingDB.clearInventoryArray();
 	}
 
 	@Override
