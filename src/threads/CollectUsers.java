@@ -2,10 +2,13 @@ package threads;
 
 import java.awt.Color;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.RankingDB;
-import sql.SqlConnect;
+import sql.RankingSystem;
+import sql.Azrael;
 
 public class CollectUsers implements Runnable{
 	private static EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("Collection complete!");
@@ -18,8 +21,10 @@ public class CollectUsers implements Runnable{
 	@Override
 	public void run() {
 		long guild_id = e.getGuild().getIdLong();
-		SqlConnect.SQLBulkInsertUsers(e.getJDA().getGuildById(guild_id).getMembers());
+		Azrael.SQLBulkInsertUsers(e.getJDA().getGuildById(guild_id).getMembers());
+		Logger logger = LoggerFactory.getLogger(CollectUsers.class);
+		logger.info("{} has registered all users from the guild", e.getMember().getUser().getId(), e.getGuild().getName());
 		e.getTextChannel().sendMessage(message.setDescription("User registration is complete!").build()).queue();
-		RankingDB.clearAllVariables();
+		RankingSystem.clearAllVariables();
 	}
 }

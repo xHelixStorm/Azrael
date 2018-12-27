@@ -8,7 +8,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.ReadyEvent;
-import sql.SqlConnect;
+import sql.Azrael;
 
 public class MuteRestart implements Runnable{
 	private EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setThumbnail(IniFileReader.getUnmuteThumbnail()).setTitle("User unmuted!");
@@ -37,8 +37,8 @@ public class MuteRestart implements Runnable{
 	public void run() {
 		try {
 			Thread.sleep(unmute);
-			SqlConnect.SQLgetMuted(member.getUser().getIdLong(), guild_id);
-			if(channel_id != 0 && SqlConnect.getMuted() == true){
+			Azrael.SQLgetMuted(member.getUser().getIdLong(), guild_id);
+			if(channel_id != 0 && Azrael.getMuted() == true){
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator() + "** with the ID Number **" + member.getUser().getId() + "** has been unmuted").build()).queue();
 			}
@@ -46,6 +46,7 @@ public class MuteRestart implements Runnable{
 			if(assignedRole != 0 && ranking_state == true){e.getJDA().getGuildById(guild_id).getController().addSingleRoleToMember(member, e.getJDA().getGuildById(guild_id).getRoleById(assignedRole)).queue();}
 			
 		} catch (InterruptedException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		}
 	}

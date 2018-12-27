@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 import inventory.Dailies;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.RankingDB;
+import sql.RankingSystem;
 
 public class SetDailyItem {
 
@@ -36,12 +36,12 @@ public class SetDailyItem {
 								String type = _input;
 								if(type.equals("cur") || type.equals("exp") || type.equals("cod")){
 									if(_weight+Integer.parseInt(weight) <= 100){
-										var editedRows = RankingDB.SQLInsertDailyItems(description.replaceAll("[\"]", ""), Integer.parseInt(weight), type);
+										var editedRows = RankingSystem.SQLInsertDailyItems(description.replaceAll("[\"]", ""), Integer.parseInt(weight), type);
 										if(editedRows > 0)
 											_e.getTextChannel().sendMessage("New daily item has been set. Your current free weight is **"+(100-_weight-Integer.parseInt(weight))+"** now!").queue();
 										else {
 											_e.getTextChannel().sendMessage("Internal error! Daily item couldn't be inserted!").queue();
-											RankingDB.SQLInsertActionLog("high", _e.getMember().getUser().getIdLong(), "Daily item registration error", "daily item couldn't be inserted with weight "+weight+" and item "+description.replaceAll("[\"]", ""));
+											RankingSystem.SQLInsertActionLog("high", _e.getMember().getUser().getIdLong(), "Daily item registration error", "daily item couldn't be inserted with weight "+weight+" and item "+description.replaceAll("[\"]", ""));
 										}
 									}
 									else{

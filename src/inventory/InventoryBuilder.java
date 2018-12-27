@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -56,6 +57,7 @@ public class InventoryBuilder{
 			
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/"+_e.getMember().getUser().getId()+"_inventory.png"));
 		} catch(IOException ioe){
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			ioe.printStackTrace();
 		}
 		

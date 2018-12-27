@@ -20,10 +20,10 @@ public class User implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-		if(IniFileReader.getUserCommand().equals("true")) {
+		if(IniFileReader.getUserCommand()) {
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || IniFileReader.getAdmin().equals(e.getMember().getUser().getId())) {
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 					if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"user")) {
 						UserExecution.getHelp(e);
 					}

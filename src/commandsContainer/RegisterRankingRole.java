@@ -4,12 +4,15 @@ import java.awt.Color;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.RankingDB;
+import sql.RankingSystem;
 
 public class RegisterRankingRole {
 	
@@ -28,9 +31,9 @@ public class RegisterRankingRole {
 		String level = "";
 		int level_requirement = 0;
 		
-		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getId().equals(IniFileReader.getAdmin())){
+		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()){
 			if(message.equals(IniFileReader.getCommandPrefix()+"register -ranking-role -clear")) {
-				RankingDB.SQLclearRoles(guild_id);
+				RankingSystem.SQLclearRoles(guild_id);
 				Hashes.removeRankingRoles();
 				_e.getTextChannel().sendMessage("All registered ranking roles have been cleared from the database!").queue();
 			}
@@ -52,10 +55,17 @@ public class RegisterRankingRole {
 						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a level between 1 and 9999 and don't forget the -level parameter!").queue();
 					}
 					else{
-						RankingDB.SQLInsertRoles(role_id, role_name, level_requirement, guild_id);
-						_e.getTextChannel().sendMessage("**The role named "+role_name+" can now be unlocked by reaching level "+level_requirement+"**").queue();
-						RankingDB.SQLgetRoles(guild_id);
-						RankingDB.SQLgetLevels();
+						if(RankingSystem.SQLInsertRoles(role_id, role_name, level_requirement, guild_id) > 0) {
+							Logger logger = LoggerFactory.getLogger(RegisterRankingRole.class);
+							logger.info("{} has registered the ranking role {} with the level requirement {} in the guild {}", _e.getMember().getUser().getId(), role_name, level_requirement, _e.getGuild().getName());
+							_e.getTextChannel().sendMessage("**The role named "+role_name+" can now be unlocked by reaching level "+level_requirement+"**").queue();
+							RankingSystem.SQLgetRoles(guild_id);
+							RankingSystem.SQLgetLevels();
+						}
+						else {
+							_e.getTextChannel().sendMessage("An internal error occurred. The role "+role_name+" with the role id "+role_id+" couldn't be inserted into RankingSystem.roles").queue();
+							RankingSystem.SQLInsertActionLog("High", role_id, "Role couldn't be registered as ranking role", "The role "+role_name+" couldn't be inserted into the RankingSystem.roles table");
+						}
 					}
 				} catch(NullPointerException npe){
 					_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();

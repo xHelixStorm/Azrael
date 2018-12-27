@@ -14,8 +14,8 @@ import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import sql.ServerRoles;
-import sql.SqlConnect;
+import sql.DiscordRoles;
+import sql.Azrael;
 import threads.DelayDelete;
 import util.CharacterReplacer;
 
@@ -76,7 +76,7 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 			
 			if(exceptionFound == false){
 				find: for(String filter : filter_lang){
-					SqlConnect.SQLgetFilter(filter, e.getGuild().getIdLong());
+					Azrael.SQLgetFilter(filter, e.getGuild().getIdLong());
 					if(wordFound == false && letterCounter > 1) {
 						Optional<String> option = Hashes.getQuerryResult(filter+"_"+e.getGuild().getIdLong()).parallelStream()
 							.filter(word -> parseMessage.equals(word) || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || parseMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.contains(" "+word+" "))
@@ -84,8 +84,8 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 						if(option.isPresent()) {
 							e.getMessage().delete().reason("Message removed due to bad manner!").complete();
 							long guild_id = e.getGuild().getIdLong();
-							SqlConnect.SQLgetChannelID(guild_id, "tra");
-							long channel_id = SqlConnect.getChannelID();
+							Azrael.SQLgetChannelID(guild_id, "tra");
+							long channel_id = Azrael.getChannelID();
 							if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();}
 							wordFound = true;
 							break find;
@@ -110,8 +110,8 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 					}
 					else if (report.contains("2")){
 						FileSetting.deleteFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");
-						ServerRoles.SQLgetRole(e.getGuild().getIdLong(), "mut");
-						long mute_role = ServerRoles.getRole_ID();
+						DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut");
+						long mute_role = DiscordRoles.getRole_ID();
 						e.getGuild().getController().addRolesToMember(e.getMember(), e.getGuild().getRoleById(mute_role)).queue();
 					}
 				}

@@ -3,7 +3,7 @@ package commandsContainer;
 import core.Guilds;
 import core.Hashes;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.RankingDB;
+import sql.RankingSystem;
 
 public class SetRankingSystem {
 	public static void runTask(MessageReceivedEvent _e, String _input){
@@ -27,7 +27,7 @@ public class SetRankingSystem {
 		}
 		
 		if(wrongInput == false){
-			RankingDB.SQLUpdateRankingSystem(_e.getGuild().getIdLong(), _e.getGuild().getName(), ranking_state);
+			RankingSystem.SQLUpdateRankingSystem(_e.getGuild().getIdLong(), _e.getGuild().getName(), ranking_state);
 			Guilds guild = Hashes.getStatus(_e.getGuild().getIdLong());
 			guild.setRankingState(ranking_state);
 			

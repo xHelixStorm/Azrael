@@ -1,7 +1,7 @@
 package commandsContainer;
 
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.SqlConnect;
+import sql.Azrael;
 
 public class SetCommandLevel {
 	
@@ -30,7 +30,7 @@ public class SetCommandLevel {
 		}
 		
 		if(wrongInput == false){
-			SqlConnect.SQLInsertCommand(_e.getGuild().getIdLong(), level);
+			Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), level);
 			_e.getTextChannel().sendMessage(message).queue();
 		}
 		else{

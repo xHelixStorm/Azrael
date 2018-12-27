@@ -56,7 +56,7 @@ import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 
 public class Main {
-
+	
 	public static JDABuilder builder;
 	
 	public static void main(String [] args){
@@ -64,16 +64,21 @@ public class Main {
 		dir[0] = (new File("./log")).mkdirs();
 		dir[1] = (new File("./message_log")).mkdirs();
 		
-		long time = System.currentTimeMillis();
-		Timestamp timestamp = new Timestamp(time);
-		
-		PrintStream out;
-		try {
-			out = new PrintStream(new FileOutputStream("log/log"+timestamp.toString().replaceAll(":", "-")+".txt"));
-			System.setOut(out);
-			System.setErr(out);
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
+		if(IniFileReader.getFileLogger()) {
+			long time = System.currentTimeMillis();
+			Timestamp timestamp = new Timestamp(time);
+			
+			PrintStream out;
+			PrintStream err;
+			try {
+				out = new PrintStream(new FileOutputStream("log/log"+timestamp.toString().replaceAll(":", "-")+".txt"));
+				err = new PrintStream(new FileOutputStream("log/errlog"+timestamp.toString().replaceAll(":", "-")+".txt"));
+				System.setOut(out);
+				System.setErr(err);
+			} catch (FileNotFoundException e1) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
+				e1.printStackTrace();
+			}
 		}
 		
 		String token = IniFileReader.getToken();
@@ -108,6 +113,7 @@ public class Main {
 			@SuppressWarnings("unused")
 			JDA jda = builder.build();
 		} catch (LoginException | IllegalArgumentException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		}
 	}

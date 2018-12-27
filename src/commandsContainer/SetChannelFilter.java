@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.SqlConnect;
+import sql.Azrael;
 
 public class SetChannelFilter {
 	public static void runTask(MessageReceivedEvent _e, String _input){
@@ -15,7 +15,7 @@ public class SetChannelFilter {
 		String channel = _input.replaceAll("[^0-9]*", "");
 		if(channel.length() == 18){
 			long channel_id = Long.parseLong(channel);
-			SqlConnect.SQLDeleteChannel_Filter(channel_id);
+			Azrael.SQLDeleteChannel_Filter(channel_id);
 			Pattern pattern = Pattern.compile("(all|eng|fre|ger|tur|rus|spa|por|ita)");
 			Matcher matcher = pattern.matcher(_input);
 			while(matcher.find()){
@@ -44,7 +44,7 @@ public class SetChannelFilter {
 			}
 			if(languageError ==  false){
 				for(String language : filter_lang){
-					SqlConnect.SQLInsertChannel_Filter(channel_id, language);
+					Azrael.SQLInsertChannel_Filter(channel_id, language);
 					_e.getTextChannel().sendMessage("**Filter for <#"+channel_id+"> has been updated!**").queue();
 				}
 			}

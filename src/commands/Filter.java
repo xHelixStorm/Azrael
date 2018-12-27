@@ -2,6 +2,9 @@ package commands;
 
 import java.awt.Color;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import commandsContainer.FilterExecution;
 import core.UserPrivs;
 import fileManagement.IniFileReader;
@@ -17,9 +20,9 @@ public class Filter implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getFilterCommand().equals("true")) {
+		if(IniFileReader.getFilterCommand()) {			
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getId().equals(IniFileReader.getAdmin())) {
+			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 				if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"filter")) {
 					FilterExecution.runHelp(e);
 				}
@@ -35,7 +38,8 @@ public class Filter implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		
+		Logger logger = LoggerFactory.getLogger(Filter.class);
+		logger.info("{} has used the Filter command", e.getMember().getUser().getId());
 	}
 
 	@Override

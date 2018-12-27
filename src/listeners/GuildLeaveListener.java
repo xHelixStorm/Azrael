@@ -9,7 +9,7 @@ import net.dv8tion.jda.core.audit.AuditLogEntry;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.core.requests.restaction.pagination.AuditLogPaginationAction;
-import sql.SqlConnect;
+import sql.Azrael;
 
 public class GuildLeaveListener extends ListenerAdapter{
 	
@@ -47,28 +47,28 @@ public class GuildLeaveListener extends ListenerAdapter{
 		long guild_id = e.getGuild().getIdLong();
 		String guild_name = e.getGuild().getName();
 		
-		SqlConnect.SQLgetChannelID(guild_id, "log");
-		long channel_id = SqlConnect.getChannelID();
+		Azrael.SQLgetChannelID(guild_id, "log");
+		long channel_id = Azrael.getChannelID();
 		
-		SqlConnect.SQLgetData(e.getMember().getUser().getIdLong(), guild_id);
-		int warning_id = SqlConnect.getWarningID();
+		Azrael.SQLgetData(e.getMember().getUser().getIdLong(), guild_id);
+		int warning_id = Azrael.getWarningID();
 		
-		SqlConnect.SQLgetMaxWarning(guild_id);
-		int max_warning_id = SqlConnect.getWarningID();
+		Azrael.SQLgetMaxWarning(guild_id);
+		int max_warning_id = Azrael.getWarningID();
 		
 		
 		if(channel_id != 0){
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			if(SqlConnect.getBanID() == 2 && SqlConnect.getMuted()){
+			if(Azrael.getBanID() == 2 && Azrael.getMuted()){
 				System.out.println("["+timestamp.toString()+"] "+user_name+" with the id number "+e.getMember().getUser().getId()+" has been banned!");
 			}
-			else if(SqlConnect.getMuted() && banned == false){
+			else if(Azrael.getMuted() && banned == false){
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from "+guild_name+" while being muted!").build()).queue();
 			}
 			else if(trigger_user_name.length() > 0 && banned == false) {
 				e.getGuild().getTextChannelById(channel_id).sendMessage(kick.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** kicked **"+user_name+"** with the id number **"+e.getUser().getId()+"** from **"+guild_name+"**"+kick_reason).build()).queue();
 			}
-			else if(IniFileReader.getLeaveMessage().equals("true") && banned == false){
+			else if(IniFileReader.getLeaveMessage() && banned == false){
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from **"+guild_name+"**").build()).queue();
 			}
 			
@@ -84,8 +84,8 @@ public class GuildLeaveListener extends ListenerAdapter{
 		}
 		
 		if(trigger_user_name.length() > 0 && banned == false) {
-			SqlConnect.SQLInsertActionLog("MEMBER_KICK", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
+			Azrael.SQLInsertActionLog("MEMBER_KICK", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
 		}
-		SqlConnect.clearAllVariables();
+		Azrael.clearAllVariables();
 	}
 }

@@ -5,13 +5,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import core.Hashes;
 import core.Roles;
 import fileManagement.IniFileReader;
 
-public class ServerRoles {
+public class DiscordRoles {
 	
 	private static long guild_id = 0;
 	private static String guild_name = null;
@@ -29,6 +30,7 @@ public class ServerRoles {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		}
 	}
@@ -45,6 +47,7 @@ public class ServerRoles {
 			stmt.executeUpdate();
 			return true;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -72,6 +75,7 @@ public class ServerRoles {
 			}
 			return success;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -95,6 +99,7 @@ public class ServerRoles {
 			stmt.executeUpdate();
 			return true;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -122,6 +127,7 @@ public class ServerRoles {
 			}
 			return success;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -155,6 +161,7 @@ public class ServerRoles {
 			}
 			return success;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -192,6 +199,7 @@ public class ServerRoles {
 				}
 				return success;
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 				return false;
 			} finally {
@@ -222,6 +230,7 @@ public class ServerRoles {
 			}
 			return success;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return false;
 		} finally {

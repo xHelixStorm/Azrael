@@ -18,9 +18,9 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import rankingSystem.Rank;
 import rankingSystem.Ranks;
-import sql.RankingDB;
-import sql.ServerRoles;
-import sql.SqlConnect;
+import sql.RankingSystem;
+import sql.DiscordRoles;
+import sql.Azrael;
 import threads.DelayDelete;
 import util.Pastebin;
 
@@ -53,24 +53,24 @@ public class UserExecution {
 		String user_name = "";
 		
 		if(raw_input.length() != 18 && raw_input.length() != 17){
-			SqlConnect.SQLgetUser(name);
-			if(SqlConnect.getUser_id() != 0){
-				raw_input = ""+SqlConnect.getUser_id();
+			Azrael.SQLgetUser(name);
+			if(Azrael.getUser_id() != 0){
+				raw_input = ""+Azrael.getUser_id();
 			}
-			if(SqlConnect.getName() != null){
-				user_name = SqlConnect.getName();
+			if(Azrael.getName() != null){
+				user_name = Azrael.getName();
 			}
 		}
 		else{
-			SqlConnect.SQLgetUserThroughID(raw_input);
-			if(SqlConnect.getName() != null){
-				user_name = SqlConnect.getName();
+			Azrael.SQLgetUserThroughID(raw_input);
+			if(Azrael.getName() != null){
+				user_name = Azrael.getName();
 			}
 		}
 		
 		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17)) {
 			if(user_name != null && user_name.length() > 0) {
-				RankingDB.SQLgetWholeRankView(Long.parseLong(raw_input));
+				RankingSystem.SQLgetWholeRankView(Long.parseLong(raw_input));
 				_e.getTextChannel().sendMessage(message.setDescription("The user has been found in this guild! Now type one of the following words within 3 minutes to execute an action!\n\n"
 						+ "**information**: To display all details of the selected user\n"
 						+ "**delete-messages**: To remove up to 100 messages from the selected user\n"
@@ -104,22 +104,22 @@ public class UserExecution {
 			if(_message.equalsIgnoreCase("information") || _message.equalsIgnoreCase("delete-messages") || _message.equalsIgnoreCase("warning") || _message.equalsIgnoreCase("mute") || _message.equalsIgnoreCase("ban") || _message.equalsIgnoreCase("kick") || _message.equalsIgnoreCase("gift-experience") || _message.equalsIgnoreCase("set-experience") || _message.equalsIgnoreCase("set-level") || _message.equalsIgnoreCase("gift-currency") || _message.equalsIgnoreCase("set-currency")) {
 				switch(_message) {
 					case "information": 
-						SqlConnect.SQLgetUserThroughID(file_value);
+						Azrael.SQLgetUserThroughID(file_value);
 						message.setTitle("Here the requested information!");
-						message.setThumbnail(SqlConnect.getAvatar());
-						message.setAuthor(SqlConnect.getName());
+						message.setThumbnail(Azrael.getAvatar());
+						message.setAuthor(Azrael.getName());
 						message.setDescription("Here you can inspect all current information for this user!");
 						message.addBlankField(false);
-						SqlConnect.SQLgetData(Long.parseLong(file_value), _e.getGuild().getIdLong());
-						int warning_id = SqlConnect.getWarningID();
-						SqlConnect.SQLgetMaxWarning(_e.getGuild().getIdLong());
-						message.addField("CURRENT WARNING", "**"+warning_id+"**/**"+SqlConnect.getWarningID()+"**", true);
-						SqlConnect.SQLgetSingleActionEventCount("MEMBER_MUTE_ADD", Long.parseLong(file_value), _e.getGuild().getIdLong());
-						message.addField("TOTAL WARNINGS", "**"+SqlConnect.getCount()+"**", true);
-						SqlConnect.SQLgetSingleActionEventCount("MEMBER_BAN_ADD", Long.parseLong(file_value), _e.getGuild().getIdLong());
-						message.addField("TOTAL BANS", "**"+SqlConnect.getCount()+"**", true);
-						message.addField("BANNED", SqlConnect.getBanID() == 2 ? "**YES**" : "**NO**", true);
-						message.addField("JOIN DATE", "**"+SqlConnect.getJoinDate()+"**", true);
+						Azrael.SQLgetData(Long.parseLong(file_value), _e.getGuild().getIdLong());
+						int warning_id = Azrael.getWarningID();
+						Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
+						message.addField("CURRENT WARNING", "**"+warning_id+"**/**"+Azrael.getWarningID()+"**", true);
+						Azrael.SQLgetSingleActionEventCount("MEMBER_MUTE_ADD", Long.parseLong(file_value), _e.getGuild().getIdLong());
+						message.addField("TOTAL WARNINGS", "**"+Azrael.getCount()+"**", true);
+						Azrael.SQLgetSingleActionEventCount("MEMBER_BAN_ADD", Long.parseLong(file_value), _e.getGuild().getIdLong());
+						message.addField("TOTAL BANS", "**"+Azrael.getCount()+"**", true);
+						message.addField("BANNED", Azrael.getBanID() == 2 ? "**YES**" : "**NO**", true);
+						message.addField("JOIN DATE", "**"+Azrael.getJoinDate()+"**", true);
 						message.addField("USER ID", "**"+file_value+"**", true);
 						message.addBlankField(false);
 						Rank user_details = Hashes.getRanking(Long.parseLong(file_value));
@@ -135,31 +135,31 @@ public class UserExecution {
 							}
 						}
 						StringBuilder out = new StringBuilder();
-						SqlConnect.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", Long.parseLong(file_value), _e.getGuild().getIdLong());
-						for(String description : SqlConnect.getDescriptions()) {
+						Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", Long.parseLong(file_value), _e.getGuild().getIdLong());
+						for(String description : Azrael.getDescriptions()) {
 							out.append("[`"+description+"`] ");
 						}
 						out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
 						message.addField("USED NAMES", out.toString(), false);
-						SqlConnect.clearDescriptions();
+						Azrael.clearDescriptions();
 						out.setLength(0);
-						SqlConnect.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", Long.parseLong(file_value), _e.getGuild().getIdLong());
-						for(String description : SqlConnect.getDescriptions()) {
+						Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", Long.parseLong(file_value), _e.getGuild().getIdLong());
+						for(String description : Azrael.getDescriptions()) {
 							out.append("[`"+description+"`] ");
 						}
 						out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
 						message.addField("USED NICKNAMES", out.toString(), false);
-						SqlConnect.clearDescriptions();
+						Azrael.clearDescriptions();
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.build()).queue();
 						message.clear();
 						message.setColor(Color.BLUE).setTitle("EVENTS");
-						SqlConnect.SQLgetCriticalActionEvents(Long.parseLong(file_value), _e.getGuild().getIdLong());
-						for(String description : SqlConnect.getDescriptions()) {
+						Azrael.SQLgetCriticalActionEvents(Long.parseLong(file_value), _e.getGuild().getIdLong());
+						for(String description : Azrael.getDescriptions()) {
 							out.append(description+"\n");
 						}
 						message.setDescription(out);
-						SqlConnect.clearDescriptions();
+						Azrael.clearDescriptions();
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.build()).queue();
 						FileSetting.deleteFile(file_path);
@@ -307,22 +307,22 @@ public class UserExecution {
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("warning")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					SqlConnect.SQLgetData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
-					int db_warning = SqlConnect.getWarningID();
+					Azrael.SQLgetData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
+					int db_warning = Azrael.getWarningID();
 					if(db_warning != 0) {
-						SqlConnect.SQLgetMaxWarning(_e.getGuild().getIdLong());
+						Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
 						int warning_id = Integer.parseInt(_message.replaceAll("[^0-9]*", ""));
-						int max_warning_id = SqlConnect.getWarningID();
+						int max_warning_id = Azrael.getWarningID();
 						if(warning_id == 0){
-							SqlConnect.SQLDeleteData(Long.parseLong(file_value.replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong());
+							Azrael.SQLDeleteData(Long.parseLong(file_value.replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong());
 							_e.getTextChannel().sendMessage("The warnings of this user has been cleared!").queue();
 						}
 						else if(warning_id <= max_warning_id) {
-							SqlConnect.SQLUpdateWarning(Long.parseLong(file_value.replaceAll("[^0-9]", "")), _e.getGuild().getIdLong(), warning_id);
+							Azrael.SQLUpdateWarning(Long.parseLong(file_value.replaceAll("[^0-9]", "")), _e.getGuild().getIdLong(), warning_id);
 							_e.getTextChannel().sendMessage("Warning value "+warning_id+" has been set!").queue();
 						}
 						else {
-							SqlConnect.SQLUpdateWarning(Long.parseLong(file_value.replaceAll("[^0-9]", "")), _e.getGuild().getIdLong(), max_warning_id);
+							Azrael.SQLUpdateWarning(Long.parseLong(file_value.replaceAll("[^0-9]", "")), _e.getGuild().getIdLong(), max_warning_id);
 							_e.getTextChannel().sendMessage("The max possible value "+max_warning_id+" has been set because your input exceeded the max possible warning!").queue();
 						}
 					}
@@ -342,10 +342,10 @@ public class UserExecution {
 					FileSetting.createFile(file_path, "mute-time"+file_value.replaceAll("[^0-9]*", ""));
 				}
 				else if(_message.equalsIgnoreCase("no")) {
-					ServerRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut");
-					_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getRoleById(ServerRoles.getRole_ID())).queue();
+					DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut");
+					_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getRoleById(DiscordRoles.getRole_ID())).queue();
 					FileSetting.deleteFile(file_path);
-					ServerRoles.clearAllVariables();
+					DiscordRoles.clearAllVariables();
 				}
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("mute-time")) {
@@ -363,21 +363,21 @@ public class UserExecution {
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
 					
-					ServerRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut");
-					_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getRoleById(ServerRoles.getRole_ID())).queue();
-					SqlConnect.SQLgetData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
-					if(SqlConnect.getWarningID() != 0) {
-						SqlConnect.SQLUpdateUnmute(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), timestamp, unmute_timestamp, false, true);
+					DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut");
+					_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getRoleById(DiscordRoles.getRole_ID())).queue();
+					Azrael.SQLgetData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
+					if(Azrael.getWarningID() != 0) {
+						Azrael.SQLUpdateUnmute(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), timestamp, unmute_timestamp, false, true);
 					}
 					else {
-						SqlConnect.SQLInsertData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), 1, 1, timestamp, unmute_timestamp, false, true);
+						Azrael.SQLInsertData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), 1, 1, timestamp, unmute_timestamp, false, true);
 					}
 					FileSetting.deleteFile(file_path);
 					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/mute_time_"+file_value.replaceAll("[^0-9]*", ""), ""+mute_time);
-					ServerRoles.clearAllVariables();
-					SqlConnect.clearAllVariables();
-					SqlConnect.clearUnmute();
-					SqlConnect.clearTimestamp();
+					DiscordRoles.clearAllVariables();
+					Azrael.clearAllVariables();
+					Azrael.clearUnmute();
+					Azrael.clearTimestamp();
 				}
 				else {
 					_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a numerical value in minutes!").queue();
@@ -390,15 +390,15 @@ public class UserExecution {
 					FileSetting.createFile(file_path, "ban-reason"+file_value.replaceAll("[^0-9]*", ""));
 				}
 				else if(_message.equalsIgnoreCase("no")) {
-					SqlConnect.SQLgetData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
-					int warning_id = SqlConnect.getWarningID();
-					SqlConnect.SQLgetMaxWarning(_e.getGuild().getIdLong());
-					int max_warning_id = SqlConnect.getWarningID();
+					Azrael.SQLgetData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
+					int warning_id = Azrael.getWarningID();
+					Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
+					int max_warning_id = Azrael.getWarningID();
 					if(warning_id == max_warning_id) {
 						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 						denied.setThumbnail(IniFileReader.getBanThumbnail()).setTitle("User Banned!");
-						SqlConnect.SQLgetChannelID(_e.getGuild().getIdLong(), "log");
-						if(SqlConnect.getChannelID() != 0) {_e.getGuild().getTextChannelById(SqlConnect.getChannelID()).sendMessage(denied.setDescription("["+timestamp.toString()+"] **" + _e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getName()+"#"+_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getDiscriminator() + " with the ID Number " + file_value.replaceAll("[^0-9]*", "") + " Has been banned after reaching the limit of allowed mutes on this server!**\nReason: User has been banned with the bot command!").build()).queue();}
+						Azrael.SQLgetChannelID(_e.getGuild().getIdLong(), "log");
+						if(Azrael.getChannelID() != 0) {_e.getGuild().getTextChannelById(Azrael.getChannelID()).sendMessage(denied.setDescription("["+timestamp.toString()+"] **" + _e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getName()+"#"+_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getDiscriminator() + " with the ID Number " + file_value.replaceAll("[^0-9]*", "") + " Has been banned after reaching the limit of allowed mutes on this server!**\nReason: User has been banned with the bot command!").build()).queue();}
 						PrivateChannel pc = _e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().openPrivateChannel().complete();
 						pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 								+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
@@ -409,15 +409,15 @@ public class UserExecution {
 				}
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("ban-reason")) {
-				SqlConnect.SQLgetData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
-				int warning_id = SqlConnect.getWarningID();
-				SqlConnect.SQLgetMaxWarning(_e.getGuild().getIdLong());
-				int max_warning_id = SqlConnect.getWarningID();
+				Azrael.SQLgetData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
+				int warning_id = Azrael.getWarningID();
+				Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
+				int max_warning_id = Azrael.getWarningID();
 				if(warning_id == max_warning_id) {
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					denied.setThumbnail(IniFileReader.getBanThumbnail()).setTitle("User Banned!");
-					SqlConnect.SQLgetChannelID(_e.getGuild().getIdLong(), "log");
-					if(SqlConnect.getChannelID() != 0) {_e.getGuild().getTextChannelById(SqlConnect.getChannelID()).sendMessage(denied.setDescription("["+timestamp.toString()+"] **" + _e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getName()+"#"+_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getDiscriminator() + " with the ID Number " + file_value.replaceAll("[^0-9]*", "") + " Has been banned after reaching the limit of allowed mutes on this server!**\nReason: "+_message).build()).queue();}
+					Azrael.SQLgetChannelID(_e.getGuild().getIdLong(), "log");
+					if(Azrael.getChannelID() != 0) {_e.getGuild().getTextChannelById(Azrael.getChannelID()).sendMessage(denied.setDescription("["+timestamp.toString()+"] **" + _e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getName()+"#"+_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getDiscriminator() + " with the ID Number " + file_value.replaceAll("[^0-9]*", "") + " Has been banned after reaching the limit of allowed mutes on this server!**\nReason: "+_message).build()).queue();}
 					PrivateChannel pc = _e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().openPrivateChannel().complete();
 					pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 							+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
@@ -474,8 +474,8 @@ public class UserExecution {
 					user_details.setRankUpExperience((int) rankUpExperience);
 					user_details.setLevel(level);
 					user_details.setCurrentRole(assign_role);
-					RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
-					RankingDB.SQLInsertActionLog("low", user_details.getUser_ID(), "Experience points gifted", "User received "+experience+" experience points");
+					RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
+					RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), "Experience points gifted", "User received "+experience+" experience points");
 					Hashes.addRanking(user_details.getUser_ID(), user_details);
 					for(Role r : _e.getMember().getRoles()){
 						for(Rank role : Hashes.getMapOfRankingRoles().values()){
@@ -524,8 +524,8 @@ public class UserExecution {
 					user_details.setRankUpExperience((int) rankUpExperience);
 					user_details.setLevel(level);
 					user_details.setCurrentRole(assign_role);
-					RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
-					RankingDB.SQLInsertActionLog("low", user_details.getUser_ID(), "Experience points edited", "User has been set to "+experience+" experience points");
+					RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
+					RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), "Experience points edited", "User has been set to "+experience+" experience points");
 					Hashes.addRanking(user_details.getUser_ID(), user_details);
 					for(Role r : _e.getMember().getRoles()){
 						for(Rank role : Hashes.getMapOfRankingRoles().values()){
@@ -568,8 +568,8 @@ public class UserExecution {
 						user_details.setCurrentExperience(0);
 						user_details.setRankUpExperience((int) rankUpExperience);
 						user_details.setCurrentRole(assign_role);
-						RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
-						RankingDB.SQLInsertActionLog("low", user_details.getUser_ID(), "Level changed", "User is now level "+user_details.getLevel());
+						RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
+						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), "Level changed", "User is now level "+user_details.getLevel());
 						Hashes.addRanking(user_details.getUser_ID(), user_details);
 						for(Role r : _e.getMember().getRoles()){
 							for(Rank role : Hashes.getMapOfRankingRoles().values()){
@@ -594,8 +594,8 @@ public class UserExecution {
 					Rank user_details = Hashes.getRanking(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(user_details.getCurrency()+currency);
-					RankingDB.SQLUpdateCurrency(user_details.getUser_ID(), user_details.getCurrency());
-					RankingDB.SQLInsertActionLog("low", user_details.getUser_ID(), "Money gifted", "User received money in value of "+currency+" PEN");
+					RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), user_details.getCurrency());
+					RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), "Money gifted", "User received money in value of "+currency+" PEN");
 					Hashes.addRanking(user_details.getUser_ID(), user_details);
 					_e.getTextChannel().sendMessage("Currency has been updated!").queue();
 					FileSetting.deleteFile(file_path);
@@ -606,8 +606,8 @@ public class UserExecution {
 					Rank user_details = Hashes.getRanking(Long.parseLong(file_value.replaceAll("[^0-9]*", "")));
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(currency);
-					RankingDB.SQLUpdateCurrency(user_details.getUser_ID(), user_details.getCurrency());
-					RankingDB.SQLInsertActionLog("low", user_details.getUser_ID(), "Money set", "Currency value for the user has been changed to "+currency+" PEN");
+					RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), user_details.getCurrency());
+					RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), "Money set", "Currency value for the user has been changed to "+currency+" PEN");
 					Hashes.addRanking(user_details.getUser_ID(), user_details);
 					_e.getTextChannel().sendMessage("Currency has been updated!").queue();
 					FileSetting.deleteFile(file_path);

@@ -2,6 +2,9 @@ package commands;
 
 import java.awt.Color;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Channels;
 import core.Hashes;
 import core.Roles;
@@ -13,9 +16,9 @@ import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.RankingDB;
-import sql.ServerRoles;
-import sql.SqlConnect;
+import sql.RankingSystem;
+import sql.DiscordRoles;
+import sql.Azrael;
 
 public class Display implements Command{
 	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA);
@@ -28,7 +31,7 @@ public class Display implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getDisplayCommand().equals("true")){
+		if(IniFileReader.getDisplayCommand()){
 			long guild_id = e.getGuild().getIdLong();
 			String message = e.getMessage().getContentRaw();
 			String out = "";
@@ -51,11 +54,11 @@ public class Display implements Command{
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -registered-roles")){
-				ServerRoles.SQLgetRoles(guild_id);
-				for(Roles r : ServerRoles.getRoles_ID()){
+				DiscordRoles.SQLgetRoles(guild_id);
+				for(Roles r : DiscordRoles.getRoles_ID()){
 					out += r.getRole_Name() + " (" + r.getRole_ID() + ") \nrole type: "+r.getCategory_Name()+"\n\n";
 				}
-				ServerRoles.clearRolesArray();
+				DiscordRoles.clearRolesArray();
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -ranking-roles")){
@@ -72,7 +75,7 @@ public class Display implements Command{
 				e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No ranking role has been registered!").build()).queue();
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -textchannels")){
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getId().equals(IniFileReader.getAdmin())) {
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 					for(TextChannel tc : e.getGuild().getTextChannels()){
 						out += tc.getName() + " (" + tc.getId() + ") \n";
 					}
@@ -83,7 +86,7 @@ public class Display implements Command{
 				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -voicechannels")){
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getId().equals(IniFileReader.getAdmin())) {
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 					for(VoiceChannel vc : e.getGuild().getVoiceChannels()){
 						out += vc.getName() + " (" + vc.getId() + ") \n";
 					}
@@ -94,9 +97,9 @@ public class Display implements Command{
 				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -registered-channels")){
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || IniFileReader.getAdmin().equals(e.getMember().getUser().getId())){
-					SqlConnect.SQLgetChannels(guild_id);
-					for(Channels ch : SqlConnect.getChannels()){
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || IniFileReader.getAdmin() == e.getMember().getUser().getIdLong()){
+					Azrael.SQLgetChannels(guild_id);
+					for(Channels ch : Azrael.getChannels()){
 						if(!out.contains(""+ch.getChannel_ID())){
 							out += "\n\n"+ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \nChannel type: "+ch.getChannel_Type_Name()+" Channel\nFilter(s) in use: "+ch.getLang_Filter();
 						}
@@ -104,7 +107,7 @@ public class Display implements Command{
 							out += ", "+ch.getLang_Filter();
 						}
 					}
-					SqlConnect.clearChannelsArray();
+					Azrael.clearChannelsArray();
 					e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No channel has been registered!").build()).queue();
 				}
 				else{
@@ -112,7 +115,7 @@ public class Display implements Command{
 				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -dailies")){
-				for(Dailies daily : RankingDB.SQLgetDailiesAndType()){
+				for(Dailies daily : RankingSystem.SQLgetDailiesAndType()){
 					out+= daily.getDescription()+"\nWeight: "+daily.getWeight()+"\n\n";
 				}
 				e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? "You can receive the following items through dailies:\n\n"+out : "No daily item has been registered!").build()).queue();
@@ -125,9 +128,10 @@ public class Display implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		RankingDB.clearAllVariables();
-		ServerRoles.clearAllVariables();
-		SqlConnect.clearAllVariables();
+		Logger logger = LoggerFactory.getLogger(Display.class);
+		logger.info("{} has used Display command", e.getMember().getUser().getIdLong());
+		DiscordRoles.clearAllVariables();
+		Azrael.clearAllVariables();
 	}
 
 	@Override

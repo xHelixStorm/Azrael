@@ -1,6 +1,7 @@
 package commands;
 
 import java.awt.Color;
+import java.sql.Timestamp;
 
 import core.UserPrivs;
 import fileManagement.IniFileReader;
@@ -18,13 +19,14 @@ public class ShutDown implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getShutDownCommand().equals("true")){
-			if(e.getMember().getUser().getId().equals(IniFileReader.getAdmin()) || UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong())){
+		if(IniFileReader.getShutDownCommand()){
+			if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin() || UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong())){
 				e.getTextChannel().sendMessage("**I'm going to shut down shortly**").queue();
 				
 				try{
 					Thread.sleep(20000);
 				}catch(InterruptedException ev){
+					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 					ev.printStackTrace();
 				}
 				e.getTextChannel().sendMessage("**shutting down now. Cya later!**").queue();

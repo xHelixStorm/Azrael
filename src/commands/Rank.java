@@ -3,16 +3,20 @@ package commands;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import rankingSystem.RankingMethods;
-import sql.RankingDB;
+import sql.RankingSystem;
 import threads.DelayDelete;
 
 public class Rank implements Command{
@@ -24,7 +28,7 @@ public class Rank implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getPurchaseCommand().equals("true")){
+		if(IniFileReader.getPurchaseCommand()){
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
 				long user_id = 0;
@@ -42,7 +46,7 @@ public class Rank implements Command{
 					String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_rank.azr";
 					File file = new File(fileName);
 					
-					RankingDB.SQLgetWholeRankView(user_id);
+					RankingSystem.SQLgetWholeRankView(user_id);
 					rankingSystem.Rank user_details = Hashes.getRanking(user_id);
 					
 					if(Hashes.getStatus(guild_id).getRankingState()){				
@@ -50,6 +54,7 @@ public class Rank implements Command{
 							try {
 								file.createNewFile();
 							} catch (IOException e2) {
+								System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 								e2.printStackTrace();
 							}
 							
@@ -84,7 +89,7 @@ public class Rank implements Command{
 								convertedExperience = 100;
 							}
 							
-							ArrayList<rankingSystem.Rank> rankList = RankingDB.SQLRanking();
+							ArrayList<rankingSystem.Rank> rankList = RankingSystem.SQLRanking();
 							if(rankList.size() > 0) {
 								search: for(rankingSystem.Rank ranking : rankList){
 									if(user_id == ranking.getUser_ID()){
@@ -100,7 +105,7 @@ public class Rank implements Command{
 							else {
 								EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
 								e.getTextChannel().sendMessage(error.setDescription("An error occured on use. Please contact an administrator or moderator!").build()).queue();
-								RankingDB.SQLInsertActionLog("critical", user_id, "negative experience value", "The user has less experience points in proportion to his level: "+currentExperience);
+								RankingSystem.SQLInsertActionLog("critical", user_id, "negative experience value", "The user has less experience points in proportion to his level: "+currentExperience);
 							}
 						}
 						else{
@@ -121,7 +126,9 @@ public class Rank implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		RankingDB.clearAllVariables();
+		Logger logger = LoggerFactory.getLogger(Rank.class);
+		logger.info("{} has used Rank command", e.getMember().getUser().getId());
+		RankingSystem.clearAllVariables();
 	}
 
 	@Override

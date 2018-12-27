@@ -1,6 +1,7 @@
 package threads;
 
 import java.io.File;
+import java.sql.Timestamp;
 
 public class DelayDelete implements Runnable{
 	File file;
@@ -17,6 +18,7 @@ public class DelayDelete implements Runnable{
 		try {
 			Thread.sleep(delay);
 		} catch (InterruptedException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		}
 		if(file.exists()) {

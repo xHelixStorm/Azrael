@@ -5,8 +5,8 @@ import core.Guilds;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.RankingDB;
-import sql.SqlConnect;
+import sql.RankingSystem;
+import sql.Azrael;
 
 public class Shop implements Command{
 
@@ -17,11 +17,11 @@ public class Shop implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getShopCommand().equals("true")){
+		if(IniFileReader.getShopCommand()){
 			String input = e.getMessage().getContentRaw();
 			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
-				SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
-				if(SqlConnect.getChannelID() == 0 || e.getTextChannel().getIdLong() == SqlConnect.getChannelID()){
+				Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
+				if(Azrael.getChannelID() == 0 || e.getTextChannel().getIdLong() == Azrael.getChannelID()){
 					//RankingDB.SQLgetDefaultSkins(e.getGuild().getIdLong());
 					Guilds guild_settings = Hashes.getStatus(e.getGuild().getIdLong());
 					if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP LEVEL UPS")){
@@ -44,7 +44,7 @@ public class Shop implements Command{
 					}
 				}
 				else{
-					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+SqlConnect.getChannelID()+">").queue();
+					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+Azrael.getChannelID()+">").queue();
 				}
 			}
 			else{
@@ -55,9 +55,9 @@ public class Shop implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		RankingDB.clearAllVariables();
-		RankingDB.clearDescriptionVariables();
-		SqlConnect.clearAllVariables();
+		RankingSystem.clearAllVariables();
+		RankingSystem.clearDescriptionVariables();
+		Azrael.clearAllVariables();
 	}
 
 	@Override

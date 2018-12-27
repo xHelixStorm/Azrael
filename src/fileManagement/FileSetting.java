@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class FileSetting {
@@ -19,6 +20,7 @@ private static PrintWriter pw;
 			pw.print(content);
 			pw.close();
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		}
 	}
@@ -50,15 +52,18 @@ private static PrintWriter pw;
 				String content = sb.toString();
 				return content;
 			} catch (IOException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 			}finally {
 				try {
 					br.close();
 				} catch (IOException e) {
+					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 					e.printStackTrace();
 				}
 			}
 		} catch (FileNotFoundException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return "";
 		}
@@ -80,15 +85,18 @@ private static PrintWriter pw;
 				}
 				return content;
 			} catch (IOException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 			}finally {
 				try {
 					br.close();
 				} catch (IOException e) {
+					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 					e.printStackTrace();
 				}
 			}
 		} catch (FileNotFoundException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		}
 		return null;
@@ -114,15 +122,18 @@ private static PrintWriter pw;
 				}
 				return contentReturn;
 			} catch (IOException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 			}finally {
 				try {
 					br.close();
 				} catch (IOException e) {
+					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 					e.printStackTrace();
 				}
 			}
 		} catch (FileNotFoundException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		}
 		return null;

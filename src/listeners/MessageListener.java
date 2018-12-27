@@ -26,8 +26,8 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import preparedMessages.ReactionMessage;
 import rankingSystem.Rank;
 import rankingSystem.RankingThreadExecution;
-import sql.RankingDB;
-import sql.SqlConnect;
+import sql.RankingSystem;
+import sql.Azrael;
 import threads.RunQuiz;
 
 public class MessageListener extends ListenerAdapter{
@@ -49,7 +49,7 @@ public class MessageListener extends ListenerAdapter{
 			String message = e.getMessage().getContentRaw();
 			long channel_id = e.getTextChannel().getIdLong();
 			
-			if(IniFileReader.getChannelLog().equals("true")){
+			if(IniFileReader.getChannelLog()){
 				LocalDateTime time = LocalDateTime.now();
 				String image_url = "";
 				for(Attachment attch : e.getMessage().getAttachments()){
@@ -65,7 +65,7 @@ public class MessageListener extends ListenerAdapter{
 				collectedMessage.setMessageID(e.getMessageIdLong());
 				collectedMessage.setTime(time);
 				FileSetting.appendFile("./message_log/"+e.getTextChannel().getName()+".txt", "["+collectedMessage.getTime().toString()+" - "+collectedMessage.getUserName()+"]: "+collectedMessage.getMessage());
-				if(IniFileReader.getCacheLog().equals("true") && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
+				if(IniFileReader.getCacheLog() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
 					Hashes.addMessagePool(e.getMessageIdLong(), collectedMessage);
 				}
 			}
@@ -113,16 +113,16 @@ public class MessageListener extends ListenerAdapter{
 				if(e.getMember().getUser().getId().equals(content) && (message.equals("1") || message.equals("2") || message.equals("3"))) {
 					//run the quiz in a thread. // retrieve the log channel and quiz channel at the same time and pass them over to the new Thread
 					long log_channel_id;
-					SqlConnect.SQLgetTwoChanneIDs(e.getGuild().getIdLong(), "qui", "log");
-					if(SqlConnect.getChannelID2() != 0) {
-						log_channel_id = SqlConnect.getChannelID();
+					Azrael.SQLgetTwoChanneIDs(e.getGuild().getIdLong(), "qui", "log");
+					if(Azrael.getChannelID2() != 0) {
+						log_channel_id = Azrael.getChannelID();
 					}
 					else {
 						log_channel_id = e.getTextChannel().getIdLong();
 					}
-					e.getTextChannel().sendMessage("The quiz will run shortly in <#"+SqlConnect.getChannelID()+">!").queue();
+					e.getTextChannel().sendMessage("The quiz will run shortly in <#"+Azrael.getChannelID()+">!").queue();
 					//execute independent Quiz Thread
-					new Thread(new RunQuiz(e, SqlConnect.getChannelID(), log_channel_id, Integer.parseInt(message))).start();
+					new Thread(new RunQuiz(e, Azrael.getChannelID(), log_channel_id, Integer.parseInt(message))).start();
 					//remove the file after starting 
 					quiz.delete();
 				}
@@ -131,9 +131,9 @@ public class MessageListener extends ListenerAdapter{
 			if(runquiz.exists()) {
 				String content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr");
 				if(!content.equals("skip-question") || !content.equals("interrupt-questions")) {
-					SqlConnect.SQLgetChannelID(guild_id, "qui");
-					if(SqlConnect.getChannelID() == e.getTextChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
-						if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || IniFileReader.getAdmin().equals(e.getMember().getUser().getId())) {
+					Azrael.SQLgetChannelID(guild_id, "qui");
+					if(Azrael.getChannelID() == e.getTextChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
+						if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 							if(message.equals("skip-question") || message.equals("interrupt-questions")) {
 								FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr", message);
 							}
@@ -150,19 +150,19 @@ public class MessageListener extends ListenerAdapter{
 						}
 					}
 				}
-				SqlConnect.setChannelID(0);
+				Azrael.setChannelID(0);
 			}
 			
 			Guilds guild_settings = Hashes.getStatus(guild_id);
 			if(guild_settings.getRankingState() == true){
-				RankingDB.SQLgetWholeRankView(user_id);
+				RankingSystem.SQLgetWholeRankView(user_id);
 				Rank user_details = Hashes.getRanking(user_id);
 				if(user_details == null){
-					var editedRows = RankingDB.SQLInsertUser(user_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
+					var editedRows = RankingSystem.SQLInsertUser(user_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
 					if(editedRows > 0) {
-						var editedRows2 = RankingDB.SQLInsertUserDetails(user_id, 0, 0, 50000, 0);
+						var editedRows2 = RankingSystem.SQLInsertUserDetails(user_id, 0, 0, 50000, 0);
 						if(editedRows2 > 0) {
-							var editedRows3 = RankingDB.SQLInsertUserGuild(user_id, guild_id);
+							var editedRows3 = RankingSystem.SQLInsertUserGuild(user_id, guild_id);
 							if(editedRows3 > 0) {
 								if(channel_id != 0) {
 									EmbedBuilder success = new EmbedBuilder().setColor(Color.GREEN).setTitle("Table insertion successful!");
@@ -173,8 +173,8 @@ public class MessageListener extends ListenerAdapter{
 					}
 				}
 				else{
-					SqlConnect.SQLgetTwoChanneIDs(guild_id, "bot", "qui");
-					if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && e.getTextChannel().getIdLong() != SqlConnect.getChannelID() && e.getTextChannel().getIdLong() != SqlConnect.getChannelID2()){
+					Azrael.SQLgetTwoChanneIDs(guild_id, "bot", "qui");
+					if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && e.getTextChannel().getIdLong() != Azrael.getChannelID() && e.getTextChannel().getIdLong() != Azrael.getChannelID2()){
 						int roleAssignLevel = 0;
 						long role_id = 0;
 						Rank ranking_levels = Hashes.getRankingRoles(guild_id+"_"+(user_details.getLevel()+1));
@@ -187,7 +187,7 @@ public class MessageListener extends ListenerAdapter{
 						
 						int percent_multiplier;
 						try {
-							percent_multiplier = Integer.parseInt(RankingDB.SQLExpBoosterExistsInInventory(user_id).replaceAll("[^0-9]*", ""));
+							percent_multiplier = Integer.parseInt(RankingSystem.SQLExpBoosterExistsInInventory(user_id).replaceAll("[^0-9]*", ""));
 						} catch(NumberFormatException nfe){
 							percent_multiplier = 0;
 						}
@@ -197,15 +197,15 @@ public class MessageListener extends ListenerAdapter{
 				}
 			}
 			
-			SqlConnect.SQLgetChannel_Filter(channel_id);
+			Azrael.SQLgetChannel_Filter(channel_id);
 			if(Hashes.getFilterLang(channel_id).size() > 0){
 				executor.execute(new LanguageFilter(e, Hashes.getFilterLang(channel_id)));
 			}
 		} catch(NullPointerException npe){
 			//play with your thumbs 
 		}
-		RankingDB.clearAllVariables();
-		SqlConnect.clearAllVariables();
+		RankingSystem.clearAllVariables();
+		Azrael.clearAllVariables();
 		executor.shutdown();
 	}
 	

@@ -7,6 +7,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 
 import javax.imageio.ImageIO;
 
@@ -35,6 +36,7 @@ public class DrawDaily {
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/daily.png"));
 			g.dispose();
 		} catch(IOException ioe){
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			ioe.printStackTrace();
 		}
 		File file1 = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/daily.png");

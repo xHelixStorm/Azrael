@@ -9,12 +9,12 @@ import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.ServerRoles;
+import sql.DiscordRoles;
 
 public class ReactionMessage {
 	public static int print(MessageReceivedEvent e, long channel_id) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
-		ServerRoles.SQLgetRolesByCategory(e.getGuild().getIdLong(), "rea");
+		DiscordRoles.SQLgetRolesByCategory(e.getGuild().getIdLong(), "rea");
 		String [] reactions = IniFileReader.getReactions();
 		StringBuilder sb = new StringBuilder();
 		int counter = 0;

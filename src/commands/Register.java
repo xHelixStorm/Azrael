@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import commandsContainer.RegisterChannel;
 import commandsContainer.RegisterRankingRole;
 import commandsContainer.RegisterRole;
@@ -11,7 +14,7 @@ import core.UserPrivs;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.ServerRoles;
+import sql.DiscordRoles;
 import threads.CollectUsers;
 
 public class Register implements Command{
@@ -28,14 +31,17 @@ public class Register implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getRegisterCommand().equals("true")){
+		if(IniFileReader.getRegisterCommand()){
+			Logger logger = LoggerFactory.getLogger(Register.class);
+			logger.info("{} has used Register command", e.getMember().getUser().getId());
+			
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			user_id = e.getMember().getUser().getId();
 			guild_id = e.getGuild().getIdLong();
 			message = e.getMessage().getContentRaw();
 			
-			ServerRoles.SQLgetRole(guild_id, "adm");
-			if(ServerRoles.getRole_ID() == 0){
+			DiscordRoles.SQLgetRole(guild_id, "adm");
+			if(DiscordRoles.getRole_ID() == 0){
 				if(message.equals(IniFileReader.getCommandPrefix()+"register")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Use this command to register either a channel, a role, a ranking role or all users in a guild. For the first time, an administrator role needs to be registered and afterwards all the other features for this command will be unlocked.\n\n"
 							+ "Here how you can display more details on how to register a role:\n"
@@ -48,7 +54,7 @@ public class Register implements Command{
 					RegisterRole.runCommandWithAdminFirst(e, guild_id, message);
 				}
 			}
-			else if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || IniFileReader.getAdmin().equals(user_id)){
+			else if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || Long.parseLong(user_id) == IniFileReader.getAdmin()){
 				if(message.equals(IniFileReader.getCommandPrefix()+"register")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Use this command to register either a channel, a role, a ranking role or all users in a guild. Use the following commands to get more details:\n\n"
 							+ "Description to register a role:\n"
@@ -100,7 +106,7 @@ public class Register implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		ServerRoles.clearAllVariables();
+		DiscordRoles.clearAllVariables();
 	}
 
 	@Override

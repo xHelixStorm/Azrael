@@ -1,14 +1,16 @@
-package TimerTask;
+package timerTask;
 
-import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Hashes;
 
-public class ClearRankingScore extends TimerTask{
+public class ClearHashes extends TimerTask{
 	//this class is meant to clear the cache of ranks, shop and dailies every 12h
 
 	@Override
@@ -17,8 +19,8 @@ public class ClearRankingScore extends TimerTask{
 		Hashes.clearShopContent();
 		Hashes.clearDailyItems();
 		
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		System.out.println("["+timestamp+"] Cache has been cleared!");
+		Logger logger = LoggerFactory.getLogger(ClearHashes.class);
+		logger.info("Cache has been cleared!");
 	}
 	
 	public static void runTask(){
@@ -29,6 +31,6 @@ public class ClearRankingScore extends TimerTask{
 		calendar.set(Calendar.MILLISECOND, 0);
 		
 		Timer time = new Timer();
-		time.schedule(new ClearRankingScore(), calendar.getTime(), TimeUnit.HOURS.toMillis(12));
+		time.schedule(new ClearHashes(), calendar.getTime(), TimeUnit.HOURS.toMillis(12));
 	}
 }

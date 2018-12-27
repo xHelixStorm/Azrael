@@ -13,8 +13,8 @@ import core.Hashes;
 import fileManagement.FileSetting;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.events.ReadyEvent;
-import sql.RankingDB;
-import sql.SqlConnect;
+import sql.RankingSystem;
+import sql.Azrael;
 
 public class DoubleExperienceStart extends TimerTask{
 
@@ -40,14 +40,14 @@ public class DoubleExperienceStart extends TimerTask{
 				guild_id = g.getIdLong();
 				
 				if(Hashes.getStatus(guild_id).getRankingState()){
-					SqlConnect.SQLgetChannelID(guild_id, "bot");
-					channel_id = SqlConnect.getChannelID();
+					Azrael.SQLgetChannelID(guild_id, "bot");
+					channel_id = Azrael.getChannelID();
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendFile(doubleEvent, "doubleweekend.jpg", null).complete();
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage("```css\nThe double EXP weekend is here\nUse the chance to gain more experience points than usual to reach new heights. See you at the top!\nThe event will stay up from Saturday 00:01 cest till Sunday 23:59 cest!```").queue();
 				}
 			}
-			RankingDB.clearAllVariables();
-			SqlConnect.clearAllVariables();
+			RankingSystem.clearAllVariables();
+			Azrael.clearAllVariables();
 		}
 	}
 	

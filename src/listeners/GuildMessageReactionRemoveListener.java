@@ -7,8 +7,8 @@ import core.UserPrivs;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import sql.ServerRoles;
-import sql.SqlConnect;
+import sql.DiscordRoles;
+import sql.Azrael;
 
 public class GuildMessageReactionRemoveListener extends ListenerAdapter{
 	
@@ -16,13 +16,13 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter{
 	public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent e) {
 		if(!UserPrivs.isUserBot(e.getUser(), e.getGuild().getIdLong())) {
 			if(!UserPrivs.isUserMuted(e.getUser(), e.getGuild().getIdLong())) {
-				ServerRoles.SQLgetRolesByCategory(e.getGuild().getIdLong(), "rea");
-				SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "rea");
+				DiscordRoles.SQLgetRolesByCategory(e.getGuild().getIdLong(), "rea");
+				Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "rea");
 				String reactionName = "";
-				if((EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":one:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":two:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":three:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":four:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":five:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":six:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":seven:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":eight:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":nine:")) && e.getChannel().getIdLong() == SqlConnect.getChannelID()) {
+				if((EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":one:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":two:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":three:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":four:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":five:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":six:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":seven:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":eight:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":nine:")) && e.getChannel().getIdLong() == Azrael.getChannelID()) {
 					reactionName = EmojiParser.parseToAliases(e.getReactionEmote().getName()).replaceAll(":", "");
 				}
-				else if(e.getChannel().getIdLong() == SqlConnect.getChannelID()) {
+				else if(e.getChannel().getIdLong() == Azrael.getChannelID()) {
 					reactionName = e.getReactionEmote().getName();
 				}
 				

@@ -5,8 +5,8 @@ import java.util.ConcurrentModificationException;
 
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.RankingDB;
-import sql.SqlConnect;
+import sql.RankingSystem;
+import sql.Azrael;
 
 public class Top implements Command{
 	
@@ -17,7 +17,7 @@ public class Top implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getTopCommand().equals("true")){
+		if(IniFileReader.getTopCommand()){
 			String command = e.getMessage().getContentRaw();
 			long member_id = e.getMember().getUser().getIdLong();
 			int rank = 0;
@@ -50,12 +50,12 @@ public class Top implements Command{
 				e.getTextChannel().sendMessage("Please type **H!top -help** to display the command usage!").queue();
 			}
 			
-			SqlConnect.SQLgetChannelID(guild_id, "bot");
-			channel_id = SqlConnect.getChannelID();
+			Azrael.SQLgetChannelID(guild_id, "bot");
+			channel_id = Azrael.getChannelID();
 			
 			if(runTopList == true){
 				if(channel_id == channel){
-					ArrayList<rankingSystem.Rank> rankList = RankingDB.SQLRanking();
+					ArrayList<rankingSystem.Rank> rankList = RankingSystem.SQLRanking();
 					rankingSystem.Rank ranking1 = rankList.parallelStream().filter(r -> r.getUser_ID() == member_id).findAny().orElse(null);
 					rank = ranking1.getRank();
 					user_experience = ranking1.getExperience();
@@ -99,8 +99,8 @@ public class Top implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		RankingDB.clearAllVariables();
-		SqlConnect.clearAllVariables();
+		RankingSystem.clearAllVariables();
+		Azrael.clearAllVariables();
 	}
 
 	@Override

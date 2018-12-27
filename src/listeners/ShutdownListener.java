@@ -2,6 +2,7 @@ package listeners;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -10,7 +11,7 @@ import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.ShutdownEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import sql.SqlConnect;
+import sql.Azrael;
 
 public class ShutdownListener extends ListenerAdapter{
 	
@@ -21,6 +22,7 @@ public class ShutdownListener extends ListenerAdapter{
 		try {
 			FileUtils.forceDelete(new File(IniFileReader.getTempDirectory()));
 		} catch (IOException e2) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e2.printStackTrace();
 		}
 		
@@ -31,6 +33,7 @@ public class ShutdownListener extends ListenerAdapter{
 					proc = Runtime.getRuntime().exec("./scripts/restart.sh");
 					proc.waitFor();
 				} catch (IOException | InterruptedException e1) {
+					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 					e1.printStackTrace();
 				}
 			}
@@ -42,10 +45,11 @@ public class ShutdownListener extends ListenerAdapter{
 					proc = Runtime.getRuntime().exec("./scripts/restart.bat");
 					proc.waitFor();
 				} catch (IOException | InterruptedException e1) {
+					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 					e1.printStackTrace();
 				}
 			}
 		}
-		SqlConnect.SQLInsertActionLog("BOT_SHUTDOWN", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
+		Azrael.SQLInsertActionLog("BOT_SHUTDOWN", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
 	}
 }

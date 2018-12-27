@@ -2,6 +2,9 @@ package commands;
 
 import java.awt.Color;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
@@ -18,8 +21,8 @@ public class Reboot implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getRebootCommand().equals("true")){
-			if(e.getMember().getUser().getId().equals(IniFileReader.getAdmin()) || UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong())){
+		if(IniFileReader.getRebootCommand()){
+			if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin() || UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong())){
 				e.getTextChannel().sendMessage("**Now rebooting!**").queue();
 				FileSetting.createFile("./files/reboot.azr", "1");			
 				e.getJDA().shutdown();
@@ -32,7 +35,8 @@ public class Reboot implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		System.out.println("Reboot commenced!");
+		Logger logger = LoggerFactory.getLogger(Reboot.class);
+		logger.info("{} has used Reboot command", e.getMember().getUser().getId());
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package threads;
 
 import java.awt.Color;
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.concurrent.ThreadLocalRandom;
 
 import core.Hashes;
@@ -123,7 +124,7 @@ public class RunQuiz implements Runnable{
 			File file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr");
 			file.delete();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		}
 	}

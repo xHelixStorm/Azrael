@@ -7,7 +7,7 @@ import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.SqlConnect;
+import sql.Azrael;
 import threads.DelayDelete;
 
 public class SetWarning {
@@ -26,12 +26,12 @@ public class SetWarning {
 		}
 		
 		if(warning_value != 0 && warning_value <= 5) {
-			SqlConnect.SQLgetMaxWarning(_e.getGuild().getIdLong());
-			if(warning_value < SqlConnect.getWarningID()) {
-				SqlConnect.SQLLowerTotalWarning(_e.getGuild().getIdLong(), warning_value);
+			Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
+			if(warning_value < Azrael.getWarningID()) {
+				Azrael.SQLLowerTotalWarning(_e.getGuild().getIdLong(), warning_value);
 			}
 			else {
-				SqlConnect.SQLInsertWarning(_e.getGuild().getIdLong(), warning_value);
+				Azrael.SQLInsertWarning(_e.getGuild().getIdLong(), warning_value);
 			}
 			_e.getTextChannel().sendMessage("The system has been set to warn "+warning_value+" time(s) before banning").queue();
 			
@@ -42,7 +42,7 @@ public class SetWarning {
 		else {
 			_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please insert a valid warning value between 1-5").queue();
 		}
-		SqlConnect.clearAllVariables();
+		Azrael.clearAllVariables();
 	}
 	
 	public static void performUpdate(MessageReceivedEvent _e, String _message) {
@@ -50,15 +50,15 @@ public class SetWarning {
 		if(_message.replaceAll("[0-9]*", "").equals("")) {
 			String file_value = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr");
 			if(!file_value.equals("expired")) {
-				SqlConnect.SQLgetMaxWarning(_e.getGuild().getIdLong());
-				if(Integer.parseInt(file_value) < SqlConnect.getWarningID()) {
-					SqlConnect.SQLUpdateMuteTimeOfWarning(_e.getGuild().getIdLong(), Integer.parseInt(file_value), (Long.parseLong(_message)*60*1000));
+				Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
+				if(Integer.parseInt(file_value) < Azrael.getWarningID()) {
+					Azrael.SQLUpdateMuteTimeOfWarning(_e.getGuild().getIdLong(), Integer.parseInt(file_value), (Long.parseLong(_message)*60*1000));
 					_e.getTextChannel().sendMessage("The mute time of warning "+Integer.parseInt(file_value)+" has been updated!").queue();
 					_e.getTextChannel().sendMessage("Please insert the mute time for warning "+(Integer.parseInt(file_value)+1)+"!").queueAfter(1, TimeUnit.SECONDS);
 					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", ""+(Integer.parseInt(file_value)+1));
 				}
-				else if(Integer.parseInt(file_value) == SqlConnect.getWarningID()) {
-					SqlConnect.SQLUpdateMuteTimeOfWarning(_e.getGuild().getIdLong(), Integer.parseInt(file_value), (Long.parseLong(_message)*60*1000));
+				else if(Integer.parseInt(file_value) == Azrael.getWarningID()) {
+					Azrael.SQLUpdateMuteTimeOfWarning(_e.getGuild().getIdLong(), Integer.parseInt(file_value), (Long.parseLong(_message)*60*1000));
 					_e.getTextChannel().sendMessage("The warnings have been configured successfully!").queue();
 					FileSetting.deleteFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr");
 				}
@@ -68,6 +68,6 @@ public class SetWarning {
 				FileSetting.deleteFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr");
 			}
 		}
-		SqlConnect.clearAllVariables();
+		Azrael.clearAllVariables();
 	}
 }

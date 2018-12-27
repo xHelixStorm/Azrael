@@ -19,7 +19,7 @@ import rankingSystem.Rank;
 import rankingSystem.Ranks;
 import rankingSystem.Skins;
 
-public class RankingDB {
+public class RankingSystem {
 	
 	private static long user_id = 0;
 	private static int level_skin = 0;
@@ -92,6 +92,7 @@ public class RankingDB {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		}
 	}
@@ -110,6 +111,7 @@ public class RankingDB {
 			stmt.setString(4, _notes);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -133,6 +135,7 @@ public class RankingDB {
 			stmt.setInt(6, _icon_skin);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return 0;
 		} finally {
@@ -154,6 +157,7 @@ public class RankingDB {
 			return stmt.executeUpdate();
 			
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return 0;
 		} finally {
@@ -174,6 +178,7 @@ public class RankingDB {
 			stmt.setLong(3, _user_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return 0;
 		} finally {
@@ -194,6 +199,7 @@ public class RankingDB {
 			stmt.setLong(3, _user_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return 0;
 		} finally {
@@ -214,6 +220,7 @@ public class RankingDB {
 			stmt.setLong(3, _user_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return 0;
 		} finally {
@@ -240,6 +247,7 @@ public class RankingDB {
 			stmt.setBoolean(8, _enabled);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -259,6 +267,7 @@ public class RankingDB {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -278,6 +287,7 @@ public class RankingDB {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -297,6 +307,7 @@ public class RankingDB {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -316,6 +327,7 @@ public class RankingDB {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -335,6 +347,7 @@ public class RankingDB {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -354,6 +367,7 @@ public class RankingDB {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -362,7 +376,7 @@ public class RankingDB {
 	}
 	
 	//roles table
-	public static void SQLInsertRoles(long _role_id, String _name, int _role_level_requirement, long _guild_id){
+	public static int SQLInsertRoles(long _role_id, String _name, int _role_level_requirement, long _guild_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -373,9 +387,11 @@ public class RankingDB {
 			stmt.setString(2, _name);
 			stmt.setInt(3, _role_level_requirement);
 			stmt.setLong(4, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -392,6 +408,7 @@ public class RankingDB {
 			stmt.setLong(1, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -418,6 +435,7 @@ public class RankingDB {
 				Hashes.addRankingRoles(_guild_id+"_"+ranks.getLevel_Requirement(), ranks);
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -441,6 +459,7 @@ public class RankingDB {
 			stmt.setLong(5, _assigned_role);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return 0;
 		} finally {
@@ -460,6 +479,7 @@ public class RankingDB {
 			stmt.setLong(2, _user_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -481,6 +501,7 @@ public class RankingDB {
 			stmt.setLong(5, _user_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -488,7 +509,7 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLUpdateCurrency(long _user_id, long _currency){
+	public static int SQLUpdateCurrency(long _user_id, long _currency){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -497,9 +518,11 @@ public class RankingDB {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _currency);
 			stmt.setLong(2, _user_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -528,6 +551,7 @@ public class RankingDB {
 				Hashes.addRankList("ranking", rankList);
 				return rankList;
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 				return rankList;
 			} finally {
@@ -552,6 +576,7 @@ public class RankingDB {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -572,6 +597,7 @@ public class RankingDB {
 			stmt.setTimestamp(3, _reset);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -589,6 +615,7 @@ public class RankingDB {
 			stmt.setLong(1, _user_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -626,6 +653,7 @@ public class RankingDB {
 				Hashes.addRankList("ranking-level", rankList);
 				return success;
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 				return false;
 			} finally {
@@ -669,6 +697,7 @@ public class RankingDB {
 				Hashes.addRankList("ranking-rank", rankList);
 				return success;
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 				return false;
 			} finally {
@@ -712,6 +741,7 @@ public class RankingDB {
 				Hashes.addRankList("ranking-profile", rankList);
 				return success;
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 				return false;
 			} finally {
@@ -746,6 +776,7 @@ public class RankingDB {
 				Hashes.addRankList("ranking-icons", rankList);
 				return success;
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 				return false;
 			} finally {
@@ -770,6 +801,7 @@ public class RankingDB {
 			stmt.setString(3, _type);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return 0;
 		} finally {
@@ -793,6 +825,7 @@ public class RankingDB {
 			stmt.setString(5, _status);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return 0;
 		} finally {
@@ -816,6 +849,7 @@ public class RankingDB {
 			stmt.setTimestamp(6, _expires);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return 0;
 		} finally {
@@ -839,6 +873,7 @@ public class RankingDB {
 				setNumberLimit(rs.getInt(1));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -862,6 +897,7 @@ public class RankingDB {
 				setExpiration(rs.getTimestamp(1));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -879,6 +915,7 @@ public class RankingDB {
 			stmt = myConn.prepareStatement(sql);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -886,21 +923,25 @@ public class RankingDB {
 		}
 	}
 	
-	public static void SQLgetTotalItemNumber(long _user_id){
+	public static int SQLgetTotalItemNumber(long _user_id){
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT COUNT(*) FROM inventory WHERE fk_user_id = ?");
+			var item_number = 0;
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setItemNumber(rs.getInt(1)/12);
+				item_number = rs.getInt(1)/12;
 			}
+			return item_number;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
+			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -925,6 +966,7 @@ public class RankingDB {
 				setNextDaily(rs.getTimestamp(3));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -945,6 +987,7 @@ public class RankingDB {
 			stmt.setTimestamp(3, _next_daily);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -963,6 +1006,7 @@ public class RankingDB {
 			stmt.setLong(2, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return 0;
 		} finally {
@@ -991,6 +1035,7 @@ public class RankingDB {
 			myConn.commit();
 			return false;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return true;
 		} finally {
@@ -1015,6 +1060,7 @@ public class RankingDB {
 			else
 				return "";
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return "";
 		} finally {
@@ -1035,6 +1081,7 @@ public class RankingDB {
 			int count = stmt.executeUpdate();
 			return count;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return 0;
 		} finally {
@@ -1102,6 +1149,7 @@ public class RankingDB {
 					Hashes.addRanking(_user_id, rank);
 				}
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1139,6 +1187,7 @@ public class RankingDB {
 				Hashes.addStatus(_guild_id, guild);
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1165,6 +1214,7 @@ public class RankingDB {
 				Hashes.addRankingLevels(rs.getInt(1), ranks);
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1196,6 +1246,7 @@ public class RankingDB {
 				Hashes.addShopContent("shop", set_skin);
 				return set_skin;
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 				return set_skin;
 			} finally {
@@ -1222,6 +1273,7 @@ public class RankingDB {
 				setItemID(rs.getInt(1));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1250,6 +1302,7 @@ public class RankingDB {
 			}
 			return success;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -1279,6 +1332,7 @@ public class RankingDB {
 				setSkinType(rs.getString(5));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1312,6 +1366,7 @@ public class RankingDB {
 			}
 			return inventory;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return inventory;
 		} finally {
@@ -1341,6 +1396,7 @@ public class RankingDB {
 			}
 			return inventory;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return inventory;
 		} finally {
@@ -1370,6 +1426,7 @@ public class RankingDB {
 			}
 			return success;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -1403,6 +1460,7 @@ public class RankingDB {
 				Hashes.addDailyItems("dailies", dailies);
 				return dailies;
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 				return dailies;
 			} finally {
@@ -1438,10 +1496,12 @@ public class RankingDB {
 			myConn.commit();	
 			return editedRows;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			try {
 				myConn.rollback();
 			} catch (SQLException e1) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e1.printStackTrace();
 			}
 			return 0;
@@ -1476,10 +1536,12 @@ public class RankingDB {
 			myConn.commit();
 			return editedRows;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			try {
 				myConn.rollback();
 			} catch (SQLException e1) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e1.printStackTrace();
 			}
 			return 0;
@@ -1513,10 +1575,12 @@ public class RankingDB {
 			myConn.commit();
 			return editedRows;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			try {
 				myConn.rollback();
 			} catch (SQLException e1) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e1.printStackTrace();
 			}
 			return 0;
@@ -1543,6 +1607,7 @@ public class RankingDB {
 			}
 			return description;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return "0";
 		} finally {

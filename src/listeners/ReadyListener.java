@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import TimerTask.ClearRankingScore;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -16,10 +15,11 @@ import preparedMessages.PatchNotes;
 import preparedMessages.PublicPatchNotes;
 import rankingSystem.DoubleExperienceOff;
 import rankingSystem.DoubleExperienceStart;
-import sql.RankingDB;
-import sql.SqlConnect;
+import sql.RankingSystem;
+import sql.Azrael;
 import threads.BotStartAssign;
 import threads.RoleExtend;
+import timerTask.ClearHashes;
 import util.STATIC;
 
 public class ReadyListener extends ListenerAdapter{
@@ -32,14 +32,14 @@ public class ReadyListener extends ListenerAdapter{
 		System.out.println();
 		System.out.println("Azrael Version: "+STATIC.getVersion_New()+"\nAll credits to xHelixStorm");
 		
-		String allowPatchNotes = IniFileReader.getAllowPatchNotes();
-		String allowPublicPatchNotes = IniFileReader.getAllowPublicPatchNotes();
+		boolean allowPatchNotes = IniFileReader.getAllowPatchNotes();
+		boolean allowPublicPatchNotes = IniFileReader.getAllowPublicPatchNotes();
 		
 		System.out.println();
 		
-		if(allowPatchNotes.equals("true")){System.out.println("private patch notes: enabled");}
+		if(allowPatchNotes){System.out.println("private patch notes: enabled");}
 		else{System.out.println("private patch notes: disabled");}
-		if(allowPublicPatchNotes.equals("true")){System.out.println("public patch notes:  enabled");}
+		if(allowPublicPatchNotes){System.out.println("public patch notes:  enabled");}
 		else{System.out.println("public patch notes:  disabled");}
 		
 		String out = "\nThis Bot is running on following servers: \n";
@@ -50,31 +50,31 @@ public class ReadyListener extends ListenerAdapter{
 		FileSetting.createTemp();
 
 		FileSetting.createFile("./files/reboot.azr", "0");
-		RankingDB.SQLgetLevels();
+		RankingSystem.SQLgetLevels();
 		for(Guild g : e.getJDA().getGuilds()){
 			long guild_id = g.getIdLong();
-			RankingDB.SQLgetGuild(guild_id);
-			RankingDB.SQLgetRoles(guild_id);
-			SqlConnect.SQLgetChannelID(guild_id, "log");
-			if(SqlConnect.getChannelID() != 0){e.getJDA().getGuildById(guild_id).getTextChannelById(SqlConnect.getChannelID()).sendMessage("Bot is now operational!").queue();}
+			RankingSystem.SQLgetGuild(guild_id);
+			RankingSystem.SQLgetRoles(guild_id);
+			Azrael.SQLgetChannelID(guild_id, "log");
+			if(Azrael.getChannelID() != 0){e.getJDA().getGuildById(guild_id).getTextChannelById(Azrael.getChannelID()).sendMessage("Bot is now operational!").queue();}
 		}
-		SqlConnect.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
+		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		
-		if(!(STATIC.getVersion_Old().contains(STATIC.getVersion_New())) && allowPatchNotes.equals("true")){
+		if(!(STATIC.getVersion_Old().contains(STATIC.getVersion_New())) && allowPatchNotes){
 			for(Guild g : e.getJDA().getGuilds()){
 				long guild_id = g.getIdLong();
-				SqlConnect.SQLgetChannelID(guild_id, "log");
-				long channel_id = SqlConnect.getChannelID();
+				Azrael.SQLgetChannelID(guild_id, "log");
+				long channel_id = Azrael.getChannelID();
 				
 				if(channel_id != 0){
 					FileSetting.createFile("./files/version.azr", STATIC.getVersion_New());
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage(
 							messageBuild.setDescription(privatePatchNotes).build()).queue();
 					
-					SqlConnect.SQLgetChannelID(guild_id, "bot");
-					long channel_id2 = SqlConnect.getChannelID();
+					Azrael.SQLgetChannelID(guild_id, "bot");
+					long channel_id2 = Azrael.getChannelID();
 					
-					if(allowPublicPatchNotes.equals("true")){
+					if(allowPublicPatchNotes){
 						if(channel_id2 != 0){
 							e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id2).sendMessage(
 									messageBuild.setDescription(publicPatchNotes).build()).queue();
@@ -89,15 +89,15 @@ public class ReadyListener extends ListenerAdapter{
 		for(Guild g : e.getJDA().getGuilds()){
 			executor.execute(new RoleExtend(e, g.getIdLong()));
 			for(TextChannel tc : g.getTextChannels()){
-				SqlConnect.SQLInsertChannels(tc.getIdLong(), tc.getName());
+				Azrael.SQLInsertChannels(tc.getIdLong(), tc.getName());
 			}
 		}
 		
 		DoubleExperienceStart.runTask(e);
 		DoubleExperienceOff.runTask();
-		ClearRankingScore.runTask();
+		ClearHashes.runTask();
 		
-		SqlConnect.clearAllVariables();
+		Azrael.clearAllVariables();
 		executor.shutdown();
 	}
 }

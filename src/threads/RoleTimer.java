@@ -7,7 +7,7 @@ import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import sql.SqlConnect;
+import sql.Azrael;
 
 public class RoleTimer extends ListenerAdapter implements Runnable{
 	private GuildMemberRoleAddEvent e;
@@ -58,17 +58,18 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 				}
 				Thread.sleep(timer);
 				
-				SqlConnect.clearUnmute();
-				SqlConnect.SQLgetMuted(Long.parseLong(name_id), guild_id);
-				if(channel_id != 0 && SqlConnect.getMuted() == true){
+				Azrael.clearUnmute();
+				Azrael.SQLgetMuted(Long.parseLong(name_id), guild_id);
+				if(channel_id != 0 && Azrael.getMuted() == true){
 					timestamp = new Timestamp(System.currentTimeMillis());
 					e.getGuild().getTextChannelById(channel_id).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted").build()).queue();
 				}
 				e.getJDA().getGuildById(e.getGuild().getIdLong()).getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).complete();
 				if(assignedRole != 0){e.getJDA().getGuildById(e.getGuild().getId()).getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
-				SqlConnect.clearAllVariables();
+				Azrael.clearAllVariables();
 			}
 		} catch (InterruptedException e1) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e1.printStackTrace();
 		}
 	}

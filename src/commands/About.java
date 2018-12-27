@@ -1,9 +1,12 @@
 package commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.SqlConnect;
+import sql.Azrael;
 import util.STATIC;
 
 public class About implements Command {
@@ -15,11 +18,11 @@ public class About implements Command {
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getAboutCommand().equals("true")){
+		if(IniFileReader.getAboutCommand()){
 			long channel = e.getTextChannel().getIdLong();
 			long guild_id = e.getGuild().getIdLong();
-			SqlConnect.SQLgetChannelID(guild_id, "bot");
-			long channel_id = SqlConnect.getChannelID();
+			Azrael.SQLgetChannelID(guild_id, "bot");
+			long channel_id = Azrael.getChannelID();
 			
 			if(channel != channel_id && channel_id != 0){
 				e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+channel_id+">").queue();
@@ -44,7 +47,9 @@ public class About implements Command {
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		SqlConnect.clearAllVariables();
+		Logger logger = LoggerFactory.getLogger(About.class);
+		logger.info("{} has used About command", e.getMember().getUser().getId());
+		Azrael.clearAllVariables();
 	}
 
 	@Override

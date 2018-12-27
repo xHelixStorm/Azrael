@@ -16,7 +16,7 @@ import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.entities.Member;
 
-public class SqlConnect {
+public class Azrael {
 	
 	private static long user_id = 0;
 	private static long guild_id = 0;
@@ -55,16 +55,17 @@ public class SqlConnect {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		}
 	}
 	
 	public static synchronized void SQLInsertActionLog(String _event, long _target_id, long _guild_id, String _description) {
-		if(IniFileReader.getActionLog().equals("true")) {
+		if(IniFileReader.getActionLog()) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("INSERT INTO action_log (log_id, event, target_id, guild_id, description, timestamp) VALUES(null, ?, ?, ?, ?, ?)");
 				Timestamp action_time = new Timestamp(System.currentTimeMillis());
 				stmt = myConn.prepareStatement(sql);
@@ -75,6 +76,7 @@ public class SqlConnect {
 				stmt.setTimestamp(5, action_time);
 				stmt.executeUpdate();
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 			} finally {
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -88,7 +90,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT COUNT(*) FROM action_log WHERE target_id = ? && guild_id = ? && event LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
@@ -99,6 +101,7 @@ public class SqlConnect {
 				setCount(rs.getInt(1));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -112,7 +115,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT description FROM action_log WHERE target_id = ? && (guild_id = ? || guild_id = 0) && (event LIKE ? || event LIKE ?) GROUP BY description");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
@@ -124,6 +127,7 @@ public class SqlConnect {
 				descriptions.add(rs.getString(1));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -137,7 +141,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT description FROM action_log WHERE target_id = ? && guild_id = ? && event LIKE ? GROUP BY description");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
@@ -148,6 +152,7 @@ public class SqlConnect {
 				descriptions.add(rs.getString(1));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -160,7 +165,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT description, timestamp FROM action_log WHERE target_id = ? && guild_id = ? && (event LIKE \"MEMBER_KICK\" || event LIKE \"MEMBER_BAN_ADD\" || event LIKE \"MEMBER_BAN_REMOVE\" || event LIKE \"MEMBER_MUTE_ADD\") ORDER BY timestamp desc LIMIT 30");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
@@ -170,6 +175,7 @@ public class SqlConnect {
 				descriptions.add("`["+rs.getTimestamp(2).toString()+"] - "+rs.getString(1)+"`");
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -182,7 +188,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO users (user_id, name, avatar_url, join_date) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -191,6 +197,7 @@ public class SqlConnect {
 			stmt.setString(4, _join_date);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -202,7 +209,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false); 
 			String sql = ("INSERT INTO users (user_id, name, avatar_url, join_date) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
 			stmt = myConn.prepareStatement(sql);
@@ -216,6 +223,7 @@ public class SqlConnect {
 			stmt.executeBatch();
 			myConn.commit();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -227,13 +235,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE users SET avatar_url = ? WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _avatar);
 			stmt.setLong(2, _user_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -246,7 +255,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM users WHERE name LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _name);
@@ -258,6 +267,7 @@ public class SqlConnect {
 				setJoinDate(rs.getString(4));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -270,7 +280,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM users WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _user_id);
@@ -282,6 +292,7 @@ public class SqlConnect {
 				setJoinDate(rs.getString(4));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -293,13 +304,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE users SET name = ? WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _name);
 			stmt.setLong(2, _user_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -311,13 +323,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO guild VALUES (?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setString(2, _guild_name);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -330,7 +343,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT nickname FROM nickname WHERE fk_user_id= ? && fk_guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -340,6 +353,7 @@ public class SqlConnect {
 				setNickname(rs.getString(1));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -352,7 +366,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO nickname VALUES (?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -360,6 +374,7 @@ public class SqlConnect {
 			stmt.setString(3, _nickname);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -371,7 +386,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE nickname SET nickname = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _nickname);
@@ -379,6 +394,7 @@ public class SqlConnect {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -390,13 +406,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM nickname WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -409,7 +426,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT fk_user_id, fk_guild_id, fk_warning_id, fk_ban_id, timestamp, unmute, muted, custom_time FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -426,6 +443,7 @@ public class SqlConnect {
 				setCustomTime(rs.getBoolean(8));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -439,7 +457,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT muted FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -449,6 +467,7 @@ public class SqlConnect {
 				setMuted(rs.getBoolean(1));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -461,7 +480,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO bancollect VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE fk_warning_id=VALUES(fk_warning_id), fk_ban_id=VALUES(fk_ban_id), timestamp=VALUES(timestamp), unmute=VALUES(unmute), muted=VALUES(muted), custom_time=VALUES(custom_time)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -474,6 +493,7 @@ public class SqlConnect {
 			stmt.setBoolean(8, _custom_time);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -485,13 +505,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM bancollect WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -503,7 +524,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE bancollect SET muted = ?, custom_time = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setBoolean(1, _muted);
@@ -512,6 +533,7 @@ public class SqlConnect {
 			stmt.setLong(4, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -524,7 +546,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT warning_id, mute_time, description FROM warnings WHERE fk_guild_id = ? && warning_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -536,6 +558,7 @@ public class SqlConnect {
 				setDescription(rs.getString(3));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -549,7 +572,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT MAX(warning_id) FROM warnings WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -558,6 +581,7 @@ public class SqlConnect {
 				setWarningID(rs.getInt(1));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -570,7 +594,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = "";
 			switch(_warning_id) {
 				case 1: 
@@ -625,6 +649,7 @@ public class SqlConnect {
 			}
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -636,7 +661,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE bancollect SET fk_warning_id = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _warning_id);
@@ -644,6 +669,7 @@ public class SqlConnect {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -655,7 +681,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE warnings SET mute_time = ? WHERE fk_guild_id = ? && warning_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _mute_time);
@@ -663,6 +689,7 @@ public class SqlConnect {
 			stmt.setInt(3, _warning_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -674,7 +701,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE bancollect SET timestamp = ?, unmute = ?, muted = ?, custom_time = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setTimestamp(1, _timestamp);
@@ -685,6 +712,7 @@ public class SqlConnect {
 			stmt.setLong(6, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -696,7 +724,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE bancollect SET fk_ban_id = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _ban_id);
@@ -704,6 +732,7 @@ public class SqlConnect {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -715,13 +744,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO channels (channel_id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
 			stmt.setString(2, _channel_name);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -733,7 +763,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_channel_type, fk_guild_id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE fk_channel_type = VALUES(fk_channel_type)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -741,6 +771,7 @@ public class SqlConnect {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -753,7 +784,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT fk_channel_id FROM channel_conf WHERE fk_channel_type = ? && fk_guild_id = ?");
 			boolean success = false;
 			stmt = myConn.prepareStatement(sql);
@@ -766,6 +797,7 @@ public class SqlConnect {
 			}
 			return success;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -780,7 +812,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT (SELECT fk_channel_id FROM channel_conf WHERE fk_channel_type LIKE ? && fk_guild_id = ?) AS channel1, (SELECT fk_channel_id FROM channel_conf WHERE fk_channel_type = ? && fk_guild_id = ?) AS channel2 FROM channel_conf LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _channel_type);
@@ -793,6 +825,7 @@ public class SqlConnect {
 				setChannelID2(rs.getLong(2));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -806,7 +839,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT fk_channel_type FROM channel_conf WHERE fk_channel_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -815,6 +848,7 @@ public class SqlConnect {
 				setChannelType(rs.getString(1));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -827,12 +861,13 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM channel_conf WHERE fk_channel_type = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _channel_type);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -845,7 +880,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM all_channels WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -862,6 +897,7 @@ public class SqlConnect {
 				channels.add(channelProperties);
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -875,7 +911,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM channeltypes");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
@@ -886,6 +922,7 @@ public class SqlConnect {
 				channels.add(channelProperties);
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -899,7 +936,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM command WHERE guild_id = ?");
 			boolean success = false;
 			stmt = myConn.prepareStatement(sql);
@@ -913,6 +950,7 @@ public class SqlConnect {
 			}
 			return success;
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -926,13 +964,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO command (guild_id, execution_id, reactions) VALUES (?, ?, 0) ON DUPLICATE KEY UPDATE execution_id=VALUES(execution_id)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _execution_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -944,7 +983,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO command (guild_id, execution_id, reactions) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE reactions=VALUES(reactions)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -952,6 +991,7 @@ public class SqlConnect {
 			stmt.setBoolean(3, _reactions);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -963,13 +1003,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE command SET reactions = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setBoolean(1, _reactions);
 			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -983,7 +1024,7 @@ public class SqlConnect {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT * FROM channel_filter WHERE fk_channel_id = ?");
 				ArrayList<String> filter_lang = new ArrayList<String>();
 				stmt = myConn.prepareStatement(sql);
@@ -994,6 +1035,7 @@ public class SqlConnect {
 				}
 				Hashes.addFilterLang(_channel_id, filter_lang);
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1009,7 +1051,7 @@ public class SqlConnect {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 				ArrayList<String> filter_words = new ArrayList<String>();
 				String sql;
 				if(_filter_lang.equals("all")){
@@ -1029,6 +1071,7 @@ public class SqlConnect {
 				}
 				Hashes.addQuerryResult(_filter_lang+"_"+_guild_id, filter_words);
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1042,7 +1085,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv, fk_guild_id) VALUES(NULL, ?, ?, ?) ON DUPLICATE KEY UPDATE word=VALUES(word)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word.toLowerCase());
@@ -1050,6 +1093,7 @@ public class SqlConnect {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1061,7 +1105,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM filter WHERE word LIKE ? && fk_lang_abbrv LIKE ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
@@ -1069,6 +1113,7 @@ public class SqlConnect {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1080,13 +1125,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM filter WHERE fk_lang_abbrv LIKE ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _lang);
 			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1100,7 +1146,7 @@ public class SqlConnect {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 				ArrayList<String> staff_names = new ArrayList<String>();
 				String sql = ("SELECT name FROM staff_name_filter WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
@@ -1111,6 +1157,7 @@ public class SqlConnect {
 				}
 				Hashes.addQuerryResult("staff-names_"+_guild_id, staff_names);
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1124,13 +1171,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO staff_name_filter (name_id, name, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word.toLowerCase());
 			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1142,13 +1190,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM staff_name_filter WHERE name LIKE ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word.toLowerCase());
 			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1160,12 +1209,13 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM staff_name_filter WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1177,7 +1227,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
 			String sql = ("INSERT INTO staff_name_filter (name_id, name, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
@@ -1189,6 +1239,7 @@ public class SqlConnect {
 			stmt.executeBatch();
 			myConn.commit();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1200,13 +1251,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO channel_filter (fk_channel_id, fk_lang_abbrv) VALUES (?,?) ON DUPLICATE KEY UPDATE fk_lang_abbrv = VALUES(fk_lang_abbrv)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
 			stmt.setString(2, _filter_lang);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1218,12 +1270,13 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM channel_filter WHERE fk_channel_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1237,7 +1290,7 @@ public class SqlConnect {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 				ArrayList<String> names = new ArrayList<String>();
 				String sql = ("SELECT name FROM names WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
@@ -1248,6 +1301,7 @@ public class SqlConnect {
 				}
 				Hashes.addQuerryResult("funny-names_"+_guild_id, names);
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1261,13 +1315,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO names (name_id, name, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1279,13 +1334,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM names WHERE name LIKE ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1297,12 +1353,13 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM names WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1316,7 +1373,7 @@ public class SqlConnect {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 				ArrayList<String> names = new ArrayList<String>();
 				String sql = ("SELECT word FROM name_filter");
 				stmt = myConn.prepareStatement(sql);
@@ -1326,6 +1383,7 @@ public class SqlConnect {
 				}
 				Hashes.addQuerryResult("bad-names_"+_guild_id, names);
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1339,13 +1397,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO name_filter (word_id, word, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE word=VALUES(word)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1357,13 +1416,14 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM name_filter WHERE word LIKE ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1375,12 +1435,13 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM name_filter WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1393,7 +1454,7 @@ public class SqlConnect {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT name FROM names WHERE fk_guild_id = ? ORDER BY RAND() LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -1402,6 +1463,7 @@ public class SqlConnect {
 				setName(rs.getString(1));
 			}
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1416,7 +1478,7 @@ public class SqlConnect {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv NOT LIKE \"all\"");
 				ArrayList<String> filter_lang = new ArrayList<String>();
 				stmt = myConn.prepareStatement(sql);
@@ -1426,6 +1488,7 @@ public class SqlConnect {
 				}
 				Hashes.addFilterLang(0, filter_lang);
 			} catch (SQLException e) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e.printStackTrace();
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1441,7 +1504,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
 			String sql = ("UPDATE bancollect SET fk_warning_id = ? WHERE fk_guild_id = ? && fk_warning_id > ?");
 			stmt = myConn.prepareStatement(sql);
@@ -1456,10 +1519,12 @@ public class SqlConnect {
 			stmt.executeUpdate();
 			myConn.commit();	
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			try {
 				myConn.rollback();
 			} catch (SQLException e1) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e1.printStackTrace();
 			}
 		} finally {
@@ -1472,7 +1537,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
 			String sql2 = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv, fk_guild_id) VALUES(NULL, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);
@@ -1486,10 +1551,12 @@ public class SqlConnect {
 			stmt.executeBatch();
 			myConn.commit();	
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			try {
 				myConn.rollback();
 			} catch (SQLException e1) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e1.printStackTrace();
 			}
 		} finally {
@@ -1502,7 +1569,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
 			String sql2 = ("INSERT INTO name_filter (word_id, word, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE word=VALUES(word)");
 			stmt = myConn.prepareStatement(sql2);
@@ -1515,10 +1582,12 @@ public class SqlConnect {
 			stmt.executeBatch();
 			myConn.commit();	
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			try {
 				myConn.rollback();
 			} catch (SQLException e1) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e1.printStackTrace();
 			}
 		} finally {
@@ -1531,7 +1600,7 @@ public class SqlConnect {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/S4League?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
 			String sql2 = ("INSERT INTO names (name_id, name, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql2);;
@@ -1544,10 +1613,12 @@ public class SqlConnect {
 			stmt.executeBatch();
 			myConn.commit();	
 		} catch (SQLException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 			try {
 				myConn.rollback();
 			} catch (SQLException e1) {
+				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 				e1.printStackTrace();
 			}
 		} finally {

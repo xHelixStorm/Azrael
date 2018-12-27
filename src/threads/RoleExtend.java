@@ -8,9 +8,9 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.ReadyEvent;
-import sql.RankingDB;
-import sql.ServerRoles;
-import sql.SqlConnect;
+import sql.RankingSystem;
+import sql.DiscordRoles;
+import sql.Azrael;
 
 public class RoleExtend implements Runnable{
 	private ReadyEvent e;
@@ -26,18 +26,18 @@ public class RoleExtend implements Runnable{
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle("Warned users can't run away even after a reboot!");
 		boolean banHammerFound = false;
 		ArrayList<Member> users = new ArrayList<Member>();
-		ServerRoles.SQLgetRole(guild_id, "mut");
-		Role mute_role = e.getJDA().getGuildById(guild_id).getRoleById(ServerRoles.getRole_ID());
-		SqlConnect.SQLgetChannelID(guild_id, "log");
-		long channel_id = SqlConnect.getChannelID();
+		DiscordRoles.SQLgetRole(guild_id, "mut");
+		Role mute_role = e.getJDA().getGuildById(guild_id).getRoleById(DiscordRoles.getRole_ID());
+		Azrael.SQLgetChannelID(guild_id, "log");
+		long channel_id = Azrael.getChannelID();
 		int i = 0;
 		
 		for(Member member : e.getJDA().getGuildById(guild_id).getMembersWithRoles(mute_role)){
-			RankingDB.SQLgetWholeRankView(member.getUser().getIdLong());
-			SqlConnect.SQLgetData(member.getUser().getIdLong(), guild_id);
+			RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong());
+			Azrael.SQLgetData(member.getUser().getIdLong(), guild_id);
 			long unmute;
 			try{
-				unmute = (SqlConnect.getUnmute().getTime() - System.currentTimeMillis());
+				unmute = (Azrael.getUnmute().getTime() - System.currentTimeMillis());
 			} catch(NullPointerException npe){
 				unmute = 0;
 			}
@@ -51,13 +51,13 @@ public class RoleExtend implements Runnable{
 			users.add(member);
 			banHammerFound = true;
 			new Thread(new MuteRestart(e, member, guild_id, channel_id, mute_role, unmute, assignedRole, rankingState)).start();
-			SqlConnect.clearUnmute();
+			Azrael.clearUnmute();
 			i++;
 		}
 		if(banHammerFound == true && channel_id != 0){
 			e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage(message.setDescription(i+" users were found muted on start up. The mute timer is restarting from where it stopped!").build()).queue();
 		}
-		ServerRoles.clearAllVariables();
-		SqlConnect.clearAllVariables();
+		DiscordRoles.clearAllVariables();
+		Azrael.clearAllVariables();
 	}
 }

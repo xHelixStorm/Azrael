@@ -10,7 +10,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import preparedMessages.ReactionMessage;
-import sql.SqlConnect;
+import sql.Azrael;
 
 public class RoleReaction implements Command{
 
@@ -22,19 +22,19 @@ public class RoleReaction implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		//after a channel has been registered for self role assignment, it can be disabled and enabled with this command
-		if(IniFileReader.getRoleReactionCommand().equals("true")) 
-			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) == true || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getId().equals(IniFileReader.getAdmin())) {
+		if(IniFileReader.getRoleReactionCommand()) 
+			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) == true || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 				if(e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+13).equals("enable")) {
-					SqlConnect.SQLgetExecutionID(e.getGuild().getIdLong());
-					if(SqlConnect.getReactions() == true) {
+					Azrael.SQLgetExecutionID(e.getGuild().getIdLong());
+					if(Azrael.getReactions() == true) {
 						e.getTextChannel().sendMessage(e.getMember().getUser().getAsMention()+" Role reactions are already enabled!").queue();
 					}
 					else {
-						if(SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "rea")) {
+						if(Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "rea")) {
 							e.getTextChannel().sendMessage("Role Reactions have been enabled!").queue();
-							String count = ""+ReactionMessage.print(e, SqlConnect.getChannelID());
-							FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getId()+"ch"+SqlConnect.getChannelID()+".azr", count);
-							SqlConnect.SQLUpdateReaction(e.getGuild().getIdLong(), true);
+							String count = ""+ReactionMessage.print(e, Azrael.getChannelID());
+							FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getId()+"ch"+Azrael.getChannelID()+".azr", count);
+							Azrael.SQLUpdateReaction(e.getGuild().getIdLong(), true);
 						}
 						else {
 							e.getTextChannel().sendMessage(e.getMember().getUser().getAsMention()+" Please set a reaction channel before continuing!!").queue();
@@ -42,13 +42,13 @@ public class RoleReaction implements Command{
 					}
 				}
 				else if(e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+13).equals("disable")) {
-					SqlConnect.SQLgetExecutionID(e.getGuild().getIdLong());
-					if(SqlConnect.getReactions() == false) {
+					Azrael.SQLgetExecutionID(e.getGuild().getIdLong());
+					if(Azrael.getReactions() == false) {
 						e.getTextChannel().sendMessage(e.getMember().getUser().getAsMention()+" Role reactions are already disabled!").queue();
 					}
 					else {
-						if(SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "rea") && Hashes.getReactionMessage(e.getGuild().getIdLong()) != null) {
-							e.getGuild().getTextChannelById(SqlConnect.getChannelID()).deleteMessageById(Hashes.getReactionMessage(e.getGuild().getIdLong())).queue();
+						if(Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "rea") && Hashes.getReactionMessage(e.getGuild().getIdLong()) != null) {
+							e.getGuild().getTextChannelById(Azrael.getChannelID()).deleteMessageById(Hashes.getReactionMessage(e.getGuild().getIdLong())).queue();
 						}
 						for(int i = 1; i < 10; i++) {
 							if(Hashes.getRoles(i+"_"+e.getGuild().getId()) != null) {
@@ -58,7 +58,7 @@ public class RoleReaction implements Command{
 								}
 							}
 						}
-						SqlConnect.SQLUpdateReaction(e.getGuild().getIdLong(), false);
+						Azrael.SQLUpdateReaction(e.getGuild().getIdLong(), false);
 						e.getTextChannel().sendMessage("Role reactions have been disabled and the assigned roles have been removed!").queue();
 					}
 				}

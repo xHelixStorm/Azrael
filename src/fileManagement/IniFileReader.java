@@ -2,6 +2,7 @@ package fileManagement;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 
 import org.ini4j.Ini;
 
@@ -13,6 +14,7 @@ public class IniFileReader {
 		try {
 			ini = new Ini(new File("./config.ini"));
 		} catch (IOException e) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e.printStackTrace();
 		}
 	}
@@ -21,17 +23,21 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Bot", "Token");
 	}
-	public static String getAdmin(){
+	public static long getAdmin(){
 		readConfig();
-		return ini.get("Bot", "Admin");
+		return ini.get("Bot", "Admin", long.class);
 	}
-	public static String getNameFilter(){
+	public static boolean getNameFilter(){
 		readConfig();
-		return ini.get("Bot", "NameFilter");
+		return ini.get("Bot", "NameFilter", boolean.class);
 	}
-	public static String getActionLog(){
+	public static boolean getActionLog(){
 		readConfig();
-		return ini.get("Bot", "ActionLog");
+		return ini.get("Bot", "ActionLog", boolean.class);
+	}
+	public static boolean getFileLogger() {
+		readConfig();
+		return ini.get("Bot", "FileLogger", boolean.class);
 	}
 	public static String getCommandPrefix(){
 		readConfig();
@@ -45,29 +51,29 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Bot", "GameMessage");
 	}
-	public static String getAllowPatchNotes(){
+	public static boolean getAllowPatchNotes(){
 		readConfig();
-		return ini.get("Patch", "PrivatePatchNotes");
+		return ini.get("Patch", "PrivatePatchNotes", boolean.class);
 	}
-	public static String getAllowPublicPatchNotes(){
+	public static boolean getAllowPublicPatchNotes(){
 		readConfig();
-		return ini.get("Patch", "PublicPatchNotes");
+		return ini.get("Patch", "PublicPatchNotes", boolean.class);
 	}
-	public static String getJoinMessage(){
+	public static boolean getJoinMessage(){
 		readConfig();
-		return ini.get("Messages", "JoinMessage");
+		return ini.get("Messages", "JoinMessage", boolean.class);
 	}
-	public static String getLeaveMessage(){
+	public static boolean getLeaveMessage(){
 		readConfig();
-		return ini.get("Messages", "LeaveMessage");
+		return ini.get("Messages", "LeaveMessage", boolean.class);
 	}
-	public static String getChannelLog(){
+	public static boolean getChannelLog(){
 		readConfig();
-		return ini.get("Messages", "ChannelLog");
+		return ini.get("Messages", "ChannelLog", boolean.class);
 	}
-	public static String getCacheLog(){
+	public static boolean getCacheLog(){
 		readConfig();
-		return ini.get("Messages", "CacheLog");
+		return ini.get("Messages", "CacheLog", boolean.class);
 	}
 	public static String getPastebinKey() {
 		readConfig();
@@ -168,92 +174,92 @@ public class IniFileReader {
 		reaction[9] = ini.get("Reactions", "Emoji9");
 		return reaction;
 	}
-	public static String getAboutCommand(){
+	public static boolean getAboutCommand(){
 		readConfig();
-		return ini.get("Commands", "About");
+		return ini.get("Commands", "About", boolean.class);
 	}
-	public static String getCommandsCommand(){
+	public static boolean getCommandsCommand(){
 		readConfig();
-		return ini.get("Commands", "Commands");
+		return ini.get("Commands", "Commands", boolean.class);
 	}
-	public static String getDailyCommand(){
+	public static boolean getDailyCommand(){
 		readConfig();
-		return ini.get("Commands", "Daily");
+		return ini.get("Commands", "Daily", boolean.class);
 	}
-	public static String getDisplayCommand(){
+	public static boolean getDisplayCommand(){
 		readConfig();
-		return ini.get("Commands", "Display");
+		return ini.get("Commands", "Display", boolean.class);
 	}
-	public static String getHelpCommand(){
+	public static boolean getHelpCommand(){
 		readConfig();
-		return ini.get("Commands", "Help");
+		return ini.get("Commands", "Help", boolean.class);
 	}
-	public static String getInventoryCommand(){
+	public static boolean getInventoryCommand(){
 		readConfig();
-		return ini.get("Commands", "Inventory");
+		return ini.get("Commands", "Inventory", boolean.class);
 	}
-	public static String getMeowCommand(){
+	public static boolean getMeowCommand(){
 		readConfig();
-		return ini.get("Commands", "Meow");
+		return ini.get("Commands", "Meow", boolean.class);
 	}
-	public static String getProfileCommand(){
+	public static boolean getProfileCommand(){
 		readConfig();
-		return ini.get("Commands", "Profile");
+		return ini.get("Commands", "Profile", boolean.class);
 	}
-	public static String getPugCommand(){
+	public static boolean getPugCommand(){
 		readConfig();
-		return ini.get("Commands", "Pug");
+		return ini.get("Commands", "Pug", boolean.class);
 	}
-	public static String getPurchaseCommand(){
+	public static boolean getPurchaseCommand(){
 		readConfig();
-		return ini.get("Commands", "Purchase");
+		return ini.get("Commands", "Purchase", boolean.class);
 	}
-	public static String getRankCommand(){
+	public static boolean getRankCommand(){
 		readConfig();
-		return ini.get("Commands", "Rank");
+		return ini.get("Commands", "Rank", boolean.class);
 	}
-	public static String getRebootCommand(){
+	public static boolean getRebootCommand(){
 		readConfig();
-		return ini.get("Commands", "Reboot");
+		return ini.get("Commands", "Reboot", boolean.class);
 	}
-	public static String getRegisterCommand(){
+	public static boolean getRegisterCommand(){
 		readConfig();
-		return ini.get("Commands", "Register");
+		return ini.get("Commands", "Register", boolean.class);
 	}
-	public static String getSetCommand(){
+	public static boolean getSetCommand(){
 		readConfig();
-		return ini.get("Commands", "Set");
+		return ini.get("Commands", "Set", boolean.class);
 	}
-	public static String getShopCommand(){
+	public static boolean getShopCommand(){
 		readConfig();
-		return ini.get("Commands", "Shop");
+		return ini.get("Commands", "Shop", boolean.class);
 	}
-	public static String getShutDownCommand(){
+	public static boolean getShutDownCommand(){
 		readConfig();
-		return ini.get("Commands", "ShutDown");
+		return ini.get("Commands", "ShutDown", boolean.class);
 	}
-	public static String getTopCommand(){
+	public static boolean getTopCommand(){
 		readConfig();
-		return ini.get("Commands", "Top");
+		return ini.get("Commands", "Top", boolean.class);
 	}
-	public static String getUseCommand(){
+	public static boolean getUseCommand(){
 		readConfig();
-		return ini.get("Commands", "Use");
+		return ini.get("Commands", "Use", boolean.class);
 	}
-	public static String getUserCommand(){
+	public static boolean getUserCommand(){
 		readConfig();
-		return ini.get("Commands", "User");
+		return ini.get("Commands", "User", boolean.class);
 	}
-	public static String getFilterCommand(){
+	public static boolean getFilterCommand(){
 		readConfig();
-		return ini.get("Commands", "Filter");
+		return ini.get("Commands", "Filter", boolean.class);
 	}
-	public static String getQuizCommand(){
+	public static boolean getQuizCommand(){
 		readConfig();
-		return ini.get("Commands", "Quiz");
+		return ini.get("Commands", "Quiz", boolean.class);
 	}
-	public static String getRoleReactionCommand() {
+	public static boolean getRoleReactionCommand() {
 		readConfig();
-		return ini.get("Commands", "RoleReaction");
+		return ini.get("Commands", "RoleReaction", boolean.class);
 	}
 }

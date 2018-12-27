@@ -3,6 +3,9 @@ package commands;
 import java.awt.Color;
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import commandsContainer.QuizExecution;
 import core.Hashes;
 import core.UserPrivs;
@@ -10,7 +13,7 @@ import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.SqlConnect;
+import sql.Azrael;
 
 public class Quiz implements Command{
 
@@ -21,10 +24,12 @@ public class Quiz implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getQuizCommand().equals("true")) {
+		if(IniFileReader.getQuizCommand()) {
+			Logger logger = LoggerFactory.getLogger(Quiz.class);
+			logger.info("{} has used Quiz command", e.getMember().getUser().getId());
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setTitle("Access denied!").setThumbnail(IniFileReader.getDeniedThumbnail());
 			if(!new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr").exists()) {
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || IniFileReader.getAdmin().equals(e.getMember().getUser().getId())) {
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 					EmbedBuilder message = new EmbedBuilder().setTitle("It's Quiz time!").setColor(Color.BLUE);
 					if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"quiz")) {
 						e.getTextChannel().sendMessage(message.setDescription("The Quiz command will allow you to register questions to provide the best quiz experience in a Discord server! At your disposal are parameters to register questions from a pastebin link, register rewards in form of codes that get sent to the user who answers a question correctly in private message and to start and interrupt the quiz session.\n\n"
@@ -63,9 +68,11 @@ public class Quiz implements Command{
 								+ "It's also possible to include rewards while registering questions in case it is easier to avoid errors. This can be done by applying the **=** before the reward.").queue();
 					}
 					else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"quiz -register-questions ")) {
+						logger.info("{} performed the registration of questions and rewards for the Quiz", e.getMember().getUser().getId());
 						QuizExecution.registerQuestions(e, e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+25), false);
 					}
 					else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"quiz -clear")) {
+						logger.info("{} cleared all quiz questions and rewards", e.getMember().getUser().getId());
 						Hashes.clearQuiz();
 						e.getTextChannel().sendMessage("Cache has been cleared from registered questions and rewards!").queue();
 					}
@@ -78,8 +85,8 @@ public class Quiz implements Command{
 								e.getTextChannel().sendMessage("Please register the rewards before proceeding!").queue();
 							}
 							else {
-								SqlConnect.SQLgetChannelID(e.getGuild().getIdLong(), "qui");
-								if(SqlConnect.getChannelID() != 0) {
+								Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "qui");
+								if(Azrael.getChannelID() != 0) {
 									e.getTextChannel().sendMessage(message.setDescription("Please select the fitting mode for the quiz with one of the following digits:\n"
 											+ "1: **no restrictions**\n"
 											+ "2: **participants will receive a 3 questions threshold on right answer**\n"
@@ -89,7 +96,7 @@ public class Quiz implements Command{
 								else {
 									e.getTextChannel().sendMessage("Please register a quiz channel before starting the quiz!").queue();
 								}
-								SqlConnect.setChannelID(0);
+								Azrael.setChannelID(0);
 							}
 						}
 						else {
@@ -100,6 +107,7 @@ public class Quiz implements Command{
 						if(Hashes.getWholeQuiz().size() > 0) {
 							//save all settings
 							QuizExecution.saveQuestions(e);
+							logger.info("{} has saved the quiz questions and rewards to file", e.getMember().getUser().getId());
 						}
 						else {
 							e.getTextChannel().sendMessage("There is nothing to save. Please use register-rewards and register-questions before this parameter is used.").queue();
@@ -109,6 +117,7 @@ public class Quiz implements Command{
 						File file = new File("./files/QuizBackup/quizsettings.azr");
 						if(file.exists()) {
 							QuizExecution.registerQuestions(e, "", true);
+							logger.info("{} has loaded the quiz questions and rewards from file", e.getMember().getUser().getId());
 						}
 						else {
 							e.getTextChannel().sendMessage("No saved settings have been found. Please save them first.").queue();

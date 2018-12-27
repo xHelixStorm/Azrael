@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,6 +75,7 @@ public class RankingMethods extends ListenerAdapter{
 			e.getTextChannel().sendFile(file1, "level_up.png", null).complete();
 			file1.delete();
 		} catch (IOException e1) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e1.printStackTrace();
 		}
 	}
@@ -133,6 +135,7 @@ public class RankingMethods extends ListenerAdapter{
 			e.getTextChannel().sendFile(file2, "rank.png", null).complete();
 			file2.delete();
 		} catch (IOException e1) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e1.printStackTrace();
 		}
 	}
@@ -202,6 +205,7 @@ public class RankingMethods extends ListenerAdapter{
 			e.getTextChannel().sendFile(file3, "profile.png", null).complete();
 			file3.delete();
 		} catch (IOException e1) {
+			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 			e1.printStackTrace();
 		}
 	}

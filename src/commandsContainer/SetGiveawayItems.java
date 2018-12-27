@@ -9,7 +9,7 @@ import java.time.temporal.TemporalAdjusters;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.RankingDB;
+import sql.RankingSystem;
 import util.Pastebin;
 
 public class SetGiveawayItems {
@@ -26,7 +26,7 @@ public class SetGiveawayItems {
 			Timestamp timestamp = Timestamp.valueOf(beginningOfMonthMidnight);
 			
 			//insert rewards into table and return error with true or false
-			boolean err = RankingDB.SQLBulkInsertGiveawayRewards(rewards, timestamp);
+			boolean err = RankingSystem.SQLBulkInsertGiveawayRewards(rewards, timestamp);
 			
 			if(err == false) {
 				e.getTextChannel().sendMessage("Rewards from pastebin link have been inserted succesfully!").queue();

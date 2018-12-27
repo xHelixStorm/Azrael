@@ -14,11 +14,11 @@ import core.Hashes;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.RankingDB;
+import sql.RankingSystem;
 
 public class RankingThreadExecution {
 	public static void setProgress(MessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, int percent_multiplier, Rank user_details, Guilds guild_settings){
-		RankingDB.SQLDeleteInventory();
+		RankingSystem.SQLDeleteInventory();
 		int multiplier = 1;
 		Path path = Paths.get("./files/double.azr");
 		
@@ -62,7 +62,7 @@ public class RankingThreadExecution {
 			Timestamp reset = Timestamp.valueOf(tomorrowMidnight);
 			
 			if(user_details.getDailyReset() == null || reset.getTime() - user_details.getDailyReset().getTime() != 0){
-				RankingDB.SQLDeleteDailyExperience(user_id);
+				RankingSystem.SQLDeleteDailyExperience(user_id);
 				daily_experience = 0;
 			}
 			
@@ -70,7 +70,7 @@ public class RankingThreadExecution {
 				daily_experience += adder;
 				ExperienceGain(e, user_details,  guild_settings, currentExperience, experience, daily_experience, roleAssignLevel, max_experience_enabled, reset);
 				if(daily_experience > max_experience*multiplier){
-					RankingDB.SQLInsertActionLog("medium", user_id, "Experience limit reached", "User reached the limit of experience points");
+					RankingSystem.SQLInsertActionLog("medium", user_id, "Experience limit reached", "User reached the limit of experience points");
 					PrivateChannel pc = e.getMember().getUser().openPrivateChannel().complete();
 					pc.sendMessage("You have reached the max possible to gain experience today. More experience points can be collected tomorrow!").queue();
 					pc.close();
@@ -125,11 +125,11 @@ public class RankingThreadExecution {
 			if(max_experience_enabled == true){
 				user_details.setDailyExperience(daily_experience);
 				user_details.setDailyReset(reset);
-				RankingDB.SQLInsertDailyExperience(daily_experience, user_details.getUser_ID(), user_details.getDailyReset());
+				RankingSystem.SQLInsertDailyExperience(daily_experience, user_details.getUser_ID(), user_details.getDailyReset());
 			}
 			
-			RankingDB.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
-			RankingDB.SQLInsertActionLog("low", user_details.getUser_ID(), "Level Up", "User reached level "+level);
+			RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
+			RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), "Level Up", "User reached level "+level);
 			RankingMethods.getRankUp(e, level, user_details.getRankingLevel(), user_details.getRankingIcon(), user_details.getColorRLevel(), user_details.getColorGLevel(), user_details.getColorBLevel(), user_details.getRankXLevel(), user_details.getRankYLevel(), user_details.getRankWidthLevel(), user_details.getRankHeightLevel());
 			Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 		}
@@ -140,10 +140,10 @@ public class RankingThreadExecution {
 			if(max_experience_enabled == true){
 				user_details.setDailyExperience(daily_experience);
 				user_details.setDailyReset(reset);
-				RankingDB.SQLInsertDailyExperience(daily_experience, user_details.getUser_ID(), user_details.getDailyReset());
+				RankingSystem.SQLInsertDailyExperience(daily_experience, user_details.getUser_ID(), user_details.getDailyReset());
 			}
 			
-			RankingDB.SQLUpdateExperience(user_details.getUser_ID(), user_details.getExperience());
+			RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), user_details.getExperience());
 			Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 		}
 	}
