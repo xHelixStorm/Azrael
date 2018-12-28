@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import commandsContainer.UserExecution;
 import core.UserPrivs;
 import fileManagement.IniFileReader;
@@ -41,7 +44,8 @@ public class User implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		
+		Logger logger = LoggerFactory.getLogger(User.class);
+		logger.info("{} has used User command", e.getMember().getUser().getId());
 	}
 
 	@Override

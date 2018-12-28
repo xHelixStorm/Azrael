@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import inventory.Dailies;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
@@ -37,8 +40,11 @@ public class SetDailyItem {
 								if(type.equals("cur") || type.equals("exp") || type.equals("cod")){
 									if(_weight+Integer.parseInt(weight) <= 100){
 										var editedRows = RankingSystem.SQLInsertDailyItems(description.replaceAll("[\"]", ""), Integer.parseInt(weight), type);
-										if(editedRows > 0)
+										if(editedRows > 0) {
+											Logger logger = LoggerFactory.getLogger(SetDailyItem.class);
+											logger.info("{} has inserted the item {} into the daily items pool with the weight {}", _e.getMember().getUser().getId(), description.replaceAll("[\"]", ""), weight);
 											_e.getTextChannel().sendMessage("New daily item has been set. Your current free weight is **"+(100-_weight-Integer.parseInt(weight))+"** now!").queue();
+										}
 										else {
 											_e.getTextChannel().sendMessage("Internal error! Daily item couldn't be inserted!").queue();
 											RankingSystem.SQLInsertActionLog("high", _e.getMember().getUser().getIdLong(), "Daily item registration error", "daily item couldn't be inserted with weight "+weight+" and item "+description.replaceAll("[\"]", ""));

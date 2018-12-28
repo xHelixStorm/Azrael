@@ -3,6 +3,9 @@ package threads;
 import java.awt.Color;
 import java.time.format.DateTimeFormatter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Guilds;
 import core.Hashes;
 import core.UserPrivs;
@@ -16,6 +19,7 @@ import sql.DiscordRoles;
 import sql.Azrael;
 
 public class BotStartAssign implements Runnable{
+	private final Logger logger = LoggerFactory.getLogger(BotStartAssign.class);
 	ReadyEvent e;
 	
 	public BotStartAssign(ReadyEvent _e){
@@ -73,6 +77,7 @@ public class BotStartAssign implements Runnable{
 					}
 				}
 			}
+			logger.info("Start up user registration complete in {}", g.getName());
 			Azrael.SQLgetChannelID(guild_id, "log");
 			if(i != 0 && Azrael.getChannelID() != 0){
 				e.getJDA().getGuildById(guild_id).getTextChannelById(Azrael.getChannelID()).sendMessage(message.setDescription(i+" User(s) received the community role on bot start up").build()).queue();

@@ -20,7 +20,7 @@ public class ClearHashes extends TimerTask{
 		Hashes.clearDailyItems();
 		
 		Logger logger = LoggerFactory.getLogger(ClearHashes.class);
-		logger.info("Cache has been cleared!");
+		logger.info("Temporary Hashes have been cleared!");
 	}
 	
 	public static void runTask(){

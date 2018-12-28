@@ -2,6 +2,9 @@ package listeners;
 
 import java.awt.Color;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -37,7 +40,9 @@ public class NameListener extends ListenerAdapter{
 							String nickname = Azrael.getName();
 							e.getJDA().getGuildById(g.getIdLong()).getController().setNickname(member, nickname).queue();
 							message.setColor(Color.RED).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle("Impersonation attempt found!");
-							e.getJDA().getTextChannelById(channel_id).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**\nPlease take action as soon as possible!").build()).queue();
+							e.getJDA().getTextChannelById(channel_id).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**\nPlease review in case of impersonation!").build()).queue();
+							Logger logger = LoggerFactory.getLogger(NameListener.class);
+							logger.info("{} got renamed into {} in guild {}. Impersonation", e.getUser().getId(), nickname, g.getName());
 							staff_name = true;
 							break check;
 						} catch(HierarchyException hye){
@@ -64,6 +69,8 @@ public class NameListener extends ListenerAdapter{
 									e.getJDA().getGuildById(guild_id).getController().setNickname(user, nickname).queue();
 									message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
 									e.getJDA().getTextChannelById(channel_id).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
+									Logger logger = LoggerFactory.getLogger(NameListener.class);
+									logger.info("{} got renamed into {} in guild {}", e.getUser().getId(), nickname, guild.getName());
 									break check;
 								} catch (HierarchyException hye){
 									message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getFalseAlarmThumbnail()).setTitle("You know that you shouldn't do it :/");

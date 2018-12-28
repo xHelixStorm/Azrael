@@ -9,11 +9,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Hashes;
 import fileManagement.FileSetting;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.events.ReadyEvent;
-import sql.RankingSystem;
 import sql.Azrael;
 
 public class DoubleExperienceStart extends TimerTask{
@@ -30,10 +32,7 @@ public class DoubleExperienceStart extends TimerTask{
 		long guild_id;
 		long channel_id;
 		
-		if(Files.exists(path)){
-			System.out.println("Double experience event is running!");
-		}
-		else{
+		if(!Files.exists(path)){
 			File doubleEvent = new File("./files/RankingSystem/doubleweekend.jpg");
 			FileSetting.createFile("files/double.azr", "This file is for the purpose of enabling the double exp event.");
 			for(Guild g : e.getJDA().getGuilds()){
@@ -46,9 +45,10 @@ public class DoubleExperienceStart extends TimerTask{
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage("```css\nThe double EXP weekend is here\nUse the chance to gain more experience points than usual to reach new heights. See you at the top!\nThe event will stay up from Saturday 00:01 cest till Sunday 23:59 cest!```").queue();
 				}
 			}
-			RankingSystem.clearAllVariables();
 			Azrael.clearAllVariables();
 		}
+		Logger logger = LoggerFactory.getLogger(DoubleExperienceStart.class);
+		logger.info("Double experience weekend is running");
 	}
 	
 	public static void runTask(ReadyEvent _e){

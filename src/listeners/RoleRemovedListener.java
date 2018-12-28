@@ -3,6 +3,9 @@ package listeners;
 import java.awt.Color;
 import java.sql.Timestamp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.UserPrivs;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.audit.AuditLogEntry;
@@ -49,10 +52,14 @@ public class RoleRemovedListener extends ListenerAdapter{
 				Azrael.clearUnmute();
 				
 				if(log_channel_id != 0){e.getGuild().getTextChannelById(log_channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** has manually removed the mute role from **"+member_name+"** with the ID number **"+user_id+"**!").build()).queue();}
+				Logger logger = LoggerFactory.getLogger(RoleRemovedListener.class);
+				logger.info("{} got the mute role removed before the time expired in guild {}", e.getUser().getId(), e.getGuild().getName());
 				Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE_HALFWAY", user_id, guild_id, "Mute role removed manually");
 			}
 			else if(!UserPrivs.isUserMuted(e.getUser(), guild_id) && Azrael.getUser_id() != 0){
 				Azrael.SQLUpdateMuted(user_id, guild_id, false, false);
+				Logger logger = LoggerFactory.getLogger(RoleRemovedListener.class);
+				logger.info("{} has been unmuted in guild {}", e.getUser().getId(), e.getGuild().getName());
 				Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild_id, "Mute role removed");
 			}
 		} catch(NullPointerException npe){

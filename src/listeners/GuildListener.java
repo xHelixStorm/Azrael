@@ -3,6 +3,9 @@ package listeners;
 import java.awt.Color;
 import java.time.format.DateTimeFormatter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Guilds;
 import core.Hashes;
 import fileManagement.IniFileReader;
@@ -18,6 +21,8 @@ public class GuildListener extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent e){
+		Logger logger = LoggerFactory.getLogger(GuildListener.class);
+		logger.info("{} has joined the guild {}", e.getUser().getId(), e.getGuild().getName());
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
 		EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name found!");
 		EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle("An error occurred!");

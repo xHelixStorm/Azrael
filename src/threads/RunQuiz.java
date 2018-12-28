@@ -5,6 +5,9 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Hashes;
 import core.Quizes;
 import fileManagement.FileSetting;
@@ -14,6 +17,7 @@ import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class RunQuiz implements Runnable{
+	private final Logger logger = LoggerFactory.getLogger(RunQuiz.class);
 	private MessageReceivedEvent e;
 	private long channel_id;
 	private long log_channel_id;
@@ -55,6 +59,7 @@ public class RunQuiz implements Runnable{
 					//check the created file if someone was able to answer the question
 					if(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr").length() == 18 || FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr").length() == 17) {
 						long user_id = Long.parseLong(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr"));
+						logger.info("{} received the reward {} out of the quiz in guild {}", e.getMember().getUser().getId(), quiz.getReward(), e.getGuild().getName());
 						e.getGuild().getTextChannelById(channel).sendMessage("Question number "+index+" goes to "+e.getGuild().getMemberById(user_id).getAsMention()+". Congratulations!").queue();
 						try {
 							//send the reward in private message to the user and log the reward and user at the same time in the log channel.

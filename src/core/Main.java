@@ -8,6 +8,9 @@ import java.sql.Timestamp;
 
 import javax.security.auth.login.LoginException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import commands.About;
 import commands.Commands;
 import commands.Daily;
@@ -33,7 +36,6 @@ import commands.User;
 import fileManagement.IniFileReader;
 import listeners.AvatarUpdateListener;
 import listeners.BanListener;
-import listeners.CommandListener;
 import listeners.GuildJoinListener;
 import listeners.GuildLeaveListener;
 import listeners.GuildListener;
@@ -56,28 +58,26 @@ import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 
 public class Main {
-	
+	static {System.setProperty("logback.configurationFile", "./logback.xml");}
 	public static JDABuilder builder;
 	
 	public static void main(String [] args){
+		Logger logger = LoggerFactory.getLogger(Main.class);
 		boolean [] dir = new boolean[2];
 		dir[0] = (new File("./log")).mkdirs();
 		dir[1] = (new File("./message_log")).mkdirs();
 		
 		if(IniFileReader.getFileLogger()) {
-			long time = System.currentTimeMillis();
-			Timestamp timestamp = new Timestamp(time);
 			
 			PrintStream out;
 			PrintStream err;
 			try {
-				out = new PrintStream(new FileOutputStream("log/log"+timestamp.toString().replaceAll(":", "-")+".txt"));
-				err = new PrintStream(new FileOutputStream("log/errlog"+timestamp.toString().replaceAll(":", "-")+".txt"));
+				out = new PrintStream(new FileOutputStream("log/log"+new Timestamp(System.currentTimeMillis())+".txt"));
+				err = new PrintStream(new FileOutputStream("log/err"+new Timestamp(System.currentTimeMillis())+".txt"));
 				System.setOut(out);
 				System.setErr(err);
 			} catch (FileNotFoundException e1) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e1.printStackTrace();
+				logger.warn("eventlog.txt or errlog.txt couldn't be found on start up", e1);
 			}
 		}
 		
@@ -113,8 +113,7 @@ public class Main {
 			@SuppressWarnings("unused")
 			JDA jda = builder.build();
 		} catch (LoginException | IllegalArgumentException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("Login or Token error", e);
 		}
 	}
 	
@@ -148,7 +147,6 @@ public class Main {
 		
 		builder.addEventListener(new ReadyListener());
 		builder.addEventListener(new GuildListener());
-		builder.addEventListener(new CommandListener());
 		builder.addEventListener(new RoleListener());
 		builder.addEventListener(new BanListener());
 		builder.addEventListener(new UnbanListener());

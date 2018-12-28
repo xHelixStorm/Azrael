@@ -2,6 +2,9 @@ package commands;
 
 import java.awt.Color;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.FileSetting;
@@ -25,16 +28,19 @@ public class RoleReaction implements Command{
 		if(IniFileReader.getRoleReactionCommand()) 
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) == true || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 				if(e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+13).equals("enable")) {
+					Logger logger = LoggerFactory.getLogger(RoleReaction.class);
+					logger.info("{} has used RoleReaction command to enable", e.getMember().getUser().getId());
+					
 					Azrael.SQLgetExecutionID(e.getGuild().getIdLong());
 					if(Azrael.getReactions() == true) {
 						e.getTextChannel().sendMessage(e.getMember().getUser().getAsMention()+" Role reactions are already enabled!").queue();
 					}
 					else {
-						if(Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "rea")) {
+						if(Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "rea")) {							
+							Azrael.SQLUpdateReaction(e.getGuild().getIdLong(), true);
 							e.getTextChannel().sendMessage("Role Reactions have been enabled!").queue();
 							String count = ""+ReactionMessage.print(e, Azrael.getChannelID());
 							FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getId()+"ch"+Azrael.getChannelID()+".azr", count);
-							Azrael.SQLUpdateReaction(e.getGuild().getIdLong(), true);
 						}
 						else {
 							e.getTextChannel().sendMessage(e.getMember().getUser().getAsMention()+" Please set a reaction channel before continuing!!").queue();
@@ -42,6 +48,9 @@ public class RoleReaction implements Command{
 					}
 				}
 				else if(e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+13).equals("disable")) {
+					Logger logger = LoggerFactory.getLogger(RoleReaction.class);
+					logger.info("{} has used RoleReaction command to disable", e.getMember().getUser().getId());
+					
 					Azrael.SQLgetExecutionID(e.getGuild().getIdLong());
 					if(Azrael.getReactions() == false) {
 						e.getTextChannel().sendMessage(e.getMember().getUser().getAsMention()+" Role reactions are already disabled!").queue();

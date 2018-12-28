@@ -3,6 +3,9 @@ package commandsContainer;
 import java.awt.Color;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -33,6 +36,8 @@ public class SetWarning {
 			else {
 				Azrael.SQLInsertWarning(_e.getGuild().getIdLong(), warning_value);
 			}
+			Logger logger = LoggerFactory.getLogger(SetWarning.class);
+			logger.info("{} has edited the warning level in guild {}", _e.getMember().getUser().getId(), _e.getGuild().getName());
 			_e.getTextChannel().sendMessage("The system has been set to warn "+warning_value+" time(s) before banning").queue();
 			
 			FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", "1");

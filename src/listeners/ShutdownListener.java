@@ -6,6 +6,8 @@ import java.sql.Timestamp;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
@@ -50,6 +52,8 @@ public class ShutdownListener extends ListenerAdapter{
 				}
 			}
 		}
+		Logger logger = LoggerFactory.getLogger(ShutdownListener.class);
+		logger.info("Bot has shut down or reboot has been commenced");
 		Azrael.SQLInsertActionLog("BOT_SHUTDOWN", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
 	}
 }

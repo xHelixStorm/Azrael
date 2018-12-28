@@ -1,5 +1,8 @@
 package listeners;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vdurmont.emoji.EmojiParser;
 
 import core.Hashes;
@@ -46,6 +49,8 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 						int emote = returnEmote(reactionName);
 						e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(emote+"_"+e.getGuild().getId()).getRole_ID())).queue();
 					}
+					Logger logger = LoggerFactory.getLogger(GuildMessageReactionAddListener.class);
+					logger.info("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getName());
 				}
 				
 			}

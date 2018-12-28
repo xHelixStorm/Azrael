@@ -1,11 +1,13 @@
 package commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import commandsContainer.ShopExecution;
 import core.Guilds;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.RankingSystem;
 import sql.Azrael;
 
 public class Shop implements Command{
@@ -55,8 +57,8 @@ public class Shop implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		RankingSystem.clearAllVariables();
-		RankingSystem.clearDescriptionVariables();
+		Logger logger = LoggerFactory.getLogger(Shop.class);
+		logger.info("{} has used Shop command", e.getMember().getUser().getId());
 		Azrael.clearAllVariables();
 	}
 

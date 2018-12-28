@@ -1,5 +1,8 @@
 package commandsContainer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Guilds;
 import core.Hashes;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -11,6 +14,9 @@ public class SetProfileDefaultSkin {
 			Guilds guild_settings = Hashes.getStatus(_e.getGuild().getIdLong());
 			guild_settings.setProfileID(_default_skin);
 			RankingSystem.SQLUpdateProfileDefaultSkin(_e.getGuild().getIdLong(), _e.getGuild().getName(), guild_settings.getProfileID());
+			
+			Logger logger = LoggerFactory.getLogger(SetProfileDefaultSkin.class);
+			logger.info("{} has set the default profile skin id to {} in guild {}", _e.getMember().getUser().getId(), guild_settings.getProfileID(), _e.getGuild().getName());
 			Hashes.addStatus(_e.getGuild().getIdLong(), guild_settings);
 			_e.getTextChannel().sendMessage("**The default skin is now the theme number "+guild_settings.getProfileID()+"!**").queue();
 		}

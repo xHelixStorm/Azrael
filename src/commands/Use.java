@@ -2,6 +2,9 @@ package commands;
 
 import java.sql.Timestamp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -264,6 +267,8 @@ public class Use implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
+		Logger logger = LoggerFactory.getLogger(Use.class);
+		logger.info("{} has used Use command", e.getMember().getUser().getId());
 		RankingSystem.clearAllVariables();
 		Azrael.clearAllVariables();
 	}

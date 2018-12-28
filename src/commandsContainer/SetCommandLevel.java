@@ -1,5 +1,8 @@
 package commandsContainer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
 
@@ -31,6 +34,8 @@ public class SetCommandLevel {
 		
 		if(wrongInput == false){
 			Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), level);
+			Logger logger = LoggerFactory.getLogger(SetCommandLevel.class);
+			logger.info("{} has changed the command level to {} in guild {}", _e.getMember().getUser().getId(), level, _e.getGuild().getName());
 			_e.getTextChannel().sendMessage(message).queue();
 		}
 		else{

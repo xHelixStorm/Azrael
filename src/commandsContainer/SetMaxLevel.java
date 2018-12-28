@@ -1,5 +1,8 @@
 package commandsContainer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Guilds;
 import core.Hashes;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -11,6 +14,9 @@ public class SetMaxLevel {
 			Guilds guild_settings = Hashes.getStatus(_e.getGuild().getIdLong());
 			guild_settings.setMaxLevel(_max_level);
 			RankingSystem.SQLUpdateMaxLevel(_e.getGuild().getIdLong(), _e.getGuild().getName(), guild_settings.getMaxLevel());
+			
+			Logger logger = LoggerFactory.getLogger(SetMaxLevel.class);
+			logger.info("{} has set the max level to {} in guild {}", _e.getMember().getUser().getId(), guild_settings.getMaxLevel(), _e.getGuild().getName());
 			Hashes.addStatus(_e.getGuild().getIdLong(), guild_settings);
 			_e.getTextChannel().sendMessage("**The max level for the ranking system is now "+guild_settings.getMaxLevel()+"**").queue();
 		}

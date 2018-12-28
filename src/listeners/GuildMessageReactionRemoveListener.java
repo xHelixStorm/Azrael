@@ -1,5 +1,8 @@
 package listeners;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vdurmont.emoji.EmojiParser;
 
 import core.Hashes;
@@ -47,7 +50,8 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter{
 						e.getGuild().getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(emote+"_"+e.getGuild().getId()).getRole_ID())).queue();
 					}
 				}
-				
+				Logger logger = LoggerFactory.getLogger(GuildMessageReactionRemoveListener.class);
+				logger.info("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getName());
 			}
 		}
 	}

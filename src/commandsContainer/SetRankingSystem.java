@@ -1,5 +1,8 @@
 package commandsContainer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Guilds;
 import core.Hashes;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -32,6 +35,8 @@ public class SetRankingSystem {
 			guild.setRankingState(ranking_state);
 			
 			Hashes.addStatus(_e.getGuild().getIdLong(), guild);
+			Logger logger = LoggerFactory.getLogger(SetRankingSystem.class);
+			logger.info("{} has set the ranking system to {} in guild {}", _e.getMember().getUser().getId(), _input, _e.getGuild().getName());
 			_e.getTextChannel().sendMessage(message).queue();
 		}
 		else{

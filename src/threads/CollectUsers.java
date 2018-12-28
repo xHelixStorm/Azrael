@@ -23,7 +23,7 @@ public class CollectUsers implements Runnable{
 		long guild_id = e.getGuild().getIdLong();
 		Azrael.SQLBulkInsertUsers(e.getJDA().getGuildById(guild_id).getMembers());
 		Logger logger = LoggerFactory.getLogger(CollectUsers.class);
-		logger.info("{} has registered all users from the guild", e.getMember().getUser().getId(), e.getGuild().getName());
+		logger.info("{} has registered all users from the guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 		e.getTextChannel().sendMessage(message.setDescription("User registration is complete!").build()).queue();
 		RankingSystem.clearAllVariables();
 	}

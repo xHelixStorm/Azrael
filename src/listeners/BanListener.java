@@ -2,6 +2,9 @@ package listeners;
 
 import java.sql.Timestamp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.dv8tion.jda.core.events.guild.GuildBanEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import sql.Azrael;
@@ -26,6 +29,8 @@ public class BanListener extends ListenerAdapter{
 		}
 		
 		Azrael.SQLUpdateMuted(user_id, guild_id, true, false);
+		Logger logger = LoggerFactory.getLogger(BanListener.class);
+		logger.info("{} has been banned from {}", e.getUser().getId(), e.getGuild().getName());
 		Azrael.SQLInsertActionLog("MEMBER_BAN_ADD", user_id, guild_id, "User Banned");
 		Azrael.clearAllVariables();
 	}

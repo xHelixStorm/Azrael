@@ -5,6 +5,9 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Guilds;
 import core.Hashes;
 import core.Messages;
@@ -162,6 +165,8 @@ public class UserExecution {
 						Azrael.clearDescriptions();
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.build()).queue();
+						Logger logger = LoggerFactory.getLogger(UserExecution.class);
+						logger.info("{} has displayed information of the user {}", _e.getMember().getUser().getId(), file_value);
 						FileSetting.deleteFile(file_path);
 						break;
 					case "delete-messages":
@@ -293,6 +298,8 @@ public class UserExecution {
 							String paste_link = Pastebin.unlistedPaste("Found comments have been succesfully removed!", hash_counter+" messages from "+messages.get(0).getUserName()+" have been removed:\n\n"+collected_messages.toString());
 							if(!paste_link.equals("Creating paste failed!")) {
 								_e.getTextChannel().sendMessage(message.setDescription("The comments of the selected user have been succesfully removed: "+paste_link).build()).queue();
+								Logger logger = LoggerFactory.getLogger(UserExecution.class);
+								logger.info("{} has bulk deleted messages from {}", _e.getMember().getUser().getId(), messages.get(0).getUserID());
 							}
 							else {
 								error.setTitle("New Paste couldn't be created!");
@@ -310,20 +317,24 @@ public class UserExecution {
 					Azrael.SQLgetData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
 					int db_warning = Azrael.getWarningID();
 					if(db_warning != 0) {
+						Logger logger = LoggerFactory.getLogger(UserExecution.class);
 						Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
 						int warning_id = Integer.parseInt(_message.replaceAll("[^0-9]*", ""));
 						int max_warning_id = Azrael.getWarningID();
 						if(warning_id == 0){
 							Azrael.SQLDeleteData(Long.parseLong(file_value.replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong());
 							_e.getTextChannel().sendMessage("The warnings of this user has been cleared!").queue();
+							logger.info("{} has cleared the warnings from {} in guild {}", _e.getMember().getUser().getId(), file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 						}
 						else if(warning_id <= max_warning_id) {
 							Azrael.SQLUpdateWarning(Long.parseLong(file_value.replaceAll("[^0-9]", "")), _e.getGuild().getIdLong(), warning_id);
 							_e.getTextChannel().sendMessage("Warning value "+warning_id+" has been set!").queue();
+							logger.info("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), warning_id, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 						}
 						else {
 							Azrael.SQLUpdateWarning(Long.parseLong(file_value.replaceAll("[^0-9]", "")), _e.getGuild().getIdLong(), max_warning_id);
 							_e.getTextChannel().sendMessage("The max possible value "+max_warning_id+" has been set because your input exceeded the max possible warning!").queue();
+							logger.info("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), max_warning_id, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 						}
 					}
 					else {
@@ -372,6 +383,8 @@ public class UserExecution {
 					else {
 						Azrael.SQLInsertData(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), 1, 1, timestamp, unmute_timestamp, false, true);
 					}
+					Logger logger = LoggerFactory.getLogger(UserExecution.class);
+					logger.info("{} has muted {} in guild {}", _e.getMember().getUser().getId(), file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 					FileSetting.deleteFile(file_path);
 					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/mute_time_"+file_value.replaceAll("[^0-9]*", ""), ""+mute_time);
 					DiscordRoles.clearAllVariables();
@@ -403,6 +416,8 @@ public class UserExecution {
 						pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 								+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
 						pc.close();
+						Logger logger = LoggerFactory.getLogger(UserExecution.class);
+						logger.info("{} has banned {} from guild {}", _e.getMember().getUser().getId(), file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 					}
 					_e.getGuild().getController().ban(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")), 0).reason("User has been banned with the bot command!").queue();
 					FileSetting.deleteFile(file_path);
@@ -422,6 +437,8 @@ public class UserExecution {
 					pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 							+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
 					pc.close();
+					Logger logger = LoggerFactory.getLogger(UserExecution.class);
+					logger.info("{} has banned {} in guild {}", _e.getMember().getUser().getId(), file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 				}
 				_e.getGuild().getController().ban(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")), 0).reason(_message).queue();
 				FileSetting.deleteFile(file_path);
@@ -434,11 +451,15 @@ public class UserExecution {
 				}
 				else if(_message.equalsIgnoreCase("no")) {
 					_e.getGuild().getController().kick(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", ""))).reason("User has been kicked with the bot command!").queue();
+					Logger logger = LoggerFactory.getLogger(UserExecution.class);
+					logger.info("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 					FileSetting.deleteFile(file_path);
 				}
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("kick-reason")) {
 				_e.getGuild().getController().kick(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", ""))).reason(_message).queue();
+				Logger logger = LoggerFactory.getLogger(UserExecution.class);
+				logger.info("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 				FileSetting.deleteFile(file_path);
 			}
 			else if(file_value.replaceAll("[0-9]*",	"").equalsIgnoreCase("gift-experience")) {
@@ -488,6 +509,8 @@ public class UserExecution {
 						_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
 					}
 					_e.getTextChannel().sendMessage("Experience points have been updated!").queue();
+					Logger logger = LoggerFactory.getLogger(UserExecution.class);
+					logger.info("{} has gifted {} experience points to {} in guild {}", _e.getMember().getUser().getId(), _message, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 					FileSetting.deleteFile(file_path);
 				}
 			}
@@ -538,6 +561,8 @@ public class UserExecution {
 						_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
 					}
 					_e.getTextChannel().sendMessage("Experience points have been updated!").queue();
+					Logger logger = LoggerFactory.getLogger(UserExecution.class);
+					logger.info("{} has set {} experience points to {} in guild {}", _e.getMember().getUser().getId(), _message, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 					FileSetting.deleteFile(file_path);
 				}
 			}
@@ -582,6 +607,8 @@ public class UserExecution {
 							_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
 						}
 						_e.getTextChannel().sendMessage("The level has been updated!").queue();
+						Logger logger = LoggerFactory.getLogger(UserExecution.class);
+						logger.info("{} has set the level {} to {} in guild {}", _e.getMember().getUser().getId(), _message, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 						FileSetting.deleteFile(file_path);
 					}
 					else {
@@ -598,6 +625,8 @@ public class UserExecution {
 					RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), "Money gifted", "User received money in value of "+currency+" PEN");
 					Hashes.addRanking(user_details.getUser_ID(), user_details);
 					_e.getTextChannel().sendMessage("Currency has been updated!").queue();
+					Logger logger = LoggerFactory.getLogger(UserExecution.class);
+					logger.info("{} has gifted {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 					FileSetting.deleteFile(file_path);
 				}
 			}
@@ -610,6 +639,8 @@ public class UserExecution {
 					RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), "Money set", "Currency value for the user has been changed to "+currency+" PEN");
 					Hashes.addRanking(user_details.getUser_ID(), user_details);
 					_e.getTextChannel().sendMessage("Currency has been updated!").queue();
+					Logger logger = LoggerFactory.getLogger(UserExecution.class);
+					logger.info("{} has set {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 					FileSetting.deleteFile(file_path);
 				}
 			}

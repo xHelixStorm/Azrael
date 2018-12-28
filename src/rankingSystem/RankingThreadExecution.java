@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Guilds;
 import core.Hashes;
 import net.dv8tion.jda.core.entities.PrivateChannel;
@@ -17,6 +20,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
 
 public class RankingThreadExecution {
+	private final static Logger logger = LoggerFactory.getLogger(RankingThreadExecution.class);
 	public static void setProgress(MessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, int percent_multiplier, Rank user_details, Guilds guild_settings){
 		RankingSystem.SQLDeleteInventory();
 		int multiplier = 1;
@@ -70,6 +74,7 @@ public class RankingThreadExecution {
 				daily_experience += adder;
 				ExperienceGain(e, user_details,  guild_settings, currentExperience, experience, daily_experience, roleAssignLevel, max_experience_enabled, reset);
 				if(daily_experience > max_experience*multiplier){
+					logger.info("{} has reached the limit of today's max experience points gain", e.getMember().getUser().getId());
 					RankingSystem.SQLInsertActionLog("medium", user_id, "Experience limit reached", "User reached the limit of experience points");
 					PrivateChannel pc = e.getMember().getUser().openPrivateChannel().complete();
 					pc.sendMessage("You have reached the max possible to gain experience today. More experience points can be collected tomorrow!").queue();
@@ -129,6 +134,7 @@ public class RankingThreadExecution {
 			}
 			
 			RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
+			logger.info("{} reached level {}, has {} experience and {} daily experience", user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getDailyExperience());
 			RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), "Level Up", "User reached level "+level);
 			RankingMethods.getRankUp(e, level, user_details.getRankingLevel(), user_details.getRankingIcon(), user_details.getColorRLevel(), user_details.getColorGLevel(), user_details.getColorBLevel(), user_details.getRankXLevel(), user_details.getRankYLevel(), user_details.getRankWidthLevel(), user_details.getRankHeightLevel());
 			Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
@@ -144,6 +150,7 @@ public class RankingThreadExecution {
 			}
 			
 			RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), user_details.getExperience());
+			logger.info("{} reached level {}, has {} experience and {} daily experience", user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getDailyExperience());
 			Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
 		}
 	}

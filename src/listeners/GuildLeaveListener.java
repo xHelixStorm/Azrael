@@ -3,6 +3,9 @@ package listeners;
 import java.awt.Color;
 import java.sql.Timestamp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.audit.AuditLogEntry;
@@ -15,6 +18,8 @@ public class GuildLeaveListener extends ListenerAdapter{
 	
 	@Override
 	public void onGuildMemberLeave(GuildMemberLeaveEvent e){
+		Logger logger = LoggerFactory.getLogger(GuildLeaveListener.class);
+		logger.info("{} has left the guild {}", e.getUser().getId(), e.getGuild().getName());
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getLeaveThumbnail()).setTitle("User left!");
 		EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User kicked!");
 		EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User banned!");

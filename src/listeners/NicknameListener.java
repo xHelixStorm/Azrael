@@ -1,5 +1,8 @@
 package listeners;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import sql.Azrael;
@@ -30,6 +33,8 @@ public class NicknameListener extends ListenerAdapter{
 		} finally {
 			Azrael.clearAllVariables();
 		}
+		Logger logger = LoggerFactory.getLogger(NameListener.class);
+		logger.info("{} received the nickname {} in guild {}", e.getUser().getId(), nickname, e.getGuild().getName());
 		Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild_id, nickname);
 	}
 }

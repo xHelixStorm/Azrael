@@ -7,6 +7,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.FileSetting;
@@ -95,6 +98,8 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 			}
 			
 			if(wordFound == true){
+				Logger logger = LoggerFactory.getLogger(LanguageFilter.class);
+				logger.info("Edited message removed from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 				Path path = Paths.get(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");
 				
 				if(Files.notExists(path)){

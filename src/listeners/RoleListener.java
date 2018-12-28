@@ -3,6 +3,9 @@ package listeners;
 import java.awt.Color;
 import java.sql.Timestamp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.FileSetting;
@@ -84,6 +87,8 @@ public class RoleListener extends ListenerAdapter{
 								+ "On a important note, this is an automated reply. You'll receive no reply in any way.").queue();
 						pc.close();
 						new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, channel_id, mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0)).start();
+						Logger logger = LoggerFactory.getLogger(RoleListener.class);
+						logger.info("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getName());
 						FileSetting.deleteFile(IniFileReader.getTempDirectory()+"AutoDelFiles/mute_time_"+e.getMember().getUser().getId());
 					}
 					else {
@@ -107,6 +112,8 @@ public class RoleListener extends ListenerAdapter{
 									+ "On a important note, this is an automated reply. You'll receive no reply in any way.").queue();
 							pc.close();
 							new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, channel_id, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning)).start();
+							Logger logger = LoggerFactory.getLogger(RoleListener.class);
+							logger.info("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getName());
 						}
 						else if((warning_id+1) > max_warning) {
 							PrivateChannel pc = e.getUser().openPrivateChannel().complete();

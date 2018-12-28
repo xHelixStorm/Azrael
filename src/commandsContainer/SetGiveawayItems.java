@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
@@ -29,10 +32,12 @@ public class SetGiveawayItems {
 			boolean err = RankingSystem.SQLBulkInsertGiveawayRewards(rewards, timestamp);
 			
 			if(err == false) {
+				Logger logger = LoggerFactory.getLogger(SetGiveawayItems.class);
+				logger.info("{} has inserted giveaway items for the daily command", e.getMember().getUser().getId());
 				e.getTextChannel().sendMessage("Rewards from pastebin link have been inserted succesfully!").queue();
 			}
 			else {
-				EmbedBuilder error = new EmbedBuilder().setTitle("Invalid url!").setColor(Color.RED);
+				EmbedBuilder error = new EmbedBuilder().setTitle("Invalid format!").setColor(Color.RED);
 				e.getTextChannel().sendMessage(error.setDescription("Rewards couldn't be set to table. Please verify the content of the link!").build()).queue();
 			}
 		}

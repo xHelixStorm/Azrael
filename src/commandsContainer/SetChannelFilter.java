@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
 
@@ -43,8 +46,10 @@ public class SetChannelFilter {
 				i++;
 			}
 			if(languageError ==  false){
+				Logger logger = LoggerFactory.getLogger(SetChannelFilter.class);
 				for(String language : filter_lang){
 					Azrael.SQLInsertChannel_Filter(channel_id, language);
+					logger.info("{} has set the channel filter {} for channel {} in guild {}", _e.getMember().getUser().getId(), language, channel_id, _e.getGuild().getName());
 					_e.getTextChannel().sendMessage("**Filter for <#"+channel_id+"> has been updated!**").queue();
 				}
 			}

@@ -3,10 +3,14 @@ package commands;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import commandsContainer.SetChannelFilter;
 import commandsContainer.SetCommandLevel;
 import commandsContainer.SetDailyItem;
 import commandsContainer.SetGiveawayItems;
+import commandsContainer.SetIconDefaultSkin;
 import commandsContainer.SetLevelDefaultSkin;
 import commandsContainer.SetMaxExperience;
 import commandsContainer.SetMaxLevel;
@@ -33,6 +37,9 @@ public class Set implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getSetCommand()){
+			Logger logger = LoggerFactory.getLogger(RoleReaction.class);
+			logger.info("{} has used Set command", e.getMember().getUser().getId());
+			
 			EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Set up your server to use the capacities of this bot to the fullest!");
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 			String input = e.getMessage().getContentRaw();
@@ -64,7 +71,7 @@ public class Set implements Command{
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -warnings")) {
 					SetWarning.runHelp(e);
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -warnings")){
+				else if(input.contains(IniFileReader.getCommandPrefix()+"set -warnings ")){
 					SetWarning.runTask(e, e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+14));
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -commands")){
@@ -160,7 +167,7 @@ public class Set implements Command{
 					RankingSystem.SQLgetRankingIcons();
 					int last_theme = Hashes.getRankList("ranking-icons").size();
 					input = input.substring(23+IniFileReader.getCommandPrefix().length());
-					SetRankDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+					SetIconDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -daily-item")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Write the name of the daily reward you want to make available for dailies together with the weight and type of the item. For example:\n**"+IniFileReader.getCommandPrefix()+"set -daily-item \"5000 PEN\" -weight 70 -type cur**\nNote that the total weight can't exceed 100 and that the currently available types are **cur** for currency , **exp** for experience enhancement items and **cod** for code giveaways.").build()).queue();

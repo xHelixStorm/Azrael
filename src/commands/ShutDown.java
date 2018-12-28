@@ -3,6 +3,9 @@ package commands;
 import java.awt.Color;
 import java.sql.Timestamp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.UserPrivs;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -40,7 +43,8 @@ public class ShutDown implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		System.out.println("Bot shutdown commenced!");
+		Logger logger = LoggerFactory.getLogger(ShutDown.class);
+		logger.info("{} has used ShutDown command", e.getMember().getUser().getId());
 	}
 
 	@Override

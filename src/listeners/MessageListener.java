@@ -11,6 +11,8 @@ import com.vdurmont.emoji.EmojiManager;
 import commandsContainer.FilterExecution;
 import commandsContainer.SetWarning;
 import commandsContainer.UserExecution;
+import core.CommandHandler;
+import core.CommandParser;
 import core.Guilds;
 import core.Hashes;
 import core.Messages;
@@ -37,6 +39,11 @@ public class MessageListener extends ListenerAdapter{
 		ExecutorService executor = Executors.newFixedThreadPool(2);
 		
 		try {
+			//execute commands first
+			if(e.getMessage().getContentRaw().startsWith(IniFileReader.getCommandPrefix()) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()){
+				CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw(), e));
+			}
+			
 			File warning = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
 			File user = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
 			File filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
@@ -204,7 +211,6 @@ public class MessageListener extends ListenerAdapter{
 		} catch(NullPointerException npe){
 			//play with your thumbs 
 		}
-		RankingSystem.clearAllVariables();
 		Azrael.clearAllVariables();
 		executor.shutdown();
 	}

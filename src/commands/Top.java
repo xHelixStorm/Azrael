@@ -3,6 +3,9 @@ package commands;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
@@ -99,7 +102,8 @@ public class Top implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		RankingSystem.clearAllVariables();
+		Logger logger = LoggerFactory.getLogger(Top.class);
+		logger.info("{} has used Top command", e.getMember().getUser().getId());
 		Azrael.clearAllVariables();
 	}
 
