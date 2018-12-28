@@ -1,7 +1,6 @@
 package commands;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,6 +24,8 @@ public class Meow implements Command{
 		if(IniFileReader.getMeowCommand()){
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
+				Logger logger = LoggerFactory.getLogger(Meow.class);
+				logger.info("{} has used Meow command", e.getMember().getUser().getId());
 				long channel = e.getTextChannel().getIdLong();
 				long guild_id = e.getGuild().getIdLong();
 				String variable = e.getMessage().getContentRaw();
@@ -46,8 +47,7 @@ public class Meow implements Command{
 							try {
 								MeowExecution.Execute(e, variable, path, channel_id);
 							} catch (IOException e1) {
-								System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-								e1.printStackTrace();
+								logger.warn("Selected meow picture couldn't be found", e1);
 							}
 						}
 						else{
@@ -55,8 +55,7 @@ public class Meow implements Command{
 								try {
 									MeowExecution.Execute(e, variable, path, channel_id);
 								} catch (IOException e1) {
-									System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-									e1.printStackTrace();
+									logger.warn("Selected meow picture couldn't be found", e1);
 								}
 							}
 							else{
@@ -71,8 +70,6 @@ public class Meow implements Command{
 	}
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Logger logger = LoggerFactory.getLogger(Meow.class);
-		logger.info("{} has used Meow command", e.getMember().getUser().getId());
 		Azrael.clearAllVariables();
 	}
 

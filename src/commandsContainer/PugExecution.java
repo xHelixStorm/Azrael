@@ -3,7 +3,9 @@ package commandsContainer;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -27,8 +29,8 @@ public class PugExecution {
 				file.createNewFile();
 				new Thread(new DelayDelete(fileName, 20000)).start();
 			} catch (IOException e2) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e2.printStackTrace();
+				Logger logger = LoggerFactory.getLogger(PugExecution.class);
+				logger.warn("{} file couldn't be created", fileName, e2);
 			}
 			
 			if(variable.equals(IniFileReader.getCommandPrefix()+"pug pug")){

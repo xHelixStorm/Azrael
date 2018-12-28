@@ -1,7 +1,6 @@
 package commands;
 
 import java.awt.Color;
-import java.sql.Timestamp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,14 +22,16 @@ public class ShutDown implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getShutDownCommand()){
+			Logger logger = LoggerFactory.getLogger(ShutDown.class);
+			logger.info("{} has used ShutDown command", e.getMember().getUser().getId());
+			
 			if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin() || UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong())){
 				e.getTextChannel().sendMessage("**I'm going to shut down shortly**").queue();
 				
 				try{
 					Thread.sleep(20000);
 				}catch(InterruptedException ev){
-					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-					ev.printStackTrace();
+					logger.warn("Exception off thread sleep while performing shut down", ev);
 				}
 				e.getTextChannel().sendMessage("**shutting down now. Cya later!**").queue();
 				e.getJDA().shutdown();
@@ -43,8 +44,7 @@ public class ShutDown implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Logger logger = LoggerFactory.getLogger(ShutDown.class);
-		logger.info("{} has used ShutDown command", e.getMember().getUser().getId());
+		
 	}
 
 	@Override

@@ -2,9 +2,10 @@ package fileManagement;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 
 import org.ini4j.Ini;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IniFileReader {
 	
@@ -14,8 +15,8 @@ public class IniFileReader {
 		try {
 			ini = new Ini(new File("./config.ini"));
 		} catch (IOException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			Logger logger = LoggerFactory.getLogger(IniFileReader.class);
+			logger.warn("Config file couldn't be found or couldn't be opened", e);
 		}
 	}
 	

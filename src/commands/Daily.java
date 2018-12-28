@@ -48,8 +48,7 @@ public class Daily implements Command{
 					file.createNewFile();
 					new Thread(new DelayDelete(fileName, 3000)).start();
 				} catch (IOException e2) {
-					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-					e2.printStackTrace();
+					logger.warn("{} file couldn't be created", fileName, e2);
 				}
 				
 				ExecutorService executor = Executors.newSingleThreadExecutor();

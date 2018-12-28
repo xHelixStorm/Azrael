@@ -1,7 +1,6 @@
 package commands;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,6 +24,9 @@ public class Pug implements Command{
 		if(IniFileReader.getPugCommand()){
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
+				Logger logger = LoggerFactory.getLogger(Pug.class);
+				logger.info("{} has used Pug command", e.getMember().getUser().getId());
+				
 				long channel = e.getTextChannel().getIdLong();
 				long guild_id = e.getGuild().getIdLong();
 				String variable = e.getMessage().getContentRaw();
@@ -46,8 +48,7 @@ public class Pug implements Command{
 							try {
 								PugExecution.Execute(e, variable, path, channel_id);
 							} catch (IOException e1) {
-								System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-								e1.printStackTrace();
+								logger.warn("Selected pug picture couldn't be found", e1);
 							}
 						}
 						else{
@@ -55,8 +56,7 @@ public class Pug implements Command{
 								try {
 									PugExecution.Execute(e, variable, path, channel_id);
 								} catch (IOException e1) {
-									System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-									e1.printStackTrace();
+									logger.warn("Selected pug picture couldn't be found", e1);
 								}
 							}
 							else{
@@ -72,8 +72,6 @@ public class Pug implements Command{
 	
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Logger logger = LoggerFactory.getLogger(Pug.class);
-		logger.info("{} has used Pug command", e.getMember().getUser().getId());
 		Azrael.clearAllVariables();
 	}
 

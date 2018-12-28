@@ -3,7 +3,6 @@ package commands;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,6 +30,9 @@ public class Rank implements Command{
 		if(IniFileReader.getPurchaseCommand()){
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
+				Logger logger = LoggerFactory.getLogger(Rank.class);
+				logger.info("{} has used Rank command", e.getMember().getUser().getId());
+				
 				long user_id = 0;
 				if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"rank ")) {
 					String id = e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+5).replaceAll("[^0-9]", "");
@@ -54,8 +56,7 @@ public class Rank implements Command{
 							try {
 								file.createNewFile();
 							} catch (IOException e2) {
-								System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-								e2.printStackTrace();
+								logger.warn("{} file couldn't be created", fileName, e2);
 							}
 							
 							new Thread(new DelayDelete(fileName, 30000)).start();
@@ -126,9 +127,7 @@ public class Rank implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Logger logger = LoggerFactory.getLogger(Rank.class);
-		logger.info("{} has used Rank command", e.getMember().getUser().getId());
-		RankingSystem.clearAllVariables();
+
 	}
 
 	@Override

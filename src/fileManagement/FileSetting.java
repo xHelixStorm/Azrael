@@ -8,11 +8,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FileSetting {
-private static PrintWriter pw;
+	private static final Logger logger = LoggerFactory.getLogger(FileSetting.class);
+	private static PrintWriter pw;
 	
 	public static void createFile(String name, String content){
 		try {
@@ -20,8 +23,7 @@ private static PrintWriter pw;
 			pw.print(content);
 			pw.close();
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.warn("Exception on file creation: {}", name, e);
 		}
 	}
 	
@@ -52,19 +54,16 @@ private static PrintWriter pw;
 				String content = sb.toString();
 				return content;
 			} catch (IOException e) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e.printStackTrace();
+				logger.warn("Error on read line of readFile: {}", name, e);
 			}finally {
 				try {
 					br.close();
 				} catch (IOException e) {
-					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-					e.printStackTrace();
+					logger.warn("File {} couldn't be closed after reading", name, e);
 				}
 			}
 		} catch (FileNotFoundException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.warn("File {} to read couldn't be found", name, e);
 			return "";
 		}
 		return null;
@@ -85,19 +84,16 @@ private static PrintWriter pw;
 				}
 				return content;
 			} catch (IOException e) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e.printStackTrace();
+				logger.warn("Error on read line of readFileIntoArray: {}", _name, e);
 			}finally {
 				try {
 					br.close();
 				} catch (IOException e) {
-					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-					e.printStackTrace();
+					logger.warn("File {} couldn't be closed after reading into an array", _name, e);
 				}
 			}
 		} catch (FileNotFoundException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.warn("File {} to read couldn't be found", _name, e);
 		}
 		return null;
 	}
@@ -122,19 +118,16 @@ private static PrintWriter pw;
 				}
 				return contentReturn;
 			} catch (IOException e) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e.printStackTrace();
+				logger.warn("Error on read line of readFileIntoFixedArray: {}", _name, e);
 			}finally {
 				try {
 					br.close();
 				} catch (IOException e) {
-					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-					e.printStackTrace();
+					logger.warn("File {} couldn't be closed after reading into a fixed array", _name, e);
 				}
 			}
 		} catch (FileNotFoundException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.warn("File {} to read couldn't be found", _name, e);
 		}
 		return null;
 	}
