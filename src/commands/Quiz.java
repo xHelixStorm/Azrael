@@ -26,7 +26,7 @@ public class Quiz implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getQuizCommand()) {
 			Logger logger = LoggerFactory.getLogger(Quiz.class);
-			logger.info("{} has used Quiz command", e.getMember().getUser().getId());
+			logger.debug("{} has used Quiz command", e.getMember().getUser().getId());
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setTitle("Access denied!").setThumbnail(IniFileReader.getDeniedThumbnail());
 			if(!new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr").exists()) {
 				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
@@ -68,11 +68,11 @@ public class Quiz implements Command{
 								+ "It's also possible to include rewards while registering questions in case it is easier to avoid errors. This can be done by applying the **=** before the reward.").queue();
 					}
 					else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"quiz -register-questions ")) {
-						logger.info("{} performed the registration of questions and rewards for the Quiz", e.getMember().getUser().getId());
+						logger.debug("{} performed the registration of questions and rewards for the Quiz", e.getMember().getUser().getId());
 						QuizExecution.registerQuestions(e, e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+25), false);
 					}
 					else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"quiz -clear")) {
-						logger.info("{} cleared all quiz questions and rewards", e.getMember().getUser().getId());
+						logger.debug("{} cleared all quiz questions and rewards", e.getMember().getUser().getId());
 						Hashes.clearQuiz();
 						e.getTextChannel().sendMessage("Cache has been cleared from registered questions and rewards!").queue();
 					}
@@ -107,7 +107,7 @@ public class Quiz implements Command{
 						if(Hashes.getWholeQuiz().size() > 0) {
 							//save all settings
 							QuizExecution.saveQuestions(e);
-							logger.info("{} has saved the quiz questions and rewards to file", e.getMember().getUser().getId());
+							logger.debug("{} has saved the quiz questions and rewards to file", e.getMember().getUser().getId());
 						}
 						else {
 							e.getTextChannel().sendMessage("There is nothing to save. Please use register-rewards and register-questions before this parameter is used.").queue();
@@ -117,7 +117,7 @@ public class Quiz implements Command{
 						File file = new File("./files/QuizBackup/quizsettings.azr");
 						if(file.exists()) {
 							QuizExecution.registerQuestions(e, "", true);
-							logger.info("{} has loaded the quiz questions and rewards from file", e.getMember().getUser().getId());
+							logger.debug("{} has loaded the quiz questions and rewards from file", e.getMember().getUser().getId());
 						}
 						else {
 							e.getTextChannel().sendMessage("No saved settings have been found. Please save them first.").queue();

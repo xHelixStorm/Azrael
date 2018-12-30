@@ -23,7 +23,7 @@ public class Help implements Command{
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
 		Logger logger = LoggerFactory.getLogger(Help.class);
-		logger.info("{} has used Help command", e.getMember().getUser().getId());
+		logger.debug("{} has used Help command", e.getMember().getUser().getId());
 	}
 
 	@Override

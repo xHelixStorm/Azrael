@@ -25,6 +25,8 @@ public class RoleListener extends ListenerAdapter{
 	
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent e){
+		final Logger logger = LoggerFactory.getLogger(RoleListener.class);
+		
 		RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong());
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setTitle("A user has been muted!");
 		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN).setTitle("Mute Retracted!");
@@ -87,8 +89,7 @@ public class RoleListener extends ListenerAdapter{
 								+ "On a important note, this is an automated reply. You'll receive no reply in any way.").queue();
 						pc.close();
 						new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, channel_id, mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0)).start();
-						Logger logger = LoggerFactory.getLogger(RoleListener.class);
-						logger.info("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getName());
+						logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getName());
 						FileSetting.deleteFile(IniFileReader.getTempDirectory()+"AutoDelFiles/mute_time_"+e.getMember().getUser().getId());
 					}
 					else {
@@ -112,14 +113,14 @@ public class RoleListener extends ListenerAdapter{
 									+ "On a important note, this is an automated reply. You'll receive no reply in any way.").queue();
 							pc.close();
 							new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, channel_id, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning)).start();
-							Logger logger = LoggerFactory.getLogger(RoleListener.class);
-							logger.info("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getName());
+							logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getName());
 						}
 						else if((warning_id+1) > max_warning) {
 							PrivateChannel pc = e.getUser().openPrivateChannel().complete();
 							pc.sendMessage("You have been banned from "+e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 									+ "On a important note, this is an automated reply. You'll receive no reply in any way.").complete();
 							pc.close();
+							logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 							e.getJDA().getGuildById(guild_id).getController().ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").complete();
 						}
 					}
@@ -127,7 +128,9 @@ public class RoleListener extends ListenerAdapter{
 					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
 					hye.printStackTrace();
 					e.getJDA().getGuildById(guild_id).getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
+					logger.debug("{} received a mute role that has been instantly removed", e.getMember().getUser().getId());
 					e.getGuild().getTextChannelById(channel_id).sendMessage(message2.setDescription("The mute role has been set on someone with higher privileges. Mute role removed!").build()).queue();
+					
 				}
 			}
 			if(unmute_time - System.currentTimeMillis() < 0){

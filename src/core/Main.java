@@ -50,6 +50,7 @@ import listeners.ReadyListener;
 import listeners.RoleListener;
 import listeners.RoleRemovedListener;
 import listeners.ShutdownListener;
+import listeners.StatusListener;
 import listeners.UnbanListener;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -72,8 +73,8 @@ public class Main {
 			PrintStream out;
 			PrintStream err;
 			try {
-				out = new PrintStream(new FileOutputStream("log/log"+new Timestamp(System.currentTimeMillis())+".txt"));
-				err = new PrintStream(new FileOutputStream("log/err"+new Timestamp(System.currentTimeMillis())+".txt"));
+				out = new PrintStream(new FileOutputStream("log/log"+new Timestamp(System.currentTimeMillis()).toString().replaceAll(":", "-")+".txt"));
+				err = new PrintStream(new FileOutputStream("log/err"+new Timestamp(System.currentTimeMillis()).toString().replaceAll(":", "-")+".txt"));
 				System.setOut(out);
 				System.setErr(err);
 			} catch (FileNotFoundException e1) {
@@ -162,5 +163,6 @@ public class Main {
 		builder.addEventListener(new AvatarUpdateListener());
 		builder.addEventListener(new GuildMessageReactionAddListener());
 		builder.addEventListener(new GuildMessageReactionRemoveListener());
+		builder.addEventListener(new StatusListener());
 	}
 }

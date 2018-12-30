@@ -3,6 +3,9 @@ package threads;
 import java.awt.Color;
 import java.sql.Timestamp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
@@ -46,8 +49,8 @@ public class MuteRestart implements Runnable{
 			if(assignedRole != 0 && ranking_state == true){e.getJDA().getGuildById(guild_id).getController().addSingleRoleToMember(member, e.getJDA().getGuildById(guild_id).getRoleById(assignedRole)).queue();}
 			
 		} catch (InterruptedException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			Logger logger = LoggerFactory.getLogger(MuteRestart.class);
+			logger.error("The mute restart has been interrupted", e);
 		}
 	}
 }

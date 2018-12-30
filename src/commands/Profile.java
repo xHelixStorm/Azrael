@@ -31,7 +31,7 @@ public class Profile implements Command{
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
 				Logger logger = LoggerFactory.getLogger(Profile.class);
-				logger.info("{} has used Profile command", e.getMember().getUser().getId());
+				logger.debug("{} has used Profile command", e.getMember().getUser().getId());
 				
 				long user_id = 0;
 				if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"profile ")) {
@@ -56,7 +56,7 @@ public class Profile implements Command{
 							try {
 								file.createNewFile();
 							} catch (IOException e2) {
-								logger.warn("{} couldn't be created", fileName, e2);
+								logger.error("{} couldn't be created", fileName, e2);
 							}
 							
 							new Thread(new DelayDelete(fileName, 30000)).start();

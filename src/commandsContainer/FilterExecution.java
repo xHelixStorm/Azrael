@@ -219,7 +219,7 @@ public class FilterExecution {
 						message.setTitle("English word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.info("{} has called the english word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has called the english word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					else if(_message.equalsIgnoreCase("german")) {
@@ -232,7 +232,7 @@ public class FilterExecution {
 						message.setTitle("German word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.info("{} has called the german word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has called the german word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					else if(_message.equalsIgnoreCase("french")) {
@@ -245,7 +245,7 @@ public class FilterExecution {
 						message.setTitle("French word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.info("{} has called the french word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has called the french word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					else if(_message.equalsIgnoreCase("turkish")) {
@@ -258,7 +258,7 @@ public class FilterExecution {
 						message.setTitle("Turkish word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.info("{} has called the turkish word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has called the turkish word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					else if(_message.equalsIgnoreCase("russian")) {
@@ -271,7 +271,7 @@ public class FilterExecution {
 						message.setTitle("Russian word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.info("{} has called the russian word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has called the russian word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					else if(_message.equalsIgnoreCase("spanish")) {
@@ -284,7 +284,7 @@ public class FilterExecution {
 						message.setTitle("Spanish word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.info("{} has called the spanish word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has called the spanish word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					else if(_message.equalsIgnoreCase("portuguese")) {
@@ -297,7 +297,7 @@ public class FilterExecution {
 						message.setTitle("Portuguese word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.info("{} has called the portuguese word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has called the portuguese word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					else if(_message.equalsIgnoreCase("italian")) {
@@ -310,7 +310,7 @@ public class FilterExecution {
 						message.setTitle("Italian word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.info("{} has called the italian word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has called the italian word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -362,7 +362,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the english word filter!").build()).queue();
 					Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has inserted the word {} into the english word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has inserted the word {} into the english word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "german-insert-word-filter":
@@ -371,7 +371,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the german word filter!").build()).queue();
 					Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has inserted the word {} into the german word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has inserted the word {} into the german word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "french-insert-word-filter":
@@ -380,7 +380,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the french word filter!").build()).queue();
 					Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has inserted the word {} into the french word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has inserted the word {} into the french word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "turkish-insert-word-filter":
@@ -389,7 +389,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the turkish word filter!").build()).queue();
 					Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has inserted the word {} into the turkish word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has inserted the word {} into the turkish word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "russian-insert-word-filter":
@@ -398,7 +398,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the russian word filter!").build()).queue();
 					Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has inserted the word {} into the russian word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has inserted the word {} into the russian word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "spanish-insert-word-filter":
@@ -407,7 +407,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the spanish word filter!").build()).queue();
 					Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has inserted the word {} into the spanish word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has inserted the word {} into the spanish word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "portuguese-insert-word-filter":
@@ -416,7 +416,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the portuguese word filter!").build()).queue();
 					Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has inserted the word {} into the portuguese word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has inserted the word {} into the portuguese word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "italian-insert-word-filter":
@@ -425,7 +425,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the italian word filter!").build()).queue();
 					Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has inserted the word {} into the italian word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has inserted the word {} into the italian word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "remove-word-filter":
@@ -476,7 +476,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the english word filter!").build()).queue();
 					Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has removed the word {} from the english word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has removed the word {} from the english word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "german-remove-word-filter":
@@ -485,7 +485,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the german word filter!").build()).queue();
 					Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has removed the word {} from the german word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has removed the word {} from the german word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "french-remove-word-filter":
@@ -494,7 +494,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the french word filter!").build()).queue();
 					Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has removed the word {} from the french word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has removed the word {} from the french word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "turkish-remove-word-filter":
@@ -503,7 +503,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the turkish word filter!").build()).queue();
 					Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has removed the word {} from the turkish word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has removed the word {} from the turkish word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "russian-remove-word-filter":
@@ -512,7 +512,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the russian word filter!").build()).queue();
 					Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has removed the word {} from the russian word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has removed the word {} from the russian word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "spanish-remove-word-filter":
@@ -521,7 +521,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the spanish word filter!").build()).queue();
 					Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has removed the word {} from the spanish word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has removed the word {} from the spanish word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "portuguese-remove-word-filter":
@@ -530,7 +530,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the portuguese word filter!").build()).queue();
 					Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has removed the word {} from the portuguese word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has removed the word {} from the portuguese word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "italian-remove-word-filter":
@@ -539,7 +539,7 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the italian word filter!").build()).queue();
 					Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
 					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.info("{} has removed the word {} from the italian word filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has removed the word {} from the italian word filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "load-word-filter":
@@ -594,7 +594,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
 						Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
 						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.info("{} has inserted words from a file into the english word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has inserted words from a file into the english word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -608,7 +608,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
 						Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
 						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.info("{} has inserted words from a file into the german word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has inserted words from a file into the german word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -622,7 +622,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
 						Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
 						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.info("{} has inserted words from a file into the french word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has inserted words from a file into the french word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -636,7 +636,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
 						Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
 						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.info("{} has inserted words from a file into the turkish word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has inserted words from a file into the turkish word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -650,7 +650,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
 						Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
 						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.info("{} has inserted words from a file into the russian word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has inserted words from a file into the russian word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -664,7 +664,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
 						Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
 						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.info("{} has inserted words from a file into the spanish word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has inserted words from a file into the spanish word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -678,7 +678,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
 						Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
 						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.info("{} has inserted words from a file into the portuguese word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has inserted words from a file into the portuguese word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -692,7 +692,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
 						Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
 						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.info("{} has inserted words from a file into the italian word filter", _e.getMember().getUser().getIdLong());
+						logger.debug("{} has inserted words from a file into the italian word filter", _e.getMember().getUser().getIdLong());
 						FileSetting.createFile(file_path, "complete");
 					}
 					break;
@@ -701,7 +701,7 @@ public class FilterExecution {
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into name filter!").build()).queue();
 					Hashes.removeQuerryResult("bad-names_"+_e.getGuild().getId());
-					logger.info("{} has inserted the word {} into the name filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has inserted the word {} into the name filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "remove-name-filter":
@@ -709,7 +709,7 @@ public class FilterExecution {
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the name filter!").build()).queue();
 					Hashes.removeQuerryResult("bad-names_"+_e.getGuild().getId());
-					logger.info("{} has removed the word {} from the name filter", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has removed the word {} from the name filter", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "load-name-filter":
@@ -720,7 +720,7 @@ public class FilterExecution {
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
 					Hashes.removeQuerryResult("bad-names_"+_e.getGuild().getId());
-					logger.info("{} has inserted words out from a file into the name filter", _e.getMember().getUser().getIdLong());
+					logger.debug("{} has inserted words out from a file into the name filter", _e.getMember().getUser().getIdLong());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "insert-funny-names":
@@ -728,7 +728,7 @@ public class FilterExecution {
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The name has been inserted into the funny names list!").build()).queue();
 					Hashes.removeQuerryResult("funny-names_"+_e.getGuild().getId());
-					logger.info("{} has inserted the word {} into the funny names", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has inserted the word {} into the funny names", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "remove-funny-names":
@@ -736,7 +736,7 @@ public class FilterExecution {
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The name has been removed from the funny names list!").build()).queue();
 					Hashes.removeQuerryResult("funny-names_"+_e.getGuild().getId());
-					logger.info("{} has removed the word {} from the funny names", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has removed the word {} from the funny names", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "load-funny-names":
@@ -747,7 +747,7 @@ public class FilterExecution {
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("Names have been inserted!").build()).queue();
 					Hashes.removeQuerryResult("funny-names_"+_e.getGuild().getId());
-					logger.info("{} has inserted words out from a file into the funny names", _e.getMember().getUser().getIdLong());
+					logger.debug("{} has inserted words out from a file into the funny names", _e.getMember().getUser().getIdLong());
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "insert-staff-names":
@@ -755,7 +755,7 @@ public class FilterExecution {
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The name has been inserted into the staff names list!").build()).queue();
 					Hashes.removeQuerryResult("staff-names_"+_e.getGuild().getId());
-					logger.info("{} has inserted the word {} into the staff names", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has inserted the word {} into the staff names", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "remove-staff-names":
@@ -763,7 +763,7 @@ public class FilterExecution {
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("The name has been removed from the staff names list!").build()).queue();
 					Hashes.removeQuerryResult("staff-names_"+_e.getGuild().getId());
-					logger.info("{} has removed the word {} from the staff names", _e.getMember().getUser().getIdLong(), _message);
+					logger.debug("{} has removed the word {} from the staff names", _e.getMember().getUser().getIdLong(), _message);
 					FileSetting.createFile(file_path, "complete");
 					break;
 				case "load-staff-names":
@@ -774,7 +774,7 @@ public class FilterExecution {
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("Names have been inserted!").build()).queue();
 					Hashes.removeQuerryResult("staff-names_"+_e.getGuild().getId());
-					logger.info("{} has inserted word out from a file into the staff names", _e.getMember().getUser().getIdLong());
+					logger.debug("{} has inserted word out from a file into the staff names", _e.getMember().getUser().getIdLong());
 					FileSetting.createFile(file_path, "complete");
 					break;
 			}

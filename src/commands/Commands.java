@@ -23,6 +23,9 @@ public class Commands implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here are all available commands!");
 		if(IniFileReader.getCommandsCommand()){
+			Logger logger = LoggerFactory.getLogger(Commands.class);
+			logger.debug("{} has used Commands command", e.getMember().getUser().getId());
+			
 			long guild_id = e.getGuild().getIdLong();
 			long channel = e.getTextChannel().getIdLong();
 			Azrael.SQLgetChannelID(guild_id, "bot");
@@ -30,6 +33,7 @@ public class Commands implements Command{
 			
 			if(channel != channel_id && channel_id != 0){
 				e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+channel_id+">").queue();
+				logger.warn("Commands command was used in a not bot channel");
 			}
 			else{
 				e.getTextChannel().sendMessage(messageBuild.setDescription(message).build()).queue();		
@@ -39,8 +43,6 @@ public class Commands implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Logger logger = LoggerFactory.getLogger(Commands.class);
-		logger.info("{} has used Commands command", e.getMember().getUser().getId());
 		Azrael.clearAllVariables();
 	}
 

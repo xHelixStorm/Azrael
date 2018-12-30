@@ -76,7 +76,7 @@ public class RegisterChannel {
 							break;
 					}
 					Logger logger = LoggerFactory.getLogger(RegisterChannel.class);
-					logger.info("{} has registered the channel {} as {} channel in the guild {}", _e.getMember().getUser().getId(), channel_type, channel_type, _e.getGuild().getName());
+					logger.debug("{} has registered the channel {} as {} channel in the guild {}", _e.getMember().getUser().getId(), channel_type, channel_type, _e.getGuild().getName());
 					_e.getTextChannel().sendMessage("**The channel has been registered!**").queue();
 					if(channel_type.equals("rea")) {
 						//create message in the channel and create an auto-delete-file so that the MessageListener can create the needed reactions
@@ -102,7 +102,7 @@ public class RegisterChannel {
 				Azrael.SQLInsertChannels(tc.getIdLong(), tc.getName());
 			}
 			Logger logger = LoggerFactory.getLogger(RegisterChannel.class);
-			logger.info("{} has registered all available channels on guild {}", _e.getMember().getUser().getId(), _e.getGuild().getName());
+			logger.debug("{} has registered all available channels on guild {}", _e.getMember().getUser().getId(), _e.getGuild().getName());
 			_e.getTextChannel().sendMessage("**All text channels have been registered!**").queue();
 		}
 		else {

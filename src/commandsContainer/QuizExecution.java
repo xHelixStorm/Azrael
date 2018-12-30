@@ -3,6 +3,9 @@ package commandsContainer;
 import java.awt.Color;
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Hashes;
 import core.Quizes;
 import fileManagement.FileSetting;
@@ -11,6 +14,8 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import util.Pastebin;
 
 public class QuizExecution {
+	private static final Logger logger = LoggerFactory.getLogger(QuizExecution.class);
+	
 	public static void registerRewards(MessageReceivedEvent e, String _link) {
 		//check if it is a link that was inserted and if yes call readPublicPasteLink and then
 		//split the returned String in an array
@@ -52,26 +57,30 @@ public class QuizExecution {
 					String integrity = IntegrityCheck();
 					if(integrity.equals("0")) {
 						e.getTextChannel().sendMessage("All rewards have been registered successfully!").queue();
+						logger.debug("Quiz rewards have been registered");
 					}
 					else {
 						e.getTextChannel().sendMessage("An error occured while registering the rewards. All inserted rewards have been cleared. Please check the error log:\n"
 								+ ""+Pastebin.unlistedPaste("Error on registering rewards", integrity)).queue();
+						logger.error("Quiz rewards couldn't be registered");
 						clearRewards(1);
 					}
 				}
 				else {
-					e.getTextChannel().sendMessage("Please don't try to register questions with this parameter! Please register only rewars!").queue();
+					e.getTextChannel().sendMessage("Please don't try to register questions with this parameter! Please register only rewards!").queue();
 					clearRewards(1);
 				}
 			}
 			else {
 				EmbedBuilder error = new EmbedBuilder().setTitle(rewards[0]).setColor(Color.RED);
 				e.getTextChannel().sendMessage(error.setDescription("Please ensure that a valid Pastebin link has been inserted and that the API key inside the config.ini file is correct").build()).queue();
+				logger.error("internal pastebin execution error for Quiz reward registration");
 			}
 		}
 		else {
 			EmbedBuilder error = new EmbedBuilder().setTitle("Invalid url!").setColor(Color.RED);
 			e.getTextChannel().sendMessage(error.setDescription("An invalid url has been inserted. Please insert a Pastebin link").build()).queue();
+			logger.warn("Wrong pastebin link has been inserted for the reward registration");
 		}
 	}
 	
@@ -146,10 +155,12 @@ public class QuizExecution {
 				String integrity = IntegrityCheck();
 				if(integrity.equals("0")) {
 					e.getTextChannel().sendMessage("All questions have been registered successfully!").queue();
+					logger.debug("Quiz questions have been registered");
 				}
 				else {
 					e.getTextChannel().sendMessage("An error occured while registering the questions. Inserted questions have been cleared. Please check the error log:\n"
 							+ ""+Pastebin.unlistedPaste("Error on registering rewards", integrity)).queue();
+					logger.error("Internal pastebin error in registering questions for the quiz");
 					clearQuestions(1);
 				}
 			}
@@ -157,10 +168,13 @@ public class QuizExecution {
 				if(_readFile == false) {
 					EmbedBuilder error = new EmbedBuilder().setTitle(content[0]).setColor(Color.RED);
 					e.getTextChannel().sendMessage(error.setDescription("Please ensure that a valid Pastebin link has been inserted and that the API key inside the config.ini file is correct").build()).queue();
+					logger.error("Pastebin link couldn't be read while registering questions");
+					
 				}
 				else {
 					EmbedBuilder error = new EmbedBuilder().setTitle("An error occurred while reading file!").setColor(Color.RED);
 					e.getTextChannel().sendMessage(error.setDescription("An unexpected error occurred while reading the file. Please check the content or create a new save file.").build()).queue();
+					logger.error("Settings from the quiz backup file couldn't be loaded");
 				}
 			}
 		}
@@ -168,10 +182,12 @@ public class QuizExecution {
 			if(_readFile == false) {
 				EmbedBuilder error = new EmbedBuilder().setTitle("Invalid url!").setColor(Color.RED);
 				e.getTextChannel().sendMessage(error.setDescription("An invalid url has been inserted. Please insert a Pastebin link").build()).queue();
+				logger.warn("Wrong pastebin link has been inserted for the question registration");
 			}
 			else {
 				EmbedBuilder error = new EmbedBuilder().setTitle("File doesn't exist!").setColor(Color.RED);
 				e.getTextChannel().sendMessage(error.setDescription("Please confirm that the settings file exists before continuing .").build()).queue();
+				logger.warn("Quiz backup file doesn't exist");
 			}
 		}
 	}
@@ -222,14 +238,17 @@ public class QuizExecution {
 			new File("./files/QuizBackup").mkdirs();
 			FileSetting.createFile("./files/QuizBackup/quizsettings.azr", sb.toString());
 			e.getTextChannel().sendMessage("Quiz settings have been saved successfully!").queue();
+			logger.debug("The settings for the quiz have been registered");
 		}
 		else if(sb.toString().equals("No questions!")){
 			EmbedBuilder error = new EmbedBuilder().setTitle("Questions missing!").setColor(Color.RED);
 			e.getTextChannel().sendMessage(error.setDescription("A backup from the settings couldn't be created because the questions are missing. Please register them first").build()).queue();
+			logger.warn("Quiz backup file couldn't be created due to the missing questions");
 		}
 		else if(sb.toString().equals("No rewards!")) {
 			EmbedBuilder error = new EmbedBuilder().setTitle("Rewards missing!").setColor(Color.RED);
 			e.getTextChannel().sendMessage(error.setDescription("A backup from the settings couldn't be created because the rewards are missing. Please register them first").build()).queue();
+			logger.warn("Quiz backup file couldn't be created due to the missing rewards");
 		}
 	}
 	

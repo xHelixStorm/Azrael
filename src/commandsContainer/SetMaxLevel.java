@@ -16,7 +16,7 @@ public class SetMaxLevel {
 			RankingSystem.SQLUpdateMaxLevel(_e.getGuild().getIdLong(), _e.getGuild().getName(), guild_settings.getMaxLevel());
 			
 			Logger logger = LoggerFactory.getLogger(SetMaxLevel.class);
-			logger.info("{} has set the max level to {} in guild {}", _e.getMember().getUser().getId(), guild_settings.getMaxLevel(), _e.getGuild().getName());
+			logger.debug("{} has set the max level to {} in guild {}", _e.getMember().getUser().getId(), guild_settings.getMaxLevel(), _e.getGuild().getName());
 			Hashes.addStatus(_e.getGuild().getIdLong(), guild_settings);
 			_e.getTextChannel().sendMessage("**The max level for the ranking system is now "+guild_settings.getMaxLevel()+"**").queue();
 		}

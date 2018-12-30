@@ -21,6 +21,9 @@ public class Use implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getUseCommand()){
+			Logger logger = LoggerFactory.getLogger(Use.class);
+			logger.debug("{} has used Use command", e.getMember().getUser().getId());
+			
 			RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong());
 			rankingSystem.Rank user_details = Hashes.getRanking(e.getMember().getUser().getIdLong());
 			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState()){
@@ -257,6 +260,7 @@ public class Use implements Command{
 				}
 				else{
 					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+Azrael.getChannelID()+">").queue();
+					logger.warn("Use command used in a not bot channel");
 				}
 			}
 			else{
@@ -267,8 +271,6 @@ public class Use implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Logger logger = LoggerFactory.getLogger(Use.class);
-		logger.info("{} has used Use command", e.getMember().getUser().getId());
 		RankingSystem.clearAllVariables();
 		Azrael.clearAllVariables();
 	}

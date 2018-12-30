@@ -19,6 +19,7 @@ public class ShutdownListener extends ListenerAdapter{
 	
 	@Override
 	public void onShutdown(ShutdownEvent e){
+		final Logger logger = LoggerFactory.getLogger(ShutdownListener.class);
 		String filecontent = FileSetting.readFile("./files/reboot.azr");
 		
 		try {
@@ -35,8 +36,7 @@ public class ShutdownListener extends ListenerAdapter{
 					proc = Runtime.getRuntime().exec("./scripts/restart.sh");
 					proc.waitFor();
 				} catch (IOException | InterruptedException e1) {
-					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-					e1.printStackTrace();
+					logger.error("restart.sh script couldn't be started");
 				}
 			}
 		}
@@ -47,13 +47,11 @@ public class ShutdownListener extends ListenerAdapter{
 					proc = Runtime.getRuntime().exec("./scripts/restart.bat");
 					proc.waitFor();
 				} catch (IOException | InterruptedException e1) {
-					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-					e1.printStackTrace();
+					logger.error("restart.bat script couldn't be started");
 				}
 			}
 		}
-		Logger logger = LoggerFactory.getLogger(ShutdownListener.class);
-		logger.info("Bot has shut down or reboot has been commenced");
+		logger.debug("Bot has shut down or reboot has been commenced");
 		Azrael.SQLInsertActionLog("BOT_SHUTDOWN", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
 	}
 }

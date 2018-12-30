@@ -31,7 +31,7 @@ public class Rank implements Command{
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
 				Logger logger = LoggerFactory.getLogger(Rank.class);
-				logger.info("{} has used Rank command", e.getMember().getUser().getId());
+				logger.debug("{} has used Rank command", e.getMember().getUser().getId());
 				
 				long user_id = 0;
 				if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"rank ")) {
@@ -56,7 +56,7 @@ public class Rank implements Command{
 							try {
 								file.createNewFile();
 							} catch (IOException e2) {
-								logger.warn("{} file couldn't be created", fileName, e2);
+								logger.error("{} file couldn't be created", fileName, e2);
 							}
 							
 							new Thread(new DelayDelete(fileName, 30000)).start();

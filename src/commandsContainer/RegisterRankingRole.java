@@ -57,7 +57,7 @@ public class RegisterRankingRole {
 					else{
 						if(RankingSystem.SQLInsertRoles(role_id, role_name, level_requirement, guild_id) > 0) {
 							Logger logger = LoggerFactory.getLogger(RegisterRankingRole.class);
-							logger.info("{} has registered the ranking role {} with the level requirement {} in the guild {}", _e.getMember().getUser().getId(), role_name, level_requirement, _e.getGuild().getName());
+							logger.debug("{} has registered the ranking role {} with the level requirement {} in the guild {}", _e.getMember().getUser().getId(), role_name, level_requirement, _e.getGuild().getName());
 							_e.getTextChannel().sendMessage("**The role named "+role_name+" can now be unlocked by reaching level "+level_requirement+"**").queue();
 							RankingSystem.SQLgetRoles(guild_id);
 							RankingSystem.SQLgetLevels();

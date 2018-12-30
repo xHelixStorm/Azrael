@@ -14,6 +14,7 @@ import sql.Azrael;
 import threads.DelayDelete;
 
 public class SetWarning {
+	private static final Logger logger = LoggerFactory.getLogger(SetWarning.class);
 	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Define the max amount of mutes that are tolerated in this server!");;
 	
 	public static void runHelp(MessageReceivedEvent _e) {
@@ -36,8 +37,8 @@ public class SetWarning {
 			else {
 				Azrael.SQLInsertWarning(_e.getGuild().getIdLong(), warning_value);
 			}
-			Logger logger = LoggerFactory.getLogger(SetWarning.class);
-			logger.info("{} has edited the warning level in guild {}", _e.getMember().getUser().getId(), _e.getGuild().getName());
+			
+			logger.debug("{} has edited the warning level in guild {}", _e.getMember().getUser().getId(), _e.getGuild().getName());
 			_e.getTextChannel().sendMessage("The system has been set to warn "+warning_value+" time(s) before banning").queue();
 			
 			FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr", "1");
@@ -65,6 +66,7 @@ public class SetWarning {
 				else if(Integer.parseInt(file_value) == Azrael.getWarningID()) {
 					Azrael.SQLUpdateMuteTimeOfWarning(_e.getGuild().getIdLong(), Integer.parseInt(file_value), (Long.parseLong(_message)*60*1000));
 					_e.getTextChannel().sendMessage("The warnings have been configured successfully!").queue();
+					logger.debug("Warnings have been configured");
 					FileSetting.deleteFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr");
 				}
 			}

@@ -99,7 +99,7 @@ public class LanguageFilter extends ListenerAdapter implements Runnable{
 			
 			if(wordFound == true){
 				Logger logger = LoggerFactory.getLogger(LanguageFilter.class);
-				logger.info("Message removed from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+				logger.debug("Message removed from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 				Path path = Paths.get(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");
 				
 				if(Files.notExists(path)){

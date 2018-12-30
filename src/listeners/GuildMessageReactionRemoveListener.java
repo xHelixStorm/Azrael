@@ -51,7 +51,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter{
 					}
 				}
 				Logger logger = LoggerFactory.getLogger(GuildMessageReactionRemoveListener.class);
-				logger.info("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getName());
+				logger.debug("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getName());
 			}
 		}
 	}

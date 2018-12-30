@@ -44,7 +44,7 @@ public class UnbanListener extends ListenerAdapter{
 			e.getJDA().getGuildById(e.getGuild().getIdLong()).getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp+"] **"+trigger_user_name+"** has unbanned **" + user_name + "** with the ID number **" + user_id + "**!").build()).queue();}
 		Azrael.SQLDeleteData(user_id, guild_id);
 		Logger logger = LoggerFactory.getLogger(UnbanListener.class);
-		logger.info("{} has been unbanned from guild {}", user_id, e.getGuild().getName());
+		logger.debug("{} has been unbanned from guild {}", user_id, e.getGuild().getName());
 		Azrael.SQLInsertActionLog("MEMBER_BAN_REMOVE", user_id, guild_id, "User Unbanned");
 		Azrael.clearAllVariables();
 	}

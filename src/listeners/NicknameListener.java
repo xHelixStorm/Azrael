@@ -34,7 +34,7 @@ public class NicknameListener extends ListenerAdapter{
 			Azrael.clearAllVariables();
 		}
 		Logger logger = LoggerFactory.getLogger(NameListener.class);
-		logger.info("{} received the nickname {} in guild {}", e.getUser().getId(), nickname, e.getGuild().getName());
+		logger.debug("{} received the nickname {} in guild {}", e.getUser().getId(), nickname, e.getGuild().getName());
 		Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild_id, nickname);
 	}
 }

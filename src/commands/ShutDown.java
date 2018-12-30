@@ -23,7 +23,7 @@ public class ShutDown implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getShutDownCommand()){
 			Logger logger = LoggerFactory.getLogger(ShutDown.class);
-			logger.info("{} has used ShutDown command", e.getMember().getUser().getId());
+			logger.debug("{} has used ShutDown command", e.getMember().getUser().getId());
 			
 			if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin() || UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong())){
 				e.getTextChannel().sendMessage("**I'm going to shut down shortly**").queue();
@@ -31,7 +31,7 @@ public class ShutDown implements Command{
 				try{
 					Thread.sleep(20000);
 				}catch(InterruptedException ev){
-					logger.warn("Exception off thread sleep while performing shut down", ev);
+					logger.error("Exception of thread sleep while performing shut down. Bot couldn't shut down", ev);
 				}
 				e.getTextChannel().sendMessage("**shutting down now. Cya later!**").queue();
 				e.getJDA().shutdown();

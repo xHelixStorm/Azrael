@@ -39,7 +39,7 @@ public class Daily implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getDailyCommand()){
 			Logger logger = LoggerFactory.getLogger(Daily.class);
-			logger.info("{} has used Daily command", e.getMember().getUser().getId());
+			logger.debug("{} has used Daily command", e.getMember().getUser().getId());
 			
 			String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_daily.azr";
 			File file = new File(fileName);
@@ -48,7 +48,7 @@ public class Daily implements Command{
 					file.createNewFile();
 					new Thread(new DelayDelete(fileName, 3000)).start();
 				} catch (IOException e2) {
-					logger.warn("{} file couldn't be created", fileName, e2);
+					logger.error("{} file couldn't be created", fileName, e2);
 				}
 				
 				ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -143,11 +143,12 @@ public class Daily implements Command{
 							}
 							if(editedRows > 0) {
 								RankingSystem.SQLInsertDailiesUsage(e.getMember().getUser().getIdLong(), timestamp, timestamp2);
-								logger.info("{} received {} out of the Daily command", e.getMember().getUser().getId(), list.get(random).getDescription());
+								logger.debug("{} received {} out of the Daily command", e.getMember().getUser().getId(), list.get(random).getDescription());
 								RankingSystem.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), "Daily retrieved", list.get(random).getDescription());
 							}
 							else {
 								e.getTextChannel().sendMessage("Internal error occurred! Daily item couldn't be inserted into your inventory. Please contact an administrator!").queue();
+								logger.warn("{} couldn't be inserted into inventory", list.get(random).getDescription());
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Daily item couldn't be inserted to inventory", "An insert error occurred for the following item "+list.get(random).getDescription());
 							}
 							list.clear();
@@ -160,6 +161,7 @@ public class Daily implements Command{
 					}
 					else{
 						e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+Azrael.getChannelID()+">").queue();
+						logger.warn("Daily command has been used in a not bot channel");
 					}
 				});
 				executor.shutdown();

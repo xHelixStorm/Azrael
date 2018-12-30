@@ -25,7 +25,7 @@ public class Meow implements Command{
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
 				Logger logger = LoggerFactory.getLogger(Meow.class);
-				logger.info("{} has used Meow command", e.getMember().getUser().getId());
+				logger.debug("{} has used Meow command", e.getMember().getUser().getId());
 				long channel = e.getTextChannel().getIdLong();
 				long guild_id = e.getGuild().getIdLong();
 				String variable = e.getMessage().getContentRaw();
@@ -47,7 +47,7 @@ public class Meow implements Command{
 							try {
 								MeowExecution.Execute(e, variable, path, channel_id);
 							} catch (IOException e1) {
-								logger.warn("Selected meow picture couldn't be found", e1);
+								logger.error("Selected meow picture couldn't be found", e1);
 							}
 						}
 						else{
@@ -55,7 +55,7 @@ public class Meow implements Command{
 								try {
 									MeowExecution.Execute(e, variable, path, channel_id);
 								} catch (IOException e1) {
-									logger.warn("Selected meow picture couldn't be found", e1);
+									logger.error("Selected meow picture couldn't be found", e1);
 								}
 							}
 							else{

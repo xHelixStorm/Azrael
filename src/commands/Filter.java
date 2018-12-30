@@ -39,7 +39,7 @@ public class Filter implements Command{
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
 		Logger logger = LoggerFactory.getLogger(Filter.class);
-		logger.info("{} has used the Filter command", e.getMember().getUser().getId());
+		logger.debug("{} has used the Filter command", e.getMember().getUser().getId());
 	}
 
 	@Override

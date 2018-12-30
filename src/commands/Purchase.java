@@ -24,7 +24,7 @@ public class Purchase implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getPurchaseCommand()){
 			Logger logger = LoggerFactory.getLogger(Purchase.class);
-			logger.info("{} has used Purchase command", e.getMember().getUser().getId());
+			logger.debug("{} has used Purchase command", e.getMember().getUser().getId());
 			
 			RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong());
 			Guilds setting = Hashes.getStatus(e.getGuild().getIdLong());
@@ -40,7 +40,6 @@ public class Purchase implements Command{
 						final String filter = input;
 						RankingSystem.SQLgetSkinshopContentAndType();
 						Skins skin = Hashes.getShopContent("shop").parallelStream().filter(s -> s.getShopDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
-						//RankingDB.SQLgetShopContent(input);
 						int item_id = skin.getItemID();
 						if(skin.getShopDescription().length() > 0){
 							if(!input.equalsIgnoreCase(setting.getLevelDescription()) && !input.equalsIgnoreCase(setting.getRankDescription()) && !input.equalsIgnoreCase(setting.getProfileDescription()) && !input.equalsIgnoreCase(setting.getIconDescription())){
@@ -57,7 +56,7 @@ public class Purchase implements Command{
 										if(editedRows > 0) {
 											user_details.setCurrency(new_currency);
 											Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
-											logger.info("{} has purchased {}", e.getMember().getUser().getId(), input.toUpperCase());
+											logger.debug("{} has purchased {}", e.getMember().getUser().getId(), input.toUpperCase());
 											e.getTextChannel().sendMessage("You have successfully purchased **"+input+"**").queue();
 										}
 										else {
@@ -84,6 +83,7 @@ public class Purchase implements Command{
 				}
 				else{
 					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+Azrael.getChannelID()+">").queue();
+					logger.warn("Purchase command used in a not bot channel");
 				}
 			}
 			else{

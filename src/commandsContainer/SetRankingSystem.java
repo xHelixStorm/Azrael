@@ -36,7 +36,7 @@ public class SetRankingSystem {
 			
 			Hashes.addStatus(_e.getGuild().getIdLong(), guild);
 			Logger logger = LoggerFactory.getLogger(SetRankingSystem.class);
-			logger.info("{} has set the ranking system to {} in guild {}", _e.getMember().getUser().getId(), _input, _e.getGuild().getName());
+			logger.debug("{} has set the ranking system to {} in guild {}", _e.getMember().getUser().getId(), _input, _e.getGuild().getName());
 			_e.getTextChannel().sendMessage(message).queue();
 		}
 		else{

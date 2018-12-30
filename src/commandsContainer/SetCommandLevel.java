@@ -35,7 +35,7 @@ public class SetCommandLevel {
 		if(wrongInput == false){
 			Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), level);
 			Logger logger = LoggerFactory.getLogger(SetCommandLevel.class);
-			logger.info("{} has changed the command level to {} in guild {}", _e.getMember().getUser().getId(), level, _e.getGuild().getName());
+			logger.debug("{} has changed the command level to {} in guild {}", _e.getMember().getUser().getId(), level, _e.getGuild().getName());
 			_e.getTextChannel().sendMessage(message).queue();
 		}
 		else{

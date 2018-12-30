@@ -21,6 +21,9 @@ public class Top implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getTopCommand()){
+			Logger logger = LoggerFactory.getLogger(Top.class);
+			logger.debug("{} has used Top command", e.getMember().getUser().getId());
+			
 			String command = e.getMessage().getContentRaw();
 			long member_id = e.getMember().getUser().getIdLong();
 			int rank = 0;
@@ -95,6 +98,7 @@ public class Top implements Command{
 				}
 				else{
 					e.getTextChannel().sendMessage("Apologies young padawan but I'm not allowed to execute this command in this channel. Please retry in <#"+channel_id+">").queue();
+					logger.warn("Top command used in a not bot channel");
 				}
 			}
 		}
@@ -102,8 +106,6 @@ public class Top implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Logger logger = LoggerFactory.getLogger(Top.class);
-		logger.info("{} has used Top command", e.getMember().getUser().getId());
 		Azrael.clearAllVariables();
 	}
 

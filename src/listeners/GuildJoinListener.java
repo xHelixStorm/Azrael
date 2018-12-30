@@ -20,7 +20,7 @@ public class GuildJoinListener extends ListenerAdapter{
 		RankingSystem.SQLInsertGuild(guild_id, guild_name, 1, 1, 1, 1, 0, false);
 		DiscordRoles.SQLInsertGuild(guild_id, guild_name);
 		Logger logger = LoggerFactory.getLogger(GuildJoinListener.class);
-		logger.info("Bot joined a new guild: {}", e.getGuild().getName());
+		logger.debug("Bot joined a new guild: {}", e.getGuild().getName());
 		Azrael.SQLInsertActionLog("GUILD_JOIN", e.getGuild().getIdLong(), e.getGuild().getIdLong(), e.getGuild().getName());
 	}
 }

@@ -59,7 +59,7 @@ public class RoleExtend implements Runnable{
 		}
 		if(banHammerFound == true && channel_id != 0){
 			Logger logger = LoggerFactory.getLogger(RoleExtend.class);
-			logger.info("Found muted users on start up in {}", e.getJDA().getGuildById(guild_id).getName());
+			logger.debug("Found muted users on start up in {}", e.getJDA().getGuildById(guild_id).getName());
 			e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage(message.setDescription(i+" users were found muted on start up. The mute timer is restarting from where it stopped!").build()).queue();
 		}
 		DiscordRoles.clearAllVariables();

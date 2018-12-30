@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.Guilds;
 import core.Hashes;
 import fileManagement.IniFileReader;
@@ -20,6 +23,7 @@ import rankingSystem.Ranks;
 import rankingSystem.Skins;
 
 public class RankingSystem {
+	private static final Logger logger = LoggerFactory.getLogger(RankingSystem.class);
 	
 	private static long user_id = 0;
 	private static int level_skin = 0;
@@ -102,7 +106,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO action_log (warning_level, affected_entity, event, notes) VALUES (?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _warning_level);
@@ -111,8 +115,7 @@ public class RankingSystem {
 			stmt.setString(4, _notes);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLInsertActionLog Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -124,7 +127,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO users (user_id, name, level_skin, rank_skin, profile_skin, icon_skin) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -135,8 +138,7 @@ public class RankingSystem {
 			stmt.setInt(6, _icon_skin);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLInsertUser Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -148,7 +150,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE users SET level_skin = ?, name = ? WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _skin_id);
@@ -157,8 +159,7 @@ public class RankingSystem {
 			return stmt.executeUpdate();
 			
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateUserLevelSkin Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -170,7 +171,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE users SET rank_skin = ?, name = ? WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _skin_id);
@@ -178,8 +179,7 @@ public class RankingSystem {
 			stmt.setLong(3, _user_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateUserRankSkin Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -191,7 +191,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE users SET profile_skin = ?, name = ? WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _skin_id);
@@ -199,8 +199,7 @@ public class RankingSystem {
 			stmt.setLong(3, _user_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateUserProfileSkin Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -212,7 +211,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE users SET icon_skin = ?, name = ? WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _skin_id);
@@ -220,8 +219,7 @@ public class RankingSystem {
 			stmt.setLong(3, _user_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateUserIconSkin Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -234,7 +232,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO guilds (guild_id, name, max_level, fk_level_id, fk_rank_id, fk_profile_id, fk_icon_id, ranking_state) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), max_level=VALUES(max_level), fk_profile_id=VALUES(fk_profile_id), ranking_state=VALUES(ranking_state)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -247,8 +245,7 @@ public class RankingSystem {
 			stmt.setBoolean(8, _enabled);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLInsertGuild Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -259,7 +256,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE guilds SET name = ?, max_level = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
@@ -267,8 +264,7 @@ public class RankingSystem {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateMaxLevel Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -279,7 +275,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE guilds SET name = ?, ranking_state = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
@@ -287,8 +283,7 @@ public class RankingSystem {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateRankingSystem Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -299,7 +294,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE guilds SET name = ?, fk_level_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
@@ -307,8 +302,7 @@ public class RankingSystem {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateLevelDefaultSkin Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -319,7 +313,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE guilds SET name = ?, fk_rank_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
@@ -327,8 +321,7 @@ public class RankingSystem {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateRankDefaultSkin Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -339,7 +332,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE guilds SET name = ?, fk_profile_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
@@ -347,8 +340,7 @@ public class RankingSystem {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateProfileDefaultSkin Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -359,7 +351,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE guilds SET name = ?, fk_icon_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
@@ -367,8 +359,7 @@ public class RankingSystem {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateIconDefaultSkin Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -380,7 +371,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO roles (role_id, name, level_requirement, fk_guild_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), level_requirement=VALUES(level_requirement)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_id);
@@ -389,8 +380,7 @@ public class RankingSystem {
 			stmt.setLong(4, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLInsertRoles Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -402,14 +392,13 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM roles WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLclearRoles Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -421,7 +410,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM roles WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -435,8 +424,7 @@ public class RankingSystem {
 				Hashes.addRankingRoles(_guild_id+"_"+ranks.getLevel_Requirement(), ranks);
 			}
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetRoles Exception", e);
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -449,7 +437,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO user_details (`fk_user_id`, `level`, `experience`, `currency`, `current_role`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE fk_user_id=VALUES(fk_user_id)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -459,8 +447,7 @@ public class RankingSystem {
 			stmt.setLong(5, _assigned_role);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLInsertUserDetails Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -472,15 +459,14 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE user_details SET `experience` = ? WHERE `fk_user_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _experience);
 			stmt.setLong(2, _user_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateExperience Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -491,7 +477,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE user_details SET `level` = ?, `experience` = ?, `currency` = ?, `current_role` = ? WHERE `fk_user_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _level);
@@ -501,8 +487,7 @@ public class RankingSystem {
 			stmt.setLong(5, _user_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLsetLevelUp Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -513,15 +498,14 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE user_details SET `currency` = ? WHERE `fk_user_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _currency);
 			stmt.setLong(2, _user_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateCurrency Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -536,7 +520,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT `fk_user_id`, `Level`, `experience`, @curRank := @curRank + 1 AS Rank FROM `user_details`, (SELECT @curRank := 0) r ORDER BY `experience` DESC");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
@@ -551,8 +535,7 @@ public class RankingSystem {
 				Hashes.addRankList("ranking", rankList);
 				return rankList;
 			} catch (SQLException e) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e.printStackTrace();
+				logger.error("RankingSystem.SQLRanking Exception", e);
 				return rankList;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -568,7 +551,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO max_exp (max_exp_id, experience, enabled, fk_guild_id) VALUES (NULL, ?, ?, ?) ON DUPLICATE KEY UPDATE experience=VALUES(experience), enabled=VALUES(enabled)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _experience);
@@ -576,8 +559,7 @@ public class RankingSystem {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLInsertMaxExperience Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -589,7 +571,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO daily_experience (user_id, experience, reset) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE experience=VALUES(experience), reset=VALUES(reset)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -597,8 +579,7 @@ public class RankingSystem {
 			stmt.setTimestamp(3, _reset);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLInsertDailyExperience Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -609,14 +590,13 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM daily_experience WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLDeleteDailyExperience Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -630,7 +610,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT * FROM ranking_level");
 				ArrayList<Rank> rankList = new ArrayList<Rank>();
 				boolean success = false;
@@ -653,8 +633,7 @@ public class RankingSystem {
 				Hashes.addRankList("ranking-level", rankList);
 				return success;
 			} catch (SQLException e) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e.printStackTrace();
+				logger.error("RankingSystem.SQLgetRankingLevel Exception", e);
 				return false;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -672,7 +651,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT * FROM ranking_rank");
 				ArrayList<Rank> rankList = new ArrayList<Rank>();
 				boolean success = false;
@@ -697,8 +676,7 @@ public class RankingSystem {
 				Hashes.addRankList("ranking-rank", rankList);
 				return success;
 			} catch (SQLException e) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e.printStackTrace();
+				logger.error("RankingSystem.SQLgetRankingRank Exception", e);
 				return false;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -716,7 +694,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT * FROM ranking_profile");
 				ArrayList<Rank> rankList = new ArrayList<Rank>();
 				boolean success = false;
@@ -741,8 +719,7 @@ public class RankingSystem {
 				Hashes.addRankList("ranking-profile", rankList);
 				return success;
 			} catch (SQLException e) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e.printStackTrace();
+				logger.error("RankingSystem.SQLgetRankingProfile Exception", e);
 				return false;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -760,7 +737,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT * FROM ranking_icons");
 				ArrayList<Rank> rankList = new ArrayList<Rank>();
 				boolean success = false;
@@ -776,8 +753,7 @@ public class RankingSystem {
 				Hashes.addRankList("ranking-icons", rankList);
 				return success;
 			} catch (SQLException e) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e.printStackTrace();
+				logger.error("RankingSystem.SQLgetRankingIcons Exception", e);
 				return false;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -793,7 +769,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO daily_items (description, weight, fk_type, action) VALUES(?, ?, ?, \"use\")");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _description);
@@ -801,8 +777,7 @@ public class RankingSystem {
 			stmt.setString(3, _type);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLInsertDailyItems Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -815,7 +790,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status) VALUES(?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE number=VALUES(number)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -825,8 +800,7 @@ public class RankingSystem {
 			stmt.setString(5, _status);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLInsertInventory Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -838,7 +812,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status, expires) VALUES(?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE number=VALUES(number), expires=VALUES(expires)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -849,8 +823,7 @@ public class RankingSystem {
 			stmt.setTimestamp(6, _expires);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLInsertInventoryWithLimitException", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -863,7 +836,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT number FROM inventory WHERE fk_user_id = ? AND fk_item_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -873,8 +846,7 @@ public class RankingSystem {
 				setNumberLimit(rs.getInt(1));
 			}
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetNumberLimitFromInventory Exception", e);
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -887,7 +859,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT expires FROM inventory WHERE fk_user_id = ? AND fk_item_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -897,8 +869,7 @@ public class RankingSystem {
 				setExpiration(rs.getTimestamp(1));
 			}
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetExpirationFromInventory Exception", e);
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -910,13 +881,12 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("DELETE FROM inventory WHERE fk_status LIKE \"limit\" AND expires-CURRENT_TIMESTAMP <= 0");
 			stmt = myConn.prepareStatement(sql);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLDeleteInventory Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -928,7 +898,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT COUNT(*) FROM inventory WHERE fk_user_id = ?");
 			var item_number = 0;
 			stmt = myConn.prepareStatement(sql);
@@ -939,8 +909,7 @@ public class RankingSystem {
 			}
 			return item_number;
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetTotalItemNumber Exception", e);
 			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -955,7 +924,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM dailies_usage WHERE fk_user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -966,8 +935,7 @@ public class RankingSystem {
 				setNextDaily(rs.getTimestamp(3));
 			}
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetDailiesUsage Exception", e);
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -979,7 +947,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO dailies_usage (fk_user_id, opened, next_daily) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE opened=VALUES(opened), next_daily=VALUES(next_daily)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -987,8 +955,7 @@ public class RankingSystem {
 			stmt.setTimestamp(3, _next_daily);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLInsertDailiesUsage Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -999,15 +966,14 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO user_guild (fk_user_id, fk_guild_id) VALUES(?, ?) ON DUPLICATE KEY UPDATE fk_guild_id=VALUES(fk_guild_id)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLInsertUserGuild Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1020,7 +986,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false); 
 			String sql = ("INSERT INTO giveaway (code, enabled, used, expires) VALUES (?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
@@ -1035,8 +1001,7 @@ public class RankingSystem {
 			myConn.commit();
 			return false;
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLBulkInsertGiveawayRewards Exception", e);
 			return true;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1049,7 +1014,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT code FROM giveaway WHERE enabled = 1 && used = 0 && expires >= ? LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
@@ -1060,8 +1025,7 @@ public class RankingSystem {
 			else
 				return "";
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLRetrieveGiveawayReward Exception", e);
 			return "";
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1074,15 +1038,14 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("UPDATE giveaway SET used = 1 WHERE code = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _code);
 			int count = stmt.executeUpdate();
 			return count;
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateUsedOnReward Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1097,7 +1060,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT user_details.fk_user_id, user_details.level, (SELECT (user_details.experience - level_list.experience) FROM level_list WHERE level_list.level = user_details.level) AS `current_experience`, (SELECT (level_list.experience - (SELECT level_list.experience FROM level_list WHERE level_list.level = user_details.level)) FROM level_list WHERE level_list.level = (user_details.level+1)) AS `rank_up_experience`, user_details.experience, user_details.currency, user_details.current_role, users.level_skin, ranking_level.description, users.rank_skin, ranking_rank.description, users.profile_skin, ranking_profile.description, users.icon_skin, ranking_icons.description, ranking_profile.fk_bar_id, ranking_rank.fk_bar_id, ranking_profile.exp_percent_txt, ranking_rank.exp_percent_txt, ranking_profile.tcolor_r, ranking_rank.tcolor_r, ranking_level.tcolor_r, ranking_profile.tcolor_g, ranking_rank.tcolor_g, ranking_level.tcolor_g, ranking_profile.tcolor_b, ranking_rank.tcolor_b, ranking_level.tcolor_b, ranking_level.rankx, ranking_level.ranky, ranking_level.rank_width, ranking_level.rank_height, ranking_rank.rankx, ranking_rank.ranky, ranking_rank.rank_width, ranking_rank.rank_height, ranking_profile.rankx, ranking_profile.ranky, ranking_profile.rank_width, ranking_profile.rank_height, daily_experience.experience, daily_experience.reset FROM user_details INNER JOIN users ON user_details.fk_user_id = users.user_id INNER JOIN ranking_level ON level_skin = level_id INNER JOIN ranking_rank ON rank_skin = rank_id INNER JOIN ranking_profile ON profile_skin = profile_id INNER JOIN ranking_icons ON icon_skin = icon_id LEFT JOIN daily_experience ON users.user_id = daily_experience.user_id WHERE users.user_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _user_id);
@@ -1149,8 +1112,7 @@ public class RankingSystem {
 					Hashes.addRanking(_user_id, rank);
 				}
 			} catch (SQLException e) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e.printStackTrace();
+				logger.error("RankingSystem.SQLgetWholeRankView Exception", e);
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1164,7 +1126,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT guild_id, name, max_level, fk_level_id, ranking_level.description, fk_rank_id, ranking_rank.description, fk_profile_id, ranking_profile.description, fk_icon_id, ranking_icons.description, ranking_state, max_exp.experience, max_exp.enabled FROM guilds INNER JOIN ranking_level ON fk_level_id = level_id INNER JOIN ranking_rank ON fk_rank_id = rank_id INNER JOIN ranking_profile ON fk_profile_id = profile_id INNER JOIN ranking_icons ON fk_icon_id = icon_id LEFT JOIN max_exp ON guild_id = fk_guild_id WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -1187,8 +1149,7 @@ public class RankingSystem {
 				Hashes.addStatus(_guild_id, guild);
 			}
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetGuild Exception", e);
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1201,7 +1162,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT level, experience, currency, role_id FROM level_list LEFT JOIN roles ON level = level_requirement ORDER BY level");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
@@ -1214,8 +1175,7 @@ public class RankingSystem {
 				Hashes.addRankingLevels(rs.getInt(1), ranks);
 			}
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetLevels Exception", e);
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1230,7 +1190,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT item_id, shop_content.description, price, skin, skin_type.description FROM shop_content INNER JOIN skin_type ON fk_skin = skin");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
@@ -1246,8 +1206,7 @@ public class RankingSystem {
 				Hashes.addShopContent("shop", set_skin);
 				return set_skin;
 			} catch (SQLException e) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e.printStackTrace();
+				logger.error("RankingSystem.SQLgetSkinshopContentAndType Exception", e);
 				return set_skin;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1263,7 +1222,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT item_id FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? AND item_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1273,8 +1232,7 @@ public class RankingSystem {
 				setItemID(rs.getInt(1));
 			}
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetItemID Exception", e);
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1287,7 +1245,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT item_id, fk_skin, fk_status FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? AND shop_content.description LIKE ?");
 			var success = false;
 			stmt = myConn.prepareStatement(sql);
@@ -1302,8 +1260,7 @@ public class RankingSystem {
 			}
 			return success;
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetItemIDAndSkinType Exception", e);
 			return false;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1317,7 +1274,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT fk_user_id, position, number, fk_status, description, fk_skin FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? AND description LIKE ? AND fk_status LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1332,8 +1289,7 @@ public class RankingSystem {
 				setSkinType(rs.getString(5));
 			}
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetInventoryAndDescription Exception", e);
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1347,7 +1303,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, description, fk_skin FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? ORDER BY position desc LIMIT ?, 12");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1366,8 +1322,7 @@ public class RankingSystem {
 			}
 			return inventory;
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetInventoryAndDescriptions Exception", e);
 			return inventory;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1382,7 +1337,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT fk_user_id, position, description FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? ORDER BY position desc");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1396,8 +1351,7 @@ public class RankingSystem {
 			}
 			return inventory;
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit Exception", e);
 			return inventory;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1411,7 +1365,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT number, expires FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? AND description = ? AND fk_status = ?");
 			var success = false;
 			stmt = myConn.prepareStatement(sql);
@@ -1426,8 +1380,7 @@ public class RankingSystem {
 			}
 			return success;
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLgetNumberExpirationFromInventory Exception", e);
 			return false;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1443,7 +1396,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT item_id, daily_items.description, weight, type, daily_type.description, action FROM daily_items INNER JOIN daily_type ON fk_type = type");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
@@ -1460,8 +1413,7 @@ public class RankingSystem {
 				Hashes.addDailyItems("dailies", dailies);
 				return dailies;
 			} catch (SQLException e) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e.printStackTrace();
+				logger.error("RankingSystem.SQLgetDailiesAndType Exception", e);
 				return dailies;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1478,7 +1430,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
 			String sql = ("UPDATE user_details SET currency = ? WHERE fk_user_id = ?");
 			stmt = myConn.prepareStatement(sql);
@@ -1496,13 +1448,11 @@ public class RankingSystem {
 			myConn.commit();	
 			return editedRows;
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateCurrencyAndInsertInventory Exception", e);
 			try {
 				myConn.rollback();
 			} catch (SQLException e1) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e1.printStackTrace();
+				logger.error("RankingSystem.SQLUpdateCurrencyAndInsertInventory rollback Exception", e);
 			}
 			return 0;
 		} finally {
@@ -1516,7 +1466,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
 			String sql = ("UPDATE inventory SET number = ? WHERE fk_user_id = ? AND fk_status LIKE \"perm\" AND fk_item_id = ?");
 			stmt = myConn.prepareStatement(sql);
@@ -1536,13 +1486,11 @@ public class RankingSystem {
 			myConn.commit();
 			return editedRows;
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLUpdateAndInsertInventory Exception", e);
 			try {
 				myConn.rollback();
 			} catch (SQLException e1) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e1.printStackTrace();
+				logger.error("RankingSystem.SQLUpdateAndInsertIventory rollback Exception", e);
 			}
 			return 0;
 		} finally {
@@ -1556,7 +1504,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
 			String sql = ("DELETE FROM inventory WHERE fk_user_id = ? AND fk_status LIKE \"perm\" AND fk_item_id = ?");
 			stmt = myConn.prepareStatement(sql);
@@ -1575,13 +1523,11 @@ public class RankingSystem {
 			myConn.commit();
 			return editedRows;
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLDeleteAndInsertIventory Exception", e);
 			try {
 				myConn.rollback();
 			} catch (SQLException e1) {
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				e1.printStackTrace();
+				logger.error("RankingSystem.SQLDeleteAndInsertInventory rollback Exception", e);
 			}
 			return 0;
 		} finally {
@@ -1596,7 +1542,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT DISTINCT description FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_status LIKE \"limit\" AND EXISTS (SELECT description FROM daily_items WHERE fk_type LIKE \"exp\") AND fk_user_id = ?");
 			var description = "0";
 			stmt = myConn.prepareStatement(sql);
@@ -1607,8 +1553,7 @@ public class RankingSystem {
 			}
 			return description;
 		} catch (SQLException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("RankingSystem.SQLExpBoosterExistsInInventory Exception", e);
 			return "0";
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }

@@ -30,7 +30,7 @@ public class BanListener extends ListenerAdapter{
 		
 		Azrael.SQLUpdateMuted(user_id, guild_id, true, false);
 		Logger logger = LoggerFactory.getLogger(BanListener.class);
-		logger.info("{} has been banned from {}", e.getUser().getId(), e.getGuild().getName());
+		logger.debug("{} has been banned from {}", e.getUser().getId(), e.getGuild().getName());
 		Azrael.SQLInsertActionLog("MEMBER_BAN_ADD", user_id, guild_id, "User Banned");
 		Azrael.clearAllVariables();
 	}

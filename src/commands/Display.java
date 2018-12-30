@@ -129,7 +129,7 @@ public class Display implements Command{
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
 		Logger logger = LoggerFactory.getLogger(Display.class);
-		logger.info("{} has used Display command", e.getMember().getUser().getIdLong());
+		logger.debug("{} has used Display command", e.getMember().getUser().getIdLong());
 		DiscordRoles.clearAllVariables();
 		Azrael.clearAllVariables();
 	}

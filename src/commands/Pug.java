@@ -25,7 +25,7 @@ public class Pug implements Command{
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
 				Logger logger = LoggerFactory.getLogger(Pug.class);
-				logger.info("{} has used Pug command", e.getMember().getUser().getId());
+				logger.debug("{} has used Pug command", e.getMember().getUser().getId());
 				
 				long channel = e.getTextChannel().getIdLong();
 				long guild_id = e.getGuild().getIdLong();
@@ -48,7 +48,7 @@ public class Pug implements Command{
 							try {
 								PugExecution.Execute(e, variable, path, channel_id);
 							} catch (IOException e1) {
-								logger.warn("Selected pug picture couldn't be found", e1);
+								logger.error("Selected pug picture couldn't be found", e1);
 							}
 						}
 						else{
@@ -56,7 +56,7 @@ public class Pug implements Command{
 								try {
 									PugExecution.Execute(e, variable, path, channel_id);
 								} catch (IOException e1) {
-									logger.warn("Selected pug picture couldn't be found", e1);
+									logger.error("Selected pug picture couldn't be found", e1);
 								}
 							}
 							else{

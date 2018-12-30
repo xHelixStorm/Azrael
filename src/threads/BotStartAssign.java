@@ -56,18 +56,21 @@ public class BotStartAssign implements Runnable{
 								if(editedRows2 > 0) {
 									var editedRows3 = RankingSystem.SQLInsertUserGuild(member.getUser().getIdLong(), guild_id);
 									if(editedRows3 == 0) {
-										RankingSystem.SQLInsertActionLog("high", member.getUser().getIdLong(), "User wasn't inserted into user_details table", "This user couldn't be inserted into the user_details table. Please verify and eventually insert it manually into the table!");
+										RankingSystem.SQLInsertActionLog("high", member.getUser().getIdLong(), "User wasn't inserted into user_guild table", "This user couldn't be inserted into the user_guild table. Please verify and eventually insert it manually into the table!");
+										logger.error("Failed to insert joined user into RankingSystem.user_guild");
 										errGuildUsers++;
 									}
 								}
 								else {
 									RankingSystem.SQLInsertActionLog("high", member.getUser().getIdLong(), "User wasn't inserted into user_details table", "This user couldn't be inserted into the user_details table. Please verify and eventually insert it manually into the table!");
+									logger.error("Failed to insert joined user into RankingSystem.user_details");
 									errUserDetails++;
 									errGuildUsers++;
 								}
 							}
 							else {
 								RankingSystem.SQLInsertActionLog("high", member.getUser().getIdLong(), "User wasn't inserted into user table", "This user couldn't be inserted into the user table. Please verify the name of this user and eventually insert it manually into the table!");
+								logger.error("Failed to insert joined user into RankingSystem.users");
 								errUsers++;
 								errUserDetails++;
 								errGuildUsers++;
@@ -77,7 +80,7 @@ public class BotStartAssign implements Runnable{
 					}
 				}
 			}
-			logger.info("Start up user registration complete in {}", g.getName());
+			logger.debug("Start up user registration complete in {}", g.getName());
 			Azrael.SQLgetChannelID(guild_id, "log");
 			if(i != 0 && Azrael.getChannelID() != 0){
 				e.getJDA().getGuildById(guild_id).getTextChannelById(Azrael.getChannelID()).sendMessage(message.setDescription(i+" User(s) received the community role on bot start up").build()).queue();

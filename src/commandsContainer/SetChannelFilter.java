@@ -49,7 +49,7 @@ public class SetChannelFilter {
 				Logger logger = LoggerFactory.getLogger(SetChannelFilter.class);
 				for(String language : filter_lang){
 					Azrael.SQLInsertChannel_Filter(channel_id, language);
-					logger.info("{} has set the channel filter {} for channel {} in guild {}", _e.getMember().getUser().getId(), language, channel_id, _e.getGuild().getName());
+					logger.debug("{} has set the channel filter {} for channel {} in guild {}", _e.getMember().getUser().getId(), language, channel_id, _e.getGuild().getName());
 					_e.getTextChannel().sendMessage("**Filter for <#"+channel_id+"> has been updated!**").queue();
 				}
 			}

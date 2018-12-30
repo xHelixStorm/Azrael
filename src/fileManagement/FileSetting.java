@@ -23,7 +23,7 @@ public class FileSetting {
 			pw.print(content);
 			pw.close();
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			logger.warn("Exception on file creation: {}", name, e);
+			logger.error("Exception on file creation: {}", name, e);
 		}
 	}
 	
@@ -54,16 +54,16 @@ public class FileSetting {
 				String content = sb.toString();
 				return content;
 			} catch (IOException e) {
-				logger.warn("Error on read line of readFile: {}", name, e);
+				logger.error("Error on read line of readFile: {}", name, e);
 			}finally {
 				try {
 					br.close();
 				} catch (IOException e) {
-					logger.warn("File {} couldn't be closed after reading", name, e);
+					logger.error("File {} couldn't be closed after reading", name, e);
 				}
 			}
 		} catch (FileNotFoundException e) {
-			logger.warn("File {} to read couldn't be found", name, e);
+			logger.error("File {} to read couldn't be found", name, e);
 			return "";
 		}
 		return null;
@@ -84,16 +84,16 @@ public class FileSetting {
 				}
 				return content;
 			} catch (IOException e) {
-				logger.warn("Error on read line of readFileIntoArray: {}", _name, e);
+				logger.error("Error on read line of readFileIntoArray: {}", _name, e);
 			}finally {
 				try {
 					br.close();
 				} catch (IOException e) {
-					logger.warn("File {} couldn't be closed after reading into an array", _name, e);
+					logger.error("File {} couldn't be closed after reading into an array", _name, e);
 				}
 			}
 		} catch (FileNotFoundException e) {
-			logger.warn("File {} to read couldn't be found", _name, e);
+			logger.error("File {} to read couldn't be found", _name, e);
 		}
 		return null;
 	}
@@ -118,16 +118,16 @@ public class FileSetting {
 				}
 				return contentReturn;
 			} catch (IOException e) {
-				logger.warn("Error on read line of readFileIntoFixedArray: {}", _name, e);
+				logger.error("Error on read line of readFileIntoFixedArray: {}", _name, e);
 			}finally {
 				try {
 					br.close();
 				} catch (IOException e) {
-					logger.warn("File {} couldn't be closed after reading into a fixed array", _name, e);
+					logger.error("File {} couldn't be closed after reading into a fixed array", _name, e);
 				}
 			}
 		} catch (FileNotFoundException e) {
-			logger.warn("File {} to read couldn't be found", _name, e);
+			logger.error("File {} to read couldn't be found", _name, e);
 		}
 		return null;
 	}

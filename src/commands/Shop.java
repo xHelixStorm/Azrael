@@ -20,6 +20,9 @@ public class Shop implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getShopCommand()){
+			Logger logger = LoggerFactory.getLogger(Shop.class);
+			logger.debug("{} has used Shop command", e.getMember().getUser().getId());
+			
 			String input = e.getMessage().getContentRaw();
 			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
 				Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
@@ -47,6 +50,8 @@ public class Shop implements Command{
 				}
 				else{
 					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+Azrael.getChannelID()+">").queue();
+					logger.warn("Shop command used in a not bot channel");
+					
 				}
 			}
 			else{
@@ -57,8 +62,6 @@ public class Shop implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Logger logger = LoggerFactory.getLogger(Shop.class);
-		logger.info("{} has used Shop command", e.getMember().getUser().getId());
 		Azrael.clearAllVariables();
 	}
 

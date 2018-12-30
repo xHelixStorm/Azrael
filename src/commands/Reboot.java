@@ -36,7 +36,7 @@ public class Reboot implements Command{
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
 		Logger logger = LoggerFactory.getLogger(Reboot.class);
-		logger.info("{} has used Reboot command", e.getMember().getUser().getId());
+		logger.debug("{} has used Reboot command", e.getMember().getUser().getId());
 	}
 
 	@Override

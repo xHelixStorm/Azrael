@@ -29,7 +29,7 @@ public class RoleReaction implements Command{
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) == true || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 				if(e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+13).equals("enable")) {
 					Logger logger = LoggerFactory.getLogger(RoleReaction.class);
-					logger.info("{} has used RoleReaction command to enable", e.getMember().getUser().getId());
+					logger.debug("{} has used RoleReaction command to enable", e.getMember().getUser().getId());
 					
 					Azrael.SQLgetExecutionID(e.getGuild().getIdLong());
 					if(Azrael.getReactions() == true) {
@@ -49,7 +49,7 @@ public class RoleReaction implements Command{
 				}
 				else if(e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+13).equals("disable")) {
 					Logger logger = LoggerFactory.getLogger(RoleReaction.class);
-					logger.info("{} has used RoleReaction command to disable", e.getMember().getUser().getId());
+					logger.debug("{} has used RoleReaction command to disable", e.getMember().getUser().getId());
 					
 					Azrael.SQLgetExecutionID(e.getGuild().getIdLong());
 					if(Azrael.getReactions() == false) {

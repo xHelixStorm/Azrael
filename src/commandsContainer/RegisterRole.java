@@ -75,7 +75,7 @@ public class RegisterRole {
 						role_name = _e.getGuild().getRoleById(role_id).getName();
 						DiscordRoles.SQLInsertRole(_guild_id, role_id, role_name, category_abv);
 						Logger logger = LoggerFactory.getLogger(RegisterRole.class);
-						logger.info("{} has registered the role {} with the category {} in guild {}", _e.getMember().getUser().getId(), role_name, category_abv, _e.getGuild().getName());
+						logger.debug("{} has registered the role {} with the category {} in guild {}", _e.getMember().getUser().getId(), role_name, category_abv, _e.getGuild().getName());
 						_e.getTextChannel().sendMessage("**The role has been registered!**").queue();
 						if(category_abv.equals("rea")) {
 							Hashes.removeRoles();

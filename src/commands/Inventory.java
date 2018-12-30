@@ -25,7 +25,10 @@ public class Inventory implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getHelpCommand()){
 			ExecutorService executor = Executors.newSingleThreadExecutor();
-			executor.execute(() -> {				
+			executor.execute(() -> {
+				Logger logger = LoggerFactory.getLogger(Inventory.class);
+				logger.debug("{} has used Inventory command", e.getMember().getUser().getId());
+				
 				if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
 					Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 					if(Azrael.getChannelID() == e.getTextChannel().getIdLong() || Azrael.getChannelID() == 0){
@@ -56,6 +59,7 @@ public class Inventory implements Command{
 					}
 					else{
 						e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+Azrael.getChannelID()+">").queue();
+						logger.warn("Inventory command used in a not bot channel");
 					}
 				}
 				else{
@@ -68,8 +72,6 @@ public class Inventory implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Logger logger = LoggerFactory.getLogger(Inventory.class);
-		logger.info("{} has used Inventory command", e.getMember().getUser().getId());
 		Azrael.clearAllVariables();
 	}
 

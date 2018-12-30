@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -23,6 +26,7 @@ import timerTask.ClearHashes;
 import util.STATIC;
 
 public class ReadyListener extends ListenerAdapter{
+	private static final Logger logger = LoggerFactory.getLogger(ReadyListener.class);
 	private static String privatePatchNotes = PatchNotes.patchNotes();
 	private static String publicPatchNotes = PublicPatchNotes.publicPatchNotes();
 	
@@ -70,6 +74,7 @@ public class ReadyListener extends ListenerAdapter{
 					FileSetting.createFile("./files/version.azr", STATIC.getVersion_New());
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage(
 							messageBuild.setDescription(privatePatchNotes).build()).queue();
+					logger.debug("Private patch notes launched");
 					
 					Azrael.SQLgetChannelID(guild_id, "bot");
 					long channel_id2 = Azrael.getChannelID();
@@ -78,6 +83,7 @@ public class ReadyListener extends ListenerAdapter{
 						if(channel_id2 != 0){
 							e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id2).sendMessage(
 									messageBuild.setDescription(publicPatchNotes).build()).queue();
+							logger.debug("Public patch notes launched");
 						}
 					}
 				}

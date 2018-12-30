@@ -33,7 +33,7 @@ public class Register implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getRegisterCommand()){
 			Logger logger = LoggerFactory.getLogger(Register.class);
-			logger.info("{} has used Register command", e.getMember().getUser().getId());
+			logger.debug("{} has used Register command", e.getMember().getUser().getId());
 			
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			user_id = e.getMember().getUser().getId();

@@ -13,6 +13,8 @@ import sql.RankingSystem;
 
 public class SetMaxExperience {
 	public static void runTask(MessageReceivedEvent _e, String _input, Guilds guild_settings){
+		Logger logger = LoggerFactory.getLogger(SetMaxExperience.class);
+		
 		Pattern pattern = Pattern.compile("(enable|disable)");
 		Matcher matcher = pattern.matcher(_input);
 		if(matcher.find()){
@@ -26,8 +28,7 @@ public class SetMaxExperience {
 				RankingSystem.SQLInsertMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), _e.getGuild().getIdLong());
 				_e.getTextChannel().sendMessage("The max experience limitation has been disabled!").queue();
 			}
-			Logger logger = LoggerFactory.getLogger(SetMaxExperience.class);
-			logger.info("{} has set the max experience limitation to {} in guild {}", _e.getMember().getUser().getId(), matcher.group(), _e.getGuild().getName());
+			logger.debug("{} has set the max experience limitation to {} in guild {}", _e.getMember().getUser().getId(), matcher.group(), _e.getGuild().getName());
 			Hashes.addStatus(_e.getGuild().getIdLong(), guild_settings);
 		}
 		else{
@@ -36,8 +37,7 @@ public class SetMaxExperience {
 				guild_settings.setMaxExpEnabled(true);
 				RankingSystem.SQLInsertMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), _e.getGuild().getIdLong());
 				
-				Logger logger = LoggerFactory.getLogger(SetMaxExperience.class);
-				logger.info("{} has set the max experience limitation to {} exp in guild {}", _e.getMember().getUser().getId(), guild_settings.getMaxExperience(), _e.getGuild().getName());
+				logger.debug("{} has set the max experience limitation to {} exp in guild {}", _e.getMember().getUser().getId(), guild_settings.getMaxExperience(), _e.getGuild().getName());
 				Hashes.addStatus(_e.getGuild().getIdLong(), guild_settings);
 				_e.getTextChannel().sendMessage("**The max experience per day is now "+guild_settings.getMaxExperience()+" and has been automatically enabled!**").queue();
 			} catch(NullPointerException | NumberFormatException npe){

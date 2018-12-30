@@ -45,7 +45,7 @@ public class User implements Command{
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
 		Logger logger = LoggerFactory.getLogger(User.class);
-		logger.info("{} has used User command", e.getMember().getUser().getId());
+		logger.debug("{} has used User command", e.getMember().getUser().getId());
 	}
 
 	@Override

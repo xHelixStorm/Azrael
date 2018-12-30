@@ -19,6 +19,9 @@ public class About implements Command {
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getAboutCommand()){
+			Logger logger = LoggerFactory.getLogger(About.class);
+			logger.debug("{} has used About command", e.getMember().getUser().getId());
+			
 			long channel = e.getTextChannel().getIdLong();
 			long guild_id = e.getGuild().getIdLong();
 			Azrael.SQLgetChannelID(guild_id, "bot");
@@ -26,6 +29,7 @@ public class About implements Command {
 			
 			if(channel != channel_id && channel_id != 0){
 				e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+channel_id+">").queue();
+				logger.warn("About command used in a not bot channel");
 			}
 			else{
 				EmbedBuilder messageBuilder = new EmbedBuilder().setColor(0x00AE86).setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl()).setTitle("About Page!");
@@ -47,8 +51,6 @@ public class About implements Command {
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Logger logger = LoggerFactory.getLogger(About.class);
-		logger.info("{} has used About command", e.getMember().getUser().getId());
 		Azrael.clearAllVariables();
 	}
 

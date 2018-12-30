@@ -42,7 +42,7 @@ public class NameListener extends ListenerAdapter{
 							message.setColor(Color.RED).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle("Impersonation attempt found!");
 							e.getJDA().getTextChannelById(channel_id).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**\nPlease review in case of impersonation!").build()).queue();
 							Logger logger = LoggerFactory.getLogger(NameListener.class);
-							logger.info("{} got renamed into {} in guild {}. Impersonation", e.getUser().getId(), nickname, g.getName());
+							logger.debug("{} got renamed into {} in guild {}. Impersonation", e.getUser().getId(), nickname, g.getName());
 							staff_name = true;
 							break check;
 						} catch(HierarchyException hye){
@@ -70,7 +70,7 @@ public class NameListener extends ListenerAdapter{
 									message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
 									e.getJDA().getTextChannelById(channel_id).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
 									Logger logger = LoggerFactory.getLogger(NameListener.class);
-									logger.info("{} got renamed into {} in guild {}", e.getUser().getId(), nickname, guild.getName());
+									logger.debug("{} got renamed into {} in guild {}", e.getUser().getId(), nickname, guild.getName());
 									break check;
 								} catch (HierarchyException hye){
 									message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getFalseAlarmThumbnail()).setTitle("You know that you shouldn't do it :/");

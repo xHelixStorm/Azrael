@@ -22,7 +22,7 @@ public class GuildListener extends ListenerAdapter {
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent e){
 		Logger logger = LoggerFactory.getLogger(GuildListener.class);
-		logger.info("{} has joined the guild {}", e.getUser().getId(), e.getGuild().getName());
+		logger.debug("{} has joined the guild {}", e.getUser().getId(), e.getGuild().getName());
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
 		EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name found!");
 		EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle("An error occurred!");
@@ -46,17 +46,20 @@ public class GuildListener extends ListenerAdapter {
 				if(editedRows2 > 0) {
 					var editedRows3 = RankingSystem.SQLInsertUserGuild(user_id, guild_id);
 					if(editedRows3 == 0) {
-						if(channel_id != 0) e.getGuild().getTextChannelById(channel_id).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **RankingSystem.user_details** table").build()).queue();
+						if(channel_id != 0) e.getGuild().getTextChannelById(channel_id).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **RankingSystem.user_guild** table").build()).queue();
+						logger.error("Failed to insert joined user into RankingSystem.user_guild");
 						RankingSystem.SQLInsertActionLog("high", user_id, "User wasn't inserted into user_details table", "This user couldn't be inserted into the user_details table. Please verify and eventually insert it manually into the table!");
 					}
 				}
 				else {
 					if(channel_id != 0) e.getGuild().getTextChannelById(channel_id).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **RankingSystem.user_details** table").build()).queue();
+					logger.error("Failed to insert joined user into RankingSystem.user_details");
 					RankingSystem.SQLInsertActionLog("high", user_id, "User wasn't inserted into user_details table", "This user couldn't be inserted into the user_details table. Please verify and eventually insert it manually into the table!");
 				}
 			}
 			else {
 				if(channel_id != 0) e.getGuild().getTextChannelById(channel_id).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **RankingSystem.users** table").build()).queue();
+				logger.error("Failed to insert joined user into RankingSystem.users");
 				RankingSystem.SQLInsertActionLog("high", user_id, "User wasn't inserted into user table", "This user couldn't be inserted into the user table. Please verify the name of this user and eventually insert it manually into the table!");
 			}
 		}
@@ -101,6 +104,7 @@ public class GuildListener extends ListenerAdapter {
 					String nickname = Azrael.getName();
 					e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
 					e.getGuild().getTextChannelById(channel_id).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server and tried to impersonate a staff member. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
+					logger.info("Impersonation attempt found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 					badName = true;
 					break check;
 				}
@@ -113,6 +117,7 @@ public class GuildListener extends ListenerAdapter {
 						String nickname = Azrael.getName();
 						e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
 						e.getGuild().getTextChannelById(channel_id).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this Server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
+						logger.info("Improper name found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 						badName = true;
 						break check;
 					}

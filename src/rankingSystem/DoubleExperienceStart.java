@@ -48,7 +48,7 @@ public class DoubleExperienceStart extends TimerTask{
 			Azrael.clearAllVariables();
 		}
 		Logger logger = LoggerFactory.getLogger(DoubleExperienceStart.class);
-		logger.info("Double experience weekend is running");
+		logger.debug("Double experience weekend is running");
 	}
 	
 	public static void runTask(ReadyEvent _e){

@@ -38,7 +38,7 @@ public class Set implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(IniFileReader.getSetCommand()){
 			Logger logger = LoggerFactory.getLogger(RoleReaction.class);
-			logger.info("{} has used Set command", e.getMember().getUser().getId());
+			logger.debug("{} has used Set command", e.getMember().getUser().getId());
 			
 			EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Set up your server to use the capacities of this bot to the fullest!");
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");

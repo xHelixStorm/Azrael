@@ -1,7 +1,9 @@
 package threads;
 
 import java.io.File;
-import java.sql.Timestamp;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DelayDelete implements Runnable{
 	File file;
@@ -18,8 +20,8 @@ public class DelayDelete implements Runnable{
 		try {
 			Thread.sleep(delay);
 		} catch (InterruptedException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			Logger logger = LoggerFactory.getLogger(DelayDelete.class);
+			logger.error("Thread sleep of DelayDelete couldn't be completed", e);
 		}
 		if(file.exists()) {
 			file.delete();

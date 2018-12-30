@@ -2,6 +2,10 @@ package threads;
 
 import java.awt.Color;
 import java.sql.Timestamp;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.UserPrivs;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -69,8 +73,8 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 				Azrael.clearAllVariables();
 			}
 		} catch (InterruptedException e1) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e1.printStackTrace();
+			Logger logger = LoggerFactory.getLogger(RoleTimer.class);
+			logger.error("Exception on separate thread for muted members", e1);
 		}
 	}
 }

@@ -16,7 +16,7 @@ public class IniFileReader {
 			ini = new Ini(new File("./config.ini"));
 		} catch (IOException e) {
 			Logger logger = LoggerFactory.getLogger(IniFileReader.class);
-			logger.warn("Config file couldn't be found or couldn't be opened", e);
+			logger.error("Config file couldn't be found or couldn't be opened", e);
 		}
 	}
 	
@@ -47,6 +47,10 @@ public class IniFileReader {
 	public static String getTempDirectory(){
 		readConfig();
 		return ini.get("Bot", "TempDirectory");
+	}
+	public static boolean getCountMembers() {
+		readConfig();
+		return ini.get("Bot", "CountMembers", boolean.class);
 	}
 	public static String getGameMessage(){
 		readConfig();
