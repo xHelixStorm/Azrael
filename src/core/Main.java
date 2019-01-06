@@ -27,6 +27,7 @@ import commands.Rank;
 import commands.Reboot;
 import commands.Register;
 import commands.RoleReaction;
+import commands.Rss;
 import commands.Set;
 import commands.Shop;
 import commands.ShutDown;
@@ -142,6 +143,7 @@ public class Main {
 		CommandHandler.commands.put("filter", new Filter());
 		CommandHandler.commands.put("quiz", new Quiz());
 		CommandHandler.commands.put("roleReaction", new RoleReaction());
+		CommandHandler.commands.put("rss", new Rss());
 	}
 	
 	public static void addListeners(){

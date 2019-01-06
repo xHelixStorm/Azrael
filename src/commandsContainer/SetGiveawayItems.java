@@ -31,7 +31,7 @@ public class SetGiveawayItems {
 			Timestamp timestamp = Timestamp.valueOf(beginningOfMonthMidnight);
 			
 			//insert rewards into table and return error with true or false
-			boolean err = RankingSystem.SQLBulkInsertGiveawayRewards(rewards, timestamp);
+			boolean err = RankingSystem.SQLBulkInsertGiveawayRewards(rewards, timestamp, e.getGuild().getIdLong());
 			
 			if(err == false) {
 				logger.debug("{} has inserted giveaway items for the daily command", e.getMember().getUser().getId());

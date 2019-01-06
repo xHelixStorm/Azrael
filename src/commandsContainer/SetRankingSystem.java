@@ -30,14 +30,29 @@ public class SetRankingSystem {
 		}
 		
 		if(wrongInput == false){
-			RankingSystem.SQLUpdateRankingSystem(_e.getGuild().getIdLong(), _e.getGuild().getName(), ranking_state);
-			Guilds guild = Hashes.getStatus(_e.getGuild().getIdLong());
-			guild.setRankingState(ranking_state);
-			
-			Hashes.addStatus(_e.getGuild().getIdLong(), guild);
 			Logger logger = LoggerFactory.getLogger(SetRankingSystem.class);
-			logger.debug("{} has set the ranking system to {} in guild {}", _e.getMember().getUser().getId(), _input, _e.getGuild().getName());
-			_e.getTextChannel().sendMessage(message).queue();
+			if(RankingSystem.SQLUpdateRankingSystem(_e.getGuild().getIdLong(), _e.getGuild().getName(), ranking_state) > 0) {
+				Guilds guild = Hashes.getStatus(_e.getGuild().getIdLong());
+				guild.setRankingState(ranking_state);
+				Hashes.addStatus(_e.getGuild().getIdLong(), guild);
+				logger.debug("{} has set the ranking system to {} in guild {}", _e.getMember().getUser().getId(), _input, _e.getGuild().getName());
+				_e.getTextChannel().sendMessage(message).queue();
+				
+				if(ranking_state == true) {
+					if(RankingSystem.SQLgetRoles(_e.getGuild().getIdLong()) == false) {
+						logger.error("Roles from RankingSystem.roles couldn't be called and cached");
+						_e.getTextChannel().sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
+					}
+					if(RankingSystem.SQLgetLevels(_e.getGuild().getIdLong()) == 0) {
+						logger.error("Levels from RankingSystem.level_list couldn't be called and cached");
+						_e.getTextChannel().sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
+					}
+				}
+			}
+			else {
+				logger.error("An internal error occurred on editing the RankingSystem.guilds table to alter the ranking state for guild {}", _e.getGuild().getName());
+				_e.getTextChannel().sendMessage("An internal error occurred. The ranking state couldn't be altered in the table RankingSystem.guilds").queue();
+			}
 		}
 		else{
 			_e.getTextChannel().sendMessage(message).queue();

@@ -12,7 +12,10 @@ public class AvatarUpdateListener extends ListenerAdapter{
 	@Override
 	public void onUserUpdateAvatar(UserUpdateAvatarEvent e){
 		Logger logger = LoggerFactory.getLogger(AvatarUpdateListener.class);
-		logger.debug("{} has updated his/her avatar: {}", e.getUser().getId(), e.getUser().getEffectiveAvatarUrl());
-		Azrael.SQLUpdateAvatar(e.getUser().getIdLong(), e.getUser().getEffectiveAvatarUrl());
+		if(Azrael.SQLUpdateAvatar(e.getUser().getIdLong(), e.getUser().getEffectiveAvatarUrl()) > 0) {
+			logger.debug("{} has updated his/her avatar: {}", e.getUser().getId(), e.getUser().getEffectiveAvatarUrl());
+		}
+		else
+			logger.error("Avatar of {} couldn't be updated in Azrael.users", e.getUser().getId());
 	}
 }

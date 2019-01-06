@@ -25,8 +25,8 @@ public class Shop implements Command{
 			
 			String input = e.getMessage().getContentRaw();
 			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
-				Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
-				if(Azrael.getChannelID() == 0 || e.getTextChannel().getIdLong() == Azrael.getChannelID()){
+				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
+				if(bot_channel == 0 || e.getTextChannel().getIdLong() == bot_channel){
 					//RankingDB.SQLgetDefaultSkins(e.getGuild().getIdLong());
 					Guilds guild_settings = Hashes.getStatus(e.getGuild().getIdLong());
 					if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP LEVEL UPS")){
@@ -49,7 +49,7 @@ public class Shop implements Command{
 					}
 				}
 				else{
-					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+Azrael.getChannelID()+">").queue();
+					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+bot_channel+">").queue();
 					logger.warn("Shop command used in a not bot channel");
 					
 				}
@@ -62,7 +62,7 @@ public class Shop implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Azrael.clearAllVariables();
+		
 	}
 
 	@Override

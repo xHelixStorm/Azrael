@@ -40,8 +40,7 @@ public class MuteRestart implements Runnable{
 	public void run() {
 		try {
 			Thread.sleep(unmute);
-			Azrael.SQLgetMuted(member.getUser().getIdLong(), guild_id);
-			if(channel_id != 0 && Azrael.getMuted() == true){
+			if(channel_id != 0 && Azrael.SQLgetMuted(member.getUser().getIdLong(), guild_id) == true){
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator() + "** with the ID Number **" + member.getUser().getId() + "** has been unmuted").build()).queue();
 			}

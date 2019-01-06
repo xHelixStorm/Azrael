@@ -56,12 +56,11 @@ public class Top implements Command{
 				e.getTextChannel().sendMessage("Please type **H!top -help** to display the command usage!").queue();
 			}
 			
-			Azrael.SQLgetChannelID(guild_id, "bot");
-			channel_id = Azrael.getChannelID();
+			channel_id = Azrael.SQLgetChannelID(guild_id, "bot");
 			
 			if(runTopList == true){
 				if(channel_id == channel){
-					ArrayList<rankingSystem.Rank> rankList = RankingSystem.SQLRanking();
+					ArrayList<rankingSystem.Rank> rankList = RankingSystem.SQLRanking(guild_id);
 					rankingSystem.Rank ranking1 = rankList.parallelStream().filter(r -> r.getUser_ID() == member_id).findAny().orElse(null);
 					rank = ranking1.getRank();
 					user_experience = ranking1.getExperience();
@@ -83,13 +82,13 @@ public class Top implements Command{
 							level = ranking.getLevel();
 							experience = ranking.getExperience();				
 							if(i == 10){
-								message.append("["+(ranking.getRank()+(page-1)*10)+"]\t> #"+name+"\n\t\t\t Level: "+level+"\t Experience: "+experience+"\n");
+								message.append("["+ranking.getRank()+"]\t> #"+name+"\n\t\t\t Level: "+level+"\t Experience: "+experience+"\n");
 								e.getTextChannel().sendMessage("```CMake\nRanking | User\n\n"+message.toString()+"\n"
 										+ "-------------------------------------\n #Personal information\n"
 										+ " Rank: "+rank+"\t Level: "+user_level+"\t Experience: "+user_experience+"\n\n \t\t\t<Page "+page+">```").queue();
 							}
 							else{
-								message.append("["+(ranking.getRank()+(page-1)*10)+"] \t> #"+name+"\n\t\t\t Level: "+level+"\t Experience: "+experience+"\n");
+								message.append("["+ranking.getRank()+"] \t> #"+name+"\n\t\t\t Level: "+level+"\t Experience: "+experience+"\n");
 							}
 						}
 					} catch(IndexOutOfBoundsException ioobe) {
@@ -106,7 +105,7 @@ public class Top implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Azrael.clearAllVariables();
+		
 	}
 
 	@Override

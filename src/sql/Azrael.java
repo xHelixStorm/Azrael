@@ -8,48 +8,22 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Bancollect;
 import core.Channels;
 import core.Hashes;
+import core.RSS;
+import core.User;
+import core.Warning;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.entities.Member;
 
 public class Azrael {
 	private static final Logger logger = LoggerFactory.getLogger(Azrael.class);
-	
-	private static long user_id = 0;
-	private static long guild_id = 0;
-	private static String name = null;
-	private static String nickname = null;
-	private static String guild_name = null; 
-	private static int warning_id = 0;
-	private static int ban_id = 0;
-	private static long channel_id = 0;
-	private static long channel_id2 = 0;
-	private static String channel_name = null;
-	private static long ch_guild_id = 0;
-	private static String channel_type = null;
-	private static String channel_type_name = null;
-	private static int execution_id = 0;
-	private static long guild = 0;
-	private static boolean muted = false;
-	private static boolean custom_time = false;
-	private static double timer = 0;
-	private static String description = "";
-	private static int count = 0;
-	private static String avatar = null;
-	private static String join_date = null;
-	private static boolean reactions = false;
-	
-	private static Date timestamp;
-	private static Date unmute;
-	private static ArrayList<Channels> channels = new ArrayList<Channels>();
-	private static ArrayList<String> descriptions = new ArrayList<String>();
 	
 	private static String username = IniFileReader.getSQLUsername();
 	private static String password = IniFileReader.getSQLPassword();
@@ -59,13 +33,13 @@ public class Azrael {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("JDBC driver couldn't be loaded", e);
 		}
 	}
 	
 	public static synchronized void SQLInsertActionLog(String _event, long _target_id, long _guild_id, String _description) {
 		if(IniFileReader.getActionLog()) {
+			logger.debug("Azrael.SQLInsertActionLog launched. Passed params {}, {}, {}, {}", _event, _target_id, _guild_id, _description);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			try {
@@ -88,7 +62,8 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetSingleActionEventCount(String _event, long _target_id, long _guild_id) {
+	public static int SQLgetSingleActionEventCount(String _event, long _target_id, long _guild_id) {
+		logger.debug("Azrael.SQLgetSingleActionEventCount launched. Passed params {}, {}, {}", _event, _target_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -101,10 +76,12 @@ public class Azrael {
 			stmt.setString(3, _event);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setCount(rs.getInt(1));
+				return rs.getInt(1);
 			}
+			return 0;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetSingleActionEventCount Exception", e);
+			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -112,7 +89,9 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetDoubleActionEventDescriptions(String _event, String _event2, long _target_id, long _guild_id) {
+	public static ArrayList<String> SQLgetDoubleActionEventDescriptions(String _event, String _event2, long _target_id, long _guild_id) {
+		logger.debug("Azrael.SQLgetDoubleActionEventDescriptions launched. Passed params {}, {}, {}, {}", _event, _event2, _target_id, _guild_id);
+		ArrayList<String> descriptions = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -128,8 +107,10 @@ public class Azrael {
 			while(rs.next()){
 				descriptions.add(rs.getString(1));
 			}
+			return descriptions;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetDoubleActionEventDescription Exception", e);
+			return descriptions;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -137,7 +118,9 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetSingleActionEventDescriptions(String _event, long _target_id, long _guild_id) {
+	public static ArrayList<String> SQLgetSingleActionEventDescriptions(String _event, long _target_id, long _guild_id) {
+		logger.debug("Azrael.SQLgetSingleActionEventDescriptions launched. Passed params {}, {}, {}", _event, _target_id, _guild_id);
+		ArrayList<String> descriptions = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -152,15 +135,19 @@ public class Azrael {
 			while(rs.next()){
 				descriptions.add(rs.getString(1));
 			}
+			return descriptions;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetSingleActionEventDescriptions Exception", e);
+			return descriptions;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
-	public static void SQLgetCriticalActionEvents(long _target_id, long _guild_id) {
+	public static ArrayList<String> SQLgetCriticalActionEvents(long _target_id, long _guild_id) {
+		logger.debug("Azrael.SQLgetCriticalActionEvents launched. Passed params {}, {}", _target_id, _guild_id);
+		ArrayList<String> descriptions = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -174,8 +161,10 @@ public class Azrael {
 			while(rs.next()){
 				descriptions.add("`["+rs.getTimestamp(2).toString()+"] - "+rs.getString(1)+"`");
 			}
+			return descriptions;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetCriticalActionEvents Exception", e);
+			return descriptions;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -183,7 +172,8 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLInsertUser(long _user_id, String _name, String _avatar, String _join_date){
+	public static int SQLInsertUser(long _user_id, String _name, String _avatar, String _join_date){
+		logger.debug("Azrael.SQLInsertUser launched. Passed params {}, {}, {}, {}", _user_id, _name, _avatar, _join_date);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -194,9 +184,10 @@ public class Azrael {
 			stmt.setString(2, _name);
 			stmt.setString(3, _avatar);
 			stmt.setString(4, _join_date);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertUser Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -204,6 +195,7 @@ public class Azrael {
 	}
 	
 	public static void SQLBulkInsertUsers(List<Member> members){
+		logger.debug("Azrael.SQLBulkInsertUsers launched. Passed member list params");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -228,7 +220,8 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLUpdateAvatar(long _user_id, String _avatar){
+	public static int SQLUpdateAvatar(long _user_id, String _avatar){
+		logger.debug("Azrael.SQLUpdateAvatar launched. Passed params {}, {}", _user_id, _avatar);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -237,40 +230,42 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _avatar);
 			stmt.setLong(2, _user_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLUpdateAvatar Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLgetUser(String _name){
+	public static User SQLgetUser(String _name){
+		logger.debug("Azrael.SqlgetUser launched. Passed params {}", _name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM users WHERE name LIKE ?");
+			String sql = ("SELECT user_id, name FROM users WHERE name LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _name);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setUser_id(rs.getLong(1));
-				setName(rs.getString(2));
-				setAvatar(rs.getString(3));
-				setJoinDate(rs.getString(4));
+				return new User(rs.getLong(1), rs.getString(2));
 			}
+			return null;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetUser Exception", e);
+			return null;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLgetUserThroughID(String _user_id){
+	public static User SQLgetUserThroughID(String _user_id){
+		logger.debug("Azrael.SQLgetUserThroughID launched. Passed params {}");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -281,20 +276,20 @@ public class Azrael {
 			stmt.setString(1, _user_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setUser_id(rs.getLong(1));
-				setName(rs.getString(2));
-				setAvatar(rs.getString(3));
-				setJoinDate(rs.getString(4));
+				return new User(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4));
 			}
+			return null;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetUserThroughID Exception", e);
+			return null;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateUser(Long _user_id, String _name){
+	public static int SQLUpdateUser(Long _user_id, String _name){
+		logger.debug("Azrael.SQLUpdateUser launched. Passed params {}, {}", _user_id, _name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -303,16 +298,18 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _name);
 			stmt.setLong(2, _user_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLUpdateUser Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLInsertGuild(Long _guild_id, String _guild_name){
+	public static int SQLInsertGuild(Long _guild_id, String _guild_name){
+		logger.debug("Azrael.SQLInsertGuild launched. Passed params {}, {}", _guild_id, _guild_name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -321,16 +318,18 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setString(2, _guild_name);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertGuild Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLgetNickname(Long _user_id, Long _guild_id){
+	public static String SQLgetNickname(Long _user_id, Long _guild_id){
+		logger.debug("Azrael.SQLgetNickname launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -342,10 +341,12 @@ public class Azrael {
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setNickname(rs.getString(1));
+				return rs.getString(1);
 			}
+			return "";
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetNickname Exception", e);
+			return "";
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -353,7 +354,8 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLInsertNickname(Long _user_id, Long _guild_id, String _nickname){
+	public static int SQLInsertNickname(Long _user_id, Long _guild_id, String _nickname){
+		logger.debug("Azrael.SQLInsertNickname launched. Passed params {}, {}, {}", _user_id, _guild_id, _nickname);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -363,16 +365,18 @@ public class Azrael {
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			stmt.setString(3, _nickname);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertNickname Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateNickname(Long _user_id, Long _guild_id, String _nickname){
+	public static int SQLUpdateNickname(Long _user_id, Long _guild_id, String _nickname){
+		logger.debug("Azrael.SQLUpdateNickname launched. Passed params {}, {}", _user_id, _guild_id, _nickname);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -382,16 +386,18 @@ public class Azrael {
 			stmt.setString(1, _nickname);
 			stmt.setLong(2, _user_id);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLUpdateNickname Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLDeleteNickname(Long _user_id, Long _guild_id){
+	public static int SQLDeleteNickname(Long _user_id, Long _guild_id){
+		logger.debug("Azrael.SQLDeleteNickname launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -400,16 +406,18 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLDeleteNickname Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLgetData(Long _user_id, Long _guild_id){
+	public static Bancollect SQLgetData(Long _user_id, Long _guild_id){
+		logger.debug("Azrael.SQLgetData launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -421,17 +429,12 @@ public class Azrael {
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setUser_id(rs.getLong(1));
-				setGuild_id(rs.getLong(2));
-				setWarningID(rs.getInt(3));
-				setBanID(rs.getInt(4));
-				setTimestamp(rs.getTimestamp(5));
-				setUnmute(rs.getTimestamp(6));
-				setMuted(rs.getBoolean(7));
-				setCustomTime(rs.getBoolean(8));
+				return new Bancollect(rs.getLong(1), rs.getLong(2), rs.getInt(3), rs.getInt(4), rs.getTimestamp(5), rs.getTimestamp(6), rs.getBoolean(7), rs.getBoolean(8));
 			}
+			return new Bancollect();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetData Exception", e);
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -439,7 +442,8 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetMuted(long _user_id, long _guild_id){
+	public static boolean SQLgetMuted(long _user_id, long _guild_id){
+		logger.debug("Azrael.SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -451,10 +455,12 @@ public class Azrael {
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setMuted(rs.getBoolean(1));
+				return rs.getBoolean(1);
 			}
+			return false;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetMuted Exception", e);
+			return false;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -462,7 +468,8 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLInsertData(long _user_id, long _guild_id, int _warning_id, int _ban_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted, boolean _custom_time){
+	public static int SQLInsertData(long _user_id, long _guild_id, int _warning_id, int _ban_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted, boolean _custom_time){
+		logger.debug("Azrael.SQLInsertData launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _warning_id, _ban_id, _timestamp, _unmute, _muted, _custom_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -477,16 +484,18 @@ public class Azrael {
 			stmt.setTimestamp(6, _unmute);
 			stmt.setBoolean(7, _muted);
 			stmt.setBoolean(8, _custom_time);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertData Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLDeleteData(long _user_id, long _guild_id) {
+	public static int SQLDeleteData(long _user_id, long _guild_id) {
+		logger.debug("Azrael.SQLDeleteData launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -495,16 +504,18 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLDeleteData Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateMuted(long _user_id, long _guild_id, boolean _muted, boolean _custom_time){
+	public static int SQLUpdateMuted(long _user_id, long _guild_id, boolean _muted, boolean _custom_time){
+		logger.debug("Azrael.SQLUpdateMuted launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _muted, _custom_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -515,16 +526,40 @@ public class Azrael {
 			stmt.setBoolean(2, _custom_time);
 			stmt.setLong(3, _user_id);
 			stmt.setLong(4, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLUpdateMuted Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLgetWarning(long _guild_id, int _warning_id) {
+	public static int SQLUpdateMutedOnEnd(long _user_id, long _guild_id, boolean _muted, boolean _custom_time){
+		logger.debug("Azrael.SQLUpdateMutedOnEnd launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _muted, _custom_time);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE bancollect SET muted = ?, custom_time = ? WHERE fk_user_id = ? && fk_guild_id = ? && muted = 1");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setBoolean(1, _muted);
+			stmt.setBoolean(2, _custom_time);
+			stmt.setLong(3, _user_id);
+			stmt.setLong(4, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("Azrael.SQLUpdateMuted Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static Warning SQLgetWarning(long _guild_id, int _warning_id) {
+		logger.debug("Azrael.SQLgetWarning launched. Passed params {}, {}", _guild_id, _warning_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -536,12 +571,12 @@ public class Azrael {
 			stmt.setInt(2, _warning_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setWarningID(rs.getInt(1));
-				setTimer(rs.getDouble(2));
-				setDescription(rs.getString(3));
+				return new Warning(rs.getInt(1), rs.getDouble(2), rs.getString(3));
 			}
+			return new Warning();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetWarning Exception", e);
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -549,7 +584,8 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetMaxWarning(long _guild_id) {
+	public static int SQLgetMaxWarning(long _guild_id) {
+		logger.debug("Azrael.SQLgetMaxWarning launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -560,10 +596,12 @@ public class Azrael {
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setWarningID(rs.getInt(1));
+				return rs.getInt(1);
 			}
+			return 0;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetMaxWarning Exception", e);
+			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -571,7 +609,8 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLInsertWarning(long _guild_id, int _warning_id) {
+	public static int SQLInsertWarning(long _guild_id, int _warning_id) {
+		logger.debug("Azrael.SQLInsertWarning launched. Passed params {}, {}", _guild_id, _warning_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -628,16 +667,18 @@ public class Azrael {
 					stmt.setLong(4, _guild_id);
 					stmt.setLong(5, _guild_id);
 			}
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertWarning Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateWarning(long _user_id, long _guild_id, int _warning_id){
+	public static int SQLUpdateWarning(long _user_id, long _guild_id, int _warning_id){
+		logger.debug("Azrael.SQLUpdateWarning launched. Passed params {}, {}", _user_id, _guild_id, _warning_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -647,16 +688,18 @@ public class Azrael {
 			stmt.setInt(1, _warning_id);
 			stmt.setLong(2, _user_id);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLUpdateWarning Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateMuteTimeOfWarning(long _guild_id, int _warning_id, long _mute_time) {
+	public static int SQLUpdateMuteTimeOfWarning(long _guild_id, int _warning_id, long _mute_time) {
+		logger.debug("Azrael.SQLUpdateTimeOfWarning launched. Passed params {}, {}, {}", _guild_id, _warning_id, _mute_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -666,16 +709,18 @@ public class Azrael {
 			stmt.setLong(1, _mute_time);
 			stmt.setLong(2, _guild_id);
 			stmt.setInt(3, _warning_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLUpdateMuteTimeOfWarning Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateUnmute(Long _user_id, Long _guild_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted, boolean _custom_time){
+	public static int SQLUpdateUnmute(Long _user_id, Long _guild_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted, boolean _custom_time){
+		logger.debug("Azrael.SQLUpdateUnmute launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _timestamp, _unmute, _muted, _custom_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -688,16 +733,18 @@ public class Azrael {
 			stmt.setBoolean(4, _custom_time);
 			stmt.setLong(5, _user_id);
 			stmt.setLong(6, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLUpdateUnmute Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateBan(Long _user_id, Long _guild_id, Integer _ban_id){
+	public static int SQLUpdateBan(Long _user_id, Long _guild_id, Integer _ban_id){
+		logger.debug("Azrael.SQLUpdateban launched. Passed params {}, {}, {}", _user_id, _guild_id, _ban_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -707,16 +754,18 @@ public class Azrael {
 			stmt.setInt(1, _ban_id);
 			stmt.setLong(2, _user_id);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLUpdateBan Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLInsertChannels(long _channel_id, String _channel_name){
+	public static int SQLInsertChannels(long _channel_id, String _channel_name){
+		logger.debug("Azrael.SQLInsertChannels launched. Passed params {}, {}", _channel_id, _channel_name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -725,16 +774,18 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
 			stmt.setString(2, _channel_name);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertChannels Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLInsertChannel_Conf(long _channel_id, long _guild_id, String _channel_type){
+	public static int SQLInsertChannel_Conf(long _channel_id, long _guild_id, String _channel_type){
+		logger.debug("Azrael.SQLInsertChannel launched. Passed params {}, {}", _channel_id, _guild_id, _channel_type);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -744,35 +795,35 @@ public class Azrael {
 			stmt.setLong(1, _channel_id);
 			stmt.setString(2, _channel_type);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertChannel_Conf Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static boolean SQLgetChannelID(long _guild_id, String _channel_type){
+	public static long SQLgetChannelID(long _guild_id, String _channel_type){
+		logger.debug("Azrael.SQLgetChannelID launched. Passed params {}, {}", _guild_id, _channel_type);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT fk_channel_id FROM channel_conf WHERE fk_channel_type = ? && fk_guild_id = ?");
-			boolean success = false;
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _channel_type);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setChannelID(rs.getLong(1));
-				success = true;
+				return rs.getLong(1);
 			}
-			return success;
+			return 0;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetChannelID Exception", e);
-			return false;
+			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -780,7 +831,8 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetTwoChanneIDs(long _guild_id, String _channel_type, String _channel_type2){
+	public static String SQLgetTwoChanneIDs(long _guild_id, String _channel_type, String _channel_type2){
+		logger.debug("Azrael.SQLgetTwoChannelIDs launched. Passed params {}, {}, {}", _guild_id, _channel_type, _channel_type2);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -794,11 +846,12 @@ public class Azrael {
 			stmt.setLong(4, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setChannelID(rs.getLong(1));
-				setChannelID2(rs.getLong(2));
+				return rs.getString(1)+"_"+rs.getString(2);
 			}
+			return "0_0";
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetTwoChannelIDs Exception", e);
+			return "0_0";
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -806,36 +859,16 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetChannelType(long _channel_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_channel_type FROM channel_conf WHERE fk_channel_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _channel_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				setChannelType(rs.getString(1));
-			}
-		} catch (SQLException e) {
-			logger.error("Azrael.SQLgetChannelType Exception", e);
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static void SQLDeleteChannelType(String _channel_type) {
+	public static void SQLDeleteChannelType(String _channel_type, long _guild_id) {
+		logger.debug("Azrael.SQLDeleteChannelType launched. Passed params {}, {}", _channel_type, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("DELETE FROM channel_conf WHERE fk_channel_type = ?");
+			String sql = ("DELETE FROM channel_conf WHERE fk_channel_type = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _channel_type);
+			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLDeleteChannelType Exception", e);
@@ -845,7 +878,9 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetChannels(long _guild_id){
+	public static ArrayList<Channels> SQLgetChannels(long _guild_id){
+		logger.debug("Azrael.SQLgetChannels launched. Passed params {}", _guild_id);
+		ArrayList<Channels> channels = new ArrayList<Channels>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -866,8 +901,10 @@ public class Azrael {
 				channelProperties.setLang_Filter(rs.getString(7));
 				channels.add(channelProperties);
 			}
+			return channels;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetChannels Exception", e);
+			return channels;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -875,7 +912,9 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetChannelTypes(){
+	public static ArrayList<Channels> SQLgetChannelTypes(){
+		logger.debug("Azrael.SQLgetChannelTypes launched. No params");
+		ArrayList<Channels> channels = new ArrayList<Channels>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -890,8 +929,10 @@ public class Azrael {
 				channelProperties.setChannel_Type_Name(rs.getString(2));
 				channels.add(channelProperties);
 			}
+			return channels;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetChannelTypes Exception", e);
+			return channels;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -899,27 +940,24 @@ public class Azrael {
 		}
 	}
 	
-	public static boolean SQLgetExecutionID(long _guild_id){
+	public static int SQLgetExecutionID(long _guild_id){
+		logger.debug("Azrael.SQLgetExecutionID launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM command WHERE guild_id = ?");
-			boolean success = false;
+			String sql = ("SELECT execution_id FROM command WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setGuild(rs.getLong(2));
-				setExecutionID(rs.getInt(3));
-				setReactions(rs.getBoolean(4));
-				success = true;
+				return rs.getInt(1);
 			}
-			return success;
+			return 0;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetExecutionID Exception", e);
-			return false;
+			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -928,6 +966,7 @@ public class Azrael {
 	}
 	
 	public static boolean SQLgetCommandExecutionReaction(long _guild_id) {
+		logger.debug("Azrael.SQLgetCommandExecutionReaction launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -951,7 +990,8 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLInsertCommand(long _guild_id, int _execution_id){
+	public static int SQLInsertCommand(long _guild_id, int _execution_id){
+		logger.debug("Azrael.SQLInsertCommand launched. Passed params {}, {}", _guild_id, _execution_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -960,16 +1000,18 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _execution_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertCommand Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLInsertCommand(long _guild_id, int _execution_id, boolean _reactions){
+	public static int SQLInsertCommand(long _guild_id, int _execution_id, boolean _reactions){
+		logger.debug("Azrael.SQLInsertCommand launched. Passed params {}, {}, {}", _guild_id, _execution_id, _reactions);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -979,16 +1021,18 @@ public class Azrael {
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _execution_id);
 			stmt.setBoolean(3, _reactions);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertCommand Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateReaction(long _guild_id, boolean _reactions) {
+	public static int SQLUpdateReaction(long _guild_id, boolean _reactions) {
+		logger.debug("Azrael.SQLUpdateReaction launched. Passed params {}, {}", _guild_id, _reactions);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -997,9 +1041,10 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setBoolean(1, _reactions);
 			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLUpdateReaction Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1007,6 +1052,7 @@ public class Azrael {
 	}
 	
 	public synchronized static void SQLgetChannel_Filter(long _channel_id){
+		logger.debug("Azrael.SQLgetChannel_Filter launched. Passed params {}", _channel_id);
 		if(Hashes.getFilterLang(_channel_id) == null){
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1033,6 +1079,7 @@ public class Azrael {
 	}
 	
 	public synchronized static void SQLgetFilter(String _filter_lang, long _guild_id){
+		logger.debug("Azrael.SQLgetFilter launched. Passed params {}, {}", _filter_lang, _guild_id);
 		if(Hashes.getQuerryResult(_filter_lang+"_"+_guild_id) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1067,7 +1114,8 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLInsertWordFilter(String _lang, String _word, long _guild_id) {
+	public static int SQLInsertWordFilter(String _lang, String _word, long _guild_id) {
+		logger.debug("Azrael.SQLInsertWordFilter launched. Passed params {}, {}, {}", _lang, _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1077,16 +1125,18 @@ public class Azrael {
 			stmt.setString(1, _word.toLowerCase());
 			stmt.setString(2, _lang);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertWordFilter Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLDeleteWordFilter(String _lang, String _word, long _guild_id) {
+	public static int SQLDeleteWordFilter(String _lang, String _word, long _guild_id) {
+		logger.debug("Azrael.SQLDeleteWordFilter launched. Passed params {}, {}. {}", _lang, _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1096,9 +1146,10 @@ public class Azrael {
 			stmt.setString(1, _word);
 			stmt.setString(2, _lang);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLDeleteWordFilter Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1106,6 +1157,7 @@ public class Azrael {
 	}
 	
 	public static void SQLDeleteLangWordFilter(String _lang, long _guild_id) {
+		logger.debug("Azrael.SQLDeleteLangWordFilter launched. Passed params {}, {}", _lang, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1123,14 +1175,15 @@ public class Azrael {
 		}
 	}
 	
-	public synchronized static void SQLgetStaffNames(long _guild_id){
+	public synchronized static ArrayList<String> SQLgetStaffNames(long _guild_id){
 		if(Hashes.getQuerryResult("staff-names_"+_guild_id) == null) {
+			logger.debug("Azrael.SQLgetStaffNames launched. Passed params {}", _guild_id);
+			ArrayList<String> staff_names = new ArrayList<String>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-				ArrayList<String> staff_names = new ArrayList<String>();
 				String sql = ("SELECT name FROM staff_name_filter WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -1139,17 +1192,21 @@ public class Azrael {
 					staff_names.add(rs.getString(1));
 				}
 				Hashes.addQuerryResult("staff-names_"+_guild_id, staff_names);
+				return staff_names;
 			} catch (SQLException e) {
 				logger.error("Azrael.SQLgetStaffNames Exception", e);
+				return staff_names;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
+		return Hashes.getQuerryResult("staff-names_"+_guild_id);
 	}
 	
-	public static void SQLInsertStaffName(String _word, long _guild_id) {
+	public static int SQLInsertStaffName(String _word, long _guild_id) {
+		logger.debug("Azrael.SQLInsertStaffName launched. Passed params {}, {}", _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1158,16 +1215,18 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word.toLowerCase());
 			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertStaffName Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLDeleteStaffNames(String _word, long _guild_id) {
+	public static int SQLDeleteStaffNames(String _word, long _guild_id) {
+		logger.debug("Azrael.SQLDeleteStaffNames launched. Passed params {}, {}", _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1176,9 +1235,10 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word.toLowerCase());
 			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLDeleteStaffNames Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1186,6 +1246,7 @@ public class Azrael {
 	}
 	
 	public static void SQLDeleteWholeStaffNames(long _guild_id) {
+		logger.debug("Azrael.SQLDeleteWholeStaffNames launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1203,6 +1264,7 @@ public class Azrael {
 	}
 	
 	public static void SQLBatchInsertStaffNames(ArrayList<String> _words, long _guild_id) {
+		logger.debug("Azrael.SQLBatchInsertStaffNames launched. Passed params array, {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1226,6 +1288,7 @@ public class Azrael {
 	}
 	
 	public static void SQLInsertChannel_Filter(long _channel_id, String _filter_lang){
+		logger.debug("Azrael.SQLInsertChannel_Filter launched. Passed params {}, {}", _channel_id, _filter_lang);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1244,6 +1307,7 @@ public class Azrael {
 	}
 	
 	public static void SQLDeleteChannel_Filter(long _channel_id){
+		logger.debug("Azrael.SQLDeleteChannel_Filter launched. Passed params {}", _channel_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1260,14 +1324,15 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetFunnyNames(long _guild_id) {
+	public static ArrayList<String> SQLgetFunnyNames(long _guild_id) {
 		if(Hashes.getQuerryResult("funny-names_"+_guild_id) == null) {
+			ArrayList<String> names = new ArrayList<String>();
+			logger.debug("Azrael.SQLgetFunnyNames launched. Passed params {}", _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-				ArrayList<String> names = new ArrayList<String>();
 				String sql = ("SELECT name FROM names WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -1276,17 +1341,21 @@ public class Azrael {
 					names.add(rs.getString(1));
 				}
 				Hashes.addQuerryResult("funny-names_"+_guild_id, names);
+				return names;
 			} catch (SQLException e) {
 				logger.error("Azrael.SQLgetFunnyNames Exception", e);
+				return names;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
+		return Hashes.getQuerryResult("funny-names_"+_guild_id);
 	}
 	
-	public static void SQLInsertFunnyNames(String _word, long _guild_id) {
+	public static int SQLInsertFunnyNames(String _word, long _guild_id) {
+		logger.debug("Azrael.SQLInsertFunnnynames launched. Passed params {}, {}", _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1295,16 +1364,18 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertFunnyNamesException", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLDeleteFunnyNames(String _word, long _guild_id) {
+	public static int SQLDeleteFunnyNames(String _word, long _guild_id) {
+		logger.debug("Azrael.SQLDeleteFunnyNames launched. Passed params {}, {}", _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1313,9 +1384,10 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLDeleteFunnyNames Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1323,6 +1395,7 @@ public class Azrael {
 	}
 	
 	public static void SQLDeleteWholeFunnyNames(long _guild_id) {
+		logger.debug("Azrael.SQLDeleteWholeFunnyNames launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1339,14 +1412,15 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetNameFilter(long _guild_id) {
+	public static ArrayList<String> SQLgetNameFilter(long _guild_id) {
+		logger.debug("Azrael.SQLgetNameFilter launched. Passed params {}", _guild_id);
+		ArrayList<String> names = new ArrayList<String>();
 		if(Hashes.getQuerryResult("bad-names_"+_guild_id) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-				ArrayList<String> names = new ArrayList<String>();
 				String sql = ("SELECT word FROM name_filter");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
@@ -1354,17 +1428,21 @@ public class Azrael {
 					names.add(rs.getString(1));
 				}
 				Hashes.addQuerryResult("bad-names_"+_guild_id, names);
+				return names;
 			} catch (SQLException e) {
 				logger.error("Azrael.SQLgetNameFilter Exception", e);
+				return names;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
+		return Hashes.getQuerryResult("bad-names_"+_guild_id);
 	}
 	
-	public static void SQLInsertNameFilter(String _word, long _guild_id) {
+	public static int SQLInsertNameFilter(String _word, long _guild_id) {
+		logger.debug("Azrael.SQLInsertNameFilter launched. Passed params {}, {}", _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1373,16 +1451,18 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLInsertNameFilter Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLDeleteNameFilter(String _word, long _guild_id) {
+	public static int SQLDeleteNameFilter(String _word, long _guild_id) {
+		logger.debug("Azrael.SQLDeleteNameFilter launched. Passed params {}, {}", _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1391,9 +1471,10 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLDeleteNameFilter Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1401,6 +1482,7 @@ public class Azrael {
 	}
 	
 	public static void SQLDeleteWholeNameFilter(long _guild_id) {
+		logger.debug("Azrael.SQLDeleteWholeNameFilter launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1417,7 +1499,8 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetRandomName(long _guild_id) {
+	public static String SQLgetRandomName(long _guild_id) {
+		logger.debug("Azrael.SQLgetRandomName launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1428,10 +1511,12 @@ public class Azrael {
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setName(rs.getString(1));
+				return rs.getString(1);
 			}
+			return "Nickname";
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLgetRandomName Exception", e);
+			return "Nickname";
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1439,7 +1524,9 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLgetFilterLanguages() {
+	public static ArrayList<String> SQLgetFilterLanguages() {
+		logger.debug("Azrael.SQLgetFilterLanguages launched. No params passed");
+		ArrayList<String> filter_lang = new ArrayList<String>();
 		if(Hashes.getFilterLang(0) == null){
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1447,13 +1534,13 @@ public class Azrael {
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv NOT LIKE \"all\"");
-				ArrayList<String> filter_lang = new ArrayList<String>();
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					filter_lang.add(rs.getString(1));
 				}
 				Hashes.addFilterLang(0, filter_lang);
+				return filter_lang;
 			} catch (SQLException e) {
 				logger.error("Azrael.SQLgetFilterLanguages Exception", e);
 			} finally {
@@ -1462,11 +1549,63 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
+		return Hashes.getFilterLang(0);
+	}
+	
+	public static int SQLInsertRSS(String _url, long _guild_id) {
+		logger.debug("SQLInsertRSS launched. Params passed {}, {}", _url, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO rss (url, fk_guild_id, format) VALUES (?, ?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _url);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, "{pubDate} | {title}\n{description}\n{link}");
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInserRSSr Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<RSS> SQLgetRSSFeeds(long _guild_id){
+		logger.debug("SQLgetRSSFeeds launched. Params passed {}", _guild_id);
+		ArrayList<RSS> feeds = new ArrayList<RSS>();
+		if(Hashes.getFeed(_guild_id) == null){
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT url, format FROM rss WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					feeds.add(new RSS(rs.getString(1), rs.getString(2)));
+				}
+				Hashes.addFeeds(_guild_id, feeds);
+				return feeds;
+			} catch (SQLException e) {
+				logger.error("SQLgetRSSFeeds Exception", e);
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		return Hashes.getFeed(_guild_id);
 	}
 	
 	//Transactions
 	@SuppressWarnings("resource")
-	public static void SQLLowerTotalWarning(long _guild_id, int _warning_id){
+	public static int SQLLowerTotalWarning(long _guild_id, int _warning_id){
+		logger.debug("Azrael.SQLLowerTotalWarning launched. Passed params {}, {}", _guild_id, _warning_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1482,8 +1621,9 @@ public class Azrael {
 			String sql2 = ("DELETE FROM warnings WHERE warning_id > ?");
 			stmt = myConn.prepareStatement(sql2);
 			stmt.setInt(1, _warning_id);
-			stmt.executeUpdate();
-			myConn.commit();	
+			var editedRows = stmt.executeUpdate();
+			myConn.commit();
+			return editedRows;
 		} catch (SQLException e) {
 			logger.error("Azrael.SQLLowerTotalWarning Exception", e);
 			try {
@@ -1491,6 +1631,7 @@ public class Azrael {
 			} catch (SQLException e1) {
 				logger.error("Azrael.SQLLowerTotalWarning  rollback Exception", e);
 			}
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1498,6 +1639,7 @@ public class Azrael {
 	}
 	
 	public static void SQLReplaceWordFilter(String _lang, ArrayList<String> _words, long _guild_id){
+		logger.debug("Azrael.SQLReplaceWordFilter launched. Passed params {}, array, {}", _lang, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1528,6 +1670,7 @@ public class Azrael {
 	}
 	
 	public static void SQLReplaceNameFilter(ArrayList<String> _words, long _guild_id){
+		logger.debug("Azrael.SQLReplaceNameFilter launched. Passed params array, {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1557,6 +1700,7 @@ public class Azrael {
 	}
 	
 	public static void SQLReplaceFunnyNames(ArrayList<String> _words, long _guild_id){
+		logger.debug("Azrael.SQLReplaceFunnyNames launched. Passed params array, {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1583,202 +1727,5 @@ public class Azrael {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
-	}
-	
-	public static void setUser_id(long _user_id){
-		user_id=_user_id;
-	}
-	public static void setGuild_id(long _guild_id){
-		guild_id=_guild_id;
-	}
-	public static void setName(String _name){
-		name=_name;
-	}
-	public static void setNickname(String _nickname){
-		nickname = _nickname;
-	}
-	public static void setGuildName(String _guild_name){
-		guild_name=_guild_name;
-	}
-	public static void setWarningID(int _warning_id){
-		warning_id=_warning_id;
-	}
-	public static void setBanID(int _ban_id){
-		ban_id=_ban_id;
-	}
-	public static void setChannelID(long _channel_id){
-		channel_id = _channel_id;
-	}
-	public static void setChannelID2(long _channel_id2) {
-		channel_id2 = _channel_id2;
-	}
-	public static void setChannelName(String _channel_name){
-		channel_name = _channel_name;
-	}
-	public static void setCH_GuildID(long _ch_guild_id){
-		ch_guild_id = _ch_guild_id;
-	}
-	public static void setChannelType(String _channel_type){
-		channel_type = _channel_type;
-	}
-	public static void setChannelTypeName(String _channel_type_name){
-		channel_type_name = _channel_type_name;
-	}
-	public static void setExecutionID(int _execution_id){
-		execution_id = _execution_id;
-	}
-	public static void setGuild(long _guild){
-		guild = _guild;
-	}
-	public static void setMuted(boolean _muted){
-		muted = _muted;
-	}
-	public static void setCustomTime(boolean _custom_time) {
-		custom_time = _custom_time;
-	}
-	public static void setTimer(double _timer){
-		timer = _timer;
-	}
-	public static void setDescription(String _description){
-		description = _description;
-	}
-	public static void setCount(int _count) {
-		count = _count;
-	}
-	public static void setTimestamp(Date _timestamp){
-		timestamp = _timestamp;
-	}
-	public static void setUnmute(Date _unmute){
-		unmute = _unmute;
-	}
-	public static void setAvatar(String _avatar){
-		avatar = _avatar;
-	}
-	public static void setJoinDate(String _join_date){
-		join_date = _join_date;
-	}
-	public static void setReactions(boolean _reactions) {
-		reactions = _reactions;
-	}
-	
-	
-	public static long getUser_id(){
-		return user_id;
-	}
-	public static long getGuild_id(){
-		return guild_id;
-	}
-	public static String getName(){
-		return name;
-	}
-	public static String getNickname(){
-		return nickname;
-	}
-	public static String getGuildName(){
-		return guild_name;
-	}
-	public static int getWarningID(){
-		return warning_id;
-	}
-	public static int getBanID(){
-		return ban_id;
-	}
-	public static long getChannelID(){
-		return channel_id;
-	}
-	public static long getChannelID2() {
-		return channel_id2;
-	}
-	public static String getChannelName(){
-		return channel_name;
-	}
-	public static long getCH_GuildID(){
-		return ch_guild_id;
-	}
-	public static String getChannelType(){
-		return channel_type;
-	}
-	public static String getChannelTypeName(){
-		return channel_type_name;
-	}
-	public static int getExecutionID(){
-		return execution_id;
-	}
-	public static long getGuild(){
-		return guild;
-	}
-	public static boolean getMuted(){
-		return muted;
-	}
-	public static boolean getCustomTime() {
-		return custom_time;
-	}
-	public static double getTimer(){
-		return timer;
-	}
-	public static String getDescription() {
-		return description;
-	}
-	public static int getCount() {
-		return count;
-	}
-	public static ArrayList<Channels> getChannels(){
-		return channels;
-	}
-	public static ArrayList<String> getDescriptions(){
-		return descriptions;
-	}
-	public static Date getTimestamp(){
-		return timestamp;
-	}
-	public static Date getUnmute(){
-		return unmute;
-	}
-	public static String getAvatar(){
-		return avatar;
-	}
-	public static String getJoinDate(){
-		return join_date;
-	}
-	public static boolean getReactions() {
-		return reactions;
-	}
-	
-	public static void clearTimestamp() {
-		timestamp = null;
-	}
-	public static void clearUnmute(){
-		unmute = null;
-	}
-	public static void clearChannelsArray(){
-		channels.clear();
-	}
-	public static void clearDescriptions() {
-		descriptions.clear();
-	}
-	
-	public static void clearAllVariables(){
-		setUser_id(0);
-		setGuild_id(0);
-		setName("");
-		setNickname("");
-		setGuildName(""); 
-		setWarningID(0);
-		setBanID (0);
-		setChannelID(0);
-		setChannelID2(0);
-		setChannelName("");
-		setCH_GuildID(0);
-		setChannelType("");
-		setChannelTypeName("");
-		setExecutionID(0);
-		setGuild(0);
-		setTimer(0);
-		setMuted(false);
-		setCustomTime(false);
-		setDescription("");
-		setCount(0);
-		setAvatar("");
-		setJoinDate("");
 	}
 }

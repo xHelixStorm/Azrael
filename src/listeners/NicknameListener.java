@@ -11,30 +11,28 @@ public class NicknameListener extends ListenerAdapter{
 	
 	@Override
 	public void onGuildMemberNickChange(GuildMemberNickChangeEvent e){
+		Logger logger = LoggerFactory.getLogger(NameListener.class);
 		long user_id = e.getMember().getUser().getIdLong();
 		long guild_id = e.getGuild().getIdLong();
 		String nickname = e.getNewNick();
 		
-		try {
-			Azrael.SQLgetNickname(user_id, guild_id);
-			String db_nickname = Azrael.getNickname();
-
-			if(!db_nickname.isEmpty() && !nickname.isEmpty()){
-				Azrael.SQLUpdateNickname(user_id, guild_id, nickname);
+		if(Azrael.SQLgetNickname(user_id, guild_id).length() > 0 && nickname != null){
+			if(Azrael.SQLUpdateNickname(user_id, guild_id, nickname) == 0) {
+				logger.error("User nickname of {} couldn't be updated in Azrael.nickname", user_id);
 			}
-		} catch (NullPointerException npe){
-			try {
-				if(!nickname.isEmpty()){
-					Azrael.SQLInsertNickname(user_id, guild_id, nickname);
-				}
-			} catch (NullPointerException npe2){
-				Azrael.SQLDeleteNickname(user_id, guild_id);
-			}
-		} finally {
-			Azrael.clearAllVariables();
 		}
-		Logger logger = LoggerFactory.getLogger(NameListener.class);
+		else if(nickname != null) {
+			if(Azrael.SQLInsertNickname(user_id, guild_id, nickname) == 0) {
+				logger.error("User nickname of {} couldn't be inserted into Azrael.nickname", user_id);
+			}
+		}
+		else {
+			if(Azrael.SQLDeleteNickname(user_id, guild_id) == 0) {
+				logger.error("Nickname from {} couldn't be deleted from Azrael.nickname", e.getUser().getId());
+			}
+		}
+		
 		logger.debug("{} received the nickname {} in guild {}", e.getUser().getId(), nickname, e.getGuild().getName());
-		Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild_id, nickname);
+		Azrael.SQLInsertActionLog((nickname != null ? "MEMBER_NICKNAME_UPDATE" : "MEMBER_NICKNAME_CLEAR"), user_id, guild_id, (nickname != null ? nickname : "<cleared name>"));
 	}
 }

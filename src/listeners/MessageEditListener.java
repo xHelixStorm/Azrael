@@ -14,13 +14,12 @@ public class MessageEditListener extends ListenerAdapter{
 	@Override
 	public void onMessageUpdate(MessageUpdateEvent e){
 		long channel_id = e.getTextChannel().getIdLong();
-		Azrael.SQLgetChannel_Filter(channel_id);;
+		Azrael.SQLgetChannel_Filter(channel_id);
 		
 		if(Hashes.getFilterLang(channel_id).size() > 0){
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(new LanguageEditFilter(e, Hashes.getFilterLang(channel_id)));
 			executor.shutdown();
 		}
-		Azrael.clearAllVariables();
 	}
 }

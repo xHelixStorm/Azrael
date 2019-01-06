@@ -13,7 +13,7 @@ public class HelpText {
 		boolean entertainment = false;
 		boolean other = false;
 		
-		if(IniFileReader.getShutDownCommand() || IniFileReader.getRebootCommand() || IniFileReader.getRegisterCommand() || IniFileReader.getSetCommand() || IniFileReader.getUserCommand() || IniFileReader.getFilterCommand() || IniFileReader.getRoleReactionCommand()){
+		if(IniFileReader.getShutDownCommand() || IniFileReader.getRebootCommand() || IniFileReader.getRegisterCommand() || IniFileReader.getSetCommand() || IniFileReader.getUserCommand() || IniFileReader.getFilterCommand() || IniFileReader.getRoleReactionCommand() || IniFileReader.getRssCommand()){
 			administration = true;
 		}
 		
@@ -33,6 +33,7 @@ public class HelpText {
 		if(IniFileReader.getUserCommand())textCollector.add("**-"+IniFileReader.getCommandPrefix()+"user**\nchoose between various actions that you can take against a user\n\n");
 		if(IniFileReader.getFilterCommand())textCollector.add("**-"+IniFileReader.getCommandPrefix()+"filter**\ndecide to view, add or remove words/names from various filters or funky names\n\n");
 		if(IniFileReader.getRoleReactionCommand())textCollector.add("**-"+IniFileReader.getCommandPrefix()+"roleReaction**\nenable / disable the role reaction and remove roles on disable\n\n");
+		if(IniFileReader.getRssCommand())textCollector.add("**-"+IniFileReader.getCommandPrefix()+"rss**\ninsert rss feeds \n\n");
 		if(entertainment == true)textCollector.add("**_Entertainment:_**\n");
 		if(IniFileReader.getPugCommand())textCollector.add("**-"+IniFileReader.getCommandPrefix()+"pug**\nshows a pug picture. Use help as a parameter to get a list of all parameters\n\n");
 		if(IniFileReader.getMeowCommand())textCollector.add("**-"+IniFileReader.getCommandPrefix()+"meow**\nshows a cat picture. Use help as a parameter to get a list of all parameters\n\n");

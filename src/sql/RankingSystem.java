@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +16,7 @@ import core.Guilds;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import inventory.Dailies;
+import inventory.Inventory;
 import inventory.InventoryContent;
 import rankingSystem.Rank;
 import rankingSystem.Ranks;
@@ -25,70 +25,6 @@ import rankingSystem.Skins;
 public class RankingSystem {
 	private static final Logger logger = LoggerFactory.getLogger(RankingSystem.class);
 	
-	private static long user_id = 0;
-	private static int level_skin = 0;
-	private static int rank_skin = 0;
-	private static int profile_skin = 0;
-	private static int icon_skin = 0;
-	private static long guild_id = 0;
-	private static int ranking_level = 0;
-	private static int ranking_rank = 0;
-	private static int ranking_profile = 0;
-	private static int ranking_icon = 0;
-	private static boolean ranking_state = false;
-	private static int max_level = 0;
-	private static String description = null;
-	private static int level = 0;
-	private static int current_experience = 0;
-	private static int rank_up_experience = 0;
-	private static long experience = 0;
-	private static boolean enabled = false;
-	private static long max_experience = 0;
-	private static long daily_experience = 0;
-	private static Date daily_reset = null;
-	private static int item_id = 0;
-	private static long price = 0;
-	private static Date position = null;
-	private static String skin_type = "";
-	private static int weight = 0;
-	private static int number = 0;
-	private static Date opened = null;
-	private static Date next_daily = null;
-	private static Date expiration = null;
-	private static int number_limit = 0;
-	private static String status = null;
-	private static int color_profile = 0;
-	private static int color_rank = 0;
-	private static boolean exp_and_percent_profile = false;
-	private static boolean exp_and_percent_rank = false;
-	private static int item_number = 0;
-	private static int text_color_r_profile = 0;
-	private static int text_color_r_rank = 0;
-	private static int text_color_r_level = 0;
-	private static int text_color_g_profile = 0;
-	private static int text_color_g_rank = 0;
-	private static int text_color_g_level = 0;
-	private static int text_color_b_profile = 0;
-	private static int text_color_b_rank = 0;
-	private static int text_color_b_level = 0;
-	private static int rankx_level = 0;
-	private static int ranky_level = 0;
-	private static int rank_width_level = 0;
-	private static int rank_height_level = 0;
-	private static int rankx_rank = 0;
-	private static int ranky_rank = 0;
-	private static int rank_width_rank = 0;
-	private static int rank_height_rank = 0;
-	private static int rankx_profile = 0;
-	private static int ranky_profile = 0;
-	private static int rank_width_profile = 0;
-	private static int rank_height_profile = 0;
-	
-	private static String level_description = "";
-	private static String rank_description = "";
-	private static String profile_description = "";
-	private static String icon_description = "";
-	
 	private static String username = IniFileReader.getSQLUsername2();
 	private static String password = IniFileReader.getSQLPassword2();
 	
@@ -96,23 +32,24 @@ public class RankingSystem {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e.printStackTrace();
+			logger.error("JDBC driver couldn't be loaded", e);
 		}
 	}
 	
 	//action_log
-	public static void SQLInsertActionLog(String _warning_level, long _entity, String _event, String _notes){
+	public static void SQLInsertActionLog(String _warning_level, long _entity, long _guild_id, String _event, String _notes){
+		logger.debug("RankingSystem.SQLInsertActionLog launched. Passed params {}, {}, {}, {}, {}", _warning_level, _entity, _guild_id, _event, _notes);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO action_log (warning_level, affected_entity, event, notes) VALUES (?, ?, ?, ?)");
+			String sql = ("INSERT INTO action_log (warning_level, affected_entity, affected_server, event, notes) VALUES (?, ?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _warning_level);
 			stmt.setLong(2, _entity);
-			stmt.setString(3, _event);
-			stmt.setString(4, _notes);
+			stmt.setLong(3, _guild_id);
+			stmt.setString(4, _event);
+			stmt.setString(5, _notes);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLInsertActionLog Exception", e);
@@ -123,12 +60,13 @@ public class RankingSystem {
 	}
 	
 	//users table
-	public static int SQLInsertUser(long _user_id, String _name, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin){
+	public static int SQLInsertUser(long _user_id, long _guild_id, String _name, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin){
+		logger.debug("RankingSystem.SQLInsertUser launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _name, _level_skin, _rank_skin, _profile_skin, _icon_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO users (user_id, name, level_skin, rank_skin, profile_skin, icon_skin) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			String sql = ("INSERT INTO users (user_id, name, level_skin, rank_skin, profile_skin, icon_skin, fk_guild_id) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _name);
@@ -136,6 +74,7 @@ public class RankingSystem {
 			stmt.setInt(4, _rank_skin);
 			stmt.setInt(5, _profile_skin);
 			stmt.setInt(6, _icon_skin);
+			stmt.setLong(7, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLInsertUser Exception", e);
@@ -146,18 +85,19 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateUserLevelSkin(long _user_id, String _name, int _skin_id){
+	public static int SQLUpdateUserLevelSkin(long _user_id, long _guild_id, String _name, int _skin_id){
+		logger.debug("RankingSystem.SQLUpdateUserLevelSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE users SET level_skin = ?, name = ? WHERE user_id = ?");
+			String sql = ("UPDATE users SET level_skin = ?, name = ? WHERE user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _skin_id);
 			stmt.setString(2, _name);
 			stmt.setLong(3, _user_id);
+			stmt.setLong(4, _guild_id);
 			return stmt.executeUpdate();
-			
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateUserLevelSkin Exception", e);
 			return 0;
@@ -167,16 +107,18 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateUserRankSkin(long _user_id, String _name, int _skin_id){
+	public static int SQLUpdateUserRankSkin(long _user_id, long _guild_id, String _name, int _skin_id){
+		logger.debug("RankingSystem.SQLUpdateUserRankSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE users SET rank_skin = ?, name = ? WHERE user_id = ?");
+			String sql = ("UPDATE users SET rank_skin = ?, name = ? WHERE user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _skin_id);
 			stmt.setString(2, _name);
 			stmt.setLong(3, _user_id);
+			stmt.setLong(4, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateUserRankSkin Exception", e);
@@ -187,16 +129,18 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateUserProfileSkin(long _user_id, String _name, int _skin_id){
+	public static int SQLUpdateUserProfileSkin(long _user_id, long _guild_id, String _name, int _skin_id){
+		logger.debug("RankingSystem.SQLUpdateUserProfileSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE users SET profile_skin = ?, name = ? WHERE user_id = ?");
+			String sql = ("UPDATE users SET profile_skin = ?, name = ? WHERE user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _skin_id);
 			stmt.setString(2, _name);
 			stmt.setLong(3, _user_id);
+			stmt.setLong(4, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateUserProfileSkin Exception", e);
@@ -207,16 +151,18 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateUserIconSkin(long _user_id, String _name, int _skin_id){
+	public static int SQLUpdateUserIconSkin(long _user_id, long _guild_id, String _name, int _skin_id){
+		logger.debug("RankingSystem.SQLUpdateUserIconSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE users SET icon_skin = ?, name = ? WHERE user_id = ?");
+			String sql = ("UPDATE users SET icon_skin = ?, name = ? WHERE user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _skin_id);
 			stmt.setString(2, _name);
 			stmt.setLong(3, _user_id);
+			stmt.setLong(4, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateUserIconSkin Exception", e);
@@ -228,7 +174,8 @@ public class RankingSystem {
 	}
 	
 	//guilds table 
-	public static void SQLInsertGuild(long _guild_id, String _name, int _max_level, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin, boolean _enabled){
+	public static int SQLInsertGuild(long _guild_id, String _name, int _max_level, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin, boolean _enabled){
+		logger.debug("RankingSystem.SQLInsertGuild launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _guild_id, _name, _max_level, _level_skin, _rank_skin, _profile_skin, _icon_skin, _enabled);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -243,16 +190,18 @@ public class RankingSystem {
 			stmt.setInt(6, _profile_skin);
 			stmt.setInt(7, _icon_skin);
 			stmt.setBoolean(8, _enabled);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLInsertGuild Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateMaxLevel(long _guild_id, String _guild_name, int _max_level){
+	public static int SQLUpdateMaxLevel(long _guild_id, String _guild_name, int _max_level){
+		logger.debug("RankingSystem.SQLUpdateMaxLevel launched. Passed params {}, {}, {}", _guild_id, _guild_name, _max_level);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -262,16 +211,18 @@ public class RankingSystem {
 			stmt.setString(1, _guild_name);
 			stmt.setInt(2, _max_level);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateMaxLevel Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdateRankingSystem(long _guild_id, String _guild_name, boolean _ranking_state){
+	public static int SQLUpdateRankingSystem(long _guild_id, String _guild_name, boolean _ranking_state){
+		logger.debug("RankingSystem.SQLUpdateRankingSystem launched. Passed params {}, {}, {}", _guild_id, _guild_name, _ranking_state);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -281,16 +232,18 @@ public class RankingSystem {
 			stmt.setString(1, _guild_name);
 			stmt.setBoolean(2, _ranking_state);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateRankingSystem Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}	
 	}
 	
-	public static void SQLUpdateLevelDefaultSkin(long _guild_id, String _guild_name, int _level_skin){
+	public static int SQLUpdateLevelDefaultSkin(long _guild_id, String _guild_name, int _level_skin){
+		logger.debug("RankingSystem.SQLUpdateLevelDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _level_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -300,16 +253,18 @@ public class RankingSystem {
 			stmt.setString(1, _guild_name);
 			stmt.setInt(2, _level_skin);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateLevelDefaultSkin Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}	
 	}
 	
-	public static void SQLUpdateRankDefaultSkin(long _guild_id, String _guild_name, int _rank_skin){
+	public static int SQLUpdateRankDefaultSkin(long _guild_id, String _guild_name, int _rank_skin){
+		logger.debug("RankingSystem.SQLUpdateRankDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _rank_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -319,16 +274,18 @@ public class RankingSystem {
 			stmt.setString(1, _guild_name);
 			stmt.setInt(2, _rank_skin);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateRankDefaultSkin Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}	
 	}
 	
-	public static void SQLUpdateProfileDefaultSkin(long _guild_id, String _guild_name, int _profile_skin){
+	public static int SQLUpdateProfileDefaultSkin(long _guild_id, String _guild_name, int _profile_skin){
+		logger.debug("RankingSystem.SQLUpdateProfileDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _profile_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -338,16 +295,18 @@ public class RankingSystem {
 			stmt.setString(1, _guild_name);
 			stmt.setInt(2, _profile_skin);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateProfileDefaultSkin Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}	
 	}
 	
-	public static void SQLUpdateIconDefaultSkin(long _guild_id, String _guild_name, int _icon_skin){
+	public static int SQLUpdateIconDefaultSkin(long _guild_id, String _guild_name, int _icon_skin){
+		logger.debug("RankingSystem.SQLUpdateIconDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _icon_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -357,9 +316,10 @@ public class RankingSystem {
 			stmt.setString(1, _guild_name);
 			stmt.setInt(2, _icon_skin);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateIconDefaultSkin Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -368,6 +328,7 @@ public class RankingSystem {
 	
 	//roles table
 	public static int SQLInsertRoles(long _role_id, String _name, int _role_level_requirement, long _guild_id){
+		logger.debug("RankingSystem.SQLInsertRoles launched. Passed params {}, {}, {}, {}", _role_id, _name, _role_level_requirement, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -388,7 +349,8 @@ public class RankingSystem {
 		}
 	}
 	
-	public static void SQLclearRoles(long _guild_id){
+	public static int SQLclearRoles(long _guild_id){
+		logger.debug("RankingSystem.SQLclearRoles launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -396,22 +358,25 @@ public class RankingSystem {
 			String sql = ("DELETE FROM roles WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLclearRoles Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLgetRoles(long _guild_id){
+	public static boolean SQLgetRoles(long _guild_id){
+		logger.debug("RankingSystem.SQLgetRoles launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM roles WHERE fk_guild_id = ?");
+			var success = false;
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
@@ -422,9 +387,12 @@ public class RankingSystem {
 				ranks.setLevel_Requirement(rs.getInt(3));
 				ranks.setGuildID(rs.getLong(4));
 				Hashes.addRankingRoles(_guild_id+"_"+ranks.getLevel_Requirement(), ranks);
+				success = true;
 			}
+			return success;
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLgetRoles Exception", e);
+			return false;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -433,18 +401,20 @@ public class RankingSystem {
 	}
 	
 	//user_details table
-	public static int SQLInsertUserDetails(long _user_id, int _level, long _experience, long _currency, long _assigned_role){
+	public static int SQLInsertUserDetails(long _user_id, long _guild_id, int _level, long _experience, long _currency, long _assigned_role){
+		logger.debug("RankingSystem.SQLInsertUserDetails launched. Passed params {}, {}, {}, {}, {}", _user_id, _level, _experience, _currency, _assigned_role);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO user_details (`fk_user_id`, `level`, `experience`, `currency`, `current_role`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE fk_user_id=VALUES(fk_user_id)");
+			String sql = ("INSERT INTO user_details (`fk_user_id`, `level`, `experience`, `currency`, `current_role`, `fk_guild_id`) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE fk_user_id=VALUES(fk_user_id)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _level);
 			stmt.setLong(3, _experience);
 			stmt.setLong(4, _currency);
 			stmt.setLong(5, _assigned_role);
+			stmt.setLong(6, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLInsertUserDetails Exception", e);
@@ -455,54 +425,62 @@ public class RankingSystem {
 		}
 	}
 	
-	public static void SQLUpdateExperience(long _user_id, long _experience){
+	public static int SQLUpdateExperience(long _user_id, long _guild_id, long _experience){
+		logger.debug("RankingSystem.SQLUpdateExperience launched. Passed params {}, {}, {}", _user_id, _guild_id, _experience);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE user_details SET `experience` = ? WHERE `fk_user_id` = ?");
+			String sql = ("UPDATE user_details SET `experience` = ? WHERE `fk_user_id` = ? AND `fk_guild_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _experience);
 			stmt.setLong(2, _user_id);
-			stmt.executeUpdate();
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateExperience Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLsetLevelUp(long _user_id, int _level, long _experience, long _currency, long _assigned_role){
+	public static int SQLsetLevelUp(long _user_id, long _guild_id, int _level, long _experience, long _currency, long _assigned_role){
+		logger.debug("RankingSystem.SQLsetLevelUp launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _level, _experience, _currency, _assigned_role);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE user_details SET `level` = ?, `experience` = ?, `currency` = ?, `current_role` = ? WHERE `fk_user_id` = ?");
+			String sql = ("UPDATE user_details SET `level` = ?, `experience` = ?, `currency` = ?, `current_role` = ? WHERE `fk_user_id` = ? AND `fk_guild_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _level);
 			stmt.setLong(2, _experience);
 			stmt.setLong(3, _currency);
 			stmt.setLong(4, _assigned_role);
 			stmt.setLong(5, _user_id);
-			stmt.executeUpdate();
+			stmt.setLong(6, _guild_id);
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLsetLevelUp Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static int SQLUpdateCurrency(long _user_id, long _currency){
+	public static int SQLUpdateCurrency(long _user_id, long _guild_id, long _currency){
+		logger.debug("RankingSystem.SQLUpdateCurrency launched. Passed params {}, {}, {}", _user_id, _guild_id, _currency);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE user_details SET `currency` = ? WHERE `fk_user_id` = ?");
+			String sql = ("UPDATE user_details SET `currency` = ? WHERE `fk_user_id` = ? AND `fk_guild_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _currency);
 			stmt.setLong(2, _user_id);
+			stmt.setLong(3, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateCurrency Exception", e);
@@ -513,16 +491,18 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<Rank> SQLRanking(){
-		if(Hashes.getRankList("ranking") == null) {
+	public static ArrayList<Rank> SQLRanking(long _guild_id){
+		if(Hashes.getRankList("ranking_"+_guild_id) == null) {
+			logger.debug("RankingSystem.SQLgetRanking launched. Passed params {}", _guild_id);
 			ArrayList<Rank> rankList = new ArrayList<Rank>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT `fk_user_id`, `Level`, `experience`, @curRank := @curRank + 1 AS Rank FROM `user_details`, (SELECT @curRank := 0) r ORDER BY `experience` DESC");
+				String sql = ("SELECT `fk_user_id`, `Level`, `experience`, @curRank := @curRank + 1 AS Rank FROM `user_details`, (SELECT @curRank := 0) r WHERE fk_guild_id = ? ORDER BY `experience` DESC");
 				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					Rank rank = new Rank();
@@ -532,7 +512,7 @@ public class RankingSystem {
 					rank.setRank(rs.getInt(4));
 					rankList.add(rank);
 				}
-				Hashes.addRankList("ranking", rankList);
+				Hashes.addRankList("ranking_"+_guild_id, rankList);
 				return rankList;
 			} catch (SQLException e) {
 				logger.error("RankingSystem.SQLRanking Exception", e);
@@ -543,11 +523,12 @@ public class RankingSystem {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getRankList("ranking");
+		return Hashes.getRankList("ranking_"+_guild_id);
 	}
 	
 	//max_exp table
-	public static void SQLInsertMaxExperience(long _experience, boolean _enabled, long _guild_id){
+	public static int SQLInsertMaxExperience(long _experience, boolean _enabled, long _guild_id){
+		logger.debug("RankingSystem.SQLInsertMaxExperience launched. Passed params {}, {}, {}", _experience, _enabled, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -557,9 +538,10 @@ public class RankingSystem {
 			stmt.setLong(1, _experience);
 			stmt.setBoolean(2, _enabled);
 			stmt.setLong(3, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLInsertMaxExperience Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -567,36 +549,42 @@ public class RankingSystem {
 	}
 	
 	//daily_experience table
-	public static void SQLInsertDailyExperience(long _experience, long _user_id, Timestamp _reset){
+	public static int SQLInsertDailyExperience(long _experience, long _user_id, long _guild_id, Timestamp _reset){
+		logger.debug("RankingSystem.SQLInsertDailyExperience launched. Passed params {}, {}, {}, {}", _experience, _user_id, _guild_id, _reset);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO daily_experience (user_id, experience, reset) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE experience=VALUES(experience), reset=VALUES(reset)");
+			String sql = ("INSERT INTO daily_experience (user_id, experience, reset, fk_guild_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE experience=VALUES(experience), reset=VALUES(reset)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _experience);
 			stmt.setTimestamp(3, _reset);
-			stmt.executeUpdate();
+			stmt.setLong(4, _guild_id);
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLInsertDailyExperience Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLDeleteDailyExperience(long _user_id){
+	public static int SQLDeleteDailyExperience(long _user_id, long _guild_id){
+		logger.debug("RankingSystem.SQLDeleteDailyExperience launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("DELETE FROM daily_experience WHERE user_id = ?");
+			String sql = ("DELETE FROM daily_experience WHERE user_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
-			stmt.executeUpdate();
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLDeleteDailyExperience Exception", e);
+			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -604,16 +592,16 @@ public class RankingSystem {
 	}
 	
 	//ranking_level
-	public static boolean SQLgetRankingLevel(){
+	public static ArrayList<Rank> SQLgetRankingLevel(){
 		if(Hashes.getRankList("ranking-level") == null) {
+			logger.debug("RankingSystem.SQLgetRankingLevel launched. No params passed");
+			ArrayList<Rank> rankList = new ArrayList<Rank>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT * FROM ranking_level");
-				ArrayList<Rank> rankList = new ArrayList<Rank>();
-				boolean success = false;
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
 				while(rs.next()){
@@ -628,33 +616,32 @@ public class RankingSystem {
 					rankingSystem.setRankWidthLevel(rs.getInt(8));
 					rankingSystem.setRankHeightLevel(rs.getInt(9));
 					rankList.add(rankingSystem);
-					success = true;
 				}
 				Hashes.addRankList("ranking-level", rankList);
-				return success;
+				return rankList;
 			} catch (SQLException e) {
 				logger.error("RankingSystem.SQLgetRankingLevel Exception", e);
-				return false;
+				return rankList;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return true;
+		return Hashes.getRankList("ranking-level");
 	}
 	
 	//ranking_rank
-	public static boolean SQLgetRankingRank(){
+	public static ArrayList<Rank> SQLgetRankingRank(){
 		if(Hashes.getRankList("ranking-rank") == null) {
+			logger.debug("RankingSystem.SQLgetRankingRank launched. No params passed");
+			ArrayList<Rank> rankList = new ArrayList<Rank>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT * FROM ranking_rank");
-				ArrayList<Rank> rankList = new ArrayList<Rank>();
-				boolean success = false;
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
 				while(rs.next()){
@@ -671,33 +658,32 @@ public class RankingSystem {
 					rankingSystem.setRankWidthRank(rs.getInt(10));
 					rankingSystem.setRankHeightRank(rs.getInt(11));
 					rankList.add(rankingSystem);
-					success = true;
 				}
 				Hashes.addRankList("ranking-rank", rankList);
-				return success;
+				return rankList;
 			} catch (SQLException e) {
 				logger.error("RankingSystem.SQLgetRankingRank Exception", e);
-				return false;
+				return rankList;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return true;
+		return Hashes.getRankList("ranking-rank");
 	}
 	
 	//ranking_profile
-	public static boolean SQLgetRankingProfile(){
+	public static ArrayList<Rank> SQLgetRankingProfile(){
 		if(Hashes.getRankList("ranking-profile") == null) {
+			logger.debug("RankingSystem.SQLgetRankingProfile launched. No params passed");
+			ArrayList<Rank> rankList = new ArrayList<Rank>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT * FROM ranking_profile");
-				ArrayList<Rank> rankList = new ArrayList<Rank>();
-				boolean success = false;
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
 				while(rs.next()){
@@ -714,33 +700,32 @@ public class RankingSystem {
 					rankingSystem.setRankWidthProfile(rs.getInt(10));
 					rankingSystem.setRankHeightProfile(rs.getInt(11));
 					rankList.add(rankingSystem);
-					success = true;
 				}
 				Hashes.addRankList("ranking-profile", rankList);
-				return success;
+				return rankList;
 			} catch (SQLException e) {
 				logger.error("RankingSystem.SQLgetRankingProfile Exception", e);
-				return false;
+				return rankList;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return true;
+		return Hashes.getRankList("ranking-profile");
 	}
 	
 	//ranking_icon
-	public static boolean SQLgetRankingIcons(){
+	public static ArrayList<Rank> SQLgetRankingIcons(){
 		if(Hashes.getRankList("ranking-icons") == null) {
+			logger.debug("RankingSystem.SQLgetRankingIcons launched. No params passed");
+			ArrayList<Rank> rankList = new ArrayList<Rank>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT * FROM ranking_icons");
-				ArrayList<Rank> rankList = new ArrayList<Rank>();
-				boolean success = false;
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
 				while(rs.next()){
@@ -748,33 +733,34 @@ public class RankingSystem {
 					rankingSystem.setRankingIcon(rs.getInt(1));
 					rankingSystem.setIconDescription(rs.getString(2));
 					rankList.add(rankingSystem);
-					success = true;
 				}
 				Hashes.addRankList("ranking-icons", rankList);
-				return success;
+				return rankList;
 			} catch (SQLException e) {
 				logger.error("RankingSystem.SQLgetRankingIcons Exception", e);
-				return false;
+				return rankList;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return true;
+		return Hashes.getRankList("ranking-icons");
 	}
 	
 	//daily_items
-	public static int SQLInsertDailyItems(String _description, int _weight, String _type){
+	public static int SQLInsertDailyItems(String _description, int _weight, String _type, long _guild_id){
+		logger.debug("RankingSystem.SQLInsertDailyItems launched. Passed params {}, {}, {}, {}", _description, _weight, _type, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO daily_items (description, weight, fk_type, action) VALUES(?, ?, ?, \"use\")");
+			String sql = ("INSERT INTO daily_items (description, weight, fk_type, action, fk_guild_id) VALUES(?, ?, ?, \"use\", ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _description);
 			stmt.setInt(2, _weight);
 			stmt.setString(3, _type);
+			stmt.setLong(4, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLInsertDailyItems Exception", e);
@@ -786,18 +772,20 @@ public class RankingSystem {
 	}
 	
 	//inventory
-	public static int SQLInsertInventory(long _user_id, int _item_id, Timestamp _position, int _number, String _status){
+	public static int SQLInsertInventory(long _user_id, long _guild_id, int _item_id, Timestamp _position, int _number, String _status){
+		logger.debug("RankingSystem.SQLInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _item_id, _position, _number, _status);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status) VALUES(?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE number=VALUES(number)");
+			String sql = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status, fk_guild_id) VALUES(?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE number=VALUES(number)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
 			stmt.setTimestamp(3, _position);
 			stmt.setInt(4, _number);
 			stmt.setString(5, _status);
+			stmt.setLong(6, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLInsertInventory Exception", e);
@@ -808,12 +796,13 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLInsertInventoryWithLimit(long _user_id, int _item_id, Timestamp _position, int _number, String _status, Timestamp _expires){
+	public static int SQLInsertInventoryWithLimit(long _user_id, long _guild_id, int _item_id, Timestamp _position, int _number, String _status, Timestamp _expires){
+		logger.debug("RankingSystem.SQLInsertInventoryWithLimit launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _item_id, _position, _number, _status, _expires);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status, expires) VALUES(?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE number=VALUES(number), expires=VALUES(expires)");
+			String sql = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status, expires, fk_guild_id) VALUES(?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE number=VALUES(number), expires=VALUES(expires)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
@@ -821,6 +810,7 @@ public class RankingSystem {
 			stmt.setInt(4, _number);
 			stmt.setString(5, _status);
 			stmt.setTimestamp(6, _expires);
+			stmt.setLong(7, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLInsertInventoryWithLimitException", e);
@@ -831,22 +821,26 @@ public class RankingSystem {
 		}
 	}
 	
-	public static void SQLgetNumberLimitFromInventory(long _user_id, int _item_id){
+	public static int SQLgetNumberLimitFromInventory(long _user_id, long _guild_id, int _item_id){
+		logger.debug("RankingSystem.SQLgetNumberLimitFromInventory launched. Passed params {}, {}, {}", _user_id, _guild_id, _item_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT number FROM inventory WHERE fk_user_id = ? AND fk_item_id = ?");
+			String sql = ("SELECT number FROM inventory WHERE fk_user_id = ? AND fk_item_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
+			stmt.setLong(3, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setNumberLimit(rs.getInt(1));
+				return rs.getInt(1);
 			}
+			return 0;
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLgetNumberLimitFromInventory Exception", e);
+			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -854,22 +848,26 @@ public class RankingSystem {
 		}
 	}
 	
-	public static void SQLgetExpirationFromInventory(long _user_id, int _item_id){
+	public static Timestamp SQLgetExpirationFromInventory(long _user_id, long _guild_id, int _item_id){
+		logger.debug("RankingSystem.SQLgetExpirationFromInventory launched. Passed params {}, {}, {}", _user_id, _guild_id, _item_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT expires FROM inventory WHERE fk_user_id = ? AND fk_item_id = ?");
+			String sql = ("SELECT expires FROM inventory WHERE fk_user_id = ? AND fk_item_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
+			stmt.setLong(3, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setExpiration(rs.getTimestamp(1));
+				return rs.getTimestamp(1);
 			}
+			return null;
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLgetExpirationFromInventory Exception", e);
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -878,6 +876,7 @@ public class RankingSystem {
 	}
 	
 	public static void SQLDeleteInventory(){
+		logger.debug("RankingSystem.SQLDeleteInventory launched. No params passed");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -893,21 +892,22 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetTotalItemNumber(long _user_id){
+	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id){
+		logger.debug("RankingSystem.SQLgetTotalItemNumber launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT COUNT(*) FROM inventory WHERE fk_user_id = ?");
-			var item_number = 0;
+			String sql = ("SELECT COUNT(*) FROM inventory WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				item_number = rs.getInt(1)/12;
+				return rs.getInt(1)/12;
 			}
-			return item_number;
+			return 0;
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLgetTotalItemNumber Exception", e);
 			return 0;
@@ -919,23 +919,25 @@ public class RankingSystem {
 	}
 	
 	//dailies_usage
-	public static void SQLgetDailiesUsage(long _user_id){
+	public static Timestamp SQLgetDailiesUsage(long _user_id, long _guild_id){
+		logger.debug("RankingSystem.SQLgetDailiesUsage launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM dailies_usage WHERE fk_user_id = ?");
+			String sql = ("SELECT next_daily FROM dailies_usage WHERE fk_user_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setUserID(rs.getLong(1));
-				setOpened(rs.getTimestamp(2));
-				setNextDaily(rs.getTimestamp(3));
+				return rs.getTimestamp(1);
 			}
+			return null;
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLgetDailiesUsage Exception", e);
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -943,37 +945,21 @@ public class RankingSystem {
 		}
 	}
 	
-	public static void SQLInsertDailiesUsage(long _user_id, Timestamp _opened, Timestamp _next_daily){
+	public static int SQLInsertDailiesUsage(long _user_id, long _guild_id, Timestamp _opened, Timestamp _next_daily){
+		logger.debug("RankingSystem.SQLInsertDailiesUsage launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _opened, _next_daily);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO dailies_usage (fk_user_id, opened, next_daily) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE opened=VALUES(opened), next_daily=VALUES(next_daily)");
+			String sql = ("INSERT INTO dailies_usage (fk_user_id, opened, next_daily, fk_guild_id) VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE opened=VALUES(opened), next_daily=VALUES(next_daily)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setTimestamp(2, _opened);
 			stmt.setTimestamp(3, _next_daily);
-			stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("RankingSystem.SQLInsertDailiesUsage Exception", e);
-		} finally {
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static int SQLInsertUserGuild(long _user_id, long _guild_id) {
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO user_guild (fk_user_id, fk_guild_id) VALUES(?, ?) ON DUPLICATE KEY UPDATE fk_guild_id=VALUES(fk_guild_id)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
-			stmt.setLong(2, _guild_id);
+			stmt.setLong(4, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("RankingSystem.SQLInsertUserGuild Exception", e);
+			logger.error("RankingSystem.SQLInsertDailiesUsage Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -982,19 +968,21 @@ public class RankingSystem {
 	}
 	
 	//giveaway
-	public static boolean SQLBulkInsertGiveawayRewards(String [] rewards, Timestamp timestamp){
+	public static boolean SQLBulkInsertGiveawayRewards(String [] rewards, Timestamp timestamp, long _guild_id){
+		logger.debug("RankingSystem.SQLbulkInsertGiveawayRewards launched. Passed params {}, {}, {}", rewards, timestamp, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false); 
-			String sql = ("INSERT INTO giveaway (code, enabled, used, expires) VALUES (?, ?, ?, ?)");
+			String sql = ("INSERT INTO giveaway (code, enabled, used, expires, fk_guild_id) VALUES (?, ?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			for(String reward : rewards){
 				stmt.setString(1, reward);
 				stmt.setBoolean(2, true);
 				stmt.setBoolean(3, false);
 				stmt.setTimestamp(4, timestamp);
+				stmt.setLong(5, _guild_id);
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
@@ -1009,15 +997,17 @@ public class RankingSystem {
 		}
 	}
 	
-	public static String SQLRetrieveGiveawayReward() {
+	public static String SQLRetrieveGiveawayReward(long _guild_id) {
+		logger.debug("RankingSystem.SQLRetrieveGiveawayReward launched. Params passed {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT code FROM giveaway WHERE enabled = 1 && used = 0 && expires >= ? LIMIT 1");
+			String sql = ("SELECT code FROM giveaway WHERE enabled = 1 && used = 0 && expires >= ? && fk_guild_id = ? LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				return rs.getString(1);
@@ -1034,16 +1024,17 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateUsedOnReward(String _code) {
+	public static int SQLUpdateUsedOnReward(String _code, long _guild_id) {
+		logger.debug("RankingSystem.SQLUpdateUserOnReward launched. Passed params {}, {}", _code, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE giveaway SET used = 1 WHERE code = ?");
+			String sql = ("UPDATE giveaway SET used = 1 WHERE code = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _code);
-			int count = stmt.executeUpdate();
-			return count;
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLUpdateUsedOnReward Exception", e);
 			return 0;
@@ -1054,16 +1045,21 @@ public class RankingSystem {
 	}
 	
 	//JOINS
-	public synchronized static void SQLgetWholeRankView(long _user_id){
-		if(Hashes.getRanking(_user_id) == null){
+	public synchronized static Rank SQLgetWholeRankView(long _user_id, long _guild_id){
+		if(Hashes.getRanking(_guild_id+"_"+_user_id) == null){
+			logger.debug("RankingSystem.SQLgetWholeRankView launched. Passed params {}, {}", _user_id, _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT user_details.fk_user_id, user_details.level, (SELECT (user_details.experience - level_list.experience) FROM level_list WHERE level_list.level = user_details.level) AS `current_experience`, (SELECT (level_list.experience - (SELECT level_list.experience FROM level_list WHERE level_list.level = user_details.level)) FROM level_list WHERE level_list.level = (user_details.level+1)) AS `rank_up_experience`, user_details.experience, user_details.currency, user_details.current_role, users.level_skin, ranking_level.description, users.rank_skin, ranking_rank.description, users.profile_skin, ranking_profile.description, users.icon_skin, ranking_icons.description, ranking_profile.fk_bar_id, ranking_rank.fk_bar_id, ranking_profile.exp_percent_txt, ranking_rank.exp_percent_txt, ranking_profile.tcolor_r, ranking_rank.tcolor_r, ranking_level.tcolor_r, ranking_profile.tcolor_g, ranking_rank.tcolor_g, ranking_level.tcolor_g, ranking_profile.tcolor_b, ranking_rank.tcolor_b, ranking_level.tcolor_b, ranking_level.rankx, ranking_level.ranky, ranking_level.rank_width, ranking_level.rank_height, ranking_rank.rankx, ranking_rank.ranky, ranking_rank.rank_width, ranking_rank.rank_height, ranking_profile.rankx, ranking_profile.ranky, ranking_profile.rank_width, ranking_profile.rank_height, daily_experience.experience, daily_experience.reset FROM user_details INNER JOIN users ON user_details.fk_user_id = users.user_id INNER JOIN ranking_level ON level_skin = level_id INNER JOIN ranking_rank ON rank_skin = rank_id INNER JOIN ranking_profile ON profile_skin = profile_id INNER JOIN ranking_icons ON icon_skin = icon_id LEFT JOIN daily_experience ON users.user_id = daily_experience.user_id WHERE users.user_id = ?");
+				String sql = ("SELECT user_details.fk_user_id, user_details.level, (SELECT (user_details.experience - level_list.experience) FROM level_list WHERE level_list.level = user_details.level AND level_list.fk_guild_id = ?) AS `current_experience`, (SELECT (level_list.experience - (SELECT level_list.experience FROM level_list WHERE level_list.level = user_details.level)) FROM level_list WHERE level_list.level = (user_details.level+1) AND level_list.fk_guild_id = ?) AS `rank_up_experience`, user_details.experience, user_details.currency, user_details.current_role, users.level_skin, ranking_level.description, users.rank_skin, ranking_rank.description, users.profile_skin, ranking_profile.description, users.icon_skin, ranking_icons.description, ranking_profile.fk_bar_id, ranking_rank.fk_bar_id, ranking_profile.exp_percent_txt, ranking_rank.exp_percent_txt, ranking_profile.tcolor_r, ranking_rank.tcolor_r, ranking_level.tcolor_r, ranking_profile.tcolor_g, ranking_rank.tcolor_g, ranking_level.tcolor_g, ranking_profile.tcolor_b, ranking_rank.tcolor_b, ranking_level.tcolor_b, ranking_level.rankx, ranking_level.ranky, ranking_level.rank_width, ranking_level.rank_height, ranking_rank.rankx, ranking_rank.ranky, ranking_rank.rank_width, ranking_rank.rank_height, ranking_profile.rankx, ranking_profile.ranky, ranking_profile.rank_width, ranking_profile.rank_height, daily_experience.experience, daily_experience.reset FROM user_details INNER JOIN users ON user_details.fk_user_id = users.user_id INNER JOIN ranking_level ON level_skin = level_id INNER JOIN ranking_rank ON rank_skin = rank_id INNER JOIN ranking_profile ON profile_skin = profile_id INNER JOIN ranking_icons ON icon_skin = icon_id INNER JOIN guilds ON user_details.fk_guild_id = guilds.guild_id LEFT JOIN daily_experience ON guilds.guild_id = daily_experience.fk_guild_id WHERE users.user_id = ? && users.fk_guild_id = ? && user_details.fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setLong(1, _user_id);
+				stmt.setLong(1, _guild_id);
+				stmt.setLong(2, _guild_id);
+				stmt.setLong(3, _user_id);
+				stmt.setLong(4, _guild_id);
+				stmt.setLong(5, _guild_id);
 				rs = stmt.executeQuery();
 				if(rs.next()){
 					Rank rank = new Rank();
@@ -1109,61 +1105,74 @@ public class RankingSystem {
 					rank.setRankHeightProfile(rs.getInt(40));
 					rank.setDailyExperience(rs.getInt(41));
 					rank.setDailyReset(rs.getTimestamp(42));
-					Hashes.addRanking(_user_id, rank);
+					Hashes.addRanking(_guild_id+"_"+_user_id, rank);
+					return rank;
 				}
+				return null;
 			} catch (SQLException e) {
 				logger.error("RankingSystem.SQLgetWholeRankView Exception", e);
+				return null;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
+		return Hashes.getRanking(_guild_id+"_"+_user_id);
 	}
 	
-	public static void SQLgetGuild(long _guild_id){
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT guild_id, name, max_level, fk_level_id, ranking_level.description, fk_rank_id, ranking_rank.description, fk_profile_id, ranking_profile.description, fk_icon_id, ranking_icons.description, ranking_state, max_exp.experience, max_exp.enabled FROM guilds INNER JOIN ranking_level ON fk_level_id = level_id INNER JOIN ranking_rank ON fk_rank_id = rank_id INNER JOIN ranking_profile ON fk_profile_id = profile_id INNER JOIN ranking_icons ON fk_icon_id = icon_id LEFT JOIN max_exp ON guild_id = fk_guild_id WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				Guilds guild = new Guilds();
-				guild.setName(rs.getString(2));
-				guild.setMaxLevel(rs.getInt(3));
-				guild.setLevelID(rs.getInt(4));
-				guild.setLevelDescription(rs.getString(5));
-				guild.setRankID(rs.getInt(6));
-				guild.setRankDescription(rs.getString(7));
-				guild.setProfileID(rs.getInt(8));
-				guild.setProfileDescription(rs.getString(9));
-				guild.setIconID(rs.getInt(10));
-				guild.setIconDescription(rs.getString(11));
-				guild.setRankingState(rs.getBoolean(12));
-				guild.setMaxExperience(rs.getLong(13));
-				guild.setMaxExpEnabled(rs.getBoolean(14));
-				Hashes.addStatus(_guild_id, guild);
+	public static Guilds SQLgetGuild(long _guild_id){
+		if(Hashes.getStatus(_guild_id) == null) {
+			logger.debug("RankingSystem.SQLgetGuild launched. Passed params {}", _guild_id);
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT guild_id, name, max_level, fk_level_id, ranking_level.description, fk_rank_id, ranking_rank.description, fk_profile_id, ranking_profile.description, fk_icon_id, ranking_icons.description, ranking_state, max_exp.experience, max_exp.enabled FROM guilds INNER JOIN ranking_level ON fk_level_id = level_id INNER JOIN ranking_rank ON fk_rank_id = rank_id INNER JOIN ranking_profile ON fk_profile_id = profile_id INNER JOIN ranking_icons ON fk_icon_id = icon_id LEFT JOIN max_exp ON guild_id = fk_guild_id WHERE guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				if(rs.next()){
+					Guilds guild = new Guilds();
+					guild.setName(rs.getString(2));
+					guild.setMaxLevel(rs.getInt(3));
+					guild.setLevelID(rs.getInt(4));
+					guild.setLevelDescription(rs.getString(5));
+					guild.setRankID(rs.getInt(6));
+					guild.setRankDescription(rs.getString(7));
+					guild.setProfileID(rs.getInt(8));
+					guild.setProfileDescription(rs.getString(9));
+					guild.setIconID(rs.getInt(10));
+					guild.setIconDescription(rs.getString(11));
+					guild.setRankingState(rs.getBoolean(12));
+					guild.setMaxExperience(rs.getLong(13));
+					guild.setMaxExpEnabled(rs.getBoolean(14));
+					Hashes.addStatus(_guild_id, guild);
+					return guild;
+				}
+				return null;
+			} catch (SQLException e) {
+				logger.error("RankingSystem.SQLgetGuild Exception", e);
+				return null;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-		} catch (SQLException e) {
-			logger.error("RankingSystem.SQLgetGuild Exception", e);
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
+		return Hashes.getStatus(_guild_id);
 	}
 	
-	public static void SQLgetLevels(){
+	public static int SQLgetLevels(long _guild_id){
+		logger.debug("RankingSystem.SQLgetLevels launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT level, experience, currency, role_id FROM level_list LEFT JOIN roles ON level = level_requirement ORDER BY level");
+			var count = 0;
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
 			while(rs.next()){
@@ -1172,10 +1181,13 @@ public class RankingSystem {
 				ranks.setExperience(rs.getInt(2));
 				ranks.setCurrency(rs.getInt(3));
 				ranks.setAssignRole(rs.getLong(4));
-				Hashes.addRankingLevels(rs.getInt(1), ranks);
+				Hashes.addRankingLevels(_guild_id+"_"+rs.getInt(1), ranks);
+				count++;
 			}
+			return count;
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLgetLevels Exception", e);
+			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1183,7 +1195,8 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<Skins> SQLgetSkinshopContentAndType(){
+	public static ArrayList<Skins> SQLgetSkinshopContentAndType(long _guild_id){
+		logger.debug("RankingSystem.SQLgetSkinshopContentAndType launched. Params passed {}", _guild_id);
 		ArrayList<Skins> set_skin = new ArrayList<Skins>();
 		if(Hashes.getShopContent("shop") == null) {
 			Connection myConn = null;
@@ -1191,8 +1204,9 @@ public class RankingSystem {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT item_id, shop_content.description, price, skin, skin_type.description FROM shop_content INNER JOIN skin_type ON fk_skin = skin");
+				String sql = ("SELECT item_id, shop_content.description, price, skin, skin_type.description FROM shop_content INNER JOIN skin_type ON fk_skin = skin WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					Skins insert_skin = new Skins();
@@ -1217,22 +1231,26 @@ public class RankingSystem {
 		return Hashes.getShopContent("shop");
 	}
 	
-	public static void SQLgetItemID(long _user_id, int _item_id){
+	public static int SQLgetItemID(long _user_id, long _guild_id, int _item_id){
+		logger.debug("RankingSystem.SQLgetItemID launched. Passed params {}, {}, {}", _user_id, _guild_id, _item_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT item_id FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? AND item_id = ?");
+			String sql = ("SELECT item_id FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id WHERE fk_user_id = ? AND item_id = ? AND inventory.fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
+			stmt.setLong(3, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setItemID(rs.getInt(1));
+				return rs.getInt(1);
 			}
+			return 0;
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLgetItemID Exception", e);
+			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1240,28 +1258,26 @@ public class RankingSystem {
 		}
 	}
 	
-	public static boolean SQLgetItemIDAndSkinType(long _user_id, String _description){
+	public static Inventory SQLgetItemIDAndSkinType(long _user_id, long _guild_id, String _description){
+		logger.debug("RankingSystem.SQLgetItemIDAndSkinType launched. Passed params {}, {}, {}", _user_id, _guild_id, _description);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT item_id, fk_skin, fk_status FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? AND shop_content.description LIKE ?");
-			var success = false;
+			String sql = ("SELECT item_id, fk_skin, fk_status FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id WHERE fk_user_id = ? AND shop_content.description LIKE ? AND fk_status LIKE \"perm\" AND inventory.fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _description);
+			stmt.setLong(3, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setItemID(rs.getInt(1));
-				setSkinType(rs.getString(2));
-				setStatus(rs.getString(3));
-				success = true;
+				return new Inventory(rs.getInt(1), rs.getString(2), rs.getString(3));
 			}
-			return success;
+			return null;
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLgetItemIDAndSkinType Exception", e);
-			return false;
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1269,27 +1285,27 @@ public class RankingSystem {
 		}
 	}
 	
-	public static void SQLgetInventoryAndDescription(long _user_id, String _description, String _status){
+	public static int SQLgetInventoryNumber(long _user_id, long _guild_id, String _description, String _status){
+		logger.debug("RankingSystem.SQLgetInventoryAndDescription launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _description, _status);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, number, fk_status, description, fk_skin FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? AND description LIKE ? AND fk_status LIKE ?");
+			String sql = ("SELECT number FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id WHERE fk_user_id = ? AND description LIKE ? AND fk_status LIKE ? AND inventory.fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _description);
 			stmt.setString(3, _status);
+			stmt.setLong(4, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				setUserID(rs.getLong(1));
-				setPosition(rs.getTimestamp(2));
-				setNumber(rs.getInt(3));
-				setDescription(rs.getString(4));
-				setSkinType(rs.getString(5));
+				return rs.getInt(3);
 			}
+			return 0;
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLgetInventoryAndDescription Exception", e);
+			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1297,17 +1313,19 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptions(long _user_id, int _limit){
+	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptions(long _user_id, long _guild_id, int _limit){
+		logger.debug("RankingSystem.SQLgetInventoryAndDescriptions launched. Passed params {}, {}", _user_id, _guild_id, _limit);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, description, fk_skin FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? ORDER BY position desc LIMIT ?, 12");
+			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, description, fk_skin FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? ORDER BY position desc LIMIT ?, 12");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
-			stmt.setInt(2, _limit);
+			stmt.setLong(2, _guild_id);
+			stmt.setInt(3, _limit);
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				InventoryContent setInventory = new InventoryContent();
@@ -1331,16 +1349,18 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionWithoutLimit(long _user_id){
+	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionWithoutLimit(long _user_id, long _guild_id){
+		logger.debug("RankingSystem.SQLgetInventoryAndDescritpionWithoutLimit launched. Passed params {}, {}", _user_id, _guild_id);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, description FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? ORDER BY position desc");
+			String sql = ("SELECT fk_user_id, position, description FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? ORDER BY position desc");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				InventoryContent setInventory = new InventoryContent();
@@ -1360,28 +1380,30 @@ public class RankingSystem {
 		}
 	}
 	
-	public static boolean SQLgetNumberAndExpirationFromInventory(long _user_id, String _description, String _status){
+	public static InventoryContent SQLgetNumberAndExpirationFromInventory(long _user_id, long _guild_id, String _description, String _status){
+		logger.debug("RankingSystem.SQLgetNumberAndExpirationFromInventory launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _description, _status);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT number, expires FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_user_id = ? AND description = ? AND fk_status = ?");
-			var success = false;
+			String sql = ("SELECT number, expires FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id WHERE fk_user_id = ? AND description = ? AND fk_status = ? AND inventory.fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _description);
 			stmt.setString(3, _status);
+			stmt.setLong(4, _guild_id);
 			rs = stmt.executeQuery();
-			while(rs.next()){
-				setNumber(rs.getInt(1));
-				setExpiration(rs.getTimestamp(2));
-				success = true;
+			if(rs.next()){
+				InventoryContent inventory = new InventoryContent();
+				inventory.setNumber(rs.getInt(1));
+				inventory.setExpiration(rs.getTimestamp(2));
+				return inventory;
 			}
-			return success;
+			return null;
 		} catch (SQLException e) {
 			logger.error("RankingSystem.SQLgetNumberExpirationFromInventory Exception", e);
-			return false;
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1389,16 +1411,18 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<Dailies> SQLgetDailiesAndType(){
+	public static ArrayList<Dailies> SQLgetDailiesAndType(long _guild_id){
 		if(Hashes.getDailyItems("dailies") == null) {
+			logger.debug("RankingSystem.SQLgetDailiesAndType launched. Params passed {}", _guild_id);
 			ArrayList<Dailies> dailies = new ArrayList<Dailies>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT item_id, daily_items.description, weight, type, daily_type.description, action FROM daily_items INNER JOIN daily_type ON fk_type = type");
+				String sql = ("SELECT item_id, daily_items.description, weight, type, daily_type.description, action FROM daily_items INNER JOIN daily_type ON fk_type = type WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					Dailies setDaily = new Dailies();
@@ -1426,24 +1450,27 @@ public class RankingSystem {
 	
 	//Transaction
 	@SuppressWarnings("resource")
-	public static int SQLUpdateCurrencyAndInsertInventory(long _user_id, long _currency, int _item_id, Timestamp _position, int _number){
+	public static int SQLUpdateCurrencyAndInsertInventory(long _user_id, long _guild_id, long _currency, int _item_id, Timestamp _position, int _number){
+		logger.debug("RankingSystem.SQLUpdateCurrencyAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _position, _number);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("UPDATE user_details SET currency = ? WHERE fk_user_id = ?");
+			String sql = ("UPDATE user_details SET currency = ? WHERE fk_user_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _currency);
 			stmt.setLong(2, _user_id);
+			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 			
-			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status) VALUES(?, ?, ?, ?, \"perm\") ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number) ");
+			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status, fk_guild_id) VALUES(?, ?, ?, ?, \"perm\", ?) ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number) ");
 			stmt = myConn.prepareStatement(sql2);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
 			stmt.setTimestamp(3, _position);
 			stmt.setInt(4, _number);
+			stmt.setLong(5, _guild_id);
 			var editedRows = stmt.executeUpdate();
 			myConn.commit();	
 			return editedRows;
@@ -1462,26 +1489,29 @@ public class RankingSystem {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLUpdateAndInsertInventory(long _user_id, int _number, int _number_limit, int _item_id, Timestamp _position, Timestamp _expiration){
+	public static int SQLUpdateAndInsertInventory(long _user_id, long _guild_id, int _number, int _number_limit, int _item_id, Timestamp _position, Timestamp _expiration){
+		logger.debug("RankingSystem.SQLUpdateAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _number, _number_limit, _item_id, _position, _expiration);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("UPDATE inventory SET number = ? WHERE fk_user_id = ? AND fk_status LIKE \"perm\" AND fk_item_id = ?");
+			String sql = ("UPDATE inventory SET number = ? WHERE fk_user_id = ? AND fk_status LIKE \"perm\" AND fk_item_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _number-1);
 			stmt.setLong(2, _user_id);
 			stmt.setInt(3, _item_id);
+			stmt.setLong(4, _guild_id);
 			stmt.executeUpdate();
 			
-			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status, expires) VALUES(?, ?, ?, ?, \"limit\", ?) ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number), expires=VALUES(expires) ");
+			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status, expires, fk_guild_id) VALUES(?, ?, ?, ?, \"limit\", ?, ?) ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number), expires=VALUES(expires) ");
 			stmt = myConn.prepareStatement(sql2);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
 			stmt.setTimestamp(3, _position);
 			stmt.setInt(4, _number_limit);
 			stmt.setTimestamp(5, _expiration);
+			stmt.setLong(6, _guild_id);
 			var editedRows = stmt.executeUpdate();
 			myConn.commit();
 			return editedRows;
@@ -1500,25 +1530,28 @@ public class RankingSystem {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLDeleteAndInsertInventory(long _user_id, int _number, int _item_id, Timestamp _position, Timestamp _expiration){
+	public static int SQLDeleteAndInsertInventory(long _user_id, long _guild_id, int _number, int _item_id, Timestamp _position, Timestamp _expiration){
+		logger.debug("RankingSystem.SQLDeleteAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _number, _item_id, _position, _expiration);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("DELETE FROM inventory WHERE fk_user_id = ? AND fk_status LIKE \"perm\" AND fk_item_id = ?");
+			String sql = ("DELETE FROM inventory WHERE fk_user_id = ? AND fk_status LIKE \"perm\" AND fk_item_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
+			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 			
-			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status, expires) VALUES(?, ?, ?, ?, \"limit\", ?) ON DUPLICATE KEY UPDATE number=VALUES(number), expires=VALUES(expires) ");
+			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status, expires, fk_guild_id) VALUES(?, ?, ?, ?, \"limit\", ?, ?) ON DUPLICATE KEY UPDATE number=VALUES(number), expires=VALUES(expires) ");
 			stmt = myConn.prepareStatement(sql2);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
 			stmt.setTimestamp(3, _position);
 			stmt.setInt(4, _number);
 			stmt.setTimestamp(5, _expiration);
+			stmt.setLong(6, _guild_id);
 			var editedRows = stmt.executeUpdate();
 			myConn.commit();
 			return editedRows;
@@ -1537,16 +1570,19 @@ public class RankingSystem {
 	}
 	
 	//EXISTS
-	public static String SQLExpBoosterExistsInInventory(long _user_id){
+	public static String SQLExpBoosterExistsInInventory(long _user_id, long _guild_id){
+		logger.debug("RankingSystem.SQLExpBoosterExistsInInventory launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT DISTINCT description FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_status LIKE \"limit\" AND EXISTS (SELECT description FROM daily_items WHERE fk_type LIKE \"exp\") AND fk_user_id = ?");
+			String sql = ("SELECT DISTINCT description FROM inventory INNER JOIN shop_content ON fk_item_id = item_id WHERE fk_status LIKE \"limit\" AND EXISTS (SELECT description FROM daily_items WHERE fk_type LIKE \"exp\" AND daily_items.fk_guild_id = ?) AND fk_user_id = ? AND inventory.fk_guild_id = ?");
 			var description = "0";
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
+			stmt.setLong(1, _guild_id);
+			stmt.setLong(2, _user_id);
+			stmt.setLong(3, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				description = rs.getString(1);
@@ -1560,445 +1596,5 @@ public class RankingSystem {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
-	}
-	
-	public static void setUserID(long _user_id){
-		user_id = _user_id;
-	}
-	public static void setLevelSkin(int _level_skin){
-		level_skin = _level_skin;
-	}
-	public static void setRankSkin(int _rank_skin){
-		rank_skin = _rank_skin;
-	}
-	public static void setProfileSkin(int _profile_skin){
-		profile_skin = _profile_skin;
-	}
-	public static void setIconSkin(int _icon_skin){
-		icon_skin = _icon_skin;
-	}
-	public static void setGuildID(long _guild_id){
-		guild_id = _guild_id;
-	}
-	public static void setRankingLevel(int _ranking_level){
-		ranking_level = _ranking_level;
-	}
-	public static void setRankingRank(int _ranking_rank){
-		ranking_rank = _ranking_rank;
-	}
-	public static void setRankingProfile(int _ranking_profile){
-		ranking_profile = _ranking_profile;
-	}
-	public static void setRankingIcon(int _ranking_icon){
-		ranking_icon = _ranking_icon;
-	}
-	public static void setRankingState(boolean _ranking_state){
-		ranking_state = _ranking_state;
-	}
-	public static void setMaxLevel(int _max_level){
-		max_level = _max_level;
-	}
-	public static void setDescription(String _description){
-		description = _description;
-	}
-	public static void setLevel(int _level){
-		level = _level;
-	}
-	public synchronized static void setCurrentExperience(int _current_experience){
-		current_experience = _current_experience;
-	}
-	public synchronized static void setRankUpExperience(int _rank_up_experience){
-		rank_up_experience = _rank_up_experience;
-	}
-	public synchronized static void setExperience(long _experience){
-		experience = _experience;
-	}
-	public static void setEnabled(boolean _enabled){
-		enabled = _enabled;
-	}
-	public static void setMaxExperience(long _max_experience){
-		max_experience = _max_experience;
-	}
-	public static void setDailyExperience(long _daily_experience){
-		daily_experience = _daily_experience;
-	}
-	public static void setDailyReset(Date _daily_reset){
-		daily_reset = _daily_reset;
-	}
-	public static void setItemID(int _item_id){
-		item_id = _item_id;
-	}
-	public static void setPrice(long _price){
-		price = _price;
-	}
-	public static void setPosition(Date _position){
-		position = _position;
-	}
-	public static void setSkinType(String _skin_type){
-		skin_type = _skin_type;
-	}
-	public static void setWeight(int _weight){
-		weight = _weight;
-	}
-	public static void setNumber(int _number){
-		number = _number;
-	}
-	public static void setOpened(Date _opened){
-		opened = _opened;
-	}
-	public static void setNextDaily(Date _next_daily){
-		next_daily = _next_daily;
-	}
-	public static void setExpiration(Date _expiration){
-		expiration = _expiration;
-	}
-	public static void setNumberLimit(int _number_limit){
-		number_limit = _number_limit;
-	}
-	public static void setStatus(String _status){
-		status = _status;
-	}
-	public static void setColorProfile(int _color_profile){
-		color_profile = _color_profile;
-	}
-	public static void setColorRank(int _color_rank){
-		color_rank = _color_rank;
-	}
-	public static void setExpAndPercentProfileAllowed(boolean _exp_and_percent_profile){
-		exp_and_percent_profile = _exp_and_percent_profile;
-	}
-	public static void setExpAndPercentRankAllowed(boolean _exp_and_percent_rank){
-		exp_and_percent_rank = _exp_and_percent_rank;
-	}
-	public static void setItemNumber(int _item_number){
-		item_number = _item_number;
-	}
-	public static void setTextColorRProfile(int _text_color_r_profile){
-		text_color_r_profile = _text_color_r_profile;
-	}
-	public static void setTextColorRRank(int _text_color_r_rank){
-		text_color_r_rank = _text_color_r_rank;
-	}
-	public static void setTextColorRLevel(int _text_color_r_level){
-		text_color_r_level = _text_color_r_level;
-	}
-	public static void setTextColorGProfile(int _text_color_g_profile){
-		text_color_g_profile = _text_color_g_profile;
-	}
-	public static void setTextColorGRank(int _text_color_g_rank){
-		text_color_g_rank = _text_color_g_rank;
-	}
-	public static void setTextColorGLevel(int _text_color_g_level){
-		text_color_g_level = _text_color_g_level;
-	}
-	public static void setTextColorBProfile(int _text_color_b_profile){
-		text_color_b_profile = _text_color_b_profile;
-	}
-	public static void setTextColorBRank(int _text_color_b_rank){
-		text_color_b_rank = _text_color_b_rank;
-	}
-	public static void setTextColorBLevel(int _text_color_b_level){
-		text_color_b_level = _text_color_b_level;
-	}
-	public static void setRankXLevel(int _rankx_level){
-		rankx_level = _rankx_level;
-	}
-	public static void setRankYLevel(int _ranky_level){
-		ranky_level = _ranky_level;
-	}
-	public static void setRankWidthLevel(int _rank_width_level){
-		rank_width_level = _rank_width_level;
-	}
-	public static void setRankHeightLevel(int _rank_height_level){
-		rank_height_level = _rank_height_level;
-	}
-	public static void setRankXRank(int _rankx_rank){
-		rankx_rank = _rankx_rank;
-	}
-	public static void setRankYRank(int _ranky_rank){
-		ranky_rank = _ranky_rank;
-	}
-	public static void setRankWidthRank(int _rank_width_rank){
-		rank_width_rank = _rank_width_rank;
-	}
-	public static void setRankHeightRank(int _rank_height_rank){
-		rank_height_rank = _rank_height_rank;
-	}
-	public static void setRankXProfile(int _rankx_profile){
-		rankx_profile = _rankx_profile;
-	}
-	public static void setRankYProfile(int _ranky_profile){
-		ranky_profile = _ranky_profile;
-	}
-	public static void setRankWidthProfile(int _rank_width_profile){
-		rank_width_profile = _rank_width_profile;
-	}
-	public static void setRankHeightProfile(int _rank_height_profile){
-		rank_height_profile = _rank_height_profile;
-	}
-	public static void setLevelDescription(String _level_description){
-		level_description = _level_description;
-	}
-	public static void setRankDescription(String _rank_description){
-		rank_description = _rank_description;
-	}
-	public static void setProfileDescription(String _profile_description){
-		profile_description = _profile_description;
-	}
-	public static void setIconDescription(String _icon_description){
-		icon_description = _icon_description;
-	}
-	
-	public static long getUserID(){
-		return user_id;
-	}
-	public static int getLevelSkin(){
-		return level_skin;
-	}
-	public static int getRankSkin(){
-		return rank_skin;
-	}
-	public static int getProfileSkin(){
-		return profile_skin;
-	}
-	public static int getIconSkin(){
-		return icon_skin;
-	}
-	public static long getGuildID(){
-		return guild_id;
-	}
-	public static int getRankingLevel(){
-		return ranking_level;
-	}
-	public static int getRankingRank(){
-		return ranking_rank;
-	}
-	public static int getRankingProfile(){
-		return ranking_profile;
-	}
-	public static int getRankingIcon(){
-		return ranking_icon;
-	}
-	public static boolean getRankingState(){
-		return ranking_state;
-	}
-	public static int getMaxLevel(){
-		return max_level;
-	}
-	public static String getDescription(){
-		return description;
-	}
-	public static int getLevel(){
-		return level;
-	}
-	public static int getCurrentExperience(){
-		return current_experience;
-	}
-	public static int getRankUpExperience(){
-		return rank_up_experience;
-	}
-	public static long getExperience(){
-		return experience;
-	}
-	public static boolean getEnabled(){
-		return enabled;
-	}
-	public static long getMaxExperience(){
-		return max_experience;
-	}
-	public static long getDailyExperience(){
-		return daily_experience;
-	}
-	public static Date getDailyReset(){
-		return daily_reset;
-	}
-	public static int getItemID(){
-		return item_id;
-	}
-	public static long getPrice(){
-		return price;
-	}
-	public static Date getPosition(){
-		return position;
-	}
-	public static String getSkinType(){
-		return skin_type;
-	}
-	public static int getWeight(){
-		return weight;
-	}
-	public static int getNumber(){
-		return number;
-	}
-	public static Date getOpened(){
-		return opened;
-	}
-	public static Date getNextDaily(){
-		return next_daily;
-	}
-	public static Date getExpiration(){
-		return expiration;
-	}
-	public static int getNumberLimit(){
-		return number_limit;
-	}
-	public static String getStatus(){
-		return status;
-	}
-	public static int getColorProfile(){
-		return color_profile;
-	}
-	public static int getColorRank(){
-		return color_rank;
-	}
-	public static boolean getExpAndPercentAllowedProfile(){
-		return exp_and_percent_profile;
-	}
-	public static boolean getExpAndPercentAllowedRank(){
-		return exp_and_percent_rank;
-	}
-	public static int getItemNumber(){
-		return item_number;
-	}
-	public static int getTextColorRProfile(){
-		return text_color_r_profile;
-	}
-	public static int getTextColorRRank(){
-		return text_color_r_rank;
-	}
-	public static int getTextColorRLevel(){
-		return text_color_r_level;
-	}
-	public static int getTextColorBProfile(){
-		return text_color_b_profile;
-	}
-	public static int getTextColorBRank(){
-		return text_color_b_rank;
-	}
-	public static int getTextColorBLevel(){
-		return text_color_b_level;
-	}
-	public static int getTextColorGProfile(){
-		return text_color_g_profile;
-	}
-	public static int getTextColorGRank(){
-		return text_color_g_rank;
-	}
-	public static int getTextColorGLevel(){
-		return text_color_g_level;
-	}
-	public static int getRankXLevel(){
-		return rankx_level;
-	}
-	public static int getRankYLevel(){
-		return ranky_level;
-	}
-	public static int getRankWidthLevel(){
-		return rank_width_level;
-	}
-	public static int getRankHeightLevel(){
-		return rank_height_level;
-	}
-	public static int getRankXRank(){
-		return rankx_rank;
-	}
-	public static int getRankYRank(){
-		return ranky_rank;
-	}
-	public static int getRankWidthRank(){
-		return rank_width_rank;
-	}
-	public static int getRankHeightRank(){
-		return rank_height_rank;
-	}
-	public static int getRankXProfile(){
-		return rankx_profile;
-	}
-	public static int getRankYProfile(){
-		return ranky_profile;
-	}
-	public static int getRankWidthProfile(){
-		return rank_width_profile;
-	}
-	public static int getRankHeightProfile(){
-		return rank_height_profile;
-	}
-	public static String getLevelDescription(){
-		return level_description;
-	}
-	public static String getRankDescription(){
-		return rank_description;
-	}
-	public static String getProfileDescription(){
-		return profile_description;
-	}
-	public static String getIconDescription(){
-		return icon_description;
-	}
-	
-	public static void clearAllVariables(){
-		setUserID(0);
-		setLevelSkin(0);
-		setRankSkin(0);
-		setProfileSkin(0);
-		setIconSkin(0);
-		setGuildID(0);
-		setRankingLevel(0);
-		setRankingRank(0);
-		setRankingProfile(0);
-		setRankingIcon(0);
-		setRankingState(false);
-		setMaxLevel(0);
-		setDescription("");
-		setLevel(0);
-		setCurrentExperience(0);
-		setRankUpExperience(0);
-		setExperience(0);
-		setEnabled(false);
-		setMaxExperience(0);
-		setDailyExperience(0);
-		setDailyReset(null);
-		setItemID(0);
-		setPosition(null);
-		setSkinType("");
-		setWeight(0);
-		setNumber(0);
-		setOpened(null);
-		setNextDaily(null);
-		setExpiration(null);
-		setNumberLimit(0);
-		setStatus(null);
-		setColorProfile(0);
-		setColorRank(0);
-		setExpAndPercentProfileAllowed(false);
-		setExpAndPercentRankAllowed(false);
-		setItemNumber(0);
-		setTextColorRProfile(0);
-		setTextColorRRank(0);
-		setTextColorRLevel(0);
-		setTextColorGProfile(0);
-		setTextColorGRank(0);
-		setTextColorGLevel(0);
-		setTextColorBProfile(0);
-		setTextColorBRank(0);
-		setTextColorBLevel(0);
-		setRankXLevel(0);
-		setRankYLevel(0);
-		setRankWidthLevel(0);
-		setRankHeightLevel(0);
-		setRankXRank(0);
-		setRankYRank(0);
-		setRankWidthRank(0);
-		setRankHeightRank(0);
-		setRankXProfile(0);
-		setRankYProfile(0);
-		setRankWidthProfile(0);
-		setRankHeightProfile(0);
-	}
-	public static void clearDescriptionVariables(){
-		setLevelDescription("");
-		setRankDescription("");
-		setProfileDescription("");
-		setIconDescription("");
 	}
 }

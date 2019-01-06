@@ -267,4 +267,8 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Commands", "RoleReaction", boolean.class);
 	}
+	public static boolean getRssCommand() {
+		readConfig();
+		return ini.get("Commands", "Rss", boolean.class);
+	}
 }

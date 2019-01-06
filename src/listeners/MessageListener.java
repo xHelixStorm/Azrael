@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import com.vdurmont.emoji.EmojiManager;
 
 import commandsContainer.FilterExecution;
+import commandsContainer.RssExecution;
 import commandsContainer.SetWarning;
 import commandsContainer.UserExecution;
 import core.CommandHandler;
@@ -47,7 +48,8 @@ public class MessageListener extends ListenerAdapter{
 			File warning = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
 			File user = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
 			File filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
-			File reaction = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getIdLong()+"ch"+e.getTextChannel().getId()+".azr");
+			File reaction = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
+			File rss = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
 			File quiz = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quizstarter.azr");
 			File runquiz = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr");
 			
@@ -115,21 +117,29 @@ public class MessageListener extends ListenerAdapter{
 				reaction.delete();
 			}
 			
+			if(rss.exists() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
+				String task = FileSetting.readFile(rss.getAbsolutePath());
+				if(task.equals("remove") && message.replaceAll("[0-9]", "").length() == 0) {
+					RssExecution.removeFeed(e, Integer.parseInt(message), rss.getAbsolutePath());
+					rss.delete();
+				}
+			}
+			
 			if(quiz.exists()) {
 				String content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quizstarter.azr");
 				if(e.getMember().getUser().getId().equals(content) && (message.equals("1") || message.equals("2") || message.equals("3"))) {
 					//run the quiz in a thread. // retrieve the log channel and quiz channel at the same time and pass them over to the new Thread
 					long log_channel_id;
-					Azrael.SQLgetTwoChanneIDs(e.getGuild().getIdLong(), "qui", "log");
-					if(Azrael.getChannelID2() != 0) {
-						log_channel_id = Azrael.getChannelID();
+					var channel_ids = Azrael.SQLgetTwoChanneIDs(e.getGuild().getIdLong(), "qui", "log").split("_");
+					if(!channel_ids[1].equals("0")) {
+						log_channel_id = Long.parseLong(channel_ids[1]);
 					}
 					else {
 						log_channel_id = e.getTextChannel().getIdLong();
 					}
-					e.getTextChannel().sendMessage("The quiz will run shortly in <#"+Azrael.getChannelID()+">!").queue();
+					e.getTextChannel().sendMessage("The quiz will run shortly in <#"+channel_ids[0]+">!").queue();
 					//execute independent Quiz Thread
-					new Thread(new RunQuiz(e, Azrael.getChannelID(), log_channel_id, Integer.parseInt(message))).start();
+					new Thread(new RunQuiz(e, Long.parseLong(channel_ids[0]), log_channel_id, Integer.parseInt(message))).start();
 					//remove the file after starting 
 					quiz.delete();
 				}
@@ -138,8 +148,7 @@ public class MessageListener extends ListenerAdapter{
 			if(runquiz.exists()) {
 				String content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr");
 				if(!content.equals("skip-question") || !content.equals("interrupt-questions")) {
-					Azrael.SQLgetChannelID(guild_id, "qui");
-					if(Azrael.getChannelID() == e.getTextChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
+					if(Azrael.SQLgetChannelID(guild_id, "qui") == e.getTextChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
 						if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 							if(message.equals("skip-question") || message.equals("interrupt-questions")) {
 								FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr", message);
@@ -157,31 +166,25 @@ public class MessageListener extends ListenerAdapter{
 						}
 					}
 				}
-				Azrael.setChannelID(0);
 			}
 			
 			Guilds guild_settings = Hashes.getStatus(guild_id);
 			if(guild_settings.getRankingState() == true){
-				RankingSystem.SQLgetWholeRankView(user_id);
-				Rank user_details = Hashes.getRanking(user_id);
+				Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
 				if(user_details == null){
-					var editedRows = RankingSystem.SQLInsertUser(user_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
-					if(editedRows > 0) {
-						var editedRows2 = RankingSystem.SQLInsertUserDetails(user_id, 0, 0, 50000, 0);
-						if(editedRows2 > 0) {
-							var editedRows3 = RankingSystem.SQLInsertUserGuild(user_id, guild_id);
-							if(editedRows3 > 0) {
-								if(channel_id != 0) {
-									EmbedBuilder success = new EmbedBuilder().setColor(Color.GREEN).setTitle("Table insertion successful!");
-									e.getGuild().getTextChannelById(channel_id).sendMessage(success.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** has been successfully inserted into all required ranking system table!").build()).queue();
-								}
+					if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
+						if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, 50000, 0) > 0) {
+							var log_channel = Azrael.SQLgetChannelID(guild_id, "log");
+							if(log_channel != 0) {
+								EmbedBuilder success = new EmbedBuilder().setColor(Color.GREEN).setTitle("Table insertion successful!");
+								e.getGuild().getTextChannelById(log_channel).sendMessage(success.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** has been successfully inserted into all required ranking system table!").build()).queue();
 							}
 						}
 					}
 				}
 				else{
-					Azrael.SQLgetTwoChanneIDs(guild_id, "bot", "qui");
-					if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && e.getTextChannel().getIdLong() != Azrael.getChannelID() && e.getTextChannel().getIdLong() != Azrael.getChannelID2()){
+					var channel_ids = Azrael.SQLgetTwoChanneIDs(guild_id, "bot", "qui").split("_");
+					if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && !e.getTextChannel().getId().equals(channel_ids[0]) && !e.getTextChannel().getId().equals(channel_ids[1])){
 						int roleAssignLevel = 0;
 						long role_id = 0;
 						Rank ranking_levels = Hashes.getRankingRoles(guild_id+"_"+(user_details.getLevel()+1));
@@ -194,7 +197,7 @@ public class MessageListener extends ListenerAdapter{
 						
 						int percent_multiplier;
 						try {
-							percent_multiplier = Integer.parseInt(RankingSystem.SQLExpBoosterExistsInInventory(user_id).replaceAll("[^0-9]*", ""));
+							percent_multiplier = Integer.parseInt(RankingSystem.SQLExpBoosterExistsInInventory(user_id, guild_id).replaceAll("[^0-9]*", ""));
 						} catch(NumberFormatException nfe){
 							percent_multiplier = 0;
 						}
@@ -211,7 +214,6 @@ public class MessageListener extends ListenerAdapter{
 		} catch(NullPointerException npe){
 			//play with your thumbs 
 		}
-		Azrael.clearAllVariables();
 		executor.shutdown();
 	}
 	

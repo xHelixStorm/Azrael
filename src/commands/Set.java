@@ -25,7 +25,6 @@ import inventory.Dailies;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
-import sql.Azrael;
 
 public class Set implements Command{
 
@@ -85,8 +84,7 @@ public class Set implements Command{
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Enable or disable the ranking system with the following command:\n\n**"+IniFileReader.getCommandPrefix()+"set -ranking enable**: To enable the ranking system\n**"+IniFileReader.getCommandPrefix()+"set -ranking disable**: To disable the ranking system").build()).queue();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -ranking ")){
-					RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-					if(Hashes.getStatus(e.getGuild().getIdLong()).getMaxLevel() != 0){
+					if(RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getMaxLevel() != 0){
 						input = input.substring(13+IniFileReader.getCommandPrefix().length());
 						SetRankingSystem.runTask(e, input);
 					}
@@ -111,70 +109,102 @@ public class Set implements Command{
 					SetMaxLevel.runTask(e, Integer.parseInt(input));
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -default-level-skin")){
-					RankingSystem.SQLgetRankingLevel();
 					String out = "";
-					for(rankingSystem.Rank rankingSystem : Hashes.getRankList("ranking-level")){
+					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingLevel()){
 						out+= "Theme "+rankingSystem.getRankingLevel()+":\t"+rankingSystem.getLevelDescription()+"\n";
 					}
-					e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-level-skin and then the digit for the desired skin. These skins are available for the level up pop ups:\n\n"+out).build()).queue();
+					if(out.length() > 0)
+						e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-level-skin and then the digit for the desired skin. These skins are available for the level up pop ups:\n\n"+out).build()).queue();
+					else
+						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_level couldn't be loaded").build()).queue();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -default-level-skin ")){
-					RankingSystem.SQLgetRankingLevel();
-					int last_theme = Hashes.getRankList("ranking-level").size();
-					input = input.substring(24+IniFileReader.getCommandPrefix().length());
-					if(input.replaceAll("[0-9]", "").length() == 0)
-						SetLevelDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
-					else
-						e.getTextChannel().sendMessage(e.getMember().getUser().getAsMention()+" Please insert a theme digit to set a default level skin!").queue();
+					int last_theme = RankingSystem.SQLgetRankingLevel().size();
+					if(last_theme > 0) {
+						input = input.substring(24+IniFileReader.getCommandPrefix().length());
+						if(input.replaceAll("[0-9]", "").length() == 0)
+							SetLevelDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+						else
+							e.getTextChannel().sendMessage(e.getMember().getAsMention()+" Please insert a theme digit to set a default level skin!").queue();
+					}
+					else {
+						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_level couldn't be loaded").queue();
+					}
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -default-rank-skin")){
-					RankingSystem.SQLgetRankingRank();
 					String out = "";
-					for(rankingSystem.Rank rankingSystem : Hashes.getRankList("ranking-rank")){
+					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingRank()){
 						out+= "Theme "+rankingSystem.getRankingRank()+":\t"+rankingSystem.getRankDescription()+"\n";
 					}
-					e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-rank-skin and then the digit for the desired skin. These skins are available for the rank command:\n\n"+out).build()).queue();
+					if(out.length() > 0)
+						e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-rank-skin and then the digit for the desired skin. These skins are available for the rank command:\n\n"+out).build()).queue();
+					else
+						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_rank couldn't be loaded").build()).queue();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -default-rank-skin ")){
-					RankingSystem.SQLgetRankingRank();
-					int last_theme = Hashes.getRankList("ranking-rank").size();
-					input = input.substring(23+IniFileReader.getCommandPrefix().length());
-					SetRankDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+					int last_theme = RankingSystem.SQLgetRankingRank().size();
+					if(last_theme > 0) {
+						input = input.substring(23+IniFileReader.getCommandPrefix().length());
+						if(input.replaceAll("[0-9]", "").length() == 0)
+							SetRankDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+						else
+							e.getTextChannel().sendMessage(e.getMember().getAsMention()+" Please insert a theme digit to set a default rank skin!").queue();
+					}
+					else {
+						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_rank couldn't be loaded").queue();
+					}
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -default-profile-skin")){
-					RankingSystem.SQLgetRankingProfile();
 					String out = "";
-					for(rankingSystem.Rank rankingSystem : Hashes.getRankList("ranking-profile")){
+					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingProfile()){
 						out+= "Theme "+rankingSystem.getRankingProfile()+":\t"+rankingSystem.getProfileDescription()+"\n";
 					}
-					e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-profile-skin and then the digit for the desired skin. These skins are available for the profile command:\n\n"+out).build()).queue();
+					if(out.length() > 0)
+						e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-profile-skin and then the digit for the desired skin. These skins are available for the profile command:\n\n"+out).build()).queue();
+					else
+						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_profile couldn't be loaded").build()).queue();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -default-profile-skin ")){
-					RankingSystem.SQLgetRankingProfile();
-					int last_theme = Hashes.getRankList("ranking-profile").size();
-					input = input.substring(26+IniFileReader.getCommandPrefix().length());
-					SetProfileDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+					int last_theme = RankingSystem.SQLgetRankingProfile().size();
+					if(last_theme > 0) {
+						input = input.substring(26+IniFileReader.getCommandPrefix().length());
+						if(input.replaceAll("[0-9]", "").length() == 0)
+							SetProfileDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+						else
+							e.getTextChannel().sendMessage(e.getMember().getAsMention()+" Please insert a theme digit to set a default profile skin!").queue();
+					}
+					else {
+						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_profile couldn't be loaded").queue();
+					}
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -default-icon-skin")){
-					RankingSystem.SQLgetRankingIcons();
 					String out = "";
-					for(rankingSystem.Rank rankingSystem : Hashes.getRankList("ranking-icons")){
+					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingIcons()){
 						out+= "Theme "+rankingSystem.getRankingIcon()+":\t"+rankingSystem.getIconDescription()+"\n";
 					}
-					e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-icon-skin and then the digit for the desired level up icons. These level up icons are available:\n\n"+out).build()).queue();
+					if(out.length() > 0)
+						e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-icon-skin and then the digit for the desired level up icons. These level up icons are available:\n\n"+out).build()).queue();
+					else
+						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_icons couldn't be loaded").build()).queue();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -default-icon-skin ")){
-					RankingSystem.SQLgetRankingIcons();
-					int last_theme = Hashes.getRankList("ranking-icons").size();
-					input = input.substring(23+IniFileReader.getCommandPrefix().length());
-					SetIconDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+					int last_theme = RankingSystem.SQLgetRankingIcons().size();
+					if(last_theme > 0) {
+						input = input.substring(23+IniFileReader.getCommandPrefix().length());
+						if(input.replaceAll("[0-9]", "").length() == 0)
+							SetIconDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+						else
+							e.getTextChannel().sendMessage(e.getMember().getAsMention()+" Please insert a theme digit to set a default icons skin!").queue();
+					}
+					else
+						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_icons couldn't be loaded").queue();
 				}
 				else if(input.equals(IniFileReader.getCommandPrefix()+"set -daily-item")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Write the name of the daily reward you want to make available for dailies together with the weight and type of the item. For example:\n**"+IniFileReader.getCommandPrefix()+"set -daily-item \"5000 PEN\" -weight 70 -type cur**\nNote that the total weight can't exceed 100 and that the currently available types are **cur** for currency , **exp** for experience enhancement items and **cod** for code giveaways.").build()).queue();
 				}
 				else if(input.contains(IniFileReader.getCommandPrefix()+"set -daily-item ")){
 					input = input.substring(16+IniFileReader.getCommandPrefix().length());
-					ArrayList<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType();
+					ArrayList<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong());
 					var tot_weight = daily_items.parallelStream().mapToInt(i -> i.getWeight()).sum();
 					SetDailyItem.runTask(e, input, daily_items, tot_weight);
 				}
@@ -197,8 +227,7 @@ public class Set implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		RankingSystem.clearAllVariables();
-		Azrael.clearAllVariables();
+		
 	}
 
 	@Override

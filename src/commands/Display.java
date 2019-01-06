@@ -54,11 +54,9 @@ public class Display implements Command{
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -registered-roles")){
-				DiscordRoles.SQLgetRoles(guild_id);
-				for(Roles r : DiscordRoles.getRoles_ID()){
+				for(Roles r : DiscordRoles.SQLgetRoles(guild_id)){
 					out += r.getRole_Name() + " (" + r.getRole_ID() + ") \nrole type: "+r.getCategory_Name()+"\n\n";
 				}
-				DiscordRoles.clearRolesArray();
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -ranking-roles")){
@@ -98,8 +96,7 @@ public class Display implements Command{
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -registered-channels")){
 				if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || IniFileReader.getAdmin() == e.getMember().getUser().getIdLong()){
-					Azrael.SQLgetChannels(guild_id);
-					for(Channels ch : Azrael.getChannels()){
+					for(Channels ch : Azrael.SQLgetChannels(guild_id)){
 						if(!out.contains(""+ch.getChannel_ID())){
 							out += "\n\n"+ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \nChannel type: "+ch.getChannel_Type_Name()+" Channel\nFilter(s) in use: "+ch.getLang_Filter();
 						}
@@ -107,7 +104,6 @@ public class Display implements Command{
 							out += ", "+ch.getLang_Filter();
 						}
 					}
-					Azrael.clearChannelsArray();
 					e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No channel has been registered!").build()).queue();
 				}
 				else{
@@ -115,7 +111,7 @@ public class Display implements Command{
 				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -dailies")){
-				for(Dailies daily : RankingSystem.SQLgetDailiesAndType()){
+				for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id)){
 					out+= daily.getDescription()+"\nWeight: "+daily.getWeight()+"\n\n";
 				}
 				e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? "You can receive the following items through dailies:\n\n"+out : "No daily item has been registered!").build()).queue();
@@ -130,8 +126,6 @@ public class Display implements Command{
 	public void executed(boolean success, MessageReceivedEvent e) {
 		Logger logger = LoggerFactory.getLogger(Display.class);
 		logger.debug("{} has used Display command", e.getMember().getUser().getIdLong());
-		DiscordRoles.clearAllVariables();
-		Azrael.clearAllVariables();
 	}
 
 	@Override

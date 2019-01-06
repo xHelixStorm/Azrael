@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import core.Guilds;
 import core.Hashes;
+import fileManagement.FileSetting;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -66,7 +67,8 @@ public class RankingThreadExecution {
 			Timestamp reset = Timestamp.valueOf(tomorrowMidnight);
 			
 			if(user_details.getDailyReset() == null || reset.getTime() - user_details.getDailyReset().getTime() != 0){
-				RankingSystem.SQLDeleteDailyExperience(user_id);
+				if(RankingSystem.SQLDeleteDailyExperience(user_id, guild_id) == 0)
+					logger.error("RankingSystem.daily_experience couldn't be cleared from {} in guild {}", user_id, guild_id);
 				daily_experience = 0;
 			}
 			
@@ -75,7 +77,7 @@ public class RankingThreadExecution {
 				ExperienceGain(e, user_details,  guild_settings, currentExperience, experience, daily_experience, roleAssignLevel, max_experience_enabled, reset);
 				if(daily_experience > max_experience*multiplier){
 					logger.info("{} has reached the limit of today's max experience points gain", e.getMember().getUser().getId());
-					RankingSystem.SQLInsertActionLog("medium", user_id, "Experience limit reached", "User reached the limit of experience points");
+					RankingSystem.SQLInsertActionLog("medium", user_id, guild_id, "Experience limit reached", "User reached the limit of experience points");
 					PrivateChannel pc = e.getMember().getUser().openPrivateChannel().complete();
 					pc.sendMessage("You have reached the max possible to gain experience today. More experience points can be collected tomorrow!").queue();
 					pc.close();
@@ -96,9 +98,9 @@ public class RankingThreadExecution {
 		if(currentExperience >= rankUpExperience && level < max_level){
 			level += 1;
 			currentExperience -= rankUpExperience;
-			currency += Hashes.getRankingLevels(level).getCurrency();
+			currency += Hashes.getRankingLevels(e.getGuild().getId()+"_"+level).getCurrency();
 			if(level != max_level){
-				rankUpExperience = Hashes.getRankingLevels(level).getExperience() - Hashes.getRankingLevels(level-1).getExperience();
+				rankUpExperience = Hashes.getRankingLevels(e.getGuild().getId()+"_"+level).getExperience() - Hashes.getRankingLevels(e.getGuild().getId()+"_"+(level-1)).getExperience();
 			}
 			else{
 				rankUpExperience = 0;
@@ -127,31 +129,47 @@ public class RankingThreadExecution {
 				user_details.setCurrentRole(current_role);
 			}
 			
+			var editedRows = 0;
 			if(max_experience_enabled == true){
 				user_details.setDailyExperience(daily_experience);
 				user_details.setDailyReset(reset);
-				RankingSystem.SQLInsertDailyExperience(daily_experience, user_details.getUser_ID(), user_details.getDailyReset());
+				editedRows = RankingSystem.SQLInsertDailyExperience(daily_experience, user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getDailyReset());
 			}
 			
-			RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole());
-			logger.info("{} reached level {}, has {} experience and {} daily experience", user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getDailyExperience());
-			RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), "Level Up", "User reached level "+level);
-			RankingMethods.getRankUp(e, level, user_details.getRankingLevel(), user_details.getRankingIcon(), user_details.getColorRLevel(), user_details.getColorGLevel(), user_details.getColorBLevel(), user_details.getRankXLevel(), user_details.getRankYLevel(), user_details.getRankWidthLevel(), user_details.getRankHeightLevel());
-			Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
+			if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole()) > 0) {
+				FileSetting.appendFile("./log/rankingdetails.txt", "["+new Timestamp(System.currentTimeMillis())+"] "+user_details.getUser_ID()+" reached level "+user_details.getLevel()+", has "+user_details.getExperience()+" experience and "+user_details.getDailyExperience()+" daily experience from guild "+e.getGuild().getIdLong()+"\n");
+				RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Level Up", "User reached level "+level);
+				RankingMethods.getRankUp(e, level, user_details.getRankingLevel(), user_details.getRankingIcon(), user_details.getColorRLevel(), user_details.getColorGLevel(), user_details.getColorBLevel(), user_details.getRankXLevel(), user_details.getRankYLevel(), user_details.getRankWidthLevel(), user_details.getRankHeightLevel());
+				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
+			}
+			else {
+				logger.error("RankingSystem.user_details table couldn't be updated with the latest experience and level information for the user {}", user_details.getUser_ID());
+			}
+			if(max_experience_enabled == true && editedRows == 0) {
+				logger.error("RankingSystem.daily_experience table couldn't be updated with the latest experience information for the user {}", user_details.getUser_ID());
+			}
 		}
 		else{
 			user_details.setCurrentExperience(currentExperience);
 			user_details.setExperience(experience);
 			
+			var editedRows = 0;
 			if(max_experience_enabled == true){
 				user_details.setDailyExperience(daily_experience);
 				user_details.setDailyReset(reset);
-				RankingSystem.SQLInsertDailyExperience(daily_experience, user_details.getUser_ID(), user_details.getDailyReset());
+				editedRows = RankingSystem.SQLInsertDailyExperience(daily_experience, user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getDailyReset());
 			}
 			
-			RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), user_details.getExperience());
-			logger.info("{} reached level {}, has {} experience and {} daily experience", user_details.getUser_ID(), user_details.getLevel(), user_details.getExperience(), user_details.getDailyExperience());
-			Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
+			if(RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getExperience()) > 0) {
+				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
+				FileSetting.appendFile("./log/rankingdetails.txt", "["+new Timestamp(System.currentTimeMillis())+"] "+user_details.getUser_ID()+" reached level "+user_details.getLevel()+", has "+user_details.getExperience()+" experience and "+user_details.getDailyExperience()+" daily experience from guild "+e.getGuild().getIdLong()+"\n");
+			}
+			else {
+				logger.error("Experience points for the user {} in the guild {} couldn't be updated in the table RankingSystem.user_details", e.getMember().getUser().getId(), e.getGuild().getName());
+			}
+			if(max_experience_enabled == true && editedRows == 0) {
+				logger.error("RankingSystem.daily_experience table couldn't be updated with the latest experience information for the user {}", user_details.getUser_ID());
+			}
 		}
 	}
 }

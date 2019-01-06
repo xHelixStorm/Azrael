@@ -13,7 +13,7 @@ import sql.RankingSystem;
 public class ShopExecution {	
 	public static void displayWholeShop(MessageReceivedEvent _e, String _level_description, String _rank_description, String _profile_description, String _icon_description){
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail()).setTitle("Welcome to my shop!");
-		List<Skins> shopContent = RankingSystem.SQLgetSkinshopContentAndType();
+		List<Skins> shopContent = RankingSystem.SQLgetSkinshopContentAndType(_e.getGuild().getIdLong());
 		List<Skins> levelContent = shopContent.parallelStream().filter(e -> e.getSkinType().equals("lev")).collect(Collectors.toList());
 		List<Skins> rankContent = shopContent.parallelStream().filter(e -> e.getSkinType().equals("ran")).collect(Collectors.toList());
 		List<Skins> profileContent = shopContent.parallelStream().filter(e -> e.getSkinType().equals("pro")).collect(Collectors.toList());
@@ -27,11 +27,9 @@ public class ShopExecution {
 			String price;
 			if(skin_info.getShopDescription().equals(_level_description)){price = "DEFAULT";}
 			else{price = skin_info.getPrice()+" PEN";}
-			RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), skin_info.getItemID());
-			if(RankingSystem.getItemID() != 0){price = "PURCHASED";}
+			if(RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), _e.getGuild().getIdLong(), skin_info.getItemID()) != 0){price = "PURCHASED";}
 			builder.append("*_"+skin_info.getShopDescription()+"_*\n");
 			priceBuilder.append("*_"+price+"_*\n");
-			RankingSystem.setItemID(0);
 		}
 		message.addField(levelContent.get(0).getSkinDescription(), "***Look here for all Level Up skins that appear when you level up!***", false);
 		message.addField("Description", builder.toString(), true);
@@ -43,11 +41,9 @@ public class ShopExecution {
 			String price;
 			if(skin_info.getShopDescription().equals(_rank_description)){price = "DEFAULT";}
 			else{price = skin_info.getPrice()+" PEN";}
-			RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), skin_info.getItemID());
-			if(RankingSystem.getItemID() != 0){price = "PURCHASED";}
+			if(RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), _e.getGuild().getIdLong(), skin_info.getItemID()) != 0){price = "PURCHASED";}
 			builder.append("*_"+skin_info.getShopDescription()+"_*\n");
 			priceBuilder.append("*_"+price+"_*\n");
-			RankingSystem.setItemID(0);
 		}
 		message.addField(rankContent.get(0).getSkinDescription(), "***Look here for all Rank skins for the command "+IniFileReader.getCommandPrefix()+"rank!***", false);
 		message.addField("Description", builder.toString(), true);
@@ -59,11 +55,9 @@ public class ShopExecution {
 			String price;
 			if(skin_info.getShopDescription().equals(_profile_description)){price = "DEFAULT";}
 			else{price = skin_info.getPrice()+" PEN";}
-			RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), skin_info.getItemID());
-			if(RankingSystem.getItemID() != 0){price = "PURCHASED";}
+			if(RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), _e.getGuild().getIdLong(), skin_info.getItemID()) != 0){price = "PURCHASED";}
 			builder.append("*_"+skin_info.getShopDescription()+"_*\n");
 			priceBuilder.append("*_"+price+"_*\n");
-			RankingSystem.setItemID(0);
 		}
 		message.addField(profileContent.get(0).getSkinDescription(), "***Look here for all Profile skins for the command "+IniFileReader.getCommandPrefix()+"profile!***", false);
 		message.addField("Description", builder.toString(), true);
@@ -75,11 +69,9 @@ public class ShopExecution {
 			String price;
 			if(skin_info.getShopDescription().equals(_icon_description)){price = "DEFAULT";}
 			else{price = skin_info.getPrice()+" PEN";}
-			RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), skin_info.getItemID());
-			if(RankingSystem.getItemID() != 0){price = "PURCHASED";}
+			if(RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), _e.getGuild().getIdLong(), skin_info.getItemID()) != 0){price = "PURCHASED";}
 			builder.append("*_"+skin_info.getShopDescription()+"_*\n");
 			priceBuilder.append("*_"+price+"_*\n");
-			RankingSystem.setItemID(0);
 		}
 		message.addField(iconsContent.get(0).getSkinDescription(), "***Look here for all special icons that will be displayed on the rank and profile command!***", false);
 		message.addField("Description", builder.toString(), true);
@@ -89,10 +81,8 @@ public class ShopExecution {
 		
 		for(Skins skin_info : itemContent){
 			String price = skin_info.getPrice()+" PEN";
-			RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), skin_info.getItemID());
 			builder.append("*_"+skin_info.getShopDescription()+"_*\n");
 			priceBuilder.append("*_"+price+"_*\n");
-			RankingSystem.setItemID(0);
 		}
 		message.addField(itemContent.get(0).getSkinDescription(), "***Look here to have a look at our available items!***", false);
 		message.addField("Description", builder.toString(), true);
@@ -101,12 +91,11 @@ public class ShopExecution {
 		priceBuilder.setLength(0);
 		
 		_e.getTextChannel().sendMessage(message.build()).queue();
-		RankingSystem.clearAllVariables();
 	}
 	
 	public static void displayPartOfShop(MessageReceivedEvent _e, String _type, String _description){
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail()).setTitle("Welcome to my shop!");
-		List<Skins> shopContent = RankingSystem.SQLgetSkinshopContentAndType();
+		List<Skins> shopContent = RankingSystem.SQLgetSkinshopContentAndType(_e.getGuild().getIdLong());
 		List<Skins> filteredContent = shopContent.parallelStream().filter(e -> e.getSkinType().equals(_type)).collect(Collectors.toList());
 		StringBuilder builder = new StringBuilder();
 		StringBuilder priceBuilder = new StringBuilder();
@@ -115,17 +104,14 @@ public class ShopExecution {
 			String price;
 			if(skin_info.getShopDescription().equals(_description)){price = "DEFAULT";}
 			else{price = skin_info.getPrice()+" PEN";}
-			RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), skin_info.getItemID());
-			if(RankingSystem.getItemID() != 0){price = "PURCHASED";}
+			if(RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), _e.getGuild().getIdLong(), skin_info.getItemID()) != 0){price = "PURCHASED";}
 			builder.append("*_"+skin_info.getShopDescription()+"_*\n");
 			priceBuilder.append("*_"+price+"_*\n");
-			RankingSystem.setItemID(0);
 		}
 		message.addField(filteredContent.get(0).getSkinDescription(), "***Here the requested stock!***", false);
 		message.addField("Description", builder.toString(), true);
 		message.addField("Price", priceBuilder.toString(), true);
 		
 		_e.getTextChannel().sendMessage(message.build()).queue();
-		RankingSystem.clearAllVariables();
 	}
 }

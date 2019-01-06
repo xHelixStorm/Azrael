@@ -30,19 +30,19 @@ public class Inventory implements Command{
 				logger.debug("{} has used Inventory command", e.getMember().getUser().getId());
 				
 				if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
-					Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
-					if(Azrael.getChannelID() == e.getTextChannel().getIdLong() || Azrael.getChannelID() == 0){
+					var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
+					if(bot_channel == e.getTextChannel().getIdLong() || bot_channel == 0){
 						//project will be enhanced with more options in the future (e.g distinction of displaying items, weapons, all or kind of weapons. for now only items)
 						if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"inventory -list")){
 							String out = "";
-							for(InventoryContent inventory : RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong())){
+							for(InventoryContent inventory : RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())){
 								out+= inventory.getDescription()+"\n";
 							}
 							e.getTextChannel().sendMessage("```"+out+"```").queue();
 						}
 						else{
 							int limit = 0;
-							int itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong());
+							int itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 							if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"inventory -page ")){
 								try {
 									limit = Integer.parseInt(e.getMessage().getContentRaw().replaceAll("[^0-9]", ""))-1;
@@ -54,11 +54,11 @@ public class Inventory implements Command{
 								}
 							}
 							e.getTextChannel().sendMessage("to have everything on one page, use the **-list** parameter together with the command!\nAdditionally, you can visualize the desired page with the **-page** paramenter.").queue();
-							InventoryBuilder.DrawInventory(e, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), limit), limit/12+1, itemNumber+1);
+							InventoryBuilder.DrawInventory(e, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
 						}
 					}
 					else{
-						e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+Azrael.getChannelID()+">").queue();
+						e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+bot_channel+">").queue();
 						logger.warn("Inventory command used in a not bot channel");
 					}
 				}
@@ -72,7 +72,7 @@ public class Inventory implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Azrael.clearAllVariables();
+		
 	}
 
 	@Override

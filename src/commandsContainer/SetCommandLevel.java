@@ -33,10 +33,15 @@ public class SetCommandLevel {
 		}
 		
 		if(wrongInput == false){
-			Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), level);
 			Logger logger = LoggerFactory.getLogger(SetCommandLevel.class);
-			logger.debug("{} has changed the command level to {} in guild {}", _e.getMember().getUser().getId(), level, _e.getGuild().getName());
-			_e.getTextChannel().sendMessage(message).queue();
+			if(Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), level) > 0) {
+				logger.debug("{} has changed the command level to {} in guild {}", _e.getMember().getUser().getId(), level, _e.getGuild().getName());
+				_e.getTextChannel().sendMessage(message).queue();
+			}
+			else {
+				logger.error("The execution id for guild {} couldn't be updated on table Azrael.commands", _e.getGuild().getName());
+				_e.getTextChannel().sendMessage("An internal error occurred.The execution id couldn't be set or updated in Azrael.commands").queue();
+			}
 		}
 		else{
 			_e.getTextChannel().sendMessage(message).queue();

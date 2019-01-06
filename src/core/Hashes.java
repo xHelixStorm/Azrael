@@ -24,7 +24,7 @@ public class Hashes {
         }
     };
     private static final int max_ranking_pool_size = 500;
-    private static final LinkedHashMap<Long, Rank> ranking = new LinkedHashMap<Long, Rank>(){
+    private static final LinkedHashMap<String, Rank> ranking = new LinkedHashMap<String, Rank>(){
 		private static final long serialVersionUID = 7054847678737381845L;
 		@Override
 		@SuppressWarnings("rawtypes")
@@ -38,7 +38,7 @@ public class Hashes {
     private static final Map<Long, Integer> message_removed = new HashMap<Long, Integer>();
     private static final Map<Long, Guilds> status = new HashMap<Long, Guilds>();
     private static final Map<String, Rank> ranking_roles = new HashMap<String, Rank>();
-    private static final Map<Integer, Ranks> ranking_levels = new HashMap<Integer, Ranks>();
+    private static final Map<String, Ranks> ranking_levels = new HashMap<String, Ranks>();
     private static final Map<String, Roles> roles = new HashMap<String, Roles>();
     private static final Map<Long, Long> reaction_message = new HashMap<Long, Long>();
     private static final Map<Integer, Quizes> quiz = new HashMap<Integer, Quizes>();
@@ -46,6 +46,8 @@ public class Hashes {
     private static final Map<String, ArrayList<Rank>> rankList = new HashMap<String, ArrayList<Rank>>();
     private static final Map<String, ArrayList<Skins>> shopContent = new HashMap<String, ArrayList<Skins>>();
     private static final Map<String, ArrayList<Dailies>> daily_items = new HashMap<String, ArrayList<Dailies>>();
+    private static final Map<Long, Roles> discordRoles = new HashMap<Long, Roles>();
+    private static final Map<Long, ArrayList<RSS>> feeds = new HashMap<Long, ArrayList<RSS>>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -62,13 +64,13 @@ public class Hashes {
 	public static void addStatus(Long _key, Guilds _status){
 		status.put(_key, _status);
 	}
-	public static void addRanking(Long _key, Rank _details){
+	public static void addRanking(String _key, Rank _details){
 		ranking.put(_key, _details);
 	}
 	public static void addRankingRoles(String _key, Rank _details){
 		ranking_roles.put(_key, _details);
 	}
-	public static void addRankingLevels(Integer _key, Ranks _levels){
+	public static void addRankingLevels(String _key, Ranks _levels){
 		ranking_levels.put(_key, _levels);
 	}
 	public static void addRoles(String _key, Roles _roles) {
@@ -92,6 +94,12 @@ public class Hashes {
 	public static void addDailyItems(String _key, ArrayList<Dailies> _daily_items) {
 		daily_items.put(_key, _daily_items);
 	}
+	public static void addDiscordRole(Long _key, Roles _role) {
+		discordRoles.put(_key, _role);
+	}
+	public static void addFeeds(Long _key, ArrayList<RSS> _feeds) {
+		feeds.put(_key, _feeds);
+	}
 	
 	public static Messages getMessagePool(long _message_id) {
 		return message_pool.get(_message_id);
@@ -111,7 +119,7 @@ public class Hashes {
 	public static Guilds getStatus(long _key){
 		return status.get(_key);
 	}
-	public static Rank getRanking(long _key){
+	public static Rank getRanking(String _key){
 		return ranking.get(_key);
 	}
 	public static Rank getRankingRoles(String _key){
@@ -120,10 +128,10 @@ public class Hashes {
 	public static Map<String, Rank> getMapOfRankingRoles(){
 		return ranking_roles;
 	}
-	public static Map<Integer, Ranks> getMapOfRankingLevels(){
+	public static Map<String, Ranks> getMapOfRankingLevels(){
 		return ranking_levels;
 	}
-	public static Ranks getRankingLevels(int _key){
+	public static Ranks getRankingLevels(String _key){
 		return ranking_levels.get(_key);
 	}
 	public static Roles getRoles(String _key) {
@@ -150,6 +158,12 @@ public class Hashes {
 	public static ArrayList<Dailies> getDailyItems(String _key){
 		return daily_items.get(_key);
 	}
+	public static Roles getDiscordRole(Long _key) {
+		return discordRoles.get(_key);
+	}
+	public static ArrayList<RSS> getFeed(Long _key) {
+		return feeds.get(_key);
+	}
 	
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
@@ -160,7 +174,7 @@ public class Hashes {
 	public static void removeMessageRemoved(long _key){
 		message_removed.remove(_key);
 	}
-	public static void removeRanking(long _key){
+	public static void removeRanking(String _key){
 		ranking.remove(_key);
 	}
 	public static void removeRoles() {
@@ -198,5 +212,11 @@ public class Hashes {
 	}
 	public static void clearDailyItems() {
 		daily_items.clear();
+	}
+	public static void clearDiscordRoles() {
+		discordRoles.clear();
+	}
+	public static void clearFeeds() {
+		feeds.clear();
 	}
 }

@@ -28,8 +28,7 @@ public class Commands implements Command{
 			
 			long guild_id = e.getGuild().getIdLong();
 			long channel = e.getTextChannel().getIdLong();
-			Azrael.SQLgetChannelID(guild_id, "bot");
-			long channel_id = Azrael.getChannelID();
+			long channel_id = Azrael.SQLgetChannelID(guild_id, "bot");
 			
 			if(channel != channel_id && channel_id != 0){
 				e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+channel_id+">").queue();
@@ -43,7 +42,7 @@ public class Commands implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Azrael.clearAllVariables();
+		
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import core.Hashes;
 import fileManagement.IniFileReader;
 import inventory.Dailies;
 import inventory.DrawDaily;
+import inventory.InventoryContent;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -53,23 +54,22 @@ public class Daily implements Command{
 				
 				ExecutorService executor = Executors.newSingleThreadExecutor();
 				executor.execute(() -> {
-					Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
-					if(Azrael.getChannelID() == e.getTextChannel().getIdLong() || Azrael.getChannelID() == 0){
-						RankingSystem.SQLgetDailiesUsage(e.getMember().getUser().getIdLong());
+					var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
+					if(bot_channel == e.getTextChannel().getIdLong() || bot_channel == 0){
 						long time_for_daily = 0;
 						try {
-							time_for_daily = RankingSystem.getNextDaily().getTime()-System.currentTimeMillis();
+							time_for_daily = RankingSystem.SQLgetDailiesUsage(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong()).getTime()-System.currentTimeMillis();
 						} catch(NullPointerException npe){
 							time_for_daily = -1;
 						}
 						if(time_for_daily < 0){
 							// confirm if there are any available rewards to send in private message
-							String cod_reward = RankingSystem.SQLRetrieveGiveawayReward();
+							String cod_reward = RankingSystem.SQLRetrieveGiveawayReward(e.getGuild().getIdLong());
 							boolean exclude_cod = false;
 							if(cod_reward.length() == 0)
 								exclude_cod = true;
 							//
-							List<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType();
+							List<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong());
 							var tot_weight = 0;
 							if(exclude_cod == true) {
 								tot_weight = daily_items.parallelStream().filter(i -> !i.getType().equals("cod")).mapToInt(i -> i.getWeight()).sum();
@@ -102,26 +102,29 @@ public class Daily implements Command{
 							Timestamp timestamp2 = Timestamp.valueOf(tomorrowMidnight);
 							var editedRows = 0;
 							if(list.get(random).getType().equals("cur")){
-								rankingSystem.Rank user_details = Hashes.getRanking(e.getMember().getUser().getIdLong());
+								rankingSystem.Rank user_details = Hashes.getRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong());
 								user_details.setCurrency(user_details.getCurrency()+Long.parseLong(list.get(random).getDescription().replaceAll("[^0-9]*", "")));
-								editedRows = RankingSystem.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), user_details.getCurrency());
+								editedRows = RankingSystem.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency());
 								if(editedRows > 0)
-									Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
+									Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 							}
 							else if(list.get(random).getType().equals("exp")){
-								var item_id = RankingSystem.SQLgetSkinshopContentAndType().parallelStream().filter(i -> i.getShopDescription().equals(list.get(random).getDescription())).findAny().orElse(null).getItemID();
+								var item_id = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong()).parallelStream().filter(i -> i.getShopDescription().equals(list.get(random).getDescription())).findAny().orElse(null).getItemID();
 								if(list.get(random).getAction().equals("keep")){
-									RankingSystem.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), list.get(random).getDescription(), "perm");
-									editedRows = RankingSystem.SQLInsertInventory(e.getMember().getUser().getIdLong(), item_id, timestamp, RankingSystem.getNumber()+1, "perm");
+									InventoryContent inventory = RankingSystem.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), list.get(random).getDescription(), "perm");
+									if(inventory != null)
+										editedRows = RankingSystem.SQLInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, inventory.getNumber()+1, "perm");
+									else
+										editedRows = RankingSystem.SQLInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, 1, "perm");
 								}
 								else if(list.get(random).getAction().equals("use")){
-									RankingSystem.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), list.get(random).getDescription(), "limit");
+									InventoryContent inventory = RankingSystem.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), list.get(random).getDescription(), "limit");
 									try {
-										Timestamp timestamp3 = new Timestamp(RankingSystem.getExpiration().getTime()+1000*60*60*24);
-										editedRows = RankingSystem.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), item_id, timestamp, RankingSystem.getNumber()+1, "limit", timestamp3);
+										Timestamp timestamp3 = new Timestamp(inventory.getExpiration().getTime()+1000*60*60*24);
+										editedRows = RankingSystem.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, inventory.getNumber()+1, "limit", timestamp3);
 									} catch(NullPointerException npe){
 										Timestamp timestamp4 = new Timestamp(time+1000*60*60*24);
-										editedRows = RankingSystem.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), item_id, timestamp, RankingSystem.getNumber()+1, "limit", timestamp4);
+										editedRows = RankingSystem.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, 1, "limit", timestamp4);
 									}
 								}
 							}
@@ -132,24 +135,29 @@ public class Daily implements Command{
 								pc.close();
 								
 								//log the reward in bot channel
-								Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "log");
-								if(Azrael.getChannelID() != 0) {
+								var log_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "log");
+								if(log_channel != 0) {
 									EmbedBuilder message = new EmbedBuilder().setColor(Color.getHSBColor(268, 81, 88)).setTitle("Reward was sent to user!");
-									e.getGuild().getTextChannelById(Azrael.getChannelID()).sendMessage(message.setDescription("The user "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" has received a rare reward from the daily commands. This is the reward:\n"+cod_reward).build()).queue();
+									e.getGuild().getTextChannelById(log_channel).sendMessage(message.setDescription("The user "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" has received a rare reward from the daily commands. This is the reward:\n"+cod_reward).build()).queue();
 								}
 								
 								//mark the code as used
-								editedRows = RankingSystem.SQLUpdateUsedOnReward(cod_reward);
+								editedRows = RankingSystem.SQLUpdateUsedOnReward(cod_reward, e.getGuild().getIdLong());
 							}
 							if(editedRows > 0) {
-								RankingSystem.SQLInsertDailiesUsage(e.getMember().getUser().getIdLong(), timestamp, timestamp2);
-								logger.debug("{} received {} out of the Daily command", e.getMember().getUser().getId(), list.get(random).getDescription());
-								RankingSystem.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), "Daily retrieved", list.get(random).getDescription());
+								if(RankingSystem.SQLInsertDailiesUsage(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), timestamp, timestamp2) > 0) {
+									logger.debug("{} received {} out of the Daily command", e.getMember().getUser().getId(), list.get(random).getDescription());
+									RankingSystem.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily retrieved", list.get(random).getDescription());
+								}
+								else {
+									logger.error("used dailies from {} couldn't be marked in RankingSystem.dailies_usage table", e.getMember().getUser().getId());
+									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily retrieval not marked", list.get(random).getDescription());
+								}
 							}
 							else {
 								e.getTextChannel().sendMessage("Internal error occurred! Daily item couldn't be inserted into your inventory. Please contact an administrator!").queue();
 								logger.warn("{} couldn't be inserted into inventory", list.get(random).getDescription());
-								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Daily item couldn't be inserted to inventory", "An insert error occurred for the following item "+list.get(random).getDescription());
+								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily item couldn't be inserted to inventory", "An insert error occurred for the following item "+list.get(random).getDescription());
 							}
 							list.clear();
 						}
@@ -160,7 +168,7 @@ public class Daily implements Command{
 						}
 					}
 					else{
-						e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+Azrael.getChannelID()+">").queue();
+						e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+bot_channel+">").queue();
 						logger.warn("Daily command has been used in a not bot channel");
 					}
 				});
@@ -171,8 +179,7 @@ public class Daily implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		RankingSystem.clearAllVariables();
-		Azrael.clearAllVariables();
+		
 	}
 
 	@Override

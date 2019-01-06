@@ -6,8 +6,9 @@ import java.sql.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Hashes;
+import core.Bancollect;
 import core.UserPrivs;
+import core.Warning;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -16,6 +17,7 @@ import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.core.exceptions.HierarchyException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import rankingSystem.Rank;
 import sql.RankingSystem;
 import sql.DiscordRoles;
 import sql.Azrael;
@@ -27,7 +29,6 @@ public class RoleListener extends ListenerAdapter{
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent e){
 		final Logger logger = LoggerFactory.getLogger(RoleListener.class);
 		
-		RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong());
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setTitle("A user has been muted!");
 		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN).setTitle("Mute Retracted!");
 		
@@ -41,26 +42,24 @@ public class RoleListener extends ListenerAdapter{
 		double unmute;
 		
 		if(UserPrivs.isUserMuted(e.getMember().getUser(), e.getGuild().getIdLong())){
-			Azrael.SQLgetChannelID(guild_id, "log");
-			channel_id = Azrael.getChannelID();
-			Azrael.SQLgetData(user_id, guild_id);
+			channel_id = Azrael.SQLgetChannelID(guild_id, "log");
+			Bancollect warnedUser = Azrael.SQLgetData(user_id, guild_id);
 			long unmute_time = 0;
 			try {
-				if(Azrael.getUnmute().getTime() != 0) {
-					unmute_time = Azrael.getUnmute().getTime();
+				if(warnedUser.getUnmute().getTime() != 0) {
+					unmute_time = warnedUser.getUnmute().getTime();
 				}
 			} catch(NullPointerException npe) {
 				unmute_time = -1;
 			}
-			if(unmute_time - System.currentTimeMillis() > 0 && Azrael.getCustomTime() == false){
+			if(unmute_time - System.currentTimeMillis() > 0 && warnedUser.getCustomTime() == false){
 				if(channel_id != 0){
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned before the mute time elapsed! Reason may be due to rejoining or manual role reassignment!").build()).queue();
 				}
 			}
 			else{
-				DiscordRoles.SQLgetRole(guild_id, "mut");
-				mute_id = DiscordRoles.getRole_ID();
+				mute_id = DiscordRoles.SQLgetRole(guild_id, "mut");
 				try {
 					for(Role r : e.getMember().getRoles()){
 						if(r.getIdLong() != mute_id){
@@ -69,14 +68,18 @@ public class RoleListener extends ListenerAdapter{
 					}
 					
 					long time = System.currentTimeMillis();
-					int warning_id=Azrael.getWarningID();
+					int warning_id = warnedUser.getWarningID();
 					long assignedRole = 0;
-					if(Hashes.getRanking(user_id) != null){
-						assignedRole = Hashes.getRanking(user_id).getCurrentRole();
+					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
+					if(user_details != null){
+						assignedRole = user_details.getCurrentRole();
 					}
 					
-					if(Azrael.getCustomTime()) {
-						Azrael.SQLUpdateMuted(e.getUser().getIdLong(), e.getGuild().getIdLong(), true, true);;
+					if(warnedUser.getCustomTime()) {
+						if(Azrael.SQLUpdateMuted(e.getUser().getIdLong(), e.getGuild().getIdLong(), true, true) == 0) {
+							logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getName());
+							if(channel_id != 0)e.getGuild().getTextChannelById(channel_id).sendMessage("An internal error occurred. The mute state couldn't be updated in table Azrael.bancollect").queue();
+						}
 						mute_time = Long.parseLong(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/mute_time_"+e.getMember().getUser().getId()));
 						long hours = (mute_time/1000/60/60);
 						long minutes = (mute_time/1000/60%60);
@@ -93,9 +96,9 @@ public class RoleListener extends ListenerAdapter{
 						FileSetting.deleteFile(IniFileReader.getTempDirectory()+"AutoDelFiles/mute_time_"+e.getMember().getUser().getId());
 					}
 					else {
-						Azrael.SQLgetWarning(e.getGuild().getIdLong(), (warning_id+1));
-						mute_time = (long) Azrael.getTimer();
-						unmute = Azrael.getTimer();
+						Warning warn = Azrael.SQLgetWarning(e.getGuild().getIdLong(), (warning_id+1));
+						mute_time = (long) warn.getTimer();
+						unmute = warn.getTimer();
 						long hours = (long) (unmute/1000/60/60);
 						long minutes = (long) (unmute/1000/60%60);
 						String hour_add = hours != 0 ? hours+" hours" : "";
@@ -104,12 +107,14 @@ public class RoleListener extends ListenerAdapter{
 						Timestamp timestamp = new Timestamp(time);
 						Timestamp unmute_timestamp = new Timestamp(time+mute_time);
 						
-						Azrael.SQLgetMaxWarning(e.getGuild().getIdLong());
-						int max_warning = Azrael.getWarningID();
+						int max_warning = Azrael.SQLgetMaxWarning(e.getGuild().getIdLong());
 						if((warning_id+1) <= max_warning) {
-							Azrael.SQLInsertData(user_id, guild_id, (warning_id+1), 1, timestamp, unmute_timestamp, true, false);
+							if(Azrael.SQLInsertData(user_id, guild_id, (warning_id+1), 1, timestamp, unmute_timestamp, true, false) == 0) {
+								logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
+								if(channel_id != 0)e.getGuild().getTextChannelById(channel_id).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
+							}
 							PrivateChannel pc = e.getUser().openPrivateChannel().complete();
-							pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+hour_add+and_add+minute_add+"** for being your "+Azrael.getDescription()+". Warning **"+(warning_id+1)+"**/**"+max_warning+"**\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
+							pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+hour_add+and_add+minute_add+"** for being your "+warn.getDescription()+". Warning **"+(warning_id+1)+"**/**"+max_warning+"**\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
 									+ "On a important note, this is an automated reply. You'll receive no reply in any way.").queue();
 							pc.close();
 							new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, channel_id, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning)).start();
@@ -136,10 +141,6 @@ public class RoleListener extends ListenerAdapter{
 			if(unmute_time - System.currentTimeMillis() < 0){
 				Azrael.SQLInsertActionLog("MEMBER_MUTE_ADD", user_id, guild_id, "User Muted");
 			}
-			DiscordRoles.clearAllVariables();
-			Azrael.clearAllVariables();
-			Azrael.clearUnmute();
-			Azrael.clearTimestamp();
 		}
 	}
 }

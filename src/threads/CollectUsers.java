@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import sql.RankingSystem;
 import sql.Azrael;
 
 public class CollectUsers implements Runnable{
@@ -25,6 +24,5 @@ public class CollectUsers implements Runnable{
 		Logger logger = LoggerFactory.getLogger(CollectUsers.class);
 		logger.debug("{} has registered all users from the guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 		e.getTextChannel().sendMessage(message.setDescription("User registration is complete!").build()).queue();
-		RankingSystem.clearAllVariables();
 	}
 }

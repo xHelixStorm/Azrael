@@ -48,8 +48,7 @@ public class Rank implements Command{
 					String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_rank.azr";
 					File file = new File(fileName);
 					
-					RankingSystem.SQLgetWholeRankView(user_id);
-					rankingSystem.Rank user_details = Hashes.getRanking(user_id);
+					rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
 					
 					if(Hashes.getStatus(guild_id).getRankingState()){				
 						if(!file.exists()){
@@ -90,7 +89,7 @@ public class Rank implements Command{
 								convertedExperience = 100;
 							}
 							
-							ArrayList<rankingSystem.Rank> rankList = RankingSystem.SQLRanking();
+							ArrayList<rankingSystem.Rank> rankList = RankingSystem.SQLRanking(guild_id);
 							if(rankList.size() > 0) {
 								search: for(rankingSystem.Rank ranking : rankList){
 									if(user_id == ranking.getUser_ID()){
@@ -106,7 +105,7 @@ public class Rank implements Command{
 							else {
 								EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
 								e.getTextChannel().sendMessage(error.setDescription("An error occured on use. Please contact an administrator or moderator!").build()).queue();
-								RankingSystem.SQLInsertActionLog("critical", user_id, "negative experience value", "The user has less experience points in proportion to his level: "+currentExperience);
+								RankingSystem.SQLInsertActionLog("critical", user_id, guild_id, "negative experience value", "The user has less experience points in proportion to his level: "+currentExperience);
 							}
 						}
 						else{

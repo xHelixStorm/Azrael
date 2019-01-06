@@ -23,6 +23,7 @@ public class RegisterRankingRole {
 	}
 	
 	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String _message){
+		Logger logger = LoggerFactory.getLogger(RegisterRankingRole.class);
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied");
 		long guild_id = _e.getGuild().getIdLong();
 		String message = _e.getMessage().getContentRaw();
@@ -33,9 +34,14 @@ public class RegisterRankingRole {
 		
 		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()){
 			if(message.equals(IniFileReader.getCommandPrefix()+"register -ranking-role -clear")) {
-				RankingSystem.SQLclearRoles(guild_id);
-				Hashes.removeRankingRoles();
-				_e.getTextChannel().sendMessage("All registered ranking roles have been cleared from the database!").queue();
+				if(RankingSystem.SQLclearRoles(guild_id) > 0) {
+					Hashes.removeRankingRoles();
+					_e.getTextChannel().sendMessage("All registered ranking roles have been cleared from the database!").queue();
+				}
+				else {
+					logger.error("Roles couldn't be cleared from RankingSystem.roles table");
+					_e.getTextChannel().sendMessage("An internal error occurred. Roles couldn't be cleared from the RankingSystem.roles table").queue();
+				}
 			}
 			else {
 				Pattern pattern = Pattern.compile("[0-9]{18,18}");
@@ -56,15 +62,22 @@ public class RegisterRankingRole {
 					}
 					else{
 						if(RankingSystem.SQLInsertRoles(role_id, role_name, level_requirement, guild_id) > 0) {
-							Logger logger = LoggerFactory.getLogger(RegisterRankingRole.class);
 							logger.debug("{} has registered the ranking role {} with the level requirement {} in the guild {}", _e.getMember().getUser().getId(), role_name, level_requirement, _e.getGuild().getName());
 							_e.getTextChannel().sendMessage("**The role named "+role_name+" can now be unlocked by reaching level "+level_requirement+"**").queue();
-							RankingSystem.SQLgetRoles(guild_id);
-							RankingSystem.SQLgetLevels();
+							if(RankingSystem.SQLgetRoles(guild_id))
+								if(RankingSystem.SQLgetLevels(guild_id) == 0) {
+									logger.error("Levels for the ranking system from RankingSystem.level_list couldn't be retrieved and cached");
+									_e.getTextChannel().sendMessage("An internal error occurred. All levels for the ranking system couldn't be retrieved from the table RankingSystem.level_list").queue();
+								}
+							else {
+								logger.error("Roles from RankingSystem.roles couldn't be called and cached");
+								_e.getTextChannel().sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
+							}
 						}
 						else {
+							logger.error("role id {} couldn't be inserted into the table RankingSystem.roles for the guild {}", role_id, _e.getGuild().getName());
 							_e.getTextChannel().sendMessage("An internal error occurred. The role "+role_name+" with the role id "+role_id+" couldn't be inserted into RankingSystem.roles").queue();
-							RankingSystem.SQLInsertActionLog("High", role_id, "Role couldn't be registered as ranking role", "The role "+role_name+" couldn't be inserted into the RankingSystem.roles table");
+							RankingSystem.SQLInsertActionLog("High", role_id, guild_id, "Role couldn't be registered as ranking role", "The role "+role_name+" couldn't be inserted into the RankingSystem.roles table");
 						}
 					}
 				} catch(NullPointerException npe){

@@ -67,14 +67,13 @@ public class MessageRemovedListener extends ListenerAdapter{
 					Hashes.removeMessagePool(message_id);
 					if(trigger_user_id > 0) {
 						message.setTitle(trigger_user_name+" has removed a message from #"+e.getTextChannel().getName()+"!");
-						Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "tra");
 						if(removed_message.getMessage().length() > 0) {
-							if(Azrael.getChannelID() != 0){e.getGuild().getTextChannelById(Azrael.getChannelID()).sendMessage(message.setDescription("["+removed_message.getTime().toString()+" - "+removed_message.getUserName()+"]: "+removed_message.getMessage()).build()).queue();}
+							var tra_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "tra");
+							if(tra_channel != 0){e.getGuild().getTextChannelById(tra_channel).sendMessage(message.setDescription("["+removed_message.getTime().toString()+" - "+removed_message.getUserName()+"]: "+removed_message.getMessage()).build()).queue();}
 						}
 					}
 				}
 			}
 		}
-		Azrael.clearAllVariables();
 	}
 }

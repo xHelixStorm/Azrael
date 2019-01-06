@@ -24,18 +24,16 @@ public class Use implements Command{
 			Logger logger = LoggerFactory.getLogger(Use.class);
 			logger.debug("{} has used Use command", e.getMember().getUser().getId());
 			
-			RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong());
-			rankingSystem.Rank user_details = Hashes.getRanking(e.getMember().getUser().getIdLong());
+			rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState()){
-				Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
-				if(e.getTextChannel().getIdLong() == Azrael.getChannelID() || Azrael.getChannelID() == 0){
+				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
+				if(e.getTextChannel().getIdLong() == bot_channel || bot_channel == 0){
 					String input = e.getMessage().getContentRaw();
 					if(input.equals(IniFileReader.getCommandPrefix()+"use")){
 						e.getTextChannel().sendMessage("write the description of the item/skin together with this command to use it!\nTo reset your choice use either default-level, default-rank, default-profile or default-icons to reset your settings!").queue();
 					}
 					else if(input.equals(IniFileReader.getCommandPrefix()+"use default-level")){
-						RankingSystem.SQLgetRankingLevel();
-						rankingSystem.Rank rank = Hashes.getRankList("ranking-level").parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(Hashes.getStatus(e.getGuild().getIdLong()).getLevelDescription())).findAny().orElse(null);
+						rankingSystem.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(Hashes.getStatus(e.getGuild().getIdLong()).getLevelDescription())).findAny().orElse(null);
 						user_details.setRankingLevel(rank.getRankingLevel());
 						user_details.setLevelDescription(rank.getLevelDescription());
 						user_details.setColorRLevel(rank.getColorRLevel());
@@ -45,20 +43,19 @@ public class Use implements Command{
 						user_details.setRankYLevel(rank.getRankYLevel());
 						user_details.setRankWidthLevel(rank.getRankWidthLevel());
 						user_details.setRankHeightLevel(rank.getRankHeightLevel());
-						var editedRows = RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel());
-						if(editedRows > 0) {
-							Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
+						if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel()) > 0) {
+							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 							e.getTextChannel().sendMessage("Level skin has been resetted to the server default skin!").queue();
 						}
 						else {
 							//if rows didn't get updated, throw and error and write it into error log
 							e.getTextChannel().sendMessage("Level skin couldn't be resetted to the server default skin. Internal error, please contact an administrator!").queue();
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Level skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getLevelDescription());
+							logger.error("RankingSystem.users table couldn't be updated with the default level skin for {}", e.getMember().getUser().getId());
+							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getLevelDescription());
 						}
 					}
 					else if(input.equals(IniFileReader.getCommandPrefix()+"use default-rank")){
-						RankingSystem.SQLgetRankingRank();
-						rankingSystem.Rank rank = Hashes.getRankList("ranking-rank").parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(Hashes.getStatus(e.getGuild().getIdLong()).getRankDescription())).findAny().orElse(null);
+						rankingSystem.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(Hashes.getStatus(e.getGuild().getIdLong()).getRankDescription())).findAny().orElse(null);
 						user_details.setRankingRank(rank.getRankingRank());
 						user_details.setRankDescription(rank.getRankDescription());
 						user_details.setBarColorRank(rank.getBarColorRank());
@@ -70,20 +67,19 @@ public class Use implements Command{
 						user_details.setRankYRank(rank.getRankYRank());
 						user_details.setRankWidthRank(rank.getRankWidthRank());
 						user_details.setRankHeightRank(rank.getRankHeightRank());
-						var editedRows = RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank());
-						if(editedRows > 0) {
-							Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
+						if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank()) > 0) {
+							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 							e.getTextChannel().sendMessage("Rank skin has been resetted to the server default skin!").queue();
 						}
 						else {
 							//if rows didn't get updated, throw and error and write it into error log
 							e.getTextChannel().sendMessage("Rank skin couldn't be resetted to the server default skin. Internal error, please contact an administrator!").queue();
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Rank skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getRankDescription());
+							logger.error("RankingSystem.users table couldn't be updated with the default rank skin for {}", e.getMember().getUser().getId());
+							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getRankDescription());
 						}
 					}
 					else if(input.equals(IniFileReader.getCommandPrefix()+"use default-profile")){
-						RankingSystem.SQLgetRankingProfile();
-						rankingSystem.Rank rank = Hashes.getRankList("ranking-profile").parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(Hashes.getStatus(e.getGuild().getIdLong()).getProfileDescription())).findAny().orElse(null);
+						rankingSystem.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(Hashes.getStatus(e.getGuild().getIdLong()).getProfileDescription())).findAny().orElse(null);
 						user_details.setRankingProfile(rank.getRankingProfile());
 						user_details.setProfileDescription(rank.getProfileDescription());
 						user_details.setBarColorProfile(rank.getBarColorProfile());
@@ -95,41 +91,39 @@ public class Use implements Command{
 						user_details.setRankYProfile(rank.getRankYProfile());
 						user_details.setRankWidthProfile(rank.getRankWidthProfile());
 						user_details.setRankHeightProfile(rank.getRankHeightProfile());
-						var editedRows = RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile());
-						if(editedRows > 0) {
-							Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
+						if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile()) > 0) {
+							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 							e.getTextChannel().sendMessage("Profile skin has been resetted to the server default skin!").queue();
 						}
 						else {
 							//if rows didn't get updated, throw and error and write it into error log
 							e.getTextChannel().sendMessage("Profile skin couldn't be resetted to the server default skin. Internal error, please contact an administrator!").queue();
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Profile skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getProfileDescription());
+							logger.error("RankingSystem.users table couldn't be updated with the default profile skin for {}", e.getMember().getUser().getId());
+							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getProfileDescription());
 						}
 					}
 					else if(input.equals(IniFileReader.getCommandPrefix()+"use default-icons")){
-						RankingSystem.SQLgetRankingIcons();
-						rankingSystem.Rank rank = Hashes.getRankList("ranking-icons").parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(Hashes.getStatus(e.getGuild().getIdLong()).getIconDescription())).findAny().orElse(null);
+						rankingSystem.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(Hashes.getStatus(e.getGuild().getIdLong()).getIconDescription())).findAny().orElse(null);
 						user_details.setRankingIcon(rank.getRankingIcon());
 						user_details.setIconDescription(rank.getIconDescription());
-						var editedRows = RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon());
-						if(editedRows > 0) {
-							Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
+						if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon()) > 0) {
+							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 							e.getTextChannel().sendMessage("Icon skins has been resetted to the server default skin!").queue();
 						}
 						else {
 							//if rows didn't get updated, throw and error and write it into error log
 							e.getTextChannel().sendMessage("Icons skin couldn't be resetted to the server default skin. Internal error, please contact an administrator!").queue();
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Icons skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getIconDescription());
+							logger.error("RankingSystem.users table couldn't be updated with the default icon skin for {}", e.getMember().getUser().getId());
+							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icons skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getIconDescription());
 						}
 					}
 					else if(input.contains(IniFileReader.getCommandPrefix()+"use ")){
 						input = input.substring(IniFileReader.getCommandPrefix().length()+4);
-						RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), input);
-						if(RankingSystem.getItemID() != 0 && RankingSystem.getStatus().equals("perm")){
-							if(RankingSystem.getSkinType().equals("lev")){
+						inventory.Inventory inventory = RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input);
+						if(inventory.getItemID() != 0 && inventory.getStatus().equals("perm")){
+							if(inventory.getSkinType().equals("lev")){
 								final String filter = input;
-								RankingSystem.SQLgetRankingLevel();
-								rankingSystem.Rank rank = Hashes.getRankList("ranking-level").parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+								rankingSystem.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 								user_details.setRankingLevel(rank.getRankingLevel());
 								user_details.setLevelDescription(rank.getLevelDescription());
 								user_details.setColorRLevel(rank.getColorRLevel());
@@ -139,20 +133,19 @@ public class Use implements Command{
 								user_details.setRankYLevel(rank.getRankYLevel());
 								user_details.setRankWidthLevel(rank.getRankWidthLevel());
 								user_details.setRankHeightLevel(rank.getRankHeightLevel());
-								var editedRows = RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel());
-								if(editedRows > 0) {
-									Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
+								if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel()) > 0) {
+									Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 									e.getTextChannel().sendMessage("**"+input+"** will be used from now on!").queue();
 								}
 								else {
 									e.getTextChannel().sendMessage("Level skin couldn't be updated to the selected skin. Internal error, please contact an administrator!").queue();
-									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Level skin couldn't be updated", "Level skin update has failed. Skin: "+user_details.getLevelDescription());
+									logger.error("RankingSystem.users table couldn't be updated with the selected level skin {} for {}", user_details.getLevelDescription(), e.getMember().getUser().getId());
+									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be updated", "Level skin update has failed. Skin: "+user_details.getLevelDescription());
 								}
 							}
-							else if(RankingSystem.getSkinType().equals("ran")){
+							else if(inventory.getSkinType().equals("ran")){
 								final String filter = input;
-								RankingSystem.SQLgetRankingRank();
-								rankingSystem.Rank rank = Hashes.getRankList("ranking-rank").parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+								rankingSystem.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 								user_details.setRankingRank(rank.getRankingRank());
 								user_details.setRankDescription(rank.getRankDescription());
 								user_details.setBarColorRank(rank.getBarColorRank());
@@ -164,20 +157,19 @@ public class Use implements Command{
 								user_details.setRankYRank(rank.getRankYRank());
 								user_details.setRankWidthRank(rank.getRankWidthRank());
 								user_details.setRankHeightRank(rank.getRankHeightRank());
-								var editedRows = RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank());
-								if(editedRows > 0) {
-									Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
+								if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank()) > 0) {
+									Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 									e.getTextChannel().sendMessage("**"+input+"** will be used from now on!").queue();
 								}
 								else {
 									e.getTextChannel().sendMessage("Level skin couldn't be updated to the selected skin. Internal error, please contact an administrator!").queue();
-									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Rank skin couldn't be updated", "Rank skin update has failed. Skin: "+user_details.getRankDescription());
+									logger.error("RankingSystem.users table couldn't be updated with the selected rank skin {} for {}", user_details.getRankDescription(), e.getMember().getUser().getId());
+									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be updated", "Rank skin update has failed. Skin: "+user_details.getRankDescription());
 								}
 							}
-							else if(RankingSystem.getSkinType().equals("pro")){
+							else if(inventory.getSkinType().equals("pro")){
 								final String filter = input;
-								RankingSystem.SQLgetRankingProfile();
-								rankingSystem.Rank rank = Hashes.getRankList("ranking-profile").parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+								rankingSystem.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 								user_details.setRankingProfile(rank.getRankingProfile());
 								user_details.setProfileDescription(rank.getProfileDescription());
 								user_details.setBarColorProfile(rank.getBarColorProfile());
@@ -189,64 +181,67 @@ public class Use implements Command{
 								user_details.setRankYProfile(rank.getRankYProfile());
 								user_details.setRankWidthProfile(rank.getRankWidthProfile());
 								user_details.setRankHeightProfile(rank.getRankHeightProfile());
-								var editedRows = RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile());
-								if(editedRows > 0) {
-									Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
+								if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile()) > 0) {
+									Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 									e.getTextChannel().sendMessage("**"+input+"** will be used from now on!").queue();
 								}
 								else {
 									e.getTextChannel().sendMessage("Profile skin couldn't be updated to the selected skin. Internal error, please contact an administrator!").queue();
-									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Profile skin couldn't be updated", "Profile skin update has failed. Skin: "+user_details.getProfileDescription());
+									logger.error("RankingSystem.users table couldn't be updated with the selected profile skin {} for {}", user_details.getProfileDescription(), e.getMember().getUser().getId());
+									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be updated", "Profile skin update has failed. Skin: "+user_details.getProfileDescription());
 								}
 							}
-							else if(RankingSystem.getSkinType().equals("ico")){
+							else if(inventory.getSkinType().equals("ico")){
 								final String filter = input;
-								RankingSystem.SQLgetRankingIcons();
-								rankingSystem.Rank rank = Hashes.getRankList("ranking-icons").parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+								rankingSystem.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 								user_details.setRankingIcon(rank.getRankingIcon());
 								user_details.setIconDescription(rank.getIconDescription());
-								var editedRows = RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon());
-								if(editedRows > 0) {
-									Hashes.addRanking(e.getMember().getUser().getIdLong(), user_details);
+								if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon()) > 0) {
+									Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 									e.getTextChannel().sendMessage("**"+input+"** will be used from now on!").queue();
 								}
 								else {
 									e.getTextChannel().sendMessage("Icons skin couldn't be updated to the selected skin. Internal error, please contact an administrator!").queue();
-									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Icon skin couldn't be updated", "Icon skin update has failed. Skin: "+user_details.getIconDescription());
+									logger.error("RankingSystem.users table couldn't be updated with the selected icons skin {} for {}", user_details.getIconDescription(), e.getMember().getUser().getId());
+									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icon skin couldn't be updated", "Icon skin update has failed. Skin: "+user_details.getIconDescription());
 								}
 							}
-							else if(RankingSystem.getSkinType().equals("ite")){
-								RankingSystem.SQLgetInventoryAndDescription(e.getMember().getUser().getIdLong(), input, "perm");
-								RankingSystem.SQLgetExpirationFromInventory(e.getMember().getUser().getIdLong(), RankingSystem.getItemID());
-								RankingSystem.SQLgetNumberLimitFromInventory(e.getMember().getUser().getIdLong(), RankingSystem.getItemID());
+							else if(inventory.getSkinType().equals("ite")){
+								var inventoryNumber = RankingSystem.SQLgetInventoryNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input, "perm");
+								var expiration = RankingSystem.SQLgetExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventory.getItemID());
+								var numberLimit = RankingSystem.SQLgetNumberLimitFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventory.getItemID());
 								long time = System.currentTimeMillis();
 								Timestamp timestamp = new Timestamp(time);
 								try {
-									Timestamp timestamp2 = new Timestamp(RankingSystem.getExpiration().getTime()+1000*60*60*24);
-									if(RankingSystem.getNumber() == 1){
-										if(RankingSystem.SQLDeleteAndInsertInventory(e.getMember().getUser().getIdLong(), RankingSystem.getNumberLimit()+1, RankingSystem.getItemID(), timestamp, timestamp2) == 0) {
+									Timestamp timestamp2 = new Timestamp(expiration.getTime()+1000*60*60*24);
+									if(inventoryNumber == 1){
+										if(RankingSystem.SQLDeleteAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), numberLimit+1, inventory.getItemID(), timestamp, timestamp2) == 0) {
 											e.getTextChannel().sendMessage("Item couldn't be used or activated. Internal error, please contact an administrator!").queue();
-											RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+RankingSystem.getItemID());
+											logger.error("Item id {} for the user {} couldn't be used or opened", inventory.getItemID(), e.getMember().getUser().getId());
+											RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+inventory.getItemID());
 										}
 									}
 									else{
-										if(RankingSystem.SQLUpdateAndInsertInventory(e.getMember().getUser().getIdLong(), RankingSystem.getNumber(), RankingSystem.getNumberLimit()+1, RankingSystem.getItemID(), timestamp, timestamp2) == 0) {
+										if(RankingSystem.SQLUpdateAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventoryNumber, numberLimit+1, inventory.getItemID(), timestamp, timestamp2) == 0) {
 											e.getTextChannel().sendMessage("Item couldn't be used or activated. Internal error, please contact an administrator!").queue();
-											RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+RankingSystem.getItemID());
+											logger.error("Item id {} for the user {} couldn't be used or opened", inventory.getItemID(), e.getMember().getUser().getId());
+											RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+inventory.getItemID());
 										}
 									}
 								} catch(NullPointerException npe){
 									Timestamp timestamp2 = new Timestamp(time+1000*60*60*24);
-									if(RankingSystem.getNumber() == 1){
-										if(RankingSystem.SQLDeleteAndInsertInventory(e.getMember().getUser().getIdLong(), RankingSystem.getNumberLimit()+1, RankingSystem.getItemID(), timestamp, timestamp2) == 0) {
+									if(inventoryNumber == 1){
+										if(RankingSystem.SQLDeleteAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), numberLimit+1, inventory.getItemID(), timestamp, timestamp2) == 0) {
 											e.getTextChannel().sendMessage("Item couldn't be used or activated. Internal error, please contact an administrator!").queue();
-											RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+RankingSystem.getItemID());
+											logger.error("Item id {} for the user {} couldn't be used or opened", inventory.getItemID(), e.getMember().getUser().getId());
+											RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+inventory.getItemID());
 										}
 									}
 									else{
-										if(RankingSystem.SQLUpdateAndInsertInventory(e.getMember().getUser().getIdLong(), RankingSystem.getNumber(), RankingSystem.getNumberLimit()+1, RankingSystem.getItemID(), timestamp, timestamp2) == 0) {
+										if(RankingSystem.SQLUpdateAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventoryNumber, numberLimit+1, inventory.getItemID(), timestamp, timestamp2) == 0) {
 											e.getTextChannel().sendMessage("Item couldn't be used or activated. Internal error, please contact an administrator!").queue();
-											RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+RankingSystem.getItemID());
+											logger.error("Item id {} for the user {} couldn't be used or opened", inventory.getItemID(), e.getMember().getUser().getId());
+											RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+inventory.getItemID());
 										}
 									}
 								}
@@ -259,7 +254,7 @@ public class Use implements Command{
 					}
 				}
 				else{
-					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+Azrael.getChannelID()+">").queue();
+					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+bot_channel+">").queue();
 					logger.warn("Use command used in a not bot channel");
 				}
 			}
@@ -271,8 +266,7 @@ public class Use implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		RankingSystem.clearAllVariables();
-		Azrael.clearAllVariables();
+		
 	}
 
 	@Override

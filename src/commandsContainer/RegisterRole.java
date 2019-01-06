@@ -16,6 +16,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.DiscordRoles;
 
 public class RegisterRole {
+	private static final Logger logger = LoggerFactory.getLogger(RegisterRole.class);
 	private static EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 	
 	public static void RegisterRoleHelper(MessageReceivedEvent _e){
@@ -24,11 +25,9 @@ public class RegisterRole {
 		String parseMessage = null;
 		
 		parseMessage = "Please write the command in this format:\n**"+IniFileReader.getCommandPrefix()+"register -role <role_type> role-id**\n\nRole-ids can be displayed with the command **"+IniFileReader.getCommandPrefix()+"display -roles**. Here are all available role_types:\n\n";
-		DiscordRoles.SQLgetCategories();
-		for(Roles categories : DiscordRoles.getRoles_ID()){
+		for(Roles categories : DiscordRoles.SQLgetCategories()){
 			strB.append("**"+categories.getCategory_ABV()+"** for the **"+categories.getCategory_Name()+"** role\n");
 		}
-		DiscordRoles.clearRolesArray();
 		_e.getTextChannel().sendMessage(messageBuild.setDescription(parseMessage+strB.toString()).build()).queue();
 	}
 	
@@ -45,8 +44,15 @@ public class RegisterRole {
 				try {
 					role_id = Long.parseLong(role);
 					role_name = _e.getGuild().getRoleById(role_id).getName();
-					DiscordRoles.SQLInsertRole(_guild_id, role_id, role_name, category_abv);
-					_e.getTextChannel().sendMessage("**The primary Administrator role has been registered!**").queue();
+					if(DiscordRoles.SQLInsertRole(_guild_id, role_id, role_name, category_abv) > 0) {
+						logger.debug("Administrator role registered {} for guild {}", role_id, _e.getGuild().getName());
+						_e.getTextChannel().sendMessage("**The primary Administrator role has been registered!**").queue();
+						DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong());
+					}
+					else {
+						logger.error("Role {} couldn't be registered into DiscordRoles.roles for the guild {}", role_id, _e.getGuild().getName());
+						_e.getTextChannel().sendMessage("An internal error occurred. Role "+role_id+" couldn't be registered into DiscordRoles.roles table").queue();
+					}
 				} catch(NullPointerException npe){
 					_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();
 				}
@@ -73,12 +79,17 @@ public class RegisterRole {
 					try {
 						role_id = Long.parseLong(role);
 						role_name = _e.getGuild().getRoleById(role_id).getName();
-						DiscordRoles.SQLInsertRole(_guild_id, role_id, role_name, category_abv);
-						Logger logger = LoggerFactory.getLogger(RegisterRole.class);
-						logger.debug("{} has registered the role {} with the category {} in guild {}", _e.getMember().getUser().getId(), role_name, category_abv, _e.getGuild().getName());
-						_e.getTextChannel().sendMessage("**The role has been registered!**").queue();
-						if(category_abv.equals("rea")) {
-							Hashes.removeRoles();
+						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, role_name, category_abv) > 0) {
+							logger.debug("{} has registered the role {} with the category {} in guild {}", _e.getMember().getUser().getId(), role_name, category_abv, _e.getGuild().getName());
+							_e.getTextChannel().sendMessage("**The role has been registered!**").queue();
+							if(category_abv.equals("rea")) {
+								Hashes.removeRoles();
+							}
+							DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong());
+						}
+						else {
+							logger.error("Role {} couldn't be registered into DiscordRoles.roles for the guild {}", role_id, _e.getGuild().getName());
+							_e.getTextChannel().sendMessage("An internal error occurred. Role "+role_id+" couldn't be registered into DiscordRoles.roles table").queue();
 						}
 					} catch(NullPointerException npe){
 						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();

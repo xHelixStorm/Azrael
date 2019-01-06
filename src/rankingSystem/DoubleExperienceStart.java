@@ -39,13 +39,11 @@ public class DoubleExperienceStart extends TimerTask{
 				guild_id = g.getIdLong();
 				
 				if(Hashes.getStatus(guild_id).getRankingState()){
-					Azrael.SQLgetChannelID(guild_id, "bot");
-					channel_id = Azrael.getChannelID();
+					channel_id = Azrael.SQLgetChannelID(guild_id, "bot");
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendFile(doubleEvent, "doubleweekend.jpg", null).complete();
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage("```css\nThe double EXP weekend is here\nUse the chance to gain more experience points than usual to reach new heights. See you at the top!\nThe event will stay up from Saturday 00:01 cest till Sunday 23:59 cest!```").queue();
 				}
 			}
-			Azrael.clearAllVariables();
 		}
 		Logger logger = LoggerFactory.getLogger(DoubleExperienceStart.class);
 		logger.debug("Double experience weekend is running");

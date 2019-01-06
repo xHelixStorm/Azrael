@@ -31,19 +31,18 @@ public class Meow implements Command{
 				String variable = e.getMessage().getContentRaw();
 				String path = "./files/Cat/";
 				
-				Azrael.SQLgetChannelID(guild_id, "bot");
-				long channel_id = Azrael.getChannelID();
+				long channel_id = Azrael.SQLgetChannelID(guild_id, "bot");
 				
 				if(variable.equals("H!meow")){
 					e.getTextChannel().sendMessage("Please, type H!meow help to check the usage").queue();
 				}
 				else{
-					Azrael.SQLgetExecutionID(guild_id);
-					if(Azrael.getExecutionID() == 0){
+					var execution_id = Azrael.SQLgetExecutionID(guild_id);
+					if(execution_id == 0){
 						e.getTextChannel().sendMessage("This type of command is disabled on this server. Please ask an administrator or moderator to enable it!").queue();
 					}
-					else if(Azrael.getExecutionID() == 2 || Azrael.getExecutionID() == 1){
-						if(Azrael.getExecutionID() != 1){
+					else if(execution_id == 2 || execution_id == 1){
+						if(execution_id != 1){
 							try {
 								MeowExecution.Execute(e, variable, path, channel_id);
 							} catch (IOException e1) {
@@ -70,7 +69,7 @@ public class Meow implements Command{
 	}
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		Azrael.clearAllVariables();
+		
 	}
 
 	@Override

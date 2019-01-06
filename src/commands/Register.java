@@ -40,8 +40,7 @@ public class Register implements Command{
 			guild_id = e.getGuild().getIdLong();
 			message = e.getMessage().getContentRaw();
 			
-			DiscordRoles.SQLgetRole(guild_id, "adm");
-			if(DiscordRoles.getRole_ID() == 0){
+			if(DiscordRoles.SQLgetRole(guild_id, "adm") == 0){
 				if(message.equals(IniFileReader.getCommandPrefix()+"register")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Use this command to register either a channel, a role, a ranking role or all users in a guild. For the first time, an administrator role needs to be registered and afterwards all the other features for this command will be unlocked.\n\n"
 							+ "Here how you can display more details on how to register a role:\n"
@@ -106,7 +105,7 @@ public class Register implements Command{
 
 	@Override
 	public void executed(boolean success, MessageReceivedEvent e) {
-		DiscordRoles.clearAllVariables();
+		
 	}
 
 	@Override

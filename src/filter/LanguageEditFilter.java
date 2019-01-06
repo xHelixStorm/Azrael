@@ -87,8 +87,7 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 						if(option.isPresent()) {
 							e.getMessage().delete().reason("Message removed due to bad manner!").complete();
 							long guild_id = e.getGuild().getIdLong();
-							Azrael.SQLgetChannelID(guild_id, "tra");
-							long channel_id = Azrael.getChannelID();
+							long channel_id = Azrael.SQLgetChannelID(guild_id, "tra");
 							if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();}
 							wordFound = true;
 							break find;
@@ -115,9 +114,7 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 					}
 					else if (report.contains("2")){
 						FileSetting.deleteFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");
-						DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut");
-						long mute_role = DiscordRoles.getRole_ID();
-						e.getGuild().getController().addRolesToMember(e.getMember(), e.getGuild().getRoleById(mute_role)).queue();
+						e.getGuild().getController().addRolesToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
 					}
 				}
 			}

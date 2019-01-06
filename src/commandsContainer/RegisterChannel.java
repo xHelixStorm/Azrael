@@ -18,6 +18,7 @@ import preparedMessages.ReactionMessage;
 import sql.Azrael;
 
 public class RegisterChannel {
+	private static final Logger logger = LoggerFactory.getLogger(RegisterChannel.class);
 	
 	public static void RegisterChannelHelper(MessageReceivedEvent _e){
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register text channels to give them unique functions!");
@@ -25,11 +26,11 @@ public class RegisterChannel {
 		String parseMessage = null;
 		
 		parseMessage = "Please write the command in this format:\n**"+IniFileReader.getCommandPrefix()+"register -text-channel <channel-type> #channel-name/channel-id**\n\nHere are all available channel-types:\n\n";
-		Azrael.SQLgetChannelTypes();
-		for(Channels channels : Azrael.getChannels()){
+		for(Channels channels : Azrael.SQLgetChannelTypes()){
 			strB.append("**"+channels.getChannel_Type()+"** for a **"+channels.getChannel_Type_Name()+"**\n");
 		}
-		Azrael.clearChannelsArray();
+		if(strB.length() == 0)
+			strB.append("<No available channel types found>");
 		_e.getTextChannel().sendMessage(messageBuild.setDescription(parseMessage+strB.toString()).build()).queue();
 	}
 	
@@ -40,7 +41,7 @@ public class RegisterChannel {
 		String channel_type;
 		
 		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()){
-			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui)");
+			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss)");
 			Matcher matcher = pattern.matcher(_message);
 			if(matcher.find()){
 				channel_type = matcher.group();
@@ -71,18 +72,23 @@ public class RegisterChannel {
 						case "tra":
 						case "rea":
 						case "qui":
-							Azrael.SQLDeleteChannelType(channel_type);
+						case "rss":
+							Azrael.SQLDeleteChannelType(channel_type, _guild_id);
 							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
 							break;
 					}
-					Logger logger = LoggerFactory.getLogger(RegisterChannel.class);
 					logger.debug("{} has registered the channel {} as {} channel in the guild {}", _e.getMember().getUser().getId(), channel_type, channel_type, _e.getGuild().getName());
 					_e.getTextChannel().sendMessage("**The channel has been registered!**").queue();
 					if(channel_type.equals("rea")) {
 						//create message in the channel and create an auto-delete-file so that the MessageListener can create the needed reactions
-						Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), 0, true);
-						String count = ""+ReactionMessage.print(_e, channel_id);
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+_e.getGuild().getId()+"ch"+channel+".azr", count);
+						if(Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), 0, true) > 0) {
+							String count = ""+ReactionMessage.print(_e, channel_id);
+							FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+_e.getGuild().getId()+"ch"+channel+".azr", count);
+						}
+						else {
+							logger.error("Role reactions couldn't be set to enable for guild {}", _e.getGuild().getName());
+							_e.getTextChannel().sendMessage("An internal error occurred. The reactions couldn't be marked as enabled in the table Azrael.commands").queue();
+						}
 					}
 				}
 			}
@@ -99,9 +105,11 @@ public class RegisterChannel {
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()){
 			for(TextChannel tc : _e.getGuild().getTextChannels()){
-				Azrael.SQLInsertChannels(tc.getIdLong(), tc.getName());
+				if(Azrael.SQLInsertChannels(tc.getIdLong(), tc.getName()) == 0) {
+					logger.error("channel {} couldn't be registered", tc.getId());
+					_e.getTextChannel().sendMessage("An internal error occurred. Channel "+tc.getName()+" couldn't be inserted into Azrael.channels").queue();
+				}
 			}
-			Logger logger = LoggerFactory.getLogger(RegisterChannel.class);
 			logger.debug("{} has registered all available channels on guild {}", _e.getMember().getUser().getId(), _e.getGuild().getName());
 			_e.getTextChannel().sendMessage("**All text channels have been registered!**").queue();
 		}
