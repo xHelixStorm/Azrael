@@ -1,5 +1,7 @@
 package listeners;
 
+import java.io.File;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,10 +9,13 @@ import com.vdurmont.emoji.EmojiParser;
 
 import core.Hashes;
 import core.UserPrivs;
+import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
+import inventory.InventoryBuilder;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import sql.DiscordRoles;
+import sql.RankingSystem;
 import sql.Azrael;
 
 public class GuildMessageReactionAddListener extends ListenerAdapter{
@@ -56,6 +61,25 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 					}
 					else
 						logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getName());
+				}
+			}
+			
+			//inventory reactions
+			if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:")) {
+				File inventory = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId()+".azr");
+				if(inventory.exists()) {
+					String file_content = FileSetting.readFile(inventory.getAbsolutePath());
+					String [] array = file_content.split("_");
+					int current_page = Integer.parseInt(array[0]);
+					final int last_page = Integer.parseInt(array[1]);
+					if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:"))
+						current_page--;
+					else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:"))
+						current_page++;
+					e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
+					inventory.delete();
+					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_2");
+					InventoryBuilder.DrawInventory(null, e, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
 				}
 			}
 		}
