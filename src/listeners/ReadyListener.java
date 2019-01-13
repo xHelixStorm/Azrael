@@ -26,6 +26,7 @@ import sql.DiscordRoles;
 import threads.BotStartAssign;
 import threads.RoleExtend;
 import timerTask.ClearHashes;
+import timerTask.ParseRSS;
 import util.STATIC;
 
 public class ReadyListener extends ListenerAdapter{
@@ -77,6 +78,8 @@ public class ReadyListener extends ListenerAdapter{
 				logger.error("Levels from RankingSystem.level_list couldn't be called and cached");
 				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
 			}
+			Azrael.SQLgetRSSFeeds(guild_id);
+			ParseRSS.runTask(e, guild_id, Azrael.SQLgetChannelID(guild_id, "rss"));
 			if(log_channel != 0){e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("Bot is now operational!").queue();}
 		}
 		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");

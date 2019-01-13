@@ -41,5 +41,9 @@ public class BanListener extends ListenerAdapter{
 		}
 		logger.debug("{} has been banned from {}", e.getUser().getId(), e.getGuild().getName());
 		Azrael.SQLInsertActionLog("MEMBER_BAN_ADD", user_id, guild_id, "User Banned");
+		
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e1) {}
 	}
 }

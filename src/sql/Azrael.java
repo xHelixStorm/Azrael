@@ -1565,7 +1565,7 @@ public class Azrael {
 			stmt.setString(3, "{pubDate} | {title}\n{description}\n{link}");
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLInserRSSr Exception", e);
+			logger.error("SQLInserRSS Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1576,30 +1576,69 @@ public class Azrael {
 	public static ArrayList<RSS> SQLgetRSSFeeds(long _guild_id){
 		logger.debug("SQLgetRSSFeeds launched. Params passed {}", _guild_id);
 		ArrayList<RSS> feeds = new ArrayList<RSS>();
-		if(Hashes.getFeed(_guild_id) == null){
-			Connection myConn = null;
-			PreparedStatement stmt = null;
-			ResultSet rs = null;
-			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT url, format FROM rss WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
-				stmt.setLong(1, _guild_id);
-				rs = stmt.executeQuery();
-				while(rs.next()){
-					feeds.add(new RSS(rs.getString(1), rs.getString(2)));
-				}
-				Hashes.addFeeds(_guild_id, feeds);
-				return feeds;
-			} catch (SQLException e) {
-				logger.error("SQLgetRSSFeeds Exception", e);
-			} finally {
-				try { rs.close(); } catch (Exception e) { /* ignored */ }
-			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT url, format FROM rss WHERE fk_guild_id = ? ORDER BY timestamp asc");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				feeds.add(new RSS(rs.getString(1), rs.getString(2)));
 			}
+			Hashes.addFeeds(_guild_id, feeds);
+			return feeds;
+		} catch (SQLException e) {
+			logger.error("SQLgetRSSFeeds Exception", e);
+			return feeds;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
-		return Hashes.getFeed(_guild_id);
+	}
+	
+	public static int SQLDeleteRSSFeed(String _url, long _guild_id) {
+		logger.debug("SQLDeleteRSSFeed launched. Params passed {}, {}", _url, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM rss WHERE url = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _url);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteRSSFeed Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateRSSFormat(String _url, long _guild_id, String _format) {
+		logger.debug("SQLUpdateRSSFormat launched. Params passed {}, {}, {}", _url, _guild_id, _format);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE rss SET format = ? WHERE url = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _format);
+			stmt.setString(2, _url);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateRSSFormat Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
 	}
 	
 	//Transactions

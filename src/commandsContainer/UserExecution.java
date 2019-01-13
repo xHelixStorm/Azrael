@@ -295,7 +295,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							_e.getTextChannel().sendMessage(message.setDescription("Nothing has been found to delete....").build()).queue();
+							_e.getTextChannel().sendMessage(message.setDescription("Nothing has been found to delete....\nPlease check the config file if the Bot is allowed to cache messages").build()).queue();
 							logger.warn("No message deleted");
 						}
 					}
@@ -356,6 +356,7 @@ public class UserExecution {
 				}
 				else if(_message.equalsIgnoreCase("no")) {
 					_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getRoleById(DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut"))).queue();
+					_e.getTextChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
 					FileSetting.deleteFile(file_path);
 				}
 			}
@@ -387,6 +388,7 @@ public class UserExecution {
 							_e.getTextChannel().sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
 						}
 					}
+					_e.getTextChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
 					logger.debug("{} has muted {} in guild {}", _e.getMember().getUser().getId(), file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 					FileSetting.deleteFile(file_path);
 					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/mute_time_"+file_value.replaceAll("[^0-9]*", ""), ""+mute_time);
@@ -415,6 +417,7 @@ public class UserExecution {
 						pc.close();
 						logger.debug("{} has banned {} from guild {}", _e.getMember().getUser().getId(), file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 					}
+					_e.getTextChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
 					_e.getGuild().getController().ban(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")), 0).reason("User has been banned with the bot command!").queue();
 					FileSetting.deleteFile(file_path);
 				}
@@ -431,6 +434,7 @@ public class UserExecution {
 					pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 							+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
 					pc.close();
+					_e.getTextChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
 					logger.debug("{} has banned {} in guild {}", _e.getMember().getUser().getId(), file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 				}
 				_e.getGuild().getController().ban(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")), 0).reason(_message).queue();
@@ -443,12 +447,14 @@ public class UserExecution {
 					FileSetting.createFile(file_path, "kick-reason"+file_value.replaceAll("[^0-9]*", ""));
 				}
 				else if(_message.equalsIgnoreCase("no")) {
+					_e.getTextChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
 					_e.getGuild().getController().kick(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", ""))).reason("User has been kicked with the bot command!").queue();
 					logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 					FileSetting.deleteFile(file_path);
 				}
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("kick-reason")) {
+				_e.getTextChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
 				_e.getGuild().getController().kick(_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", ""))).reason(_message).queue();
 				logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 				FileSetting.deleteFile(file_path);

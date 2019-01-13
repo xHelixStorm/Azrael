@@ -33,7 +33,8 @@ public class Rss implements Command{
 							+ "**-register**: register an rss url for this server\n"
 							+ "**-format**: change the format of how rss feeds should be displayed\n"
 							+ "**-remove**: remove an rss url for this server\n"
-							+ "**-test**: pick a random rss feeed to test the settings").build()).queue();
+							+ "**-test**: picks the first rss feeed to test the settings\n"
+							+ "**-display**: display the current registered feeds for this server").build()).queue();
 				}
 				else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"rss -register")) {
 					message.setColor(Color.BLUE);
@@ -57,7 +58,7 @@ public class Rss implements Command{
 					int counter = 1;
 					StringBuilder out = new StringBuilder();
 					for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
-						out.append(counter+": "+feed.getURL());
+						out.append("**Link "+counter+":** "+feed.getURL()+"\n");
 						counter++;
 					}
 					message.setColor(Color.BLUE);
@@ -67,10 +68,45 @@ public class Rss implements Command{
 						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", "remove");
 				}
 				else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"rss -format")) {
-					
+					int counter = 1;
+					StringBuilder out = new StringBuilder();
+					for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
+						out.append("**Link "+counter+":** "+feed.getURL()+"\n");
+						counter++;
+					}
+					message.setColor(Color.BLUE);
+					e.getTextChannel().sendMessage(message.setDescription("Please select a digit for the RSS feed to be personalized:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
+					logger.debug("{} chose to change the format of a feed", e.getMember().getUser().getId());
+					if(out.length() > 0)
+						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", "format");
 				}
 				else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"rss -test")) {
-					
+					//test a feed
+					int counter = 1;
+					StringBuilder out = new StringBuilder();
+					for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
+						out.append("**Link "+counter+":** "+feed.getURL()+"\n");
+						counter++;
+					}
+					message.setColor(Color.BLUE);
+					e.getTextChannel().sendMessage(message.setDescription("Please select a digit for the RSS that needs to be tested:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
+					logger.debug("{} chose to change the format of a feed", e.getMember().getUser().getId());
+					if(out.length() > 0)
+						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", "test");
+				}
+				else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"rss -display")) {
+					//display the registered feeds
+					int counter = 1;
+					StringBuilder out = new StringBuilder();
+					for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
+						out.append("**Link "+counter+":** "+feed.getURL()+"\n");
+						counter++;
+					}
+					message.setColor(Color.BLUE);
+					e.getTextChannel().sendMessage(message.setDescription("These are the registered rss feeds:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
+				}
+				else {
+					e.getTextChannel().sendMessage(message.setColor(Color.RED).setDescription("Parameter not accepted. Please review the available parameters for this command").build()).queue();
 				}
 			}
 			else {

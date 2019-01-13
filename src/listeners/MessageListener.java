@@ -119,9 +119,26 @@ public class MessageListener extends ListenerAdapter{
 			
 			if(rss.exists() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
 				String task = FileSetting.readFile(rss.getAbsolutePath());
-				if(task.equals("remove") && message.replaceAll("[0-9]", "").length() == 0) {
-					RssExecution.removeFeed(e, Integer.parseInt(message), rss.getAbsolutePath());
-					rss.delete();
+				if(!message.equalsIgnoreCase("exit")) {
+					if(task.equals("remove") && message.replaceAll("[0-9]", "").length() == 0) {
+						if(RssExecution.removeFeed(e, Integer.parseInt(message)-1))
+							rss.delete();
+					}
+					else if(task.equals("format") && message.replaceAll("[0-9]", "").length() == 0) {
+						RssExecution.currentFormat(e, Integer.parseInt(message)-1, rss.getAbsolutePath());
+					}
+					else if(task.contains("updateformat")) {
+						if(RssExecution.updateFormat(e, Integer.parseInt(task.replaceAll("[^0-9]", "")), message))
+							rss.delete();
+					}
+					else if(task.equals("test") && message.replaceAll("[0-9]", "").length() == 0) {
+						if(RssExecution.runTest(e, Integer.parseInt(message)-1))
+							rss.delete();
+					}
+				}
+				else {
+					EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
+					e.getTextChannel().sendMessage(embed.setDescription("Rss command cancelled").build()).queue();
 				}
 			}
 			

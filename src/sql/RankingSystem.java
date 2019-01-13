@@ -1286,7 +1286,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLgetInventoryNumber(long _user_id, long _guild_id, String _description, String _status){
-		logger.debug("RankingSystem.SQLgetInventoryAndDescription launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _description, _status);
+		logger.debug("RankingSystem.SQLgetInventoryNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _description, _status);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1304,7 +1304,7 @@ public class RankingSystem {
 			}
 			return 0;
 		} catch (SQLException e) {
-			logger.error("RankingSystem.SQLgetInventoryAndDescription Exception", e);
+			logger.error("RankingSystem.SQLgetInventoryNumber Exception", e);
 			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -1314,7 +1314,7 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptions(long _user_id, long _guild_id, int _limit){
-		logger.debug("RankingSystem.SQLgetInventoryAndDescriptions launched. Passed params {}, {}", _user_id, _guild_id, _limit);
+		logger.debug("RankingSystem.SQLgetInventoryAndDescriptions launched. Passed params {}, {}, {}", _user_id, _guild_id, _limit);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;

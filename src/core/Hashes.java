@@ -47,7 +47,7 @@ public class Hashes {
     private static final Map<String, ArrayList<Skins>> shopContent = new HashMap<String, ArrayList<Skins>>();
     private static final Map<String, ArrayList<Dailies>> daily_items = new HashMap<String, ArrayList<Dailies>>();
     private static final Map<Long, Roles> discordRoles = new HashMap<Long, Roles>();
-    private static final Map<Long, ArrayList<RSS>> feeds = new HashMap<Long, ArrayList<RSS>>();
+    private static final ConcurrentMap<Long, ArrayList<RSS>> feeds = new ConcurrentHashMap<Long, ArrayList<RSS>>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);

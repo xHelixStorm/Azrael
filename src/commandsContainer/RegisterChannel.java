@@ -16,6 +16,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import preparedMessages.ReactionMessage;
 import sql.Azrael;
+import timerTask.ParseRSS;
 
 public class RegisterChannel {
 	private static final Logger logger = LoggerFactory.getLogger(RegisterChannel.class);
@@ -89,6 +90,9 @@ public class RegisterChannel {
 							logger.error("Role reactions couldn't be set to enable for guild {}", _e.getGuild().getName());
 							_e.getTextChannel().sendMessage("An internal error occurred. The reactions couldn't be marked as enabled in the table Azrael.commands").queue();
 						}
+					}
+					else if(channel_type.equals("rss")) {
+						ParseRSS.setRss_Channel(channel_id);
 					}
 				}
 			}
