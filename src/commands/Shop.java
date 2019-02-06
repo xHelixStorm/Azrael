@@ -27,7 +27,6 @@ public class Shop implements Command{
 			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
 				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 				if(bot_channel == 0 || e.getTextChannel().getIdLong() == bot_channel){
-					//RankingDB.SQLgetDefaultSkins(e.getGuild().getIdLong());
 					Guilds guild_settings = Hashes.getStatus(e.getGuild().getIdLong());
 					if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP LEVEL UPS")){
 						ShopExecution.displayPartOfShop(e, "lev", guild_settings.getLevelDescription());

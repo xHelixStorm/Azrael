@@ -12,7 +12,7 @@ public class StatusListener extends ListenerAdapter{
 	public void onUserUpdateOnlineStatus(UserUpdateOnlineStatusEvent e){
 		//if enabled in config file, check how many users are online and set it as currently playing
 		if((e.getNewOnlineStatus().toString().equals("OFFLINE") || e.getNewOnlineStatus().toString().equals("ONLINE")) && IniFileReader.getCountMembers()){
-			e.getJDA().getPresence().setGame(Game.of(GameType.DEFAULT, e.getGuild().getMembers().parallelStream().filter(f -> f.getOnlineStatus() == OnlineStatus.ONLINE).count()+" Members online"));
+			e.getJDA().getPresence().setGame(Game.of(GameType.DEFAULT, e.getGuild().getMembers().parallelStream().filter(f -> f.getOnlineStatus() == OnlineStatus.ONLINE || f.getOnlineStatus() == OnlineStatus.IDLE || f.getOnlineStatus() == OnlineStatus.DO_NOT_DISTURB).count()+" Members online"));
 		}
 	}
 }

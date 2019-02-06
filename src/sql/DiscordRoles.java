@@ -29,18 +29,18 @@ public class DiscordRoles {
 	}
 	
 	public static int SQLInsertGuild(long _guild_id, String _guild_name){
-		logger.debug("DiscordRoles.SQLInsertGuild launched. Passed params {}, {}", _guild_id, _guild_name);
+		logger.debug("SQLInsertGuild launched. Passed params {}, {}", _guild_id, _guild_name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO guilds(guild_id, name) VALUES(?,?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setString(2, _guild_name);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("DiscordRoles.SQLInsertGuild Exception", e);
+			logger.error("SQLInsertGuild Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -49,12 +49,12 @@ public class DiscordRoles {
 	}
 	
 	public static long SQLgetRole(long _guild_id, String _category_abv){
-		logger.debug("DiscordRoles.SQLgetRole launched. Passed params {}, {}", _guild_id, _category_abv);
+		logger.debug("SQLgetRole launched. Passed params {}, {}", _guild_id, _category_abv);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT role_id FROM roles WHERE fk_guild_id = ? && fk_category_abv LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -65,7 +65,7 @@ public class DiscordRoles {
 			}
 			return 0;
 		} catch (SQLException e) {
-			logger.error("DiscordRoles.SQLgetRole Exception", e);
+			logger.error("SQLgetRole Exception", e);
 			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -75,11 +75,11 @@ public class DiscordRoles {
 	}
 	
 	public static int SQLInsertRole(long _guild_id, long _role_id, String _role_name, String _category_abv){
-		logger.debug("DiscordRoles.SQLInsertRole launched. Passed params {}, {}, {}, {}", _guild_id, _role_id, _role_name, _category_abv);
+		logger.debug("SQLInsertRole launched. Passed params {}, {}, {}, {}", _guild_id, _role_id, _role_name, _category_abv);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("INSERT INTO roles(role_id, name, fk_category_abv, fk_guild_id) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name), fk_category_abv=VALUES(fk_category_abv)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_id);
@@ -88,7 +88,7 @@ public class DiscordRoles {
 			stmt.setLong(4, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("DiscordRoles.SQLInsertRole Exception", e);
+			logger.error("SQLInsertRole Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -97,13 +97,13 @@ public class DiscordRoles {
 	}
 	
 	public static ArrayList<Roles> SQLgetRoles(long _guild_id){
-		logger.debug("DiscordRoles.SQLgetRoles launched. Passed params {}", _guild_id);
+		logger.debug("SQLgetRoles launched. Passed params {}", _guild_id);
 		ArrayList<Roles> roles = new ArrayList<Roles>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT guilds.guild_id, guilds.name, roles.role_id, roles.name, role_category.category_abv, role_category.rank FROM guilds INNER JOIN roles ON guilds.guild_id = roles.fk_guild_id INNER JOIN role_category ON roles.fk_category_abv = role_category.category_abv WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -121,7 +121,7 @@ public class DiscordRoles {
 			}
 			return roles;
 		} catch (SQLException e) {
-			logger.error("DiscordRoles.SQLgetRoles Exception", e);
+			logger.error("SQLgetRoles Exception", e);
 			return roles;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -131,13 +131,13 @@ public class DiscordRoles {
 	}
 	
 	public static boolean SQLgetRolesByCategory(long _guild_id, String _channel_type){
-		logger.debug("DiscordRoles.SQLgetRolesByCategory launched. Passed params {}, {}", _guild_id, _channel_type);
+		logger.debug("SQLgetRolesByCategory launched. Passed params {}, {}", _guild_id, _channel_type);
 		if(Hashes.getRoles(1+"_"+_guild_id) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT guilds.guild_id, guilds.name, roles.role_id, roles.name, role_category.category_abv, role_category.rank FROM guilds INNER JOIN roles ON guilds.guild_id = roles.fk_guild_id INNER JOIN role_category ON roles.fk_category_abv = role_category.category_abv WHERE guild_id = ? AND role_category.category_abv LIKE ?");
 				boolean success = false;
 				stmt = myConn.prepareStatement(sql);
@@ -159,7 +159,7 @@ public class DiscordRoles {
 				}
 				return success;
 			} catch (SQLException e) {
-				logger.error("DiscordRoles.SQLgetRolesByCategory Exception", e);
+				logger.error("SQLgetRolesByCategory Exception", e);
 				return false;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -171,13 +171,13 @@ public class DiscordRoles {
 	}
 	
 	public static ArrayList<Roles> SQLgetCategories(){
-		logger.debug("DiscordRoles.SQLgetCategories launched. No params passed");
+		logger.debug("SQLgetCategories launched. No params passed");
 		ArrayList<Roles> roles = new ArrayList<Roles>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://192.168.178.2:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT * FROM role_category");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
@@ -189,7 +189,7 @@ public class DiscordRoles {
 			}
 			return roles;
 		} catch (SQLException e) {
-			logger.error("DiscordRoles.SQLgetCategories Exception", e);
+			logger.error("SQLgetCategories Exception", e);
 			return roles;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
