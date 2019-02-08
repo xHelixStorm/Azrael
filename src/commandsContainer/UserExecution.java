@@ -108,7 +108,8 @@ public class UserExecution {
 					case "information": 
 						User user = Azrael.SQLgetUserThroughID(file_value);
 						message.setTitle("Here the requested information!");
-						message.setThumbnail(user.getAvatar());
+						if(user.getAvatar() != null)
+							message.setThumbnail(user.getAvatar());
 						message.setAuthor(user.getUserName());
 						message.setDescription("Here you can inspect all current information for this user!");
 						message.addBlankField(false);

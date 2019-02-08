@@ -551,7 +551,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateMuted Exception", e);
-			return 0;
+			return 999;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -619,20 +619,25 @@ public class Azrael {
 			switch(_warning_id) {
 				case 1: 
 					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
+							+ "(?, 0, 0, \"no warning\"),"
 							+ "(?, 1, 0, \"first warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
 					stmt = myConn.prepareStatement(sql);
 					stmt.setLong(1, _guild_id);
+					stmt.setLong(2, _guild_id);
 					break;
 				case 2:
 					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
+							+ "(?, 0, 0, \"no warning\"),"
 							+ "(?, 1, 0, \"first warning\"),"
 							+ "(?, 2, 0, \"second warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
 					stmt = myConn.prepareStatement(sql);
 					stmt.setLong(1, _guild_id);
 					stmt.setLong(2, _guild_id);
+					stmt.setLong(3, _guild_id);
 					break;
 				case 3:
 					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
+							+ "(?, 0, 0, \"no warning\"),"
 							+ "(?, 1, 0, \"first warning\"),"
 							+ "(?, 2, 0, \"second warning\"),"
 							+ "(?, 3, 0, \"third warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
@@ -640,9 +645,11 @@ public class Azrael {
 					stmt.setLong(1, _guild_id);
 					stmt.setLong(2, _guild_id);
 					stmt.setLong(3, _guild_id);
+					stmt.setLong(4, _guild_id);
 					break;
 				case 4:
 					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
+							+ "(?, 0, 0, \"no warning\"),"
 							+ "(?, 1, 0, \"first warning\"),"
 							+ "(?, 2, 0, \"second warning\"),"
 							+ "(?, 3, 0, \"third warning\"),"
@@ -652,9 +659,11 @@ public class Azrael {
 					stmt.setLong(2, _guild_id);
 					stmt.setLong(3, _guild_id);
 					stmt.setLong(4, _guild_id);
+					stmt.setLong(5, _guild_id);
 					break;
 				case 5:
 					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
+							+ "(?, 0, 0, \"no warning\"),"
 							+ "(?, 1, 0, \"first warning\"),"
 							+ "(?, 2, 0, \"second warning\"),"
 							+ "(?, 3, 0, \"third warning\"),"
@@ -666,6 +675,7 @@ public class Azrael {
 					stmt.setLong(3, _guild_id);
 					stmt.setLong(4, _guild_id);
 					stmt.setLong(5, _guild_id);
+					stmt.setLong(6, _guild_id);
 			}
 			return stmt.executeUpdate();
 		} catch (SQLException e) {

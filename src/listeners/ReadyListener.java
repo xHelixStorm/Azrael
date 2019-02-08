@@ -79,7 +79,8 @@ public class ReadyListener extends ListenerAdapter{
 				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
 			}
 			Azrael.SQLgetRSSFeeds(guild_id);
-			new Thread(new ParseRSS(e, null, guild_id, Azrael.SQLgetChannelID(guild_id, "rss"))).start();
+			var rss_channel = Azrael.SQLgetChannelID(guild_id, "rss");
+			if(rss_channel != 0)ParseRSS.runTask(e, guild_id, rss_channel);
 			if(log_channel != 0){e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("Bot is now operational!").queue();}
 		}
 		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");

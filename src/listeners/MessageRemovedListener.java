@@ -37,7 +37,7 @@ public class MessageRemovedListener extends ListenerAdapter{
 					}
 					if(send_message == true && e.getTextChannel().getIdLong() == Long.parseLong(entry.getOptionByName("channel_id").toString()) && (UserPrivs.isUserAdmin(e.getGuild().getMemberById(entry.getUser().getId()).getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getGuild().getMemberById(entry.getUser().getId()).getUser(), e.getGuild().getIdLong()))) {
 						removed_from = entry.getTargetIdLong();
-						if(Hashes.getMessagePool(e.getMessageIdLong()).getUserID() == removed_from){
+						if(Hashes.getMessagePool(e.getMessageIdLong()) != null && Hashes.getMessagePool(e.getMessageIdLong()).getUserID() == removed_from){
 							if(!UserPrivs.isUserBot(e.getGuild().getMemberById(removed_from).getUser(), e.getGuild().getIdLong())){
 								trigger_user_id = entry.getUser().getIdLong();
 								trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();

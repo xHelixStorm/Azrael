@@ -76,14 +76,14 @@ public class GuildLeaveListener extends ListenerAdapter{
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from **"+guild_name+"**").build()).queue();
 			}
 			
-			if(warning_id < max_warning_id && banned == true){
+			if(warning_id == 0 && banned == true){
+				e.getGuild().getTextChannelById(channel_id).sendMessage(ban.setDescription("["+timestamp+"] "+trigger_user_name+" has banned **" + user_name + "** with the ID Number **" + user_id + "** without any protocolled warnings!"+ban_reason).build()).queue();
+			}
+			else if(warning_id < max_warning_id && banned == true){
 				e.getGuild().getTextChannelById(channel_id).sendMessage(ban.setDescription("["+timestamp+"] "+trigger_user_name+" has banned **" + user_name + "** with the ID Number **" + user_id + "** without enough protocolled warnings! Warnings: "+warning_id+""+ban_reason).build()).queue();
 			}
-			else if(++warning_id > max_warning_id && banned == true){
+			else if(warning_id == max_warning_id && banned == true){
 				e.getGuild().getTextChannelById(channel_id).sendMessage(ban.setDescription("["+timestamp+"] "+trigger_user_name+" has banned **" + user_name + "** with the ID Number **" + user_id + "**!"+ban_reason).build()).queue();
-			}
-			else if(--warning_id == 1 && banned == true){
-				e.getGuild().getTextChannelById(channel_id).sendMessage(ban.setDescription("["+timestamp+"] "+trigger_user_name+" has banned **" + user_name + "** with the ID Number **" + user_id + "** without any protocolled warnings!"+ban_reason).build()).queue();
 			}
 		}
 		

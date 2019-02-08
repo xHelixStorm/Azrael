@@ -107,9 +107,7 @@ public class GuildListener extends ListenerAdapter {
 				}
 			}
 			if(badName == false){
-				if(Azrael.SQLDeleteNickname(user_id, guild_id) == 0) {
-					logger.error("Nickname from {} couldn't be deleted from Azrael.nickname", e.getUser().getId());
-				}
+				Azrael.SQLDeleteNickname(user_id, guild_id);
 			}
 		}
 		

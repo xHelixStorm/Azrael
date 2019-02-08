@@ -57,7 +57,7 @@ public class RoleRemovedListener extends ListenerAdapter{
 				Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE_HALFWAY", user_id, guild_id, "Mute role removed manually");
 			}
 			else if(!UserPrivs.isUserMuted(e.getUser(), guild_id) && warnedUser.getUserID() != 0){
-				if(Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false) == 0) {
+				if(Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false) == 999) {
 					logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getName());
 				}
 				else {

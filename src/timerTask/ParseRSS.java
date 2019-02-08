@@ -1,9 +1,9 @@
 package timerTask;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
@@ -26,12 +26,12 @@ public class ParseRSS extends TimerTask{
 	
 	private ReadyEvent e;
 	private long guild_id;
-	private static long rss_channel;
+	private long rss_channel;
 	
 	public ParseRSS(ReadyEvent _e, long _guild_id, long _rss_channel) {
 		this.e = _e;
 		this.guild_id = _guild_id;
-		ParseRSS.rss_channel = _rss_channel;
+		this.rss_channel = _rss_channel;
 	}
 
 	@Override
@@ -39,11 +39,14 @@ public class ParseRSS extends TimerTask{
 		logger.info("task running for guild {}", e.getJDA().getGuildById(guild_id).getName());
 		if(rss_channel != 0 && Hashes.getFeed(guild_id) != null) {
 			for(RSS rss : Hashes.getFeed(guild_id)) {
-				logger.debug("Retrieving rss feeds for guild {}", e.getJDA().getGuildById(guild_id).getName());
 				try {
 					String format = rss.getFormat();
+					logger.debug("Retrieving rss feed for {} in guild {}", rss.getURL(), e.getJDA().getGuildById(guild_id).getName());
 					URL rssUrl = new URL(rss.getURL());
-					BufferedReader in = new BufferedReader(new InputStreamReader(rssUrl.openStream()));
+					URLConnection con = rssUrl.openConnection();
+					con.setConnectTimeout(5000);
+					con.setReadTimeout(10000);
+					BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 					
 					boolean itemTagFound = false;
 					String title = "";
@@ -93,8 +96,8 @@ public class ParseRSS extends TimerTask{
 							e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel).sendMessage(outMessage).queue();
 					}
 					in.close();
-				} catch (IOException e1) {
-					logger.error("Error on reading the BufferedReader on rss test", e1);
+				} catch (Exception e1) {
+					logger.error("Error on retrieving feed", e1);
 				}
 			}
 		}
@@ -106,10 +109,6 @@ public class ParseRSS extends TimerTask{
 		calendar.set(Calendar.MILLISECOND, 0);
 		
 		Timer time = new Timer();
-		time.schedule(new ParseRSS(_e, _guild_id, _rss_channel), calendar.getTime(), TimeUnit.MINUTES.toMillis(5));
-	}
-	
-	public static void setRss_Channel(long _rss_channel) {
-		rss_channel = _rss_channel;
+		time.schedule(new ParseRSS(_e, _guild_id, _rss_channel), calendar.getTime(), TimeUnit.MINUTES.toMillis(10));
 	}
 }

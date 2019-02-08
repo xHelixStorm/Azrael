@@ -29,7 +29,7 @@ public class BanListener extends ListenerAdapter{
 		}
 		else{
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			if(Azrael.SQLInsertData(user_id, guild_id, 1, 2, timestamp, timestamp, true, false) == 0) {
+			if(Azrael.SQLInsertData(user_id, guild_id, 0, 2, timestamp, timestamp, true, false) == 0) {
 				logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
 				if(log_channel != 0)e.getGuild().getTextChannelById(log_channel).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
 			}

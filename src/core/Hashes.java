@@ -38,7 +38,7 @@ public class Hashes {
     private static final Map<Long, Integer> message_removed = new HashMap<Long, Integer>();
     private static final Map<Long, Guilds> status = new HashMap<Long, Guilds>();
     private static final Map<String, Rank> ranking_roles = new HashMap<String, Rank>();
-    private static final Map<String, Ranks> ranking_levels = new HashMap<String, Ranks>();
+    private static final LinkedHashMap<String, Ranks> ranking_levels = new LinkedHashMap<String, Ranks>();
     private static final Map<String, Roles> roles = new HashMap<String, Roles>();
     private static final Map<Long, Long> reaction_message = new HashMap<Long, Long>();
     private static final Map<Integer, Quizes> quiz = new HashMap<Integer, Quizes>();
