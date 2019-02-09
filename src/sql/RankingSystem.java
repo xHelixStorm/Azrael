@@ -1198,7 +1198,7 @@ public class RankingSystem {
 	public static ArrayList<Skins> SQLgetSkinshopContentAndType(long _guild_id){
 		logger.debug("SQLgetSkinshopContentAndType launched. Params passed {}", _guild_id);
 		ArrayList<Skins> set_skin = new ArrayList<Skins>();
-		if(Hashes.getShopContent("shop") == null) {
+		if(Hashes.getShopContent(_guild_id) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -1217,7 +1217,7 @@ public class RankingSystem {
 					insert_skin.setSkinDescription(rs.getString(5));
 					set_skin.add(insert_skin);
 				}
-				Hashes.addShopContent("shop", set_skin);
+				Hashes.addShopContent(_guild_id, set_skin);
 				return set_skin;
 			} catch (SQLException e) {
 				logger.error("SQLgetSkinshopContentAndType Exception", e);
@@ -1228,7 +1228,7 @@ public class RankingSystem {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getShopContent("shop");
+		return Hashes.getShopContent(_guild_id);
 	}
 	
 	public static int SQLgetItemID(long _user_id, long _guild_id, int _item_id){

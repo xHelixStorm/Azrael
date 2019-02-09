@@ -25,12 +25,10 @@ public class ClearHashes extends TimerTask{
 	
 	public static void runTask(){
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.HOUR_OF_DAY, 12);
-		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 		
 		Timer time = new Timer();
-		time.schedule(new ClearHashes(), calendar.getTime(), TimeUnit.HOURS.toMillis(12));
+		time.schedule(new ClearHashes(), calendar.getTime(), TimeUnit.HOURS.toMillis(4));
 	}
 }

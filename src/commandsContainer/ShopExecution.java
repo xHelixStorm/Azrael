@@ -11,7 +11,7 @@ import rankingSystem.Skins;
 import sql.RankingSystem;
 
 public class ShopExecution {	
-	public static void displayWholeShop(MessageReceivedEvent _e, String _level_description, String _rank_description, String _profile_description, String _icon_description){
+	/*public static void displayWholeShop(MessageReceivedEvent _e, String _level_description, String _rank_description, String _profile_description, String _icon_description){
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail()).setTitle("Welcome to my shop!");
 		List<Skins> shopContent = RankingSystem.SQLgetSkinshopContentAndType(_e.getGuild().getIdLong());
 		List<Skins> levelContent = shopContent.parallelStream().filter(e -> e.getSkinType().equals("lev")).collect(Collectors.toList());
@@ -91,7 +91,7 @@ public class ShopExecution {
 		priceBuilder.setLength(0);
 		
 		_e.getTextChannel().sendMessage(message.build()).queue();
-	}
+	}*/
 	
 	public static void displayPartOfShop(MessageReceivedEvent _e, String _type, String _description){
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail()).setTitle("Welcome to my shop!");

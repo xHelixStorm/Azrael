@@ -44,7 +44,7 @@ public class Hashes {
     private static final Map<Integer, Quizes> quiz = new HashMap<Integer, Quizes>();
     private static final Map<Member, Integer> quiz_winners = new HashMap<Member, Integer>();
     private static final Map<String, ArrayList<Rank>> rankList = new HashMap<String, ArrayList<Rank>>();
-    private static final Map<String, ArrayList<Skins>> shopContent = new HashMap<String, ArrayList<Skins>>();
+    private static final Map<Long, ArrayList<Skins>> shopContent = new HashMap<Long, ArrayList<Skins>>();
     private static final Map<String, ArrayList<Dailies>> daily_items = new HashMap<String, ArrayList<Dailies>>();
     private static final Map<Long, Roles> discordRoles = new HashMap<Long, Roles>();
     private static final ConcurrentMap<Long, ArrayList<RSS>> feeds = new ConcurrentHashMap<Long, ArrayList<RSS>>();
@@ -88,7 +88,7 @@ public class Hashes {
 	public static void addRankList(String _key, ArrayList<Rank> _rankList) {
 		rankList.put(_key, _rankList);
 	}
-	public static void addShopContent(String _key, ArrayList<Skins> _skin_content) {
+	public static void addShopContent(Long _key, ArrayList<Skins> _skin_content) {
 		shopContent.put(_key, _skin_content);
 	}
 	public static void addDailyItems(String _key, ArrayList<Dailies> _daily_items) {
@@ -152,7 +152,7 @@ public class Hashes {
 	public static ArrayList<Rank> getRankList(String _key){
 		return rankList.get(_key);
 	}
-	public static ArrayList<Skins> getShopContent(String _key){
+	public static ArrayList<Skins> getShopContent(Long _key){
 		return shopContent.get(_key);
 	}
 	public static ArrayList<Dailies> getDailyItems(String _key){

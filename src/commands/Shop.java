@@ -44,7 +44,7 @@ public class Shop implements Command{
 						ShopExecution.displayPartOfShop(e, "ite", "");
 					}
 					else{
-						ShopExecution.displayWholeShop(e, guild_settings.getLevelDescription(), guild_settings.getRankDescription(), guild_settings.getProfileDescription(), guild_settings.getIconDescription());
+						e.getTextChannel().sendMessage("Write the shop command together with the category of the shop you want to visit. For example "+IniFileReader.getCommandPrefix()+"shop **level ups**/**ranks**/**profiles**/**icons**/**items**").queue();
 					}
 				}
 				else{
