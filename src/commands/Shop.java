@@ -9,6 +9,7 @@ import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
+import sql.RankingSystemItems;
 
 public class Shop implements Command{
 
@@ -28,23 +29,34 @@ public class Shop implements Command{
 				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 				if(bot_channel == 0 || e.getTextChannel().getIdLong() == bot_channel){
 					Guilds guild_settings = Hashes.getStatus(e.getGuild().getIdLong());
-					if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP LEVEL UPS")){
+					if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP LEVEL UPS")) {
 						ShopExecution.displayPartOfShop(e, "lev", guild_settings.getLevelDescription());
 					}
-					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP RANKS")){
+					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP RANKS")) {
 						ShopExecution.displayPartOfShop(e, "ran", guild_settings.getRankDescription());
 					}
-					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP PROFILES")){
+					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP PROFILES")) {
 						ShopExecution.displayPartOfShop(e, "pro", guild_settings.getProfileDescription());
 					}
-					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP ICONS")){
+					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP ICONS")) {
 						ShopExecution.displayPartOfShop(e, "ico", guild_settings.getIconDescription());
 					}
-					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP ITEMS")){
+					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP ITEMS")) {
 						ShopExecution.displayPartOfShop(e, "ite", "");
 					}
+					else if(input.toUpperCase().equals(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP WEAPONS")) {
+						StringBuilder builder = new StringBuilder();
+						for(String category : RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong())) {
+							builder.append(category+", ");
+						}
+						e.getTextChannel().sendMessage("Use these weapon sections to filter the weapons you wish to purchase together with the command:\n**"+builder.toString()+"**").queue();
+					}
+					else if(input.toUpperCase().contains(IniFileReader.getCommandPrefix().toUpperCase()+"SHOP WEAPONS ")) {
+						String type = input.substring(IniFileReader.getCommandPrefix().length()+13);
+						ShopExecution.displayPartOfShopWeapons(e, type);
+					}
 					else{
-						e.getTextChannel().sendMessage("Write the shop command together with the category of the shop you want to visit. For example "+IniFileReader.getCommandPrefix()+"shop **level ups**/**ranks**/**profiles**/**icons**/**items**").queue();
+						e.getTextChannel().sendMessage("Write the shop command together with the category of the shop you want to visit. For example "+IniFileReader.getCommandPrefix()+"shop **level ups** / **ranks** / **profiles** / **icons** / **items** / **weapons**").queue();
 					}
 				}
 				else{

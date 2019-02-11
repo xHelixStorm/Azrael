@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.entities.Member;
 import rankingSystem.Rank;
 import rankingSystem.Ranks;
 import rankingSystem.Skins;
+import rankingSystem.Weapons;
 
 public class Hashes {
 	private static final int max_message_pool_size = 1500;
@@ -48,6 +49,7 @@ public class Hashes {
     private static final Map<String, ArrayList<Dailies>> daily_items = new HashMap<String, ArrayList<Dailies>>();
     private static final Map<Long, Roles> discordRoles = new HashMap<Long, Roles>();
     private static final ConcurrentMap<Long, ArrayList<RSS>> feeds = new ConcurrentHashMap<Long, ArrayList<RSS>>();
+    private static final Map<Long, ArrayList<Weapons>> weaponShopContent = new HashMap<Long, ArrayList<Weapons>>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -99,6 +101,9 @@ public class Hashes {
 	}
 	public static void addFeeds(Long _key, ArrayList<RSS> _feeds) {
 		feeds.put(_key, _feeds);
+	}
+	public static void addWeaponShopContent(Long _key, ArrayList<Weapons> _weapons) {
+		weaponShopContent.put(_key, _weapons);
 	}
 	
 	public static Messages getMessagePool(long _message_id) {
@@ -164,6 +169,9 @@ public class Hashes {
 	public static ArrayList<RSS> getFeed(Long _key) {
 		return feeds.get(_key);
 	}
+	public static ArrayList<Weapons> getWeaponShopContent(Long _key){
+		return weaponShopContent.get(_key);
+	}
 	
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
@@ -218,5 +226,8 @@ public class Hashes {
 	}
 	public static void clearFeeds() {
 		feeds.clear();
+	}
+	public static void clearWeaponShopContent() {
+		weaponShopContent.clear();
 	}
 }
