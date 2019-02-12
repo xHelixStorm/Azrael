@@ -42,10 +42,14 @@ public class InventoryBuilder{
 				for(InventoryContent inventory : _items){
 					int x = getDrawPositionX(i);
 					int y = getDrawPositionY(i);
-					BufferedImage item = ImageIO.read(new File("./files/RankingSystem/Inventory/items/"+inventory.getDescription()+".png"));
+					BufferedImage item;
+					if(inventory.getType() != null)
+						item = ImageIO.read(new File("./files/RankingSystem/Inventory/items/"+inventory.getDescription()+".png"));
+					else
+						item = ImageIO.read(new File("./files/RankingSystem/Inventory/weapons/"+inventory.getWeaponDescription()+".png"));
 					g.drawImage(item, startX+289-(item.getWidth()/2)+x, startY+243-(item.getHeight()/2)+y, null);
-					g.drawString(inventory.getDescription(), startX+getCenteredString(inventory.getDescription(), 288, g)+x, startY+243+180+y);
-					if(inventory.getType().equals("ite")){
+					g.drawString((inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+ " "+inventory.getStat()), startX+getCenteredString(inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+ " "+inventory.getStat(), 288, g)+x, startY+243+180+y);
+					if(inventory.getType() == null || inventory.getType().equals("ite")){
 						if(inventory.getStatus().equals("limit")){
 							long time = inventory.getExpiration().getTime()-System.currentTimeMillis();
 							long days = time/1000/60/60/24;

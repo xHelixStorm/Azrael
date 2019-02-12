@@ -1321,7 +1321,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, description, fk_skin FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? ORDER BY position desc LIMIT ?, 12");
+			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_guild_id = weapon_shop_content.fk_guild_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_guild_id = weapon_category.fk_guild_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? ORDER BY position desc LIMIT ?, 12");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -1336,6 +1336,10 @@ public class RankingSystem {
 				setInventory.setExpiration(rs.getTimestamp(5));
 				setInventory.setDescription(rs.getString(6));
 				setInventory.setType(rs.getString(7));
+				setInventory.setWeaponDescription(rs.getString(8));
+				setInventory.setStat(rs.getString(9));
+				setInventory.setWeaponCategoryID(rs.getInt(10));
+				setInventory.setWeaponCategoryDescription(rs.getString(11));
 				inventory.add(setInventory);
 			}
 			return inventory;
