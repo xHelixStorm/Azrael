@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 import fileManagement.IniFileReader;
+import inventory.InventoryContent;
 import rankingSystem.Weapons;
 
 public class RankingSystemItems {
@@ -74,7 +76,7 @@ public class RankingSystemItems {
 					Weapons weapon = new Weapons(
 						rs.getInt(1),
 						rs.getString(2),
-						rs.getDouble(3),
+						rs.getLong(3),
 						rs.getString(4),
 						rs.getInt(5),
 						rs.getInt(6),
@@ -97,5 +99,77 @@ public class RankingSystemItems {
 			}
 		}
 		return Hashes.getWeaponShopContent(_guild_id);
+	}
+	
+	public static InventoryContent SQLgetNumberAndExpirationFromInventory(long _user_id, long _guild_id, int _weapon_id, String _status){
+		logger.debug("SQLgetNumberAndExpirationFromInventory launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _weapon_id, _status);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT number, expires FROM inventory INNER JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_guild_id = weapon_shop_content.fk_guild_id WHERE fk_user_id = ? AND fk_weapon_id = ? AND fk_status = ? AND inventory.fk_guild_id = ? AND enabled = 1");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setInt(2, _weapon_id);
+			stmt.setString(3, _status);
+			stmt.setLong(4, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				InventoryContent inventory = new InventoryContent();
+				inventory.setNumber(rs.getInt(1));
+				inventory.setExpiration(rs.getTimestamp(2));
+				return inventory;
+			}
+			return null;
+		} catch (SQLException e) {
+			logger.error("SQLgetNumberExpirationFromInventory Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	//Transaction
+	@SuppressWarnings("resource")
+	public static int SQLUpdateCurrencyAndInsertTimedInventory(long _user_id, long _guild_id, long _currency, int _item_id, long _position, long _expires, int _number){
+		logger.debug("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _position, _expires, _number);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false);
+			String sql = ("UPDATE user_details SET currency = ? WHERE fk_user_id = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _currency);
+			stmt.setLong(2, _user_id);
+			stmt.setLong(3, _guild_id);
+			stmt.executeUpdate();
+			
+			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_weapon_id, position, number, fk_status, expires, fk_guild_id) VALUES(?, ?, ?, ?, \"limit\", ?, ?) ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number), expires=VALUES(expires)");
+			stmt = myConn.prepareStatement(sql2);
+			stmt.setLong(1, _user_id);
+			stmt.setInt(2, _item_id);
+			stmt.setTimestamp(3, new Timestamp(_position));
+			stmt.setInt(4, _number);
+			stmt.setTimestamp(5, new Timestamp(_expires+604800000));
+			stmt.setLong(6, _guild_id);
+			var editedRows = stmt.executeUpdate();
+			myConn.commit();	
+			return editedRows;
+		} catch (SQLException e) {
+			logger.error("SQLUpdateCurrencyAndInsertTimedInventory Exception", e);
+			try {
+				myConn.rollback();
+			} catch (SQLException e1) {
+				logger.error("SQLUpdateCurrencyAndInsertTImedInventory rollback Exception", e);
+			}
+			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
 	}
 }

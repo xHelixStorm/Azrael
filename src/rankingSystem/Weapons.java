@@ -3,7 +3,7 @@ package rankingSystem;
 public class Weapons {
 	private int weapon_id;
 	private String description;
-	private double price;
+	private long price;
 	private String weapon_abbv;
 	private int skin;
 	private int stat;
@@ -12,7 +12,7 @@ public class Weapons {
 	private String category_description;
 	private boolean enabled;
 	
-	public Weapons(int _weapon_id, String _description, double _price, String _weapon_abbv, int _skin, int _stat, String _stat_description, int _category_id, String _category_description, boolean _enabled) {
+	public Weapons(int _weapon_id, String _description, long _price, String _weapon_abbv, int _skin, int _stat, String _stat_description, int _category_id, String _category_description, boolean _enabled) {
 		this.weapon_id = _weapon_id;
 		this.description = _description;
 		this.price = _price;
@@ -31,7 +31,7 @@ public class Weapons {
 	public String getDescription() {
 		return description;
 	}
-	public double getPrice() {
+	public long getPrice() {
 		return price;
 	}
 	public String getWeaponAbbv() {

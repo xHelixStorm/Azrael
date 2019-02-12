@@ -43,7 +43,7 @@ public class ShopExecution {
 			
 			for(Weapons weapon : filteredContent) {
 				builder.append("*_"+weapon.getDescription()+" "+weapon.getStatDescription()+"_*\n");
-				priceBuilder.append("*_"+(int)weapon.getPrice()+" PEN_*\n");
+				priceBuilder.append("*_"+weapon.getPrice()+" PEN_*\n");
 			}
 			EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail()).setTitle("Welcome to my shop!");
 			message.addField("Weapons: "+filteredContent.get(0).getCategoryDescription(), "***Here the requested stock!***", false);
