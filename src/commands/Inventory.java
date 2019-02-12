@@ -38,7 +38,18 @@ public class Inventory implements Command{
 					}
 					else{
 						int limit = 0;
-						int itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+						int itemNumber;
+						String lastWord = e.getMessage().getContentRaw().substring(e.getMessage().getContentRaw().lastIndexOf(" ")+1).toLowerCase();
+						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
+							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "ite");
+						else if(e.getMessage().getContentRaw().toLowerCase().contains("weapons")) {
+							if(!lastWord.equals("weapons"))
+								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), lastWord);
+							else
+								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), false);
+						}
+						else
+							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 						if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"inventory -page ")){
 							try {
 								limit = Integer.parseInt(e.getMessage().getContentRaw().replaceAll("[^0-9]", ""))-1;
@@ -50,7 +61,12 @@ public class Inventory implements Command{
 							}
 						}
 						e.getTextChannel().sendMessage("to have everything on one page, use the **-list** parameter together with the command!\nAdditionally, you can visualize the desired page with the **-page** paramenter.").queue();
-						InventoryBuilder.DrawInventory(e, null, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
+						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
+							InventoryBuilder.DrawInventory(e, null, "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
+						else if(e.getMessage().getContentRaw().contains("weapons"))
+							InventoryBuilder.DrawInventory(e, null, "total", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
+						else
+							InventoryBuilder.DrawInventory(e, null, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
 						
 						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+(limit/12+1)+"_"+(itemNumber+1)+"_1");
 					}
