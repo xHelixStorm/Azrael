@@ -62,18 +62,25 @@ public class Inventory implements Command{
 							}
 						}
 						e.getTextChannel().sendMessage("to have everything on one page, use the **-list** parameter together with the command!\nAdditionally, you can visualize the desired page with the **-page** paramenter.").queue();
+						String drawTab = "";
 						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
 							InventoryBuilder.DrawInventory(e, null, "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
 						else if(e.getMessage().getContentRaw().contains("weapons")) {
-							if(!lastWord.equals("weapons") && sub_cat != null)
+							if(!lastWord.equals("weapons") && sub_cat != null) {
+								drawTab = "weapons_"+lastWord;
 								InventoryBuilder.DrawInventory(e, null, "weapons", lastWord, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, lastWord), limit/12+1, itemNumber+1);
-							else
+							}
+							else {
+								drawTab = "weapons_total";
 								InventoryBuilder.DrawInventory(e, null, "weapons", "total", RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
+							}
 						}
-						else
+						else {
+							drawTab = "total_total";
 							InventoryBuilder.DrawInventory(e, null, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
+						}
 						
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+(limit/12+1)+"_"+(itemNumber+1)+"_1");
+						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+(limit/12+1)+"_"+(itemNumber+1)+"_1_"+drawTab);
 					}
 				}
 				else{

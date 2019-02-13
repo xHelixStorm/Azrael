@@ -101,8 +101,10 @@ public class MessageListener extends ListenerAdapter{
 				final int current_page = Integer.parseInt(array[1]);
 				final int last_page = Integer.parseInt(array[2]);
 				final int ignoreMessages = Integer.parseInt(array[3]);
+				final String inventory_tab = array[4];
+				final String sub_tab = array[5];
 				if(ignoreMessages == 1) {
-					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", member_id+"_"+current_page+"_"+last_page+"_2");
+					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", member_id+"_"+current_page+"_"+last_page+"_2_"+inventory_tab+"_"+sub_tab);
 				}
 				else {
 					boolean createFile = false;
@@ -115,7 +117,7 @@ public class MessageListener extends ListenerAdapter{
 						createFile = true;
 					}
 					if(createFile == true) {
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id+".azr", current_page+"_"+last_page);
+						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id+".azr", current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab);
 					}
 					inventory_bot.delete();
 				}

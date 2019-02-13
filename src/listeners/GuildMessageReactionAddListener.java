@@ -72,14 +72,16 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 					String [] array = file_content.split("_");
 					int current_page = Integer.parseInt(array[0]);
 					final int last_page = Integer.parseInt(array[1]);
+					final String inventory_tab = array[2];
+					final String sub_tab = array[3];
 					if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:"))
 						current_page--;
 					else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:"))
 						current_page++;
 					e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
 					inventory.delete();
-					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_2");
-					InventoryBuilder.DrawInventory(null, e, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
+					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_2_"+inventory_tab+"_"+sub_tab);
+					InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
 				}
 			}
 		}
