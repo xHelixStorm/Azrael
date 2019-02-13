@@ -1,5 +1,7 @@
 package commands;
 
+import java.awt.Color;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +10,7 @@ import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import inventory.InventoryBuilder;
 import inventory.InventoryContent;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
@@ -29,10 +32,17 @@ public class Inventory implements Command{
 			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
 				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 				if(bot_channel == e.getTextChannel().getIdLong() || bot_channel == 0){
-					if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"inventory -list")){
+					if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"inventory -help")) {
+						EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
+						e.getTextChannel().sendMessage(message.setDescription("- Type **-list** after the command to display the whole inventory as a list\n"
+								+ "- Type **-page** and then the page together with the command to directly select the page you wish to view\n"
+								+ "- Type the tab name to filter your inventory item by type. Available types are **items** and **weapons**\n"
+								+ "- Type the sub tab after the tab name together with the command to further filter your inventory selection").build()).queue();
+					}
+					else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"inventory -list")){
 						String out = "";
 						for(InventoryContent inventory : RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())){
-							out+= inventory.getDescription()+"\n";
+							out+= (inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+" "+inventory.getStat())+"\n";
 						}
 						e.getTextChannel().sendMessage("```"+out+"```").queue();
 					}
@@ -61,7 +71,7 @@ public class Inventory implements Command{
 								limit = 0;
 							}
 						}
-						e.getTextChannel().sendMessage("to have everything on one page, use the **-list** parameter together with the command!\nAdditionally, you can visualize the desired page with the **-page** paramenter.").queue();
+						
 						String drawTab = "";
 						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
 							InventoryBuilder.DrawInventory(e, null, "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
@@ -80,7 +90,7 @@ public class Inventory implements Command{
 							InventoryBuilder.DrawInventory(e, null, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
 						}
 						
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+(limit/12+1)+"_"+(itemNumber+1)+"_1_"+drawTab);
+						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+(limit/12+1)+"_"+(itemNumber+1)+"_"+drawTab);
 					}
 				}
 				else{

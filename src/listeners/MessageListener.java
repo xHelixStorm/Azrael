@@ -100,27 +100,22 @@ public class MessageListener extends ListenerAdapter{
 				final long member_id = Long.parseLong(array[0]);
 				final int current_page = Integer.parseInt(array[1]);
 				final int last_page = Integer.parseInt(array[2]);
-				final int ignoreMessages = Integer.parseInt(array[3]);
-				final String inventory_tab = array[4];
-				final String sub_tab = array[5];
-				if(ignoreMessages == 1) {
-					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", member_id+"_"+current_page+"_"+last_page+"_2_"+inventory_tab+"_"+sub_tab);
+				final String inventory_tab = array[3];
+				final String sub_tab = array[4];
+				
+				boolean createFile = false;
+				if(current_page > 1) {
+					e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).complete();
+					createFile = true;
 				}
-				else {
-					boolean createFile = false;
-					if(current_page > 1) {
-						e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).complete();
-						createFile = true;
-					}
-					if(current_page < last_page) {
-						e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).complete();
-						createFile = true;
-					}
-					if(createFile == true) {
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id+".azr", current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab);
-					}
-					inventory_bot.delete();
+				if(current_page < last_page) {
+					e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).complete();
+					createFile = true;
 				}
+				if(createFile == true) {
+					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id+".azr", current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab);
+				}
+				inventory_bot.delete();
 			}
 			
 			if(reaction.exists() && UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
