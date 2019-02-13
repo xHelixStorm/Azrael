@@ -50,6 +50,7 @@ public class Hashes {
     private static final Map<Long, Roles> discordRoles = new HashMap<Long, Roles>();
     private static final ConcurrentMap<Long, ArrayList<RSS>> feeds = new ConcurrentHashMap<Long, ArrayList<RSS>>();
     private static final Map<Long, ArrayList<Weapons>> weaponShopContent = new HashMap<Long, ArrayList<Weapons>>();
+    private static final Map<Long, ArrayList<String>> weaponCategories = new HashMap<Long, ArrayList<String>>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -104,6 +105,9 @@ public class Hashes {
 	}
 	public static void addWeaponShopContent(Long _key, ArrayList<Weapons> _weapons) {
 		weaponShopContent.put(_key, _weapons);
+	}
+	public static void addWeaponCategories(Long _key, ArrayList<String> _categories) {
+		weaponCategories.put(_key, _categories);
 	}
 	
 	public static Messages getMessagePool(long _message_id) {
@@ -169,8 +173,11 @@ public class Hashes {
 	public static ArrayList<RSS> getFeed(Long _key) {
 		return feeds.get(_key);
 	}
-	public static ArrayList<Weapons> getWeaponShopContent(Long _key){
+	public static ArrayList<Weapons> getWeaponShopContent(Long _key) {
 		return weaponShopContent.get(_key);
+	}
+	public static ArrayList<String> getWeaponCategories(Long _key) {
+		return weaponCategories.get(_key);
 	}
 	
 	public static void removeMessagePool(long _message_id) {
@@ -229,5 +236,8 @@ public class Hashes {
 	}
 	public static void clearWeaponShopContent() {
 		weaponShopContent.clear();
+	}
+	public static void clearWeaponCategories() {
+		weaponCategories.clear();
 	}
 }

@@ -6,12 +6,14 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -69,8 +71,8 @@ public class InventoryBuilder{
 				else
 					ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/"+_e2.getMember().getUser().getId()+"_inventory.png"));
 			} catch(IOException ioe){
-				System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-				ioe.printStackTrace();
+				Logger logger = LoggerFactory.getLogger(InventoryBuilder.class);
+				logger.warn("Inventory tab not found", ioe);
 			}
 			
 			if(_e != null) {

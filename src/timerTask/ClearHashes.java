@@ -18,6 +18,7 @@ public class ClearHashes extends TimerTask{
 		Hashes.clearRankList();
 		Hashes.clearShopContent();
 		Hashes.clearWeaponShopContent();
+		Hashes.clearWeaponCategories();
 		Hashes.clearDailyItems();
 		
 		Logger logger = LoggerFactory.getLogger(ClearHashes.class);

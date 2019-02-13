@@ -35,27 +35,31 @@ public class RankingSystemItems {
 	public static ArrayList<String> SQLgetWeaponCategories(long _guild_id){
 		logger.debug("SQLgetWeaponCategories launched. Params passed {}", _guild_id);
 		ArrayList<String> categories = new ArrayList<String>();
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT DISTINCT(name) FROM weapon_category WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				categories.add(rs.getString(1));
+		if(Hashes.getWeaponCategories(_guild_id) == null) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT DISTINCT(name) FROM weapon_category WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					categories.add(rs.getString(1));
+				}
+				Hashes.addWeaponCategories(_guild_id, categories);
+				return categories;
+			} catch (SQLException e) {
+				logger.error("SQLgetWeaponCategories Exception", e);
+				return categories;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-			return categories;
-		} catch (SQLException e) {
-			logger.error("SQLgetWeaponCategories Exception", e);
-			return categories;
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
+		return Hashes.getWeaponCategories(_guild_id);
 	}
 	
 	//JOINS

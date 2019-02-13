@@ -10,6 +10,7 @@ import inventory.InventoryBuilder;
 import inventory.InventoryContent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
+import sql.RankingSystemItems;
 import sql.Azrael;
 
 public class Inventory implements Command{
@@ -28,7 +29,6 @@ public class Inventory implements Command{
 			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
 				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 				if(bot_channel == e.getTextChannel().getIdLong() || bot_channel == 0){
-					//project will be enhanced with more options in the future (e.g distinction of displaying items, weapons, all or kind of weapons. for now only items)
 					if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"inventory -list")){
 						String out = "";
 						for(InventoryContent inventory : RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())){
@@ -40,10 +40,11 @@ public class Inventory implements Command{
 						int limit = 0;
 						int itemNumber;
 						String lastWord = e.getMessage().getContentRaw().substring(e.getMessage().getContentRaw().lastIndexOf(" ")+1).toLowerCase();
+						String sub_cat = RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()).parallelStream().filter(c -> c.equalsIgnoreCase(lastWord)).findAny().orElse(null);
 						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
 							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "ite");
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("weapons")) {
-							if(!lastWord.equals("weapons"))
+							if(!lastWord.equals("weapons") && sub_cat != null)
 								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), lastWord);
 							else
 								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), false);
@@ -63,8 +64,12 @@ public class Inventory implements Command{
 						e.getTextChannel().sendMessage("to have everything on one page, use the **-list** parameter together with the command!\nAdditionally, you can visualize the desired page with the **-page** paramenter.").queue();
 						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
 							InventoryBuilder.DrawInventory(e, null, "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
-						else if(e.getMessage().getContentRaw().contains("weapons"))
-							InventoryBuilder.DrawInventory(e, null, "total", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
+						else if(e.getMessage().getContentRaw().contains("weapons")) {
+							if(!lastWord.equals("weapons") && sub_cat != null)
+								InventoryBuilder.DrawInventory(e, null, "weapons", lastWord, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, lastWord), limit/12+1, itemNumber+1);
+							else
+								InventoryBuilder.DrawInventory(e, null, "weapons", "total", RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
+						}
 						else
 							InventoryBuilder.DrawInventory(e, null, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
 						
