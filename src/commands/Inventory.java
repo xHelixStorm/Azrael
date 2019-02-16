@@ -55,7 +55,7 @@ public class Inventory implements Command{
 							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "ite");
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("weapons")) {
 							if(!lastWord.equals("weapons") && sub_cat != null)
-								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), lastWord);
+								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), true, lastWord);
 							else
 								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), false);
 						}
