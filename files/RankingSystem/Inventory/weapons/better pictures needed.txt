@@ -1,4 +1,5 @@
 Black cannonade
+Black Turret
 Black Gauss Rifle
 Black Heavy Machine Gun
 Black Mind Energy
@@ -9,6 +10,7 @@ Blue Cannonade
 Blue Hand Gun
 Blue Heavy Machine Gun
 Blue Submachine Gun
+Blue Gauss Rifle
 Gold-Black Semi Rifle
 Green Gauss Rifle
 Green Heavy Machine Gun
@@ -17,3 +19,8 @@ Green Mind Shock
 Green Smash Rifle
 Green Submashine Gun
 Heavy Machine Gun
+
+Violet Counter Sword
+Black Counter Sword
+Silver-Black Semi Rifle
+Shadow Turret
