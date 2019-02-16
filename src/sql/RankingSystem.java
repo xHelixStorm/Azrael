@@ -945,6 +945,33 @@ public class RankingSystem {
 		}
 	}
 	
+	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, String _ignore, boolean _boolIgnore){
+		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _ignore, _boolIgnore);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT COUNT(*) FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id WHERE fk_user_id = ? && inventory.fk_guild_id = ? AND fk_skin NOT LIKE ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, _ignore);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return rs.getInt(1)/12;
+			}
+			return 0;
+		} catch (SQLException e) {
+			logger.error("SQLgetTotalItemNumber Exception", e);
+			return 0;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, boolean _oneType){
 		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}", _user_id, _guild_id, _oneType);
 		Connection myConn = null;
@@ -1546,6 +1573,42 @@ public class RankingSystem {
 			return inventory;
 		} catch (SQLException e) {
 			logger.error("SQLgetInventoryAndDescriptionsWeapons Exception", e);
+			return inventory;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionsSkins(long _user_id, long _guild_id, int _limit){
+		logger.debug("SQLgetInventoryAndDescriptions launched. Passed params {}, {}, {}", _user_id, _guild_id, _limit);
+		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND shop_content.fk_skin != 'ite' ORDER BY position desc LIMIT ?, 12");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setInt(3, _limit);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				InventoryContent setInventory = new InventoryContent();
+				setInventory.setUserID(rs.getLong(1));
+				setInventory.setTimestamp(rs.getTimestamp(2));
+				setInventory.setNumber(rs.getInt(3));
+				setInventory.setStatus(rs.getString(4));
+				setInventory.setExpiration(rs.getTimestamp(5));
+				setInventory.setDescription(rs.getString(6));
+				setInventory.setType(rs.getString(7));
+				inventory.add(setInventory);
+			}
+			return inventory;
+		} catch (SQLException e) {
+			logger.error("SQLgetInventoryAndDescriptions Exception", e);
 			return inventory;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }

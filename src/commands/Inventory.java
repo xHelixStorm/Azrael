@@ -59,6 +59,9 @@ public class Inventory implements Command{
 							else
 								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), false);
 						}
+						else if(e.getMessage().getContentRaw().toLowerCase().contains("skins")) {
+							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "ite", true);
+						}
 						else
 							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 						if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"inventory -page ")){
@@ -75,7 +78,7 @@ public class Inventory implements Command{
 						String drawTab = "";
 						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
 							InventoryBuilder.DrawInventory(e, null, "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
-						else if(e.getMessage().getContentRaw().contains("weapons")) {
+						else if(e.getMessage().getContentRaw().toLowerCase().contains("weapons")) {
 							if(!lastWord.equals("weapons") && sub_cat != null) {
 								drawTab = "weapons_"+lastWord;
 								InventoryBuilder.DrawInventory(e, null, "weapons", lastWord, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, lastWord), limit/12+1, itemNumber+1);
@@ -84,6 +87,10 @@ public class Inventory implements Command{
 								drawTab = "weapons_total";
 								InventoryBuilder.DrawInventory(e, null, "weapons", "total", RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
 							}
+						}
+						else if(e.getMessage().getContentRaw().toLowerCase().contains("skins")) {
+							drawTab = "skins_total";
+							InventoryBuilder.DrawInventory(e, null, "skins", "total", RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
 						}
 						else {
 							drawTab = "total_total";

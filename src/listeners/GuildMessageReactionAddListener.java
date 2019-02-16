@@ -81,7 +81,12 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 					e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
 					inventory.delete();
 					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab);
-					InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
+					if(inventory_tab.equalsIgnoreCase("weapons"))
+						InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
+					else if(inventory_tab.equalsIgnoreCase("skins"))
+						InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
+					else
+						InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
 				}
 			}
 		}
