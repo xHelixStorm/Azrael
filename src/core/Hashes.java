@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.entities.Member;
 import rankingSystem.Rank;
 import rankingSystem.Ranks;
 import rankingSystem.Skins;
+import rankingSystem.Weapon_Abbvs;
 import rankingSystem.Weapons;
 
 public class Hashes {
@@ -51,6 +52,7 @@ public class Hashes {
     private static final ConcurrentMap<Long, ArrayList<RSS>> feeds = new ConcurrentHashMap<Long, ArrayList<RSS>>();
     private static final Map<Long, ArrayList<Weapons>> weaponShopContent = new HashMap<Long, ArrayList<Weapons>>();
     private static final Map<Long, ArrayList<String>> weaponCategories = new HashMap<Long, ArrayList<String>>();
+    private static final Map<Long, ArrayList<Weapon_Abbvs>> weaponAbbvs = new HashMap<Long, ArrayList<Weapon_Abbvs>>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -108,6 +110,9 @@ public class Hashes {
 	}
 	public static void addWeaponCategories(Long _key, ArrayList<String> _categories) {
 		weaponCategories.put(_key, _categories);
+	}
+	public static void addWeaponAbbreviation(Long _key, ArrayList<Weapon_Abbvs> _abbreviations) {
+		weaponAbbvs.put(_key, _abbreviations);
 	}
 	
 	public static Messages getMessagePool(long _message_id) {
@@ -179,6 +184,9 @@ public class Hashes {
 	public static ArrayList<String> getWeaponCategories(Long _key) {
 		return weaponCategories.get(_key);
 	}
+	public static ArrayList<Weapon_Abbvs> getWeaponAbbreviations(Long _key) {
+		return weaponAbbvs.get(_key);
+	}
 	
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
@@ -239,5 +247,8 @@ public class Hashes {
 	}
 	public static void clearWeaponCategories() {
 		weaponCategories.clear();
+	}
+	public static void clearWeaponAbbreviations() {
+		weaponAbbvs.clear();
 	}
 }

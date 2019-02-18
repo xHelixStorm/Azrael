@@ -23,6 +23,7 @@ import commands.Profile;
 import commands.Pug;
 import commands.Purchase;
 import commands.Quiz;
+import commands.Randomshop;
 import commands.Rank;
 import commands.Reboot;
 import commands.Register;
@@ -144,6 +145,7 @@ public class Main {
 		CommandHandler.commands.put("quiz", new Quiz());
 		CommandHandler.commands.put("roleReaction", new RoleReaction());
 		CommandHandler.commands.put("rss", new Rss());
+		CommandHandler.commands.put("randomshop", new Randomshop());
 	}
 	
 	public static void addListeners(){

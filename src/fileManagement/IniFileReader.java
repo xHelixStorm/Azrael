@@ -271,4 +271,8 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Commands", "Rss", boolean.class);
 	}
+	public static boolean getRandomshopCommand() {
+		readConfig();
+		return ini.get("Commands", "Randomshop", boolean.class);
+	}
 }

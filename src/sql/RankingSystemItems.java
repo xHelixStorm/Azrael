@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import inventory.InventoryContent;
+import rankingSystem.Weapon_Abbvs;
 import rankingSystem.Weapons;
 
 public class RankingSystemItems {
@@ -60,6 +61,38 @@ public class RankingSystemItems {
 			}
 		}
 		return Hashes.getWeaponCategories(_guild_id);
+	}
+	
+	//weapon_abbreviation
+	public static ArrayList<Weapon_Abbvs> SQLgetWeaponAbbvs(long _guild_id) {
+		logger.debug("SQLgetWeaponAbbvs launched. Params passed {}", _guild_id);
+		ArrayList<Weapon_Abbvs> abbreviations = new ArrayList<Weapon_Abbvs>();
+		if(Hashes.getWeaponAbbreviations(_guild_id) == null) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT s.weapon_id, s.description, s.price, s.weapon_abbv, s.fk_skin, s.weapon_stat, w.stat, s.fk_category_id, c.name, s.enabled FROM weapon_shop_content s INNER JOIN weapon_stats w ON s.weapon_stat = w.stat_id INNER JOIN weapon_category c ON s.fk_category_id = c.category_id && s.fk_guild_id = c.fk_guild_id WHERE s.fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					Weapon_Abbvs abbreviation = new Weapon_Abbvs(rs.getString(1), rs.getString(2));
+					abbreviations.add(abbreviation);
+				}
+				Hashes.addWeaponAbbreviation(_guild_id, abbreviations);
+				return abbreviations;
+			} catch (SQLException e) {
+				logger.error("SQLgetWholeWeaponShop Exception", e);
+				return abbreviations;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		return Hashes.getWeaponAbbreviations(_guild_id);
 	}
 	
 	//JOINS
