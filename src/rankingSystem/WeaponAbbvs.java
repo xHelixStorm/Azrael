@@ -1,10 +1,10 @@
 package rankingSystem;
 
-public class Weapon_Abbvs {
+public class WeaponAbbvs {
 	String abbv;
 	String description;
 	
-	public Weapon_Abbvs(String _abbv, String _description) {
+	public WeaponAbbvs(String _abbv, String _description) {
 		this.abbv = _abbv;
 		this.description = _description;
 	}

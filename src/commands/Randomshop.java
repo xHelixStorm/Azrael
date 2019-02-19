@@ -26,13 +26,18 @@ public class Randomshop implements Command{
 			if(e.getTextChannel().getIdLong() == bot_channel || bot_channel == 0) {
 				if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"randomshop")) {
 					//run help and collect all possible parameters
-					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()));
+					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()));
 				}
-				else if(e.getMessage().getContentRaw().contains("play")) {
+				else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"randomshop -play ")) {
 					//start a round
+					RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()), e.getMessage().getContentRaw().substring((e.getMessage().getContentRaw().indexOf("-play")+6)));
 				}
-				else if(e.getMessage().getContentRaw().contains("replay")) {
+				else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"randomshop -replay ")) {
 					//play another round if a match occurred within 5 minutes
+				}
+				else {
+					//by typos run help
+					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()));
 				}
 			}
 			else {

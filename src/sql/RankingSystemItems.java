@@ -14,7 +14,8 @@ import org.slf4j.LoggerFactory;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import inventory.InventoryContent;
-import rankingSystem.Weapon_Abbvs;
+import rankingSystem.WeaponAbbvs;
+import rankingSystem.WeaponStats;
 import rankingSystem.Weapons;
 
 public class RankingSystemItems {
@@ -29,6 +30,61 @@ public class RankingSystemItems {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			logger.error("JDBC driver couldn't be loaded", e);
+		}
+	}
+	
+	//weapon_shop_content
+	public static int SQLgetRandomWeaponIDByAbbv(long _guild_id, String _abbv, int _stat_id) {
+		logger.debug("SQLgetRandomWeaponIDByAbbv launched. Params passed {}, {}, {}", _guild_id, _abbv, _stat_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT weapon_id FROM weapon_shop_content WHERE fk_guild_id = ? AND weapon_abbv LIKE ? AND weapon_stat = ? ORDER BY RAND() LIMIT 1");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setString(2, _abbv);
+			stmt.setInt(3, _stat_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return rs.getInt(1);
+			}
+			return 0;
+		} catch (SQLException e) {
+			logger.error("SQLgetRandomWeaponIDByAbbv Exception", e);
+			return 0;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLgetRandomWeaponIDByCategory(long _guild_id, String _category, int _stat_id) {
+		logger.debug("SQLgetRandomWeaponIDByAbbv launched. Params passed {}, {}, {}", _guild_id, _category, _stat_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT weapon_id FROM weapon_shop_content INNER JOIN weapon_category ON fk_category_id = category_id AND weapon_shop_content.fk_guild_id = weapon_category.fk_guild_id WHERE fk_guild_id = ? AND name LIKE ?  AND weapon_stat = ? ORDER BY RAND() LIMIT 1");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setString(2, _category);
+			stmt.setInt(3, _stat_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return rs.getInt(1);
+			}
+			return 0;
+		} catch (SQLException e) {
+			logger.error("SQLgetRandomWeaponIDByAbbv Exception", e);
+			return 0;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
@@ -64,27 +120,27 @@ public class RankingSystemItems {
 	}
 	
 	//weapon_abbreviation
-	public static ArrayList<Weapon_Abbvs> SQLgetWeaponAbbvs(long _guild_id) {
+	public static ArrayList<WeaponAbbvs> SQLgetWeaponAbbvs(long _guild_id) {
 		logger.debug("SQLgetWeaponAbbvs launched. Params passed {}", _guild_id);
-		ArrayList<Weapon_Abbvs> abbreviations = new ArrayList<Weapon_Abbvs>();
+		ArrayList<WeaponAbbvs> abbreviations = new ArrayList<WeaponAbbvs>();
 		if(Hashes.getWeaponAbbreviations(_guild_id) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT s.weapon_id, s.description, s.price, s.weapon_abbv, s.fk_skin, s.weapon_stat, w.stat, s.fk_category_id, c.name, s.enabled FROM weapon_shop_content s INNER JOIN weapon_stats w ON s.weapon_stat = w.stat_id INNER JOIN weapon_category c ON s.fk_category_id = c.category_id && s.fk_guild_id = c.fk_guild_id WHERE s.fk_guild_id = ?");
+				String sql = ("SELECT abbv, description FROM weapon_abbreviation WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
-					Weapon_Abbvs abbreviation = new Weapon_Abbvs(rs.getString(1), rs.getString(2));
+					WeaponAbbvs abbreviation = new WeaponAbbvs(rs.getString(1), rs.getString(2));
 					abbreviations.add(abbreviation);
 				}
 				Hashes.addWeaponAbbreviation(_guild_id, abbreviations);
 				return abbreviations;
 			} catch (SQLException e) {
-				logger.error("SQLgetWholeWeaponShop Exception", e);
+				logger.error("SQLgetWeponAbbvs Exception", e);
 				return abbreviations;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -93,6 +149,37 @@ public class RankingSystemItems {
 			}
 		}
 		return Hashes.getWeaponAbbreviations(_guild_id);
+	}
+	
+	//weapon_stats
+	public static ArrayList<WeaponStats> SQLgetWeaponStats(long _guild_id) {
+		logger.debug("SQLgetWeaponStats launched. Params passed {}", _guild_id);
+		ArrayList<WeaponStats> stats = new ArrayList<WeaponStats>();
+		if(Hashes.getWeaponStats(_guild_id) == null) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT stat_id, stat FROM weapon_stats");
+				stmt = myConn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					WeaponStats stat = new WeaponStats(rs.getInt(1), rs.getString(2));
+					stats.add(stat);
+				}
+				Hashes.addWeaponStat(_guild_id, stats);
+				return stats;
+			} catch (SQLException e) {
+				logger.error("SQLgetWeponStats Exception", e);
+				return stats;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		return Hashes.getWeaponStats(_guild_id);
 	}
 	
 	//JOINS
@@ -193,6 +280,43 @@ public class RankingSystemItems {
 			stmt.setInt(4, _number);
 			stmt.setTimestamp(5, new Timestamp(_expires+604800000));
 			stmt.setLong(6, _guild_id);
+			var editedRows = stmt.executeUpdate();
+			myConn.commit();	
+			return editedRows;
+		} catch (SQLException e) {
+			logger.error("SQLUpdateCurrencyAndInsertTimedInventory Exception", e);
+			try {
+				myConn.rollback();
+			} catch (SQLException e1) {
+				logger.error("SQLUpdateCurrencyAndInsertTImedInventory rollback Exception", e);
+			}
+			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	@SuppressWarnings("resource")
+	public static int SQLUpdateCurrencyAndInsertWeaponRandomshop(long _user_id, long _guild_id, long _currency, int _weapon_id){
+		logger.debug("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _currency, _weapon_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false);
+			String sql = ("UPDATE user_details SET currency = ? WHERE fk_user_id = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _currency);
+			stmt.setLong(2, _user_id);
+			stmt.setLong(3, _guild_id);
+			stmt.executeUpdate();
+			
+			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_weapon_id, number, fk_status, fk_guild_id) SELECT ?, weapon_id, '1', 'perm', ? WHERE weapon_id = ?");
+			stmt = myConn.prepareStatement(sql2);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setInt(3, _weapon_id);
 			var editedRows = stmt.executeUpdate();
 			myConn.commit();	
 			return editedRows;
