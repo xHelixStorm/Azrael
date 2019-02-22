@@ -1,9 +1,12 @@
 package commands;
 
+import java.io.File;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commandsContainer.RandomshopExecution;
+import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
@@ -32,11 +35,20 @@ public class Randomshop implements Command{
 					//start a round
 					RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()), e.getMessage().getContentRaw().substring((e.getMessage().getContentRaw().indexOf("-play")+6)));
 				}
-				else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"randomshop -replay ")) {
-					//play another round if a match occurred within 5 minutes
+				else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"randomshop -replay")) {
+					//play another round if a match occurred within 10 minutes
+					File file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_play_"+e.getMember().getUser().getId());
+					if(file.exists() && System.currentTimeMillis() - file.lastModified() < 600000) {
+						RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()), FileSetting.readFile(file.getAbsolutePath()));
+					}
+					else {
+						e.getTextChannel().sendMessage("You haven't played one round yet or the last time you played was over 10 minutes ago. Please rewrite the full command").queue();
+						if(file.exists())
+							file.delete();
+					}
 				}
 				else {
-					//by typos run help
+					//if typos occur, run help
 					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()));
 				}
 			}

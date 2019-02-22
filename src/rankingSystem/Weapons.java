@@ -10,9 +10,10 @@ public class Weapons {
 	private String stat_description;
 	private int category_id;
 	private String category_description;
+	private String overlay_name;
 	private boolean enabled;
 	
-	public Weapons(int _weapon_id, String _description, long _price, String _weapon_abbv, int _skin, int _stat, String _stat_description, int _category_id, String _category_description, boolean _enabled) {
+	public Weapons(int _weapon_id, String _description, long _price, String _weapon_abbv, int _skin, int _stat, String _stat_description, int _category_id, String _category_description, String _overlay_name, boolean _enabled) {
 		this.weapon_id = _weapon_id;
 		this.description = _description;
 		this.price = _price;
@@ -22,6 +23,7 @@ public class Weapons {
 		this.stat_description = _stat_description;
 		this.category_id = _category_id;
 		this.category_description = _category_description;
+		this.overlay_name = _overlay_name;
 		this.enabled = _enabled;
 	}
 	
@@ -51,6 +53,9 @@ public class Weapons {
 	}
 	public String getCategoryDescription() {
 		return category_description;
+	}
+	public String getOverlayName() {
+		return overlay_name;
 	}
 	public boolean getEnabled() {
 		return enabled;

@@ -220,7 +220,7 @@ public class RankingSystemItems {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT s.weapon_id, s.description, s.price, s.weapon_abbv, s.fk_skin, s.weapon_stat, w.stat, s.fk_category_id, c.name, s.enabled FROM weapon_shop_content s INNER JOIN weapon_stats w ON s.weapon_stat = w.stat_id INNER JOIN weapon_category c ON s.fk_category_id = c.category_id && s.fk_guild_id = c.fk_guild_id WHERE s.fk_guild_id = ?");
+				String sql = ("SELECT s.weapon_id, s.description, s.price, s.weapon_abbv, s.fk_skin, s.weapon_stat, w.stat, s.fk_category_id, c.name, o.overlay, s.enabled FROM weapon_shop_content s INNER JOIN weapon_stats w ON s.weapon_stat = w.stat_id INNER JOIN weapon_category c ON s.fk_category_id = c.category_id && s.fk_guild_id = c.fk_guild_id INNER JOIN randomshop_reward_overlays o ON s.fk_overlay_id = o.overlay_id WHERE s.fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
@@ -235,7 +235,8 @@ public class RankingSystemItems {
 						rs.getString(7),
 						rs.getInt(8),
 						rs.getString(9),
-						rs.getBoolean(10)
+						rs.getString(10),
+						rs.getBoolean(11)
 					);
 					weapons.add(weapon);
 				}
