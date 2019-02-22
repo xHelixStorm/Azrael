@@ -47,6 +47,10 @@ public class Randomshop implements Command{
 							file.delete();
 					}
 				}
+				else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"randomshop ")) {
+					//display the weapons that can be obtained.
+					RandomshopExecution.inspectItems(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()), e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+11));
+				}
 				else {
 					//if typos occur, run help
 					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()));

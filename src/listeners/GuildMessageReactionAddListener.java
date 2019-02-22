@@ -1,6 +1,8 @@
 package listeners;
 
 import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,29 +70,32 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 			if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:")) {
 				File inventory = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId()+".azr");
 				if(inventory.exists()) {
-					String file_content = FileSetting.readFile(inventory.getAbsolutePath());
-					String [] array = file_content.split("_");
-					int current_page = Integer.parseInt(array[0]);
-					final int last_page = Integer.parseInt(array[1]);
-					final String inventory_tab = array[2];
-					final String sub_tab = array[3];
-					if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:"))
-						current_page--;
-					else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:"))
-						current_page++;
-					e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
-					inventory.delete();
-					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab);
-					if(inventory_tab.equalsIgnoreCase("weapons")) {
-						if(!sub_tab.equalsIgnoreCase("total"))
-							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12), sub_tab), current_page, last_page);
+					ExecutorService executor = Executors.newSingleThreadExecutor();
+					executor.execute(() -> {
+						String file_content = FileSetting.readFile(inventory.getAbsolutePath());
+						String [] array = file_content.split("_");
+						int current_page = Integer.parseInt(array[0]);
+						final int last_page = Integer.parseInt(array[1]);
+						final String inventory_tab = array[2];
+						final String sub_tab = array[3];
+						if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:"))
+							current_page--;
+						else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:"))
+							current_page++;
+						e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
+						inventory.delete();
+						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab);
+						if(inventory_tab.equalsIgnoreCase("weapons")) {
+							if(!sub_tab.equalsIgnoreCase("total"))
+								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12), sub_tab), current_page, last_page);
+							else
+								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
+						}
+						else if(inventory_tab.equalsIgnoreCase("skins"))
+							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
 						else
-							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
-					}
-					else if(inventory_tab.equalsIgnoreCase("skins"))
-						InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
-					else
-						InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
+							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
+					});
 				}
 			}
 		}

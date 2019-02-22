@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import randomshop.RandomshopRewardDrawer;
 import rankingSystem.Rank;
 import rankingSystem.WeaponAbbvs;
 import rankingSystem.WeaponStats;
+import rankingSystem.Weapons;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
 import threads.DelayDelete;
@@ -162,6 +164,51 @@ public class RandomshopExecution {
 					}
 					else {
 						e.getTextChannel().sendMessage("I'm sorry. you don't have enough currency to play another round. Your current currency amounts to: "+user_details.getCurrency()).queue();
+					}
+				}
+				else {
+					e.getTextChannel().sendMessage("No valid input has been passed. Randomshop interrupted!").queue();
+				}
+			});
+		}
+	}
+	
+	public static void inspectItems(MessageReceivedEvent e, List<WeaponAbbvs> abbreviations, List<String> categories, String input) {
+		String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_randomshop_play.azr";
+		File file = new File(fileName);
+		if(!file.exists()) {
+			try {
+				file.createNewFile();
+				new Thread(new DelayDelete(fileName, 3000)).start();
+			} catch (IOException e2) {
+				logger.error("{} file couldn't be created", fileName, e2);
+			}
+			
+			ExecutorService executor = Executors.newSingleThreadExecutor();
+			executor.execute(() -> {
+				final String abbv;
+				final String category;
+				WeaponAbbvs weapon_abbv = abbreviations.parallelStream().filter(a -> a.getDescription().equalsIgnoreCase(input)).findAny().orElse(null);
+				if(weapon_abbv != null) {
+					abbv = weapon_abbv.getAbbv();
+				}
+				else {
+					abbv = null;
+				}
+				if(abbv == null) {
+					category = categories.parallelStream().filter(c -> c.equalsIgnoreCase(input)).findAny().orElse(null);
+				}
+				else {
+					category = null;
+				}
+				
+				if(abbv != null || category != null) {
+					List<Weapons> weapons;
+					if(abbv != null) {
+						weapons = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong()).parallelStream().filter(w -> w.getWeaponAbbv().equalsIgnoreCase(abbv) && w.getStat() == 1).collect(Collectors.toList());
+					}
+					else {
+						weapons = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong()).parallelStream().filter(w -> w.getCategoryDescription().equalsIgnoreCase(category) && w.getStat() == 1).collect(Collectors.toList());
 					}
 				}
 				else {

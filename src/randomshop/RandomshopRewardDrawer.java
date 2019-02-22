@@ -1,7 +1,6 @@
 package randomshop;
 
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -30,10 +29,7 @@ public class RandomshopRewardDrawer {
 			BufferedImage overlay = new BufferedImage(overlayW, overlayH, BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics2D g = overlay.createGraphics();
 			g.drawImage(rewardOverlay, 0, 0, null);
-			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g.drawImage(drawWeapon, rewardX, rewardY, null);
+			g.drawImage(drawWeapon, rewardX, rewardY, drawWeapon.getWidth(), drawWeapon.getHeight(), null);
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_reward_"+e.getMember().getUser().getId()+".png"));
 			g.dispose();
 			
