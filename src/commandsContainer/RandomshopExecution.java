@@ -1,6 +1,7 @@
 package commandsContainer;
 
 import java.awt.Color;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -45,6 +46,7 @@ public class RandomshopExecution {
 				}
 				message.addField("Weapon Types", "_"+out1.toString()+"_", true);
 				message.addField("", "_"+out2.toString()+"_", true);
+				message.addBlankField(false);
 			}
 			if(categories.size() > 0) {
 				//display all categories
@@ -72,11 +74,11 @@ public class RandomshopExecution {
 	
 	public static void runRound(MessageReceivedEvent e, List<WeaponAbbvs> abbreviations, List<String> categories, String input) {
 		//first, search for results from the available lists
-		WeaponAbbvs weapon_abbv = abbreviations.parallelStream().filter(a -> a.getDescription().equalsIgnoreCase(input)).findAny().orElse(null);
 		final String abbv;
 		final String category;
+		WeaponAbbvs weapon_abbv = abbreviations.parallelStream().filter(a -> a.getDescription().equalsIgnoreCase(input)).findAny().orElse(null);
 		if(weapon_abbv != null) {
-			abbv = weapon_abbv.getDescription();
+			abbv = weapon_abbv.getAbbv();
 		}
 		else {
 			abbv = null;
@@ -91,17 +93,20 @@ public class RandomshopExecution {
 		//second, check if anything has been found, else interrupt the process
 		if(abbv != null || category != null) {
 			Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
-			if(user_details.getCurrency() >= 10000) {
+			final long price = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getRandomshopPrice();
+			if(user_details.getCurrency() >= price) {
 				List<WeaponStats> stats = RankingSystemItems.SQLgetWeaponStats(e.getGuild().getIdLong());
 				if(stats.size() > 0) {
-					int rand = ThreadLocalRandom.current().nextInt(0, (stats.size()-1));
-					user_details.setCurrency(user_details.getCurrency()-20000);
+					final int rand = ThreadLocalRandom.current().nextInt(0, (stats.size()-1));
+					user_details.setCurrency(user_details.getCurrency()-price);
+					var weapon_id = 0;
 					var editedRows = 0;
 					//get a random weapon id basing of either abbreviation or category and the random stat
 					if(abbv != null) {
-						var weapon_id = RankingSystemItems.SQLgetRandomWeaponIDByAbbv(e.getGuild().getIdLong(), abbv, stats.get(rand).getID());
+						weapon_id = RankingSystemItems.SQLgetRandomWeaponIDByAbbv(e.getGuild().getIdLong(), abbv, stats.get(rand).getID());
+						final var number = RankingSystemItems.SQLgetNumberOfWeaponID(e.getGuild().getIdLong(), weapon_id);
 						if(weapon_id > 0) {
-							editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id);
+							editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1));
 						}
 						else {
 							e.getTextChannel().sendMessage("Weapons for this weapon type have not been configured. Please contact an administrator!").queue();
@@ -109,9 +114,10 @@ public class RandomshopExecution {
 						}
 					}
 					else {
-						var weapon_id = RankingSystemItems.SQLgetRandomWeaponIDByCategory(e.getGuild().getIdLong(), category, stats.get(rand).getID());
+						weapon_id = RankingSystemItems.SQLgetRandomWeaponIDByCategory(e.getGuild().getIdLong(), category, stats.get(rand).getID());
+						final var number = RankingSystemItems.SQLgetNumberOfWeaponID(e.getGuild().getIdLong(), weapon_id);
 						if(weapon_id > 0) {
-							editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id);
+							editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1));
 						}
 						else {
 							e.getTextChannel().sendMessage("Weapons for this weapon category have not been configured. Please contact an administrator!").queue();
@@ -123,9 +129,10 @@ public class RandomshopExecution {
 						//draw won item from the Randomshop
 						
 					}
-					else {
+					else if(weapon_id > 0){
 						EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle("Randomshop failed");
 						e.getTextChannel().sendMessage(message.setDescription("An internal error occurred while receiving a weapon from the Randomshop. Please contact an administrator").build()).queue();
+						logger.error("The user {} couldn't receive the weapon with the weapon_id {} in guild {}", e.getMember().getUser().getId(), weapon_id, e.getGuild().getName());
 					}
 				}
 				else {
@@ -134,7 +141,7 @@ public class RandomshopExecution {
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage("I'm sorry. you don't have enough currency to play another round. Your current currency amounts to: "+user_details.getCurrency());
+				e.getTextChannel().sendMessage("I'm sorry. you don't have enough currency to play another round. Your current currency amounts to: "+user_details.getCurrency()).queue();
 			}
 		}
 		else {

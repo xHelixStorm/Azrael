@@ -23,7 +23,7 @@ public class ShopExecution {
 		for(Skins skin_info : filteredContent){
 			String price;
 			if(skin_info.getShopDescription().equals(_description)){price = "DEFAULT";}
-			else{price = skin_info.getPrice()+" PEN";}
+			else{price = skin_info.getPrice()+" "+RankingSystem.SQLgetGuild(_e.getGuild().getIdLong()).getCurrency();}
 			if(RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), _e.getGuild().getIdLong(), skin_info.getItemID()) != 0){price = "PURCHASED";}
 			builder.append("*_"+skin_info.getShopDescription()+"_*\n");
 			priceBuilder.append("*_"+price+"_*\n");
@@ -43,7 +43,7 @@ public class ShopExecution {
 			
 			for(Weapons weapon : filteredContent) {
 				builder.append("*_"+weapon.getDescription()+" "+weapon.getStatDescription()+"_*\n");
-				priceBuilder.append("*_"+weapon.getPrice()+" PEN_*\n");
+				priceBuilder.append("*_"+weapon.getPrice()+" "+RankingSystem.SQLgetGuild(_e.getGuild().getIdLong()).getCurrency()+"_*\n");
 			}
 			EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail()).setTitle("Welcome to my shop!");
 			message.addField("Weapons: "+filteredContent.get(0).getCategoryDescription(), "***Here the requested stock!***", false);
