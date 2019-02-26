@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,6 +18,7 @@ import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import randomshop.RandomshopItemDrawer;
 import randomshop.RandomshopRewardDrawer;
 import rankingSystem.Rank;
 import rankingSystem.WeaponAbbvs;
@@ -173,7 +175,7 @@ public class RandomshopExecution {
 		}
 	}
 	
-	public static void inspectItems(MessageReceivedEvent e, List<WeaponAbbvs> abbreviations, List<String> categories, String input) {
+	public static void inspectItems(MessageReceivedEvent e, List<WeaponAbbvs> abbreviations, List<String> categories, String input, int page) {
 		String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_randomshop_play.azr";
 		File file = new File(fileName);
 		if(!file.exists()) {
@@ -209,6 +211,25 @@ public class RandomshopExecution {
 					}
 					else {
 						weapons = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong()).parallelStream().filter(w -> w.getCategoryDescription().equalsIgnoreCase(category) && w.getStat() == 1).collect(Collectors.toList());
+					}
+					
+					ArrayList<Weapons> filteredWeapons = new ArrayList<Weapons>();
+					final var lastPage = (page*10)-1;
+					for(var i = (page-1)*10; i <= lastPage; i++) {
+						if(weapons.get(i) != null)
+							filteredWeapons.add(weapons.get(i));
+						else
+							break;
+					}
+					
+					if(filteredWeapons != null && filteredWeapons.size() > 0) {
+						//draw page
+						RandomshopItemDrawer.drawItems(e, filteredWeapons);
+					}
+					else {
+						//no items to display
+						e.getTextChannel().sendMessage("No items to display could be retrieved!").queue();
+						logger.warn("Randomshop content couldn't be displayed in guild {}", e.getGuild().getName());
 					}
 				}
 				else {
