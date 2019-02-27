@@ -17,7 +17,7 @@ public class HelpText {
 			administration = true;
 		}
 		
-		if(IniFileReader.getPugCommand() || IniFileReader.getMeowCommand() || IniFileReader.getRankCommand() || IniFileReader.getProfileCommand() || IniFileReader.getTopCommand() || IniFileReader.getUseCommand() || IniFileReader.getShopCommand() || IniFileReader.getInventoryCommand() || IniFileReader.getPurchaseCommand() || IniFileReader.getDailyCommand() || IniFileReader.getQuizCommand()){
+		if(IniFileReader.getPugCommand() || IniFileReader.getMeowCommand() || IniFileReader.getRankCommand() || IniFileReader.getProfileCommand() || IniFileReader.getTopCommand() || IniFileReader.getUseCommand() || IniFileReader.getShopCommand() || IniFileReader.getInventoryCommand() || IniFileReader.getPurchaseCommand() || IniFileReader.getDailyCommand() || IniFileReader.getQuizCommand() || IniFileReader.getRandomshopCommand()){
 			entertainment = true;
 		}
 		
@@ -46,6 +46,7 @@ public class HelpText {
 		if(IniFileReader.getPurchaseCommand())textCollector.add("**-"+IniFileReader.getCommandPrefix()+"purchase**\nto purchase and item or skin from the shop\n\n");
 		if(IniFileReader.getDailyCommand())textCollector.add("**-"+IniFileReader.getCommandPrefix()+"daily**\nto get a daily reward\n\n");
 		if(IniFileReader.getQuizCommand())textCollector.add("**-"+IniFileReader.getCommandPrefix()+"quiz**\nto initialize a question and answer session with rewards\n\n");
+		if(IniFileReader.getRandomshopCommand())textCollector.add("**-"+IniFileReader.getCommandPrefix()+"randomshop**\nto receive a random weapon from the randomshop\n\n");
 		if(other == true)textCollector.add("**_Other:_**\n");
 		if(IniFileReader.getAboutCommand())textCollector.add("**-"+IniFileReader.getCommandPrefix()+"about**\nshows all information regarding this Bot\n\n");
 		if(IniFileReader.getHelpCommand())textCollector.add("**-"+IniFileReader.getCommandPrefix()+"help**\nshows a link to our tech thread on forum\n\n");

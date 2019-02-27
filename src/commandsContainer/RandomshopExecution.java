@@ -18,6 +18,7 @@ import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import randomshop.RandomshopItemDrawer;
 import randomshop.RandomshopRewardDrawer;
 import rankingSystem.Rank;
@@ -38,7 +39,7 @@ public class RandomshopExecution {
 		}
 		else {
 			message.setDescription("Write either one weapon type or weapon category together with the command to start the random shop. For example **"+IniFileReader.getCommandPrefix()+"randomshop -play <weapon type/weapon category>**."
-					+ " Also make use of the -replay parameter to replay with the same weapon type or category");
+					+ " Also make use of the -replay parameter to replay with the same weapon type or category. If you write a weapon category or weapon type without any parameters, you can view the selected content");
 			
 			if(abbreviations.size() > 0) {
 				//display all weapons
@@ -175,14 +176,14 @@ public class RandomshopExecution {
 		}
 	}
 	
-	public static void inspectItems(MessageReceivedEvent e, List<WeaponAbbvs> abbreviations, List<String> categories, String input, int page) {
-		String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_randomshop_play.azr";
+	public static void inspectItems(MessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<WeaponAbbvs> abbreviations, List<String> categories, String input, int page) {
+		String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+(e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId())+"_randomshop_play.azr";
 		File file = new File(fileName);
-		if(!file.exists()) {
+		if(!file.exists() || e2 != null) {
 			try {
 				file.createNewFile();
 				new Thread(new DelayDelete(fileName, 3000)).start();
-			} catch (IOException e2) {
+			} catch (IOException e3) {
 				logger.error("{} file couldn't be created", fileName, e2);
 			}
 			
@@ -207,28 +208,39 @@ public class RandomshopExecution {
 				if(abbv != null || category != null) {
 					List<Weapons> weapons;
 					if(abbv != null) {
-						weapons = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong()).parallelStream().filter(w -> w.getWeaponAbbv().equalsIgnoreCase(abbv) && w.getStat() == 1).collect(Collectors.toList());
+						weapons = RankingSystemItems.SQLgetWholeWeaponShop((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong())).parallelStream().filter(w -> w.getWeaponAbbv().equalsIgnoreCase(abbv) && w.getStat() == 1).collect(Collectors.toList());
 					}
 					else {
-						weapons = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong()).parallelStream().filter(w -> w.getCategoryDescription().equalsIgnoreCase(category) && w.getStat() == 1).collect(Collectors.toList());
+						weapons = RankingSystemItems.SQLgetWholeWeaponShop((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong())).parallelStream().filter(w -> w.getCategoryDescription().equalsIgnoreCase(category) && w.getStat() == 1).collect(Collectors.toList());
 					}
 					
 					ArrayList<Weapons> filteredWeapons = new ArrayList<Weapons>();
 					final var lastPage = (page*10)-1;
 					for(var i = (page-1)*10; i <= lastPage; i++) {
-						if(weapons.get(i) != null)
+						if(i < weapons.size() && weapons.get(i) != null)
 							filteredWeapons.add(weapons.get(i));
 						else
 							break;
 					}
 					
 					if(filteredWeapons != null && filteredWeapons.size() > 0) {
+						final int last_page = (weapons.size()/10)+1; //using modulo for the page size
 						//draw page
-						RandomshopItemDrawer.drawItems(e, filteredWeapons);
+						if(e != null) {
+							FileSetting.createFile(IniFileReader.getTempDirectory()+"/AutoDelFiles/randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+page+"_"+input+"_"+last_page);
+							RandomshopItemDrawer.drawItems(e, null, filteredWeapons, page, last_page);
+						}
+						else {
+							FileSetting.createFile(IniFileReader.getTempDirectory()+"/AutoDelFiles/randomshop_bot_gu"+e2.getGuild().getId()+"ch"+e2.getChannel().getId()+".azr", e2.getMember().getUser().getId()+"_"+page+"_"+input+"_"+last_page);
+							RandomshopItemDrawer.drawItems(null, e2, filteredWeapons, page, last_page);
+						}
 					}
 					else {
 						//no items to display
-						e.getTextChannel().sendMessage("No items to display could be retrieved!").queue();
+						if(e != null)
+							e.getTextChannel().sendMessage("No items to display could be retrieved!").queue();
+						else
+							e2.getChannel().sendMessage("No items to display could be retrieved!").queue();
 						logger.warn("Randomshop content couldn't be displayed in guild {}", e.getGuild().getName());
 					}
 				}

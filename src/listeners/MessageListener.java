@@ -49,6 +49,7 @@ public class MessageListener extends ListenerAdapter{
 			File user = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
 			File filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
 			File inventory_bot = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
+			File randomshop_bot = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
 			File reaction = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
 			File rss = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
 			File quiz = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quizstarter.azr");
@@ -116,6 +117,30 @@ public class MessageListener extends ListenerAdapter{
 					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id+".azr", current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab);
 				}
 				inventory_bot.delete();
+			}
+			
+			if(randomshop_bot.exists() && UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
+				String file_content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
+				String [] array = file_content.split("_");
+				final long member_id = Long.parseLong(array[0]);
+				final int current_page = Integer.parseInt(array[1]);
+				final String input = array[2];
+				final int last_page = Integer.parseInt(array[3]);
+				
+				boolean createFile = false;
+				if(current_page > 1) {
+					e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).complete();
+					createFile = true;
+				}
+				if(current_page < last_page) {
+					e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).complete();
+					createFile = true;
+				}
+				if(createFile == true) {
+					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id+".azr", current_page+"_"+input);
+				}
+				randomshop_bot.delete();
+				
 			}
 			
 			if(reaction.exists() && UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {

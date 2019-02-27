@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiParser;
 
+import commandsContainer.RandomshopExecution;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.FileSetting;
@@ -18,6 +19,7 @@ import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEv
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import sql.DiscordRoles;
 import sql.RankingSystem;
+import sql.RankingSystemItems;
 import sql.Azrael;
 
 public class GuildMessageReactionAddListener extends ListenerAdapter{
@@ -66,9 +68,12 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 				}
 			}
 			
-			//inventory reactions
 			if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:")) {
+				//inventory reactions
 				File inventory = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId()+".azr");
+				//randomshop reactions
+				File randomshop = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId()+".azr");
+				
 				if(inventory.exists()) {
 					ExecutorService executor = Executors.newSingleThreadExecutor();
 					executor.execute(() -> {
@@ -96,6 +101,19 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 						else
 							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*12)), current_page, last_page);
 					});
+				}
+				else if(randomshop.exists()) {
+					String file_content = FileSetting.readFile(randomshop.getAbsolutePath());
+					String [] array = file_content.split("_");
+					int current_page = Integer.parseInt(array[0]);
+					final String input = array[1];
+					if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:"))
+						current_page--;
+					else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:"))
+						current_page++;
+					e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
+					randomshop.delete();
+					RandomshopExecution.inspectItems(null, e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()), input, current_page);
 				}
 			}
 		}
