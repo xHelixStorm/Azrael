@@ -28,6 +28,8 @@ public class GuildIni {
 			ini.add("Inventory", "nextBoxX", "0");
 			ini.add("Inventory", "nextBoxY", "0");
 			ini.add("Inventory", "expiration-positionY", "0");
+			ini.add("Inventory", "rowLimit", "0");
+			ini.add("Inventory", "maxItems", 0);
 			
 			ini.store(new File("./ini/"+guild_id+".ini"));
 		} catch (IOException e) {
@@ -66,5 +68,10 @@ public class GuildIni {
 		inven[15] = inventory.get("expiration-positionY", int.class);
 		inven[16] = inventory.get("rowLimit", int.class);
 		return inven;
+	}
+	
+	public static int getInventoryMaxItems(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Inventory", "maxItems", int.class);
 	}
 }

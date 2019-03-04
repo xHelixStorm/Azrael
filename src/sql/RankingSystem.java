@@ -892,8 +892,8 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id){
-		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}", _user_id, _guild_id);
+	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems){
+		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}", _user_id, _guild_id, _maxItems);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -905,7 +905,7 @@ public class RankingSystem {
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				return rs.getInt(1)/12;
+				return rs.getInt(1)/_maxItems;
 			}
 			return 0;
 		} catch (SQLException e) {
@@ -918,8 +918,8 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, String _type){
-		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}", _user_id, _guild_id, _type);
+	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, String _type, int _maxItems){
+		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _type, _maxItems);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -932,7 +932,7 @@ public class RankingSystem {
 			stmt.setString(3, _type);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				return rs.getInt(1)/12;
+				return rs.getInt(1)/_maxItems;
 			}
 			return 0;
 		} catch (SQLException e) {
@@ -945,8 +945,8 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, String _ignore, boolean _boolIgnore){
-		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _ignore, _boolIgnore);
+	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, String _ignore, boolean _boolIgnore){
+		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _maxItems, _ignore, _boolIgnore);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -959,7 +959,7 @@ public class RankingSystem {
 			stmt.setString(3, _ignore);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				return rs.getInt(1)/12;
+				return rs.getInt(1)/_maxItems;
 			}
 			return 0;
 		} catch (SQLException e) {
@@ -972,8 +972,8 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, boolean _oneType){
-		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}", _user_id, _guild_id, _oneType);
+	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, boolean _oneType){
+		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _maxItems, _oneType);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -985,7 +985,7 @@ public class RankingSystem {
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				return rs.getInt(1)/12;
+				return rs.getInt(1)/_maxItems;
 			}
 			return 0;
 		} catch (SQLException e) {
@@ -998,8 +998,8 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, boolean _oneType, String _category){
-		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _oneType, _category);
+	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, boolean _oneType, String _category){
+		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _maxItems, _oneType, _category);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1012,7 +1012,7 @@ public class RankingSystem {
 			stmt.setString(3, _category);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				return rs.getInt(1)/12;
+				return rs.getInt(1)/_maxItems;
 			}
 			return 0;
 		} catch (SQLException e) {
@@ -1422,19 +1422,20 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptions(long _user_id, long _guild_id, int _limit){
-		logger.debug("SQLgetInventoryAndDescriptions launched. Passed params {}, {}, {}", _user_id, _guild_id, _limit);
+	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptions(long _user_id, long _guild_id, int _limit, int _maxItems){
+		logger.debug("SQLgetInventoryAndDescriptions launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_guild_id = weapon_shop_content.fk_guild_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_guild_id = weapon_category.fk_guild_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? ORDER BY position desc LIMIT ?, 12");
+			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_guild_id = weapon_shop_content.fk_guild_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_guild_id = weapon_category.fk_guild_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? ORDER BY position desc LIMIT ?, ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			stmt.setInt(3, _limit);
+			stmt.setInt(4, _maxItems);
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				InventoryContent setInventory = new InventoryContent();

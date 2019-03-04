@@ -21,8 +21,8 @@ import rankingSystem.Weapons;
 public class RankingSystemItems {
 	private static final Logger logger = LoggerFactory.getLogger(RankingSystemItems.class);
 	
-	private static String username = IniFileReader.getSQLUsername3();
-	private static String password = IniFileReader.getSQLPassword3();
+	private static String username = IniFileReader.getSQLUsername2();
+	private static String password = IniFileReader.getSQLPassword2();
 	
 	
 	public static void SQLconnection(){

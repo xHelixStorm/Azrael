@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 import fileManagement.FileSetting;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import inventory.InventoryBuilder;
 import inventory.InventoryContent;
@@ -51,24 +52,25 @@ public class Inventory implements Command{
 						int itemNumber;
 						String lastWord = e.getMessage().getContentRaw().substring(e.getMessage().getContentRaw().lastIndexOf(" ")+1).toLowerCase();
 						String sub_cat = RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()).parallelStream().filter(c -> c.equalsIgnoreCase(lastWord)).findAny().orElse(null);
+						final var maxItems = GuildIni.getInventoryMaxItems(e.getGuild().getIdLong());
 						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
-							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "ite");
+							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "ite", maxItems);
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("weapons")) {
 							if(!lastWord.equals("weapons") && sub_cat != null)
-								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), true, lastWord);
+								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems, true, lastWord);
 							else
-								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), false);
+								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems, false);
 						}
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("skins")) {
-							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "ite", true);
+							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems, "ite", true);
 						}
 						else
-							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems);
 						if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"inventory -page ")){
 							try {
 								limit = Integer.parseInt(e.getMessage().getContentRaw().replaceAll("[^0-9]", ""))-1;
 								if(limit <= itemNumber){
-									limit*=12;
+									limit*=maxItems;
 								}
 							} catch(NumberFormatException nfe){
 								limit = 0;
@@ -77,27 +79,27 @@ public class Inventory implements Command{
 						
 						String drawTab = "";
 						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
-							InventoryBuilder.DrawInventory(e, null, "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
+							InventoryBuilder.DrawInventory(e, null, "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/maxItems+1, itemNumber+1);
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("weapons")) {
 							if(!lastWord.equals("weapons") && sub_cat != null) {
 								drawTab = "weapons_"+lastWord;
-								InventoryBuilder.DrawInventory(e, null, "weapons", lastWord, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, lastWord), limit/12+1, itemNumber+1);
+								InventoryBuilder.DrawInventory(e, null, "weapons", lastWord, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, lastWord), limit/maxItems+1, itemNumber+1);
 							}
 							else {
 								drawTab = "weapons_total";
-								InventoryBuilder.DrawInventory(e, null, "weapons", "total", RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
+								InventoryBuilder.DrawInventory(e, null, "weapons", "total", RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/maxItems+1, itemNumber+1);
 							}
 						}
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("skins")) {
 							drawTab = "skins_total";
-							InventoryBuilder.DrawInventory(e, null, "skins", "total", RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
+							InventoryBuilder.DrawInventory(e, null, "skins", "total", RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/maxItems+1, itemNumber+1);
 						}
 						else {
 							drawTab = "total_total";
-							InventoryBuilder.DrawInventory(e, null, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/12+1, itemNumber+1);
+							InventoryBuilder.DrawInventory(e, null, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1);
 						}
 						
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+(limit/12+1)+"_"+(itemNumber+1)+"_"+drawTab);
+						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+(limit/maxItems+1)+"_"+(itemNumber+1)+"_"+drawTab);
 					}
 				}
 				else{
