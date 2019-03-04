@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -27,43 +28,66 @@ public class InventoryBuilder{
 				BufferedImage blank_inventory = ImageIO.read(new File("./files/RankingSystem/Inventory/inventory_blank.png"));
 				BufferedImage inventory_tab = ImageIO.read(new File("./files/RankingSystem/Inventory/inventory_"+_inventory_tab+"_"+_sub_tab+".png"));
 				
-				int startX = 32;
-				int startY = 198;
+				int [] inven = GuildIni.getWholeInventory((_e != null ? _e.getGuild().getIdLong() : _e2.getGuild().getIdLong()));
+				final int startX = inven[0];
+				final int startY = inven[1];
+				final int tabX = inven[2];
+				final int tabY = inven[3];
+				final int pageFontSize = inven[4];
+				final int pageX = inven[5];
+				final int pageY = inven[6];
+				final int generalTextFontSize = inven[7];
+				final int boxSizeX = inven[8];
+				final int boxSizeY = inven[9];
+				final int descriptionY = inven[10];
+				final int itemSizeX = inven[11];
+				final int itemSizeY = inven[12];
+				final int nextBoxX = inven[13];
+				final int nextBoxY = inven[14];
+				final int expiration_positionY = inven[15];
+				final int rowLimit = inven[16];
 				
 				int inventory_Width = blank_inventory.getWidth();
 				int inventory_Height = blank_inventory.getHeight();
 				BufferedImage overlay = new BufferedImage(inventory_Width, inventory_Height, BufferedImage.TYPE_4BYTE_ABGR);
 				Graphics2D g = overlay.createGraphics();
 				g.drawImage(blank_inventory, 0, 0, null);
-				g.drawImage(inventory_tab, 13, 3, null);
-				g.setFont(new Font("Nexa Bold", Font.BOLD, 40));
-				g.drawString(_current_page+"/"+_max_page, getRightString(""+_current_page, 1220, g), 1810);
-				g.setFont(new Font("Nexa Bold", Font.BOLD, 36));
+				g.drawImage(inventory_tab, tabX, tabY, null);
+				g.setFont(new Font("Nexa Bold", Font.BOLD, pageFontSize));
+				g.drawString(_current_page+"/"+_max_page, getRightString(""+_current_page, pageX, g), pageY);
+				g.setFont(new Font("Nexa Bold", Font.BOLD, generalTextFontSize));
 				
-				int i = 1;
+				int i = 0;
+				var currentX = startX;
+				var currentY = startY;
 				for(InventoryContent inventory : _items){
-					int x = getDrawPositionX(i);
-					int y = getDrawPositionY(i);
+					i++;
 					BufferedImage item;
 					if(inventory.getType() != null)
 						item = ImageIO.read(new File("./files/RankingSystem/Inventory/items/"+inventory.getDescription()+".png"));
 					else
 						item = ImageIO.read(new File("./files/RankingSystem/Inventory/weapons/"+inventory.getWeaponDescription()+".png"));
-					g.drawImage(item, startX+289-(item.getWidth()/2)+x, startY+243-(item.getHeight()/2)+y, null);
-					g.drawString((inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+ " "+inventory.getStat()), startX+getCenteredString(inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+ " "+inventory.getStat(), 288, g)+x, startY+243+180+y);
+					g.drawImage(item, currentX+boxSizeX-(item.getWidth()/2), currentY+boxSizeY-(item.getHeight()/2), (itemSizeX != 0 ? itemSizeX : item.getWidth()), (itemSizeY != 0 ? itemSizeY : item.getHeight()), null);
+					g.drawString((inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+ " "+inventory.getStat()), currentX+getCenteredString(inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+ " "+inventory.getStat(), boxSizeX, g), currentY+boxSizeY+descriptionY);
 					if(inventory.getType() == null || inventory.getType().equals("ite")){
 						if(inventory.getStatus().equals("limit")){
 							long time = inventory.getExpiration().getTime()-System.currentTimeMillis();
 							long days = time/1000/60/60/24;
 							long hours = time/1000/60/60%24;
 							long minutes = time/1000/60-(days*24*60)-(hours*60);
-							g.drawString(days+"D "+hours+"H "+minutes+"M", startX+getCenteredString(days+"D "+hours+"H "+minutes+"M", 288, g)+x, startY+243+230+y);
+							g.drawString(days+"D "+hours+"H "+minutes+"M", currentX+getCenteredString(days+"D "+hours+"H "+minutes+"M", boxSizeX, g), currentY+boxSizeY+expiration_positionY);
 						}
 						else{
-							g.drawString(inventory.getNumber()+"x", startX+getCenteredString(inventory.getNumber()+"x", 288, g)+x, startY+243+230+y);
+							g.drawString(inventory.getNumber()+"x", currentX+getCenteredString(inventory.getNumber()+"x", boxSizeX, g), currentY+boxSizeY+expiration_positionY);
 						}
 					}
-					i++;
+					if(i % rowLimit != 0) {
+						currentX += nextBoxX;
+					}
+					else {
+						currentX = startX;
+						currentY += nextBoxY;
+					}
 				}
 				
 				if(_e != null)
@@ -99,58 +123,5 @@ public class InventoryBuilder{
 	    FontMetrics fm = g.getFontMetrics();
 	    int x = w - fm.stringWidth(s);
 	    return x;
-	}
-	
-	private static int getDrawPositionX(int i){
-		int x = 0;
-		
-		switch(i){
-			case 1:
-			case 5:
-			case 9:
-				x = 0;
-				break;
-			case 2:
-			case 6:
-			case 10:
-				x = 603;
-				break;
-			case 3:
-			case 7:
-			case 11:
-				x = 603*2;
-				break;
-			case 4:
-			case 8:
-			case 12:
-				x = 603*3;
-		}
-		return x;
-	}
-	
-	private static int getDrawPositionY(int i){
-		int y = 0;
-		
-		switch(i){
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-				y = 0;
-				break;
-			case 5:
-			case 6:
-			case 7:
-			case 8:
-				y = 496;
-				break;
-			case 9:
-			case 10:
-			case 11:
-			case 12:
-				y = 496*2;
-				break;
-			}
-		return y;
 	}
 }

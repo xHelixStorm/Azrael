@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import core.Guilds;
 import core.Hashes;
 import fileManagement.FileSetting;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -60,6 +62,9 @@ public class ReadyListener extends ListenerAdapter{
 		FileSetting.createFile("./files/reboot.azr", "0");
 		for(Guild g : e.getJDA().getGuilds()){
 			long guild_id = g.getIdLong();
+			if(!new File("./ini/"+guild_id+".ini").exists()) {
+				GuildIni.createIni(guild_id);
+			}
 			var log_channel = Azrael.SQLgetChannelID(guild_id, "log");
 			if(DiscordRoles.SQLgetRoles(guild_id).size() == 0) {
 				logger.error("Roles information from DiscordRoles.roles couldn't be retrieved and cached");

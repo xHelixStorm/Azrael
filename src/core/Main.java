@@ -66,9 +66,10 @@ public class Main {
 	
 	public static void main(String [] args){
 		Logger logger = LoggerFactory.getLogger(Main.class);
-		boolean [] dir = new boolean[2];
+		boolean [] dir = new boolean[3];
 		dir[0] = (new File("./log")).mkdirs();
 		dir[1] = (new File("./message_log")).mkdirs();
+		dir[2] = (new File("./ini")).mkdirs();
 		
 		if(IniFileReader.getFileLogger()) {
 			
