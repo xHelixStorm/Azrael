@@ -84,9 +84,9 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 						final int last_page = Integer.parseInt(array[1]);
 						final String inventory_tab = array[2];
 						final String sub_tab = array[3];
-						if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:"))
+						if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") && current_page != 1)
 							current_page--;
-						else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:"))
+						else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && current_page != last_page)
 							current_page++;
 						e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
 						inventory.delete();
