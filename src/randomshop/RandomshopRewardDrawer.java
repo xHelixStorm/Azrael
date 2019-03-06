@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import rankingSystem.Weapons;
@@ -20,16 +21,18 @@ public class RandomshopRewardDrawer {
 			BufferedImage rewardOverlay = ImageIO.read(new File("./files/RankingSystem/Inventory/"+weapon.getOverlayName()+".png"));
 			BufferedImage drawWeapon = ImageIO.read(new File("./files/RankingSystem/Inventory/weapons/"+weapon.getDescription()+".png"));
 			
-			int overlayW = rewardOverlay.getWidth();
-			int overlayH = rewardOverlay.getHeight();
-			
-			int rewardX = (overlayW/2)-(drawWeapon.getWidth()/2);
-			int rewardY = (overlayH/2)-(drawWeapon.getHeight()/2);
+			int[] rand = GuildIni.getWholeRandomshopReward(e.getGuild().getIdLong());
+			final int overlayW = rewardOverlay.getWidth();
+			final int overlayH = rewardOverlay.getHeight();
+			final int itemSizeX = rand[0];
+			final int itemSizeY = rand[1];
+			final int rewardX = (overlayW/2)-((itemSizeX != 0 ? itemSizeX : drawWeapon.getWidth())/2);
+			final int rewardY = (overlayH/2)-((itemSizeY != 0 ? itemSizeY : drawWeapon.getHeight())/2);
 			
 			BufferedImage overlay = new BufferedImage(overlayW, overlayH, BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics2D g = overlay.createGraphics();
 			g.drawImage(rewardOverlay, 0, 0, null);
-			g.drawImage(drawWeapon, rewardX, rewardY, drawWeapon.getWidth(), drawWeapon.getHeight(), null);
+			g.drawImage(drawWeapon, rewardX, rewardY, (itemSizeX != 0 ? itemSizeX : drawWeapon.getWidth()), (itemSizeY != 0 ? itemSizeY : drawWeapon.getHeight()), null);
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_reward_"+e.getMember().getUser().getId()+".png"));
 			g.dispose();
 			

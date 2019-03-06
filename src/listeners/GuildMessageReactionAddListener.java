@@ -108,10 +108,11 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 					String file_content = FileSetting.readFile(randomshop.getAbsolutePath());
 					String [] array = file_content.split("_");
 					int current_page = Integer.parseInt(array[0]);
-					final String input = array[1];
-					if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:"))
+					final int last_page = Integer.parseInt(array[1]);
+					final String input = array[2];
+					if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") && current_page != 1)
 						current_page--;
-					else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:"))
+					else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && current_page != last_page)
 						current_page++;
 					e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
 					randomshop.delete();

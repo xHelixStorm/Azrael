@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import core.Guilds;
 import core.Hashes;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import inventory.InventoryContent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -25,7 +26,7 @@ public class Purchase implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getPurchaseCommand()){
+		if(GuildIni.getPurchaseCommand(e.getGuild().getIdLong())){
 			Logger logger = LoggerFactory.getLogger(Purchase.class);
 			logger.debug("{} has used Purchase command", e.getMember().getUser().getId());
 			

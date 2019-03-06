@@ -11,6 +11,7 @@ import commandsContainer.RegisterChannel;
 import commandsContainer.RegisterRankingRole;
 import commandsContainer.RegisterRole;
 import core.UserPrivs;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -31,7 +32,7 @@ public class Register implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getRegisterCommand()){
+		if(GuildIni.getRegisterCommand(e.getGuild().getIdLong())){
 			Logger logger = LoggerFactory.getLogger(Register.class);
 			logger.debug("{} has used Register command", e.getMember().getUser().getId());
 			

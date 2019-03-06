@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fileManagement.FileSetting;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -214,9 +215,10 @@ public class RandomshopExecution {
 						weapons = RankingSystemItems.SQLgetWholeWeaponShop((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong())).parallelStream().filter(w -> w.getCategoryDescription().equalsIgnoreCase(category) && w.getStat() == 1).collect(Collectors.toList());
 					}
 					
+					var maxItems = GuildIni.getRandomshopItemsMaxItems((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()));
 					ArrayList<Weapons> filteredWeapons = new ArrayList<Weapons>();
-					final var lastPage = (page*10)-1;
-					for(var i = (page-1)*10; i <= lastPage; i++) {
+					final var lastPage = (page*maxItems)-1;
+					for(var i = (page-1)*maxItems; i <= lastPage; i++) {
 						if(i < weapons.size() && weapons.get(i) != null)
 							filteredWeapons.add(weapons.get(i));
 						else
@@ -224,7 +226,7 @@ public class RandomshopExecution {
 					}
 					
 					if(filteredWeapons != null && filteredWeapons.size() > 0) {
-						final int last_page = (weapons.size()/10)+1; //using modulo for the page size
+						final int last_page = ((weapons.size()-1)/maxItems)+1; //using modulo for the page size
 						//draw page
 						if(e != null) {
 							FileSetting.createFile(IniFileReader.getTempDirectory()+"/AutoDelFiles/randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+page+"_"+input+"_"+last_page);

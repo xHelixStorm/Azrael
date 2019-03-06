@@ -9,6 +9,7 @@ import core.Channels;
 import core.Hashes;
 import core.Roles;
 import core.UserPrivs;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import inventory.Dailies;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -31,7 +32,7 @@ public class Display implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getDisplayCommand()){
+		if(GuildIni.getDisplayCommand(e.getGuild().getIdLong())){
 			long guild_id = e.getGuild().getIdLong();
 			String message = e.getMessage().getContentRaw();
 			String out = "";

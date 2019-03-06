@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -27,7 +28,7 @@ public class Profile implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getProfileCommand()){
+		if(GuildIni.getProfileCommand(e.getGuild().getIdLong())){
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
 				Logger logger = LoggerFactory.getLogger(Profile.class);

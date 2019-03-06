@@ -26,7 +26,7 @@ public class Inventory implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getHelpCommand()){
+		if(GuildIni.getHelpCommand(e.getGuild().getIdLong())){
 			Logger logger = LoggerFactory.getLogger(Inventory.class);
 			logger.debug("{} has used Inventory command", e.getMember().getUser().getId());
 			

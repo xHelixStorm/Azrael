@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.FileSetting;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
@@ -25,7 +26,7 @@ public class RoleReaction implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		//after a channel has been registered for self role assignment, it can be disabled and enabled with this command
-		if(IniFileReader.getRoleReactionCommand()) 
+		if(GuildIni.getRoleReactionCommand(e.getGuild().getIdLong())) 
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) == true || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 				if(e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+13).equals("enable")) {
 					Logger logger = LoggerFactory.getLogger(RoleReaction.class);

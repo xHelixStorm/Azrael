@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import commandsContainer.ShopExecution;
 import core.Guilds;
 import core.Hashes;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
@@ -20,7 +21,7 @@ public class Shop implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getShopCommand()){
+		if(GuildIni.getShopCommand(e.getGuild().getIdLong())){
 			Logger logger = LoggerFactory.getLogger(Shop.class);
 			logger.debug("{} has used Shop command", e.getMember().getUser().getId());
 			

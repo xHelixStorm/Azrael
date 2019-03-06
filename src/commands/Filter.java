@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import commandsContainer.FilterExecution;
 import core.UserPrivs;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -20,7 +21,7 @@ public class Filter implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getFilterCommand()) {			
+		if(GuildIni.getFilterCommand(e.getGuild().getIdLong())) {			
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 				if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"filter")) {

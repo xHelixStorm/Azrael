@@ -137,7 +137,7 @@ public class MessageListener extends ListenerAdapter{
 					createFile = true;
 				}
 				if(createFile == true) {
-					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id+".azr", current_page+"_"+input);
+					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id+".azr", current_page+"_"+last_page+"_"+input);
 				}
 				randomshop_bot.delete();
 				

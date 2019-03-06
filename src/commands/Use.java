@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
@@ -20,7 +21,7 @@ public class Use implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getUseCommand()){
+		if(GuildIni.getUseCommand(e.getGuild().getIdLong())){
 			Logger logger = LoggerFactory.getLogger(Use.class);
 			logger.debug("{} has used Use command", e.getMember().getUser().getId());
 			

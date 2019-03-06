@@ -3,7 +3,7 @@ package commands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fileManagement.IniFileReader;
+import fileManagement.GuildIni;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class Help implements Command{
@@ -15,7 +15,7 @@ public class Help implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getHelpCommand()){
+		if(GuildIni.getHelpCommand(e.getGuild().getIdLong())){
 			e.getTextChannel().sendMessage("Here all listed issues about S4. If you got something to add or to ask about a specific point, poke a GM\nhttps://s4league.aeriagames.com/forum/index.php?thread/52-guide-general-technical-issues/").queue();
 		}
 	}

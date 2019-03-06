@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import inventory.Dailies;
 import inventory.DrawDaily;
@@ -38,7 +39,7 @@ public class Daily implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getDailyCommand()){
+		if(GuildIni.getDailyCommand(e.getGuild().getIdLong())){
 			Logger logger = LoggerFactory.getLogger(Daily.class);
 			logger.debug("{} has used Daily command", e.getMember().getUser().getId());
 			

@@ -20,6 +20,7 @@ import commandsContainer.SetRankingSystem;
 import commandsContainer.SetWarning;
 import core.Hashes;
 import core.UserPrivs;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import inventory.Dailies;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -35,7 +36,7 @@ public class Set implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getSetCommand()){
+		if(GuildIni.getSetCommand(e.getGuild().getIdLong())){
 			Logger logger = LoggerFactory.getLogger(RoleReaction.class);
 			logger.debug("{} has used Set command", e.getMember().getUser().getId());
 			

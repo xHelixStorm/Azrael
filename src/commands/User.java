@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import commandsContainer.UserExecution;
 import core.UserPrivs;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -23,7 +24,7 @@ public class User implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-		if(IniFileReader.getUserCommand()) {
+		if(GuildIni.getUserCommand(e.getGuild().getIdLong())) {
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
 				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import core.RSS;
 import core.UserPrivs;
 import fileManagement.FileSetting;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -22,7 +23,7 @@ public class Rss implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getRssCommand()) {
+		if(GuildIni.getRssCommand(e.getGuild().getIdLong())) {
 			EmbedBuilder message = new EmbedBuilder();
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || IniFileReader.getAdmin() == e.getMember().getUser().getIdLong()) {
 				Logger logger = LoggerFactory.getLogger(Rss.class);

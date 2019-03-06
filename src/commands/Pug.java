@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commandsContainer.PugExecution;
-import fileManagement.IniFileReader;
+import fileManagement.GuildIni;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
 
@@ -21,7 +21,7 @@ public class Pug implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getPugCommand()){
+		if(GuildIni.getPugCommand(e.getGuild().getIdLong())){
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
 				Logger logger = LoggerFactory.getLogger(Pug.class);

@@ -6,6 +6,7 @@ import java.util.ConcurrentModificationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
@@ -20,7 +21,7 @@ public class Top implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getTopCommand()){
+		if(GuildIni.getTopCommand(e.getGuild().getIdLong())){
 			Logger logger = LoggerFactory.getLogger(Top.class);
 			logger.debug("{} has used Top command", e.getMember().getUser().getId());
 			

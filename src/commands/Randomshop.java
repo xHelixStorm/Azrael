@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import commandsContainer.RandomshopExecution;
 import fileManagement.FileSetting;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
@@ -21,7 +22,7 @@ public class Randomshop implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getRandomshopCommand()) {
+		if(GuildIni.getRandomshopCommand(e.getGuild().getIdLong())) {
 			Logger logger = LoggerFactory.getLogger(Randomshop.class);
 			logger.debug("The user {} has executed the Randomshop command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			

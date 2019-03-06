@@ -3,6 +3,7 @@ package commands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -18,7 +19,7 @@ public class About implements Command {
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getAboutCommand()){
+		if(GuildIni.getAboutCommand(e.getGuild().getIdLong())){
 			Logger logger = LoggerFactory.getLogger(About.class);
 			logger.debug("{} has used About command", e.getMember().getUser().getId());
 			

@@ -10,6 +10,7 @@ import commandsContainer.QuizExecution;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.FileSetting;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -24,7 +25,7 @@ public class Quiz implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(IniFileReader.getQuizCommand()) {
+		if(GuildIni.getQuizCommand(e.getGuild().getIdLong())) {
 			Logger logger = LoggerFactory.getLogger(Quiz.class);
 			logger.debug("{} has used Quiz command", e.getMember().getUser().getId());
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setTitle("Access denied!").setThumbnail(IniFileReader.getDeniedThumbnail());
