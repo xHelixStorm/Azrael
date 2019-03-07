@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Bancollect;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.audit.AuditLogEntry;
@@ -72,7 +73,7 @@ public class GuildLeaveListener extends ListenerAdapter{
 			else if(trigger_user_name.length() > 0 && banned == false) {
 				e.getGuild().getTextChannelById(channel_id).sendMessage(kick.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** kicked **"+user_name+"** with the id number **"+e.getUser().getId()+"** from **"+guild_name+"**"+kick_reason).build()).queue();
 			}
-			else if(IniFileReader.getLeaveMessage() && banned == false){
+			else if(GuildIni.getLeaveMessage(guild_id) && banned == false){
 				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from **"+guild_name+"**").build()).queue();
 			}
 			

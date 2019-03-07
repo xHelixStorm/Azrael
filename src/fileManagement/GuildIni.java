@@ -17,6 +17,17 @@ public class GuildIni {
 			//General
 			ini.add("General", "Theme", "");
 			ini.add("General", "Administrator", "");
+			ini.add("General", "CountMembers", "false");
+			ini.add("General", "GameMessage", "");
+			ini.add("General", "JoinMessage", "false");
+			ini.add("General", "LeaveMessage", "false");
+			ini.add("General", "ChannelLog", "false");
+			ini.add("General", "CacheLog", "false");
+			
+			//Pastebin
+			ini.add("Pastebin", "Key", "");
+			ini.add("Pastebin", "Username", "");
+			ini.add("Pastebin", "Password", "");
 			
 			//Reactions
 			ini.add("Reactions", "Enabled", "false");
@@ -120,6 +131,51 @@ public class GuildIni {
 	public static String getCommandPrefix(long guild_id){
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "CommandPrefix");
+	}
+	
+	public static boolean getCountMembers(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "CountMembers", boolean.class);
+	}
+
+	public static String getGameMessage(long guild_id){
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "GameMessage");
+	}
+	
+	public static boolean getJoinMessage(long guild_id){
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "JoinMessage", boolean.class);
+	}
+	
+	public static boolean getLeaveMessage(long guild_id){
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "LeaveMessage", boolean.class);
+	}
+	
+	public static boolean getChannelLog(long guild_id){
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "ChannelLog", boolean.class);
+	}
+	
+	public static boolean getCacheLog(long guild_id){
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "CacheLog", boolean.class);
+	}
+	
+	public static String[] getWholePastebin(long guild_id) {
+		Ini ini = readIni(guild_id);
+		Ini.Section pastebin = ini.get("Pastebin");
+		String[] credentials = new String[3];
+		credentials[0] = pastebin.get("Key");
+		credentials[1] = pastebin.get("Username");
+		credentials[2] = pastebin.get("Password");
+		return credentials;
+	}
+	
+	public static String getPastebinKey(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Pastebin", "Key");
 	}
 	
 	public static String[] getReactions(long guild_id) {

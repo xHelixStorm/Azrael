@@ -10,20 +10,19 @@ import org.jpaste.pastebin.PastebinPaste;
 import org.jpaste.pastebin.account.PastebinAccount;
 import org.jpaste.pastebin.exceptions.LoginException;
 
-import fileManagement.IniFileReader;
+import fileManagement.GuildIni;
 
 public class Pastebin {
-	public static String unlistedPaste(String _title, String _contents) {
+	public static String unlistedPaste(String _title, String _contents, long guild_id) {
 		String return_link = "";
 		try {
-			String[] credentials = { IniFileReader.getPastebinUsername(), IniFileReader.getPastebinPassword() };
-			String developerKey = IniFileReader.getPastebinKey();
+			String[] credentials = GuildIni.getWholePastebin(guild_id);
 			
 			String title = _title; // insert your own title
 			String contents = _contents; // insert your own paste contents
 			int visibility = PastebinPaste.VISIBILITY_UNLISTED; // makes paste unlisted
 			
-			PastebinAccount account = new PastebinAccount(developerKey, credentials[0], credentials[1]);
+			PastebinAccount account = new PastebinAccount(credentials[0], credentials[1], credentials[2]);
 			// fetches an user session id
 			account.login();
 			
@@ -43,11 +42,11 @@ public class Pastebin {
 		return return_link;
 	}
 	
-	public static String readPublicPasteLink(String _link) {
+	public static String readPublicPasteLink(String _link, long guild_id) {
 		String content = "";
 		try {
 			//read the developerKey into account
-			String developerKey = IniFileReader.getPastebinKey();			
+			String developerKey = GuildIni.getPastebinKey(guild_id);			
 			PastebinAccount account = new PastebinAccount(developerKey);
 			
 			//convert String URL and fetch the content of the link

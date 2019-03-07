@@ -20,7 +20,7 @@ public class QuizExecution {
 		//check if it is a link that was inserted and if yes call readPublicPasteLink and then
 		//split the returned String in an array
 		if(_link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _link.startsWith("http")) {
-			String [] rewards = Pastebin.readPublicPasteLink(_link).split("[\\r\\n]+");
+			String [] rewards = Pastebin.readPublicPasteLink(_link, e.getGuild().getIdLong()).split("[\\r\\n]+");
 			
 			if(!rewards[0].equals("Reading paste failed!")) {
 				int index = 1;
@@ -61,7 +61,7 @@ public class QuizExecution {
 					}
 					else {
 						e.getTextChannel().sendMessage("An error occured while registering the rewards. All inserted rewards have been cleared. Please check the error log:\n"
-								+ ""+Pastebin.unlistedPaste("Error on registering rewards", integrity)).queue();
+								+ ""+Pastebin.unlistedPaste("Error on registering rewards", integrity, e.getGuild().getIdLong())).queue();
 						logger.error("Quiz rewards couldn't be registered");
 						clearRewards(1);
 					}
@@ -91,7 +91,7 @@ public class QuizExecution {
 				|| (new File("./files/QuizBackup/quizsettings.azr").exists() && _readFile == true)) {
 			String [] content;
 			if(_readFile == false) {
-				content = Pastebin.readPublicPasteLink(_link).split("[\\r\\n]+");
+				content = Pastebin.readPublicPasteLink(_link, e.getGuild().getIdLong()).split("[\\r\\n]+");
 			}
 			else {
 				content = FileSetting.readFileIntoFixedArray("./files/QuizBackup/quizsettings.azr");
@@ -159,7 +159,7 @@ public class QuizExecution {
 				}
 				else {
 					e.getTextChannel().sendMessage("An error occured while registering the questions. Inserted questions have been cleared. Please check the error log:\n"
-							+ ""+Pastebin.unlistedPaste("Error on registering rewards", integrity)).queue();
+							+ ""+Pastebin.unlistedPaste("Error on registering rewards", integrity, e.getGuild().getIdLong())).queue();
 					logger.error("Internal pastebin error in registering questions for the quiz");
 					clearQuestions(1);
 				}

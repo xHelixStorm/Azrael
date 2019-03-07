@@ -58,7 +58,6 @@ import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.entities.Game;
 
 public class Main {
 	static {System.setProperty("logback.configurationFile", "./logback.xml");}
@@ -93,25 +92,6 @@ public class Main {
 	
 		addCommands();
 		addListeners();
-		
-		builder.setGame(new Game(null){
-
-			@Override
-			public String getName() {
-				return IniFileReader.getGameMessage();
-			}
-
-			@Override
-			public GameType getType() {
-				return GameType.DEFAULT;
-			}
-
-			@Override
-			public String getUrl() {
-				return null;
-			}
-			
-		});
 		
 		try {
 			@SuppressWarnings("unused")

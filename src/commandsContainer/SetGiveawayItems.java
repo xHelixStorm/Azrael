@@ -21,7 +21,7 @@ public class SetGiveawayItems {
 		
 		//verify pastebin link and save the content into array
 		if(_link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _link.startsWith("http")) {
-			String [] rewards = Pastebin.readPublicPasteLink(_link).split("[\\r\\n]+");
+			String [] rewards = Pastebin.readPublicPasteLink(_link, e.getGuild().getIdLong()).split("[\\r\\n]+");
 			
 			//calculate the next beginning of the month
 			LocalTime midnight = LocalTime.MIDNIGHT;

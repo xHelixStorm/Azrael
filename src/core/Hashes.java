@@ -17,7 +17,7 @@ import rankingSystem.WeaponStats;
 import rankingSystem.Weapons;
 
 public class Hashes {
-	private static final int max_message_pool_size = 1500;
+	private static final int max_message_pool_size = 100000;
 	private static final LinkedHashMap<Long, Messages> message_pool = new LinkedHashMap<Long, Messages>(){
 		private static final long serialVersionUID = 7505333508062985903L;
 		@Override

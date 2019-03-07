@@ -284,7 +284,7 @@ public class UserExecution {
 						}
 						
 						if(messages.size() > 0) {
-							String paste_link = Pastebin.unlistedPaste("Found comments have been succesfully removed!", hash_counter+" messages from "+messages.get(0).getUserName()+" have been removed:\n\n"+collected_messages.toString());
+							String paste_link = Pastebin.unlistedPaste("Found comments have been succesfully removed!", hash_counter+" messages from "+messages.get(0).getUserName()+" have been removed:\n\n"+collected_messages.toString(), _e.getGuild().getIdLong());
 							if(!paste_link.equals("Creating paste failed!")) {
 								_e.getTextChannel().sendMessage(message.setDescription("The comments of the selected user have been succesfully removed: "+paste_link).build()).queue();
 								logger.debug("{} has bulk deleted messages from {}", _e.getMember().getUser().getId(), messages.get(0).getUserID());

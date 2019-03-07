@@ -61,7 +61,8 @@ public class MessageListener extends ListenerAdapter{
 			String message = e.getMessage().getContentRaw();
 			long channel_id = e.getTextChannel().getIdLong();
 			
-			if(IniFileReader.getChannelLog()){
+			final boolean channelLog = GuildIni.getChannelLog(guild_id);
+			if(channelLog){
 				LocalDateTime time = LocalDateTime.now();
 				String image_url = "";
 				for(Attachment attch : e.getMessage().getAttachments()){
@@ -77,7 +78,7 @@ public class MessageListener extends ListenerAdapter{
 				collectedMessage.setMessageID(e.getMessageIdLong());
 				collectedMessage.setTime(time);
 				FileSetting.appendFile("./message_log/"+e.getTextChannel().getName()+".txt", "["+collectedMessage.getTime().toString()+" - "+collectedMessage.getUserName()+"]: "+collectedMessage.getMessage());
-				if(IniFileReader.getCacheLog() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
+				if(channelLog && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
 					Hashes.addMessagePool(e.getMessageIdLong(), collectedMessage);
 				}
 			}

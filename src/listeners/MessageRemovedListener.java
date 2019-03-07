@@ -60,17 +60,15 @@ public class MessageRemovedListener extends ListenerAdapter{
 		
 		long message_id = e.getMessageIdLong();
 		Messages removed_message = Hashes.getMessagePool(message_id);
+		Hashes.removeMessagePool(message_id);
 		
 		if(send_message == true && removed_from != 0){
 			if(trigger_user_id != removed_from){
-				if(removed_message != null && removed_message.getMessage().length() > 0) {
-					Hashes.removeMessagePool(message_id);
-					if(trigger_user_id > 0) {
-						message.setTitle(trigger_user_name+" has removed a message from #"+e.getTextChannel().getName()+"!");
-						if(removed_message.getMessage().length() > 0) {
-							var tra_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "tra");
-							if(tra_channel != 0){e.getGuild().getTextChannelById(tra_channel).sendMessage(message.setDescription("["+removed_message.getTime().toString()+" - "+removed_message.getUserName()+"]: "+removed_message.getMessage()).build()).queue();}
-						}
+				if(removed_message != null && removed_message.getMessage().length() > 0 && trigger_user_id > 0) {
+					message.setTitle(trigger_user_name+" has removed a message from #"+e.getTextChannel().getName()+"!");
+					if(removed_message.getMessage().length() > 0) {
+						var tra_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "tra");
+						if(tra_channel != 0){e.getGuild().getTextChannelById(tra_channel).sendMessage(message.setDescription("["+removed_message.getTime().toString()+" - "+removed_message.getUserName()+"]: "+removed_message.getMessage()).build()).queue();}
 					}
 				}
 			}

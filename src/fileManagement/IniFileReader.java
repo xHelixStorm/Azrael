@@ -40,14 +40,6 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Bot", "TempDirectory");
 	}
-	public static boolean getCountMembers() {
-		readConfig();
-		return ini.get("Bot", "CountMembers", boolean.class);
-	}
-	public static String getGameMessage(){
-		readConfig();
-		return ini.get("Bot", "GameMessage");
-	}
 	public static boolean getAllowPatchNotes(){
 		readConfig();
 		return ini.get("Patch", "PrivatePatchNotes", boolean.class);
@@ -55,34 +47,6 @@ public class IniFileReader {
 	public static boolean getAllowPublicPatchNotes(){
 		readConfig();
 		return ini.get("Patch", "PublicPatchNotes", boolean.class);
-	}
-	public static boolean getJoinMessage(){
-		readConfig();
-		return ini.get("Messages", "JoinMessage", boolean.class);
-	}
-	public static boolean getLeaveMessage(){
-		readConfig();
-		return ini.get("Messages", "LeaveMessage", boolean.class);
-	}
-	public static boolean getChannelLog(){
-		readConfig();
-		return ini.get("Messages", "ChannelLog", boolean.class);
-	}
-	public static boolean getCacheLog(){
-		readConfig();
-		return ini.get("Messages", "CacheLog", boolean.class);
-	}
-	public static String getPastebinKey() {
-		readConfig();
-		return ini.get("Pastebin", "Key");
-	}
-	public static String getPastebinUsername() {
-		readConfig();
-		return ini.get("Pastebin", "Username");
-	}
-	public static String getPastebinPassword() {
-		readConfig();
-		return ini.get("Pastebin", "Password");
 	}
 	public static String getSQLUsername(){
 		readConfig();

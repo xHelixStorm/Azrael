@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import core.Bancollect;
 import core.Guilds;
 import core.Hashes;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
@@ -60,7 +61,7 @@ public class GuildListener extends ListenerAdapter {
 		Bancollect warnedUser = Azrael.SQLgetData(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		muted = warnedUser.getMuted();
 		boolean custom_time = warnedUser.getCustomTime();
-		if(IniFileReader.getJoinMessage()){
+		if(GuildIni.getJoinMessage(guild_id)){
 			if(channel_id != 0 && muted == false){e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription(":warning: The user **" + user_name + "** with the ID Number **" + user_id + "** joined **" + e.getGuild().getName() + "**").build()).queue();}
 		}
 		

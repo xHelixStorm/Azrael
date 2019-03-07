@@ -124,7 +124,7 @@ public class FilterExecution {
 						for(String word : Hashes.getQuerryResult("bad-names_"+_e.getGuild().getId())) {
 							out.append(word+"\n");
 						}
-						String paste_link = Pastebin.unlistedPaste("Name filter", out.toString());
+						String paste_link = Pastebin.unlistedPaste("Name filter", out.toString(), _e.getGuild().getIdLong());
 						message.setTitle("Name filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Every name that includes one of this words, will receive a funny name: "+paste_link).build()).queue();
@@ -152,7 +152,7 @@ public class FilterExecution {
 						for(String word : Azrael.SQLgetFunnyNames(_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						String paste_link = Pastebin.unlistedPaste("Funny names for the name filter", (out.length() > 0 ? out.toString() : "<No funny names found>"));
+						String paste_link = Pastebin.unlistedPaste("Funny names for the name filter", (out.length() > 0 ? out.toString() : "<No funny names found>"), _e.getGuild().getIdLong());
 						message.setTitle("Funny names!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("A user will receive one of these names, if the name filter gets triggered: "+paste_link).build()).queue();
@@ -180,7 +180,7 @@ public class FilterExecution {
 						for(String word : Azrael.SQLgetStaffNames(_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						String paste_link = Pastebin.unlistedPaste("Staff names for the name filter", (out.length() > 0 ? out.toString() : "<staff-names list is empty>"));
+						String paste_link = Pastebin.unlistedPaste("Staff names for the name filter", (out.length() > 0 ? out.toString() : "<staff-names list is empty>"), _e.getGuild().getIdLong());
 						message.setTitle("Staff names!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here the list to censor names containing staff names: "+paste_link).build()).queue();
@@ -209,7 +209,7 @@ public class FilterExecution {
 						for(String word : Hashes.getQuerryResult("eng_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						String paste_link = Pastebin.unlistedPaste("English word filter", out.toString());
+						String paste_link = Pastebin.unlistedPaste("English word filter", out.toString(), _e.getGuild().getIdLong());
 						message.setTitle("English word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
@@ -222,7 +222,7 @@ public class FilterExecution {
 						for(String word : Hashes.getQuerryResult("ger_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						String paste_link = Pastebin.unlistedPaste("German word filter", out.toString());
+						String paste_link = Pastebin.unlistedPaste("German word filter", out.toString(), _e.getGuild().getIdLong());
 						message.setTitle("German word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
@@ -235,7 +235,7 @@ public class FilterExecution {
 						for(String word : Hashes.getQuerryResult("fre_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						String paste_link = Pastebin.unlistedPaste("French word filter", out.toString());
+						String paste_link = Pastebin.unlistedPaste("French word filter", out.toString(), _e.getGuild().getIdLong());
 						message.setTitle("French word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
@@ -248,7 +248,7 @@ public class FilterExecution {
 						for(String word : Hashes.getQuerryResult("tur_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						String paste_link = Pastebin.unlistedPaste("Turkish word filter", out.toString());
+						String paste_link = Pastebin.unlistedPaste("Turkish word filter", out.toString(), _e.getGuild().getIdLong());
 						message.setTitle("Turkish word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
@@ -261,7 +261,7 @@ public class FilterExecution {
 						for(String word : Hashes.getQuerryResult("rus_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						String paste_link = Pastebin.unlistedPaste("Russian word filter", out.toString());
+						String paste_link = Pastebin.unlistedPaste("Russian word filter", out.toString(), _e.getGuild().getIdLong());
 						message.setTitle("Russian word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
@@ -274,7 +274,7 @@ public class FilterExecution {
 						for(String word : Hashes.getQuerryResult("eng_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						String paste_link = Pastebin.unlistedPaste("Spanish word filter", out.toString());
+						String paste_link = Pastebin.unlistedPaste("Spanish word filter", out.toString(), _e.getGuild().getIdLong());
 						message.setTitle("Spanish word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
@@ -287,7 +287,7 @@ public class FilterExecution {
 						for(String word : Hashes.getQuerryResult("por_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						String paste_link = Pastebin.unlistedPaste("Portuguese word filter", out.toString());
+						String paste_link = Pastebin.unlistedPaste("Portuguese word filter", out.toString(), _e.getGuild().getIdLong());
 						message.setTitle("Portuguese word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
@@ -300,7 +300,7 @@ public class FilterExecution {
 						for(String word : Hashes.getQuerryResult("ita_"+_e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
-						String paste_link = Pastebin.unlistedPaste("Italian word filter", out.toString());
+						String paste_link = Pastebin.unlistedPaste("Italian word filter", out.toString(), _e.getGuild().getIdLong());
 						message.setTitle("Italian word filter!");
 						out.setLength(0);
 						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
