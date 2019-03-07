@@ -2,7 +2,6 @@ package listeners;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -25,8 +24,7 @@ public class ShutdownListener extends ListenerAdapter{
 		try {
 			FileUtils.forceDelete(new File(IniFileReader.getTempDirectory()));
 		} catch (IOException e2) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e2.printStackTrace();
+			logger.error("Temp directory couldn't be deleted", e2);
 		}
 		
 		if(SystemUtils.IS_OS_LINUX) {

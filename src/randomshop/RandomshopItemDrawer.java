@@ -10,6 +10,9 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -68,7 +71,8 @@ public class RandomshopItemDrawer {
 				e2.getChannel().sendFile(file1, "randomshop.png", null).complete();
 			file1.delete();
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			Logger logger = LoggerFactory.getLogger(RandomshopItemDrawer.class);
+			logger.error("Randomshop Items couldn't be drawn", e1);
 		}
 	}
 	

@@ -7,9 +7,11 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 
 import javax.imageio.ImageIO;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -36,8 +38,8 @@ public class DrawDaily {
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/daily.png"));
 			g.dispose();
 		} catch(IOException ioe){
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			ioe.printStackTrace();
+			Logger logger = LoggerFactory.getLogger(DrawDaily.class);
+			logger.error("Error on daily reward drawing", ioe);
 		}
 		File file1 = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/daily.png");
 		_e.getTextChannel().sendFile(file1, "daily.png", null).complete();

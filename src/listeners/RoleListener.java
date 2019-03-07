@@ -130,10 +130,8 @@ public class RoleListener extends ListenerAdapter{
 						}
 					}
 				} catch (HierarchyException hye) {
-					System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-					hye.printStackTrace();
 					e.getJDA().getGuildById(guild_id).getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
-					logger.debug("{} received a mute role that has been instantly removed", e.getMember().getUser().getId());
+					logger.warn("{} received a mute role that has been instantly removed", e.getMember().getUser().getId(), hye);
 					e.getGuild().getTextChannelById(channel_id).sendMessage(message2.setDescription("The mute role has been set on someone with higher privileges. Mute role removed!").build()).queue();
 					
 				}

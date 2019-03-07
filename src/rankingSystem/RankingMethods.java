@@ -13,17 +13,21 @@ import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class RankingMethods extends ListenerAdapter{
+	private final static Logger logger = LoggerFactory.getLogger(RankingMethods.class);
+	
 	public static void getRankUp(MessageReceivedEvent e , int _level, int _level_skin, int _icon_skin, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
 		try {
 			BufferedImage rankUp = ImageIO.read(new File("./files/RankingSystem/levelup"+_level_skin+"_blank.png"));
@@ -75,8 +79,7 @@ public class RankingMethods extends ListenerAdapter{
 			e.getTextChannel().sendFile(file1, "level_up.png", null).complete();
 			file1.delete();
 		} catch (IOException e1) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e1.printStackTrace();
+			logger.error("RankUp couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	
@@ -135,8 +138,7 @@ public class RankingMethods extends ListenerAdapter{
 			e.getTextChannel().sendFile(file2, "rank.png", null).complete();
 			file2.delete();
 		} catch (IOException e1) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e1.printStackTrace();
+			logger.error("Rank couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	
@@ -205,8 +207,7 @@ public class RankingMethods extends ListenerAdapter{
 			e.getTextChannel().sendFile(file3, "profile.png", null).complete();
 			file3.delete();
 		} catch (IOException e1) {
-			System.err.print("["+new Timestamp(System.currentTimeMillis())+"] ");
-			e1.printStackTrace();
+			logger.error("Profile couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	
