@@ -39,7 +39,7 @@ public class RandomshopExecution {
 			e.getTextChannel().sendMessage(message.setDescription("The randomshop is currently not available. Please retry later!").build()).queue();
 		}
 		else {
-			message.setDescription("Write either one weapon type or weapon category together with the command to start the random shop. For example **"+IniFileReader.getCommandPrefix()+"randomshop -play <weapon type/weapon category>**."
+			message.setDescription("Write either one weapon type or weapon category together with the command to start the random shop. For example **"+GuildIni.getCommandPrefix(e.getGuild().getIdLong())+"randomshop -play <weapon type/weapon category>**."
 					+ " Also make use of the -replay parameter to replay with the same weapon type or category. If you write a weapon category or weapon type without any parameters, you can view the selected content");
 			
 			if(abbreviations.size() > 0) {

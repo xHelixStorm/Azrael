@@ -42,7 +42,7 @@ public class MessageListener extends ListenerAdapter{
 		
 		try {
 			//execute commands first
-			if(e.getMessage().getContentRaw().startsWith(IniFileReader.getCommandPrefix()) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()){
+			if(e.getMessage().getContentRaw().startsWith(GuildIni.getCommandPrefix(e.getGuild().getIdLong())) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()){
 				CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw(), e));
 			}
 			

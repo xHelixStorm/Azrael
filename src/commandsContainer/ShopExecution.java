@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -53,7 +54,7 @@ public class ShopExecution {
 			_e.getTextChannel().sendMessage(message.build()).queue();
 		}
 		else {
-			_e.getTextChannel().sendMessage("This weapon shop section doesn't exist or there are no items available. Please run **"+IniFileReader.getCommandPrefix()+"shop weapons** to view all available sections to purchase weapons").queue();
+			_e.getTextChannel().sendMessage("This weapon shop section doesn't exist or there are no items available. Please run **"+GuildIni.getCommandPrefix(_e.getGuild().getIdLong())+"shop weapons** to view all available sections to purchase weapons").queue();
 		}
 	}
 }

@@ -36,10 +36,6 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Bot", "FileLogger", boolean.class);
 	}
-	public static String getCommandPrefix(){
-		readConfig();
-		return ini.get("Bot", "CommandPrefix");
-	}
 	public static String getTempDirectory(){
 		readConfig();
 		return ini.get("Bot", "TempDirectory");

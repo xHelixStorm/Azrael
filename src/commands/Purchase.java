@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import core.Guilds;
 import core.Hashes;
 import fileManagement.GuildIni;
-import fileManagement.IniFileReader;
 import inventory.InventoryContent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import rankingSystem.Skins;
@@ -35,11 +34,12 @@ public class Purchase implements Command{
 				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 				if(e.getTextChannel().getIdLong() == bot_channel || bot_channel == 0){
 					String input = e.getMessage().getContentRaw();
-					if(input.equals(IniFileReader.getCommandPrefix()+"purchase")){
-						e.getTextChannel().sendMessage("To purchase an item or skin, use the **"+IniFileReader.getCommandPrefix()+"purchase** command together with the description name of the item you want to purchase. Items to purchase can be found with the **"+IniFileReader.getCommandPrefix()+"shop** command").queue();
+					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+					if(input.equals(prefix+"purchase")){
+						e.getTextChannel().sendMessage("To purchase an item or skin, use the **"+prefix+"purchase** command together with the description name of the item you want to purchase. Items to purchase can be found with the **"+prefix+"shop** command").queue();
 					}
-					else if(input.contains(IniFileReader.getCommandPrefix()+"purchase ")){
-						input = input.substring(IniFileReader.getCommandPrefix().length()+9);
+					else if(input.contains(prefix+"purchase ")){
+						input = input.substring(prefix.length()+9);
 						final String filter = input;
 						Skins skin = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong()).parallelStream().filter(s -> s.getShopDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 						Weapons weapon = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong()).parallelStream().filter(w -> filter.equalsIgnoreCase(w.getDescription()+" "+w.getStatDescription())).findAny().orElse(null);
@@ -83,7 +83,7 @@ public class Purchase implements Command{
 									}
 								}
 								else{
-									e.getTextChannel().sendMessage(e.getMember().getAsMention()+" the requested item doesn't exist. Please use "+IniFileReader.getCommandPrefix()+"shop and type the given item description to purchase an item!").queue();
+									e.getTextChannel().sendMessage(e.getMember().getAsMention()+" the requested item doesn't exist. Please use "+prefix+"shop and type the given item description to purchase an item!").queue();
 								}
 							}
 							else if(weapon != null) {
@@ -114,7 +114,7 @@ public class Purchase implements Command{
 									}
 								}
 								else {
-									e.getTextChannel().sendMessage(e.getMember().getAsMention()+" the requested item doesn't exist. Please use "+IniFileReader.getCommandPrefix()+"shop and type the given item description to purchase an item!").queue();
+									e.getTextChannel().sendMessage(e.getMember().getAsMention()+" the requested item doesn't exist. Please use "+prefix+"shop and type the given item description to purchase an item!").queue();
 								}
 							}
 						}

@@ -2,14 +2,14 @@ package core;
 
 import java.util.ArrayList;
 
-import fileManagement.IniFileReader;
+import fileManagement.GuildIni;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class CommandParser {
 	
 	public static CommandContainer parser(String raw, MessageReceivedEvent e){
 		
-		String beheaded = raw.replaceFirst(IniFileReader.getCommandPrefix(), "");
+		String beheaded = raw.replaceFirst(GuildIni.getCommandPrefix(e.getGuild().getIdLong()), "");
 		String[] splitBeheaded = beheaded.split(" ");
 		String invoke = splitBeheaded[0];
 		ArrayList <String> split = new ArrayList <String>();

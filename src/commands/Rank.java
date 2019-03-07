@@ -35,8 +35,9 @@ public class Rank implements Command{
 				logger.debug("{} has used Rank command", e.getMember().getUser().getId());
 				
 				long user_id = 0;
-				if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"rank ")) {
-					String id = e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+5).replaceAll("[^0-9]", "");
+				final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+				if(e.getMessage().getContentRaw().contains(prefix+"rank ")) {
+					String id = e.getMessage().getContentRaw().substring(prefix.length()+5).replaceAll("[^0-9]", "");
 					user_id = id.length() > 0 ? Long.parseLong(id) : 0;
 				}
 				else {

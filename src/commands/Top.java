@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fileManagement.GuildIni;
-import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
 import sql.Azrael;
@@ -41,7 +40,7 @@ public class Top implements Command{
 			int page = 0;
 			boolean runTopList = false;
 			
-			if(command.equals(IniFileReader.getCommandPrefix()+"top")){
+			if(command.equals(GuildIni.getCommandPrefix(e.getGuild().getIdLong())+"top")){
 				page = 1;
 				runTopList = true;
 			}

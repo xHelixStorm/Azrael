@@ -25,7 +25,8 @@ public class RegisterRole {
 		StringBuilder strB = new StringBuilder();
 		String parseMessage = null;
 		
-		parseMessage = "Please write the command in this format:\n**"+IniFileReader.getCommandPrefix()+"register -role <role_type> role-id**\n\nRole-ids can be displayed with the command **"+IniFileReader.getCommandPrefix()+"display -roles**. Here are all available role_types:\n\n";
+		final String prefix = GuildIni.getCommandPrefix(_e.getGuild().getIdLong());
+		parseMessage = "Please write the command in this format:\n**"+prefix+"register -role <role_type> role-id**\n\nRole-ids can be displayed with the command **"+prefix+"display -roles**. Here are all available role_types:\n\n";
 		for(Roles categories : DiscordRoles.SQLgetCategories()){
 			strB.append("**"+categories.getCategory_ABV()+"** for the **"+categories.getCategory_Name()+"** role\n");
 		}

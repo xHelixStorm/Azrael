@@ -45,7 +45,8 @@ public class Set implements Command{
 			String input = e.getMessage().getContentRaw();
 			
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())){
-				if(input.equals(IniFileReader.getCommandPrefix()+"set")){
+				final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+				if(input.equals(prefix+"set")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Use the set command to set specific parameters for the bot:\n\n"
 							+ "**-channel-filter**: To set one or few language filters for one channel\n\n"
 							+ "**-warnings**: To set a max allowed number of warnings before the affected users gets banned together with the mute time for each warning\n\n"
@@ -54,75 +55,75 @@ public class Set implements Command{
 							+ "**-max-experience**: To enable/disable the max experience limiter and to set the limit in experience\n\n"
 							+ "**-max-level**: To define the max level that can be reached with the ranking system\n\n"
 							+ "**-default-level-skin**: To define the default skin for level ups\n\n"
-							+ "**-default-rank-skin**: To define the default skin for rank commands like "+IniFileReader.getCommandPrefix()+"rank\n\n"
-							+ "**-default-profile-skin**: To define the default skin for profile commands like "+IniFileReader.getCommandPrefix()+"profile\n\n"
+							+ "**-default-rank-skin**: To define the default skin for rank commands like "+prefix+"rank\n\n"
+							+ "**-default-profile-skin**: To define the default skin for profile commands like "+prefix+"profile\n\n"
 							+ "**-default-icon-skin**: To define the default skin for level up icons that get displayed on rank and profile commands\n\n"
 							+ "**-daily-item**: To add a item to the list to win every 24 hours\n\n"
 							+ "**-giveaway-items**: To add giveaway rewards in private message when H!daily gets called\n\n\n"
-							+ "Write the full command with one parameter to return more information. E.g **"+IniFileReader.getCommandPrefix()+"set -channel-filter**").build()).queue();
+							+ "Write the full command with one parameter to return more information. E.g **"+prefix+"set -channel-filter**").build()).queue();
 				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -channel-filter")){
-					e.getTextChannel().sendMessage(messageBuild.setDescription("Use the command with this parameter to set one or few self chosen filters on a channel. Write the command in the following way as an example:\n\n**"+IniFileReader.getCommandPrefix()+"set -channel-filter #yourchannel eng,ger,fre**\nThese languages can be added to the filter:\n**eng** for English\n**ger** for German\n**fre** for French\n**tur** for Turkish\n**rus** for Russian").build()).queue();
+				else if(input.equals(prefix+"set -channel-filter")){
+					e.getTextChannel().sendMessage(messageBuild.setDescription("Use the command with this parameter to set one or few self chosen filters on a channel. Write the command in the following way as an example:\n\n**"+prefix+"set -channel-filter #yourchannel eng,ger,fre**\nThese languages can be added to the filter:\n**eng** for English\n**ger** for German\n**fre** for French\n**tur** for Turkish\n**rus** for Russian").build()).queue();
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -channel-filter ")){
-					input = input.substring(20+IniFileReader.getCommandPrefix().length());
+				else if(input.contains(prefix+"set -channel-filter ")){
+					input = input.substring(20+prefix.length());
 					SetChannelFilter.runTask(e, input);
 				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -warnings")) {
+				else if(input.equals(prefix+"set -warnings")) {
 					SetWarning.runHelp(e);
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -warnings ")){
-					SetWarning.runTask(e, e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+14));
+				else if(input.contains(prefix+"set -warnings ")){
+					SetWarning.runTask(e, e.getMessage().getContentRaw().substring(prefix.length()+14));
 				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -commands")){
-					e.getTextChannel().sendMessage(messageBuild.setDescription("To change the level on how the commands are allowed to be used, try to use the following:\n\n**"+IniFileReader.getCommandPrefix()+"set -commands disable** to disable specific commands in all channels\n**"+IniFileReader.getCommandPrefix()+"set -commands bot** to enable specific commands only in bot channel\n**"+IniFileReader.getCommandPrefix()+"set -commands enable** to enable specific commands in all channels").build()).queue();
+				else if(input.equals(prefix+"set -commands")){
+					e.getTextChannel().sendMessage(messageBuild.setDescription("To change the level on how the commands are allowed to be used, try to use the following:\n\n**"+prefix+"set -commands disable** to disable specific commands in all channels\n**"+prefix+"set -commands bot** to enable specific commands only in bot channel\n**"+prefix+"set -commands enable** to enable specific commands in all channels").build()).queue();
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -commands ")){
-					input = input.substring(14+IniFileReader.getCommandPrefix().length());
+				else if(input.contains(prefix+"set -commands ")){
+					input = input.substring(14+prefix.length());
 					SetCommandLevel.runTask(e, input);
 				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -ranking")){
-					e.getTextChannel().sendMessage(messageBuild.setDescription("Enable or disable the ranking system with the following command:\n\n**"+IniFileReader.getCommandPrefix()+"set -ranking enable**: To enable the ranking system\n**"+IniFileReader.getCommandPrefix()+"set -ranking disable**: To disable the ranking system").build()).queue();
+				else if(input.equals(prefix+"set -ranking")){
+					e.getTextChannel().sendMessage(messageBuild.setDescription("Enable or disable the ranking system with the following command:\n\n**"+prefix+"set -ranking enable**: To enable the ranking system\n**"+prefix+"set -ranking disable**: To disable the ranking system").build()).queue();
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -ranking ")){
+				else if(input.contains(prefix+"set -ranking ")){
 					if(RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getMaxLevel() != 0){
-						input = input.substring(13+IniFileReader.getCommandPrefix().length());
+						input = input.substring(13+prefix.length());
 						SetRankingSystem.runTask(e, input);
 					}
 					else{
 						e.getTextChannel().sendMessage(e.getMember().getAsMention() + " **Before using this command, set the max level for this guild!**").queue();
 					}
 				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -max-experience")){
-					e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, type one of the following parameters after the syntax:\n\n**"+IniFileReader.getCommandPrefix()+"set -max-experience <experience>**: To set an experience limit per day\n"
-							+ "**"+IniFileReader.getCommandPrefix()+"set -max-experience enable**: To enable the experience limit\n"
-							+ "**"+IniFileReader.getCommandPrefix()+"set -max-experience disable**: To disable the experience limit").build()).queue();
+				else if(input.equals(prefix+"set -max-experience")){
+					e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, type one of the following parameters after the syntax:\n\n**"+prefix+"set -max-experience <experience>**: To set an experience limit per day\n"
+							+ "**"+prefix+"set -max-experience enable**: To enable the experience limit\n"
+							+ "**"+prefix+"set -max-experience disable**: To disable the experience limit").build()).queue();
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -max-experience ")){
-					input = input.substring(19+IniFileReader.getCommandPrefix().length());
+				else if(input.contains(prefix+"set -max-experience ")){
+					input = input.substring(19+prefix.length());
 					SetMaxExperience.runTask(e, input, Hashes.getStatus(e.getGuild().getIdLong()));
 				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -max-level")){
-					e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, type **"+IniFileReader.getCommandPrefix()+"set -max-level <level in number>** for defining the max level that can be achieved in this guild").build()).queue();
+				else if(input.equals(prefix+"set -max-level")){
+					e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, type **"+prefix+"set -max-level <level in number>** for defining the max level that can be achieved in this guild").build()).queue();
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -max-level ")){
-					input = input.substring(15+IniFileReader.getCommandPrefix().length());
+				else if(input.contains(prefix+"set -max-level ")){
+					input = input.substring(15+prefix.length());
 					SetMaxLevel.runTask(e, Integer.parseInt(input));
 				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -default-level-skin")){
+				else if(input.equals(prefix+"set -default-level-skin")){
 					String out = "";
 					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingLevel()){
 						out+= "Theme "+rankingSystem.getRankingLevel()+":\t"+rankingSystem.getLevelDescription()+"\n";
 					}
 					if(out.length() > 0)
-						e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-level-skin and then the digit for the desired skin. These skins are available for the level up pop ups:\n\n"+out).build()).queue();
+						e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+prefix+"set -default-level-skin and then the digit for the desired skin. These skins are available for the level up pop ups:\n\n"+out).build()).queue();
 					else
 						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_level couldn't be loaded").build()).queue();
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -default-level-skin ")){
+				else if(input.contains(prefix+"set -default-level-skin ")){
 					int last_theme = RankingSystem.SQLgetRankingLevel().size();
 					if(last_theme > 0) {
-						input = input.substring(24+IniFileReader.getCommandPrefix().length());
+						input = input.substring(24+prefix.length());
 						if(input.replaceAll("[0-9]", "").length() == 0)
 							SetLevelDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
 						else
@@ -132,20 +133,20 @@ public class Set implements Command{
 						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_level couldn't be loaded").queue();
 					}
 				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -default-rank-skin")){
+				else if(input.equals(prefix+"set -default-rank-skin")){
 					String out = "";
 					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingRank()){
 						out+= "Theme "+rankingSystem.getRankingRank()+":\t"+rankingSystem.getRankDescription()+"\n";
 					}
 					if(out.length() > 0)
-						e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-rank-skin and then the digit for the desired skin. These skins are available for the rank command:\n\n"+out).build()).queue();
+						e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+prefix+"set -default-rank-skin and then the digit for the desired skin. These skins are available for the rank command:\n\n"+out).build()).queue();
 					else
 						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_rank couldn't be loaded").build()).queue();
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -default-rank-skin ")){
+				else if(input.contains(prefix+"set -default-rank-skin ")){
 					int last_theme = RankingSystem.SQLgetRankingRank().size();
 					if(last_theme > 0) {
-						input = input.substring(23+IniFileReader.getCommandPrefix().length());
+						input = input.substring(23+prefix.length());
 						if(input.replaceAll("[0-9]", "").length() == 0)
 							SetRankDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
 						else
@@ -155,20 +156,20 @@ public class Set implements Command{
 						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_rank couldn't be loaded").queue();
 					}
 				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -default-profile-skin")){
+				else if(input.equals(prefix+"set -default-profile-skin")){
 					String out = "";
 					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingProfile()){
 						out+= "Theme "+rankingSystem.getRankingProfile()+":\t"+rankingSystem.getProfileDescription()+"\n";
 					}
 					if(out.length() > 0)
-						e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-profile-skin and then the digit for the desired skin. These skins are available for the profile command:\n\n"+out).build()).queue();
+						e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+prefix+"set -default-profile-skin and then the digit for the desired skin. These skins are available for the profile command:\n\n"+out).build()).queue();
 					else
 						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_profile couldn't be loaded").build()).queue();
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -default-profile-skin ")){
+				else if(input.contains(prefix+"set -default-profile-skin ")){
 					int last_theme = RankingSystem.SQLgetRankingProfile().size();
 					if(last_theme > 0) {
-						input = input.substring(26+IniFileReader.getCommandPrefix().length());
+						input = input.substring(26+prefix.length());
 						if(input.replaceAll("[0-9]", "").length() == 0)
 							SetProfileDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
 						else
@@ -178,20 +179,20 @@ public class Set implements Command{
 						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_profile couldn't be loaded").queue();
 					}
 				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -default-icon-skin")){
+				else if(input.equals(prefix+"set -default-icon-skin")){
 					String out = "";
 					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingIcons()){
 						out+= "Theme "+rankingSystem.getRankingIcon()+":\t"+rankingSystem.getIconDescription()+"\n";
 					}
 					if(out.length() > 0)
-						e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+IniFileReader.getCommandPrefix()+"set -default-icon-skin and then the digit for the desired level up icons. These level up icons are available:\n\n"+out).build()).queue();
+						e.getTextChannel().sendMessage(messageBuild.setDescription("Type "+prefix+"set -default-icon-skin and then the digit for the desired level up icons. These level up icons are available:\n\n"+out).build()).queue();
 					else
 						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_icons couldn't be loaded").build()).queue();
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -default-icon-skin ")){
+				else if(input.contains(prefix+"set -default-icon-skin ")){
 					int last_theme = RankingSystem.SQLgetRankingIcons().size();
 					if(last_theme > 0) {
-						input = input.substring(23+IniFileReader.getCommandPrefix().length());
+						input = input.substring(23+prefix.length());
 						if(input.replaceAll("[0-9]", "").length() == 0)
 							SetIconDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
 						else
@@ -200,20 +201,20 @@ public class Set implements Command{
 					else
 						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_icons couldn't be loaded").queue();
 				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -daily-item")){
-					e.getTextChannel().sendMessage(messageBuild.setDescription("Write the name of the daily reward you want to make available for dailies together with the weight and type of the item. For example:\n**"+IniFileReader.getCommandPrefix()+"set -daily-item \"5000 "+RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getCurrency()+"\" -weight 70 -type cur**\nNote that the total weight can't exceed 100 and that the currently available types are **cur** for currency , **exp** for experience enhancement items and **cod** for code giveaways.").build()).queue();
+				else if(input.equals(prefix+"set -daily-item")){
+					e.getTextChannel().sendMessage(messageBuild.setDescription("Write the name of the daily reward you want to make available for dailies together with the weight and type of the item. For example:\n**"+prefix+"set -daily-item \"5000 "+RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getCurrency()+"\" -weight 70 -type cur**\nNote that the total weight can't exceed 100 and that the currently available types are **cur** for currency , **exp** for experience enhancement items and **cod** for code giveaways.").build()).queue();
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -daily-item ")){
-					input = input.substring(16+IniFileReader.getCommandPrefix().length());
+				else if(input.contains(prefix+"set -daily-item ")){
+					input = input.substring(16+prefix.length());
 					ArrayList<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong());
 					var tot_weight = daily_items.parallelStream().mapToInt(i -> i.getWeight()).sum();
 					SetDailyItem.runTask(e, input, daily_items, tot_weight);
 				}
-				else if(input.equals(IniFileReader.getCommandPrefix()+"set -giveaway-items")) {
+				else if(input.equals(prefix+"set -giveaway-items")) {
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Please past a pastebin link, together with the command, that contains all giveaway codes for the current month").build()).queue();
 				}
-				else if(input.contains(IniFileReader.getCommandPrefix()+"set -giveaway-items ")) {
-					input = input.substring(20+IniFileReader.getCommandPrefix().length());
+				else if(input.contains(prefix+"set -giveaway-items ")) {
+					input = input.substring(20+prefix.length());
 					SetGiveawayItems.runTask(e, input);
 				}
 				else{

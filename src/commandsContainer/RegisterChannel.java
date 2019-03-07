@@ -26,7 +26,7 @@ public class RegisterChannel {
 		StringBuilder strB = new StringBuilder();
 		String parseMessage = null;
 		
-		parseMessage = "Please write the command in this format:\n**"+IniFileReader.getCommandPrefix()+"register -text-channel <channel-type> #channel-name/channel-id**\n\nHere are all available channel-types:\n\n";
+		parseMessage = "Please write the command in this format:\n**"+GuildIni.getCommandPrefix(_e.getGuild().getIdLong())+"register -text-channel <channel-type> #channel-name/channel-id**\n\nHere are all available channel-types:\n\n";
 		for(Channels channels : Azrael.SQLgetChannelTypes()){
 			strB.append("**"+channels.getChannel_Type()+"** for a **"+channels.getChannel_Type_Name()+"**\n");
 		}

@@ -32,8 +32,6 @@ import timerTask.ParseRSS;
 import util.STATIC;
 
 public class ReadyListener extends ListenerAdapter{
-	private static String privatePatchNotes = PatchNotes.patchNotes();
-	private static String publicPatchNotes = PublicPatchNotes.publicPatchNotes();
 	
 	@Override
 	public void onReady(ReadyEvent e){
@@ -98,7 +96,7 @@ public class ReadyListener extends ListenerAdapter{
 				if(channel_id != 0){
 					FileSetting.createFile("./files/version.azr", STATIC.getVersion_New());
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage(
-							messageBuild.setDescription(privatePatchNotes).build()).queue();
+							messageBuild.setDescription(PatchNotes.patchNotes(guild_id)).build()).queue();
 					logger.debug("Private patch notes launched");
 					
 					long channel_id2 = Azrael.SQLgetChannelID(guild_id, "bot");
@@ -106,7 +104,7 @@ public class ReadyListener extends ListenerAdapter{
 					if(allowPublicPatchNotes){
 						if(channel_id2 != 0){
 							e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id2).sendMessage(
-									messageBuild.setDescription(publicPatchNotes).build()).queue();
+									messageBuild.setDescription(PublicPatchNotes.publicPatchNotes()).build()).queue();
 							logger.debug("Public patch notes launched");
 						}
 					}

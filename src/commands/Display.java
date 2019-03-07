@@ -37,30 +37,31 @@ public class Display implements Command{
 			String message = e.getMessage().getContentRaw();
 			String out = "";
 			
-			if(message.equals(IniFileReader.getCommandPrefix()+"display")){
-				out = "Use these parameters after the display command like **"+IniFileReader.getCommandPrefix()+"display -roles** for further information on what to display:\n\n"
+			final String prefix = GuildIni.getCommandPrefix(guild_id);
+			if(message.equals(prefix+"display")){
+				out = "Use these parameters after the display command like **"+prefix+"display -roles** for further information on what to display:\n\n"
 						+ "**-roles**: Display all roles from this guild.\n"
 						+ "**-registered-roles**: Display all registered roles with their privileges.\n"
 						+ "**-ranking-roles**: Display all roles that can be unlocked with which level.\n"
 						+ "**-textchannels**: Display all textchannels from this guild.\n"
 						+ "**-voicechannels**: Display all voicechannels from this guild.\n"
 						+ "**-registered-channels**: Display all registered textchannels with configured filter options.\n"
-						+ "**-dailies**: Display all items that the "+IniFileReader.getCommandPrefix()+"daily command contains.";
+						+ "**-dailies**: Display all items that the "+prefix+"daily command contains.";
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
-			else if(message.equals(IniFileReader.getCommandPrefix()+"display -roles")){
+			else if(message.equals(prefix+"display -roles")){
 				for(Role r : e.getGuild().getRoles()){
 					out += r.getName() + " (" + r.getId() + ") \n";
 				}
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
-			else if(message.equals(IniFileReader.getCommandPrefix()+"display -registered-roles")){
+			else if(message.equals(prefix+"display -registered-roles")){
 				for(Roles r : DiscordRoles.SQLgetRoles(guild_id)){
 					out += r.getRole_Name() + " (" + r.getRole_ID() + ") \nrole type: "+r.getCategory_Name()+"\n\n";
 				}
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
-			else if(message.equals(IniFileReader.getCommandPrefix()+"display -ranking-roles")){
+			else if(message.equals(prefix+"display -ranking-roles")){
 				if(Hashes.getStatus(guild_id).getRankingState()){
 					for(rankingSystem.Rank r : Hashes.getMapOfRankingRoles().values()){
 						if(r.getGuildID() == guild_id){
@@ -73,7 +74,7 @@ public class Display implements Command{
 				}
 				e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No ranking role has been registered!").build()).queue();
 			}
-			else if(message.equals(IniFileReader.getCommandPrefix()+"display -textchannels")){
+			else if(message.equals(prefix+"display -textchannels")){
 				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
 					for(TextChannel tc : e.getGuild().getTextChannels()){
 						out += tc.getName() + " (" + tc.getId() + ") \n";
@@ -84,7 +85,7 @@ public class Display implements Command{
 					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden textchannels!**").build()).queue();
 				}
 			}
-			else if(message.equals(IniFileReader.getCommandPrefix()+"display -voicechannels")){
+			else if(message.equals(prefix+"display -voicechannels")){
 				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
 					for(VoiceChannel vc : e.getGuild().getVoiceChannels()){
 						out += vc.getName() + " (" + vc.getId() + ") \n";
@@ -95,7 +96,7 @@ public class Display implements Command{
 					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden voicechannels!**").build()).queue();
 				}
 			}
-			else if(message.equals(IniFileReader.getCommandPrefix()+"display -registered-channels")){
+			else if(message.equals(prefix+"display -registered-channels")){
 				if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || GuildIni.getAdmin(guild_id) == e.getMember().getUser().getIdLong()){
 					for(Channels ch : Azrael.SQLgetChannels(guild_id)){
 						if(!out.contains(""+ch.getChannel_ID())){
@@ -111,7 +112,7 @@ public class Display implements Command{
 					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden channels!**").build()).queue();
 				}
 			}
-			else if(message.equals(IniFileReader.getCommandPrefix()+"display -dailies")){
+			else if(message.equals(prefix+"display -dailies")){
 				for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id)){
 					out+= daily.getDescription()+"\nWeight: "+daily.getWeight()+"\n\n";
 				}

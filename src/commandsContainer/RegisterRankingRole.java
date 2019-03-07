@@ -19,8 +19,9 @@ public class RegisterRankingRole {
 	
 	public static void RegisterRankingRoleHelper(MessageReceivedEvent _e){
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register roles for the ranking system!");
+		final String prefix = GuildIni.getCommandPrefix(_e.getGuild().getIdLong());
 		_e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, write the role_id right after the command and add the required level to unlock this role in this format:\n"
-				+ "**"+IniFileReader.getCommandPrefix()+"register -ranking-role <role_id> -level <level>**\n\n To display all roles, type the command **"+IniFileReader.getCommandPrefix()+"display -roles**. To remove all registered roles, type **"+IniFileReader.getCommandPrefix()+"register -ranking-role -clear**").build()).queue();
+				+ "**"+prefix+"register -ranking-role <role_id> -level <level>**\n\n To display all roles, type the command **"+prefix+"display -roles**. To remove all registered roles, type **"+prefix+"register -ranking-role -clear**").build()).queue();
 	}
 	
 	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String _message){
@@ -33,8 +34,9 @@ public class RegisterRankingRole {
 		String level = "";
 		int level_requirement = 0;
 		
+		final String prefix = GuildIni.getCommandPrefix(_e.getGuild().getIdLong());
 		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)){
-			if(message.equals(IniFileReader.getCommandPrefix()+"register -ranking-role -clear")) {
+			if(message.equals(prefix+"register -ranking-role -clear")) {
 				if(RankingSystem.SQLclearRoles(guild_id) > 0) {
 					Hashes.removeRankingRoles();
 					_e.getTextChannel().sendMessage("All registered ranking roles have been cleared from the database!").queue();

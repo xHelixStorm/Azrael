@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fileManagement.GuildIni;
-import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
@@ -41,7 +40,7 @@ public class About implements Command {
 				messageBuilder.addField("Functionalities", "- Self designed ranking system.\n"
 						+ "- Various bot settings for numerous moderation tools such as an automated mute system, bad-word filter, name filter and much more.\n"
 						+ "- Entertainment commands to display your current level, ranking gain dailies, purchase from an integrated shop, take a look at your inventory or simply bring up cute pictures of pugs or cats.\n\n"
-						+ "You can see all enabled commands under "+IniFileReader.getCommandPrefix()+"commands", false);
+						+ "You can see all enabled commands under "+GuildIni.getCommandPrefix(guild_id)+"commands", false);
 				messageBuilder.addBlankField(false);
 				messageBuilder.addField("SOURCE CODE", "[Check the latest updates of Azrael on GitHub!](https://github.com/xHelixStorm/Azrael)", false);
 				e.getTextChannel().sendMessage(messageBuilder.build()).queue();

@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 import fileManagement.GuildIni;
-import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
 import sql.Azrael;
@@ -30,10 +29,11 @@ public class Use implements Command{
 				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 				if(e.getTextChannel().getIdLong() == bot_channel || bot_channel == 0){
 					String input = e.getMessage().getContentRaw();
-					if(input.equals(IniFileReader.getCommandPrefix()+"use")){
+					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+					if(input.equals(prefix+"use")){
 						e.getTextChannel().sendMessage("write the description of the item/skin together with this command to use it!\nTo reset your choice use either default-level, default-rank, default-profile or default-icons to reset your settings!").queue();
 					}
-					else if(input.equals(IniFileReader.getCommandPrefix()+"use default-level")){
+					else if(input.equals(prefix+"use default-level")){
 						rankingSystem.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(Hashes.getStatus(e.getGuild().getIdLong()).getLevelDescription())).findAny().orElse(null);
 						user_details.setRankingLevel(rank.getRankingLevel());
 						user_details.setLevelDescription(rank.getLevelDescription());
@@ -55,7 +55,7 @@ public class Use implements Command{
 							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getLevelDescription());
 						}
 					}
-					else if(input.equals(IniFileReader.getCommandPrefix()+"use default-rank")){
+					else if(input.equals(prefix+"use default-rank")){
 						rankingSystem.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(Hashes.getStatus(e.getGuild().getIdLong()).getRankDescription())).findAny().orElse(null);
 						user_details.setRankingRank(rank.getRankingRank());
 						user_details.setRankDescription(rank.getRankDescription());
@@ -79,7 +79,7 @@ public class Use implements Command{
 							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getRankDescription());
 						}
 					}
-					else if(input.equals(IniFileReader.getCommandPrefix()+"use default-profile")){
+					else if(input.equals(prefix+"use default-profile")){
 						rankingSystem.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(Hashes.getStatus(e.getGuild().getIdLong()).getProfileDescription())).findAny().orElse(null);
 						user_details.setRankingProfile(rank.getRankingProfile());
 						user_details.setProfileDescription(rank.getProfileDescription());
@@ -103,7 +103,7 @@ public class Use implements Command{
 							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getProfileDescription());
 						}
 					}
-					else if(input.equals(IniFileReader.getCommandPrefix()+"use default-icons")){
+					else if(input.equals(prefix+"use default-icons")){
 						rankingSystem.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(Hashes.getStatus(e.getGuild().getIdLong()).getIconDescription())).findAny().orElse(null);
 						user_details.setRankingIcon(rank.getRankingIcon());
 						user_details.setIconDescription(rank.getIconDescription());
@@ -118,8 +118,8 @@ public class Use implements Command{
 							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icons skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getIconDescription());
 						}
 					}
-					else if(input.contains(IniFileReader.getCommandPrefix()+"use ")){
-						input = input.substring(IniFileReader.getCommandPrefix().length()+4);
+					else if(input.contains(prefix+"use ")){
+						input = input.substring(prefix.length()+4);
 						inventory.Inventory inventory = RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input);
 						if(inventory.getItemID() != 0 && inventory.getStatus().equals("perm")){
 							if(inventory.getSkinType().equals("lev")){

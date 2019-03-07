@@ -33,14 +33,15 @@ public class Inventory implements Command{
 			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
 				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 				if(bot_channel == e.getTextChannel().getIdLong() || bot_channel == 0){
-					if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"inventory -help")) {
+					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+					if(e.getMessage().getContentRaw().equals(prefix+"inventory -help")) {
 						EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 						e.getTextChannel().sendMessage(message.setDescription("- Type **-list** after the command to display the whole inventory as a list\n"
 								+ "- Type **-page** and then the page together with the command to directly select the page you wish to view\n"
 								+ "- Type the tab name to filter your inventory item by type. Available types are **items** and **weapons**\n"
 								+ "- Type the sub tab after the tab name together with the command to further filter your inventory selection").build()).queue();
 					}
-					else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"inventory -list")){
+					else if(e.getMessage().getContentRaw().equals(prefix+"inventory -list")){
 						String out = "";
 						for(InventoryContent inventory : RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())){
 							out+= (inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+" "+inventory.getStat())+"\n";
@@ -66,7 +67,7 @@ public class Inventory implements Command{
 						}
 						else
 							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems);
-						if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"inventory -page ")){
+						if(e.getMessage().getContentRaw().contains(prefix+"inventory -page ")){
 							try {
 								limit = Integer.parseInt(e.getMessage().getContentRaw().replaceAll("[^0-9]", ""))-1;
 								if(limit <= itemNumber){

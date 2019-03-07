@@ -28,15 +28,16 @@ public class Randomshop implements Command{
 			
 			var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 			if(e.getTextChannel().getIdLong() == bot_channel || bot_channel == 0) {
-				if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"randomshop")) {
+				final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+				if(e.getMessage().getContentRaw().equals(prefix+"randomshop")) {
 					//run help and collect all possible parameters
 					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()));
 				}
-				else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"randomshop -play ")) {
+				else if(e.getMessage().getContentRaw().contains(prefix+"randomshop -play ")) {
 					//start a round
 					RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()), e.getMessage().getContentRaw().substring((e.getMessage().getContentRaw().indexOf("-play")+6)));
 				}
-				else if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"randomshop -replay")) {
+				else if(e.getMessage().getContentRaw().equals(prefix+"randomshop -replay")) {
 					//play another round if a match occurred within 10 minutes
 					File file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_play_"+e.getMember().getUser().getId());
 					if(file.exists() && System.currentTimeMillis() - file.lastModified() < 600000) {
@@ -48,9 +49,9 @@ public class Randomshop implements Command{
 							file.delete();
 					}
 				}
-				else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"randomshop ")) {
+				else if(e.getMessage().getContentRaw().contains(prefix+"randomshop ")) {
 					//display the weapons that can be obtained.
-					RandomshopExecution.inspectItems(e, null, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()), e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+11), 1);
+					RandomshopExecution.inspectItems(e, null, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()), e.getMessage().getContentRaw().substring(prefix.length()+11), 1);
 				}
 				else {
 					//if typos occur, run help

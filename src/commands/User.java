@@ -28,11 +28,12 @@ public class User implements Command{
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
 				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
-					if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"user")) {
+					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+					if(e.getMessage().getContentRaw().equals(prefix+"user")) {
 						UserExecution.getHelp(e);
 					}
-					else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"user ")) {
-						UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]", ""), e.getMessage().getContentDisplay().substring(IniFileReader.getCommandPrefix().length()+5));
+					else if(e.getMessage().getContentRaw().contains(prefix+"user ")) {
+						UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]", ""), e.getMessage().getContentDisplay().substring(prefix.length()+5));
 					}
 				}
 				else {

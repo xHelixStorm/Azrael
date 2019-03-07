@@ -23,12 +23,13 @@ public class Filter implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(GuildIni.getFilterCommand(e.getGuild().getIdLong())) {			
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
+			final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
-				if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"filter")) {
+				if(e.getMessage().getContentRaw().equals(prefix+"filter")) {
 					FilterExecution.runHelp(e);
 				}
-				else if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"filter ")) {
-					FilterExecution.runTask(e, e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+7));
+				else if(e.getMessage().getContentRaw().contains(prefix+"filter ")) {
+					FilterExecution.runTask(e, e.getMessage().getContentRaw().substring(prefix.length()+7));
 				}
 			}
 			else {

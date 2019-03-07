@@ -35,8 +35,9 @@ public class Profile implements Command{
 				logger.debug("{} has used Profile command", e.getMember().getUser().getId());
 				
 				long user_id = 0;
-				if(e.getMessage().getContentRaw().contains(IniFileReader.getCommandPrefix()+"profile ")) {
-					String id = e.getMessage().getContentRaw().substring(IniFileReader.getCommandPrefix().length()+7).replaceAll("[^0-9]", "");
+				final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+				if(e.getMessage().getContentRaw().contains(prefix+"profile ")) {
+					String id = e.getMessage().getContentRaw().substring(prefix.length()+7).replaceAll("[^0-9]", "");
 					user_id = id.length() > 0 ? Long.parseLong(id) : 0;
 				}
 				else {

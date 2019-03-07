@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -14,10 +15,11 @@ import preparedMessages.MeowUsage;
 import threads.DelayDelete;
 
 public class MeowExecution {
-	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail(IniFileReader.getMeowThumbnail()).setTitle("Help for the "+IniFileReader.getCommandPrefix()+"meow command!");
 	private static String commandInfo = MeowUsage.getMeowInfos();
 
 	public static void Execute(MessageReceivedEvent e, String _variable, String _path, long channel_id) throws IOException{
+		final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail(IniFileReader.getMeowThumbnail()).setTitle("Help for the "+prefix+"meow command!");
 		String variable = _variable;
 		String path = _path;
 		String pictureName = "";
@@ -33,377 +35,377 @@ public class MeowExecution {
 				logger.warn("{} couldn't be created", fileName, e2);
 			}
 			
-			if(variable.equals(IniFileReader.getCommandPrefix()+"meow meow")){
+			if(variable.equals(prefix+"meow meow")){
 				file = new File(path+"meow01.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow art")){
+			else if(variable.equals(prefix+"meow art")){
 				file = new File(path+"meow02.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow attention")){
+			else if(variable.equals(prefix+"meow attention")){
 				file = new File(path+"meow03.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow baker")){
+			else if(variable.equals(prefix+"meow baker")){
 				file = new File(path+"meow04.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow bicycle")){
+			else if(variable.equals(prefix+"meow bicycle")){
 				file = new File(path+"meow05.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow birthday")){
+			else if(variable.equals(prefix+"meow birthday")){
 				file = new File(path+"meow06.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow blonde")){
+			else if(variable.equals(prefix+"meow blonde")){
 				file = new File(path+"meow07.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow blue")){
+			else if(variable.equals(prefix+"meow blue")){
 				file = new File(path+"meow08.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow box")){
+			else if(variable.equals(prefix+"meow box")){
 				file = new File(path+"meow09.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow broken")){
+			else if(variable.equals(prefix+"meow broken")){
 				file = new File(path+"meow10.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow brunette")){
+			else if(variable.equals(prefix+"meow brunette")){
 				file = new File(path+"meow11.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow car")){
+			else if(variable.equals(prefix+"meow car")){
 				file = new File(path+"meow12.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow catrick")){
+			else if(variable.equals(prefix+"meow catrick")){
 				file = new File(path+"meow13.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow chef")){
+			else if(variable.equals(prefix+"meow chef")){
 				file = new File(path+"meow14.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow chicks")){
+			else if(variable.equals(prefix+"meow chicks")){
 				file = new File(path+"meow15.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow christmas")){
+			else if(variable.equals(prefix+"meow christmas")){
 				file = new File(path+"meow16.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow cup")){
+			else if(variable.equals(prefix+"meow cup")){
 				file = new File(path+"meow17.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow distracted")){
+			else if(variable.equals(prefix+"meow distracted")){
 				file = new File(path+"meow18.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow down")){
+			else if(variable.equals(prefix+"meow down")){
 				file = new File(path+"meow19.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow elvis")){
+			else if(variable.equals(prefix+"meow elvis")){
 				file = new File(path+"meow20.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow excited")){
+			else if(variable.equals(prefix+"meow excited")){
 				file = new File(path+"meow21.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow family")){
+			else if(variable.equals(prefix+"meow family")){
 				file = new File(path+"meow22.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow gaming")){
+			else if(variable.equals(prefix+"meow gaming")){
 				file = new File(path+"meow23.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow happy")){
+			else if(variable.equals(prefix+"meow happy")){
 				file = new File(path+"meow24.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow kidmeow")){
+			else if(variable.equals(prefix+"meow kidmeow")){
 				file = new File(path+"meow25.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow laundry")){
+			else if(variable.equals(prefix+"meow laundry")){
 				file = new File(path+"meow26.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow life")){
+			else if(variable.equals(prefix+"meow life")){
 				file = new File(path+"meow27.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow litter")){
+			else if(variable.equals(prefix+"meow litter")){
 				file = new File(path+"meow28.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow love")){
+			else if(variable.equals(prefix+"meow love")){
 				file = new File(path+"meow29.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow loveyou")){
+			else if(variable.equals(prefix+"meow loveyou")){
 				file = new File(path+"meow30.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow mess")){
+			else if(variable.equals(prefix+"meow mess")){
 				file = new File(path+"meow31.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow mexican")){
+			else if(variable.equals(prefix+"meow mexican")){
 				file = new File(path+"meow32.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow moustache")){
+			else if(variable.equals(prefix+"meow moustache")){
 				file = new File(path+"meow33.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow munching")){
+			else if(variable.equals(prefix+"meow munching")){
 				file = new File(path+"meow34.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow nudge")){
+			else if(variable.equals(prefix+"meow nudge")){
 				file = new File(path+"meow35.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow online")){
+			else if(variable.equals(prefix+"meow online")){
 				file = new File(path+"meow36.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow piano")){
+			else if(variable.equals(prefix+"meow piano")){
 				file = new File(path+"meow37.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow pikachu")){
+			else if(variable.equals(prefix+"meow pikachu")){
 				file = new File(path+"meow38.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow powerpuffmeow")){
+			else if(variable.equals(prefix+"meow powerpuffmeow")){
 				file = new File(path+"meow39.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow present")){
+			else if(variable.equals(prefix+"meow present")){
 				file = new File(path+"meow40.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow relaxed")){
+			else if(variable.equals(prefix+"meow relaxed")){
 				file = new File(path+"meow41.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow ripped")){
+			else if(variable.equals(prefix+"meow ripped")){
 				file = new File(path+"meow42.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow sad")){
+			else if(variable.equals(prefix+"meow sad")){
 				file = new File(path+"meow43.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow satisfied")){
+			else if(variable.equals(prefix+"meow satisfied")){
 				file = new File(path+"meow44.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow seal")){
+			else if(variable.equals(prefix+"meow seal")){
 				file = new File(path+"meow45.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow sia")){
+			else if(variable.equals(prefix+"meow sia")){
 				file = new File(path+"meow46.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow sir")){
+			else if(variable.equals(prefix+"meow sir")){
 				file = new File(path+"meow47.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow sleeping")){
+			else if(variable.equals(prefix+"meow sleeping")){
 				file = new File(path+"meow48.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow string")){
+			else if(variable.equals(prefix+"meow string")){
 				file = new File(path+"meow49.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow study")){
+			else if(variable.equals(prefix+"meow study")){
 				file = new File(path+"meow50.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow unicorn")){
+			else if(variable.equals(prefix+"meow unicorn")){
 				file = new File(path+"meow51.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow tumblr")){
+			else if(variable.equals(prefix+"meow tumblr")){
 				file = new File(path+"meow52.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow viking")){
+			else if(variable.equals(prefix+"meow viking")){
 				file = new File(path+"meow53.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow winkyface")){
+			else if(variable.equals(prefix+"meow winkyface")){
 				file = new File(path+"meow54.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow wool")){
+			else if(variable.equals(prefix+"meow wool")){
 				file = new File(path+"meow55.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow workout")){
+			else if(variable.equals(prefix+"meow workout")){
 				file = new File(path+"meow56.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow wrapped")){
+			else if(variable.equals(prefix+"meow wrapped")){
 				file = new File(path+"meow57.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow cake")){
+			else if(variable.equals(prefix+"meow cake")){
 				file = new File(path+"meow58.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow chickenwings")){
+			else if(variable.equals(prefix+"meow chickenwings")){
 				file = new File(path+"meow59.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow cookies")){
+			else if(variable.equals(prefix+"meow cookies")){
 				file = new File(path+"meow60.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow cupcake")){
+			else if(variable.equals(prefix+"meow cupcake")){
 				file = new File(path+"meow61.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow diet")){
+			else if(variable.equals(prefix+"meow diet")){
 				file = new File(path+"meow62.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow donut")){
+			else if(variable.equals(prefix+"meow donut")){
 				file = new File(path+"meow63.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow fishy")){
+			else if(variable.equals(prefix+"meow fishy")){
 				file = new File(path+"meow64.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow hotchocolate")){
+			else if(variable.equals(prefix+"meow hotchocolate")){
 				file = new File(path+"meow65.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow icecream")){
+			else if(variable.equals(prefix+"meow icecream")){
 				file = new File(path+"meow66.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow mcmeow")){
+			else if(variable.equals(prefix+"meow mcmeow")){
 				file = new File(path+"meow67.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow noodles")){
+			else if(variable.equals(prefix+"meow noodles")){
 				file = new File(path+"meow68.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow nutella")){
+			else if(variable.equals(prefix+"meow nutella")){
 				file = new File(path+"meow69.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow onigiri")){
+			else if(variable.equals(prefix+"meow onigiri")){
 				file = new File(path+"meow70.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow pizza")){
+			else if(variable.equals(prefix+"meow pizza")){
 				file = new File(path+"meow71.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow sushy")){
+			else if(variable.equals(prefix+"meow sushy")){
 				file = new File(path+"meow72.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow sweetmountain")){
+			else if(variable.equals(prefix+"meow sweetmountain")){
 				file = new File(path+"meow73.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow toast")){
+			else if(variable.equals(prefix+"meow toast")){
 				file = new File(path+"meow74.png");
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow random-emoji")){
+			else if(variable.equals(prefix+"meow random-emoji")){
 				int randomNumber = (int)(Math.random()*57)+1;
 				switch(randomNumber){
 				case 1: pictureName = "meow01.png";
@@ -525,7 +527,7 @@ public class MeowExecution {
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow random-food")){
+			else if(variable.equals(prefix+"meow random-food")){
 				int randomNumber = (int)(Math.random()*18)+1;
 				switch(randomNumber){
 				case 1: pictureName = "meow58.png";
@@ -566,7 +568,7 @@ public class MeowExecution {
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow random-meow")){
+			else if(variable.equals(prefix+"meow random-meow")){
 				int randomNumber = (int)(Math.random()*74)+1;
 				switch(randomNumber){
 				case 1: pictureName = "meow01.png";
@@ -722,7 +724,7 @@ public class MeowExecution {
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"meow help")){
+			else if(variable.equals(prefix+"meow help")){
 				long channel = e.getTextChannel().getIdLong();
 				if(channel == channel_id || channel_id == 0){
 					e.getTextChannel().sendMessage(messageBuild.setDescription(commandInfo).build()).queue();

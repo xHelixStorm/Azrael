@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -14,10 +15,11 @@ import preparedMessages.PugUsage;
 import threads.DelayDelete;
 
 public class PugExecution {
-	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail(IniFileReader.getPugThumbnail()).setTitle("Help for the "+IniFileReader.getCommandPrefix()+"pug command!");
 	private static String commandInfo = PugUsage.getPugInfos();
 
 	public static void Execute(MessageReceivedEvent e, String _variable, String _path, long channel_id) throws IOException{
+		final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail(IniFileReader.getPugThumbnail()).setTitle("Help for the "+prefix+"pug command!");
 		String variable = _variable;
 		String path = _path;
 		String pictureName = "";
@@ -33,502 +35,502 @@ public class PugExecution {
 				logger.warn("{} file couldn't be created", fileName, e2);
 			}
 			
-			if(variable.equals(IniFileReader.getCommandPrefix()+"pug pug")){
+			if(variable.equals(prefix+"pug pug")){
 				file = new File(path+"pug01.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug greet")){
+			else if(variable.equals(prefix+"pug greet")){
 				file = new File(path+"pug02.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug showoff")){
+			else if(variable.equals(prefix+"pug showoff")){
 				file = new File(path+"pug03.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug annoyed")){
+			else if(variable.equals(prefix+"pug annoyed")){
 				file = new File(path+"pug04.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug wink")){
+			else if(variable.equals(prefix+"pug wink")){
 				file = new File(path+"pug05.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug sleep")){
+			else if(variable.equals(prefix+"pug sleep")){
 				file = new File(path+"pug06.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug stress")){
+			else if(variable.equals(prefix+"pug stress")){
 				file = new File(path+"pug07.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug stormtrooper")){
+			else if(variable.equals(prefix+"pug stormtrooper")){
 				file = new File(path+"pug08.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug cry")){
+			else if(variable.equals(prefix+"pug cry")){
 				file = new File(path+"pug09.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug unconscious")){
+			else if(variable.equals(prefix+"pug unconscious")){
 				file = new File(path+"pug10.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug puzzled")){
+			else if(variable.equals(prefix+"pug puzzled")){
 				file = new File(path+"pug11.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug rage")){
+			else if(variable.equals(prefix+"pug rage")){
 				file = new File(path+"pug12.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug taco")){
+			else if(variable.equals(prefix+"pug taco")){
 				file = new File(path+"pug13.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug burrito")){
+			else if(variable.equals(prefix+"pug burrito")){
 				file = new File(path+"pug14.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug bread")){
+			else if(variable.equals(prefix+"pug bread")){
 				file = new File(path+"pug15.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug donut")){
+			else if(variable.equals(prefix+"pug donut")){
 				file = new File(path+"pug16.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug pizza")){
+			else if(variable.equals(prefix+"pug pizza")){
 				file = new File(path+"pug17.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug fries")){
+			else if(variable.equals(prefix+"pug fries")){
 				file = new File(path+"pug18.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug potato")){
+			else if(variable.equals(prefix+"pug potato")){
 				file = new File(path+"pug19.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug lollipop")){
+			else if(variable.equals(prefix+"pug lollipop")){
 				file = new File(path+"pug20.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug salmon")){
+			else if(variable.equals(prefix+"pug salmon")){
 				file = new File(path+"pug21.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug onigiri")){
+			else if(variable.equals(prefix+"pug onigiri")){
 				file = new File(path+"pug22.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug chocolate")){
+			else if(variable.equals(prefix+"pug chocolate")){
 				file = new File(path+"pug23.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug bacon")){
+			else if(variable.equals(prefix+"pug bacon")){
 				file = new File(path+"pug24.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug cottoncandy")){
+			else if(variable.equals(prefix+"pug cottoncandy")){
 				file = new File(path+"pug25.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug hotdog")){
+			else if(variable.equals(prefix+"pug hotdog")){
 				file = new File(path+"pug26.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug cookie")){
+			else if(variable.equals(prefix+"pug cookie")){
 				file = new File(path+"pug27.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug tart")){
+			else if(variable.equals(prefix+"pug tart")){
 				file = new File(path+"pug28.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug ironman")){
+			else if(variable.equals(prefix+"pug ironman")){
 				file = new File(path+"pug29.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug captainamerica")){
+			else if(variable.equals(prefix+"pug captainamerica")){
 				file = new File(path+"pug30.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug thor")){
+			else if(variable.equals(prefix+"pug thor")){
 				file = new File(path+"pug31.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug batman")){
+			else if(variable.equals(prefix+"pug batman")){
 				file = new File(path+"pug32.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug catwoman")){
+			else if(variable.equals(prefix+"pug catwoman")){
 				file = new File(path+"pug39.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug loki")){
+			else if(variable.equals(prefix+"pug loki")){
 				file = new File(path+"pug33.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug storm")){
+			else if(variable.equals(prefix+"pug storm")){
 				file = new File(path+"pug34.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug wolverine")){
+			else if(variable.equals(prefix+"pug wolverine")){
 				file = new File(path+"pug35.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug wonderwoman")){
+			else if(variable.equals(prefix+"pug wonderwoman")){
 				file = new File(path+"pug36.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug spiderman")){
+			else if(variable.equals(prefix+"pug spiderman")){
 				file = new File(path+"pug37.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug deadpool")){
+			else if(variable.equals(prefix+"pug deadpool")){
 				file = new File(path+"pug38.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug flash")){
+			else if(variable.equals(prefix+"pug flash")){
 				file = new File(path+"pug40.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug superman")){
+			else if(variable.equals(prefix+"pug superman")){
 				file = new File(path+"pug41.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug star-lord")){
+			else if(variable.equals(prefix+"pug star-lord")){
 				file = new File(path+"pug42.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug bastion")){
+			else if(variable.equals(prefix+"pug bastion")){
 				file = new File(path+"pug43.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug dva")){
+			else if(variable.equals(prefix+"pug dva")){
 				file = new File(path+"pug44.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug genji")){
+			else if(variable.equals(prefix+"pug genji")){
 				file = new File(path+"pug45.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug hanzo")){
+			else if(variable.equals(prefix+"pug hanzo")){
 				file = new File(path+"pug46.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug lucio")){
+			else if(variable.equals(prefix+"pug lucio")){
 				file = new File(path+"pug47.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug mccree")){
+			else if(variable.equals(prefix+"pug mccree")){
 				file = new File(path+"pug48.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug mei")){
+			else if(variable.equals(prefix+"pug mei")){
 				file = new File(path+"pug49.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug mercy")){
+			else if(variable.equals(prefix+"pug mercy")){
 				file = new File(path+"pug50.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug reaper")){
+			else if(variable.equals(prefix+"pug reaper")){
 				file = new File(path+"pug51.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug soldier76")){
+			else if(variable.equals(prefix+"pug soldier76")){
 				file = new File(path+"pug52.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug symmetra")){
+			else if(variable.equals(prefix+"pug symmetra")){
 				file = new File(path+"pug53.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug tracer")){
+			else if(variable.equals(prefix+"pug tracer")){
 				file = new File(path+"pug54.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug widowmaker")){
+			else if(variable.equals(prefix+"pug widowmaker")){
 				file = new File(path+"pug55.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug winston")){
+			else if(variable.equals(prefix+"pug winston")){
 				file = new File(path+"pug56.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug zarya")){
+			else if(variable.equals(prefix+"pug zarya")){
 				file = new File(path+"pug57.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug zenyatta")){
+			else if(variable.equals(prefix+"pug zenyatta")){
 				file = new File(path+"pug58.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug fashion")){
+			else if(variable.equals(prefix+"pug fashion")){
 				file = new File(path+"pug59.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug fat")){
+			else if(variable.equals(prefix+"pug fat")){
 				file = new File(path+"pug60.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug holiday")){
+			else if(variable.equals(prefix+"pug holiday")){
 				file = new File(path+"pug61.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug loveletter")){
+			else if(variable.equals(prefix+"pug loveletter")){
 				file = new File(path+"pug62.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug pride")){
+			else if(variable.equals(prefix+"pug pride")){
 				file = new File(path+"pug63.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug pugmountain")){
+			else if(variable.equals(prefix+"pug pugmountain")){
 				file = new File(path+"pug64.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug rainbow")){
+			else if(variable.equals(prefix+"pug rainbow")){
 				file = new File(path+"pug65.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug rein")){
+			else if(variable.equals(prefix+"pug rein")){
 				file = new File(path+"pug66.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug santa")){
+			else if(variable.equals(prefix+"pug santa")){
 				file = new File(path+"pug67.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug sleepy")){
+			else if(variable.equals(prefix+"pug sleepy")){
 				file = new File(path+"pug68.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug smile")){
+			else if(variable.equals(prefix+"pug smile")){
 				file = new File(path+"pug69.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug snowman")){
+			else if(variable.equals(prefix+"pug snowman")){
 				file = new File(path+"pug70.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug twitch")){
+			else if(variable.equals(prefix+"pug twitch")){
 				file = new File(path+"pug71.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug wub")){
+			else if(variable.equals(prefix+"pug wub")){
 				file = new File(path+"pug72.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug bunny")){
+			else if(variable.equals(prefix+"pug bunny")){
 				file = new File(path+"pug73.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug bunnyherd")){
+			else if(variable.equals(prefix+"pug bunnyherd")){
 				file = new File(path+"pug74.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug pockie")){
+			else if(variable.equals(prefix+"pug pockie")){
 				file = new File(path+"pug75.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug ramune")){
+			else if(variable.equals(prefix+"pug ramune")){
 				file = new File(path+"pug76.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug chocolatemilk")){
+			else if(variable.equals(prefix+"pug chocolatemilk")){
 				file = new File(path+"pug77.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug chocoswiss")){
+			else if(variable.equals(prefix+"pug chocoswiss")){
 				file = new File(path+"pug78.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug coffee")){
+			else if(variable.equals(prefix+"pug coffee")){
 				file = new File(path+"pug79.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug coke")){
+			else if(variable.equals(prefix+"pug coke")){
 				file = new File(path+"pug80.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug corn")){
+			else if(variable.equals(prefix+"pug corn")){
 				file = new File(path+"pug81.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug cream")){
+			else if(variable.equals(prefix+"pug cream")){
 				file = new File(path+"pug82.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug crisps")){
+			else if(variable.equals(prefix+"pug crisps")){
 				file = new File(path+"pug83.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug cupcake")){
+			else if(variable.equals(prefix+"pug cupcake")){
 				file = new File(path+"pug84.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug fruittart")){
+			else if(variable.equals(prefix+"pug fruittart")){
 				file = new File(path+"pug85.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug icecream")){
+			else if(variable.equals(prefix+"pug icecream")){
 				file = new File(path+"pug86.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug jelly")){
+			else if(variable.equals(prefix+"pug jelly")){
 				file = new File(path+"pug87.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug meatball")){
+			else if(variable.equals(prefix+"pug meatball")){
 				file = new File(path+"pug88.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug milk")){
+			else if(variable.equals(prefix+"pug milk")){
 				file = new File(path+"pug89.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug nacho")){
+			else if(variable.equals(prefix+"pug nacho")){
 				file = new File(path+"pug90.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug pancake")){
+			else if(variable.equals(prefix+"pug pancake")){
 				file = new File(path+"pug91.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug pootloops")){
+			else if(variable.equals(prefix+"pug pootloops")){
 				file = new File(path+"pug92.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug ramen")){
+			else if(variable.equals(prefix+"pug ramen")){
 				file = new File(path+"pug93.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug smores")){
+			else if(variable.equals(prefix+"pug smores")){
 				file = new File(path+"pug94.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug starbucks")){
+			else if(variable.equals(prefix+"pug starbucks")){
 				file = new File(path+"pug95.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug takiyaki")){
+			else if(variable.equals(prefix+"pug takiyaki")){
 				file = new File(path+"pug96.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug takoyaki")){
+			else if(variable.equals(prefix+"pug takoyaki")){
 				file = new File(path+"pug97.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug toastie")){
+			else if(variable.equals(prefix+"pug toastie")){
 				file = new File(path+"pug98.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug wizard")){
+			else if(variable.equals(prefix+"pug wizard")){
 				file = new File(path+"pug99.png");
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug random-emoji")){
+			else if(variable.equals(prefix+"pug random-emoji")){
 				int randomNumber = (int)(Math.random()*31)+1;
 				switch(randomNumber){
 				case 1: pictureName = "pug01.png";
@@ -598,7 +600,7 @@ public class PugExecution {
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug random-food")){
+			else if(variable.equals(prefix+"pug random-food")){
 				int randomNumber = (int)(Math.random()*39)+1;
 				switch(randomNumber){
 				case 1: pictureName = "pug13.png";
@@ -682,7 +684,7 @@ public class PugExecution {
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug random-marvel")){
+			else if(variable.equals(prefix+"pug random-marvel")){
 				int randomNumber = (int)(Math.random()*14)+1;
 				switch(randomNumber){
 				case 1: pictureName = "pug29.png";
@@ -718,7 +720,7 @@ public class PugExecution {
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug random-overwatch")){
+			else if(variable.equals(prefix+"pug random-overwatch")){
 				int randomNumber = (int)(Math.random()*16)+1;
 				switch(randomNumber){
 				case 1: pictureName = "pug43.png";
@@ -757,7 +759,7 @@ public class PugExecution {
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug random-pug")){
+			else if(variable.equals(prefix+"pug random-pug")){
 				int randomNumber = (int)(Math.random()*99)+1;
 				switch(randomNumber){
 				case 1: pictureName = "pug01.png";
@@ -963,7 +965,7 @@ public class PugExecution {
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(IniFileReader.getCommandPrefix()+"pug help")){
+			else if(variable.equals(prefix+"pug help")){
 				long channel = e.getTextChannel().getIdLong();
 				if(channel == channel_id || channel_id == 0){
 					e.getTextChannel().sendMessage(messageBuild.setDescription(commandInfo).build()).queue();
