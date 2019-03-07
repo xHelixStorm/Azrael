@@ -80,35 +80,33 @@ public class GuildListener extends ListenerAdapter {
 			}
 		}
 		
-		if(IniFileReader.getNameFilter()) {
-			String lc_user_name = user_name.toLowerCase();
-			check: for(String name : Azrael.SQLgetStaffNames(guild_id)){
-				if(lc_user_name.matches(name+"#[0-9]{4}")){
-					nick_assign.setColor(Color.RED).setTitle("Impersonation attempt found!").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
+		String lc_user_name = user_name.toLowerCase();
+		check: for(String name : Azrael.SQLgetStaffNames(guild_id)){
+			if(lc_user_name.matches(name+"#[0-9]{4}")){
+				nick_assign.setColor(Color.RED).setTitle("Impersonation attempt found!").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
+				String nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
+				e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
+				e.getGuild().getTextChannelById(channel_id).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server and tried to impersonate a staff member. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
+				logger.info("Impersonation attempt found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+				badName = true;
+				break check;
+			}
+		}
+		if(badName == false){
+			Azrael.SQLgetNameFilter(e.getGuild().getIdLong());
+			check: for(String word : Hashes.getQuerryResult("bad-names_"+guild_id)){
+				if(lc_user_name.contains(word)){
 					String nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
 					e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
-					e.getGuild().getTextChannelById(channel_id).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server and tried to impersonate a staff member. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
-					logger.info("Impersonation attempt found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+					e.getGuild().getTextChannelById(channel_id).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this Server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
+					logger.info("Improper name found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 					badName = true;
 					break check;
 				}
 			}
-			if(badName == false){
-				Azrael.SQLgetNameFilter(e.getGuild().getIdLong());
-				check: for(String word : Hashes.getQuerryResult("bad-names_"+guild_id)){
-					if(lc_user_name.contains(word)){
-						String nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
-						e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
-						e.getGuild().getTextChannelById(channel_id).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this Server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
-						logger.info("Improper name found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
-						badName = true;
-						break check;
-					}
-				}
-			}
-			if(badName == false){
-				Azrael.SQLDeleteNickname(user_id, guild_id);
-			}
+		}
+		if(badName == false){
+			Azrael.SQLDeleteNickname(user_id, guild_id);
 		}
 		
 		Azrael.SQLInsertActionLog("GUILD_MEMBER_JOIN", user_id, guild_id, user_name);

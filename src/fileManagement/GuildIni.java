@@ -117,7 +117,6 @@ public class GuildIni {
 		return ini.get("General", "Administrator", long.class);
 	}
 	
-
 	public static String[] getReactions(long guild_id) {
 		Ini ini = readIni(guild_id);
 		String[] reaction = new String[10];

@@ -28,10 +28,6 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Bot", "Admin", long.class);
 	}
-	public static boolean getNameFilter(){
-		readConfig();
-		return ini.get("Bot", "NameFilter", boolean.class);
-	}
 	public static boolean getActionLog(){
 		readConfig();
 		return ini.get("Bot", "ActionLog", boolean.class);
