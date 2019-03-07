@@ -9,7 +9,7 @@ import com.vdurmont.emoji.EmojiManager;
 
 import core.Hashes;
 import fileManagement.FileSetting;
-import fileManagement.IniFileReader;
+import fileManagement.GuildIni;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.DiscordRoles;
@@ -19,7 +19,7 @@ public class ReactionMessage {
 		Logger logger = LoggerFactory.getLogger(ReactionMessage.class);
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		if(DiscordRoles.SQLgetRolesByCategory(e.getGuild().getIdLong(), "rea")) {
-			String [] reactions = IniFileReader.getReactions();
+			String [] reactions = GuildIni.getReactions(e.getGuild().getIdLong());
 			StringBuilder sb = new StringBuilder();
 			int counter = 0;
 			for(int i = 1; i < 10; i++) {

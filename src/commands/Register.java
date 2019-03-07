@@ -54,7 +54,7 @@ public class Register implements Command{
 					RegisterRole.runCommandWithAdminFirst(e, guild_id, message);
 				}
 			}
-			else if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || Long.parseLong(user_id) == IniFileReader.getAdmin()){
+			else if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || Long.parseLong(user_id) == GuildIni.getAdmin(guild_id)){
 				if(message.equals(IniFileReader.getCommandPrefix()+"register")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Use this command to register either a channel, a role, a ranking role or all users in a guild. Use the following commands to get more details:\n\n"
 							+ "Description to register a role:\n"

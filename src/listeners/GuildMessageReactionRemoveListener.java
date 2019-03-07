@@ -7,7 +7,7 @@ import com.vdurmont.emoji.EmojiParser;
 
 import core.Hashes;
 import core.UserPrivs;
-import fileManagement.IniFileReader;
+import fileManagement.GuildIni;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import sql.DiscordRoles;
@@ -32,7 +32,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter{
 						}
 						
 						if(reactionName.length() > 0) {
-							String [] reactions = IniFileReader.getReactions();
+							String [] reactions = GuildIni.getReactions(e.getGuild().getIdLong());
 							boolean emoteFound = false;
 							if(reactions[0].equals("true")) {
 								for(int i = 1; i < 10; i++) {

@@ -25,7 +25,7 @@ public class Rss implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(GuildIni.getRssCommand(e.getGuild().getIdLong())) {
 			EmbedBuilder message = new EmbedBuilder();
-			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || IniFileReader.getAdmin() == e.getMember().getUser().getIdLong()) {
+			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				Logger logger = LoggerFactory.getLogger(Rss.class);
 				if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"rss")) {
 					//throw default message with instructions

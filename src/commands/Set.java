@@ -44,7 +44,7 @@ public class Set implements Command{
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 			String input = e.getMessage().getContentRaw();
 			
-			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()){
+			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())){
 				if(input.equals(IniFileReader.getCommandPrefix()+"set")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Use the set command to set specific parameters for the bot:\n\n"
 							+ "**-channel-filter**: To set one or few language filters for one channel\n\n"

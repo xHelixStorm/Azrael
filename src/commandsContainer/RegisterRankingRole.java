@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 import core.UserPrivs;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -32,7 +33,7 @@ public class RegisterRankingRole {
 		String level = "";
 		int level_requirement = 0;
 		
-		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()){
+		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)){
 			if(message.equals(IniFileReader.getCommandPrefix()+"register -ranking-role -clear")) {
 				if(RankingSystem.SQLclearRoles(guild_id) > 0) {
 					Hashes.removeRankingRoles();

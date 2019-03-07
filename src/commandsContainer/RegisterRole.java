@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import core.Hashes;
 import core.Roles;
 import core.UserPrivs;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -37,29 +38,34 @@ public class RegisterRole {
 		String role_name;
 		long role_id;
 		
-		if(_message.contains(" adm ") || _message.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\sadm(?!\\w\\d\\s)")){
-			category_abv = "adm";
-			role = _message.replaceAll("[^0-9]*", "");
-			if(role.length() == 18){
-				try {
-					role_id = Long.parseLong(role);
-					role_name = _e.getGuild().getRoleById(role_id).getName();
-					if(DiscordRoles.SQLInsertRole(_guild_id, role_id, role_name, category_abv) > 0) {
-						logger.debug("Administrator role registered {} for guild {}", role_id, _e.getGuild().getName());
-						_e.getTextChannel().sendMessage("**The primary Administrator role has been registered!**").queue();
-						DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong());
+		if(GuildIni.getAdmin(_guild_id) == _e.getMember().getUser().getIdLong()) {
+			if(_message.contains(" adm ") || _message.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\sadm(?!\\w\\d\\s)")){
+				category_abv = "adm";
+				role = _message.replaceAll("[^0-9]*", "");
+				if(role.length() == 18){
+					try {
+						role_id = Long.parseLong(role);
+						role_name = _e.getGuild().getRoleById(role_id).getName();
+						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, role_name, category_abv) > 0) {
+							logger.debug("Administrator role registered {} for guild {}", role_id, _e.getGuild().getName());
+							_e.getTextChannel().sendMessage("**The primary Administrator role has been registered!**").queue();
+							DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong());
+						}
+						else {
+							logger.error("Role {} couldn't be registered into DiscordRoles.roles for the guild {}", role_id, _e.getGuild().getName());
+							_e.getTextChannel().sendMessage("An internal error occurred. Role "+role_id+" couldn't be registered into DiscordRoles.roles table").queue();
+						}
+					} catch(NullPointerException npe){
+						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();
 					}
-					else {
-						logger.error("Role {} couldn't be registered into DiscordRoles.roles for the guild {}", role_id, _e.getGuild().getName());
-						_e.getTextChannel().sendMessage("An internal error occurred. Role "+role_id+" couldn't be registered into DiscordRoles.roles table").queue();
-					}
-				} catch(NullPointerException npe){
-					_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();
 				}
 			}
+			else{
+				_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please start with assigning an administrator role or recheck the syntax!").queue();
+			}
 		}
-		else{
-			_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please start with assigning an administrator role or recheck the syntax!").queue();
+		else {
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").build()).queue();
 		}
 	}
 
@@ -69,7 +75,7 @@ public class RegisterRole {
 		String role_name;
 		long role_id;
 		
-		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()){
+		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == GuildIni.getAdmin(_guild_id)){
 			Pattern pattern = Pattern.compile("(adm|mod|com|bot|mut|rea)");
 			Matcher matcher = pattern.matcher(_message);
 			if(matcher.find()){

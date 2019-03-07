@@ -23,7 +23,7 @@ public class Filter implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(GuildIni.getFilterCommand(e.getGuild().getIdLong())) {			
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
+			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
 				if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"filter")) {
 					FilterExecution.runHelp(e);
 				}

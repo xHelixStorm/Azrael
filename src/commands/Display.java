@@ -74,7 +74,7 @@ public class Display implements Command{
 				e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No ranking role has been registered!").build()).queue();
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -textchannels")){
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
 					for(TextChannel tc : e.getGuild().getTextChannels()){
 						out += tc.getName() + " (" + tc.getId() + ") \n";
 					}
@@ -85,7 +85,7 @@ public class Display implements Command{
 				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -voicechannels")){
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
 					for(VoiceChannel vc : e.getGuild().getVoiceChannels()){
 						out += vc.getName() + " (" + vc.getId() + ") \n";
 					}
@@ -96,7 +96,7 @@ public class Display implements Command{
 				}
 			}
 			else if(message.equals(IniFileReader.getCommandPrefix()+"display -registered-channels")){
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || IniFileReader.getAdmin() == e.getMember().getUser().getIdLong()){
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || GuildIni.getAdmin(guild_id) == e.getMember().getUser().getIdLong()){
 					for(Channels ch : Azrael.SQLgetChannels(guild_id)){
 						if(!out.contains(""+ch.getChannel_ID())){
 							out += "\n\n"+ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \nChannel type: "+ch.getChannel_Type_Name()+" Channel\nFilter(s) in use: "+ch.getLang_Filter();

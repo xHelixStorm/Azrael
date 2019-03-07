@@ -19,6 +19,7 @@ import core.Hashes;
 import core.Messages;
 import core.UserPrivs;
 import fileManagement.FileSetting;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import filter.LanguageFilter;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -146,7 +147,7 @@ public class MessageListener extends ListenerAdapter{
 			if(reaction.exists() && UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
 				int counter = Integer.parseInt(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getIdLong()+"ch"+e.getTextChannel().getId()+".azr"));
 				Message m = e.getMessage();
-				String [] reactions = IniFileReader.getReactions();
+				String [] reactions = GuildIni.getReactions(guild_id);
 				for(int i = 1; i <= counter; i++) {
 					if(!reactions[0].equals("true")) {
 						m.addReaction(EmojiManager.getForAlias(ReactionMessage.getReaction(i)).getUnicode()).complete();
@@ -217,7 +218,7 @@ public class MessageListener extends ListenerAdapter{
 				String content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr");
 				if(!content.equals("skip-question") || !content.equals("interrupt-questions")) {
 					if(Azrael.SQLgetChannelID(guild_id, "qui") == e.getTextChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
-						if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
+						if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
 							if(message.equals("skip-question") || message.equals("interrupt-questions")) {
 								FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr", message);
 							}

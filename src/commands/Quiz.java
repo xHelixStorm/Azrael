@@ -30,7 +30,7 @@ public class Quiz implements Command{
 			logger.debug("{} has used Quiz command", e.getMember().getUser().getId());
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setTitle("Access denied!").setThumbnail(IniFileReader.getDeniedThumbnail());
 			if(!new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr").exists()) {
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
 					EmbedBuilder message = new EmbedBuilder().setTitle("It's Quiz time!").setColor(Color.BLUE);
 					if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"quiz")) {
 						e.getTextChannel().sendMessage(message.setDescription("The Quiz command will allow you to register questions to provide the best quiz experience in a Discord server! At your disposal are parameters to register questions from a pastebin link, register rewards in form of codes that get sent to the user who answers a question correctly in private message and to start and interrupt the quiz session.\n\n"

@@ -42,7 +42,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 						}
 						
 						if(reactionName.length() > 0) {
-							String [] reactions = IniFileReader.getReactions();
+							String [] reactions = GuildIni.getReactions(e.getGuild().getIdLong());
 							boolean emoteFound = false;
 							if(reactions[0].equals("true")) {
 								for(int i = 1; i < 10; i++) {

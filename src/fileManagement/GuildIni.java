@@ -16,6 +16,7 @@ public class GuildIni {
 			
 			//General
 			ini.add("General", "Theme", "");
+			ini.add("General", "Administrator", "");
 			
 			//Reactions
 			ini.add("Reactions", "Enabled", "false");
@@ -109,6 +110,28 @@ public class GuildIni {
 	public static String getTheme(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "Theme");
+	}
+	
+	public static long getAdmin(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "Administrator", long.class);
+	}
+	
+
+	public static String[] getReactions(long guild_id) {
+		Ini ini = readIni(guild_id);
+		String[] reaction = new String[10];
+		reaction[0] = ini.get("Reactions", "Enabled");
+		reaction[1] = ini.get("Reactions", "Emoji1");
+		reaction[2] = ini.get("Reactions", "Emoji2");
+		reaction[3] = ini.get("Reactions", "Emoji3");
+		reaction[4] = ini.get("Reactions", "Emoji4");
+		reaction[5] = ini.get("Reactions", "Emoji5");
+		reaction[6] = ini.get("Reactions", "Emoji6");
+		reaction[7] = ini.get("Reactions", "Emoji7");
+		reaction[8] = ini.get("Reactions", "Emoji8");
+		reaction[9] = ini.get("Reactions", "Emoji9");
+		return reaction;
 	}
 	
 	public static boolean getAboutCommand(long guild_id){

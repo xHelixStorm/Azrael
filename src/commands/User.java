@@ -27,7 +27,7 @@ public class User implements Command{
 		if(GuildIni.getUserCommand(e.getGuild().getIdLong())) {
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
+				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
 					if(e.getMessage().getContentRaw().equals(IniFileReader.getCommandPrefix()+"user")) {
 						UserExecution.getHelp(e);
 					}

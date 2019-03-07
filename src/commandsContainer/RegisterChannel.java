@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import core.Channels;
 import core.UserPrivs;
 import fileManagement.FileSetting;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -40,7 +41,7 @@ public class RegisterChannel {
 		long channel_id;
 		String channel_type;
 		
-		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()){
+		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == GuildIni.getAdmin(_e.getGuild().getIdLong())){
 			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss)");
 			Matcher matcher = pattern.matcher(_message);
 			if(matcher.find()){
