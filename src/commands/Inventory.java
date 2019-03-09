@@ -80,20 +80,20 @@ public class Inventory implements Command{
 						
 						String drawTab = "";
 						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
-							InventoryBuilder.DrawInventory(e, null, "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/maxItems+1, itemNumber+1);
+							InventoryBuilder.DrawInventory(e, null, "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1);
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("weapons")) {
 							if(!lastWord.equals("weapons") && sub_cat != null) {
 								drawTab = "weapons_"+lastWord;
-								InventoryBuilder.DrawInventory(e, null, "weapons", lastWord, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, lastWord), limit/maxItems+1, itemNumber+1);
+								InventoryBuilder.DrawInventory(e, null, "weapons", lastWord, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems, lastWord), limit/maxItems+1, itemNumber+1);
 							}
 							else {
 								drawTab = "weapons_total";
-								InventoryBuilder.DrawInventory(e, null, "weapons", "total", RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/maxItems+1, itemNumber+1);
+								InventoryBuilder.DrawInventory(e, null, "weapons", "total", RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1);
 							}
 						}
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("skins")) {
 							drawTab = "skins_total";
-							InventoryBuilder.DrawInventory(e, null, "skins", "total", RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit), limit/maxItems+1, itemNumber+1);
+							InventoryBuilder.DrawInventory(e, null, "skins", "total", RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1);
 						}
 						else {
 							drawTab = "total_total";
