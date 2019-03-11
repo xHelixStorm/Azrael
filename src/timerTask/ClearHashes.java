@@ -22,6 +22,7 @@ public class ClearHashes extends TimerTask{
 		Hashes.clearWeaponAbbreviations();
 		Hashes.clearWeaponStats();
 		Hashes.clearDailyItems();
+		Hashes.clearThemes();
 		
 		Logger logger = LoggerFactory.getLogger(ClearHashes.class);
 		logger.debug("Temporary Hashes have been cleared!");

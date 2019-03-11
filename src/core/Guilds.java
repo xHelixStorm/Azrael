@@ -14,8 +14,6 @@ public class Guilds {
 	private boolean ranking_state;
 	private long max_experience;
 	private boolean max_exp_enabled;
-	private String currency;
-	private long randomshop_price;
 	
 	public void setName(String _name){
 		name = _name;
@@ -56,12 +54,6 @@ public class Guilds {
 	public void setMaxExpEnabled(boolean _max_exp_enabled){
 		max_exp_enabled = _max_exp_enabled;
 	}
-	public void setCurrency(String _currency) {
-		currency = _currency;
-	}
-	public void setRandomshopPrice(long _randomshop_price) {
-		randomshop_price = _randomshop_price;
-	}
 	
 	public String getName(){
 		return name;
@@ -101,11 +93,5 @@ public class Guilds {
 	}
 	public boolean getMaxExpEnabled(){
 		return max_exp_enabled;
-	}
-	public String getCurrency() {
-		return currency;
-	}
-	public long getRandomshopPrice() {
-		return randomshop_price;
 	}
 }

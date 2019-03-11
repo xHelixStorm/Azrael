@@ -117,7 +117,7 @@ public class RandomshopExecution {
 				//second, check if anything has been found, else interrupt the process
 				if(abbv != null || category != null) {
 					Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
-					final long price = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getRandomshopPrice();
+					final long price = GuildIni.getRandomshopPrice(e.getGuild().getIdLong());
 					if(user_details.getCurrency() >= price) {
 						List<WeaponStats> stats = RankingSystemItems.SQLgetWeaponStats(e.getGuild().getIdLong());
 						if(stats.size() > 0) {

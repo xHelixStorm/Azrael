@@ -49,10 +49,11 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT number FROM inventory WHERE fk_guild_id =  ? AND fk_weapon_id = ?");
+			String sql = ("SELECT number FROM inventory WHERE fk_guild_id =  ? AND fk_weapon_id = ? AND fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _weapon_id);
+			stmt.setInt(3, Hashes.getTheme(GuildIni.getTheme(_guild_id)));
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				return rs.getInt(1);
@@ -78,7 +79,7 @@ public class RankingSystemItems {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT weapon_id FROM weapon_shop_content WHERE fk_theme_id = ? AND weapon_abbv LIKE ? AND weapon_stat = ? ORDER BY RAND() LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, GuildIni.getTheme(_guild_id));
+			stmt.setInt(1, Hashes.getTheme(GuildIni.getTheme(_guild_id)));
 			stmt.setString(2, _abbv);
 			stmt.setInt(3, _stat_id);
 			rs = stmt.executeQuery();
@@ -105,7 +106,7 @@ public class RankingSystemItems {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT weapon_id FROM weapon_shop_content INNER JOIN weapon_category ON fk_category_id = category_id AND weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id WHERE weapon_shop_content.fk_theme_id = ? AND name LIKE ?  AND weapon_stat = ? ORDER BY RAND() LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, GuildIni.getTheme(_guild_id));
+			stmt.setInt(1, Hashes.getTheme(GuildIni.getTheme(_guild_id)));
 			stmt.setString(2, _category);
 			stmt.setInt(3, _stat_id);
 			rs = stmt.executeQuery();
@@ -137,7 +138,7 @@ public class RankingSystemItems {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT DISTINCT(name) FROM weapon_category WHERE fk_theme_id = ? AND skill = 0");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setString(1, theme);
+				stmt.setInt(1, Hashes.getTheme(theme));
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					categories.add(rs.getString(1));
@@ -170,7 +171,7 @@ public class RankingSystemItems {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT abbv, description FROM weapon_abbreviation WHERE fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setString(1, theme);
+				stmt.setInt(1, Hashes.getTheme(theme));;
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					WeaponAbbvs abbreviation = new WeaponAbbvs(rs.getString(1), rs.getString(2));
@@ -203,7 +204,7 @@ public class RankingSystemItems {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT stat_id, stat FROM weapon_stats WHERE fk_theme_id = ? AND weapon = 1");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setString(1, theme);
+				stmt.setInt(1, Hashes.getTheme(theme));
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					WeaponStats stat = new WeaponStats(rs.getInt(1), rs.getString(2));
@@ -236,7 +237,7 @@ public class RankingSystemItems {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT s.weapon_id, s.description, s.price, s.weapon_abbv, s.fk_skin, s.weapon_stat, w.stat, s.fk_category_id, c.name, o.overlay, s.enabled FROM weapon_shop_content s INNER JOIN weapon_stats w ON s.weapon_stat = w.stat_id INNER JOIN weapon_category c ON s.fk_category_id = c.category_id && s.fk_theme_id = c.fk_theme_id INNER JOIN randomshop_reward_overlays o ON s.fk_overlay_id = o.overlay_id  && s.fk_theme_id = o.fk_theme_id WHERE s.fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setString(1, theme);
+				stmt.setInt(1, Hashes.getTheme(theme));
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					Weapons weapon = new Weapons(
@@ -275,13 +276,13 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT number, expires FROM inventory INNER JOIN weapon_shop_content ON fk_weapon_id = weapon_id WHERE fk_user_id = ? AND fk_weapon_id = ? AND fk_status = ? AND fk_guild_id = ? AND fk_theme_id = ? AND enabled = 1");
+			String sql = ("SELECT number, expires FROM inventory INNER JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id WHERE fk_user_id = ? AND fk_weapon_id = ? AND fk_status = ? AND fk_guild_id = ? AND inventory.fk_theme_id = ? AND enabled = 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _weapon_id);
 			stmt.setString(3, _status);
 			stmt.setLong(4, _guild_id);
-			stmt.setString(5, GuildIni.getTheme(_guild_id));
+			stmt.setInt(5, Hashes.getTheme(GuildIni.getTheme(_guild_id)));
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				InventoryContent inventory = new InventoryContent();
@@ -316,7 +317,7 @@ public class RankingSystemItems {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 			
-			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_weapon_id, position, number, fk_status, expires, fk_guild_id) VALUES(?, ?, ?, ?, \"limit\", ?, ?) ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number), expires=VALUES(expires)");
+			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_weapon_id, position, number, fk_status, expires, fk_guild_id, fk_theme_id) VALUES(?, ?, ?, ?, \"limit\", ?, ?, ?) ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number), expires=VALUES(expires)");
 			stmt = myConn.prepareStatement(sql2);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
@@ -324,6 +325,7 @@ public class RankingSystemItems {
 			stmt.setInt(4, _number);
 			stmt.setTimestamp(5, new Timestamp(_expires+604800000));
 			stmt.setLong(6, _guild_id);
+			stmt.setInt(7, Hashes.getTheme(GuildIni.getTheme(_guild_id)));
 			var editedRows = stmt.executeUpdate();
 			myConn.commit();	
 			return editedRows;
@@ -356,13 +358,16 @@ public class RankingSystemItems {
 			stmt.setLong(3, _guild_id);
 			stmt.executeUpdate();
 			
-			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_weapon_id, position, number, fk_status, fk_guild_id) SELECT ?, weapon_id, ?, ?, 'perm', ? FROM weapon_shop_content WHERE weapon_id = ? ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number)");
+			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_weapon_id, position, number, fk_status, fk_guild_id, fk_theme_id) SELECT ?, weapon_id, ?, ?, 'perm', ?, ? FROM weapon_shop_content WHERE weapon_id = ? AND fk_theme_id = ? ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number)");
 			stmt = myConn.prepareStatement(sql2);
+			var theme = Hashes.getTheme(GuildIni.getTheme(_guild_id));
 			stmt.setLong(1, _user_id);
 			stmt.setTimestamp(2, _timestamp);
 			stmt.setInt(3, _number);
 			stmt.setLong(4, _guild_id);
-			stmt.setInt(5, _weapon_id);
+			stmt.setInt(5, theme);
+			stmt.setInt(6, _weapon_id);
+			stmt.setInt(7, theme);
 			var editedRows = stmt.executeUpdate();
 			myConn.commit();	
 			return editedRows;

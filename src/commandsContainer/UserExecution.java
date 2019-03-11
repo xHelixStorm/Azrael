@@ -14,6 +14,7 @@ import core.Hashes;
 import core.Messages;
 import core.User;
 import fileManagement.FileSetting;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -632,7 +633,7 @@ public class UserExecution {
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(user_details.getCurrency()+currency);
 					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getCurrency()) > 0) {
-						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money gifted", "User received money in value of "+currency+" "+RankingSystem.SQLgetGuild(_e.getGuild().getIdLong()).getCurrency());
+						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money gifted", "User received money in value of "+currency+" "+GuildIni.getCurrency(_e.getGuild().getIdLong()));
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						_e.getTextChannel().sendMessage("Currency has been updated!").queue();
 						logger.debug("{} has gifted {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
@@ -650,7 +651,7 @@ public class UserExecution {
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(currency);
 					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getCurrency()) > 0) {
-						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money set", "Currency value for the user has been changed to "+currency+" "+RankingSystem.SQLgetGuild(_e.getGuild().getIdLong()).getCurrency());
+						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money set", "Currency value for the user has been changed to "+currency+" "+GuildIni.getCurrency(_e.getGuild().getIdLong()));
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						_e.getTextChannel().sendMessage("Currency has been updated!").queue();
 						logger.debug("{} has set {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());

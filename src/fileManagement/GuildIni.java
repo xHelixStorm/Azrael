@@ -17,6 +17,8 @@ public class GuildIni {
 			//General
 			ini.add("General", "Theme", "");
 			ini.add("General", "Administrator", "");
+			ini.add("General", "CommandPrefix", "");
+			ini.add("General", "Currency", "");
 			ini.add("General", "CountMembers", "false");
 			ini.add("General", "GameMessage", "");
 			ini.add("General", "JoinMessage", "false");
@@ -84,6 +86,9 @@ public class GuildIni {
 			ini.add("Inventory", "rowLimit", "0");
 			ini.add("Inventory", "maxItems", "0");
 			
+			//Randomshop
+			ini.add("Randomshop", "Price", "0");
+			
 			//RandomshopItems
 			ini.add("RandomshopItems", "startX", "0");
 			ini.add("RandomshopItems", "startY", "0");
@@ -128,9 +133,14 @@ public class GuildIni {
 		return ini.get("General", "Administrator", long.class);
 	}
 	
-	public static String getCommandPrefix(long guild_id){
+	public static String getCommandPrefix(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "CommandPrefix");
+	}
+	
+	public static String getCurrency(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "Currency");
 	}
 	
 	public static boolean getCountMembers(long guild_id) {
@@ -318,6 +328,11 @@ public class GuildIni {
 	public static int getInventoryMaxItems(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Inventory", "maxItems", int.class);
+	}
+	
+	public static long getRandomshopPrice(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Randomshop", "Price", long.class);
 	}
 	
 	public static int[] getWholeRandomshopItems(long guild_id) {

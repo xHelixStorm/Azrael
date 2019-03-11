@@ -58,6 +58,11 @@ public class ReadyListener extends ListenerAdapter{
 		FileSetting.createTemp();
 
 		FileSetting.createFile("./files/reboot.azr", "0");
+		var themesRetrieved = true;
+		if(RankingSystem.SQLgetThemes() == false) {
+			themesRetrieved = false;
+			logger.error("Themes couldn't be retried from RankingSystem.themes");
+		}
 		for(Guild g : e.getJDA().getGuilds()){
 			long guild_id = g.getIdLong();
 			if(!new File("./ini/"+guild_id+".ini").exists()) {
@@ -80,6 +85,9 @@ public class ReadyListener extends ListenerAdapter{
 			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetLevels(guild_id) == 0) {
 				logger.error("Levels from RankingSystem.level_list couldn't be called and cached");
 				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
+			}
+			if(themesRetrieved == false) {
+				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Themes from RankingSystem.themes couldn't be called and cached").queue();
 			}
 			Azrael.SQLgetRSSFeeds(guild_id);
 			var rss_channel = Azrael.SQLgetChannelID(guild_id, "rss");

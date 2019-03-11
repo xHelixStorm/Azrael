@@ -55,6 +55,7 @@ public class Hashes {
     private static final Map<Long, ArrayList<String>> weaponCategories = new HashMap<Long, ArrayList<String>>();
     private static final Map<Long, ArrayList<WeaponAbbvs>> weaponAbbvs = new HashMap<Long, ArrayList<WeaponAbbvs>>();
     private static final LinkedHashMap<Long, ArrayList<WeaponStats>> weaponStats = new LinkedHashMap<Long, ArrayList<WeaponStats>>();
+    private static final Map<String, Integer> themes = new HashMap<String, Integer>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -118,6 +119,9 @@ public class Hashes {
 	}
 	public static void addWeaponStat(Long _key, ArrayList<WeaponStats> _stats) {
 		weaponStats.put(_key, _stats);
+	}
+	public static void addTheme(String _key, Integer _id) {
+		themes.put(_key, _id);
 	}
 	
 	public static Messages getMessagePool(long _message_id) {
@@ -195,6 +199,9 @@ public class Hashes {
 	public static ArrayList<WeaponStats> getWeaponStats(Long _key) {
 		return weaponStats.get(_key);
 	}
+	public static Integer getTheme(String _key) {
+		return themes.get(_key);
+	}
 	
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
@@ -261,5 +268,8 @@ public class Hashes {
 	}
 	public static void clearWeaponStats() {
 		weaponStats.clear();
+	}
+	public static void clearThemes() {
+		themes.clear();
 	}
 }
