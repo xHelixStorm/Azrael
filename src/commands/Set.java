@@ -2,6 +2,7 @@ package commands;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +103,8 @@ public class Set implements Command{
 				}
 				else if(input.equals(prefix+"set -default-level-skin")){
 					String out = "";
-					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingLevel()){
+					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
+					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingLevel().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())){
 						out+= "Theme "+rankingSystem.getRankingLevel()+":\t"+rankingSystem.getLevelDescription()+"\n";
 					}
 					if(out.length() > 0)
@@ -111,7 +113,8 @@ public class Set implements Command{
 						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_level couldn't be loaded").build()).queue();
 				}
 				else if(input.contains(prefix+"set -default-level-skin ")){
-					int last_theme = RankingSystem.SQLgetRankingLevel().size();
+					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
+					int last_theme = RankingSystem.SQLgetRankingLevel().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 					if(last_theme > 0) {
 						input = input.substring(24+prefix.length());
 						if(input.replaceAll("[0-9]", "").length() == 0)
@@ -125,7 +128,8 @@ public class Set implements Command{
 				}
 				else if(input.equals(prefix+"set -default-rank-skin")){
 					String out = "";
-					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingRank()){
+					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
+					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingRank().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())){
 						out+= "Theme "+rankingSystem.getRankingRank()+":\t"+rankingSystem.getRankDescription()+"\n";
 					}
 					if(out.length() > 0)
@@ -134,7 +138,8 @@ public class Set implements Command{
 						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_rank couldn't be loaded").build()).queue();
 				}
 				else if(input.contains(prefix+"set -default-rank-skin ")){
-					int last_theme = RankingSystem.SQLgetRankingRank().size();
+					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
+					int last_theme = RankingSystem.SQLgetRankingRank().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 					if(last_theme > 0) {
 						input = input.substring(23+prefix.length());
 						if(input.replaceAll("[0-9]", "").length() == 0)
@@ -148,7 +153,8 @@ public class Set implements Command{
 				}
 				else if(input.equals(prefix+"set -default-profile-skin")){
 					String out = "";
-					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingProfile()){
+					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
+					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingProfile().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())){
 						out+= "Theme "+rankingSystem.getRankingProfile()+":\t"+rankingSystem.getProfileDescription()+"\n";
 					}
 					if(out.length() > 0)
@@ -157,7 +163,8 @@ public class Set implements Command{
 						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_profile couldn't be loaded").build()).queue();
 				}
 				else if(input.contains(prefix+"set -default-profile-skin ")){
-					int last_theme = RankingSystem.SQLgetRankingProfile().size();
+					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
+					int last_theme = RankingSystem.SQLgetRankingProfile().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 					if(last_theme > 0) {
 						input = input.substring(26+prefix.length());
 						if(input.replaceAll("[0-9]", "").length() == 0)
@@ -171,7 +178,8 @@ public class Set implements Command{
 				}
 				else if(input.equals(prefix+"set -default-icon-skin")){
 					String out = "";
-					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingIcons()){
+					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
+					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingIcons().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())){
 						out+= "Theme "+rankingSystem.getRankingIcon()+":\t"+rankingSystem.getIconDescription()+"\n";
 					}
 					if(out.length() > 0)
@@ -180,7 +188,8 @@ public class Set implements Command{
 						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_icons couldn't be loaded").build()).queue();
 				}
 				else if(input.contains(prefix+"set -default-icon-skin ")){
-					int last_theme = RankingSystem.SQLgetRankingIcons().size();
+					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
+					int last_theme = RankingSystem.SQLgetRankingIcons().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 					if(last_theme > 0) {
 						input = input.substring(23+prefix.length());
 						if(input.replaceAll("[0-9]", "").length() == 0)

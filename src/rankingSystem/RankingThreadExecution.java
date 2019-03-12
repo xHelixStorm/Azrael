@@ -69,8 +69,7 @@ public class RankingThreadExecution {
 			Timestamp reset = Timestamp.valueOf(tomorrowMidnight);
 			
 			if(user_details.getDailyReset() == null || reset.getTime() - user_details.getDailyReset().getTime() != 0){
-				if(RankingSystem.SQLDeleteDailyExperience(user_id, guild_id) == 0)
-					logger.error("RankingSystem.daily_experience couldn't be cleared from {} in guild {}", user_id, guild_id);
+				RankingSystem.SQLDeleteDailyExperience(user_id, guild_id);
 				daily_experience = 0;
 			}
 			

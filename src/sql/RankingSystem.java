@@ -67,7 +67,11 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO users (user_id, name, level_skin, rank_skin, profile_skin, icon_skin, fk_guild_id) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			String sql;
+			if(_level_skin != 0 && _rank_skin != 0 && _profile_skin != 0 && _icon_skin != 0)
+				sql = ("INSERT INTO users (user_id, name, level_skin, rank_skin, profile_skin, icon_skin, fk_guild_id) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			else
+				sql = ("INSERT INTO users (user_id, name, fk_guild_id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _name);
@@ -175,18 +179,17 @@ public class RankingSystem {
 	}
 	
 	//guilds table 
-	public static int SQLInsertGuild(long _guild_id, String _name, int _max_level, boolean _enabled){
-		logger.debug("SQLInsertGuild launched. Passed params {}, {}, {}, {}", _guild_id, _name, _max_level, _enabled);
+	public static int SQLInsertGuild(long _guild_id, String _name, boolean _enabled){
+		logger.debug("SQLInsertGuild launched. Passed params {}, {}, {}", _guild_id, _name, _enabled);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO guilds (guild_id, name, max_level, ranking_state) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), max_level=VALUES(max_level), fk_profile_id=VALUES(fk_profile_id), ranking_state=VALUES(ranking_state)");
+			String sql = ("INSERT INTO guilds (guild_id, name, ranking_state) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), ranking_state=VALUES(ranking_state)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setString(2, _name);
-			stmt.setInt(3, _max_level);
-			stmt.setBoolean(4, _enabled);
+			stmt.setBoolean(3, _enabled);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertGuild Exception", e);
@@ -591,6 +594,7 @@ public class RankingSystem {
 					rankingSystem.setRankYLevel(rs.getInt(7));
 					rankingSystem.setRankWidthLevel(rs.getInt(8));
 					rankingSystem.setRankHeightLevel(rs.getInt(9));
+					rankingSystem.setThemeID(rs.getInt(10));
 					rankList.add(rankingSystem);
 				}
 				Hashes.addRankList("ranking-level", rankList);
@@ -633,6 +637,7 @@ public class RankingSystem {
 					rankingSystem.setRankYRank(rs.getInt(9));
 					rankingSystem.setRankWidthRank(rs.getInt(10));
 					rankingSystem.setRankHeightRank(rs.getInt(11));
+					rankingSystem.setThemeID(rs.getInt(12));
 					rankList.add(rankingSystem);
 				}
 				Hashes.addRankList("ranking-rank", rankList);
@@ -675,6 +680,7 @@ public class RankingSystem {
 					rankingSystem.setRankYProfile(rs.getInt(9));
 					rankingSystem.setRankWidthProfile(rs.getInt(10));
 					rankingSystem.setRankHeightProfile(rs.getInt(11));
+					rankingSystem.setThemeID(rs.getInt(12));
 					rankList.add(rankingSystem);
 				}
 				Hashes.addRankList("ranking-profile", rankList);
@@ -708,6 +714,7 @@ public class RankingSystem {
 					Rank rankingSystem = new Rank();
 					rankingSystem.setRankingIcon(rs.getInt(1));
 					rankingSystem.setIconDescription(rs.getString(2));
+					rankingSystem.setThemeID(rs.getInt(3));
 					rankList.add(rankingSystem);
 				}
 				Hashes.addRankList("ranking-icons", rankList);

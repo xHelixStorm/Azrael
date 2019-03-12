@@ -1,5 +1,6 @@
 package commands;
 
+import java.awt.Color;
 import java.sql.Timestamp;
 
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import core.Guilds;
 import core.Hashes;
 import fileManagement.GuildIni;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
 import sql.Azrael;
@@ -36,7 +38,7 @@ public class Use implements Command{
 						e.getTextChannel().sendMessage("write the description of the item/skin together with this command to use it!\nTo reset your choice use either default-level, default-rank, default-profile or default-icons to reset your settings!").queue();
 					}
 					else if(input.equals(prefix+"use default-level")){
-						rankingSystem.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(guild_settings.getLevelDescription())).findAny().orElse(null);
+						rankingSystem.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(guild_settings.getLevelDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 						user_details.setRankingLevel(rank.getRankingLevel());
 						user_details.setLevelDescription(rank.getLevelDescription());
 						user_details.setColorRLevel(rank.getColorRLevel());
@@ -46,19 +48,26 @@ public class Use implements Command{
 						user_details.setRankYLevel(rank.getRankYLevel());
 						user_details.setRankWidthLevel(rank.getRankWidthLevel());
 						user_details.setRankHeightLevel(rank.getRankHeightLevel());
-						if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel()) > 0) {
-							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
-							e.getTextChannel().sendMessage("Level skin has been resetted to the server default skin!").queue();
+						if(user_details.getRankingLevel() != 0) {
+							if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel()) > 0) {
+								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
+								e.getTextChannel().sendMessage("Level skin has been resetted to the server default skin!").queue();
+							}
+							else {
+								//if rows didn't get updated, throw and error and write it into error log
+								e.getTextChannel().sendMessage("Level skin couldn't be resetted to the server default skin. Internal error, please contact an administrator!").queue();
+								logger.error("RankingSystem.users table couldn't be updated with the default level skin for {}", e.getMember().getUser().getId());
+								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getLevelDescription());
+							}
 						}
 						else {
-							//if rows didn't get updated, throw and error and write it into error log
-							e.getTextChannel().sendMessage("Level skin couldn't be resetted to the server default skin. Internal error, please contact an administrator!").queue();
-							logger.error("RankingSystem.users table couldn't be updated with the default level skin for {}", e.getMember().getUser().getId());
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getLevelDescription());
+							EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
+							e.getTextChannel().sendMessage(error.setDescription("Default skins aren't defined. Please contact an administrator!").build()).queue();
+							logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 						}
 					}
 					else if(input.equals(prefix+"use default-rank")){
-						rankingSystem.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(guild_settings.getRankDescription())).findAny().orElse(null);
+						rankingSystem.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(guild_settings.getRankDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 						user_details.setRankingRank(rank.getRankingRank());
 						user_details.setRankDescription(rank.getRankDescription());
 						user_details.setBarColorRank(rank.getBarColorRank());
@@ -70,19 +79,26 @@ public class Use implements Command{
 						user_details.setRankYRank(rank.getRankYRank());
 						user_details.setRankWidthRank(rank.getRankWidthRank());
 						user_details.setRankHeightRank(rank.getRankHeightRank());
-						if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank()) > 0) {
-							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
-							e.getTextChannel().sendMessage("Rank skin has been resetted to the server default skin!").queue();
+						if(user_details.getRankingRank() != 0) {
+							if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank()) > 0) {
+								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
+								e.getTextChannel().sendMessage("Rank skin has been resetted to the server default skin!").queue();
+							}
+							else {
+								//if rows didn't get updated, throw and error and write it into error log
+								e.getTextChannel().sendMessage("Rank skin couldn't be resetted to the server default skin. Internal error, please contact an administrator!").queue();
+								logger.error("RankingSystem.users table couldn't be updated with the default rank skin for {}", e.getMember().getUser().getId());
+								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getRankDescription());
+							}
 						}
 						else {
-							//if rows didn't get updated, throw and error and write it into error log
-							e.getTextChannel().sendMessage("Rank skin couldn't be resetted to the server default skin. Internal error, please contact an administrator!").queue();
-							logger.error("RankingSystem.users table couldn't be updated with the default rank skin for {}", e.getMember().getUser().getId());
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getRankDescription());
+							EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
+							e.getTextChannel().sendMessage(error.setDescription("Default skins aren't defined. Please contact an administrator!").build()).queue();
+							logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 						}
 					}
 					else if(input.equals(prefix+"use default-profile")){
-						rankingSystem.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(guild_settings.getProfileDescription())).findAny().orElse(null);
+						rankingSystem.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(guild_settings.getProfileDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 						user_details.setRankingProfile(rank.getRankingProfile());
 						user_details.setProfileDescription(rank.getProfileDescription());
 						user_details.setBarColorProfile(rank.getBarColorProfile());
@@ -94,30 +110,44 @@ public class Use implements Command{
 						user_details.setRankYProfile(rank.getRankYProfile());
 						user_details.setRankWidthProfile(rank.getRankWidthProfile());
 						user_details.setRankHeightProfile(rank.getRankHeightProfile());
-						if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile()) > 0) {
-							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
-							e.getTextChannel().sendMessage("Profile skin has been resetted to the server default skin!").queue();
+						if(user_details.getRankingProfile() != 0) {
+							if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile()) > 0) {
+								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
+								e.getTextChannel().sendMessage("Profile skin has been resetted to the server default skin!").queue();
+							}
+							else {
+								//if rows didn't get updated, throw and error and write it into error log
+								e.getTextChannel().sendMessage("Profile skin couldn't be resetted to the server default skin. Internal error, please contact an administrator!").queue();
+								logger.error("RankingSystem.users table couldn't be updated with the default profile skin for {}", e.getMember().getUser().getId());
+								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getProfileDescription());
+							}
 						}
 						else {
-							//if rows didn't get updated, throw and error and write it into error log
-							e.getTextChannel().sendMessage("Profile skin couldn't be resetted to the server default skin. Internal error, please contact an administrator!").queue();
-							logger.error("RankingSystem.users table couldn't be updated with the default profile skin for {}", e.getMember().getUser().getId());
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getProfileDescription());
+							EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
+							e.getTextChannel().sendMessage(error.setDescription("Default skins aren't defined. Please contact an administrator!").build()).queue();
+							logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 						}
 					}
 					else if(input.equals(prefix+"use default-icons")){
-						rankingSystem.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(guild_settings.getIconDescription())).findAny().orElse(null);
+						rankingSystem.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(guild_settings.getIconDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 						user_details.setRankingIcon(rank.getRankingIcon());
 						user_details.setIconDescription(rank.getIconDescription());
-						if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon()) > 0) {
-							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
-							e.getTextChannel().sendMessage("Icon skins has been resetted to the server default skin!").queue();
+						if(user_details.getRankingIcon() != 0) {
+							if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon()) > 0) {
+								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
+								e.getTextChannel().sendMessage("Icon skins has been resetted to the server default skin!").queue();
+							}
+							else {
+								//if rows didn't get updated, throw and error and write it into error log
+								e.getTextChannel().sendMessage("Icons skin couldn't be resetted to the server default skin. Internal error, please contact an administrator!").queue();
+								logger.error("RankingSystem.users table couldn't be updated with the default icon skin for {}", e.getMember().getUser().getId());
+								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icons skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getIconDescription());
+							}
 						}
 						else {
-							//if rows didn't get updated, throw and error and write it into error log
-							e.getTextChannel().sendMessage("Icons skin couldn't be resetted to the server default skin. Internal error, please contact an administrator!").queue();
-							logger.error("RankingSystem.users table couldn't be updated with the default icon skin for {}", e.getMember().getUser().getId());
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icons skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getIconDescription());
+							EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
+							e.getTextChannel().sendMessage(error.setDescription("Default skins aren't defined. Please contact an administrator!").build()).queue();
+							logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 						}
 					}
 					else if(input.contains(prefix+"use ")){

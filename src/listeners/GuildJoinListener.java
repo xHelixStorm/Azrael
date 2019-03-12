@@ -22,7 +22,7 @@ public class GuildJoinListener extends ListenerAdapter{
 		if(Azrael.SQLInsertGuild(guild_id, guild_name) == 0) {
 			logger.error("guild information couldn't be inserted into Azrael.guilds table for the guild {}", e.getGuild().getName());
 		}
-		if(RankingSystem.SQLInsertGuild(guild_id, guild_name, 0, false) > 0) {
+		if(RankingSystem.SQLInsertGuild(guild_id, guild_name, false) > 0) {
 			if(DiscordRoles.SQLInsertGuild(guild_id, guild_name) == 0) {
 				logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", e.getGuild().getName());
 			}
