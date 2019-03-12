@@ -12,7 +12,7 @@ public class SetProfileDefaultSkin {
 	public static void runTask(MessageReceivedEvent _e, int _default_skin, int _last_theme){
 		Logger logger = LoggerFactory.getLogger(SetProfileDefaultSkin.class);
 		if(_default_skin <= _last_theme){
-			Guilds guild_settings = Hashes.getStatus(_e.getGuild().getIdLong());
+			Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 			guild_settings.setProfileID(_default_skin);
 			if(RankingSystem.SQLUpdateProfileDefaultSkin(_e.getGuild().getIdLong(), _e.getGuild().getName(), guild_settings.getProfileID()) > 0) {
 				logger.debug("{} has set the default profile skin id to {} in guild {}", _e.getMember().getUser().getId(), guild_settings.getProfileID(), _e.getGuild().getName());

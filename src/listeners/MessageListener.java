@@ -238,9 +238,9 @@ public class MessageListener extends ListenerAdapter{
 				}
 			}
 			
-			Guilds guild_settings = Hashes.getStatus(guild_id);
+			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 			if(guild_settings.getRankingState() == true){
-				Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
+				Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
 				if(user_details == null){
 					if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
 						if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, 50000, 0) > 0) {
@@ -267,7 +267,7 @@ public class MessageListener extends ListenerAdapter{
 						
 						int percent_multiplier;
 						try {
-							percent_multiplier = Integer.parseInt(RankingSystem.SQLExpBoosterExistsInInventory(user_id, guild_id).replaceAll("[^0-9]*", ""));
+							percent_multiplier = Integer.parseInt(RankingSystem.SQLExpBoosterExistsInInventory(user_id, guild_id, guild_settings.getThemeID()).replaceAll("[^0-9]*", ""));
 						} catch(NumberFormatException nfe){
 							percent_multiplier = 0;
 						}

@@ -13,12 +13,10 @@ import commandsContainer.SetGiveawayItems;
 import commandsContainer.SetIconDefaultSkin;
 import commandsContainer.SetLevelDefaultSkin;
 import commandsContainer.SetMaxExperience;
-import commandsContainer.SetMaxLevel;
 import commandsContainer.SetProfileDefaultSkin;
 import commandsContainer.SetRankDefaultSkin;
 import commandsContainer.SetRankingSystem;
 import commandsContainer.SetWarning;
-import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
@@ -53,7 +51,6 @@ public class Set implements Command{
 							+ "**-commands**: To disable, enable or limit specific commands to a bot channel or for the whole server\n\n"
 							+ "**-ranking**: To enable or disable the rankiing system\n\n"
 							+ "**-max-experience**: To enable/disable the max experience limiter and to set the limit in experience\n\n"
-							+ "**-max-level**: To define the max level that can be reached with the ranking system\n\n"
 							+ "**-default-level-skin**: To define the default skin for level ups\n\n"
 							+ "**-default-rank-skin**: To define the default skin for rank commands like "+prefix+"rank\n\n"
 							+ "**-default-profile-skin**: To define the default skin for profile commands like "+prefix+"profile\n\n"
@@ -101,14 +98,7 @@ public class Set implements Command{
 				}
 				else if(input.contains(prefix+"set -max-experience ")){
 					input = input.substring(19+prefix.length());
-					SetMaxExperience.runTask(e, input, Hashes.getStatus(e.getGuild().getIdLong()));
-				}
-				else if(input.equals(prefix+"set -max-level")){
-					e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, type **"+prefix+"set -max-level <level in number>** for defining the max level that can be achieved in this guild").build()).queue();
-				}
-				else if(input.contains(prefix+"set -max-level ")){
-					input = input.substring(15+prefix.length());
-					SetMaxLevel.runTask(e, Integer.parseInt(input));
+					SetMaxExperience.runTask(e, input, RankingSystem.SQLgetGuild(e.getGuild().getIdLong()));
 				}
 				else if(input.equals(prefix+"set -default-level-skin")){
 					String out = "";
@@ -202,11 +192,11 @@ public class Set implements Command{
 						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_icons couldn't be loaded").queue();
 				}
 				else if(input.equals(prefix+"set -daily-item")){
-					e.getTextChannel().sendMessage(messageBuild.setDescription("Write the name of the daily reward you want to make available for dailies together with the weight and type of the item. For example:\n**"+prefix+"set -daily-item \"5000 "+GuildIni.getCurrency(e.getGuild().getIdLong())+"\" -weight 70 -type cur**\nNote that the total weight can't exceed 100 and that the currently available types are **cur** for currency , **exp** for experience enhancement items and **cod** for code giveaways.").build()).queue();
+					e.getTextChannel().sendMessage(messageBuild.setDescription("Write the name of the daily reward you want to make available for dailies together with the weight and type of the item. For example:\n**"+prefix+"set -daily-item \"5000 "+RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getCurrency()+"\" -weight 70 -type cur**\nNote that the total weight can't exceed 100 and that the currently available types are **cur** for currency , **exp** for experience enhancement items and **cod** for code giveaways.").build()).queue();
 				}
 				else if(input.contains(prefix+"set -daily-item ")){
 					input = input.substring(16+prefix.length());
-					ArrayList<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong());
+					ArrayList<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong(), RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID());
 					var tot_weight = daily_items.parallelStream().mapToInt(i -> i.getWeight()).sum();
 					SetDailyItem.runTask(e, input, daily_items, tot_weight);
 				}

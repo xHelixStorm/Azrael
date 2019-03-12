@@ -70,7 +70,7 @@ public class RoleListener extends ListenerAdapter{
 					long time = System.currentTimeMillis();
 					int warning_id = warnedUser.getWarningID();
 					long assignedRole = 0;
-					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
+					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID());
 					if(user_details != null){
 						assignedRole = user_details.getCurrentRole();
 					}

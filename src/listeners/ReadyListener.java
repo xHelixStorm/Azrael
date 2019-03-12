@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Guilds;
-import core.Hashes;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
@@ -73,16 +72,16 @@ public class ReadyListener extends ListenerAdapter{
 				logger.error("Roles information from DiscordRoles.roles couldn't be retrieved and cached");
 				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Roles information from DiscordRoles.roles couldn't be called and cached").queue();
 			}
-			if(RankingSystem.SQLgetGuild(guild_id) == null) {
+			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
+			if(guild_settings == null) {
 				logger.error("Guild information from RankingSystem.guilds couldn't be retrieved and cached");
 				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Guild information from RankingSystem.guilds couldn't be called and cached").queue();
 			}
-			Guilds guild_settings = Hashes.getStatus(guild_id);
 			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetRoles(guild_id) == false) {
 				logger.error("Roles from RankingSystem.roles couldn't be called and cached");
 				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
 			}
-			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetLevels(guild_id) == 0) {
+			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetLevels(guild_id, guild_settings.getThemeID()) == 0) {
 				logger.error("Levels from RankingSystem.level_list couldn't be called and cached");
 				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
 			}

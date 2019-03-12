@@ -29,8 +29,8 @@ public class Purchase implements Command{
 			Logger logger = LoggerFactory.getLogger(Purchase.class);
 			logger.debug("{} has used Purchase command", e.getMember().getUser().getId());
 			
-			Guilds setting = Hashes.getStatus(e.getGuild().getIdLong());
-			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState()){
+			Guilds setting = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
+			if(setting.getRankingState()){
 				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 				if(e.getTextChannel().getIdLong() == bot_channel || bot_channel == 0){
 					String input = e.getMessage().getContentRaw();
@@ -41,24 +41,24 @@ public class Purchase implements Command{
 					else if(input.contains(prefix+"purchase ")){
 						input = input.substring(prefix.length()+9);
 						final String filter = input;
-						Skins skin = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong()).parallelStream().filter(s -> s.getShopDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
-						Weapons weapon = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong()).parallelStream().filter(w -> filter.equalsIgnoreCase(w.getDescription()+" "+w.getStatDescription())).findAny().orElse(null);
+						Skins skin = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), setting.getThemeID()).parallelStream().filter(s -> s.getShopDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+						Weapons weapon = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong(), setting.getThemeID()).parallelStream().filter(w -> filter.equalsIgnoreCase(w.getDescription()+" "+w.getStatDescription())).findAny().orElse(null);
 						if(skin != null || weapon != null) {
 							if(skin != null) {
 								int item_id = skin.getItemID();
 								if(skin.getShopDescription().length() > 0){
 									if(!input.equalsIgnoreCase(setting.getLevelDescription()) && !input.equalsIgnoreCase(setting.getRankDescription()) && !input.equalsIgnoreCase(setting.getProfileDescription()) && !input.equalsIgnoreCase(setting.getIconDescription())){
-										if(RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input) == null || skin.getSkinType().equals("ite")){
-											rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+										if(RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input, setting.getThemeID()) == null || skin.getSkinType().equals("ite")){
+											rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), setting.getThemeID());
 											if(user_details.getCurrency() >= skin.getPrice()){
 												long new_currency = user_details.getCurrency() - skin.getPrice();
 												var editedRows = 0;
 												Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-												InventoryContent inventory = RankingSystem.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), skin.getShopDescription(), "perm");
+												InventoryContent inventory = RankingSystem.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), skin.getShopDescription(), "perm", setting.getThemeID());
 												if(inventory != null)
-													editedRows = RankingSystem.SQLUpdateCurrencyAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), new_currency, item_id, timestamp, inventory.getNumber()+1);
+													editedRows = RankingSystem.SQLUpdateCurrencyAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), new_currency, item_id, timestamp, inventory.getNumber()+1, setting.getThemeID());
 												else
-													editedRows = RankingSystem.SQLUpdateCurrencyAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), new_currency, item_id, timestamp, 1);
+													editedRows = RankingSystem.SQLUpdateCurrencyAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), new_currency, item_id, timestamp, 1, setting.getThemeID());
 												if(editedRows > 0) {
 													user_details.setCurrency(new_currency);
 													Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
@@ -88,16 +88,16 @@ public class Purchase implements Command{
 							}
 							else if(weapon != null) {
 								if(weapon.getDescription().length() > 0) {
-									rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+									rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), setting.getThemeID());
 									if(user_details.getCurrency() >= weapon.getPrice()) {
 										long new_currency = user_details.getCurrency() - weapon.getPrice();
 										var editedRows = 0;
 										long timestamp = System.currentTimeMillis();
-										InventoryContent inventory = RankingSystemItems.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), weapon.getWeaponID(), "limit");
+										InventoryContent inventory = RankingSystemItems.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), weapon.getWeaponID(), "limit", setting.getThemeID());
 										if(inventory != null)
-											editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertTimedInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), new_currency, weapon.getWeaponID(), timestamp, inventory.getExpiration().getTime(), 1);
+											editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertTimedInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), new_currency, weapon.getWeaponID(), timestamp, inventory.getExpiration().getTime(), 1, setting.getThemeID());
 										else
-											editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertTimedInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), new_currency, weapon.getWeaponID(), timestamp, timestamp, 1);
+											editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertTimedInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), new_currency, weapon.getWeaponID(), timestamp, timestamp, 1, setting.getThemeID());
 										if(editedRows > 0) {
 											user_details.setCurrency(new_currency);
 											Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);

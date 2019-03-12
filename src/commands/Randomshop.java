@@ -6,11 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commandsContainer.RandomshopExecution;
+import core.Guilds;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
+import sql.RankingSystem;
 import sql.RankingSystemItems;
 
 public class Randomshop implements Command{
@@ -28,20 +30,21 @@ public class Randomshop implements Command{
 			
 			var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 			if(e.getTextChannel().getIdLong() == bot_channel || bot_channel == 0) {
+				Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 				final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 				if(e.getMessage().getContentRaw().equals(prefix+"randomshop")) {
 					//run help and collect all possible parameters
-					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()));
+					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()));
 				}
 				else if(e.getMessage().getContentRaw().contains(prefix+"randomshop -play ")) {
 					//start a round
-					RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()), e.getMessage().getContentRaw().substring((e.getMessage().getContentRaw().indexOf("-play")+6)));
+					RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()), e.getMessage().getContentRaw().substring((e.getMessage().getContentRaw().indexOf("-play")+6)));
 				}
 				else if(e.getMessage().getContentRaw().equals(prefix+"randomshop -replay")) {
 					//play another round if a match occurred within 10 minutes
 					File file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_play_"+e.getMember().getUser().getId());
 					if(file.exists() && System.currentTimeMillis() - file.lastModified() < 600000) {
-						RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()), FileSetting.readFile(file.getAbsolutePath()));
+						RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()), FileSetting.readFile(file.getAbsolutePath()));
 					}
 					else {
 						e.getTextChannel().sendMessage("You haven't played one round yet or the last time you played was over 10 minutes ago. Please rewrite the full command").queue();
@@ -51,11 +54,11 @@ public class Randomshop implements Command{
 				}
 				else if(e.getMessage().getContentRaw().contains(prefix+"randomshop ")) {
 					//display the weapons that can be obtained.
-					RandomshopExecution.inspectItems(e, null, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()), e.getMessage().getContentRaw().substring(prefix.length()+11), 1);
+					RandomshopExecution.inspectItems(e, null, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()), e.getMessage().getContentRaw().substring(prefix.length()+11), 1);
 				}
 				else {
 					//if typos occur, run help
-					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()));
+					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()));
 				}
 			}
 			else {

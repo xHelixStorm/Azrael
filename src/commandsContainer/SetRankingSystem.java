@@ -32,7 +32,7 @@ public class SetRankingSystem {
 		if(wrongInput == false){
 			Logger logger = LoggerFactory.getLogger(SetRankingSystem.class);
 			if(RankingSystem.SQLUpdateRankingSystem(_e.getGuild().getIdLong(), _e.getGuild().getName(), ranking_state) > 0) {
-				Guilds guild = Hashes.getStatus(_e.getGuild().getIdLong());
+				Guilds guild = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 				guild.setRankingState(ranking_state);
 				Hashes.addStatus(_e.getGuild().getIdLong(), guild);
 				logger.debug("{} has set the ranking system to {} in guild {}", _e.getMember().getUser().getId(), _input, _e.getGuild().getName());
@@ -43,7 +43,7 @@ public class SetRankingSystem {
 						logger.error("Roles from RankingSystem.roles couldn't be called and cached");
 						_e.getTextChannel().sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
 					}
-					if(RankingSystem.SQLgetLevels(_e.getGuild().getIdLong()) == 0) {
+					if(RankingSystem.SQLgetLevels(_e.getGuild().getIdLong(), guild.getThemeID()) == 0) {
 						logger.error("Levels from RankingSystem.level_list couldn't be called and cached");
 						_e.getTextChannel().sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
 					}

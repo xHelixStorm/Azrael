@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Guilds;
-import core.Hashes;
 import core.UserPrivs;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -34,11 +33,11 @@ public class BotStartAssign implements Runnable{
 		var errAzraelUsers = 0;
 		for(Guild g : e.getJDA().getGuilds()){
 			long guild_id = g.getIdLong();
-			Guilds guild_settings = Hashes.getStatus(guild_id);
+			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 			if(guild_settings.getRankingState() == true){
 				for(Member member : e.getJDA().getGuildById(g.getIdLong()).getMembers()){
 					if(!UserPrivs.isUserBot(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong()) && !UserPrivs.isUserMuted(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong()) && !UserPrivs.isUserCommunity(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong())){
-						Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), g.getIdLong());
+						Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), g.getIdLong(), guild_settings.getThemeID());
 						if(user_details != null){
 							if(user_details.getCurrentRole() != 0){
 								e.getJDA().getGuildById(guild_id).getController().addSingleRoleToMember(member, e.getJDA().getGuildById(guild_id).getRoleById(user_details.getCurrentRole())).queue();

@@ -7,14 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
-import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import inventory.InventoryContent;
 import rankingSystem.WeaponAbbvs;
@@ -27,12 +24,6 @@ public class RankingSystemItems {
 	private static String username = IniFileReader.getSQLUsername2();
 	private static String password = IniFileReader.getSQLPassword2();
 	
-	private static final Map<Long, String> cachedWeaponCategories = new HashMap<Long, String>();
-	private static final Map<Long, String> cachedWeaponAbbreviations = new HashMap<Long, String>();
-	private static final Map<Long, String> cachedWeaponStats = new HashMap<Long, String>();
-	private static final Map<Long, String> cachedWeaponShopContent = new HashMap<Long, String>();
-	
-	
 	public static void SQLconnection(){
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -42,8 +33,8 @@ public class RankingSystemItems {
 	}
 	
 	//inventory
-	public static int SQLgetNumberOfWeaponID(long _guild_id, int _weapon_id) {
-		logger.debug("SQLgetNumberOfWeaponID launched. Params passed {}, {}", _guild_id, _weapon_id);
+	public static int SQLgetNumberOfWeaponID(long _guild_id, int _weapon_id, int _theme_id) {
+		logger.debug("SQLgetNumberOfWeaponID launched. Params passed {}, {}, {}", _guild_id, _weapon_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -53,7 +44,7 @@ public class RankingSystemItems {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _weapon_id);
-			stmt.setInt(3, Hashes.getTheme(GuildIni.getTheme(_guild_id)));
+			stmt.setInt(3, _theme_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				return rs.getInt(1);
@@ -70,8 +61,8 @@ public class RankingSystemItems {
 	}
 	
 	//weapon_shop_content
-	public static int SQLgetRandomWeaponIDByAbbv(long _guild_id, String _abbv, int _stat_id) {
-		logger.debug("SQLgetRandomWeaponIDByAbbv launched. Params passed {}, {}, {}", _guild_id, _abbv, _stat_id);
+	public static int SQLgetRandomWeaponIDByAbbv(long _guild_id, String _abbv, int _stat_id, int _theme_id) {
+		logger.debug("SQLgetRandomWeaponIDByAbbv launched. Params passed {}, {}, {}, {}", _guild_id, _abbv, _stat_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -79,7 +70,7 @@ public class RankingSystemItems {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT weapon_id FROM weapon_shop_content WHERE fk_theme_id = ? AND weapon_abbv LIKE ? AND weapon_stat = ? ORDER BY RAND() LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, Hashes.getTheme(GuildIni.getTheme(_guild_id)));
+			stmt.setInt(1, _theme_id);
 			stmt.setString(2, _abbv);
 			stmt.setInt(3, _stat_id);
 			rs = stmt.executeQuery();
@@ -97,8 +88,8 @@ public class RankingSystemItems {
 		}
 	}
 	
-	public static int SQLgetRandomWeaponIDByCategory(long _guild_id, String _category, int _stat_id) {
-		logger.debug("SQLgetRandomWeaponIDByAbbv launched. Params passed {}, {}, {}", _guild_id, _category, _stat_id);
+	public static int SQLgetRandomWeaponIDByCategory(long _guild_id, String _category, int _stat_id, int _theme_id) {
+		logger.debug("SQLgetRandomWeaponIDByAbbv launched. Params passed {}, {}, {}, {}", _guild_id, _category, _stat_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -106,7 +97,7 @@ public class RankingSystemItems {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = ("SELECT weapon_id FROM weapon_shop_content INNER JOIN weapon_category ON fk_category_id = category_id AND weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id WHERE weapon_shop_content.fk_theme_id = ? AND name LIKE ?  AND weapon_stat = ? ORDER BY RAND() LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, Hashes.getTheme(GuildIni.getTheme(_guild_id)));
+			stmt.setInt(1, _theme_id);
 			stmt.setString(2, _category);
 			stmt.setInt(3, _stat_id);
 			rs = stmt.executeQuery();
@@ -125,12 +116,10 @@ public class RankingSystemItems {
 	}
 	
 	//weapon_category
-	public static ArrayList<String> SQLgetWeaponCategories(long _guild_id){
-		logger.debug("SQLgetWeaponCategories launched. Params passed {}", _guild_id);
+	public static ArrayList<String> SQLgetWeaponCategories(long _guild_id, int _theme_id){
+		logger.debug("SQLgetWeaponCategories launched. Params passed {}, {}", _guild_id, _theme_id);
 		ArrayList<String> categories = new ArrayList<String>();
-		String theme = GuildIni.getTheme(_guild_id);
-		if(Hashes.getWeaponCategories(_guild_id) == null || !cachedWeaponCategories.get(_guild_id).equals(theme)) {
-			cachedWeaponCategories.put(_guild_id, theme);
+		if(Hashes.getWeaponCategories(_guild_id) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -138,7 +127,7 @@ public class RankingSystemItems {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT DISTINCT(name) FROM weapon_category WHERE fk_theme_id = ? AND skill = 0");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setInt(1, Hashes.getTheme(theme));
+				stmt.setInt(1, _theme_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					categories.add(rs.getString(1));
@@ -158,12 +147,10 @@ public class RankingSystemItems {
 	}
 	
 	//weapon_abbreviation
-	public static ArrayList<WeaponAbbvs> SQLgetWeaponAbbvs(long _guild_id) {
-		logger.debug("SQLgetWeaponAbbvs launched. Params passed {}", _guild_id);
+	public static ArrayList<WeaponAbbvs> SQLgetWeaponAbbvs(long _guild_id, int _theme_id) {
+		logger.debug("SQLgetWeaponAbbvs launched. Params passed {}, {}", _guild_id, _theme_id);
 		ArrayList<WeaponAbbvs> abbreviations = new ArrayList<WeaponAbbvs>();
-		String theme = GuildIni.getTheme(_guild_id);
-		if(Hashes.getWeaponAbbreviations(_guild_id) == null | !cachedWeaponAbbreviations.get(_guild_id).equals(theme)) {
-			cachedWeaponAbbreviations.put(_guild_id, theme);
+		if(Hashes.getWeaponAbbreviations(_guild_id) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -171,7 +158,7 @@ public class RankingSystemItems {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT abbv, description FROM weapon_abbreviation WHERE fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setInt(1, Hashes.getTheme(theme));;
+				stmt.setInt(1, _theme_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					WeaponAbbvs abbreviation = new WeaponAbbvs(rs.getString(1), rs.getString(2));
@@ -192,11 +179,10 @@ public class RankingSystemItems {
 	}
 	
 	//weapon_stats
-	public static ArrayList<WeaponStats> SQLgetWeaponStats(long _guild_id) {
-		logger.debug("SQLgetWeaponStats launched. Params passed {}", _guild_id);
+	public static ArrayList<WeaponStats> SQLgetWeaponStats(long _guild_id, int _theme_id) {
+		logger.debug("SQLgetWeaponStats launched. Params passed {}, {}", _guild_id, _theme_id);
 		ArrayList<WeaponStats> stats = new ArrayList<WeaponStats>();
-		String theme = GuildIni.getTheme(_guild_id);
-		if(Hashes.getWeaponStats(_guild_id) == null || !cachedWeaponStats.get(_guild_id).equals(theme)) {
+		if(Hashes.getWeaponStats(_guild_id) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -204,7 +190,7 @@ public class RankingSystemItems {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT stat_id, stat FROM weapon_stats WHERE fk_theme_id = ? AND weapon = 1");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setInt(1, Hashes.getTheme(theme));
+				stmt.setInt(1, _theme_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					WeaponStats stat = new WeaponStats(rs.getInt(1), rs.getString(2));
@@ -225,11 +211,10 @@ public class RankingSystemItems {
 	}
 	
 	//JOINS
-	public static ArrayList<Weapons> SQLgetWholeWeaponShop(long _guild_id){
+	public static ArrayList<Weapons> SQLgetWholeWeaponShop(long _guild_id, int _theme_id){
 		logger.debug("SQLgetWholeWeaponShop launched. Params passed {}", _guild_id);
 		ArrayList<Weapons> weapons = new ArrayList<Weapons>();
-		String theme = GuildIni.getTheme(_guild_id);
-		if(Hashes.getWeaponShopContent(_guild_id) == null || !cachedWeaponShopContent.get(_guild_id).equals(theme)) {
+		if(Hashes.getWeaponShopContent(_guild_id) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -237,7 +222,7 @@ public class RankingSystemItems {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT s.weapon_id, s.description, s.price, s.weapon_abbv, s.fk_skin, s.weapon_stat, w.stat, s.fk_category_id, c.name, o.overlay, s.enabled FROM weapon_shop_content s INNER JOIN weapon_stats w ON s.weapon_stat = w.stat_id INNER JOIN weapon_category c ON s.fk_category_id = c.category_id && s.fk_theme_id = c.fk_theme_id INNER JOIN randomshop_reward_overlays o ON s.fk_overlay_id = o.overlay_id  && s.fk_theme_id = o.fk_theme_id WHERE s.fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setInt(1, Hashes.getTheme(theme));
+				stmt.setInt(1, _theme_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					Weapons weapon = new Weapons(
@@ -269,8 +254,8 @@ public class RankingSystemItems {
 		return Hashes.getWeaponShopContent(_guild_id);
 	}
 	
-	public static InventoryContent SQLgetNumberAndExpirationFromInventory(long _user_id, long _guild_id, int _weapon_id, String _status){
-		logger.debug("SQLgetNumberAndExpirationFromInventory launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _weapon_id, _status);
+	public static InventoryContent SQLgetNumberAndExpirationFromInventory(long _user_id, long _guild_id, int _weapon_id, String _status, int _theme_id){
+		logger.debug("SQLgetNumberAndExpirationFromInventory launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _weapon_id, _status, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -282,7 +267,7 @@ public class RankingSystemItems {
 			stmt.setInt(2, _weapon_id);
 			stmt.setString(3, _status);
 			stmt.setLong(4, _guild_id);
-			stmt.setInt(5, Hashes.getTheme(GuildIni.getTheme(_guild_id)));
+			stmt.setInt(5, _theme_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				InventoryContent inventory = new InventoryContent();
@@ -303,8 +288,8 @@ public class RankingSystemItems {
 	
 	//Transaction
 	@SuppressWarnings("resource")
-	public static int SQLUpdateCurrencyAndInsertTimedInventory(long _user_id, long _guild_id, long _currency, int _item_id, long _position, long _expires, int _number){
-		logger.debug("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _position, _expires, _number);
+	public static int SQLUpdateCurrencyAndInsertTimedInventory(long _user_id, long _guild_id, long _currency, int _item_id, long _position, long _expires, int _number, int _theme_id){
+		logger.debug("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _position, _expires, _number, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -325,7 +310,7 @@ public class RankingSystemItems {
 			stmt.setInt(4, _number);
 			stmt.setTimestamp(5, new Timestamp(_expires+604800000));
 			stmt.setLong(6, _guild_id);
-			stmt.setInt(7, Hashes.getTheme(GuildIni.getTheme(_guild_id)));
+			stmt.setInt(7, _theme_id);
 			var editedRows = stmt.executeUpdate();
 			myConn.commit();	
 			return editedRows;
@@ -344,8 +329,8 @@ public class RankingSystemItems {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLUpdateCurrencyAndInsertWeaponRandomshop(long _user_id, long _guild_id, long _currency, int _weapon_id, Timestamp _timestamp, int _number){
-		logger.debug("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _weapon_id, _timestamp, _number);
+	public static int SQLUpdateCurrencyAndInsertWeaponRandomshop(long _user_id, long _guild_id, long _currency, int _weapon_id, Timestamp _timestamp, int _number, int _theme_id){
+		logger.debug("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _weapon_id, _timestamp, _number, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -360,14 +345,13 @@ public class RankingSystemItems {
 			
 			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_weapon_id, position, number, fk_status, fk_guild_id, fk_theme_id) SELECT ?, weapon_id, ?, ?, 'perm', ?, ? FROM weapon_shop_content WHERE weapon_id = ? AND fk_theme_id = ? ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number)");
 			stmt = myConn.prepareStatement(sql2);
-			var theme = Hashes.getTheme(GuildIni.getTheme(_guild_id));
 			stmt.setLong(1, _user_id);
 			stmt.setTimestamp(2, _timestamp);
 			stmt.setInt(3, _number);
 			stmt.setLong(4, _guild_id);
-			stmt.setInt(5, theme);
+			stmt.setInt(5, _theme_id);
 			stmt.setInt(6, _weapon_id);
-			stmt.setInt(7, theme);
+			stmt.setInt(7, _theme_id);
 			var editedRows = stmt.executeUpdate();
 			myConn.commit();	
 			return editedRows;

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Hashes;
+import core.Guilds;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
@@ -34,6 +34,7 @@ public class RoleExtend implements Runnable{
 		long channel_id = Azrael.SQLgetChannelID(guild_id, "log");
 		int i = 0;
 		
+		Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 		for(Member member : e.getJDA().getGuildById(guild_id).getMembersWithRoles(mute_role)){
 			long unmute;
 			try{
@@ -44,10 +45,10 @@ public class RoleExtend implements Runnable{
 			if(unmute < 0){unmute = 0;}
 			long assignedRole = 0;
 			boolean rankingState = false;
-			Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), guild_id);
+			Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), guild_id, guild_settings.getThemeID());
 			if(user_details != null){
 				assignedRole = user_details.getCurrentRole();
-				rankingState = Hashes.getStatus(guild_id).getRankingState();
+				rankingState = guild_settings.getRankingState();
 			}
 			users.add(member);
 			banHammerFound = true;

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Guilds;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
@@ -116,10 +117,11 @@ public class RandomshopExecution {
 				
 				//second, check if anything has been found, else interrupt the process
 				if(abbv != null || category != null) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
-					final long price = GuildIni.getRandomshopPrice(e.getGuild().getIdLong());
+					Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
+					Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
+					final long price = guild_settings.getRandomshopPrice();
 					if(user_details.getCurrency() >= price) {
-						List<WeaponStats> stats = RankingSystemItems.SQLgetWeaponStats(e.getGuild().getIdLong());
+						List<WeaponStats> stats = RankingSystemItems.SQLgetWeaponStats(e.getGuild().getIdLong(), guild_settings.getThemeID());
 						if(stats.size() > 0) {
 							final int rand = ThreadLocalRandom.current().nextInt(0, (stats.size()-1));
 							user_details.setCurrency(user_details.getCurrency()-price);
@@ -127,10 +129,10 @@ public class RandomshopExecution {
 							var editedRows = 0;
 							//get a random weapon id basing of either abbreviation or category and the random stat
 							if(abbv != null) {
-								weapon_id = RankingSystemItems.SQLgetRandomWeaponIDByAbbv(e.getGuild().getIdLong(), abbv, stats.get(rand).getID());
-								final var number = RankingSystemItems.SQLgetNumberOfWeaponID(e.getGuild().getIdLong(), weapon_id);
+								weapon_id = RankingSystemItems.SQLgetRandomWeaponIDByAbbv(e.getGuild().getIdLong(), abbv, stats.get(rand).getID(), guild_settings.getThemeID());
+								final var number = RankingSystemItems.SQLgetNumberOfWeaponID(e.getGuild().getIdLong(), weapon_id, guild_settings.getThemeID());
 								if(weapon_id > 0) {
-									editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1));
+									editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1), guild_settings.getThemeID());
 								}
 								else {
 									e.getTextChannel().sendMessage("Weapons for this weapon type have not been configured. Please contact an administrator!").queue();
@@ -138,10 +140,10 @@ public class RandomshopExecution {
 								}
 							}
 							else {
-								weapon_id = RankingSystemItems.SQLgetRandomWeaponIDByCategory(e.getGuild().getIdLong(), category, stats.get(rand).getID());
-								final var number = RankingSystemItems.SQLgetNumberOfWeaponID(e.getGuild().getIdLong(), weapon_id);
+								weapon_id = RankingSystemItems.SQLgetRandomWeaponIDByCategory(e.getGuild().getIdLong(), category, stats.get(rand).getID(), guild_settings.getThemeID());
+								final var number = RankingSystemItems.SQLgetNumberOfWeaponID(e.getGuild().getIdLong(), weapon_id, guild_settings.getThemeID());
 								if(weapon_id > 0) {
-									editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1));
+									editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1), guild_settings.getThemeID());
 								}
 								else {
 									e.getTextChannel().sendMessage("Weapons for this weapon category have not been configured. Please contact an administrator!").queue();
@@ -152,7 +154,7 @@ public class RandomshopExecution {
 							if(editedRows > 0) {
 								//draw won item from the Randomshop
 								final int weapon = weapon_id;
-								RandomshopRewardDrawer.drawReward(e, RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong()).parallelStream().filter(w -> w.getWeaponID() == weapon).findAny().orElse(null), user_details.getCurrency());
+								RandomshopRewardDrawer.drawReward(e, RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(w -> w.getWeaponID() == weapon).findAny().orElse(null), user_details.getCurrency());
 								FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_play_"+e.getMember().getUser().getId(), input);
 							}
 							else if(weapon_id > 0){
@@ -209,10 +211,10 @@ public class RandomshopExecution {
 				if(abbv != null || category != null) {
 					List<Weapons> weapons;
 					if(abbv != null) {
-						weapons = RankingSystemItems.SQLgetWholeWeaponShop((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong())).parallelStream().filter(w -> w.getWeaponAbbv().equalsIgnoreCase(abbv) && w.getStat() == 1).collect(Collectors.toList());
+						weapons = RankingSystemItems.SQLgetWholeWeaponShop((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()), RankingSystem.SQLgetGuild((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong())).getThemeID()).parallelStream().filter(w -> w.getWeaponAbbv().equalsIgnoreCase(abbv) && w.getStat() == 1).collect(Collectors.toList());
 					}
 					else {
-						weapons = RankingSystemItems.SQLgetWholeWeaponShop((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong())).parallelStream().filter(w -> w.getCategoryDescription().equalsIgnoreCase(category) && w.getStat() == 1).collect(Collectors.toList());
+						weapons = RankingSystemItems.SQLgetWholeWeaponShop((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()), RankingSystem.SQLgetGuild((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong())).getThemeID()).parallelStream().filter(w -> w.getCategoryDescription().equalsIgnoreCase(category) && w.getStat() == 1).collect(Collectors.toList());
 					}
 					
 					var maxItems = GuildIni.getRandomshopItemsMaxItems((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()));

@@ -5,7 +5,7 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Hashes;
+import core.Guilds;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
@@ -30,7 +30,8 @@ public class Inventory implements Command{
 			Logger logger = LoggerFactory.getLogger(Inventory.class);
 			logger.debug("{} has used Inventory command", e.getMember().getUser().getId());
 			
-			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
+			Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
+			if(guild_settings.getRankingState()){
 				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 				if(bot_channel == e.getTextChannel().getIdLong() || bot_channel == 0){
 					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
@@ -43,7 +44,7 @@ public class Inventory implements Command{
 					}
 					else if(e.getMessage().getContentRaw().equals(prefix+"inventory -list")){
 						String out = "";
-						for(InventoryContent inventory : RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())){
+						for(InventoryContent inventory : RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID())){
 							out+= (inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+" "+inventory.getStat())+"\n";
 						}
 						e.getTextChannel().sendMessage("```"+out+"```").queue();
@@ -52,21 +53,21 @@ public class Inventory implements Command{
 						int limit = 0;
 						int itemNumber;
 						String lastWord = e.getMessage().getContentRaw().substring(e.getMessage().getContentRaw().lastIndexOf(" ")+1).toLowerCase();
-						String sub_cat = RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong()).parallelStream().filter(c -> c.equalsIgnoreCase(lastWord)).findAny().orElse(null);
+						String sub_cat = RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(c -> c.equalsIgnoreCase(lastWord)).findAny().orElse(null);
 						final var maxItems = GuildIni.getInventoryMaxItems(e.getGuild().getIdLong());
 						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
-							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "ite", maxItems);
+							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "ite", maxItems, guild_settings.getThemeID());
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("weapons")) {
 							if(!lastWord.equals("weapons") && sub_cat != null)
-								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems, true, lastWord);
+								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems, true, lastWord, guild_settings.getThemeID());
 							else
-								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems, false);
+								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems, false, guild_settings.getThemeID());
 						}
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("skins")) {
-							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems, "ite", true);
+							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems, "ite", true, guild_settings.getThemeID());
 						}
 						else
-							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems);
+							itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems, guild_settings.getThemeID());
 						if(e.getMessage().getContentRaw().contains(prefix+"inventory -page ")){
 							try {
 								limit = Integer.parseInt(e.getMessage().getContentRaw().replaceAll("[^0-9]", ""))-1;
@@ -80,24 +81,24 @@ public class Inventory implements Command{
 						
 						String drawTab = "";
 						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
-							InventoryBuilder.DrawInventory(e, null, "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1);
+							InventoryBuilder.DrawInventory(e, null, "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems, guild_settings.getThemeID()), limit/maxItems+1, itemNumber+1);
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("weapons")) {
 							if(!lastWord.equals("weapons") && sub_cat != null) {
 								drawTab = "weapons_"+lastWord;
-								InventoryBuilder.DrawInventory(e, null, "weapons", lastWord, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems, lastWord), limit/maxItems+1, itemNumber+1);
+								InventoryBuilder.DrawInventory(e, null, "weapons", lastWord, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems, lastWord, guild_settings.getThemeID()), limit/maxItems+1, itemNumber+1);
 							}
 							else {
 								drawTab = "weapons_total";
-								InventoryBuilder.DrawInventory(e, null, "weapons", "total", RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1);
+								InventoryBuilder.DrawInventory(e, null, "weapons", "total", RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems, guild_settings.getThemeID()), limit/maxItems+1, itemNumber+1);
 							}
 						}
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("skins")) {
 							drawTab = "skins_total";
-							InventoryBuilder.DrawInventory(e, null, "skins", "total", RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1);
+							InventoryBuilder.DrawInventory(e, null, "skins", "total", RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems, guild_settings.getThemeID()), limit/maxItems+1, itemNumber+1);
 						}
 						else {
 							drawTab = "total_total";
-							InventoryBuilder.DrawInventory(e, null, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1);
+							InventoryBuilder.DrawInventory(e, null, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems, guild_settings.getThemeID()), limit/maxItems+1, itemNumber+1);
 						}
 						
 						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+(limit/maxItems+1)+"_"+(itemNumber+1)+"_"+drawTab);

@@ -14,7 +14,6 @@ import core.Hashes;
 import core.Messages;
 import core.User;
 import fileManagement.FileSetting;
-import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -73,7 +72,7 @@ public class UserExecution {
 		
 		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17)) {
 			if(user_name != null && user_name.length() > 0) {
-				RankingSystem.SQLgetWholeRankView(Long.parseLong(raw_input), _e.getGuild().getIdLong());
+				RankingSystem.SQLgetWholeRankView(Long.parseLong(raw_input), _e.getGuild().getIdLong(), RankingSystem.SQLgetGuild(_e.getGuild().getIdLong()).getThemeID());
 				_e.getTextChannel().sendMessage(message.setDescription("The user has been found in this guild! Now type one of the following words within 3 minutes to execute an action!\n\n"
 						+ "**information**: To display all details of the selected user\n"
 						+ "**delete-messages**: To remove up to 100 messages from the selected user\n"
@@ -104,6 +103,7 @@ public class UserExecution {
 		String file_path = _file_name;
 		String file_value = FileSetting.readFile(file_path);
 		if(!file_value.equals("complete")) {
+			Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 			if(_message.equalsIgnoreCase("information") || _message.equalsIgnoreCase("delete-messages") || _message.equalsIgnoreCase("warning") || _message.equalsIgnoreCase("mute") || _message.equalsIgnoreCase("ban") || _message.equalsIgnoreCase("kick") || _message.equalsIgnoreCase("gift-experience") || _message.equalsIgnoreCase("set-experience") || _message.equalsIgnoreCase("set-level") || _message.equalsIgnoreCase("gift-currency") || _message.equalsIgnoreCase("set-currency")) {
 				switch(_message) {
 					case "information": 
@@ -122,8 +122,7 @@ public class UserExecution {
 						message.addField("JOIN DATE", "**"+user.getJoinDate()+"**", true);
 						message.addField("USER ID", "**"+file_value+"**", true);
 						message.addBlankField(false);
-						Rank user_details = Hashes.getRanking(_e.getGuild().getId()+"_"+file_value);
-						Guilds guild_settings = Hashes.getStatus(_e.getGuild().getIdLong());
+						Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(file_value), _e.getGuild().getIdLong(), guild_settings.getThemeID());
 						if(guild_settings.getRankingState() == true) {
 							message.addField("LEVEL", "**"+user_details.getLevel()+"**/**"+guild_settings.getMaxLevel()+"**", true);
 							message.addField("EXPERIENCE", "**"+user_details.getCurrentExperience()+"**/**"+user_details.getRankUpExperience()+"**", true);
@@ -191,7 +190,7 @@ public class UserExecution {
 						FileSetting.createFile(file_path, "kick"+file_value);
 						break;
 					case "gift-experience":
-						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
+						if(guild_settings.getRankingState()) {
 							message.setTitle("You chose to gift experience points!");
 							_e.getTextChannel().sendMessage(message.setDescription("Choose a number of experience points to add to the total number of experience points").build()).queue();
 							FileSetting.createFile(file_path, "gift-experience"+file_value);
@@ -202,7 +201,7 @@ public class UserExecution {
 						}
 						break;
 					case "set-experience":
-						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
+						if(guild_settings.getRankingState()) {
 							message.setTitle("You chose to set experience points!");
 							_e.getTextChannel().sendMessage(message.setDescription("Choose a number of experience points to set for the user").build()).queue();
 							FileSetting.createFile(file_path, "set-experience"+file_value);
@@ -213,7 +212,7 @@ public class UserExecution {
 						}
 						break;
 					case "set-level":
-						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
+						if(guild_settings.getRankingState()) {
 							message.setTitle("You chose to set a level!");
 							_e.getTextChannel().sendMessage(message.setDescription("Choose a level to assign the user").build()).queue();
 							FileSetting.createFile(file_path, "set-level"+file_value);
@@ -224,7 +223,7 @@ public class UserExecution {
 						}
 						break;
 					case "gift-currency":
-						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
+						if(guild_settings.getRankingState()) {
 							message.setTitle("You chose to gift money!");
 							_e.getTextChannel().sendMessage(message.setDescription("Choose the amount of money to gift the user").build()).queue();
 							FileSetting.createFile(file_path, "gift-currency"+file_value);
@@ -235,7 +234,7 @@ public class UserExecution {
 						}
 						break;
 					case "set-currency":
-						if(Hashes.getStatus(_e.getGuild().getIdLong()).getRankingState()) {
+						if(guild_settings.getRankingState()) {
 							message.setTitle("You chose to set money!");
 							_e.getTextChannel().sendMessage(message.setDescription("Choose the amount of money to set for the user").build()).queue();
 							FileSetting.createFile(file_path, "set-currency"+file_value);
@@ -463,7 +462,7 @@ public class UserExecution {
 			}
 			else if(file_value.replaceAll("[0-9]*",	"").equalsIgnoreCase("gift-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = Hashes.getRanking(_e.getGuild().getId()+"_"+file_value.replaceAll("[^0-9]*", ""));
+					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), guild_settings.getThemeID());
 					long experience = Integer.parseInt(_message);
 					long totExperience = 0;
 					long currentExperience = 0;
@@ -519,7 +518,7 @@ public class UserExecution {
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("set-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = Hashes.getRanking(_e.getGuild().getId()+"_"+file_value.replaceAll("[^0-9]*", ""));
+					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), guild_settings.getThemeID());
 					long experience = Long.parseLong(_message);
 					long totExperience = 0;
 					long currentExperience = 0;
@@ -576,8 +575,8 @@ public class UserExecution {
 			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("set-level")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					int level = Integer.parseInt(_message);
-					if(level <= Hashes.getStatus(_e.getGuild().getIdLong()).getMaxLevel()) {
-						Rank user_details = Hashes.getRanking(_e.getGuild().getId()+"_"+file_value.replaceAll("[^0-9]*", ""));
+					if(level <= guild_settings.getMaxLevel()) {
+						Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), guild_settings.getThemeID());
 						long experience = 0;
 						long rankUpExperience = 0;
 						long assign_role = 0;
@@ -623,17 +622,17 @@ public class UserExecution {
 						}
 					}
 					else {
-						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please choose a level that is lower or equal to "+Hashes.getStatus(_e.getGuild().getIdLong()).getMaxLevel()).queue();
+						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please choose a level that is lower or equal to "+guild_settings.getMaxLevel()).queue();
 					}
 				}
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("gift-currency")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = Hashes.getRanking(_e.getGuild().getId()+"_"+file_value.replaceAll("[^0-9]*", ""));
+					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), guild_settings.getThemeID());
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(user_details.getCurrency()+currency);
 					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getCurrency()) > 0) {
-						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money gifted", "User received money in value of "+currency+" "+GuildIni.getCurrency(_e.getGuild().getIdLong()));
+						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money gifted", "User received money in value of "+currency+" "+guild_settings.getCurrency());
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						_e.getTextChannel().sendMessage("Currency has been updated!").queue();
 						logger.debug("{} has gifted {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
@@ -647,11 +646,11 @@ public class UserExecution {
 			}
 			else if(file_value.replaceAll("[0-9]*", "").equalsIgnoreCase("set-currency")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = Hashes.getRanking(_e.getGuild().getId()+"_"+file_value.replaceAll("[^0-9]*", ""));
+					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(file_value.replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), guild_settings.getThemeID());
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(currency);
 					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getCurrency()) > 0) {
-						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money set", "Currency value for the user has been changed to "+currency+" "+GuildIni.getCurrency(_e.getGuild().getIdLong()));
+						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money set", "Currency value for the user has been changed to "+currency+" "+guild_settings.getCurrency());
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						_e.getTextChannel().sendMessage("Currency has been updated!").queue();
 						logger.debug("{} has set {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());

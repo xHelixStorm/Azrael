@@ -42,7 +42,7 @@ public class GuildListener extends ListenerAdapter {
 			if(channel_id != 0) e.getGuild().getTextChannelById(channel_id).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **Azrael.users** table").build()).queue();
 			logger.error("User {} couldn't be inserted into the table Azrael.users for guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 		}
-		Guilds guild_settings = Hashes.getStatus(guild_id);
+		Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 		if(guild_settings.getRankingState() == true){
 			if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
 				if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, 50000, 0) == 0) {
@@ -75,8 +75,8 @@ public class GuildListener extends ListenerAdapter {
 			e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
 		}
 		else{
-			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState()){
-				Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
+			if(guild_settings.getRankingState()){
+				Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
 				if(user_details.getCurrentRole() != 0){e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(user_details.getCurrentRole())).queue();}
 			}
 		}

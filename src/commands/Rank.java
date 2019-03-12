@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Hashes;
+import core.Guilds;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -50,9 +50,10 @@ public class Rank implements Command{
 					String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_rank.azr";
 					File file = new File(fileName);
 					
-					rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
+					Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
+					rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
 					
-					if(Hashes.getStatus(guild_id).getRankingState()){				
+					if(guild_settings.getRankingState()){				
 						if(!file.exists()){
 							try {
 								file.createNewFile();
@@ -70,7 +71,7 @@ public class Rank implements Command{
 							int level = user_details.getLevel();
 							float currentExperience = user_details.getCurrentExperience();
 							float rankUpExperience = user_details.getRankUpExperience();
-							int max_level = Hashes.getStatus(guild_id).getMaxLevel();
+							int max_level = guild_settings.getMaxLevel();
 							int rank_skin = user_details.getRankingRank();
 							int icon_skin = user_details.getRankingIcon();
 							int bar_color = user_details.getBarColorRank();
@@ -83,31 +84,39 @@ public class Rank implements Command{
 							int rank_width = user_details.getRankWidthRank();
 							int rank_height = user_details.getRankHeightRank();
 							
-							if(level == max_level){currentExperience = 999999; rankUpExperience = 999999;}
-							
-							experienceCounter = (currentExperience / rankUpExperience)*100;
-							convertedExperience = (int) experienceCounter;
-							if(convertedExperience > 100) {
-								convertedExperience = 100;
-							}
-							
-							ArrayList<rankingSystem.Rank> rankList = RankingSystem.SQLRanking(guild_id);
-							if(rankList.size() > 0) {
-								search: for(rankingSystem.Rank ranking : rankList){
-									if(user_id == ranking.getUser_ID()){
-										rank = ranking.getRank();
-										break search;
+							if(rank_skin != 0 && icon_skin != 0) {
+								if(level == max_level){currentExperience = 999999; rankUpExperience = 999999;}
+								
+								experienceCounter = (currentExperience / rankUpExperience)*100;
+								convertedExperience = (int) experienceCounter;
+								if(convertedExperience > 100) {
+									convertedExperience = 100;
+								}
+								
+								ArrayList<rankingSystem.Rank> rankList = RankingSystem.SQLRanking(guild_id);
+								if(rankList.size() > 0) {
+									search: for(rankingSystem.Rank ranking : rankList){
+										if(user_id == ranking.getUser_ID()){
+											rank = ranking.getRank();
+											break search;
+										}
 									}
 								}
-							}
-							
-							if(currentExperience >= 0) {
-								RankingMethods.getRank(e, name, avatar, convertedExperience, level, rank, rank_skin, icon_skin, bar_color, additional_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
+								
+								if(currentExperience >= 0) {
+									RankingMethods.getRank(e, name, avatar, convertedExperience, level, rank, rank_skin, icon_skin, bar_color, additional_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
+								}
+								else {
+									EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
+									e.getTextChannel().sendMessage(error.setDescription("An error occured on use. Please contact an administrator or moderator!").build()).queue();
+									RankingSystem.SQLInsertActionLog("critical", user_id, guild_id, "negative experience value", "The user has less experience points in proportion to his level: "+currentExperience);
+									logger.error("Negative experience valur for {} in guild {}", user_id, e.getGuild().getName());
+								}
 							}
 							else {
 								EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
-								e.getTextChannel().sendMessage(error.setDescription("An error occured on use. Please contact an administrator or moderator!").build()).queue();
-								RankingSystem.SQLInsertActionLog("critical", user_id, guild_id, "negative experience value", "The user has less experience points in proportion to his level: "+currentExperience);
+								e.getTextChannel().sendMessage(error.setDescription("Default skins aren't defined. Please contact an administrator!").build()).queue();
+								logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 							}
 						}
 						else{

@@ -5,10 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import commandsContainer.ShopExecution;
 import core.Guilds;
-import core.Hashes;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
+import sql.RankingSystem;
 import sql.RankingSystemItems;
 
 public class Shop implements Command{
@@ -25,10 +25,10 @@ public class Shop implements Command{
 			logger.debug("{} has used Shop command", e.getMember().getUser().getId());
 			
 			String input = e.getMessage().getContentRaw();
-			if(Hashes.getStatus(e.getGuild().getIdLong()).getRankingState() == true){
+			Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
+			if(guild_settings.getRankingState() == true){
 				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
 				if(bot_channel == 0 || e.getTextChannel().getIdLong() == bot_channel){
-					Guilds guild_settings = Hashes.getStatus(e.getGuild().getIdLong());
 					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 					if(input.toUpperCase().equals(prefix.toUpperCase()+"SHOP LEVEL UPS")) {
 						ShopExecution.displayPartOfShop(e, "lev", guild_settings.getLevelDescription());
@@ -47,7 +47,7 @@ public class Shop implements Command{
 					}
 					else if(input.toUpperCase().equals(prefix.toUpperCase()+"SHOP WEAPONS")) {
 						StringBuilder builder = new StringBuilder();
-						for(String category : RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong())) {
+						for(String category : RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID())) {
 							builder.append(category+", ");
 						}
 						e.getTextChannel().sendMessage("Use these weapon sections to filter the weapons you wish to purchase together with the command:\n**"+builder.toString()+"**").queue();

@@ -62,7 +62,7 @@ public class Display implements Command{
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
 			else if(message.equals(prefix+"display -ranking-roles")){
-				if(Hashes.getStatus(guild_id).getRankingState()){
+				if(RankingSystem.SQLgetGuild(guild_id).getRankingState()){
 					for(rankingSystem.Rank r : Hashes.getMapOfRankingRoles().values()){
 						if(r.getGuildID() == guild_id){
 							out += r.getRole_Name() + " (" + r.getRoleID() + ") \nlevel to unlock: " + r.getLevel_Requirement() + "\n";
@@ -113,7 +113,7 @@ public class Display implements Command{
 				}
 			}
 			else if(message.equals(prefix+"display -dailies")){
-				for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id)){
+				for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID())){
 					out+= daily.getDescription()+"\nWeight: "+daily.getWeight()+"\n\n";
 				}
 				e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? "You can receive the following items through dailies:\n\n"+out : "No daily item has been registered!").build()).queue();
