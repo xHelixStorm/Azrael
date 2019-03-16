@@ -28,6 +28,14 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Bot", "Admin", long.class);
 	}
+	public static boolean getCountMembers() {
+		readConfig();
+		return ini.get("Bot", "CountMembers", boolean.class);
+	}
+	public static String getGameMessage(){
+		readConfig();
+		return ini.get("Bot", "GameMessage");
+	}
 	public static boolean getActionLog(){
 		readConfig();
 		return ini.get("Bot", "ActionLog", boolean.class);

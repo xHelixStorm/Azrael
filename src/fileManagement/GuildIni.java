@@ -18,8 +18,6 @@ public class GuildIni {
 			ini.add("General", "Theme", "");
 			ini.add("General", "Administrator", "");
 			ini.add("General", "CommandPrefix", "");
-			ini.add("General", "CountMembers", "false");
-			ini.add("General", "GameMessage", "");
 			ini.add("General", "JoinMessage", "false");
 			ini.add("General", "LeaveMessage", "false");
 			ini.add("General", "ChannelLog", "false");
@@ -132,16 +130,6 @@ public class GuildIni {
 	public static String getCommandPrefix(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "CommandPrefix");
-	}
-	
-	public static boolean getCountMembers(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("General", "CountMembers", boolean.class);
-	}
-
-	public static String getGameMessage(long guild_id){
-		Ini ini = readIni(guild_id);
-		return ini.get("General", "GameMessage");
 	}
 	
 	public static boolean getJoinMessage(long guild_id){
