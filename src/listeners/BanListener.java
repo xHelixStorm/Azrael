@@ -43,7 +43,7 @@ public class BanListener extends ListenerAdapter{
 		Azrael.SQLInsertActionLog("MEMBER_BAN_ADD", user_id, guild_id, "User Banned");
 		
 		try {
-			Thread.sleep(100);
+			Thread.sleep(1000);
 		} catch (InterruptedException e1) {}
 	}
 }

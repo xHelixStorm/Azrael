@@ -965,7 +965,7 @@ public class PugExecution {
 				e.getTextChannel().sendFile(file, "pug.png", null).complete();
 			}
 			
-			else if(variable.equals(prefix+"pug help")){
+			else if(variable.equals(prefix+"pug")){
 				long channel = e.getTextChannel().getIdLong();
 				if(channel == channel_id || channel_id == 0){
 					e.getTextChannel().sendMessage(messageBuild.setDescription(commandInfo).build()).queue();

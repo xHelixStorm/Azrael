@@ -33,16 +33,20 @@ public class Meow implements Command{
 				
 				long channel_id = Azrael.SQLgetChannelID(guild_id, "bot");
 				
-				if(variable.equals("H!meow")){
-					e.getTextChannel().sendMessage("Please, type H!meow help to check the usage").queue();
+				var execution_id = Azrael.SQLgetExecutionID(guild_id);
+				if(execution_id == 0){
+					e.getTextChannel().sendMessage("This type of command is disabled on this server. Please ask an administrator or moderator to enable it!").queue();
 				}
-				else{
-					var execution_id = Azrael.SQLgetExecutionID(guild_id);
-					if(execution_id == 0){
-						e.getTextChannel().sendMessage("This type of command is disabled on this server. Please ask an administrator or moderator to enable it!").queue();
+				else if(execution_id == 2 || execution_id == 1){
+					if(execution_id != 1){
+						try {
+							MeowExecution.Execute(e, variable, path, channel_id);
+						} catch (IOException e1) {
+							logger.error("Selected meow picture couldn't be found", e1);
+						}
 					}
-					else if(execution_id == 2 || execution_id == 1){
-						if(execution_id != 1){
+					else{
+						if(channel_id == channel){
 							try {
 								MeowExecution.Execute(e, variable, path, channel_id);
 							} catch (IOException e1) {
@@ -50,16 +54,7 @@ public class Meow implements Command{
 							}
 						}
 						else{
-							if(channel_id == channel){
-								try {
-									MeowExecution.Execute(e, variable, path, channel_id);
-								} catch (IOException e1) {
-									logger.error("Selected meow picture couldn't be found", e1);
-								}
-							}
-							else{
-								e.getTextChannel().sendMessage("This command can be used only in <#"+channel_id+">").queue();
-							}
+							e.getTextChannel().sendMessage("This command can be used only in <#"+channel_id+">").queue();
 						}
 					}
 				}

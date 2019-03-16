@@ -80,8 +80,10 @@ public class Inventory implements Command{
 						}
 						
 						String drawTab = "";
-						if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
+						if(e.getMessage().getContentRaw().toLowerCase().contains("items")) {
+							drawTab = "items_total";
 							InventoryBuilder.DrawInventory(e, null, "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems, guild_settings.getThemeID()), limit/maxItems+1, itemNumber+1);
+						}
 						else if(e.getMessage().getContentRaw().toLowerCase().contains("weapons")) {
 							if(!lastWord.equals("weapons") && sub_cat != null) {
 								drawTab = "weapons_"+lastWord;

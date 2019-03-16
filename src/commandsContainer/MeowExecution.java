@@ -724,7 +724,7 @@ public class MeowExecution {
 				e.getTextChannel().sendFile(file, "meow.png", null).complete();
 			}
 			
-			else if(variable.equals(prefix+"meow help")){
+			else if(variable.equals(prefix+"meow")){
 				long channel = e.getTextChannel().getIdLong();
 				if(channel == channel_id || channel_id == 0){
 					e.getTextChannel().sendMessage(messageBuild.setDescription(commandInfo).build()).queue();

@@ -27,7 +27,7 @@ public class ShopExecution {
 			String price;
 			if(skin_info.getShopDescription().equals(_description)){price = "DEFAULT";}
 			else{price = skin_info.getPrice()+" "+guild_settings.getCurrency();}
-			if(RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), _e.getGuild().getIdLong(), skin_info.getItemID(), guild_settings.getThemeID()) != 0){price = "PURCHASED";}
+			if(RankingSystem.SQLgetItemID(_e.getMember().getUser().getIdLong(), _e.getGuild().getIdLong(), skin_info.getItemID(), guild_settings.getThemeID()) != 0 && !skin_info.getSkinType().equals("ite")){price = "PURCHASED";}
 			builder.append("*_"+skin_info.getShopDescription()+"_*\n");
 			priceBuilder.append("*_"+price+"_*\n");
 		}

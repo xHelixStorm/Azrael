@@ -34,16 +34,20 @@ public class Pug implements Command{
 				
 				long channel_id = Azrael.SQLgetChannelID(guild_id, "bot");
 				
-				if(variable.equals("H!pug")){
-					e.getTextChannel().sendMessage("Please, type H!pug help to check the usage").queue();
+				var execution_id = Azrael.SQLgetExecutionID(guild_id);
+				if(execution_id == 0){
+					e.getTextChannel().sendMessage("This type of command is disabled on this server. Please ask an administrator or moderator to activate it!").queue();
 				}
-				else{
-					var execution_id = Azrael.SQLgetExecutionID(guild_id);
-					if(execution_id == 0){
-						e.getTextChannel().sendMessage("This type of command is disabled on this server. Please ask an administrator or moderator to activate it!").queue();
+				else if(execution_id == 2 || execution_id == 1){
+					if(execution_id != 1){
+						try {
+							PugExecution.Execute(e, variable, path, channel_id);
+						} catch (IOException e1) {
+							logger.error("Selected pug picture couldn't be found", e1);
+						}
 					}
-					else if(execution_id == 2 || execution_id == 1){
-						if(execution_id != 1){
+					else{
+						if(channel_id == channel){
 							try {
 								PugExecution.Execute(e, variable, path, channel_id);
 							} catch (IOException e1) {
@@ -51,16 +55,7 @@ public class Pug implements Command{
 							}
 						}
 						else{
-							if(channel_id == channel){
-								try {
-									PugExecution.Execute(e, variable, path, channel_id);
-								} catch (IOException e1) {
-									logger.error("Selected pug picture couldn't be found", e1);
-								}
-							}
-							else{
-								e.getTextChannel().sendMessage("This command can be used only in <#"+channel_id+">").queue();
-							}
+							e.getTextChannel().sendMessage("This command can be used only in <#"+channel_id+">").queue();
 						}
 					}
 				}

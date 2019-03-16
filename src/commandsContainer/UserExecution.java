@@ -127,11 +127,12 @@ public class UserExecution {
 							message.addField("LEVEL", "**"+user_details.getLevel()+"**/**"+guild_settings.getMaxLevel()+"**", true);
 							message.addField("EXPERIENCE", "**"+user_details.getCurrentExperience()+"**/**"+user_details.getRankUpExperience()+"**", true);
 							if(user_details.getCurrentRole() != 0){
-								message.addField("UNLOCKED ROLE", _e.getGuild().getRoleById(user_details.getCurrentRole()).getAsMention(), false);
+								message.addField("UNLOCKED ROLE", _e.getGuild().getRoleById(user_details.getCurrentRole()).getAsMention(), true);
 							}
 							else{
-								message.addField("UNLOCKED ROLE", "**N/A**", false);
+								message.addField("UNLOCKED ROLE", "**N/A**", true);
 							}
+							message.addField("TOTAL EXPERIENCE", "**"+user_details.getExperience()+"**", true);
 						}
 						StringBuilder out = new StringBuilder();
 						for(String description : Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", Long.parseLong(file_value), _e.getGuild().getIdLong())) {
