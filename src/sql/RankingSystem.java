@@ -1544,7 +1544,7 @@ public class RankingSystem {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
-			stmt.setInt(7, _theme_id);
+			stmt.setInt(3, _theme_id);
 			stmt.setInt(4, _limit);
 			stmt.setInt(5, _maxItems);
 			rs = stmt.executeQuery();
@@ -1730,7 +1730,7 @@ public class RankingSystem {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("SELECT item_id, daily_items.description, weight, type, daily_type.description, action FROM daily_items INNER JOIN daily_type ON fk_type = type WHERE fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setInt(4, _theme_id);
+				stmt.setInt(1, _theme_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
 					Dailies setDaily = new Dailies();
