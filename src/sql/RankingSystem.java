@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import core.Guilds;
 import core.Hashes;
-import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import inventory.Dailies;
 import inventory.Inventory;
@@ -1255,10 +1254,9 @@ public class RankingSystem {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT guild_id, name, themes.max_level, fk_level_id, ranking_level.description, fk_rank_id, ranking_rank.description, fk_profile_id, ranking_profile.description, fk_icon_id, ranking_icons.description, ranking_state, max_exp.experience, max_exp.enabled, guilds.fk_theme_id, themes.currency, themes.randomshop_price FROM guilds INNER JOIN ranking_level ON fk_level_id = level_id INNER JOIN ranking_rank ON fk_rank_id = rank_id INNER JOIN ranking_profile ON fk_profile_id = profile_id INNER JOIN ranking_icons ON fk_icon_id = icon_id LEFT JOIN max_exp ON guild_id = fk_guild_id LEFT JOIN themes ON guilds.fk_theme_id = theme_id WHERE guild_id = ? AND (guilds.fk_theme_id = ? OR guilds.fk_theme_id IS NULL)");
+				String sql = ("SELECT guild_id, name, themes.max_level, fk_level_id, ranking_level.description, fk_rank_id, ranking_rank.description, fk_profile_id, ranking_profile.description, fk_icon_id, ranking_icons.description, ranking_state, max_exp.experience, max_exp.enabled, guilds.fk_theme_id, themes.currency, themes.randomshop_price FROM guilds LEFT JOIN ranking_level ON fk_level_id = level_id LEFT JOIN ranking_rank ON fk_rank_id = rank_id LEFT JOIN ranking_profile ON fk_profile_id = profile_id LEFT JOIN ranking_icons ON fk_icon_id = icon_id LEFT JOIN max_exp ON guild_id = fk_guild_id LEFT JOIN themes ON guilds.fk_theme_id = theme_id WHERE guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, Hashes.getTheme(GuildIni.getTheme(_guild_id)));
 				rs = stmt.executeQuery();
 				if(rs.next()){
 					Guilds guild = new Guilds();

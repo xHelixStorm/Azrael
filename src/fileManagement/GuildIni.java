@@ -15,7 +15,6 @@ public class GuildIni {
 			Ini ini = new Ini();
 			
 			//General
-			ini.add("General", "Theme", "");
 			ini.add("General", "Administrator", "");
 			ini.add("General", "CommandPrefix", "");
 			ini.add("General", "JoinMessage", "false");
@@ -115,11 +114,6 @@ public class GuildIni {
 			logger.error("Error while reading guild ini file {}.ini", guild_id);
 			return null;
 		}
-	}
-	
-	public static String getTheme(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("General", "Theme");
 	}
 	
 	public static long getAdmin(long guild_id) {
