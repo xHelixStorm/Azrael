@@ -70,13 +70,13 @@ public class BotStartAssign implements Runnable{
 				}
 			}
 			logger.debug("Start up user registration complete in {}", g.getName());
-			var log_channel = Azrael.SQLgetChannelID(guild_id, "log");
-			if(i != 0 && log_channel != 0){
-				e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage(message.setDescription(i+" User(s) received the community role on bot start up").build()).queue();
+			var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+			if(i != 0 && log_channel != null){
+				e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(i+" User(s) received the community role on bot start up").build()).queue();
 			}
-			if((errUsers != 0 || errUserDetails != 0 || errAzraelUsers != 0) && log_channel != 0) {
+			if((errUsers != 0 || errUserDetails != 0 || errAzraelUsers != 0) && log_channel != null) {
 				EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle("Users couldn't be registered!");
-				e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage(err.setDescription("Various users couldn't be inserted into the ranking system tables. Please check the error log for affected users!\n"
+				e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("Various users couldn't be inserted into the ranking system tables. Please check the error log for affected users!\n"
 						+ "failed insertions in RankingSystem.users: "+errUsers+"\n"
 						+ "failed insertions in RankingSystem.user_details: "+errUserDetails+"\n"
 						+ "failed insertions in Azrael.users: "+errAzraelUsers).build()).queue();

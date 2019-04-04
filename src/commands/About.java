@@ -1,5 +1,7 @@
 package commands;
 
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,12 +24,12 @@ public class About implements Command {
 			Logger logger = LoggerFactory.getLogger(About.class);
 			logger.debug("{} has used About command", e.getMember().getUser().getId());
 			
-			long channel = e.getTextChannel().getIdLong();
 			long guild_id = e.getGuild().getIdLong();
-			long channel_id = Azrael.SQLgetChannelID(guild_id, "bot");
+			var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+			var this_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null);
 			
-			if(channel != channel_id && channel_id != 0){
-				e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+channel_id+">").queue();
+			if(this_channel == null && bot_channels.size() > 0){
+				e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
 				logger.warn("About command used in a not bot channel");
 			}
 			else{

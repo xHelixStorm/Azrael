@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Channels;
 import core.Guilds;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
@@ -67,50 +68,50 @@ public class ReadyListener extends ListenerAdapter{
 			if(!new File("./ini/"+guild_id+".ini").exists()) {
 				GuildIni.createIni(guild_id);
 			}
-			var log_channel = Azrael.SQLgetChannelID(guild_id, "log");
+			Channels log_channel = null;
+			Channels bot_channel = null;
+			var channels = Azrael.SQLgetChannels(guild_id);
+			if(channels == null) {
+				logger.error("Channel information from Azrael.channels couldn't be retrieved and cached");
+			}
+			else {
+				log_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+				bot_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals("bot")).findAny().orElse(null);
+			}
 			if(DiscordRoles.SQLgetRoles(guild_id).size() == 0) {
 				logger.error("Roles information from DiscordRoles.roles couldn't be retrieved and cached");
-				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Roles information from DiscordRoles.roles couldn't be called and cached").queue();
+				if(log_channel != null)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Roles information from DiscordRoles.roles couldn't be called and cached").queue();
 			}
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 			if(guild_settings == null) {
 				logger.error("Guild information from RankingSystem.guilds couldn't be retrieved and cached");
-				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Guild information from RankingSystem.guilds couldn't be called and cached").queue();
+				if(log_channel != null)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Guild information from RankingSystem.guilds couldn't be called and cached").queue();
 			}
 			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetRoles(guild_id) == false) {
 				logger.error("Roles from RankingSystem.roles couldn't be called and cached");
-				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
+				if(log_channel != null)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
 			}
 			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetLevels(guild_id, guild_settings.getThemeID()) == 0) {
 				logger.error("Levels from RankingSystem.level_list couldn't be called and cached");
-				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
+				if(log_channel != null)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
 			}
 			if(themesRetrieved == false) {
-				if(log_channel != 0)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("An internal error occurred. Themes from RankingSystem.themes couldn't be called and cached").queue();
+				if(log_channel != null)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Themes from RankingSystem.themes couldn't be called and cached").queue();
 			}
 			Azrael.SQLgetRSSFeeds(guild_id);
-			var rss_channel = Azrael.SQLgetChannelID(guild_id, "rss");
-			if(rss_channel != 0)ParseRSS.runTask(e, guild_id, rss_channel);
-			if(log_channel != 0){e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel).sendMessage("Bot is now operational!").queue();}
-		}
-		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
-		
-		if(!(STATIC.getVersion_Old().contains(STATIC.getVersion_New())) && allowPatchNotes){
-			for(Guild g : e.getJDA().getGuilds()){
-				long guild_id = g.getIdLong();
-				long channel_id = Azrael.SQLgetChannelID(guild_id, "log");
-				
-				if(channel_id != 0){
+			ParseRSS.runTask(e, guild_id);
+			
+			if(log_channel != null){e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("Bot is now operational!").queue();}
+			
+			if(!(STATIC.getVersion_Old().contains(STATIC.getVersion_New())) && allowPatchNotes){
+				if(log_channel != null){
 					FileSetting.createFile("./files/version.azr", STATIC.getVersion_New());
-					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage(
+					e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
 							messageBuild.setDescription(PatchNotes.patchNotes(guild_id)).build()).queue();
-					logger.debug("Private patch notes launched");
-					
-					long channel_id2 = Azrael.SQLgetChannelID(guild_id, "bot");
-					
+					logger.debug("Private patch notes launched");					
 					if(allowPublicPatchNotes){
-						if(channel_id2 != 0){
-							e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id2).sendMessage(
+						if(bot_channel != null){
+							e.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
 									messageBuild.setDescription(PublicPatchNotes.publicPatchNotes()).build()).queue();
 							logger.debug("Public patch notes launched");
 						}
@@ -118,6 +119,7 @@ public class ReadyListener extends ListenerAdapter{
 				}
 			}
 		}
+		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		
 		ExecutorService executor = Executors.newFixedThreadPool(1);
 		executor.execute(new BotStartAssign(e));

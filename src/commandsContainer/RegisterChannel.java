@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Channels;
+import core.Hashes;
 import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
@@ -78,6 +79,7 @@ public class RegisterChannel {
 							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
 							break;
 					}
+					Hashes.removeChannels(_guild_id);
 					logger.debug("{} has registered the channel {} as {} channel in the guild {}", _e.getMember().getUser().getId(), channel_type, channel_type, _e.getGuild().getName());
 					_e.getTextChannel().sendMessage("**The channel has been registered!**").queue();
 					if(channel_type.equals("rea")) {

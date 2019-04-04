@@ -1,5 +1,7 @@
 package commands;
 
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +12,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
+import util.STATIC;
 
 public class Shop implements Command{
 
@@ -27,8 +30,8 @@ public class Shop implements Command{
 			String input = e.getMessage().getContentRaw();
 			Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 			if(guild_settings.getRankingState() == true){
-				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
-				if(bot_channel == 0 || e.getTextChannel().getIdLong() == bot_channel){
+				var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+				if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null) {
 					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 					if(input.toUpperCase().equals(prefix.toUpperCase()+"SHOP LEVEL UPS")) {
 						ShopExecution.displayPartOfShop(e, "lev", guild_settings.getLevelDescription());
@@ -61,7 +64,7 @@ public class Shop implements Command{
 					}
 				}
 				else{
-					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+bot_channel+">").queue();
+					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
 					logger.warn("Shop command used in a not bot channel");
 					
 				}

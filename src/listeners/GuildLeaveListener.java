@@ -54,7 +54,7 @@ public class GuildLeaveListener extends ListenerAdapter{
 		long guild_id = e.getGuild().getIdLong();
 		String guild_name = e.getGuild().getName();
 		
-		long channel_id = Azrael.SQLgetChannelID(guild_id, "log");
+		var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 		
 		Bancollect warnedUser = Azrael.SQLgetData(e.getMember().getUser().getIdLong(), guild_id);
 		int warning_id = warnedUser.getWarningID();
@@ -62,29 +62,29 @@ public class GuildLeaveListener extends ListenerAdapter{
 		int max_warning_id = Azrael.SQLgetMaxWarning(guild_id);
 		
 		
-		if(channel_id != 0){
+		if(log_channel != null){
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			if(warnedUser.getBanID() == 2 && warnedUser.getMuted()){
 				System.out.println("["+timestamp.toString()+"] "+user_name+" with the id number "+e.getMember().getUser().getId()+" has been banned!");
 			}
 			else if(warnedUser.getMuted() && banned == false){
-				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from "+guild_name+" while being muted!").build()).queue();
+				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from "+guild_name+" while being muted!").build()).queue();
 			}
 			else if(trigger_user_name.length() > 0 && banned == false) {
-				e.getGuild().getTextChannelById(channel_id).sendMessage(kick.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** kicked **"+user_name+"** with the id number **"+e.getUser().getId()+"** from **"+guild_name+"**"+kick_reason).build()).queue();
+				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(kick.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** kicked **"+user_name+"** with the id number **"+e.getUser().getId()+"** from **"+guild_name+"**"+kick_reason).build()).queue();
 			}
 			else if(GuildIni.getLeaveMessage(guild_id) && banned == false){
-				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from **"+guild_name+"**").build()).queue();
+				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from **"+guild_name+"**").build()).queue();
 			}
 			
 			if(warning_id == 0 && banned == true){
-				e.getGuild().getTextChannelById(channel_id).sendMessage(ban.setDescription("["+timestamp+"] "+trigger_user_name+" has banned **" + user_name + "** with the ID Number **" + user_id + "** without any protocolled warnings!"+ban_reason).build()).queue();
+				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] "+trigger_user_name+" has banned **" + user_name + "** with the ID Number **" + user_id + "** without any protocolled warnings!"+ban_reason).build()).queue();
 			}
 			else if(warning_id < max_warning_id && banned == true){
-				e.getGuild().getTextChannelById(channel_id).sendMessage(ban.setDescription("["+timestamp+"] "+trigger_user_name+" has banned **" + user_name + "** with the ID Number **" + user_id + "** without enough protocolled warnings! Warnings: "+warning_id+""+ban_reason).build()).queue();
+				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] "+trigger_user_name+" has banned **" + user_name + "** with the ID Number **" + user_id + "** without enough protocolled warnings! Warnings: "+warning_id+""+ban_reason).build()).queue();
 			}
 			else if(warning_id == max_warning_id && banned == true){
-				e.getGuild().getTextChannelById(channel_id).sendMessage(ban.setDescription("["+timestamp+"] "+trigger_user_name+" has banned **" + user_name + "** with the ID Number **" + user_id + "**!"+ban_reason).build()).queue();
+				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] "+trigger_user_name+" has banned **" + user_name + "** with the ID Number **" + user_id + "**!"+ban_reason).build()).queue();
 			}
 		}
 		

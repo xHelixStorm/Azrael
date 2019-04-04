@@ -1,6 +1,7 @@
 package commands;
 
 import java.sql.Timestamp;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import rankingSystem.Skins;
 import rankingSystem.Weapons;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
+import util.STATIC;
 import sql.Azrael;
 
 public class Purchase implements Command{
@@ -31,8 +33,8 @@ public class Purchase implements Command{
 			
 			Guilds setting = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 			if(setting.getRankingState()){
-				var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
-				if(e.getTextChannel().getIdLong() == bot_channel || bot_channel == 0){
+				var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+				if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null){
 					String input = e.getMessage().getContentRaw();
 					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 					if(input.equals(prefix+"purchase")){
@@ -124,7 +126,7 @@ public class Purchase implements Command{
 					}
 				}
 				else{
-					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+bot_channel+">").queue();
+					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
 					logger.warn("Purchase command used in a not bot channel");
 				}
 			}

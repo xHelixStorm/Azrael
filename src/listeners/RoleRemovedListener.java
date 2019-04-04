@@ -44,15 +44,15 @@ public class RoleRemovedListener extends ListenerAdapter{
 		try{
 			Logger logger = LoggerFactory.getLogger(RoleRemovedListener.class);
 			if(!UserPrivs.isUserMuted(e.getUser(), guild_id) &&(warnedUser.getUnmute().getTime() - System.currentTimeMillis()) > 0){
-				var log_channel_id = Azrael.SQLgetChannelID(guild_id, "log");
+				var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 				if(warnedUser.getUserID() != 0){
 					if(Azrael.SQLUpdateMuted(user_id, guild_id, false, false) == 0) {
 						logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getName());
-						if(log_channel_id != 0)e.getGuild().getTextChannelById(log_channel_id).sendMessage("An internal error occurred. The mute state couldn't be updated in table Azrael.bancollect").queue();
+						if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The mute state couldn't be updated in table Azrael.bancollect").queue();
 					}
 				}
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-				if(log_channel_id != 0){e.getGuild().getTextChannelById(log_channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** has manually removed the mute role from **"+member_name+"** with the ID number **"+user_id+"**!").build()).queue();}
+				if(log_channel != null){e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** has manually removed the mute role from **"+member_name+"** with the ID number **"+user_id+"**!").build()).queue();}
 				logger.debug("{} got the mute role removed before the time expired in guild {}", e.getUser().getId(), e.getGuild().getName());
 				Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE_HALFWAY", user_id, guild_id, "Mute role removed manually");
 			}

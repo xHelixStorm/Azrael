@@ -1,6 +1,7 @@
 package commands;
 
 import java.awt.Color;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import preparedMessages.HelpText;
 import sql.Azrael;
+import util.STATIC;
 
 public class Commands implements Command{
 
@@ -26,11 +28,11 @@ public class Commands implements Command{
 			logger.debug("{} has used Commands command", e.getMember().getUser().getId());
 			
 			long guild_id = e.getGuild().getIdLong();
-			long channel = e.getTextChannel().getIdLong();
-			long channel_id = Azrael.SQLgetChannelID(guild_id, "bot");
+			var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+			var this_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null);
 			
-			if(channel != channel_id && channel_id != 0){
-				e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+channel_id+">").queue();
+			if(this_channel == null && bot_channels.size() > 0){
+				e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
 				logger.warn("Commands command was used in a not bot channel");
 			}
 			else{

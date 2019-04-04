@@ -411,8 +411,8 @@ public class UserExecution {
 					if(warning_id == max_warning_id) {
 						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 						denied.setThumbnail(IniFileReader.getBanThumbnail()).setTitle("User Banned!");
-						var log_channel = Azrael.SQLgetChannelID(_e.getGuild().getIdLong(), "log");
-						if(log_channel != 0) {_e.getGuild().getTextChannelById(log_channel).sendMessage(denied.setDescription("["+timestamp.toString()+"] **" + _e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getName()+"#"+_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getDiscriminator() + " with the ID Number " + file_value.replaceAll("[^0-9]*", "") + " Has been banned after reaching the limit of allowed mutes on this server!**\nReason: User has been banned with the bot command!").build()).queue();}
+						var log_channel = Azrael.SQLgetChannels(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+						if(log_channel != null) {_e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(denied.setDescription("["+timestamp.toString()+"] **" + _e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getName()+"#"+_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getDiscriminator() + " with the ID Number " + file_value.replaceAll("[^0-9]*", "") + " Has been banned after reaching the limit of allowed mutes on this server!**\nReason: User has been banned with the bot command!").build()).queue();}
 						PrivateChannel pc = _e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().openPrivateChannel().complete();
 						pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 								+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
@@ -430,8 +430,8 @@ public class UserExecution {
 				if(warning_id == max_warning_id) {
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					denied.setThumbnail(IniFileReader.getBanThumbnail()).setTitle("User Banned!");
-					var log_channel = Azrael.SQLgetChannelID(_e.getGuild().getIdLong(), "log");
-					if(log_channel != 0) {_e.getGuild().getTextChannelById(log_channel).sendMessage(denied.setDescription("["+timestamp.toString()+"] **" + _e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getName()+"#"+_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getDiscriminator() + " with the ID Number " + file_value.replaceAll("[^0-9]*", "") + " Has been banned after reaching the limit of allowed mutes on this server!**\nReason: "+_message).build()).queue();}
+					var log_channel = Azrael.SQLgetChannels(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+					if(log_channel != null) {_e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(denied.setDescription("["+timestamp.toString()+"] **" + _e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getName()+"#"+_e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().getDiscriminator() + " with the ID Number " + file_value.replaceAll("[^0-9]*", "") + " Has been banned after reaching the limit of allowed mutes on this server!**\nReason: "+_message).build()).queue();}
 					PrivateChannel pc = _e.getGuild().getMemberById(file_value.replaceAll("[^0-9]*", "")).getUser().openPrivateChannel().complete();
 					pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 							+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();

@@ -31,7 +31,7 @@ public class RoleExtend implements Runnable{
 		boolean banHammerFound = false;
 		ArrayList<Member> users = new ArrayList<Member>();
 		Role mute_role = e.getJDA().getGuildById(guild_id).getRoleById(DiscordRoles.SQLgetRole(guild_id, "mut"));
-		long channel_id = Azrael.SQLgetChannelID(guild_id, "log");
+		var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 		int i = 0;
 		
 		Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
@@ -52,13 +52,13 @@ public class RoleExtend implements Runnable{
 			}
 			users.add(member);
 			banHammerFound = true;
-			new Thread(new MuteRestart(e, member, guild_id, channel_id, mute_role, unmute, assignedRole, rankingState)).start();
+			new Thread(new MuteRestart(e, member, guild_id, log_channel.getChannel_ID(), mute_role, unmute, assignedRole, rankingState)).start();
 			i++;
 		}
-		if(banHammerFound == true && channel_id != 0){
+		if(banHammerFound == true && log_channel != null){
 			Logger logger = LoggerFactory.getLogger(RoleExtend.class);
 			logger.debug("Found muted users on start up in {}", e.getJDA().getGuildById(guild_id).getName());
-			e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage(message.setDescription(i+" users were found muted on start up. The mute timer is restarting from where it stopped!").build()).queue();
+			e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(i+" users were found muted on start up. The mute timer is restarting from where it stopped!").build()).queue();
 		}
 	}
 }

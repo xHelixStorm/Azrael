@@ -1,6 +1,7 @@
 package commands;
 
 import java.io.File;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
+import util.STATIC;
 
 public class Randomshop implements Command{
 
@@ -28,8 +30,8 @@ public class Randomshop implements Command{
 			Logger logger = LoggerFactory.getLogger(Randomshop.class);
 			logger.debug("The user {} has executed the Randomshop command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			
-			var bot_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "bot");
-			if(e.getTextChannel().getIdLong() == bot_channel || bot_channel == 0) {
+			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null) {
 				Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 				final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 				if(e.getMessage().getContentRaw().equals(prefix+"randomshop")) {
@@ -62,7 +64,7 @@ public class Randomshop implements Command{
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in <#"+bot_channel+">").queue();
+				e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
 				logger.warn("Daily command has been used in a not bot channel");
 			}
 		}

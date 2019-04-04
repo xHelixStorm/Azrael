@@ -87,7 +87,7 @@ public class Quiz implements Command{
 								e.getTextChannel().sendMessage("Please register the rewards before proceeding!").queue();
 							}
 							else {
-								if(Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "qui") != 0) {
+								if(Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("qui")).findAny().orElse(null) != null) {
 									e.getTextChannel().sendMessage(message.setDescription("Please select the fitting mode for the quiz with one of the following digits:\n"
 											+ "1: **no restrictions**\n"
 											+ "2: **participants will receive a 3 questions threshold on right answer**\n"

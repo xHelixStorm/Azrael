@@ -2,6 +2,7 @@ package commands;
 
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
+import util.STATIC;
 import sql.Azrael;
 
 public class Top implements Command{
@@ -29,8 +31,6 @@ public class Top implements Command{
 			int rank = 0;
 			StringBuilder message = new StringBuilder();
 			long guild_id = e.getGuild().getIdLong();
-			long channel = e.getTextChannel().getIdLong();
-			long channel_id;
 			String name;
 			int level;
 			long experience;
@@ -55,11 +55,10 @@ public class Top implements Command{
 			else{
 				e.getTextChannel().sendMessage("Please type **H!top -help** to display the command usage!").queue();
 			}
-			
-			channel_id = Azrael.SQLgetChannelID(guild_id, "bot");
-			
+						
 			if(runTopList == true){
-				if(channel_id == channel){
+				var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+				if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null) {
 					ArrayList<rankingSystem.Rank> rankList = RankingSystem.SQLRanking(guild_id);
 					rankingSystem.Rank ranking1 = rankList.parallelStream().filter(r -> r.getUser_ID() == member_id).findAny().orElse(null);
 					rank = ranking1.getRank();
@@ -96,7 +95,7 @@ public class Top implements Command{
 					}
 				}
 				else{
-					e.getTextChannel().sendMessage("Apologies young padawan but I'm not allowed to execute this command in this channel. Please retry in <#"+channel_id+">").queue();
+					e.getTextChannel().sendMessage("Apologies young padawan but I'm not allowed to execute this command in this channel. Please retry in "+STATIC.getChannels(bot_channels)).queue();
 					logger.warn("Top command used in a not bot channel");
 				}
 			}

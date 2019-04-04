@@ -75,8 +75,8 @@ public class RssExecution {
 	
 	public static boolean runTest(MessageReceivedEvent e, int feed) {
 		EmbedBuilder message = new EmbedBuilder();
-		long rss_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "rss");
-		if(rss_channel != 0) {
+		var rss_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("rss")).findAny().orElse(null);
+		if(rss_channel != null) {
 			ArrayList<RSS> rss = Hashes.getFeed(e.getGuild().getIdLong());
 			if(rss.size() >= feed+1) {
 				try {
@@ -124,7 +124,7 @@ public class RssExecution {
 						out = out.replace("{description}", description);
 						out = out.replace("{pubDate}", pubDate);
 						out = out.replace("{link}", link);
-						e.getGuild().getTextChannelById(rss_channel).sendMessage(out).queue();
+						e.getGuild().getTextChannelById(rss_channel.getChannel_ID()).sendMessage(out).queue();
 					}
 					else {
 						e.getTextChannel().sendMessage("No feed could be found").queue();

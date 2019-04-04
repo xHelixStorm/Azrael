@@ -37,12 +37,12 @@ public class RoleReaction implements Command{
 						e.getTextChannel().sendMessage(e.getMember().getUser().getAsMention()+" Role reactions are already enabled!").queue();
 					}
 					else {
-						var rea_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "rea");
-						if(rea_channel != 0) {							
+						var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("rea")).findAny().orElse(null);
+						if(rea_channel != null) {							
 							if(Azrael.SQLUpdateReaction(e.getGuild().getIdLong(), true) > 0) {
 								e.getTextChannel().sendMessage("Role Reactions have been enabled!").queue();
-								String count = ""+ReactionMessage.print(e, rea_channel);
-								FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getId()+"ch"+rea_channel+".azr", count);
+								String count = ""+ReactionMessage.print(e, rea_channel.getChannel_ID());
+								FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getId()+"ch"+rea_channel.getChannel_ID()+".azr", count);
 							}
 							else {
 								e.getTextChannel().sendMessage("An internal error occurred. Role reactions couldn't be enabled in Azrael.commands").queue();
@@ -63,9 +63,9 @@ public class RoleReaction implements Command{
 					}
 					else {
 						if(Azrael.SQLUpdateReaction(e.getGuild().getIdLong(), false) > 0) {
-							var rea_channel = Azrael.SQLgetChannelID(e.getGuild().getIdLong(), "rea");
-							if(rea_channel != 0 && Hashes.getReactionMessage(e.getGuild().getIdLong()) != null) {
-								e.getGuild().getTextChannelById(rea_channel).deleteMessageById(Hashes.getReactionMessage(e.getGuild().getIdLong())).queue();
+							var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("rea")).findAny().orElse(null);
+							if(rea_channel != null && Hashes.getReactionMessage(e.getGuild().getIdLong()) != null) {
+								e.getGuild().getTextChannelById(rea_channel.getChannel_ID()).deleteMessageById(Hashes.getReactionMessage(e.getGuild().getIdLong())).queue();
 							}
 							for(int i = 1; i < 10; i++) {
 								if(Hashes.getRoles(i+"_"+e.getGuild().getId()) != null) {

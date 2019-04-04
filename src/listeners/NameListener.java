@@ -34,12 +34,12 @@ public class NameListener extends ListenerAdapter{
 			check: for(String name : Azrael.SQLgetStaffNames(g.getIdLong())){
 				if(nameCheck.matches(name+"#[0-9]{4}")){
 					Member member = e.getJDA().getGuildById(g.getIdLong()).getMemberById(user_id);
-					long channel_id = Azrael.SQLgetChannelID(g.getIdLong(), "log");
+					var log_channel = Azrael.SQLgetChannels(g.getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 					try {
 						String nickname = Azrael.SQLgetRandomName(g.getIdLong());
 						e.getJDA().getGuildById(g.getIdLong()).getController().setNickname(member, nickname).queue();
 						message.setColor(Color.RED).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle("Impersonation attempt found!");
-						e.getJDA().getTextChannelById(channel_id).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**\nPlease review in case of impersonation!").build()).queue();
+						if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**\nPlease review in case of impersonation!").build()).queue();
 						logger.debug("{} got renamed into {} in guild {}. Impersonation", e.getUser().getId(), nickname, g.getName());
 						staff_name = true;
 						break check;
@@ -59,17 +59,17 @@ public class NameListener extends ListenerAdapter{
 						Member user = e.getJDA().getGuildById(guild_id).getMemberById(user_id);
 						
 						if(user.getUser().getIdLong() != 0){
-							long channel_id = Azrael.SQLgetChannelID(guild_id, "log");
+							var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 							try {
 								String nickname = Azrael.SQLgetRandomName(guild_id);
 								e.getJDA().getGuildById(guild_id).getController().setNickname(user, nickname).queue();
 								message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
-								e.getJDA().getTextChannelById(channel_id).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
+								if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
 								logger.debug("{} got renamed into {} in guild {}", e.getUser().getId(), nickname, guild.getName());
 								break check;
 							} catch (HierarchyException hye){
 								message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getFalseAlarmThumbnail()).setTitle("You know that you shouldn't do it :/");
-								e.getJDA().getTextChannelById(channel_id).sendMessage("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** but had a higher role than myself. Hence, name won't be changed").queue();
+								e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** but had a higher role than myself. Hence, name won't be changed").queue();
 								break check;
 							}
 						}

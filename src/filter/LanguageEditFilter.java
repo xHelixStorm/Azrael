@@ -86,9 +86,8 @@ public class LanguageEditFilter extends ListenerAdapter implements Runnable{
 							.findAny();
 						if(option.isPresent()) {
 							e.getMessage().delete().reason("Message removed due to bad manner!").complete();
-							long guild_id = e.getGuild().getIdLong();
-							long channel_id = Azrael.SQLgetChannelID(guild_id, "tra");
-							if(channel_id != 0){e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();}
+							var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("tra")).findAny().orElse(null);
+							if(tra_channel != null){e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();}
 							wordFound = true;
 							break find;
 						}

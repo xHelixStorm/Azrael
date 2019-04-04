@@ -815,60 +815,6 @@ public class Azrael {
 		}
 	}
 	
-	public static long SQLgetChannelID(long _guild_id, String _channel_type){
-		logger.debug("SQLgetChannelID launched. Passed params {}, {}", _guild_id, _channel_type);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_channel_id FROM channel_conf WHERE fk_channel_type = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _channel_type);
-			stmt.setLong(2, _guild_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				return rs.getLong(1);
-			}
-			return 0;
-		} catch (SQLException e) {
-			logger.error("SQLgetChannelID Exception", e);
-			return 0;
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static String SQLgetTwoChanneIDs(long _guild_id, String _channel_type, String _channel_type2){
-		logger.debug("SQLgetTwoChannelIDs launched. Passed params {}, {}, {}", _guild_id, _channel_type, _channel_type2);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT (SELECT fk_channel_id FROM channel_conf WHERE fk_channel_type LIKE ? && fk_guild_id = ?) AS channel1, (SELECT fk_channel_id FROM channel_conf WHERE fk_channel_type = ? && fk_guild_id = ?) AS channel2 FROM channel_conf LIMIT 1");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _channel_type);
-			stmt.setLong(2, _guild_id);
-			stmt.setString(3, _channel_type2);
-			stmt.setLong(4, _guild_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				return rs.getString(1)+"_"+rs.getString(2);
-			}
-			return "0_0";
-		} catch (SQLException e) {
-			logger.error("SQLgetTwoChannelIDs Exception", e);
-			return "0_0";
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static void SQLDeleteChannelType(String _channel_type, long _guild_id) {
 		logger.debug("SQLDeleteChannelType launched. Passed params {}, {}", _channel_type, _guild_id);
 		Connection myConn = null;
@@ -891,35 +837,39 @@ public class Azrael {
 	public static ArrayList<Channels> SQLgetChannels(long _guild_id){
 		logger.debug("SQLgetChannels launched. Passed params {}", _guild_id);
 		ArrayList<Channels> channels = new ArrayList<Channels>();
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM all_channels WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			rs = stmt.executeQuery();
-			while(rs.next()){
-				Channels channelProperties = new Channels();
-				channelProperties.setChannel_ID(rs.getLong(1));
-				channelProperties.setChannel_Name(rs.getString(2));
-				channelProperties.setChannel_Type(rs.getString(3));
-				channelProperties.setChannel_Type_Name(rs.getString(4));
-				channelProperties.setGuild_ID(rs.getLong(5));
-				channelProperties.setGuild_Name(rs.getString(6));
-				channelProperties.setLang_Filter(rs.getString(7));
-				channels.add(channelProperties);
+		if(Hashes.getChannels(_guild_id) == null) {
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT * FROM all_channels WHERE guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					Channels channelProperties = new Channels();
+					channelProperties.setChannel_ID(rs.getLong(1));
+					channelProperties.setChannel_Name(rs.getString(2));
+					channelProperties.setChannel_Type(rs.getString(3));
+					channelProperties.setChannel_Type_Name(rs.getString(4));
+					channelProperties.setGuild_ID(rs.getLong(5));
+					channelProperties.setGuild_Name(rs.getString(6));
+					channelProperties.setLang_Filter(rs.getString(7));
+					channels.add(channelProperties);
+				}
+				Hashes.addChannels(_guild_id, channels);
+				return channels;
+			} catch (SQLException e) {
+				logger.error("SQLgetChannels Exception", e);
+				return channels;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-			return channels;
-		} catch (SQLException e) {
-			logger.error("SQLgetChannels Exception", e);
-			return channels;
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
+		return Hashes.getChannels(_guild_id);
 	}
 	
 	public static ArrayList<Channels> SQLgetChannelTypes(){

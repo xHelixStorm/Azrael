@@ -30,7 +30,6 @@ public class DoubleExperienceStart extends TimerTask{
 	public void run() {
 		Path path = Paths.get("./files/double.azr");
 		long guild_id;
-		long channel_id;
 		
 		if(!Files.exists(path)){
 			File doubleEvent = new File("./files/RankingSystem/doubleweekend.jpg");
@@ -39,9 +38,11 @@ public class DoubleExperienceStart extends TimerTask{
 				guild_id = g.getIdLong();
 				
 				if(RankingSystem.SQLgetGuild(guild_id).getRankingState()){
-					channel_id = Azrael.SQLgetChannelID(guild_id, "bot");
-					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendFile(doubleEvent, "doubleweekend.jpg", null).complete();
-					e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage("```css\nThe double EXP weekend is here\nUse the chance to gain more experience points than usual to reach new heights. See you at the top!\nThe event will stay up from Saturday 00:01 cest till Sunday 23:59 cest!```").queue();
+					var bot_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).findAny().orElse(null);
+					if(bot_channel != null) {
+						e.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg", null).complete();
+						e.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\nThe double EXP weekend is here\nUse the chance to gain more experience points than usual to reach new heights. See you at the top!\nThe event will stay up from Saturday 00:01 cest till Sunday 23:59 cest!```").queue();
+					}
 				}
 			}
 		}

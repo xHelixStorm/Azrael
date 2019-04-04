@@ -5,6 +5,7 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import com.vdurmont.emoji.EmojiManager;
 
@@ -36,6 +37,7 @@ import threads.RunQuiz;
 
 public class MessageListener extends ListenerAdapter{
 	
+	@SuppressWarnings("null")
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e){
 		ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -199,17 +201,16 @@ public class MessageListener extends ListenerAdapter{
 				String content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quizstarter.azr");
 				if(e.getMember().getUser().getId().equals(content) && (message.equals("1") || message.equals("2") || message.equals("3"))) {
 					//run the quiz in a thread. // retrieve the log channel and quiz channel at the same time and pass them over to the new Thread
-					long log_channel_id;
-					var channel_ids = Azrael.SQLgetTwoChanneIDs(e.getGuild().getIdLong(), "qui", "log").split("_");
-					if(!channel_ids[1].equals("0")) {
-						log_channel_id = Long.parseLong(channel_ids[1]);
-					}
-					else {
-						log_channel_id = e.getTextChannel().getIdLong();
-					}
-					e.getTextChannel().sendMessage("The quiz will run shortly in <#"+channel_ids[0]+">!").queue();
+					var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log") || f.getChannel_Type().equals("qui")).collect(Collectors.toList());
+					var log_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+					var qui_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals("qui")).findAny().orElse(null);
+					if(log_channel == null)
+						log_channel.setChannel_ID(e.getTextChannel().getIdLong());
+					if(qui_channel == null)
+						qui_channel.setChannel_ID(e.getTextChannel().getIdLong());
+					e.getTextChannel().sendMessage("The quiz will run shortly in <#"+qui_channel.getChannel_ID()+">!").queue();
 					//execute independent Quiz Thread
-					new Thread(new RunQuiz(e, Long.parseLong(channel_ids[0]), log_channel_id, Integer.parseInt(message))).start();
+					new Thread(new RunQuiz(e, qui_channel.getChannel_ID(), log_channel.getChannel_ID(), Integer.parseInt(message))).start();
 					//remove the file after starting 
 					quiz.delete();
 				}
@@ -218,7 +219,8 @@ public class MessageListener extends ListenerAdapter{
 			if(runquiz.exists()) {
 				String content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr");
 				if(!content.equals("skip-question") || !content.equals("interrupt-questions")) {
-					if(Azrael.SQLgetChannelID(guild_id, "qui") == e.getTextChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
+					var qui_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("qui")).findAny().orElse(null);
+					if(qui_channel != null && qui_channel.getChannel_ID() == e.getTextChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
 						if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
 							if(message.equals("skip-question") || message.equals("interrupt-questions")) {
 								FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr", message);
@@ -244,17 +246,17 @@ public class MessageListener extends ListenerAdapter{
 				if(user_details == null){
 					if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
 						if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, 50000, 0) > 0) {
-							var log_channel = Azrael.SQLgetChannelID(guild_id, "log");
-							if(log_channel != 0) {
+							var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+							if(log_channel != null) {
 								EmbedBuilder success = new EmbedBuilder().setColor(Color.GREEN).setTitle("Table insertion successful!");
-								e.getGuild().getTextChannelById(log_channel).sendMessage(success.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** has been successfully inserted into all required ranking system table!").build()).queue();
+								e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(success.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** has been successfully inserted into all required ranking system table!").build()).queue();
 							}
 						}
 					}
 				}
 				else{
-					var channel_ids = Azrael.SQLgetTwoChanneIDs(guild_id, "bot", "qui").split("_");
-					if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && !e.getTextChannel().getId().equals(channel_ids[0]) && !e.getTextChannel().getId().equals(channel_ids[1])){
+					var channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("bot") || f.getChannel_Type().equals("qui")).collect(Collectors.toList());
+					if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) == null){
 						int roleAssignLevel = 0;
 						long role_id = 0;
 						Rank ranking_levels = Hashes.getRankingRoles(guild_id+"_"+(user_details.getLevel()+1));
