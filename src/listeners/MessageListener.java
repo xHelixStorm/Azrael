@@ -241,7 +241,8 @@ public class MessageListener extends ListenerAdapter{
 			}
 			
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
-			if(guild_settings.getRankingState() == true){
+			if(guild_settings.getRankingState() == true && (Hashes.getCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId()) == null || guild_settings.getMessageTimeout() == 0)){
+				if(guild_settings.getMessageTimeout() != 0) Hashes.addCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId(), e.getMember().getEffectiveName());
 				Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
 				if(user_details == null){
 					if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {

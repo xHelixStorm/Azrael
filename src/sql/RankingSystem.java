@@ -1276,6 +1276,7 @@ public class RankingSystem {
 					guild.setThemeID(rs.getInt(15));
 					guild.setCurrency(rs.getString(16));
 					guild.setRandomshopPrice(rs.getLong(17));
+					guild.setMessageTimeout(IniFileReader.getMessageTimeout());
 					Hashes.addStatus(_guild_id, guild);
 					return guild;
 				}

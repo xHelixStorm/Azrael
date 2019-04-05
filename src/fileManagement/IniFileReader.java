@@ -64,6 +64,10 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("Azrael", "Password");
 	}
+	public static long getMessageTimeout(){
+		readConfig();
+		return ini.get("RankingSystem", "MessageTimeout", long.class);
+	}
 	public static String getSQLUsername2(){
 		readConfig();
 		return ini.get("RankingSystem", "Username");

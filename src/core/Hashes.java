@@ -39,7 +39,7 @@ public class Hashes {
     private static final ConcurrentMap<String, ArrayList<String>> querry_result = new ConcurrentHashMap<String, ArrayList<String>>();
     private static final Map<Long, ArrayList<String>> filter_lang = new HashMap<Long, ArrayList<String>>();
     private static final Map<Long, Integer> message_removed = new HashMap<Long, Integer>();
-    private static final Map<Long, Guilds> status = new HashMap<Long, Guilds>();
+    private static final ConcurrentHashMap<Long, Guilds> status = new ConcurrentHashMap<Long, Guilds>();
     private static final Map<String, Rank> ranking_roles = new HashMap<String, Rank>();
     private static final LinkedHashMap<String, Ranks> ranking_levels = new LinkedHashMap<String, Ranks>();
     private static final Map<String, Roles> roles = new HashMap<String, Roles>();
@@ -57,6 +57,7 @@ public class Hashes {
     private static final LinkedHashMap<Long, ArrayList<WeaponStats>> weaponStats = new LinkedHashMap<Long, ArrayList<WeaponStats>>();
     private static final Map<String, Integer> themes = new HashMap<String, Integer>();
     private static final Map<Long, ArrayList<Channels>> channels = new HashMap<Long, ArrayList<Channels>>();
+    private static final ConcurrentHashMap<String, String> commentedUsers = new ConcurrentHashMap<String, String>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -127,6 +128,10 @@ public class Hashes {
 	public static void addChannels(Long _key, ArrayList<Channels> _channels) {
 		channels.put(_key, _channels);
 	}
+	public static void addCommentedUser(String _key, String _name) {
+		commentedUsers.put(_key, _name);
+	}
+	
 	
 	public static Messages getMessagePool(long _message_id) {
 		return message_pool.get(_message_id);
@@ -209,6 +214,9 @@ public class Hashes {
 	public static ArrayList<Channels> getChannels(Long _key) {
 		return channels.get(_key);
 	}
+	public static String getCommentedUser(String _key) {
+		return commentedUsers.get(_key);
+	}
 	
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
@@ -281,5 +289,8 @@ public class Hashes {
 	}
 	public static void removeChannels(Long _key) {
 		channels.remove(_key);
+	}
+	public static void clearCommentedUsers() {
+		commentedUsers.clear();
 	}
 }

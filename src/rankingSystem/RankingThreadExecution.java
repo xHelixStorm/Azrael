@@ -40,6 +40,7 @@ public class RankingThreadExecution {
 		message = message.replaceAll("<a:[a-zA-Z0-9]*:[0-9]{18,18}>", ""); //Edit custom animated images
 		message = message.replaceAll("<@[0-9!]{18,19}>", ""); //Edit tags
 		message = message.replaceAll("[\\s]{2,}", " "); //Edit every multiple whitespace type to a single whitespace
+		message = message.replaceAll("[^\\w\\d\\s]", ""); //Edit all special characters
 		int messageLength = message.length();
 		
 		int adder = 0;

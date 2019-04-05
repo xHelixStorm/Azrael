@@ -17,6 +17,7 @@ public class Guilds {
 	private int theme_id;
 	private String currency;
 	private long randomshop_price;
+	private long messageTimeout;
 	
 	public void setName(String _name) {
 		name = _name;
@@ -66,6 +67,9 @@ public class Guilds {
 	public void setRandomshopPrice(long _randomshop_price) {
 		randomshop_price = _randomshop_price;
 	}
+	public void setMessageTimeout(long _messageTimeout) {
+		messageTimeout = _messageTimeout;
+	}
 	
 	public String getName() {
 		return name;
@@ -114,5 +118,8 @@ public class Guilds {
 	}
 	public long getRandomshopPrice() {
 		return randomshop_price;
+	}
+	public long getMessageTimeout() {
+		return messageTimeout;
 	}
 }

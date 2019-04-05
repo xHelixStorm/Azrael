@@ -27,6 +27,7 @@ import sql.Azrael;
 import sql.DiscordRoles;
 import threads.BotStartAssign;
 import threads.RoleExtend;
+import timerTask.ClearCommentedUser;
 import timerTask.ClearHashes;
 import timerTask.ParseRSS;
 import util.STATIC;
@@ -135,6 +136,10 @@ public class ReadyListener extends ListenerAdapter{
 		DoubleExperienceStart.runTask(e);
 		DoubleExperienceOff.runTask();
 		ClearHashes.runTask();
+		
+		var timeout = IniFileReader.getMessageTimeout();
+		if(timeout != 0)
+			ClearCommentedUser.runTask(timeout);
 		
 		executor.shutdown();
 	}
