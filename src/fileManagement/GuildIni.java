@@ -99,7 +99,18 @@ public class GuildIni {
 			
 			//RandomshopReward
 			ini.add("RandomshopReward", "itemSizeX", "0");
-			ini.add("RandomshopReward", "itemSizeY", 0);
+			ini.add("RandomshopReward", "itemSizeY", "0");
+			
+			//Daily
+			ini.add("Daily", "rewardX", "0");
+			ini.add("Daily", "rewardY", "0");
+			ini.add("Daily", "generalTextFontSize", "12");
+			ini.add("Daily", "descriptionMode", "0");
+			ini.add("Daily", "descriptionX", "0");
+			ini.add("Daily", "descriptionY", "0");
+			ini.add("Daily", "descriptionStartX", "0");
+			ini.add("Daily", "fieldSizeX", "0");
+			
 			
 			ini.store(new File("./ini/"+guild_id+".ini"));
 		} catch (IOException e) {
@@ -334,5 +345,20 @@ public class GuildIni {
 		rand[0] = randomshop.get("itemSizeX", int.class);
 		rand[1] = randomshop.get("itemSizeY", int.class);
 		return rand;
+	}
+	
+	public static int[] getWholeDaily(long guild_id) {
+		Ini ini = readIni(guild_id);
+		Ini.Section daily = ini.get("Daily");
+		int [] dail = new int[8];
+		dail[0] = daily.get("rewardX", int.class);
+		dail[1] = daily.get("rewardY", int.class);
+		dail[2] = daily.get("generalTextFontSize", int.class);
+		dail[3] = daily.get("descriptionMode", int.class);
+		dail[4] = daily.get("descriptionX", int.class);
+		dail[5] = daily.get("descriptionY", int.class);
+		dail[6] = daily.get("descriptionStartX", int.class);
+		dail[7] = daily.get("fieldSizeX", int.class);
+		return dail;
 	}
 }
