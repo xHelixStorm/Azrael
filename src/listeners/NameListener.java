@@ -30,17 +30,17 @@ public class NameListener extends ListenerAdapter{
 		if(Azrael.SQLUpdateUser(user_id, newname) == 0) {
 			logger.error("Azrael.users couldn't be updated with a name update from {}",user_id);
 		}
-		for(Guild g : e.getJDA().getGuilds()){
-			check: for(String name : Azrael.SQLgetStaffNames(g.getIdLong())){
+		for(Guild guild : e.getJDA().getGuilds()){
+			check: for(String name : Azrael.SQLgetStaffNames(guild.getIdLong())){
 				if(nameCheck.matches(name+"#[0-9]{4}")){
-					Member member = e.getJDA().getGuildById(g.getIdLong()).getMemberById(user_id);
-					var log_channel = Azrael.SQLgetChannels(g.getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+					Member member = e.getJDA().getGuildById(guild.getIdLong()).getMemberById(user_id);
+					var log_channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 					try {
-						String nickname = Azrael.SQLgetRandomName(g.getIdLong());
-						e.getJDA().getGuildById(g.getIdLong()).getController().setNickname(member, nickname).queue();
+						String nickname = Azrael.SQLgetRandomName(guild.getIdLong());
+						e.getJDA().getGuildById(guild.getIdLong()).getController().setNickname(member, nickname).queue();
 						message.setColor(Color.RED).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle("Impersonation attempt found!");
 						if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**\nPlease review in case of impersonation!").build()).queue();
-						logger.debug("{} got renamed into {} in guild {}. Impersonation", e.getUser().getId(), nickname, g.getName());
+						updateNickname(member, guild, nickname, logger);
 						staff_name = true;
 						break check;
 					} catch(HierarchyException hye){
@@ -56,16 +56,16 @@ public class NameListener extends ListenerAdapter{
 				Azrael.SQLgetNameFilter(guild_id);
 				check: for(String word : Hashes.getQuerryResult("bad-names_"+guild_id)){
 					if(nameCheck.contains(word)){
-						Member user = e.getJDA().getGuildById(guild_id).getMemberById(user_id);
+						Member member = e.getJDA().getGuildById(guild_id).getMemberById(user_id);
 						
-						if(user.getUser().getIdLong() != 0){
+						if(member.getUser().getIdLong() != 0){
 							var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 							try {
 								String nickname = Azrael.SQLgetRandomName(guild_id);
-								e.getJDA().getGuildById(guild_id).getController().setNickname(user, nickname).queue();
+								e.getJDA().getGuildById(guild_id).getController().setNickname(member, nickname).queue();
 								message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
 								if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
-								logger.debug("{} got renamed into {} in guild {}", e.getUser().getId(), nickname, guild.getName());
+								updateNickname(member, guild, nickname, logger);
 								break check;
 							} catch (HierarchyException hye){
 								message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getFalseAlarmThumbnail()).setTitle("You know that you shouldn't do it :/");
@@ -78,5 +78,19 @@ public class NameListener extends ListenerAdapter{
 			}
 		}
 		Azrael.SQLInsertActionLog("MEMBER_NAME_UPDATE", e.getUser().getIdLong(), 0, e.getUser().getName()+"#"+e.getUser().getDiscriminator());
+	}
+	
+	private void updateNickname(Member member, Guild guild, String nickname, Logger logger) {
+		var user_id = member.getUser().getIdLong();
+		if(Azrael.SQLgetNickname(user_id, guild.getIdLong()).length() > 0){
+			if(Azrael.SQLUpdateNickname(user_id, guild.getIdLong(), nickname) == 0) {
+				logger.error("User nickname of {} couldn't be updated in Azrael.nickname", user_id);
+			}
+		}
+		else if(Azrael.SQLInsertNickname(user_id, guild.getIdLong(), nickname) == 0) {
+			logger.error("User nickname of {} couldn't be inserted into Azrael.nickname", user_id);
+		}
+		logger.debug("{} received the nickname {} in guild {}", member.getUser().getId(), nickname, guild.getName());
+		Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild.getIdLong(), nickname);
 	}
 }
