@@ -6,10 +6,11 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.UserPrivs;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import preparedMessages.HelpText;
+import preparedMessages.CommandList;
 import sql.Azrael;
 import util.STATIC;
 
@@ -36,7 +37,7 @@ public class Commands implements Command{
 				logger.warn("Commands command was used in a not bot channel");
 			}
 			else{
-				e.getTextChannel().sendMessage(messageBuild.setDescription(HelpText.getHelp(guild_id)).build()).queue();		
+				e.getTextChannel().sendMessage(messageBuild.setDescription(CommandList.getHelp(guild_id, (UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)))).build()).queue();		
 			}
 		}
 	}
