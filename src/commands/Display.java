@@ -37,15 +37,16 @@ public class Display implements Command{
 			String message = e.getMessage().getContentRaw();
 			String out = "";
 			
+			var permissionGranted = UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id);
 			final String prefix = GuildIni.getCommandPrefix(guild_id);
 			if(message.equals(prefix+"display")){
 				out = "Use these parameters after the display command like **"+prefix+"display -roles** for further information on what to display:\n\n"
 						+ "**-roles**: Display all roles from this guild.\n"
 						+ "**-registered-roles**: Display all registered roles with their privileges.\n"
 						+ "**-ranking-roles**: Display all roles that can be unlocked with which level.\n"
-						+ "**-textchannels**: Display all textchannels from this guild.\n"
-						+ "**-voicechannels**: Display all voicechannels from this guild.\n"
-						+ "**-registered-channels**: Display all registered textchannels with configured filter options.\n"
+						+ (permissionGranted ? "**-textchannels**: Display all textchannels from this guild.\n" : "")
+						+ (permissionGranted ? "**-voicechannels**: Display all voicechannels from this guild.\n" : "")
+						+ (permissionGranted ? "**-registered-channels**: Display all registered textchannels with configured filter options.\n" : "")
 						+ "**-dailies**: Display all items that the "+prefix+"daily command contains.";
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
@@ -75,7 +76,7 @@ public class Display implements Command{
 				e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No ranking role has been registered!").build()).queue();
 			}
 			else if(message.equals(prefix+"display -textchannels")){
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
+				if(permissionGranted) {
 					for(TextChannel tc : e.getGuild().getTextChannels()){
 						out += tc.getName() + " (" + tc.getId() + ") \n";
 					}
@@ -86,7 +87,7 @@ public class Display implements Command{
 				}
 			}
 			else if(message.equals(prefix+"display -voicechannels")){
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
+				if(permissionGranted) {
 					for(VoiceChannel vc : e.getGuild().getVoiceChannels()){
 						out += vc.getName() + " (" + vc.getId() + ") \n";
 					}
@@ -97,7 +98,7 @@ public class Display implements Command{
 				}
 			}
 			else if(message.equals(prefix+"display -registered-channels")){
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || GuildIni.getAdmin(guild_id) == e.getMember().getUser().getIdLong()){
+				if(permissionGranted){
 					for(Channels ch : Azrael.SQLgetChannels(guild_id)){
 						if(!out.contains(""+ch.getChannel_ID())){
 							out += "\n\n"+ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \nChannel type: "+ch.getChannel_Type_Name()+" Channel\nFilter(s) in use: "+ch.getLang_Filter();
