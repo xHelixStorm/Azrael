@@ -66,23 +66,24 @@ public class Rank implements Command{
 							float experienceCounter;
 							int convertedExperience;
 							
-							String name = e.getGuild().getMemberById(user_id).getEffectiveName();
-							String avatar = e.getGuild().getMemberById(user_id).getUser().getEffectiveAvatarUrl();
-							int level = user_details.getLevel();
+							final String name = e.getGuild().getMemberById(user_id).getEffectiveName();
+							final String avatar = e.getGuild().getMemberById(user_id).getUser().getEffectiveAvatarUrl();
+							final int level = user_details.getLevel();
 							float currentExperience = user_details.getCurrentExperience();
 							float rankUpExperience = user_details.getRankUpExperience();
-							int max_level = guild_settings.getMaxLevel();
-							int rank_skin = user_details.getRankingRank();
-							int icon_skin = user_details.getRankingIcon();
-							int bar_color = user_details.getBarColorRank();
-							boolean additional_text = user_details.getAdditionalTextRank();
-							int color_r = user_details.getColorRRank();
-							int color_g = user_details.getColorGRank();
-							int color_b = user_details.getColorBRank();
-							int rankx = user_details.getRankXRank();
-							int ranky = user_details.getRankYRank();
-							int rank_width = user_details.getRankWidthRank();
-							int rank_height = user_details.getRankHeightRank();
+							final int max_level = guild_settings.getMaxLevel();
+							final int rank_skin = user_details.getRankingRank();
+							final int icon_skin = user_details.getRankingIcon();
+							final int bar_color = user_details.getBarColorRank();
+							final boolean additional_exp_text = user_details.getAdditionalExpTextRank();
+							final boolean additional_percent_text = user_details.getAdditionalPercentTextRank();
+							final int color_r = user_details.getColorRRank();
+							final int color_g = user_details.getColorGRank();
+							final int color_b = user_details.getColorBRank();
+							final int rankx = user_details.getRankXRank();
+							final int ranky = user_details.getRankYRank();
+							final int rank_width = user_details.getRankWidthRank();
+							final int rank_height = user_details.getRankHeightRank();
 							
 							if(rank_skin != 0 && icon_skin != 0) {
 								if(level == max_level){currentExperience = 999999; rankUpExperience = 999999;}
@@ -104,7 +105,7 @@ public class Rank implements Command{
 								}
 								
 								if(currentExperience >= 0) {
-									RankingMethods.getRank(e, name, avatar, convertedExperience, level, rank, rank_skin, icon_skin, bar_color, additional_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
+									RankingMethods.getRank(e, name, avatar, convertedExperience, level, rank, rank_skin, icon_skin, bar_color, additional_exp_text, additional_percent_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
 								}
 								else {
 									EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");

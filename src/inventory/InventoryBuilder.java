@@ -67,7 +67,7 @@ public class InventoryBuilder{
 						item = ImageIO.read(new File("./files/RankingSystem/Inventory/items/"+inventory.getDescription()+".png"));
 					else
 						item = ImageIO.read(new File("./files/RankingSystem/Inventory/weapons/"+inventory.getWeaponDescription()+".png"));
-					g.drawImage(item, currentX+boxSizeX-(item.getWidth()/2), currentY+boxSizeY-(item.getHeight()/2), (itemSizeX != 0 ? itemSizeX : item.getWidth()), (itemSizeY != 0 ? itemSizeY : item.getHeight()), null);
+					g.drawImage(item, currentX+(boxSizeX/2)-(item.getWidth()/2), currentY+boxSizeY-(item.getHeight()/2), (itemSizeX != 0 ? itemSizeX : item.getWidth()), (itemSizeY != 0 ? itemSizeY : item.getHeight()), null);
 					g.drawString((inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+ " "+inventory.getStat()), currentX+getCenteredString(inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+ " "+inventory.getStat(), boxSizeX, g), currentY+boxSizeY+descriptionY);
 					if(inventory.getType() == null || inventory.getType().equals("ite")){
 						if(inventory.getStatus().equals("limit")){
@@ -115,7 +115,7 @@ public class InventoryBuilder{
 	
 	private static int getCenteredString(String s, int w, Graphics2D g) {
 	    FontMetrics fm = g.getFontMetrics();
-	    int x = w - (fm.stringWidth(s)/2);
+	    int x = (w/2) - (fm.stringWidth(s)/2);
 	    return x;
 	}
 	

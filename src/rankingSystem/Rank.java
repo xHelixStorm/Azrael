@@ -24,8 +24,10 @@ public class Rank {
 	
 	private int bar_color_rank;
 	private int bar_color_profile;
-	private boolean additional_text_rank;
-	private boolean additional_text_profile;
+	private boolean additional_exp_text_rank;
+	private boolean additional_percent_text_rank;
+	private boolean additional_exp_text_profile;
+	private boolean additional_percent_text_profile;
 	
 	private int color_r_level;
 	private int color_r_rank;
@@ -118,11 +120,17 @@ public class Rank {
 	public void setBarColorProfile(int _bar_color_profile) {
 		bar_color_profile = _bar_color_profile;
 	}
-	public void setAdditionalTextRank(boolean _additional_text_rank) {
-		additional_text_rank = _additional_text_rank;
+	public void setAdditionalExpTextRank(boolean _additional_exp_text_rank) {
+		additional_exp_text_rank = _additional_exp_text_rank;
 	}
-	public void setAdditionalTextProfile(boolean _additional_text_profile) {
-		additional_text_profile = _additional_text_profile;
+	public void setAdditionalPercentTextRank(boolean _additional_percent_text_rank) {
+		additional_percent_text_rank = _additional_percent_text_rank;
+	}
+	public void setAdditionalExpTextProfile(boolean _additional_exp_text_profile) {
+		additional_exp_text_profile = _additional_exp_text_profile;
+	}
+	public void setAdditionalPercentTextProfile(boolean _additional_percent_text_profile) {
+		additional_percent_text_profile = _additional_percent_text_profile;
 	}
 	public void setColorRLevel(int _color_r_level) {
 		color_r_level = _color_r_level;
@@ -266,11 +274,17 @@ public class Rank {
 	public int getBarColorProfile() {
 		return bar_color_profile;
 	}
-	public boolean getAdditionalTextRank() {
-		return additional_text_rank;
+	public boolean getAdditionalExpTextRank() {
+		return additional_exp_text_rank;
 	}
-	public boolean getAdditionalTextProfile() {
-		return additional_text_profile;
+	public boolean getAdditionalPercentTextRank() {
+		return additional_percent_text_rank;
+	}
+	public boolean getAdditionalExpTextProfile() {
+		return additional_exp_text_profile;
+	}
+	public boolean getAdditionalPercentTextProfile() {
+		return additional_percent_text_profile;
 	}
 	public int getColorRLevel() {
 		return color_r_level;

@@ -83,7 +83,7 @@ public class RankingMethods extends ListenerAdapter{
 		}
 	}
 	
-	public static void getRank(MessageReceivedEvent e, String _name, String _avatar, int _experience, int _level, int _rank, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
+	public static void getRank(MessageReceivedEvent e, String _name, String _avatar, int _experience, int _level, int _rank, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_exp_text, boolean _additional_percent_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
 		try{
 			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/rank"+_rank_skin+"_blank.png"));
 			BufferedImage experienceBar;
@@ -123,9 +123,11 @@ public class RankingMethods extends ListenerAdapter{
 			g.setColor(color);
 			g.setFont(new Font("Nexa Bold", Font.PLAIN, 12));
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			if(_additional_text == true){
+			if(_additional_exp_text == true) {
 				g.drawString("Exp:", 14, 73);
-				g.drawString(levelT+"%", 239, 73);
+			}
+			if(_additional_percent_text == true) {
+				g.drawString(levelT+"%", 246, 73);
 			}
 			g.drawString("Rank:  #"+_rank, 118, 57);
 			g.setFont(new Font("Nexa Bold", Font.BOLD, 23));
@@ -142,7 +144,7 @@ public class RankingMethods extends ListenerAdapter{
 		}
 	}
 	
-	public static void getProfile(MessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _level, float _currentExperience, float _rankUpExperience, long _experience, long _currency, int _rank, int _profile_skin, int _icon_skin, int _bar_color, boolean _additional_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
+	public static void getProfile(MessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _level, float _currentExperience, float _rankUpExperience, long _experience, long _currency, int _rank, int _profile_skin, int _icon_skin, int _bar_color, boolean _additional_exp_text, boolean _additional_percent_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
 		try{
 			BufferedImage profile = ImageIO.read(new File("./files/RankingSystem/profile"+_profile_skin+"_blank.png"));
 			BufferedImage experienceBar;
@@ -188,8 +190,10 @@ public class RankingMethods extends ListenerAdapter{
 			Color color = new Color(_color_r, _color_g, _color_b);
 			g.setColor(color);
 			g.setFont(new Font("Nexa Bold", Font.PLAIN, 13));
-			if(_additional_text == true){
+			if(_additional_exp_text == true) {
 				g.drawString("Exp:", 15, 109);
+			}
+			if(_additional_percent_text == true) {
 				g.drawString(levelT+"%", 243, 109);
 			}
 			g.drawString(""+_level, getRightString(""+_level, 136, g), 176);

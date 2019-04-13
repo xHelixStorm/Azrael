@@ -62,7 +62,7 @@ public class DrawDaily {
 	
 	private static int getCenteredString(String s, int w, Graphics2D g) {
 	    FontMetrics fm = g.getFontMetrics();
-	    int x = w - (fm.stringWidth(s)/2);
+	    int x = (w/2) - (fm.stringWidth(s)/2);
 	    return x;
 	}
 	

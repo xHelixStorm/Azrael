@@ -68,23 +68,24 @@ public class Profile implements Command{
 							
 							String name = e.getGuild().getMemberById(user_id).getEffectiveName();
 							String avatar = e.getGuild().getMemberById(user_id).getUser().getEffectiveAvatarUrl();
-							int level = user_details.getLevel();
+							final int level = user_details.getLevel();
 							float currentExperience = user_details.getCurrentExperience();
 							float rankUpExperience = user_details.getRankUpExperience();
-							long experience = user_details.getExperience();
-							long currency = user_details.getCurrency();
-							int max_level = guild_settings.getMaxLevel();
-							int profile_skin = user_details.getRankingProfile();
-							int icon_skin = user_details.getRankingIcon();
-							int bar_color = user_details.getBarColorProfile();
-							boolean additional_text = user_details.getAdditionalTextProfile();
-							int color_r = user_details.getColorRProfile();
-							int color_g = user_details.getColorGProfile();
-							int color_b = user_details.getColorBProfile();
-							int rankx = user_details.getRankXProfile();
-							int ranky = user_details.getRankYProfile();
-							int rank_width = user_details.getRankWidthProfile();
-							int rank_height = user_details.getRankHeightProfile();
+							final long experience = user_details.getExperience();
+							final long currency = user_details.getCurrency();
+							final int max_level = guild_settings.getMaxLevel();
+							final int profile_skin = user_details.getRankingProfile();
+							final int icon_skin = user_details.getRankingIcon();
+							final int bar_color = user_details.getBarColorProfile();
+							final boolean additional_exp_text = user_details.getAdditionalExpTextProfile();
+							final boolean additional_percent_text = user_details.getAdditionalPercentTextProfile();
+							final int color_r = user_details.getColorRProfile();
+							final int color_g = user_details.getColorGProfile();
+							final int color_b = user_details.getColorBProfile();
+							final int rankx = user_details.getRankXProfile();
+							final int ranky = user_details.getRankYProfile();
+							final int rank_width = user_details.getRankWidthProfile();
+							final int rank_height = user_details.getRankHeightProfile();
 							
 							if(profile_skin != 0 && icon_skin != 0) {
 								if(level == max_level){currentExperience = 999999; rankUpExperience = 999999;}
@@ -105,7 +106,7 @@ public class Profile implements Command{
 									}
 								}
 								if(currentExperience >= 0) {
-									RankingMethods.getProfile(e, name, avatar, convertedExperience, level, currentExperience, rankUpExperience, experience, currency, rank, profile_skin, icon_skin, bar_color, additional_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
+									RankingMethods.getProfile(e, name, avatar, convertedExperience, level, currentExperience, rankUpExperience, experience, currency, rank, profile_skin, icon_skin, bar_color, additional_exp_text, additional_percent_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
 								}
 								else {
 									EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");

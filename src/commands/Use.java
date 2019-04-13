@@ -53,7 +53,7 @@ public class Use implements Command{
 						if(user_details.getRankingLevel() != 0) {
 							if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel()) > 0) {
 								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
-								e.getTextChannel().sendMessage("Level skin has been resetted to the server default skin!").queue();
+								e.getTextChannel().sendMessage("Level skin has been resetted to **"+user_details.getLevelDescription()+"**!").queue();
 							}
 							else {
 								//if rows didn't get updated, throw and error and write it into error log
@@ -73,7 +73,8 @@ public class Use implements Command{
 						user_details.setRankingRank(rank.getRankingRank());
 						user_details.setRankDescription(rank.getRankDescription());
 						user_details.setBarColorRank(rank.getBarColorRank());
-						user_details.setAdditionalTextRank(rank.getAdditionalTextRank());
+						user_details.setAdditionalExpTextRank(rank.getAdditionalExpTextRank());
+						user_details.setAdditionalPercentTextRank(rank.getAdditionalPercentTextRank());
 						user_details.setColorRRank(rank.getColorRRank());
 						user_details.setColorGRank(rank.getColorGRank());
 						user_details.setColorBRank(rank.getColorBRank());
@@ -84,7 +85,7 @@ public class Use implements Command{
 						if(user_details.getRankingRank() != 0) {
 							if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank()) > 0) {
 								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
-								e.getTextChannel().sendMessage("Rank skin has been resetted to the server default skin!").queue();
+								e.getTextChannel().sendMessage("Rank skin has been resetted to **"+user_details.getRankDescription()+"**!").queue();
 							}
 							else {
 								//if rows didn't get updated, throw and error and write it into error log
@@ -104,7 +105,8 @@ public class Use implements Command{
 						user_details.setRankingProfile(rank.getRankingProfile());
 						user_details.setProfileDescription(rank.getProfileDescription());
 						user_details.setBarColorProfile(rank.getBarColorProfile());
-						user_details.setAdditionalTextProfile(rank.getAdditionalTextProfile());
+						user_details.setAdditionalExpTextProfile(rank.getAdditionalExpTextProfile());
+						user_details.setAdditionalPercentTextProfile(rank.getAdditionalPercentTextProfile());
 						user_details.setColorRProfile(rank.getColorRProfile());
 						user_details.setColorGProfile(rank.getColorGProfile());
 						user_details.setColorBProfile(rank.getColorBProfile());
@@ -115,7 +117,7 @@ public class Use implements Command{
 						if(user_details.getRankingProfile() != 0) {
 							if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile()) > 0) {
 								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
-								e.getTextChannel().sendMessage("Profile skin has been resetted to the server default skin!").queue();
+								e.getTextChannel().sendMessage("Profile skin has been resetted to **"+user_details.getProfileDescription()+"**!").queue();
 							}
 							else {
 								//if rows didn't get updated, throw and error and write it into error log
@@ -137,7 +139,7 @@ public class Use implements Command{
 						if(user_details.getRankingIcon() != 0) {
 							if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon()) > 0) {
 								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
-								e.getTextChannel().sendMessage("Icon skins has been resetted to the server default skin!").queue();
+								e.getTextChannel().sendMessage("Icon skins has been resetted to **"+user_details.getIconDescription()+"**!").queue();
 							}
 							else {
 								//if rows didn't get updated, throw and error and write it into error log
@@ -155,7 +157,7 @@ public class Use implements Command{
 					else if(input.contains(prefix+"use ")){
 						input = input.substring(prefix.length()+4);
 						inventory.Inventory inventory = RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input, guild_settings.getThemeID());
-						if(inventory.getItemID() != 0 && inventory.getStatus().equals("perm")){
+						if(inventory != null && inventory.getItemID() != 0 && inventory.getStatus().equals("perm")){
 							if(inventory.getSkinType().equals("lev")){
 								final String filter = input;
 								rankingSystem.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
@@ -184,7 +186,8 @@ public class Use implements Command{
 								user_details.setRankingRank(rank.getRankingRank());
 								user_details.setRankDescription(rank.getRankDescription());
 								user_details.setBarColorRank(rank.getBarColorRank());
-								user_details.setAdditionalTextRank(rank.getAdditionalTextRank());
+								user_details.setAdditionalExpTextRank(rank.getAdditionalExpTextRank());
+								user_details.setAdditionalPercentTextRank(rank.getAdditionalPercentTextRank());
 								user_details.setColorRRank(rank.getColorRRank());
 								user_details.setColorGRank(rank.getColorGRank());
 								user_details.setColorBRank(rank.getColorBRank());
@@ -208,7 +211,8 @@ public class Use implements Command{
 								user_details.setRankingProfile(rank.getRankingProfile());
 								user_details.setProfileDescription(rank.getProfileDescription());
 								user_details.setBarColorProfile(rank.getBarColorProfile());
-								user_details.setAdditionalTextProfile(rank.getAdditionalTextProfile());
+								user_details.setAdditionalExpTextProfile(rank.getAdditionalExpTextProfile());
+								user_details.setAdditionalPercentTextProfile(rank.getAdditionalPercentTextProfile());
 								user_details.setColorRProfile(rank.getColorRProfile());
 								user_details.setColorGProfile(rank.getColorGProfile());
 								user_details.setColorBProfile(rank.getColorBProfile());
