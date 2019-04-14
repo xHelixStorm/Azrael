@@ -129,7 +129,8 @@ public class RankingMethods extends ListenerAdapter{
 			if(_additional_percent_text == true) {
 				g.drawString(levelT+"%", 246, 73);
 			}
-			g.drawString("Rank:  #"+_rank, 118, 57);
+			var rankString = insertDots(_rank);
+			g.drawString("Rank:  #"+rankString, 118, 57);
 			g.setFont(new Font("Nexa Bold", Font.BOLD, 23));
 			g.drawString(name, 117, 38);
 			
@@ -197,10 +198,15 @@ public class RankingMethods extends ListenerAdapter{
 				g.drawString(levelT+"%", 243, 109);
 			}
 			g.drawString(""+_level, getRightString(""+_level, 136, g), 176);
-			g.drawString(""+experience, getRightString(""+experience, 136, g), 153);
-			g.drawString(currentExperience+"/"+rankUpExperience, getRightString(""+currentExperience, 142, g), 123);
-			g.drawString(""+currency, getRightString(""+_currency, 263, g), 153);
-			g.drawString(""+rank, getRightString(""+_rank, 263, g), 176);
+			var experienceString = insertDots(experience);
+			g.drawString(""+experienceString, getRightString(""+experienceString, 136, g), 153);
+			var currentExperienceString = insertDots(currentExperience);
+			var rankUpExperienceString = insertDots(rankUpExperience);
+			g.drawString(currentExperienceString+"/"+rankUpExperienceString, getRightString(""+currentExperienceString, 142, g), 123);
+			var currencyString = insertDots(currency);
+			g.drawString(currencyString, getRightString(currencyString, 263, g), 153);
+			var rankString = insertDots(rank);
+			g.drawString(rankString, getRightString(rankString, 263, g), 176);
 			g.setFont(new Font("Nexa Bold", Font.BOLD, 24));
 			g.drawString(name, 126, 56);
 			
@@ -242,5 +248,26 @@ public class RankingMethods extends ListenerAdapter{
 		RenderingHints hints = new RenderingHints(map);
 		BufferedImageOp op = new ConvolveOp(new Kernel(3, 3, blurKernel), ConvolveOp.EDGE_NO_OP, hints);
 		return op.filter(image, null);
+	}
+	
+	private static String insertDots(long value) {
+		var number = ""+value;
+		var stringLength = number.length();
+		var line = 0;
+		var newString = "";
+		while(stringLength != 0) {
+			var spot = stringLength % 3;
+			if(spot != 0) {
+				stringLength -= spot;
+				newString += number.substring(line, spot)+(stringLength != 0 ? "." : "");
+				line += spot;
+			}
+			else {
+				stringLength -= 3;
+				newString += number.substring(line, line+3)+(stringLength != 0 ? "." : "");
+				line += 3;
+			}
+		}
+		return newString;
 	}
 }
