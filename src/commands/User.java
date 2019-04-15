@@ -29,10 +29,10 @@ public class User implements Command{
 			executor.execute(() -> {
 				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
 					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-					if(e.getMessage().getContentRaw().equals(prefix+"user")) {
+					if(args.length == 0) {
 						UserExecution.getHelp(e);
 					}
-					else if(e.getMessage().getContentRaw().contains(prefix+"user ")) {
+					else if(args.length > 0) {
 						UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]", ""), e.getMessage().getContentDisplay().substring(prefix.length()+5));
 					}
 				}

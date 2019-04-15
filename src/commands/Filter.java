@@ -25,10 +25,10 @@ public class Filter implements Command{
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 			final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
-				if(e.getMessage().getContentRaw().equals(prefix+"filter")) {
+				if(args.length == 0) {
 					FilterExecution.runHelp(e);
 				}
-				else if(e.getMessage().getContentRaw().contains(prefix+"filter ")) {
+				else if(args.length > 0) {
 					FilterExecution.runTask(e, e.getMessage().getContentRaw().substring(prefix.length()+7));
 				}
 			}

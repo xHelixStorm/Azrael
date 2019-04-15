@@ -29,7 +29,6 @@ public class Meow implements Command{
 				Logger logger = LoggerFactory.getLogger(Meow.class);
 				logger.debug("{} has used Meow command", e.getMember().getUser().getId());
 				long guild_id = e.getGuild().getIdLong();
-				String variable = e.getMessage().getContentRaw();
 				String path = "./files/Cat/";				
 				
 				var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
@@ -42,7 +41,7 @@ public class Meow implements Command{
 				else if(execution_id == 2 || execution_id == 1){
 					if(execution_id != 1){
 						try {
-							MeowExecution.Execute(e, variable, path, e.getTextChannel().getIdLong());
+							MeowExecution.Execute(e, args, path, e.getTextChannel().getIdLong());
 						} catch (IOException e1) {
 							logger.error("Selected meow picture couldn't be found", e1);
 						}
@@ -50,7 +49,7 @@ public class Meow implements Command{
 					else{
 						if(bot_channels.size() > 0 && this_channel != null){
 							try {
-								MeowExecution.Execute(e, variable, path, this_channel.getChannel_ID());
+								MeowExecution.Execute(e, args, path, this_channel.getChannel_ID());
 							} catch (IOException e1) {
 								logger.error("Selected meow picture couldn't be found", e1);
 							}

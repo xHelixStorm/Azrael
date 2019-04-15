@@ -30,7 +30,6 @@ public class Pug implements Command{
 				logger.debug("{} has used Pug command", e.getMember().getUser().getId());
 				
 				long guild_id = e.getGuild().getIdLong();
-				String variable = e.getMessage().getContentRaw();
 				String path = "./files/Pug/";
 				
 				var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
@@ -43,7 +42,7 @@ public class Pug implements Command{
 				else if(execution_id == 2 || execution_id == 1){
 					if(execution_id != 1){
 						try {
-							PugExecution.Execute(e, variable, path, e.getTextChannel().getIdLong());
+							PugExecution.Execute(e, args, path, e.getTextChannel().getIdLong());
 						} catch (IOException e1) {
 							logger.error("Selected pug picture couldn't be found", e1);
 						}
@@ -51,7 +50,7 @@ public class Pug implements Command{
 					else{
 						if(bot_channels.size() > 0 && this_channel != null){
 							try {
-								PugExecution.Execute(e, variable, path, this_channel.getChannel_ID());
+								PugExecution.Execute(e, args, path, this_channel.getChannel_ID());
 							} catch (IOException e1) {
 								logger.error("Selected pug picture couldn't be found", e1);
 							}

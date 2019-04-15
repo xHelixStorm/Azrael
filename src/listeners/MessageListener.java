@@ -7,6 +7,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vdurmont.emoji.EmojiManager;
 
 import commandsContainer.FilterExecution;
@@ -45,7 +48,11 @@ public class MessageListener extends ListenerAdapter{
 		try {
 			//execute commands first
 			if(e.getMessage().getContentRaw().startsWith(GuildIni.getCommandPrefix(e.getGuild().getIdLong())) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()){
-				CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw(), e));
+				var prefixLength = GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length();
+				if(!CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength).toLowerCase(), e))) {
+					Logger logger = LoggerFactory.getLogger(MessageListener.class);
+					logger.debug("Command {} doesn't exist!", e.getMessage().getContentRaw());
+				}
 			}
 			
 			File warning = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");

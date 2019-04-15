@@ -34,12 +34,11 @@ public class Display implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(GuildIni.getDisplayCommand(e.getGuild().getIdLong())){
 			long guild_id = e.getGuild().getIdLong();
-			String message = e.getMessage().getContentRaw();
 			String out = "";
 			
 			var permissionGranted = UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id);
 			final String prefix = GuildIni.getCommandPrefix(guild_id);
-			if(message.equals(prefix+"display")){
+			if(args.length == 0){
 				out = "Use these parameters after the display command like **"+prefix+"display -roles** for further information on what to display:\n\n"
 						+ "**-roles**: Display all roles from this guild.\n"
 						+ "**-registered-roles**: Display all registered roles with their privileges.\n"
@@ -50,19 +49,19 @@ public class Display implements Command{
 						+ "**-dailies**: Display all items that the "+prefix+"daily command contains.";
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
-			else if(message.equals(prefix+"display -roles")){
+			else if(args[0].equalsIgnoreCase("-roles")){
 				for(Role r : e.getGuild().getRoles()){
 					out += r.getName() + " (" + r.getId() + ") \n";
 				}
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
-			else if(message.equals(prefix+"display -registered-roles")){
+			else if(args[0].equalsIgnoreCase("-registered-roles")){
 				for(Roles r : DiscordRoles.SQLgetRoles(guild_id)){
 					out += r.getRole_Name() + " (" + r.getRole_ID() + ") \nrole type: "+r.getCategory_Name()+"\n\n";
 				}
 				e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 			}
-			else if(message.equals(prefix+"display -ranking-roles")){
+			else if(args[0].equalsIgnoreCase("-ranking-roles")){
 				if(RankingSystem.SQLgetGuild(guild_id).getRankingState()){
 					for(rankingSystem.Rank r : Hashes.getMapOfRankingRoles().values()){
 						if(r.getGuildID() == guild_id){
@@ -75,7 +74,7 @@ public class Display implements Command{
 				}
 				e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No ranking role has been registered!").build()).queue();
 			}
-			else if(message.equals(prefix+"display -textchannels")){
+			else if(args[0].equalsIgnoreCase("-textchannels")){
 				if(permissionGranted) {
 					for(TextChannel tc : e.getGuild().getTextChannels()){
 						out += tc.getName() + " (" + tc.getId() + ") \n";
@@ -86,7 +85,7 @@ public class Display implements Command{
 					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden textchannels!**").build()).queue();
 				}
 			}
-			else if(message.equals(prefix+"display -voicechannels")){
+			else if(args[0].equalsIgnoreCase("-voicechannels")){
 				if(permissionGranted) {
 					for(VoiceChannel vc : e.getGuild().getVoiceChannels()){
 						out += vc.getName() + " (" + vc.getId() + ") \n";
@@ -97,7 +96,7 @@ public class Display implements Command{
 					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden voicechannels!**").build()).queue();
 				}
 			}
-			else if(message.equals(prefix+"display -registered-channels")){
+			else if(args[0].equalsIgnoreCase("-registered-channels")){
 				if(permissionGranted){
 					for(Channels ch : Azrael.SQLgetChannels(guild_id)){
 						if(!out.contains(""+ch.getChannel_ID())){
@@ -113,7 +112,7 @@ public class Display implements Command{
 					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" sry, you're not allowed to run this command, since it may show hidden channels!**").build()).queue();
 				}
 			}
-			else if(message.equals(prefix+"display -dailies")){
+			else if(args[0].equalsIgnoreCase("-dailies")){
 				for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID())){
 					out+= daily.getDescription()+"\nWeight: "+daily.getWeight()+"\n\n";
 				}
