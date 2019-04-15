@@ -65,6 +65,8 @@ public class FilterExecution {
 				FileSetting.createFile(file_name, "staff-names");
 				new Thread(new DelayDelete(file_name, 180000)).start();
 				break;
+			default:
+				_e.getTextChannel().sendMessage("Please choose between word-filter, name-filter, funny-names or staff-names").queue();
 		}
 	}
 	
