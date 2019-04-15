@@ -61,9 +61,14 @@ public class UserExecution {
 		
 		if(raw_input.length() != 18 && raw_input.length() != 17){
 			User user = Azrael.SQLgetUser(name);
-			if(user.getUserID() != 0) {
-				raw_input = ""+user.getUserID();
-				user_name = user.getUserName();
+			try {
+				if(user.getUserID() != 0) {
+					raw_input = ""+user.getUserID();
+					user_name = user.getUserName();
+				}
+			} catch(Exception exc) {
+				_e.getTextChannel().sendMessage("Error, user doesn't exist. Please try again!").queue();
+				return;
 			}
 		}
 		else{
