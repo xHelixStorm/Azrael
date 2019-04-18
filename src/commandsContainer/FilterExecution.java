@@ -94,7 +94,7 @@ public class FilterExecution {
 						for(String lang : Azrael.SQLgetFilterLanguages()) {
 							out.append(lang+"\n");
 						}
-						_e.getTextChannel().sendMessage(message.setDescription("Please choose a language for the new word!\n\n**"+(out.length() > 0 ? out.toString() : "<no languages available>")+"**").build()).queue();
+						_e.getTextChannel().sendMessage(message.setDescription("Please choose a language for the new word!\n\n**"+(out.length() > 0 ? out.toString()+"All" : "<no languages available>")+"**").build()).queue();
 						out.setLength(0);
 						FileSetting.createFile(file_path, "insert-word-filter");
 					}
@@ -104,7 +104,7 @@ public class FilterExecution {
 						for(String lang : Azrael.SQLgetFilterLanguages()) {
 							out.append(lang+"\n");
 						}
-						_e.getTextChannel().sendMessage(message.setDescription("Please choose a language for the word you want to remove!\n\n**"+(out.length() > 0 ? out.toString() : "<no languages available>")+"**").build()).queue();
+						_e.getTextChannel().sendMessage(message.setDescription("Please choose a language for the word you want to remove!\n\n**"+(out.length() > 0 ? out.toString()+"All" : "<no languages available>")+"**").build()).queue();
 						out.setLength(0);
 						FileSetting.createFile(file_path, "remove-word-filter");
 					}
@@ -351,6 +351,11 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
 						FileSetting.createFile(file_path, "italian-insert-word-filter");
 					}
+					else if(_message.equalsIgnoreCase("all")) {
+						message.setTitle("You chose to insert a word for all languages!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
+						FileSetting.createFile(file_path, "all-insert-word-filter");
+					}
 					break;
 				case "english-insert-word-filter":
 					if(Azrael.SQLInsertWordFilter("eng", _message, _e.getGuild().getIdLong()) > 0) {
@@ -464,6 +469,27 @@ public class FilterExecution {
 						logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
 					}
 					break;
+				case "all-insert-word-filter":
+					if(Azrael.SQLDeleteWordFilterAllLang(_message.toLowerCase(), _e.getGuild().getIdLong()) && Azrael.SQLInsertWordFilter("all", _message, _e.getGuild().getIdLong()) > 0) {
+						message.setTitle("Success!");
+						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into all word filter languages!").build()).queue();
+						Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
+						logger.debug("{} has inserted the word {} into the word filter for all languages", _e.getMember().getUser().getIdLong(), _message);
+						FileSetting.createFile(file_path, "complete");
+					}
+					else {
+						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be inserted into the word-filter table.").queue();
+						logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
+					}
+					break;
 				case "remove-word-filter":
 					if(_message.equalsIgnoreCase("english")) {
 						message.setTitle("You chose to remove an english word!");
@@ -504,6 +530,11 @@ public class FilterExecution {
 						message.setTitle("You chose to remove an italian word!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
 						FileSetting.createFile(file_path, "italian-remove-word-filter");
+					}
+					else if(_message.equalsIgnoreCase("all")) {
+						message.setTitle("You chose to remove an word from all languages!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
+						FileSetting.createFile(file_path, "all-remove-word-filter");
 					}
 					break;
 				case "english-remove-word-filter":
@@ -611,6 +642,27 @@ public class FilterExecution {
 						Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
 						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
 						logger.debug("{} has removed the word {} from the italian word filter", _e.getMember().getUser().getIdLong(), _message);
+						FileSetting.createFile(file_path, "complete");
+					}
+					else {
+						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be removed from the word-filter").queue();
+						logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
+					}
+					break;
+				case "all-remove-word-filter":
+					if(Azrael.SQLDeleteWordFilterAllLang(_message.toLowerCase(), _e.getGuild().getIdLong())) {
+						message.setTitle("Success!");
+						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from all word filter languages!").build()).queue();
+						Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
+						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
+						logger.debug("{} has removed the word {} from all word filter languages", _e.getMember().getUser().getIdLong(), _message);
 						FileSetting.createFile(file_path, "complete");
 					}
 					else {

@@ -1080,11 +1080,45 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv, fk_guild_id) VALUES(NULL, ?, ?, ?) ON DUPLICATE KEY UPDATE word=VALUES(word)");
+			var sql = "";
+			if(!_lang.equals("all"))
+				sql = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv, fk_guild_id) VALUES(NULL, ?, ?, ?) ON DUPLICATE KEY UPDATE word=VALUES(word)");
+			else {
+				sql = ("INSERT INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES"
+						+ "(?, \"eng\", ?),"
+						+ "(?, \"ger\", ?),"
+						+ "(?, \"fre\", ?),"
+						+ "(?, \"tur\", ?),"
+						+ "(?, \"rus\", ?),"
+						+ "(?, \"spa\", ?),"
+						+ "(?, \"por\", ?),"
+						+ "(?, \"ita\", ?)");
+			}
 			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _word.toLowerCase());
-			stmt.setString(2, _lang);
-			stmt.setLong(3, _guild_id);
+			if(!_lang.equals("all")) {
+				stmt.setString(1, _word.toLowerCase());
+				stmt.setString(2, _lang);
+				stmt.setLong(3, _guild_id);
+			}
+			else {
+				var word = _word.toLowerCase();
+				stmt.setString(1, word);
+				stmt.setLong(2, _guild_id);
+				stmt.setString(3, word);
+				stmt.setLong(4, _guild_id);
+				stmt.setString(5, word);
+				stmt.setLong(6, _guild_id);
+				stmt.setString(7, word);
+				stmt.setLong(8, _guild_id);
+				stmt.setString(9, word);
+				stmt.setLong(10, _guild_id);
+				stmt.setString(11, word);
+				stmt.setLong(12, _guild_id);
+				stmt.setString(13, word);
+				stmt.setLong(14, _guild_id);
+				stmt.setString(15,word);
+				stmt.setLong(16, _guild_id);
+			}
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertWordFilter Exception", e);
@@ -1095,8 +1129,29 @@ public class Azrael {
 		}
 	}
 	
+	public static boolean SQLDeleteWordFilterAllLang(String _word, long _guild_id) {
+		logger.debug("SQLDeleteWordFilter launched. Passed params {}, {}", _word, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM filter WHERE word LIKE ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _word);
+			stmt.setLong(2, _guild_id);
+			stmt.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			logger.error("SQLDeleteWordFilter Exception", e);
+			return false;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLDeleteWordFilter(String _lang, String _word, long _guild_id) {
-		logger.debug("SQLDeleteWordFilter launched. Passed params {}, {}. {}", _lang, _word, _guild_id);
+		logger.debug("SQLDeleteWordFilter launched. Passed params {}, {}, {}", _lang, _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
