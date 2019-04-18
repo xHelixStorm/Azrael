@@ -26,7 +26,6 @@ public class Top implements Command{
 			Logger logger = LoggerFactory.getLogger(Top.class);
 			logger.debug("{} has used Top command", e.getMember().getUser().getId());
 			
-			String command = e.getMessage().getContentRaw();
 			long member_id = e.getMember().getUser().getIdLong();
 			int rank = 0;
 			StringBuilder message = new StringBuilder();
@@ -40,16 +39,20 @@ public class Top implements Command{
 			int page = 0;
 			boolean runTopList = false;
 			
-			if(command.equals(GuildIni.getCommandPrefix(e.getGuild().getIdLong())+"top")){
+			if(args.length == 0){
 				page = 1;
 				runTopList = true;
 			}
-			else if(command.contains("H!top -page ")){
-				page = Integer.parseInt(command.substring(12));
-				if(page < 1){page = 1;}
+			else if(args.length > 1 && args[0].equalsIgnoreCase("-page")) {
+				try {
+					page = Integer.parseInt(args[1]);
+					if(page < 1){page = 1;}
+				} catch(NumberFormatException nfe) {
+					page = 1;
+				}
 				runTopList = true;
 			}
-			else if(command.equals("H!top -help")){
+			else if(args[0].equalsIgnoreCase("-help")){
 				e.getTextChannel().sendMessage("```To use this command, type H!top to show the top 10 ranking in this server.\nTo display other pages use H!top -page x.\nNote that it can't display pages where 10 users aren't listed!```").queue();
 			}
 			else{

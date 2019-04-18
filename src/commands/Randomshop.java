@@ -33,16 +33,15 @@ public class Randomshop implements Command{
 			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null) {
 				Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-				final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-				if(e.getMessage().getContentRaw().equals(prefix+"randomshop")) {
+				if(args.length == 0) {
 					//run help and collect all possible parameters
 					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()));
 				}
-				else if(e.getMessage().getContentRaw().contains(prefix+"randomshop -play ")) {
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-play")) {
 					//start a round
-					RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()), e.getMessage().getContentRaw().substring((e.getMessage().getContentRaw().indexOf("-play")+6)));
+					RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()), bundleArguments(args, 1));
 				}
-				else if(e.getMessage().getContentRaw().equals(prefix+"randomshop -replay")) {
+				else if(args[0].equalsIgnoreCase("-replay")) {
 					//play another round if a match occurred within 10 minutes
 					File file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_play_"+e.getMember().getUser().getId());
 					if(file.exists() && System.currentTimeMillis() - file.lastModified() < 600000) {
@@ -54,9 +53,9 @@ public class Randomshop implements Command{
 							file.delete();
 					}
 				}
-				else if(e.getMessage().getContentRaw().contains(prefix+"randomshop ")) {
+				else if(args.length > 0) {
 					//display the weapons that can be obtained.
-					RandomshopExecution.inspectItems(e, null, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()), e.getMessage().getContentRaw().substring(prefix.length()+11), 1);
+					RandomshopExecution.inspectItems(e, null, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()), bundleArguments(args, 0), 1);
 				}
 				else {
 					//if typos occur, run help
@@ -78,6 +77,14 @@ public class Randomshop implements Command{
 	@Override
 	public String help() {
 		return null;
+	}
+	
+	private String bundleArguments(String [] args, int start) {
+		var weapon = "";
+		for(int i = start; i < args.length; i++) {
+			weapon += args[i]+" ";
+		}
+		return weapon.trim();
 	}
 
 }

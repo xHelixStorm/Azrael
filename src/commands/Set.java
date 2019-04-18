@@ -41,11 +41,10 @@ public class Set implements Command{
 			
 			EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Set up your server to use the capacities of this bot to the fullest!");
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-			String input = e.getMessage().getContentRaw();
 			
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())){
 				final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-				if(input.equals(prefix+"set")){
+				if(args.length == 0){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Use the set command to set specific parameters for the bot:\n\n"
 							+ "**-channel-filter**: To set one or few language filters for one channel\n\n"
 							+ "**-warnings**: To set a max allowed number of warnings before the affected users gets banned together with the mute time for each warning\n\n"
@@ -60,48 +59,44 @@ public class Set implements Command{
 							+ "**-giveaway-items**: To add giveaway rewards in private message when H!daily gets called\n\n\n"
 							+ "Write the full command with one parameter to return more information. E.g **"+prefix+"set -channel-filter**").build()).queue();
 				}
-				else if(input.equals(prefix+"set -channel-filter")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-channel-filter")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Use the command with this parameter to set one or few self chosen filters on a channel. Write the command in the following way as an example:\n\n**"+prefix+"set -channel-filter #yourchannel eng,ger,fre**\nThese languages can be added to the filter:\n**eng** for English\n**ger** for German\n**fre** for French\n**tur** for Turkish\n**rus** for Russian").build()).queue();
 				}
-				else if(input.contains(prefix+"set -channel-filter ")){
-					input = input.substring(20+prefix.length());
-					SetChannelFilter.runTask(e, input);
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-channel-filter")){
+					SetChannelFilter.runTask(e, args);
 				}
-				else if(input.equals(prefix+"set -warnings")) {
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-warnings")) {
 					SetWarning.runHelp(e);
 				}
-				else if(input.contains(prefix+"set -warnings ")){
-					SetWarning.runTask(e, e.getMessage().getContentRaw().substring(prefix.length()+14));
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-warnings")){
+					SetWarning.runTask(e, args[1]);
 				}
-				else if(input.equals(prefix+"set -commands")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-commands")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("To change the level on how the commands are allowed to be used, try to use the following:\n\n**"+prefix+"set -commands disable** to disable specific commands in all channels\n**"+prefix+"set -commands bot** to enable specific commands only in bot channel\n**"+prefix+"set -commands enable** to enable specific commands in all channels").build()).queue();
 				}
-				else if(input.contains(prefix+"set -commands ")){
-					input = input.substring(14+prefix.length());
-					SetCommandLevel.runTask(e, input);
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-commands")){
+					SetCommandLevel.runTask(e, args[1]);
 				}
-				else if(input.equals(prefix+"set -ranking")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-ranking")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Enable or disable the ranking system with the following command:\n\n**"+prefix+"set -ranking enable**: To enable the ranking system\n**"+prefix+"set -ranking disable**: To disable the ranking system").build()).queue();
 				}
-				else if(input.contains(prefix+"set -ranking ")){
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-ranking")){
 					if(RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getMaxLevel() != 0){
-						input = input.substring(13+prefix.length());
-						SetRankingSystem.runTask(e, input);
+						SetRankingSystem.runTask(e, args[1]);
 					}
 					else{
 						e.getTextChannel().sendMessage(e.getMember().getAsMention() + " **Before using this command, set the max level for this guild!**").queue();
 					}
 				}
-				else if(input.equals(prefix+"set -max-experience")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-max-experience")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, type one of the following parameters after the syntax:\n\n**"+prefix+"set -max-experience <experience>**: To set an experience limit per day\n"
 							+ "**"+prefix+"set -max-experience enable**: To enable the experience limit\n"
 							+ "**"+prefix+"set -max-experience disable**: To disable the experience limit").build()).queue();
 				}
-				else if(input.contains(prefix+"set -max-experience ")){
-					input = input.substring(19+prefix.length());
-					SetMaxExperience.runTask(e, input, RankingSystem.SQLgetGuild(e.getGuild().getIdLong()));
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-max-experience")){
+					SetMaxExperience.runTask(e, args[1], RankingSystem.SQLgetGuild(e.getGuild().getIdLong()));
 				}
-				else if(input.equals(prefix+"set -default-level-skin")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-default-level-skin")){
 					String out = "";
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingLevel().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())){
@@ -112,13 +107,12 @@ public class Set implements Command{
 					else
 						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_level couldn't be loaded").build()).queue();
 				}
-				else if(input.contains(prefix+"set -default-level-skin ")){
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-default-level-skin")){
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					int last_theme = RankingSystem.SQLgetRankingLevel().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 					if(last_theme > 0) {
-						input = input.substring(24+prefix.length());
-						if(input.replaceAll("[0-9]", "").length() == 0)
-							SetLevelDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+						if(args[1].replaceAll("[0-9]", "").length() == 0)
+							SetLevelDefaultSkin.runTask(e, Integer.parseInt(args[1]), last_theme);
 						else
 							e.getTextChannel().sendMessage(e.getMember().getAsMention()+" Please insert a theme digit to set a default level skin!").queue();
 					}
@@ -126,7 +120,7 @@ public class Set implements Command{
 						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_level couldn't be loaded").queue();
 					}
 				}
-				else if(input.equals(prefix+"set -default-rank-skin")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-default-rank-skin")){
 					String out = "";
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingRank().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())){
@@ -137,13 +131,12 @@ public class Set implements Command{
 					else
 						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_rank couldn't be loaded").build()).queue();
 				}
-				else if(input.contains(prefix+"set -default-rank-skin ")){
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-default-rank-skin")){
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					int last_theme = RankingSystem.SQLgetRankingRank().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 					if(last_theme > 0) {
-						input = input.substring(23+prefix.length());
-						if(input.replaceAll("[0-9]", "").length() == 0)
-							SetRankDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+						if(args[1].replaceAll("[0-9]", "").length() == 0)
+							SetRankDefaultSkin.runTask(e, Integer.parseInt(args[1]), last_theme);
 						else
 							e.getTextChannel().sendMessage(e.getMember().getAsMention()+" Please insert a theme digit to set a default rank skin!").queue();
 					}
@@ -151,7 +144,7 @@ public class Set implements Command{
 						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_rank couldn't be loaded").queue();
 					}
 				}
-				else if(input.equals(prefix+"set -default-profile-skin")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-default-profile-skin")){
 					String out = "";
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingProfile().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())){
@@ -162,13 +155,12 @@ public class Set implements Command{
 					else
 						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_profile couldn't be loaded").build()).queue();
 				}
-				else if(input.contains(prefix+"set -default-profile-skin ")){
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-default-profile-skin")){
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					int last_theme = RankingSystem.SQLgetRankingProfile().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 					if(last_theme > 0) {
-						input = input.substring(26+prefix.length());
-						if(input.replaceAll("[0-9]", "").length() == 0)
-							SetProfileDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+						if(args[1].replaceAll("[0-9]", "").length() == 0)
+							SetProfileDefaultSkin.runTask(e, Integer.parseInt(args[1]), last_theme);
 						else
 							e.getTextChannel().sendMessage(e.getMember().getAsMention()+" Please insert a theme digit to set a default profile skin!").queue();
 					}
@@ -176,7 +168,7 @@ public class Set implements Command{
 						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_profile couldn't be loaded").queue();
 					}
 				}
-				else if(input.equals(prefix+"set -default-icon-skin")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-default-icon-skin")){
 					String out = "";
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingIcons().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())){
@@ -187,34 +179,31 @@ public class Set implements Command{
 					else
 						e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_icons couldn't be loaded").build()).queue();
 				}
-				else if(input.contains(prefix+"set -default-icon-skin ")){
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-default-icon-skin")){
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					int last_theme = RankingSystem.SQLgetRankingIcons().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 					if(last_theme > 0) {
-						input = input.substring(23+prefix.length());
-						if(input.replaceAll("[0-9]", "").length() == 0)
-							SetIconDefaultSkin.runTask(e, Integer.parseInt(input), last_theme);
+						if(args[1].replaceAll("[0-9]", "").length() == 0)
+							SetIconDefaultSkin.runTask(e, Integer.parseInt(args[1]), last_theme);
 						else
 							e.getTextChannel().sendMessage(e.getMember().getAsMention()+" Please insert a theme digit to set a default icons skin!").queue();
 					}
 					else
 						e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_icons couldn't be loaded").queue();
 				}
-				else if(input.equals(prefix+"set -daily-item")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-daily-item")){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Write the name of the daily reward you want to make available for dailies together with the weight and type of the item. For example:\n**"+prefix+"set -daily-item \"5000 "+RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getCurrency()+"\" -weight 70 -type cur**\nNote that the total weight can't exceed 100 and that the currently available types are **cur** for currency , **exp** for experience enhancement items and **cod** for code giveaways.").build()).queue();
 				}
-				else if(input.contains(prefix+"set -daily-item ")){
-					input = input.substring(16+prefix.length());
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-daily-item")){
 					ArrayList<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong(), RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID());
 					var tot_weight = daily_items.parallelStream().mapToInt(i -> i.getWeight()).sum();
-					SetDailyItem.runTask(e, input, daily_items, tot_weight);
+					SetDailyItem.runTask(e, e.getMessage().getContentRaw().substring(16+prefix.length()), daily_items, tot_weight);
 				}
-				else if(input.equals(prefix+"set -giveaway-items")) {
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-giveaway-items")) {
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Please past a pastebin link, together with the command, that contains all giveaway codes for the current month").build()).queue();
 				}
-				else if(input.contains(prefix+"set -giveaway-items ")) {
-					input = input.substring(20+prefix.length());
-					SetGiveawayItems.runTask(e, input);
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-giveaway-items")) {
+					SetGiveawayItems.runTask(e, args[1]);
 				}
 				else{
 					e.getTextChannel().sendMessage("**"+e.getMember().getAsMention()+" Something went wrong. Please recheck the syntax and try again!**").queue();

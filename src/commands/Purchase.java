@@ -37,10 +37,10 @@ public class Purchase implements Command{
 				if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null){
 					String input = e.getMessage().getContentRaw();
 					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-					if(input.equals(prefix+"purchase")){
+					if(args.length == 0){
 						e.getTextChannel().sendMessage("To purchase an item or skin, use the **"+prefix+"purchase** command together with the description name of the item you want to purchase. Items to purchase can be found with the **"+prefix+"shop** command").queue();
 					}
-					else if(input.contains(prefix+"purchase ")){
+					else if(args.length > 0){
 						input = input.substring(prefix.length()+9);
 						final String filter = input;
 						Skins skin = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), setting.getThemeID()).parallelStream().filter(s -> s.getShopDescription().equalsIgnoreCase(filter)).findAny().orElse(null);

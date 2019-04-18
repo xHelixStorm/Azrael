@@ -27,8 +27,7 @@ public class Rss implements Command{
 			EmbedBuilder message = new EmbedBuilder();
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				Logger logger = LoggerFactory.getLogger(Rss.class);
-				final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-				if(e.getMessage().getContentRaw().equals(prefix+"rss")) {
+				if(args.length == 0) {
 					//throw default message with instructions
 					message.setColor(Color.BLUE);
 					e.getTextChannel().sendMessage(message.setDescription("Use this command to set up RSS pages that will be displayed in a dedicated channel:\n\n"
@@ -38,13 +37,13 @@ public class Rss implements Command{
 							+ "**-test**: picks the first rss feeed to test the settings\n"
 							+ "**-display**: display the current registered feeds for this server").build()).queue();
 				}
-				else if(e.getMessage().getContentRaw().equals(prefix+"rss -register")) {
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-register")) {
 					message.setColor(Color.BLUE);
 					e.getTextChannel().sendMessage(message.setDescription("Please insert an URL to register the rss page").build()).queue();
 				}
-				else if(e.getMessage().getContentRaw().contains(prefix+"rss -register ")) {
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-register")) {
 					//register a link
-					String input = e.getMessage().getContentRaw().substring(prefix.length()+14);
+					String input = args[1];
 					if(Azrael.SQLInsertRSS(input, e.getGuild().getIdLong()) > 0) {
 						message.setColor(Color.BLUE);
 						e.getTextChannel().sendMessage(message.setDescription("RSS has been registered").build()).queue();
@@ -56,7 +55,7 @@ public class Rss implements Command{
 						logger.error("{} RSS link couldn't be registered for guild {}", input, e.getGuild().getId());
 					}
 				}
-				else if(e.getMessage().getContentRaw().contains(prefix+"rss -remove")) {
+				else if(args[0].equalsIgnoreCase("-remove")) {
 					int counter = 1;
 					StringBuilder out = new StringBuilder();
 					for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
@@ -69,7 +68,7 @@ public class Rss implements Command{
 					if(out.length() > 0)
 						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", "remove");
 				}
-				else if(e.getMessage().getContentRaw().equals(prefix+"rss -format")) {
+				else if(args[0].equalsIgnoreCase("-format")) {
 					int counter = 1;
 					StringBuilder out = new StringBuilder();
 					for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
@@ -82,7 +81,7 @@ public class Rss implements Command{
 					if(out.length() > 0)
 						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", "format");
 				}
-				else if(e.getMessage().getContentRaw().equals(prefix+"rss -test")) {
+				else if(args[0].equalsIgnoreCase("-test")) {
 					//test a feed
 					int counter = 1;
 					StringBuilder out = new StringBuilder();
@@ -96,7 +95,7 @@ public class Rss implements Command{
 					if(out.length() > 0)
 						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", "test");
 				}
-				else if(e.getMessage().getContentRaw().equals(prefix+"rss -display")) {
+				else if(args[0].equalsIgnoreCase("-display")) {
 					//display the registered feeds
 					int counter = 1;
 					StringBuilder out = new StringBuilder();

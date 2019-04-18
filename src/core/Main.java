@@ -124,7 +124,7 @@ public class Main {
 		CommandHandler.commands.put("user", new User());
 		CommandHandler.commands.put("filter", new Filter());
 		CommandHandler.commands.put("quiz", new Quiz());
-		CommandHandler.commands.put("roleReaction", new RoleReaction());
+		CommandHandler.commands.put("rolereaction", new RoleReaction());
 		CommandHandler.commands.put("rss", new Rss());
 		CommandHandler.commands.put("randomshop", new Randomshop());
 	}

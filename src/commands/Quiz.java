@@ -33,7 +33,7 @@ public class Quiz implements Command{
 				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
 					EmbedBuilder message = new EmbedBuilder().setTitle("It's Quiz time!").setColor(Color.BLUE);
 					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-					if(e.getMessage().getContentRaw().equals(prefix+"quiz")) {
+					if(args.length == 0) {
 						e.getTextChannel().sendMessage(message.setDescription("The Quiz command will allow you to register questions to provide the best quiz experience in a Discord server! At your disposal are parameters to register questions from a pastebin link, register rewards in form of codes that get sent to the user who answers a question correctly in private message and to start and interrupt the quiz session.\n\n"
 								+ "If a question gets answered, the next questions will appear after a 20 seconds and if they don't get replied within 20 seconds, users will receive a reminder that no one has yet answered the question and if available, it will write a hint to facilitate the question. These are the available parameters. Use them together with the quiz command:\n\n"
 								+ "**-register-codes**: To register the rewards that get sent to one user who answers a question correctly\n"
@@ -43,7 +43,7 @@ public class Quiz implements Command{
 								+ "**-save**: To save the settings on the local machine\n"
 								+ "**-load**: To load presaved questions").build()).queue();
 					}
-					else if(e.getMessage().getContentRaw().equals(prefix+"quiz -register-rewards")) {
+					else if(args.length == 1 && args[0].equalsIgnoreCase("-register-rewards")) {
 						e.getTextChannel().sendMessage("To register the rewards, attach a pastebin link after the full command. The pastebin format should look like this:\n"
 								+ "```\nxxx-xx-xx-0001\n"
 								+ "xxx-xx-xx-0002\n"
@@ -51,10 +51,10 @@ public class Quiz implements Command{
 								+ "...```"
 								+ "write one reward per line so that the bot can recognize every single reward!").queue();
 					}
-					else if(e.getMessage().getContentRaw().contains(prefix+"quiz -register-rewards ")) {
-						QuizExecution.registerRewards(e, e.getMessage().getContentRaw().substring(prefix.length()+23));
+					else if(args.length > 1 && args[0].equalsIgnoreCase("-register-rewards")) {
+						QuizExecution.registerRewards(e, args[2]);
 					}
-					else if(e.getMessage().getContentRaw().equals(prefix+"quiz -register-questions")) {
+					else if(args.length == 1 && args[0].equalsIgnoreCase("-register-questions")) {
 						e.getTextChannel().sendMessage("To register questions, attach a pastebin link after the full command. The pastebin format should look like this:\n"
 								+ "```\n"
 								+ "START\n"
@@ -69,16 +69,16 @@ public class Quiz implements Command{
 								+ "Questions have to be separated by a numerical value. For example 1. and 2.. Solutions to the questions should begin with **:**. The words written after the : doesn't have to be written together but it will be counted as one answer. It's possible to choose up to 3 possible answers for a question. Hints are given with the **;** symbol. Also here maximal 3 hints are allowed."
 								+ "It's also possible to include rewards while registering questions in case it is easier to avoid errors. This can be done by applying the **=** before the reward.").queue();
 					}
-					else if(e.getMessage().getContentRaw().contains(prefix+"quiz -register-questions ")) {
+					else if(args.length > 1 && args[0].equalsIgnoreCase("-register-questions")) {
 						logger.debug("{} performed the registration of questions and rewards for the Quiz", e.getMember().getUser().getId());
 						QuizExecution.registerQuestions(e, e.getMessage().getContentRaw().substring(prefix.length()+25), false);
 					}
-					else if(e.getMessage().getContentRaw().contains(prefix+"quiz -clear")) {
+					else if(args[0].equalsIgnoreCase("-clear")) {
 						logger.debug("{} cleared all quiz questions and rewards", e.getMember().getUser().getId());
 						Hashes.clearQuiz();
 						e.getTextChannel().sendMessage("Cache has been cleared from registered questions and rewards!").queue();
 					}
-					else if(e.getMessage().getContentRaw().equals(prefix+"quiz -run")) {
+					else if(args[0].equalsIgnoreCase("-run")) {
 						if(Hashes.getWholeQuiz().size() > 0) {
 							if(Hashes.getQuiz(1).getQuestion().length() == 0) {
 								e.getTextChannel().sendMessage("Please register questions and answers before proceeding!").queue();
@@ -103,7 +103,7 @@ public class Quiz implements Command{
 							e.getTextChannel().sendMessage("Please register questions and rewards before this parameter is used!").queue();
 						}
 					}
-					else if(e.getMessage().getContentRaw().equals(prefix+"quiz -save")) {
+					else if(args[0].equalsIgnoreCase("-save")) {
 						if(Hashes.getWholeQuiz().size() > 0) {
 							//save all settings
 							QuizExecution.saveQuestions(e);
@@ -113,7 +113,7 @@ public class Quiz implements Command{
 							e.getTextChannel().sendMessage("There is nothing to save. Please use register-rewards and register-questions before this parameter is used.").queue();
 						}
 					}
-					else if(e.getMessage().getContentRaw().equals(prefix+"quiz -load")) {
+					else if(args[0].equalsIgnoreCase("-load")) {
 						File file = new File("./files/QuizBackup/quizsettings.azr");
 						if(file.exists()) {
 							QuizExecution.registerQuestions(e, "", true);

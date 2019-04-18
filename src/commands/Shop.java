@@ -27,37 +27,35 @@ public class Shop implements Command{
 			Logger logger = LoggerFactory.getLogger(Shop.class);
 			logger.debug("{} has used Shop command", e.getMember().getUser().getId());
 			
-			String input = e.getMessage().getContentRaw();
 			Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 			if(guild_settings.getRankingState() == true){
 				var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 				if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null) {
 					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-					if(input.toUpperCase().equals(prefix.toUpperCase()+"SHOP LEVEL UPS")) {
+					if(args.length > 1 && args[0].equalsIgnoreCase("level") && args[1].equalsIgnoreCase("ups")) {
 						ShopExecution.displayPartOfShop(e, "lev", guild_settings.getLevelDescription());
 					}
-					else if(input.toUpperCase().equals(prefix.toUpperCase()+"SHOP RANKS")) {
+					else if(args.length > 0 && args[0].equalsIgnoreCase("ranks")) {
 						ShopExecution.displayPartOfShop(e, "ran", guild_settings.getRankDescription());
 					}
-					else if(input.toUpperCase().equals(prefix.toUpperCase()+"SHOP PROFILES")) {
+					else if(args.length > 0 && args[0].equalsIgnoreCase("profiles")) {
 						ShopExecution.displayPartOfShop(e, "pro", guild_settings.getProfileDescription());
 					}
-					else if(input.toUpperCase().equals(prefix.toUpperCase()+"SHOP ICONS")) {
+					else if(args.length > 0 && args[0].equalsIgnoreCase("icons")) {
 						ShopExecution.displayPartOfShop(e, "ico", guild_settings.getIconDescription());
 					}
-					else if(input.toUpperCase().equals(prefix.toUpperCase()+"SHOP ITEMS")) {
+					else if(args.length > 0 && args[0].equalsIgnoreCase("items")) {
 						ShopExecution.displayPartOfShop(e, "ite", "");
 					}
-					else if(input.toUpperCase().equals(prefix.toUpperCase()+"SHOP WEAPONS")) {
+					else if(args.length == 1 && args[0].equalsIgnoreCase("weapons")) {
 						StringBuilder builder = new StringBuilder();
 						for(String category : RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID())) {
 							builder.append(category+", ");
 						}
 						e.getTextChannel().sendMessage("Use these weapon sections to filter the weapons you wish to purchase together with the command:\n**"+builder.toString()+"**").queue();
 					}
-					else if(input.toUpperCase().contains(prefix.toUpperCase()+"SHOP WEAPONS ")) {
-						String type = input.substring(prefix.length()+13);
-						ShopExecution.displayPartOfShopWeapons(e, type);
+					else if(args.length > 1 && args[0].equalsIgnoreCase("weapons")) {
+						ShopExecution.displayPartOfShopWeapons(e, args[1]);
 					}
 					else{
 						e.getTextChannel().sendMessage("Write the shop command together with the category of the shop you want to visit. For example "+prefix+"shop **level ups** / **ranks** / **profiles** / **icons** / **items** / **weapons**").queue();

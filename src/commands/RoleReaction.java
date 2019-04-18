@@ -28,8 +28,7 @@ public class RoleReaction implements Command{
 		//after a channel has been registered for self role assignment, it can be disabled and enabled with this command
 		if(GuildIni.getRoleReactionCommand(e.getGuild().getIdLong())) 
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) == true || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
-				final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-				if(e.getMessage().getContentRaw().substring(prefix.length()+13).equals("enable")) {
+				if(args.length > 0 && args[0].equalsIgnoreCase("enable")) {
 					Logger logger = LoggerFactory.getLogger(RoleReaction.class);
 					logger.debug("{} has used RoleReaction command to enable", e.getMember().getUser().getId());
 					
@@ -54,7 +53,7 @@ public class RoleReaction implements Command{
 						}
 					}
 				}
-				else if(e.getMessage().getContentRaw().substring(prefix.length()+13).equals("disable")) {
+				else if(args.length > 0 && args[0].equalsIgnoreCase("disable")) {
 					Logger logger = LoggerFactory.getLogger(RoleReaction.class);
 					logger.debug("{} has used RoleReaction command to disable", e.getMember().getUser().getId());
 					

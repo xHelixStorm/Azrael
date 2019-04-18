@@ -36,10 +36,10 @@ public class Use implements Command{
 				if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null) {
 					String input = e.getMessage().getContentRaw();
 					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-					if(input.equals(prefix+"use")){
+					if(args.length == 0){
 						e.getTextChannel().sendMessage("write the description of the item/skin together with this command to use it!\nTo reset your choice use either default-level, default-rank, default-profile or default-icons to reset your settings!").queue();
 					}
-					else if(input.equals(prefix+"use default-level")){
+					else if(args[0].equalsIgnoreCase("default-level")){
 						rankingSystem.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(guild_settings.getLevelDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 						user_details.setRankingLevel(rank.getRankingLevel());
 						user_details.setLevelDescription(rank.getLevelDescription());
@@ -68,7 +68,7 @@ public class Use implements Command{
 							logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 						}
 					}
-					else if(input.equals(prefix+"use default-rank")){
+					else if(args[0].equalsIgnoreCase("default-rank")){
 						rankingSystem.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(guild_settings.getRankDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 						user_details.setRankingRank(rank.getRankingRank());
 						user_details.setRankDescription(rank.getRankDescription());
@@ -100,7 +100,7 @@ public class Use implements Command{
 							logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 						}
 					}
-					else if(input.equals(prefix+"use default-profile")){
+					else if(args[0].equalsIgnoreCase("default-profile")){
 						rankingSystem.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(guild_settings.getProfileDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 						user_details.setRankingProfile(rank.getRankingProfile());
 						user_details.setProfileDescription(rank.getProfileDescription());
@@ -132,7 +132,7 @@ public class Use implements Command{
 							logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 						}
 					}
-					else if(input.equals(prefix+"use default-icons")){
+					else if(args[0].equalsIgnoreCase("default-icons")){
 						rankingSystem.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(guild_settings.getIconDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 						user_details.setRankingIcon(rank.getRankingIcon());
 						user_details.setIconDescription(rank.getIconDescription());
@@ -154,7 +154,7 @@ public class Use implements Command{
 							logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 						}
 					}
-					else if(input.contains(prefix+"use ")){
+					else {
 						input = input.substring(prefix.length()+4);
 						inventory.Inventory inventory = RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input, guild_settings.getThemeID());
 						if(inventory != null && inventory.getItemID() != 0 && inventory.getStatus().equals("perm")){

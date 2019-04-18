@@ -33,16 +33,16 @@ public class RegisterRole {
 		_e.getTextChannel().sendMessage(messageBuild.setDescription(parseMessage+strB.toString()).build()).queue();
 	}
 	
-	public static void runCommandWithAdminFirst(MessageReceivedEvent _e, long _guild_id, String _message){
+	public static void runCommandWithAdminFirst(MessageReceivedEvent _e, long _guild_id, String [] _args){
 		String category_abv = null;
 		String role;
 		String role_name;
 		long role_id;
 		
 		if(GuildIni.getAdmin(_guild_id) == _e.getMember().getUser().getIdLong()) {
-			if(_message.contains(" adm ") || _message.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\sadm(?!\\w\\d\\s)")){
+			if(_args.length > 2 && _args[1].equalsIgnoreCase("adm")) {
 				category_abv = "adm";
-				role = _message.replaceAll("[^0-9]*", "");
+				role = _args[2].replaceAll("[^0-9]*", "");
 				if(role.length() == 18){
 					try {
 						role_id = Long.parseLong(role);
@@ -70,7 +70,7 @@ public class RegisterRole {
 		}
 	}
 
-	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String _message){
+	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String [] _args){
 		String category_abv = null;
 		String role;
 		String role_name;
@@ -78,10 +78,10 @@ public class RegisterRole {
 		
 		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == GuildIni.getAdmin(_guild_id)){
 			Pattern pattern = Pattern.compile("(adm|mod|com|bot|mut|rea)");
-			Matcher matcher = pattern.matcher(_message);
-			if(matcher.find()){
+			Matcher matcher = pattern.matcher(_args[1].toLowerCase());
+			if(_args.length > 2 && matcher.find()){
 				category_abv = matcher.group();
-				role = _message.replaceAll("[^0-9]*", "");
+				role = _args[2].replaceAll("[^0-9]*", "");
 				if(role.length() == 18){
 					try {
 						role_id = Long.parseLong(role);

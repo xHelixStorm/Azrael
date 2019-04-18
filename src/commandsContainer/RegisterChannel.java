@@ -36,7 +36,7 @@ public class RegisterChannel {
 		_e.getTextChannel().sendMessage(messageBuild.setDescription(parseMessage+strB.toString()).build()).queue();
 	}
 	
-	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String _message){
+	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String [] _args){
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 		String channel;
 		long channel_id;
@@ -44,10 +44,10 @@ public class RegisterChannel {
 		
 		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == GuildIni.getAdmin(_e.getGuild().getIdLong())){
 			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss)");
-			Matcher matcher = pattern.matcher(_message);
-			if(matcher.find()){
+			Matcher matcher = pattern.matcher(_args[1]);
+			if(_args.length > 2 && matcher.find()){
 				channel_type = matcher.group();
-				channel = _message.replaceAll("[^0-9]*", "");
+				channel = _args[2].replaceAll("[^0-9]*", "");
 				if(channel.length() == 18){
 					channel_id = Long.parseLong(channel);
 					switch(channel_type){

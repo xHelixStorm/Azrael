@@ -21,7 +21,6 @@ import threads.CollectUsers;
 public class Register implements Command{
 	private EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register various stuff from your server to enable all features!");
 	private EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-	private String message;
 	private String user_id;
 	private long guild_id;
 	
@@ -39,24 +38,23 @@ public class Register implements Command{
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			user_id = e.getMember().getUser().getId();
 			guild_id = e.getGuild().getIdLong();
-			message = e.getMessage().getContentRaw();
 			
 			final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 			if(DiscordRoles.SQLgetRole(guild_id, "adm") == 0){
-				if(message.equals(prefix+"register")){
+				if(args.length == 0){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Use this command to register either a channel, a role, a ranking role or all users in a guild. For the first time, an administrator role needs to be registered and afterwards all the other features for this command will be unlocked.\n\n"
 							+ "Here how you can display more details on how to register a role:\n"
 							+ "**"+prefix+"register -role**").build()).queue();
 				}
-				else if(message.equals(prefix+"register -role")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-role")){
 					RegisterRole.RegisterRoleHelper(e);
 				}
-				else if(message.contains(prefix+"register -role ")){
-					RegisterRole.runCommandWithAdminFirst(e, guild_id, message);
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-role")){
+					RegisterRole.runCommandWithAdminFirst(e, guild_id, args);
 				}
 			}
 			else if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || Long.parseLong(user_id) == GuildIni.getAdmin(guild_id)){
-				if(message.equals(prefix+"register")){
+				if(args.length == 0){
 					e.getTextChannel().sendMessage(messageBuild.setDescription("Use this command to register either a channel, a role, a ranking role or all users in a guild. Use the following commands to get more details:\n\n"
 							+ "Description to register a role:\n"
 								+ "**"+prefix+"register -role**\n\n"
@@ -69,28 +67,28 @@ public class Register implements Command{
 							+ "How to register all users into the database:\n"
 								+ "**"+prefix+"register -users**").build()).queue();
 				}
-				else if(message.equals(prefix+"register -role")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-role")){
 					RegisterRole.RegisterRoleHelper(e);
 				}
-				else if(message.contains(prefix+"register -role ")){
-					RegisterRole.runCommand(e, guild_id, message);
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-role")){
+					RegisterRole.runCommand(e, guild_id, args);
 				}
-				else if(message.equals(prefix+"register -text-channel")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-text-channel")){
 					RegisterChannel.RegisterChannelHelper(e);
 				}
-				else if(message.equals(prefix+"register -text-channels")){
+				else if(args[0].equalsIgnoreCase("-text-channels")){
 					RegisterChannel.runChannelsRegistration(e, guild_id);
 				}
-				else if(message.contains(prefix+"register -text-channel ")){
-					RegisterChannel.runCommand(e, guild_id, message);
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-text-channel")){
+					RegisterChannel.runCommand(e, guild_id, args);
 				}
-				else if(message.equals(prefix+"register -ranking-role")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-ranking-role")){
 					RegisterRankingRole.RegisterRankingRoleHelper(e);
 				}
-				else if(message.contains(prefix+"register -ranking-role ")){
-					RegisterRankingRole.runCommand(e, guild_id, message);
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-ranking-role")){
+					RegisterRankingRole.runCommand(e, guild_id, args);
 				}
-				else if(message.equals(prefix+"register -users")){
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-users")){
 					executor.execute(new CollectUsers(e));
 					e.getTextChannel().sendMessage("All users in this server are being registered. Please wait...").queue();
 					executor.shutdown();
