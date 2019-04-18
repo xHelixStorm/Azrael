@@ -103,8 +103,11 @@ public class RankingThreadExecution {
 		long currency = user_details.getCurrency();
 		
 		if(currentExperience >= rankUpExperience && level < max_level){
-			level += 1;
 			currentExperience -= rankUpExperience;
+			if(currentExperience < 0) {
+				return;
+			}
+			level += 1;
 			currency += Hashes.getRankingLevels(e.getGuild().getId()+"_"+level).getCurrency();
 			if(level != max_level){
 				rankUpExperience = Hashes.getRankingLevels(e.getGuild().getId()+"_"+level).getExperience() - Hashes.getRankingLevels(e.getGuild().getId()+"_"+(level-1)).getExperience();
