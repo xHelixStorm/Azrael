@@ -41,6 +41,7 @@ public class RankingThreadExecution {
 		message = message.replaceAll("<@[0-9!]{18,19}>", ""); //Edit tags
 		message = message.replaceAll("[\\s]{2,}", " "); //Edit every multiple whitespace type to a single whitespace
 		message = message.replaceAll("[^\\w\\d\\s]", ""); //Edit all special characters
+		message = message.replaceAll("[_]", ""); // Edit all underscores
 		int messageLength = message.length();
 		
 		int adder = 0;
@@ -62,32 +63,36 @@ public class RankingThreadExecution {
 		currentExperience += adder;
 		experience += adder;
 		
-		if(max_experience_enabled == true){
-			int daily_experience = user_details.getDailyExperience();
-			LocalTime midnight = LocalTime.MIDNIGHT;
-			LocalDate today = LocalDate.now();
-			LocalDateTime tomorrowMidnight = LocalDateTime.of(today, midnight).plusDays(1);
-			Timestamp reset = Timestamp.valueOf(tomorrowMidnight);
-			
-			if(user_details.getDailyReset() == null || reset.getTime() - user_details.getDailyReset().getTime() != 0){
-				RankingSystem.SQLDeleteDailyExperience(user_id, guild_id);
-				daily_experience = 0;
-			}
-			
-			if(daily_experience < max_experience*multiplier){
-				daily_experience += adder;
-				ExperienceGain(e, user_details,  guild_settings, currentExperience, experience, daily_experience, roleAssignLevel, max_experience_enabled, reset);
-				if(daily_experience > max_experience*multiplier){
-					logger.info("{} has reached the limit of today's max experience points gain", e.getMember().getUser().getId());
-					RankingSystem.SQLInsertActionLog("medium", user_id, guild_id, "Experience limit reached", "User reached the limit of experience points");
-					PrivateChannel pc = e.getMember().getUser().openPrivateChannel().complete();
-					pc.sendMessage("You have reached the max possible to gain experience today. More experience points can be collected tomorrow!").queue();
-					pc.close();
+		if(adder != 0) {
+			if(max_experience_enabled == true) {
+				int daily_experience = user_details.getDailyExperience();
+				LocalTime midnight = LocalTime.MIDNIGHT;
+				LocalDate today = LocalDate.now();
+				LocalDateTime tomorrowMidnight = LocalDateTime.of(today, midnight).plusDays(1);
+				Timestamp reset = Timestamp.valueOf(tomorrowMidnight);
+				
+				if(user_details.getDailyReset() == null || reset.getTime() - user_details.getDailyReset().getTime() != 0){
+					RankingSystem.SQLDeleteDailyExperience(user_id, guild_id);
+					daily_experience = 0;
+				}
+				
+				if(daily_experience < max_experience*multiplier){
+					daily_experience += adder;
+					ExperienceGain(e, user_details,  guild_settings, currentExperience, experience, daily_experience, roleAssignLevel, max_experience_enabled, reset);
+					if(daily_experience > max_experience*multiplier){
+						logger.info("{} has reached the limit of today's max experience points gain", e.getMember().getUser().getId());
+						RankingSystem.SQLInsertActionLog("medium", user_id, guild_id, "Experience limit reached", "User reached the limit of experience points");
+						PrivateChannel pc = e.getMember().getUser().openPrivateChannel().complete();
+						pc.sendMessage("You have reached the max possible to gain experience today. More experience points can be collected tomorrow!").queue();
+						pc.close();
+					}
 				}
 			}
-		}
-		else if(max_experience_enabled == false){
-			ExperienceGain(e, user_details, guild_settings, currentExperience, experience, 0, roleAssignLevel, max_experience_enabled, null);
+			else if(max_experience_enabled == false) {
+				ExperienceGain(e, user_details, guild_settings, currentExperience, experience, 0, roleAssignLevel, max_experience_enabled, null);
+			}
+			if(guild_settings.getMessageTimeout() != 0)
+				Hashes.addCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId(), e.getMember().getEffectiveName());
 		}
 	}
 	
