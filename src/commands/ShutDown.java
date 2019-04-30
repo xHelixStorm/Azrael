@@ -5,6 +5,7 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -24,13 +25,7 @@ public class ShutDown implements Command{
 		logger.debug("{} has used ShutDown command", e.getMember().getUser().getId());
 		
 		if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()){
-			e.getTextChannel().sendMessage("**I'm going to shut down shortly**").queue();
-			
-			try{
-				Thread.sleep(20000);
-			}catch(InterruptedException ev){
-				logger.error("Exception of thread sleep while performing shut down. Bot couldn't shut down", ev);
-			}
+			FileSetting.createFile("./files/running.azr", "0");
 			e.getTextChannel().sendMessage("**shutting down now. Cya later!**").queue();
 			e.getJDA().shutdown();
 		}

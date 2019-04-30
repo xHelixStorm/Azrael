@@ -5,7 +5,6 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -22,7 +21,6 @@ public class Reboot implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()){
 			e.getTextChannel().sendMessage("**Now rebooting!**").queue();
-			FileSetting.createFile("./files/reboot.azr", "1");			
 			e.getJDA().shutdown();
 		}
 		else {

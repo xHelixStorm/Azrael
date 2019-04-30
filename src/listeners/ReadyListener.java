@@ -31,10 +31,16 @@ import timerTask.ClearHashes;
 import timerTask.ParseRSS;
 import util.STATIC;
 
-public class ReadyListener extends ListenerAdapter{
+public class ReadyListener extends ListenerAdapter {
 	
 	@Override
-	public void onReady(ReadyEvent e){
+	public void onReady(ReadyEvent e) {
+		if(FileSetting.readFile("./files/running.azr").contains("1")) {
+			FileSetting.createFile("./files/running.azr", "2");
+			e.getJDA().shutdownNow();
+			return;
+		}
+		FileSetting.createFile("./files/running.azr", "1");
 		Logger logger = LoggerFactory.getLogger(ReadyListener.class);
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the latest patch notes!");
 		System.out.println();
@@ -57,7 +63,6 @@ public class ReadyListener extends ListenerAdapter{
 		System.out.println(out);
 		FileSetting.createTemp();
 
-		FileSetting.createFile("./files/reboot.azr", "0");
 		var themesRetrieved = true;
 		if(RankingSystem.SQLgetThemes() == false) {
 			themesRetrieved = false;

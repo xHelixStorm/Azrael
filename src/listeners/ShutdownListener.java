@@ -19,7 +19,7 @@ public class ShutdownListener extends ListenerAdapter{
 	@Override
 	public void onShutdown(ShutdownEvent e){
 		final Logger logger = LoggerFactory.getLogger(ShutdownListener.class);
-		String filecontent = FileSetting.readFile("./files/reboot.azr");
+		String filecontent = FileSetting.readFile("./files/running.azr");
 		
 		try {
 			FileUtils.forceDelete(new File(IniFileReader.getTempDirectory()));
@@ -28,8 +28,9 @@ public class ShutdownListener extends ListenerAdapter{
 		}
 		
 		if(SystemUtils.IS_OS_LINUX) {
-			if(filecontent.contains("1")){
+			if(filecontent.contains("1")) {
 				try {
+					FileSetting.createFile("./files/running.azr", "0");
 					Process proc;
 					proc = Runtime.getRuntime().exec("./scripts/restart.sh");
 					proc.waitFor();
@@ -39,8 +40,9 @@ public class ShutdownListener extends ListenerAdapter{
 			}
 		}
 		else if(SystemUtils.IS_OS_WINDOWS) {			
-			if(filecontent.contains("1")){
+			if(filecontent.contains("1")) {
 				try {
+					FileSetting.createFile("./files/running.azr", "0");
 					Process proc;
 					proc = Runtime.getRuntime().exec("./scripts/restart.bat");
 					proc.waitFor();
@@ -49,7 +51,14 @@ public class ShutdownListener extends ListenerAdapter{
 				}
 			}
 		}
-		logger.debug("Bot has shut down or reboot has been commenced");
-		Azrael.SQLInsertActionLog("BOT_SHUTDOWN", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
+		if(filecontent.contains("2")) {
+			FileSetting.createFile("./files/running.azr", "1");
+			logger.warn("Duplicate running session shut down!");
+			Azrael.SQLInsertActionLog("DUPLICATE_SESSION", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
+		}
+		else {
+			logger.debug("Bot has shut down or reboot has been commenced");
+			Azrael.SQLInsertActionLog("BOT_SHUTDOWN", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
+		}
 	}
 }
