@@ -34,7 +34,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT message1, message2, date FROM priv_notes WHERE version_number = ? AND published = 0");
+			String sql = ("SELECT message1, message2, date FROM priv_notes WHERE version_number LIKE ? AND published = 0");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
@@ -63,7 +63,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT message1, message2, date FROM priv_notes WHERE version_number = ? AND published = 0");
+			String sql = ("SELECT message1, message2, date FROM publ_notes WHERE version_number LIKE ? AND published = 0");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
@@ -90,8 +90,8 @@ public class Patchnotes {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE priv_notes SET published = 1 WHERE version_number = ? AND published = 0");
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE priv_notes SET published = 1 WHERE version_number LIKE ? AND published = 0");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
 			stmt.executeUpdate();
@@ -108,8 +108,8 @@ public class Patchnotes {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE publ_notes SET published = 1 WHERE version_number = ? AND published = 0");
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE publ_notes SET published = 1 WHERE version_number LIKE ? AND published = 0");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
 			stmt.executeUpdate();
