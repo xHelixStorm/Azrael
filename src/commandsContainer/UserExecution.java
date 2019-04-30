@@ -502,15 +502,19 @@ public class UserExecution {
 					if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole()) > 0) {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Experience points gifted", "User received "+experience+" experience points");
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
-						for(Role r : _e.getMember().getRoles()){
-							for(Rank role : Hashes.getMapOfRankingRoles().values()){
-								if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()){
-									_e.getGuild().getController().removeSingleRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
+						try {
+							for(Role r : _e.getMember().getRoles()){
+								for(Rank role : Hashes.getMapOfRankingRoles().values()){
+									if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()){
+										_e.getGuild().getController().removeSingleRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
+									}
 								}
 							}
-						}
-						if(assign_role != 0){
-							_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
+							if(assign_role != 0){
+								_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
+							}
+						} catch(IllegalArgumentException iae) {
+							_e.getTextChannel().sendMessage("Roles won't be updated because user isn't present in this guild!").queue();
 						}
 						_e.getTextChannel().sendMessage("Experience points have been updated!").queue();
 						logger.debug("{} has gifted {} experience points to {} in guild {}", _e.getMember().getUser().getId(), _message, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
@@ -558,15 +562,19 @@ public class UserExecution {
 					if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole()) > 0) {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Experience points edited", "User has been set to "+experience+" experience points");
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
-						for(Role r : _e.getMember().getRoles()){
-							for(Rank role : Hashes.getMapOfRankingRoles().values()){
-								if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()){
-									_e.getGuild().getController().removeSingleRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
+						try {
+							for(Role r : _e.getMember().getRoles()){
+								for(Rank role : Hashes.getMapOfRankingRoles().values()){
+									if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()) {
+										_e.getGuild().getController().removeSingleRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
+									}
 								}
 							}
-						}
-						if(assign_role != 0){
-							_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
+							if(assign_role != 0){
+								_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
+							}
+						} catch(IllegalArgumentException iae) {
+							_e.getTextChannel().sendMessage("Roles won't be updated because user isn't present in this guild!").queue();
 						}
 						_e.getTextChannel().sendMessage("Experience points have been updated!").queue();
 						logger.debug("{} has set {} experience points to {} in guild {}", _e.getMember().getUser().getId(), _message, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());
@@ -608,15 +616,19 @@ public class UserExecution {
 						if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole()) > 0) {
 							RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Level changed", "User is now level "+user_details.getLevel());
 							Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
-							for(Role r : _e.getMember().getRoles()){
-								for(Rank role : Hashes.getMapOfRankingRoles().values()){
-									if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()){
-										_e.getGuild().getController().removeSingleRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
+							try {
+								for(Role r : _e.getMember().getRoles()){
+									for(Rank role : Hashes.getMapOfRankingRoles().values()){
+										if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()){
+											_e.getGuild().getController().removeSingleRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
+										}
 									}
 								}
-							}
-							if(assign_role != 0){
-								_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
+								if(assign_role != 0){
+									_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
+								}
+							} catch(IllegalArgumentException iae) {
+								_e.getTextChannel().sendMessage("Roles won't be updated because user isn't present in this guild!").queue();
 							}
 							_e.getTextChannel().sendMessage("The level has been updated!").queue();
 							logger.debug("{} has set the level {} to {} in guild {}", _e.getMember().getUser().getId(), _message, file_value.replaceAll("[^0-9]",  ""), _e.getGuild().getName());

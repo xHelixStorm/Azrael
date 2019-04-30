@@ -13,9 +13,8 @@
 	<classpathentry kind="lib" path="lib/commons-io-2.6.jar"/>
 	<classpathentry kind="lib" path="lib/emoji-java-4.0.0-javadoc.jar"/>
 	<classpathentry kind="lib" path="lib/emoji-java-4.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="lib" path="lib/logback-core-1.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/logback-classic-1.2.3.jar"/>
-	<classpathentry kind="lib" path="lib/JDA-3.8.2_459-withDependencies.jar"/>
+	<classpathentry kind="lib" path="lib/JDA-3.8.3_463-withDependencies.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
