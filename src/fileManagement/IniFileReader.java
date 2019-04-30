@@ -84,6 +84,14 @@ public class IniFileReader {
 		readConfig();
 		return ini.get("DiscordRoles", "Password");
 	}
+	public static String getSQLUsername4(){
+		readConfig();
+		return ini.get("Patchnotes", "Username");
+	}
+	public static String getSQLPassword4(){
+		readConfig();
+		return ini.get("Patchnotes", "Password");
+	}
 	public static String getPugThumbnail() {
 		readConfig();
 		return ini.get("Thumbnails", "Pug");

@@ -18,13 +18,12 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import preparedMessages.PatchNotes;
-import preparedMessages.PublicPatchNotes;
 import rankingSystem.DoubleExperienceOff;
 import rankingSystem.DoubleExperienceStart;
 import sql.RankingSystem;
 import sql.Azrael;
 import sql.DiscordRoles;
+import sql.Patchnotes;
 import threads.BotStartAssign;
 import threads.RoleExtend;
 import timerTask.ClearCommentedUser;
@@ -39,7 +38,7 @@ public class ReadyListener extends ListenerAdapter{
 		Logger logger = LoggerFactory.getLogger(ReadyListener.class);
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the latest patch notes!");
 		System.out.println();
-		System.out.println("Azrael Version: "+STATIC.getVersion_New()+"\nAll credits to xHelixStorm");
+		System.out.println("Azrael Version: "+STATIC.getVersion()+"\nAll credits to xHelixStorm");
 		
 		boolean allowPatchNotes = IniFileReader.getAllowPatchNotes();
 		boolean allowPublicPatchNotes = IniFileReader.getAllowPublicPatchNotes();
@@ -104,18 +103,30 @@ public class ReadyListener extends ListenerAdapter{
 			
 			if(log_channel != null){e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("Bot is now operational!").queue();}
 			
-			if(!(STATIC.getVersion_Old().contains(STATIC.getVersion_New())) && allowPatchNotes){
-				if(log_channel != null){
-					FileSetting.createFile("./files/version.azr", STATIC.getVersion_New());
+			var priv_notes = Patchnotes.SQLgetPrivatePatchnotes();
+			var publ_notes = Patchnotes.SQLgetPublicPatchnotes();
+			
+			if(priv_notes != null && allowPatchNotes) {
+				if(log_channel != null) {
 					e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
-							messageBuild.setDescription(PatchNotes.patchNotes(guild_id)).build()).queue();
-					logger.debug("Private patch notes launched");					
-					if(allowPublicPatchNotes){
-						if(bot_channel != null){
-							e.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
-									messageBuild.setDescription(PublicPatchNotes.publicPatchNotes()).build()).queue();
-							logger.debug("Public patch notes launched");
-						}
+							messageBuild.setDescription("Bot Patchnotes version "+ STATIC.getVersion()+ " "+priv_notes.getDate()+"\n"+priv_notes.getMessage1())
+							.build()).complete();
+					if(priv_notes.getMessage2() != null && priv_notes.getMessage2().length() > 0) {
+						e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
+								messageBuild.setDescription(priv_notes.getMessage2())
+								.build()).complete();
+					}
+				}
+			}
+			if(publ_notes != null && allowPublicPatchNotes) {
+				if(bot_channel != null) {
+					e.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
+							messageBuild.setDescription("Bot Patchnotes version "+ STATIC.getVersion()+ " "+publ_notes.getDate()+"\n"+publ_notes.getMessage1())
+							.build()).complete();
+					if(publ_notes.getMessage2() != null && publ_notes.getMessage2().length() > 0) {
+						e.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
+								messageBuild.setDescription(publ_notes.getMessage2())
+								.build()).complete();
 					}
 				}
 			}

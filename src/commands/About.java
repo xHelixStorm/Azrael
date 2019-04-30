@@ -36,7 +36,7 @@ public class About implements Command {
 				EmbedBuilder messageBuilder = new EmbedBuilder().setColor(0x00AE86).setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl()).setTitle("About Page!");
 				messageBuilder.setAuthor("Azrael", e.getJDA().getSelfUser().getEffectiveAvatarUrl());
 				messageBuilder.setDescription("Here are all details about myself!");
-				messageBuilder.addField("BOT VERSION", STATIC.getVersion_New(), true);
+				messageBuilder.addField("BOT VERSION", STATIC.getVersion(), true);
 				messageBuilder.addField("DEVELOPER", "Java developer xHelixStorm", true);
 				messageBuilder.addBlankField(false);
 				messageBuilder.addField("Functionalities", "- Self designed ranking system.\n"
