@@ -84,4 +84,40 @@ public class Patchnotes {
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
+	
+	public static void SQLUpdatePrivPatchnotesPublished() {
+		logger.debug("SQLUpdatePrivPatchnotesPublished launched without params");
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE priv_notes SET published = 1 WHERE version_number = ? AND published = 0");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, STATIC.getVersion());
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdatePrivPatchnotesPublished Exception", e);
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLUpdatePublPatchnotesPublished() {
+		logger.debug("SQLUpdatePublPatchnotesPublished launched without params");
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE publ_notes SET published = 1 WHERE version_number = ? AND published = 0");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, STATIC.getVersion());
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdatePublPatchnotesPublished Exception", e);
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
 }

@@ -131,6 +131,8 @@ public class ReadyListener extends ListenerAdapter{
 				}
 			}
 		}
+		Patchnotes.SQLUpdatePrivPatchnotesPublished();
+		Patchnotes.SQLUpdatePublPatchnotesPublished();
 		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		
 		ExecutorService executor = Executors.newFixedThreadPool(1);
