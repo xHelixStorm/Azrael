@@ -66,24 +66,23 @@ public class RankingThreadExecution {
 		if(adder != 0) {
 			if(max_experience_enabled == true) {
 				int daily_experience = user_details.getDailyExperience();
-				LocalTime midnight = LocalTime.MIDNIGHT;
-				LocalDate today = LocalDate.now();
-				LocalDateTime tomorrowMidnight = LocalDateTime.of(today, midnight).plusDays(1);
-				Timestamp reset = Timestamp.valueOf(tomorrowMidnight);
-				
-				if(user_details.getDailyReset() == null || reset.getTime() - user_details.getDailyReset().getTime() != 0){
-					RankingSystem.SQLDeleteDailyExperience(user_id, guild_id);
-					daily_experience = 0;
-				}
-				
-				if(daily_experience < max_experience*multiplier){
+				if(daily_experience <= max_experience*multiplier) {
+					LocalTime midnight = LocalTime.MIDNIGHT;
+					LocalDate today = LocalDate.now();
+					LocalDateTime tomorrowMidnight = LocalDateTime.of(today, midnight).plusDays(1);
+					Timestamp reset = Timestamp.valueOf(tomorrowMidnight);
+					
+					if(user_details.getDailyReset() == null || reset.getTime() - user_details.getDailyReset().getTime() != 0) {
+						RankingSystem.SQLDeleteDailyExperience(user_id, guild_id);
+						daily_experience = 0;
+					}
 					daily_experience += adder;
 					ExperienceGain(e, user_details,  guild_settings, currentExperience, experience, daily_experience, roleAssignLevel, max_experience_enabled, reset);
-					if(daily_experience > max_experience*multiplier){
+					if(daily_experience > max_experience*multiplier) {
 						logger.info("{} has reached the limit of today's max experience points gain", e.getMember().getUser().getId());
 						RankingSystem.SQLInsertActionLog("medium", user_id, guild_id, "Experience limit reached", "User reached the limit of experience points");
 						PrivateChannel pc = e.getMember().getUser().openPrivateChannel().complete();
-						pc.sendMessage("You have reached the max possible to gain experience today. More experience points can be collected tomorrow!").queue();
+						pc.sendMessage("You have reached the limit of experience points for today. More experience points can be collected tomorrow!").queue();
 						pc.close();
 					}
 				}
@@ -102,15 +101,12 @@ public class RankingThreadExecution {
 		int level = user_details.getLevel();
 		long currency = user_details.getCurrency();
 		
-		if(currentExperience >= rankUpExperience && level < max_level){
-			currentExperience -= rankUpExperience;
-			if(currentExperience < 0) {
-				return;
-			}
+		if(currentExperience >= rankUpExperience && level < max_level) {
 			level += 1;
+			currentExperience -= rankUpExperience;
 			currency += Hashes.getRankingLevels(e.getGuild().getId()+"_"+level).getCurrency();
-			if(level != max_level){
-				rankUpExperience = Hashes.getRankingLevels(e.getGuild().getId()+"_"+level).getExperience() - Hashes.getRankingLevels(e.getGuild().getId()+"_"+(level-1)).getExperience();
+			if(level != max_level) {
+				rankUpExperience = Hashes.getRankingLevels(e.getGuild().getId()+"_"+level).getExperience() - Hashes.getRankingLevels(e.getGuild().getId()+"_"+(level+1)).getExperience();
 			}
 			else{
 				rankUpExperience = 0;
