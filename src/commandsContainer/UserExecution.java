@@ -78,7 +78,7 @@ public class UserExecution {
 		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17)) {
 			if(user_name != null && user_name.length() > 0) {
 				RankingSystem.SQLgetWholeRankView(Long.parseLong(raw_input), _e.getGuild().getIdLong(), RankingSystem.SQLgetGuild(_e.getGuild().getIdLong()).getThemeID());
-				_e.getTextChannel().sendMessage(message.setDescription("The user has been found in this guild! Now type one of the following words within 3 minutes to execute an action!\n\n"
+				_e.getTextChannel().sendMessage(message.setDescription("User **"+user_name+"** has been found in this guild! Now type one of the following words within 3 minutes to execute an action!\n\n"
 						+ "**information**: To display all details of the selected user\n"
 						+ "**delete-messages**: To remove up to 100 messages from the selected user\n"
 						+ "**warning**: To change the current warning value\n"
