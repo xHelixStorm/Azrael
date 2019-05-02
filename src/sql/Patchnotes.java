@@ -34,7 +34,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT message1, message2, date FROM priv_notes WHERE version_number LIKE ? AND published = 0");
+			String sql = ("SELECT message1, message2, date FROM priv_notes WHERE version_number LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
@@ -63,7 +63,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT message1, message2, date FROM publ_notes WHERE version_number LIKE ? AND published = 0");
+			String sql = ("SELECT message1, message2, date FROM publ_notes WHERE version_number LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
@@ -85,37 +85,46 @@ public class Patchnotes {
 		}
 	}
 	
-	public static void SQLUpdatePrivPatchnotesPublished() {
-		logger.debug("SQLUpdatePrivPatchnotesPublished launched without params");
+	public static void SQLInsertPublishedPatchnotes(long _guild_id) {
+		logger.debug("SQLInsertPublishedPatchnotes launched. Params passed {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE priv_notes SET published = 1 WHERE version_number LIKE ? AND published = 0");
+			String sql = ("INSERT INTO published (fk_version_number, guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
+			stmt.setLong(2, _guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLUpdatePrivPatchnotesPublished Exception", e);
+			logger.error("SQLInsertPublishedPatchnotes Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
-	public static void SQLUpdatePublPatchnotesPublished() {
-		logger.debug("SQLUpdatePublPatchnotesPublished launched without params");
+	public static boolean SQLcheckPublishedPatchnotes(long _guild_id) {
+		logger.debug("SQLcheckPublishedPatchnotes launched. Params passed {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
+		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE publ_notes SET published = 1 WHERE version_number LIKE ? AND published = 0");
+			String sql = ("SELECT * FROM published WHERE fk_version_number LIKE ? AND guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
-			stmt.executeUpdate();
+			stmt.setLong(2, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return true;
+			}
+			return false;
 		} catch (SQLException e) {
-			logger.error("SQLUpdatePublPatchnotesPublished Exception", e);
+			logger.error("SQLcheckPublishedPatchnotes Exception", e);
+			return false;
 		} finally {
+		  try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}

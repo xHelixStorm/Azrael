@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import core.Channels;
 import core.Guilds;
+import core.Patchnote;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
@@ -108,9 +109,14 @@ public class ReadyListener extends ListenerAdapter {
 			
 			if(log_channel != null){e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("Bot is now operational!").queue();}
 			
-			var priv_notes = Patchnotes.SQLgetPrivatePatchnotes();
-			var publ_notes = Patchnotes.SQLgetPublicPatchnotes();
+			Patchnote priv_notes = null;
+			Patchnote publ_notes = null;
+			if(!Patchnotes.SQLcheckPublishedPatchnotes(guild_id)) {
+				priv_notes = Patchnotes.SQLgetPrivatePatchnotes();
+				publ_notes = Patchnotes.SQLgetPublicPatchnotes();
+			}
 			
+			var published = false;
 			if(priv_notes != null && allowPatchNotes) {
 				if(log_channel != null) {
 					e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
@@ -121,6 +127,7 @@ public class ReadyListener extends ListenerAdapter {
 								messageBuild.setDescription(priv_notes.getMessage2())
 								.build()).complete();
 					}
+					published = true;
 				}
 			}
 			if(publ_notes != null && allowPublicPatchNotes) {
@@ -133,11 +140,13 @@ public class ReadyListener extends ListenerAdapter {
 								messageBuild.setDescription(publ_notes.getMessage2())
 								.build()).complete();
 					}
+					published = true;
 				}
 			}
+			if(published) {
+				Patchnotes.SQLInsertPublishedPatchnotes(guild_id);
+			}
 		}
-		Patchnotes.SQLUpdatePrivPatchnotesPublished();
-		Patchnotes.SQLUpdatePublPatchnotesPublished();
 		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		
 		ExecutorService executor = Executors.newFixedThreadPool(1);
