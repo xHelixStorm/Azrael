@@ -176,31 +176,6 @@ public class Patchnotes {
 		}
 	}
 	
-	public static boolean SQLcheckPublishedGamePatchnotes(long _guild_id) {
-		logger.debug("SQLcheckPublishedGamePatchnotes launched. Params passed {}", _guild_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM game_notes WHERE fk_guild_id = ? LIMIT 1");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				return true;
-			}
-			return false;
-		} catch (SQLException e) {
-			logger.error("SQLcheckPublishedGamePatchnotes Exception", e);
-			return false;
-		} finally {
-		  try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static ArrayList<Patchnote> SQLgetPrivatePatchnotesArray() {
 		logger.debug("SQLgetPrivatePatchnotesArray launched without params");
 		Connection myConn = null;
@@ -209,16 +184,16 @@ public class Patchnotes {
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT message1, message2, date FROM priv_notes WHERE version_number = ? ORDER BY date desc LIMIT 10");
+			String sql = ("SELECT message1, message2, date, version_number FROM priv_notes ORDER BY date desc LIMIT 10");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				patchnotes.add(
 					new Patchnote(
 						rs.getString(1),
 						rs.getString(2),
-						rs.getString(3)
+						rs.getString(3),
+						rs.getString(4)
 					)
 				);
 			}
@@ -244,9 +219,8 @@ public class Patchnotes {
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT message1, message2, date, version_number FROM publ_notes WHERE version_number = ? ORDER BY date desc LIMIT 10");
+			String sql = ("SELECT message1, message2, date, version_number FROM publ_notes ORDER BY date desc LIMIT 10");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				patchnotes.add(

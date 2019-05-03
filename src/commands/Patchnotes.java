@@ -41,17 +41,14 @@ public class Patchnotes implements Command {
 				ArrayList<Patchnote> publ_notes = null;
 				ArrayList<Patchnote> game_notes = null;
 				var modRights = false;
-				//retrieve bot patchnotes
+				//retrieve patchnotes
 				if(UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 					modRights = true;
 				}
 				if(modRights)
 					priv_notes = sql.Patchnotes.SQLgetPrivatePatchnotesArray();
 				publ_notes = sql.Patchnotes.SQLgetPublicPatchnotesArray();
-				if(sql.Patchnotes.SQLcheckPublishedGamePatchnotes(e.getGuild().getIdLong())) {
-					//retrieve game patchnotes
-					game_notes = sql.Patchnotes.SQLgetGamePatchnotesArray(e.getGuild().getIdLong());
-				}
+				game_notes = sql.Patchnotes.SQLgetGamePatchnotesArray(e.getGuild().getIdLong());
 				
 				if(priv_notes == null && publ_notes == null && game_notes == null) {
 					message.setTitle("No patch notes are available!").setColor(Color.RED);
@@ -73,13 +70,7 @@ public class Patchnotes implements Command {
 								e.getTextChannel().sendMessage(message.setDescription("No Patchnotes available for this filter option").build()).queue();
 							}
 							else {
-								StringBuilder out = new StringBuilder();
-								for(Patchnote note : display_notes) {
-									out.append(note.getDate()+":\t**"+note.getTitle()+"**\n");
-								}
-								message.setTitle("Here a list of patch notes!").setColor(Color.BLUE);
-								e.getTextChannel().sendMessage(message.setDescription("Please write one of the following patch notes title together with the full command to display the notes.\n"
-										+ out.toString()).build()).queue();
+								collectPatchNotes(e, display_notes, message);
 							}
 						}
 						else if(args.length == 2 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public"))) {
@@ -92,10 +83,7 @@ public class Patchnotes implements Command {
 								e.getTextChannel().sendMessage("Patch notes not found!").queue();
 							}
 							else {
-								message.setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the requested patch notes!");
-								e.getTextChannel().sendMessage(message.setDescription("Bot patch notes version **"+note.getTitle()+"** "+note.getDate()+"\n"+note.getMessage1()).build()).complete();
-								if(note.getMessage2() != null || note.getMessage2().length() > 0)
-									e.getTextChannel().sendMessage(message.setDescription(note.getMessage2()).build()).complete();
+								printPatchNotes(e, note, message);
 							}
 						}
 						else {
@@ -104,13 +92,7 @@ public class Patchnotes implements Command {
 					}
 					else {
 						if(args.length == 0) {
-							StringBuilder out = new StringBuilder();
-							for(Patchnote note : publ_notes) {
-								out.append(note.getDate()+":\t**"+note.getTitle()+"**\n");
-							}
-							message.setTitle("Here a list of patch notes!").setColor(Color.BLUE);
-							e.getTextChannel().sendMessage(message.setDescription("Please write one of the following patch notes title together with the full command to display the notes.\n"
-									+ out.toString()).build()).queue();
+							collectPatchNotes(e, publ_notes, message);
 						}
 						else if(args.length == 1) {
 							var note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[0])).findAny().orElse(null);
@@ -118,23 +100,14 @@ public class Patchnotes implements Command {
 								e.getTextChannel().sendMessage("Patch notes not found!").queue();
 							}
 							else {
-								message.setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the requested patch notes!");
-								e.getTextChannel().sendMessage(message.setDescription("Bot patch notes version **"+note.getTitle()+"** "+note.getDate()+"\n"+note.getMessage1()).build()).complete();
-								if(note.getMessage2() != null || note.getMessage2().length() > 0)
-									e.getTextChannel().sendMessage(message.setDescription(note.getMessage2()).build()).complete();
+								printPatchNotes(e, note, message);
 							}
 						}
 					}
 				}
 				else if(priv_notes == null && publ_notes == null && game_notes != null) {
 					if(args.length == 0) {
-						StringBuilder out = new StringBuilder();
-						for(Patchnote note : game_notes) {
-							out.append(note.getDate()+":\t**"+note.getTitle()+"**\n");
-						}
-						message.setTitle("Here a list of patch notes!").setColor(Color.BLUE);
-						e.getTextChannel().sendMessage(message.setDescription("Please write one of the following patch notes title together with the full command to display the notes.\n"
-								+ out.toString()).build()).queue();
+						collectPatchNotes(e, game_notes, message);
 					}
 					else if(args.length == 1) {
 						var note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[0])).findAny().orElse(null);
@@ -142,10 +115,7 @@ public class Patchnotes implements Command {
 							e.getTextChannel().sendMessage("Patch notes not found!").queue();
 						}
 						else {
-							message.setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the requested patch notes!");
-							e.getTextChannel().sendMessage(message.setDescription("Bot patch notes version **"+note.getTitle()+"** "+note.getDate()+"\n"+note.getMessage1()).build()).complete();
-							if(note.getMessage2() != null || note.getMessage2().length() > 0)
-								e.getTextChannel().sendMessage(message.setDescription(note.getMessage2()).build()).complete();
+							printPatchNotes(e, note, message);
 						}
 					}
 				}
@@ -167,13 +137,7 @@ public class Patchnotes implements Command {
 								e.getTextChannel().sendMessage(message.setDescription("No Patchnotes available for this filter option").build()).queue();
 							}
 							else {
-								StringBuilder out = new StringBuilder();
-								for(Patchnote note : display_notes) {
-									out.append(note.getDate()+":\t**"+note.getTitle()+"**\n");
-								}
-								message.setTitle("Here a list of patch notes!").setColor(Color.BLUE);
-								e.getTextChannel().sendMessage(message.setDescription("Please write one of the following patch notes title together with the full command to display the notes.\n"
-										+ out.toString()).build()).queue();
+								collectPatchNotes(e, display_notes, message);
 							}
 						}
 						else if(args.length == 2 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public") || args[0].equalsIgnoreCase("game"))) {
@@ -188,10 +152,7 @@ public class Patchnotes implements Command {
 								e.getTextChannel().sendMessage("Patch notes not found!").queue();
 							}
 							else {
-								message.setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the requested patch notes!");
-								e.getTextChannel().sendMessage(message.setDescription("Bot patch notes version **"+note.getTitle()+"** "+note.getDate()+"\n"+note.getMessage1()).build()).complete();
-								if(note.getMessage2() != null || note.getMessage2().length() > 0)
-									e.getTextChannel().sendMessage(message.setDescription(note.getMessage2()).build()).complete();
+								printPatchNotes(e, note, message);
 							}
 						}
 						else {
@@ -213,13 +174,7 @@ public class Patchnotes implements Command {
 								e.getTextChannel().sendMessage(message.setDescription("No Patchnotes available for this filter option").build()).queue();
 							}
 							else {
-								StringBuilder out = new StringBuilder();
-								for(Patchnote note : display_notes) {
-									out.append(note.getDate()+":\t**"+note.getTitle()+"**\n");
-								}
-								message.setTitle("Here a list of patch notes!").setColor(Color.BLUE);
-								e.getTextChannel().sendMessage(message.setDescription("Please write one of the following patch notes title together with the full command to display the notes.\n"
-										+ out.toString()).build()).queue();
+								collectPatchNotes(e, display_notes, message);
 							}
 						}
 						else if(args.length == 2 && (args[0].equalsIgnoreCase("public") || args[0].equalsIgnoreCase("game"))) {
@@ -232,10 +187,7 @@ public class Patchnotes implements Command {
 								e.getTextChannel().sendMessage("Patch notes not found!").queue();
 							}
 							else {
-								message.setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the requested patch notes!");
-								e.getTextChannel().sendMessage(message.setDescription("Bot patch notes version **"+note.getTitle()+"** "+note.getDate()+"\n"+note.getMessage1()).build()).complete();
-								if(note.getMessage2() != null || note.getMessage2().length() > 0)
-									e.getTextChannel().sendMessage(message.setDescription(note.getMessage2()).build()).complete();
+								printPatchNotes(e, note, message);
 							}
 						}
 					}
@@ -252,6 +204,23 @@ public class Patchnotes implements Command {
 	@Override
 	public String help() {
 		return null;
+	}
+	
+	private void collectPatchNotes(MessageReceivedEvent e, ArrayList<Patchnote> display_notes, EmbedBuilder message) {
+		StringBuilder out = new StringBuilder();
+		for(Patchnote note : display_notes) {
+			out.append(note.getDate()+":\t **"+note.getTitle()+"**\n");
+		}
+		message.setTitle("Here a list of patch notes!").setColor(Color.BLUE);
+		e.getTextChannel().sendMessage(message.setDescription("Please write one of the following patch notes title together with the full command to display the notes.\n"
+				+ out.toString()).build()).queue();
+	}
+	
+	private void printPatchNotes(MessageReceivedEvent e, Patchnote note, EmbedBuilder message) {
+		message.setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the requested patch notes!");
+		e.getTextChannel().sendMessage(message.setDescription("Bot patch notes version **"+note.getTitle()+"** "+note.getDate()+"\n"+note.getMessage1()).build()).complete();
+		if(note.getMessage2() != null || note.getMessage2().length() > 0)
+			e.getTextChannel().sendMessage(message.setDescription(note.getMessage2()).build()).complete();
 	}
 
 }
