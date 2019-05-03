@@ -21,7 +21,7 @@ public class CommandList {
 			entertainment = true;
 		}
 		
-		if(GuildIni.getAboutCommand(guild_id) || GuildIni.getHelpCommand(guild_id) || GuildIni.getDisplayCommand(guild_id)){
+		if(GuildIni.getAboutCommand(guild_id) || GuildIni.getHelpCommand(guild_id) || GuildIni.getDisplayCommand(guild_id) || GuildIni.getPatchnotesCommand(guild_id)){
 			other = true;
 		}
 		
@@ -55,6 +55,7 @@ public class CommandList {
 			if(GuildIni.getAboutCommand(guild_id))textCollector.add("**-"+prefix+"about**\nshows all information regarding this Bot\n\n");
 			if(GuildIni.getHelpCommand(guild_id))textCollector.add("**-"+prefix+"help**\nshows a link to our tech thread on forum\n\n");
 			if(GuildIni.getDisplayCommand(guild_id))textCollector.add("**-"+prefix+"display**\nshows details of registered roles, rank level, channel filter, etc. (few parameters may be restricted)\n\n");
+			if(GuildIni.getPatchnotesCommand(guild_id))textCollector.add("**-"+prefix+"patchnotes**\nshows past published patchnotes of the game and game\n\n");
 		}
 		
 		if(administration == false && entertainment == false && other == false){
