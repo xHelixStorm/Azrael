@@ -19,6 +19,7 @@ import commands.Filter;
 import commands.Help;
 import commands.Inventory;
 import commands.Meow;
+import commands.Patchnotes;
 import commands.Profile;
 import commands.Pug;
 import commands.Purchase;
@@ -127,6 +128,7 @@ public class Main {
 		CommandHandler.commands.put("rolereaction", new RoleReaction());
 		CommandHandler.commands.put("rss", new Rss());
 		CommandHandler.commands.put("randomshop", new Randomshop());
+		CommandHandler.commands.put("patchnotes", new Patchnotes());
 	}
 	
 	public static void addListeners(){

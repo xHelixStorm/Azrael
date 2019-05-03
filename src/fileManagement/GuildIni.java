@@ -62,6 +62,7 @@ public class GuildIni {
 			ini.add("Commands", "RoleReaction", "true");
 			ini.add("Commands", "Rss", "true");
 			ini.add("Commands", "Randomshop", "true");
+			ini.add("Commands", "Patchnotes", "true");
 			
 			//Inventory
 			ini.add("Inventory", "startX", "0");
@@ -283,6 +284,10 @@ public class GuildIni {
 	public static boolean getRandomshopCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Randomshop", boolean.class);
+	}
+	public static boolean getPatchnotesCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Patchnotes", boolean.class);
 	}
 	
 	public static int[] getWholeInventory(long guild_id) {

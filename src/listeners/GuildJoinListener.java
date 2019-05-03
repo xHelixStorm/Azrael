@@ -7,6 +7,7 @@ import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import sql.RankingSystem;
 import sql.DiscordRoles;
+import sql.Patchnotes;
 import sql.Azrael;
 
 public class GuildJoinListener extends ListenerAdapter{
@@ -20,16 +21,19 @@ public class GuildJoinListener extends ListenerAdapter{
 		String guild_name = e.getGuild().getName();
 		
 		if(Azrael.SQLInsertGuild(guild_id, guild_name) == 0) {
-			logger.error("guild information couldn't be inserted into Azrael.guilds table for the guild {}", e.getGuild().getName());
+			logger.error("guild information couldn't be inserted into Azrael.guilds table for the guild {}", guild_name);
 		}
 		if(RankingSystem.SQLInsertGuild(guild_id, guild_name, false) > 0) {
 			if(DiscordRoles.SQLInsertGuild(guild_id, guild_name) == 0) {
-				logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", e.getGuild().getName());
+				logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", guild_name);
 			}
 		}
 		else {
-			logger.error("guild settings couldn't be inserted into RankingSystem.guilds table for the guild {}", e.getGuild().getName());
+			logger.error("guild settings couldn't be inserted into RankingSystem.guilds table for the guild {}", guild_name);
 		}
-		Azrael.SQLInsertActionLog("GUILD_JOIN", e.getGuild().getIdLong(), e.getGuild().getIdLong(), e.getGuild().getName());
+		if(Patchnotes.SQLInsertGuild(guild_id, guild_name) == 0) {
+			logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", guild_name);
+		}
+		Azrael.SQLInsertActionLog("GUILD_JOIN", e.getGuild().getIdLong(), e.getGuild().getIdLong(), guild_name);
 	}
 }

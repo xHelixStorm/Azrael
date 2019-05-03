@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +92,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO published (fk_version_number, guild_id) VALUES(?, ?)");
+			String sql = ("INSERT INTO published (fk_version_number, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
 			stmt.setLong(2, _guild_id);
@@ -111,7 +112,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM published WHERE fk_version_number LIKE ? AND guild_id = ?");
+			String sql = ("SELECT * FROM published WHERE fk_version_number LIKE ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
 			stmt.setLong(2, _guild_id);
@@ -123,6 +124,183 @@ public class Patchnotes {
 		} catch (SQLException e) {
 			logger.error("SQLcheckPublishedPatchnotes Exception", e);
 			return false;
+		} finally {
+		  try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLInsertGuild(long _guild_id, String _name) {
+		logger.debug("SQLInsertGuilds launched. Params passed {}, {}", _guild_id, _name);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO guilds (guild_id, name) VALUES(?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setString(2, _name);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertGuilds Exception", e);
+			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLcheckPublishedBotPatchnotes(long _guild_id) {
+		logger.debug("SQLcheckPublishedBotPatchnotes launched. Params passed {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT * FROM published WHERE fk_guild_id = ? LIMIT 1");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return true;
+			}
+			return false;
+		} catch (SQLException e) {
+			logger.error("SQLcheckPublishedBotPatchnotes Exception", e);
+			return false;
+		} finally {
+		  try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLcheckPublishedGamePatchnotes(long _guild_id) {
+		logger.debug("SQLcheckPublishedGamePatchnotes launched. Params passed {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT * FROM game_notes WHERE fk_guild_id = ? LIMIT 1");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return true;
+			}
+			return false;
+		} catch (SQLException e) {
+			logger.error("SQLcheckPublishedGamePatchnotes Exception", e);
+			return false;
+		} finally {
+		  try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<Patchnote> SQLgetPrivatePatchnotesArray() {
+		logger.debug("SQLgetPrivatePatchnotesArray launched without params");
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT message1, message2, date FROM priv_notes WHERE version_number = ? ORDER BY date desc LIMIT 10");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, STATIC.getVersion());
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				patchnotes.add(
+					new Patchnote(
+						rs.getString(1),
+						rs.getString(2),
+						rs.getString(3)
+					)
+				);
+			}
+			if(patchnotes.size() > 0)
+				return patchnotes;
+			else
+				return null;
+		} catch (SQLException e) {
+			logger.error("SQLgetPrivatePatchnotesArray Exception", e);
+			return null;
+		} finally {
+		  try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<Patchnote> SQLgetPublicPatchnotesArray() {
+		logger.debug("SQLgetPublicPatchnotesArray launched without params");
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT message1, message2, date, version_number FROM publ_notes WHERE version_number = ? ORDER BY date desc LIMIT 10");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, STATIC.getVersion());
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				patchnotes.add(
+					new Patchnote(
+						rs.getString(1),
+						rs.getString(2),
+						rs.getString(3),
+						rs.getString(4)
+					)
+				);
+			}
+			if(patchnotes.size() > 0)
+				return patchnotes;
+			else
+				return null;
+		} catch (SQLException e) {
+			logger.error("SQLgetPublicPatchnotesArray Exception", e);
+			return null;
+		} finally {
+		  try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<Patchnote> SQLgetGamePatchnotesArray(long _guild_id) {
+		logger.debug("SQLgetGamePatchnotesArray launched. Params passed {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT message1, message2, date, title FROM game_notes WHERE fk_guild_id = ? ORDER BY date desc LIMIT 10");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				patchnotes.add(
+					new Patchnote(
+						rs.getString(1),
+						rs.getString(2),
+						rs.getString(3),
+						rs.getString(4)
+					)
+				);
+			}
+			if(patchnotes.size() > 0)
+				return patchnotes;
+			else
+				return null;
+		} catch (SQLException e) {
+			logger.error("SQLgetPrivatePatchnotesArray Exception", e);
+			return null;
 		} finally {
 		  try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
