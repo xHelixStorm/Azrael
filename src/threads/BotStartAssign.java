@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import rankingSystem.Rank;
 import sql.RankingSystem;
 import sql.Azrael;
@@ -19,9 +20,11 @@ import sql.Azrael;
 public class BotStartAssign implements Runnable{
 	private final Logger logger = LoggerFactory.getLogger(BotStartAssign.class);
 	ReadyEvent e;
+	GuildJoinEvent e2;
 	
-	public BotStartAssign(ReadyEvent _e){
+	public BotStartAssign(ReadyEvent _e, GuildJoinEvent _e2) {
 		e = _e;
+		e2 = _e2;
 	}
 	
 	@Override
@@ -32,17 +35,17 @@ public class BotStartAssign implements Runnable{
 		var errUserDetails = 0;
 		var errAzraelUsers = 0;
 		var rankingIncluded = false;
-		for(Guild g : e.getJDA().getGuilds()){
+		for(Guild g : (e != null ? e.getJDA().getGuilds() : e2.getJDA().getGuilds())) {
 			long guild_id = g.getIdLong();
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 			if(guild_settings.getRankingState() == true){
 				rankingIncluded = true;
-				for(Member member : e.getJDA().getGuildById(g.getIdLong()).getMembers()){
-					if(!UserPrivs.isUserBot(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong()) && !UserPrivs.isUserMuted(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong()) && !UserPrivs.isUserCommunity(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong())){
-						Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), g.getIdLong(), guild_settings.getThemeID());
+				for(Member member : (e != null ? e.getJDA().getGuildById(g.getIdLong()).getMembers() : e2.getJDA().getGuildById(g.getIdLong()).getMembers())) {
+					if(!UserPrivs.isUserBot(member.getUser(), guild_id) && !UserPrivs.isUserMuted(member.getUser(), guild_id) && !UserPrivs.isUserCommunity(member.getUser(), guild_id)){
+						Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), guild_id, guild_settings.getThemeID());
 						if(user_details != null){
 							if(user_details.getCurrentRole() != 0){
-								e.getJDA().getGuildById(guild_id).getController().addSingleRoleToMember(member, e.getJDA().getGuildById(guild_id).getRoleById(user_details.getCurrentRole())).queue();
+								g.getController().addSingleRoleToMember(member, g.getRoleById(user_details.getCurrentRole())).queue();
 								if(Azrael.SQLInsertUser(member.getUser().getIdLong(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getUser().getEffectiveAvatarUrl(), member.getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
 									logger.error("User {} couldn't be inserted into the table Azrael.users for guild {}", member.getUser().getId(), g.getName());
 									errAzraelUsers++;
@@ -85,18 +88,18 @@ public class BotStartAssign implements Runnable{
 			logger.debug("Start up user registration complete in {}", g.getName());
 			var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 			if(i != 0 && log_channel != null){
-				e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(i+" User(s) received the community role on bot start up").build()).queue();
+				g.getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(i+" User(s) received the community role on bot start up").build()).queue();
 			}
 			if((errUsers != 0 || errUserDetails != 0 || errAzraelUsers != 0) && log_channel != null && rankingIncluded) {
 				EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle("Users couldn't be registered!");
-				e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("Various users couldn't be inserted into the ranking system tables. Please check the error log for affected users!\n"
+				g.getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("Various users couldn't be inserted into the ranking system tables. Please check the error log for affected users!\n"
 						+ "failed insertions in RankingSystem.users: "+errUsers+"\n"
 						+ "failed insertions in RankingSystem.user_details: "+errUserDetails+"\n"
 						+ "failed insertions in Azrael.users: "+errAzraelUsers).build()).queue();
 			}
 			else if(errAzraelUsers != 0 && log_channel != null) {
 				EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle("Users couldn't be registered!");
-				e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("Various users couldn't be inserted into the users table. Please check the error log for affected users!\n"
+				g.getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("Various users couldn't be inserted into the users table. Please check the error log for affected users!\n"
 						+ "failed insertions in RankingSystem.users: "+errUsers).build()).queue();
 			}
 		}
