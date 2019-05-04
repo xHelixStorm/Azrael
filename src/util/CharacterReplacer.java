@@ -5,7 +5,7 @@ private static String parseMessage;
 	
 	public static String replace(String message){
 		if(message != null){
-			message = message.replaceAll("[\\.\\?!,\"'+@#$%^&*\\(\\)\\{\\}\\]\\[/\\-\\_\\|\\=§‘’`„°•—–¿¡₩€¢¥£​]", "");
+			message = message.replaceAll("[\\.\\?!,\"'+@#$%^&*\\(\\)\\{\\}\\]\\[/\\-\\_\\|\\=§‘’`„°•—–¿¡₩€¢¥£-​]", "");
 			message = message.replaceAll("[ÀÁÂÃÅÆàáâãåæĀāĂăΑАаӒӓ]", "a");
 			message = message.replaceAll("[Ąą]", "ah");
 			message = message.replaceAll("[ΒВЬ]", "b");
