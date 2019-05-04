@@ -52,6 +52,9 @@ public class Register implements Command{
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-role")){
 					RegisterRole.runCommandWithAdminFirst(e, guild_id, args);
 				}
+				else {
+					e.getTextChannel().sendMessage("**"+e.getMember().getAsMention()+" Something went wrong. Please recheck the syntax and try again!**").queue();
+				}
 			}
 			else if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || UserPrivs.isUserMod(e.getMember().getUser(), guild_id) || Long.parseLong(user_id) == GuildIni.getAdmin(guild_id)){
 				if(args.length == 0){
