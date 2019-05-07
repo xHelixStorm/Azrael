@@ -112,6 +112,11 @@ public class GuildIni {
 			ini.add("Daily", "descriptionStartX", "0");
 			ini.add("Daily", "fieldSizeX", "0");
 			
+			//Profile
+			ini.add("Profile", "nameLengthLimit", "0");
+			ini.add("Profile", "generalTextFontSize", "12");
+			ini.add("Profile", "nameTextFontSize", "12");
+			ini.add("Profile", "descriptionMode", "0");
 			
 			ini.store(new File("./ini/"+guild_id+".ini"));
 		} catch (IOException e) {
@@ -365,5 +370,16 @@ public class GuildIni {
 		dail[6] = daily.get("descriptionStartX", int.class);
 		dail[7] = daily.get("fieldSizeX", int.class);
 		return dail;
+	}
+	
+	public static int[] getWholeProfile(long guild_id) {
+		Ini ini = readIni(guild_id);
+		Ini.Section profile = ini.get("Profile");
+		int [] prof = new int[4];
+		prof[0] = profile.get("nameLengthLimit", int.class);
+		prof[1] = profile.get("generalTextFontSize", int.class);
+		prof[2] = profile.get("nameTextFontSize", int.class);
+		prof[3] = profile.get("descriptionMode", int.class);
+		return prof;
 	}
 }

@@ -66,16 +66,15 @@ public class RankingThreadExecution {
 		if(adder != 0) {
 			if(max_experience_enabled == true) {
 				int daily_experience = user_details.getDailyExperience();
+				if(user_details.getDailyReset() == null || user_details.getDailyReset().getTime() - System.currentTimeMillis() <= 0) {
+					RankingSystem.SQLDeleteDailyExperience(user_id, guild_id);
+					daily_experience = 0;
+				}
 				if(daily_experience <= max_experience*multiplier) {
 					LocalTime midnight = LocalTime.MIDNIGHT;
 					LocalDate today = LocalDate.now();
 					LocalDateTime tomorrowMidnight = LocalDateTime.of(today, midnight).plusDays(1);
 					Timestamp reset = Timestamp.valueOf(tomorrowMidnight);
-					
-					if(user_details.getDailyReset() == null || reset.getTime() - user_details.getDailyReset().getTime() != 0) {
-						RankingSystem.SQLDeleteDailyExperience(user_id, guild_id);
-						daily_experience = 0;
-					}
 					daily_experience += adder;
 					ExperienceGain(e, user_details,  guild_settings, currentExperience, experience, daily_experience, roleAssignLevel, max_experience_enabled, reset);
 					if(daily_experience > max_experience*multiplier) {

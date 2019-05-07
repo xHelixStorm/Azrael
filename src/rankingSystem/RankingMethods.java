@@ -21,6 +21,7 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -174,7 +175,14 @@ public class RankingMethods extends ListenerAdapter{
 			long currency = _currency;
 			int rank = _rank;
 			
-			if(characterCounter > 10){name = name.substring(0, 10);}
+			int[] prof = GuildIni.getWholeProfile(e.getGuild().getIdLong());
+			final var nameLengthLimit = prof[0];
+			final var generalTextFontSize = prof[1];
+			final var nameTextFontSize = prof[2];
+			final var descriptionMode = prof[3];
+			
+			if(characterCounter > nameLengthLimit && nameLengthLimit != 0)
+				name = name.substring(0, nameLengthLimit);
 			
 			int profileW = profile.getWidth();
 			int profileH = profile.getHeight();
@@ -190,24 +198,49 @@ public class RankingMethods extends ListenerAdapter{
 			g.drawImage(avatarPicture, 20, 20, 55, 55, null);
 			Color color = new Color(_color_r, _color_g, _color_b);
 			g.setColor(color);
-			g.setFont(new Font("Nexa Bold", Font.PLAIN, 13));
+			g.setFont(new Font("Nexa Bold", Font.PLAIN, generalTextFontSize));
 			if(_additional_exp_text == true) {
 				g.drawString("Exp:", 15, 109);
 			}
 			if(_additional_percent_text == true) {
 				g.drawString(levelT+"%", 243, 109);
 			}
-			g.drawString(""+_level, getRightString(""+_level, 136, g), 176);
-			var experienceString = insertDots(experience);
-			g.drawString(""+experienceString, getRightString(""+experienceString, 136, g), 153);
+			
+			if(descriptionMode == 0) {
+				g.drawString(""+_level, 136, 176);
+				var experienceString = insertDots(experience);
+				g.drawString(""+experienceString, 136, 153);
+				var currentExperienceString = insertDots(currentExperience);
+				var rankUpExperienceString = insertDots(rankUpExperience);
+				g.drawString(currentExperienceString+"/"+rankUpExperienceString, 142, 123);
+				var currencyString = insertDots(currency);
+				g.drawString(currencyString, 263, 153);
+				var rankString = insertDots(rank);
+				g.drawString(rankString, 263, 176);
+			}
+			else if(descriptionMode == 1) {
+				g.drawString(""+_level, getCenteredString(""+_level, 136, g), 176);
+				var experienceString = insertDots(experience);
+				g.drawString(""+experienceString, getCenteredString(""+experienceString, 136, g), 153);
+				var currencyString = insertDots(currency);
+				g.drawString(currencyString, getCenteredString(currencyString, 263, g), 153);
+				var rankString = insertDots(rank);
+				g.drawString(rankString, getCenteredString(rankString, 263, g), 176);
+			}
+			else if(descriptionMode == 2) {
+				g.drawString(""+_level, getRightString(""+_level, 136, g), 176);
+				var experienceString = insertDots(experience);
+				g.drawString(""+experienceString, getRightString(""+experienceString, 136, g), 153);
+				var currencyString = insertDots(currency);
+				g.drawString(currencyString, getRightString(currencyString, 263, g), 153);
+				var rankString = insertDots(rank);
+				g.drawString(rankString, getRightString(rankString, 263, g), 176);
+			}
 			var currentExperienceString = insertDots(currentExperience);
 			var rankUpExperienceString = insertDots(rankUpExperience);
 			g.drawString(currentExperienceString+"/"+rankUpExperienceString, getRightString(""+currentExperienceString, 142, g), 123);
-			var currencyString = insertDots(currency);
-			g.drawString(currencyString, getRightString(currencyString, 263, g), 153);
-			var rankString = insertDots(rank);
-			g.drawString(rankString, getRightString(rankString, 263, g), 176);
-			g.setFont(new Font("Nexa Bold", Font.BOLD, 24));
+
+			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
 			g.drawString(name, 126, 56);
 			
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/profile_"+e.getMember().getUser().getId()+".png"));
@@ -229,7 +262,7 @@ public class RankingMethods extends ListenerAdapter{
 	
 	private static int getCenteredString(String s, int w, Graphics2D g) {
 	    FontMetrics fm = g.getFontMetrics();
-	    int x = w - (fm.stringWidth(s)/2);
+	    int x = (w/2) - (fm.stringWidth(s)/2);
 	    return x;
 	}
 	
