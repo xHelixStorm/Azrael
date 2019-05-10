@@ -108,7 +108,13 @@ public class RankingMethods extends ListenerAdapter{
 			int characterCounter = name.length();
 			int levelT = _experience;
 			
-			if(characterCounter > 10){name = name.substring(0, 10);}
+			int[] ran = GuildIni.getWholeProfile(e.getGuild().getIdLong());
+			final var nameLengthLimit = ran[0];
+			final var generalTextFontSize = ran[1];
+			final var nameTextFontSize = ran[2];
+			
+			if(characterCounter > nameLengthLimit && nameLengthLimit != 0)
+				name = name.substring(0, nameLengthLimit);
 			
 			int rankW = rank.getWidth();
 			int rankH = rank.getHeight();
@@ -122,7 +128,7 @@ public class RankingMethods extends ListenerAdapter{
 			g.drawImage(avatarPicture, 19, 19, 40, 40, null);
 			Color color = new Color(_color_r, _color_g, _color_b);
 			g.setColor(color);
-			g.setFont(new Font("Nexa Bold", Font.PLAIN, 12));
+			g.setFont(new Font("Nexa Bold", Font.PLAIN, generalTextFontSize));
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			if(_additional_exp_text == true) {
 				g.drawString("Exp:", 14, 73);
@@ -132,7 +138,7 @@ public class RankingMethods extends ListenerAdapter{
 			}
 			var rankString = insertDots(_rank);
 			g.drawString("Rank:  #"+rankString, 118, 57);
-			g.setFont(new Font("Nexa Bold", Font.BOLD, 23));
+			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
 			g.drawString(name, 117, 38);
 			
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/rank_"+e.getMember().getUser().getId()+".png"));
