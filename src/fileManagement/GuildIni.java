@@ -122,7 +122,11 @@ public class GuildIni {
 			ini.add("Rank", "nameLengthLimit", "0");
 			ini.add("Rank", "generalTextFontSize", "12");
 			ini.add("Rank", "nameTextFontSize", "12");
-			ini.add("Profile", "descriptionMode", "0");
+			
+			//Level
+			ini.add("Level", "nameLengthLimit", "0");
+			ini.add("Level", "generalTextFontSize", "12");
+			ini.add("Level", "nameTextFontSize", "12");
 			
 			ini.store(new File("./ini/"+guild_id+".ini"));
 		} catch (IOException e) {
@@ -397,5 +401,15 @@ public class GuildIni {
 		ran[1] = rank.get("generalTextFontSize", int.class);
 		ran[2] = rank.get("nameTextFontSize", int.class);
 		return ran;
+	}
+	
+	public static int[] getWholeLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		Ini.Section level = ini.get("Level");
+		int [] lev = new int[3];
+		lev[0] = level.get("nameLengthLimit", int.class);
+		lev[1] = level.get("generalTextFontSize", int.class);
+		lev[2] = level.get("nameTextFontSize", int.class);
+		return lev;
 	}
 }
