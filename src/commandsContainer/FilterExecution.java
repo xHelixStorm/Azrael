@@ -205,623 +205,118 @@ public class FilterExecution {
 					}
 					break;
 				case "display-word-filter":
-					if(_message.equalsIgnoreCase("english")) {
-						Azrael.SQLgetFilter("eng", _e.getGuild().getIdLong());
-						StringBuilder out = new StringBuilder();
-						for(String word : Hashes.getQuerryResult("eng_"+_e.getGuild().getIdLong())) {
-							out.append(word+"\n");
-						}
-						String paste_link = Pastebin.unlistedPaste("English word filter", out.toString(), _e.getGuild().getIdLong());
-						message.setTitle("English word filter!");
-						out.setLength(0);
-						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.debug("{} has called the english word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
-					}
-					else if(_message.equalsIgnoreCase("german")) {
-						Azrael.SQLgetFilter("ger", _e.getGuild().getIdLong());
-						StringBuilder out = new StringBuilder();
-						for(String word : Hashes.getQuerryResult("ger_"+_e.getGuild().getIdLong())) {
-							out.append(word+"\n");
-						}
-						String paste_link = Pastebin.unlistedPaste("German word filter", out.toString(), _e.getGuild().getIdLong());
-						message.setTitle("German word filter!");
-						out.setLength(0);
-						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.debug("{} has called the german word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
-					}
-					else if(_message.equalsIgnoreCase("french")) {
-						Azrael.SQLgetFilter("fre", _e.getGuild().getIdLong());
-						StringBuilder out = new StringBuilder();
-						for(String word : Hashes.getQuerryResult("fre_"+_e.getGuild().getIdLong())) {
-							out.append(word+"\n");
-						}
-						String paste_link = Pastebin.unlistedPaste("French word filter", out.toString(), _e.getGuild().getIdLong());
-						message.setTitle("French word filter!");
-						out.setLength(0);
-						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.debug("{} has called the french word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
-					}
-					else if(_message.equalsIgnoreCase("turkish")) {
-						Azrael.SQLgetFilter("tur", _e.getGuild().getIdLong());
-						StringBuilder out = new StringBuilder();
-						for(String word : Hashes.getQuerryResult("tur_"+_e.getGuild().getIdLong())) {
-							out.append(word+"\n");
-						}
-						String paste_link = Pastebin.unlistedPaste("Turkish word filter", out.toString(), _e.getGuild().getIdLong());
-						message.setTitle("Turkish word filter!");
-						out.setLength(0);
-						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.debug("{} has called the turkish word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
-					}
-					else if(_message.equalsIgnoreCase("russian")) {
-						Azrael.SQLgetFilter("rus", _e.getGuild().getIdLong());
-						StringBuilder out = new StringBuilder();
-						for(String word : Hashes.getQuerryResult("rus_"+_e.getGuild().getIdLong())) {
-							out.append(word+"\n");
-						}
-						String paste_link = Pastebin.unlistedPaste("Russian word filter", out.toString(), _e.getGuild().getIdLong());
-						message.setTitle("Russian word filter!");
-						out.setLength(0);
-						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.debug("{} has called the russian word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
-					}
-					else if(_message.equalsIgnoreCase("spanish")) {
-						Azrael.SQLgetFilter("spa", _e.getGuild().getIdLong());
-						StringBuilder out = new StringBuilder();
-						for(String word : Hashes.getQuerryResult("eng_"+_e.getGuild().getIdLong())) {
-							out.append(word+"\n");
-						}
-						String paste_link = Pastebin.unlistedPaste("Spanish word filter", out.toString(), _e.getGuild().getIdLong());
-						message.setTitle("Spanish word filter!");
-						out.setLength(0);
-						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.debug("{} has called the spanish word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
-					}
-					else if(_message.equalsIgnoreCase("portuguese")) {
-						Azrael.SQLgetFilter("por", _e.getGuild().getIdLong());
-						StringBuilder out = new StringBuilder();
-						for(String word : Hashes.getQuerryResult("por_"+_e.getGuild().getIdLong())) {
-							out.append(word+"\n");
-						}
-						String paste_link = Pastebin.unlistedPaste("Portuguese word filter", out.toString(), _e.getGuild().getIdLong());
-						message.setTitle("Portuguese word filter!");
-						out.setLength(0);
-						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.debug("{} has called the portuguese word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
-					}
-					else if(_message.equalsIgnoreCase("italian")) {
-						Azrael.SQLgetFilter("ita", _e.getGuild().getIdLong());
-						StringBuilder out = new StringBuilder();
-						for(String word : Hashes.getQuerryResult("ita_"+_e.getGuild().getIdLong())) {
-							out.append(word+"\n");
-						}
-						String paste_link = Pastebin.unlistedPaste("Italian word filter", out.toString(), _e.getGuild().getIdLong());
-						message.setTitle("Italian word filter!");
-						out.setLength(0);
-						_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
-						logger.debug("{} has called the italian word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
-					}
+					callFilterLangContent(_e, message, logger, file_path, _message.toLowerCase());
 					break;
 				case "insert-word-filter":
-					if(_message.equalsIgnoreCase("english")) {
-						message.setTitle("You chose to insert an english word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "english-insert-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("german")) {
-						message.setTitle("You chose to insert an german word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "german-insert-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("french")) {
-						message.setTitle("You chose to insert an french word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "french-insert-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("turkish")) {
-						message.setTitle("You chose to insert an turkish word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "turkish-insert-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("russian")) {
-						message.setTitle("You chose to insert an russian word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "russian-insert-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("spanish")) {
-						message.setTitle("You chose to insert an spanish word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "spanish-insert-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("portuguese")) {
-						message.setTitle("You chose to insert an portuguese word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "portuguese-insert-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("italian")) {
-						message.setTitle("You chose to insert an italian word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "italian-insert-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("all")) {
-						message.setTitle("You chose to insert a word for all languages!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "all-insert-word-filter");
-					}
+					var langInsert = _message.toLowerCase();
+					message.setTitle("You chose to insert an "+langInsert+" word!");
+					_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
+					FileSetting.createFile(file_path, langInsert+"-insert-word-filter");
 					break;
 				case "english-insert-word-filter":
-					if(Azrael.SQLInsertWordFilter("eng", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the english word filter!").build()).queue();
-						Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted the word {} into the english word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be inserted into the word-filter table.").queue();
-						logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
-					}
+					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "german-insert-word-filter":
-					if(Azrael.SQLInsertWordFilter("ger", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the german word filter!").build()).queue();
-						Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted the word {} into the german word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be inserted into the word-filter table.").queue();
-						logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
-					}
+					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "french-insert-word-filter":
-					if(Azrael.SQLInsertWordFilter("fre", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the french word filter!").build()).queue();
-						Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted the word {} into the french word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be inserted into the word-filter table.").queue();
-						logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
-					}
+					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "turkish-insert-word-filter":
-					if(Azrael.SQLInsertWordFilter("tur", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the turkish word filter!").build()).queue();
-						Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted the word {} into the turkish word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be inserted into the word-filter table.").queue();
-						logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
-					}
+					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "russian-insert-word-filter":
-					if(Azrael.SQLInsertWordFilter("rus", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the russian word filter!").build()).queue();
-						Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted the word {} into the russian word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be inserted into the word-filter table.").queue();
-						logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
-					}
+					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "spanish-insert-word-filter":
-					if(Azrael.SQLInsertWordFilter("spa", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the spanish word filter!").build()).queue();
-						Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted the word {} into the spanish word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be inserted into the word-filter table.").queue();
-						logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
-					}
+					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "portuguese-insert-word-filter":
-					if(Azrael.SQLInsertWordFilter("por", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the portuguese word filter!").build()).queue();
-						Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted the word {} into the portuguese word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be inserted into the word-filter table.").queue();
-						logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
-					}
+					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "italian-insert-word-filter":
-					if(Azrael.SQLInsertWordFilter("ita", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the italian word filter!").build()).queue();
-						Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted the word {} into the italian word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be inserted into the word-filter table.").queue();
-						logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
-					}
+					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "all-insert-word-filter":
-					if(Azrael.SQLDeleteWordFilterAllLang(_message.toLowerCase(), _e.getGuild().getIdLong()) && Azrael.SQLInsertWordFilter("all", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into all word filter languages!").build()).queue();
-						Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted the word {} into the word filter for all languages", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be inserted into the word-filter table.").queue();
-						logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
-					}
+					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "remove-word-filter":
-					if(_message.equalsIgnoreCase("english")) {
-						message.setTitle("You chose to remove an english word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "english-remove-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("german")) {
-						message.setTitle("You chose to remove an german word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "german-remove-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("french")) {
-						message.setTitle("You chose to remove an french word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "french-remove-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("turkish")) {
-						message.setTitle("You chose to remove an turkish word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "turkish-remove-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("russian")) {
-						message.setTitle("You chose to remove an russian word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "russian-remove-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("spanish")) {
-						message.setTitle("You chose to remove an spanish word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "spanish-remove-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("portuguese")) {
-						message.setTitle("You chose to remove an portuguese word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "portuguese-remove-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("italian")) {
-						message.setTitle("You chose to remove an italian word!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "italian-remove-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("all")) {
-						message.setTitle("You chose to remove an word from all languages!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, "all-remove-word-filter");
-					}
+					var langRemove = _message.toLowerCase();
+					message.setTitle("You chose to remove an "+langRemove+" word!");
+					_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
+					FileSetting.createFile(file_path, langRemove+"-remove-word-filter");
 					break;
 				case "english-remove-word-filter":
-					if(Azrael.SQLDeleteWordFilter("eng", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the english word filter!").build()).queue();
-						Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has removed the word {} from the english word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be removed from the word-filter").queue();
-						logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
-					}
+					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "german-remove-word-filter":
-					if(Azrael.SQLDeleteWordFilter("ger", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the german word filter!").build()).queue();
-						Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has removed the word {} from the german word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be removed from the word-filter").queue();
-						logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
-					}
+					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "french-remove-word-filter":
-					if(Azrael.SQLDeleteWordFilter("fre", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the french word filter!").build()).queue();
-						Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has removed the word {} from the french word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be removed from the word-filter").queue();
-						logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
-					}
+					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "turkish-remove-word-filter":
-					if(Azrael.SQLDeleteWordFilter("tur", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the turkish word filter!").build()).queue();
-						Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has removed the word {} from the turkish word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be removed from the word-filter").queue();
-						logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
-					}
+					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "russian-remove-word-filter":
-					if(Azrael.SQLDeleteWordFilter("rus", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the russian word filter!").build()).queue();
-						Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has removed the word {} from the russian word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be removed from the word-filter").queue();
-						logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
-					}
+					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "spanish-remove-word-filter":
-					if(Azrael.SQLDeleteWordFilter("spa", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the spanish word filter!").build()).queue();
-						Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has removed the word {} from the spanish word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be removed from the word-filter").queue();
-						logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
-					}
+					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "portuguese-remove-word-filter":
-					if(Azrael.SQLDeleteWordFilter("por", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the portuguese word filter!").build()).queue();
-						Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has removed the word {} from the portuguese word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be removed from the word-filter").queue();
-						logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
-					}
+					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "italian-remove-word-filter":
-					if(Azrael.SQLDeleteWordFilter("ita", _message, _e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the italian word filter!").build()).queue();
-						Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has removed the word {} from the italian word filter", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be removed from the word-filter").queue();
-						logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
-					}
+					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "all-remove-word-filter":
-					if(Azrael.SQLDeleteWordFilterAllLang(_message.toLowerCase(), _e.getGuild().getIdLong())) {
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from all word filter languages!").build()).queue();
-						Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has removed the word {} from all word filter languages", _e.getMember().getUser().getIdLong(), _message);
-						FileSetting.createFile(file_path, "complete");
-					}
-					else {
-						_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be removed from the word-filter").queue();
-						logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
-					}
+					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
 					break;
 				case "load-word-filter":
-					if(_message.equalsIgnoreCase("english")) {
-						message.setTitle("You chose to add english words!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\nType **continue** if you're done.").build()).queue();
-						FileSetting.createFile(file_path, "english-load-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("german")) {
-						message.setTitle("You chose to add german words!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\\nType **continue** if you're done.").build()).queue();
-						FileSetting.createFile(file_path, "german-load-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("french")) {
-						message.setTitle("You chose to add french words!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\\nType **continue** if you're done.").build()).queue();
-						FileSetting.createFile(file_path, "french-load-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("turkish")) {
-						message.setTitle("You chose to add turkish words!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\\nType **continue** if you're done.").build()).queue();
-						FileSetting.createFile(file_path, "turkish-load-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("russian")) {
-						message.setTitle("You chose to add russian words!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\\nType **continue** if you're done.").build()).queue();
-						FileSetting.createFile(file_path, "russian-load-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("spanish")) {
-						message.setTitle("You chose to add spanish words!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\\nType **continue** if you're done.").build()).queue();
-						FileSetting.createFile(file_path, "spanish-load-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("portuguese")) {
-						message.setTitle("You chose to add portuguese words!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\\nType **continue** if you're done.").build()).queue();
-						FileSetting.createFile(file_path, "portuguese-load-word-filter");
-					}
-					else if(_message.equalsIgnoreCase("italian")) {
-						message.setTitle("You chose to add italian words!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\\nType **continue** if you're done.").build()).queue();
-						FileSetting.createFile(file_path, "italian-load-word-filter");
-					}
+					var langLoad = _message.toLowerCase();
+					message.setTitle("You chose to add "+langLoad+" words!");
+					_e.getTextChannel().sendMessage(message.setDescription("Please put a file named **words.txt** into the files folder of the bot.\nType **continue** if you're done.").build()).queue();
+					FileSetting.createFile(file_path, langLoad+"-load-word-filter");
 					break;
 				case "english-load-word-filter":
 					if(_message.equalsIgnoreCase("continue")) {
-						ArrayList<String> words = new ArrayList<String>();
-						words = FileSetting.readFileIntoArray("./files/words.txt");
-						Azrael.SQLDeleteLangWordFilter("eng", _e.getGuild().getIdLong());
-						Azrael.SQLReplaceWordFilter("eng", words, _e.getGuild().getIdLong());
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted words from a file into the english word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
+						loadLangWords(_e, message, logger, file_path, file_value.split("-")[0]);
 					}
 					break;
 				case "german-load-word-filter":
 					if(_message.equalsIgnoreCase("continue")) {
-						ArrayList<String> words = new ArrayList<String>();
-						words = FileSetting.readFileIntoArray("./files/words.txt");
-						Azrael.SQLDeleteLangWordFilter("ger", _e.getGuild().getIdLong());
-						Azrael.SQLReplaceWordFilter("ger", words, _e.getGuild().getIdLong());
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted words from a file into the german word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
+						loadLangWords(_e, message, logger, file_path, file_value.split("-")[0]);
 					}
 					break;
 				case "french-load-word-filter":
 					if(_message.equalsIgnoreCase("continue")) {
-						ArrayList<String> words = new ArrayList<String>();
-						words = FileSetting.readFileIntoArray("./files/words.txt");
-						Azrael.SQLDeleteLangWordFilter("fre", _e.getGuild().getIdLong());
-						Azrael.SQLReplaceWordFilter("fre", words, _e.getGuild().getIdLong());
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted words from a file into the french word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
+						loadLangWords(_e, message, logger, file_path, file_value.split("-")[0]);
 					}
 					break;
 				case "turkish-load-word-filter":
 					if(_message.equalsIgnoreCase("continue")) {
-						ArrayList<String> words = new ArrayList<String>();
-						words = FileSetting.readFileIntoArray("./files/words.txt");
-						Azrael.SQLDeleteLangWordFilter("tur", _e.getGuild().getIdLong());
-						Azrael.SQLReplaceWordFilter("tur", words, _e.getGuild().getIdLong());
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted words from a file into the turkish word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
+						loadLangWords(_e, message, logger, file_path, file_value.split("-")[0]);
 					}
 					break;
 				case "russian-load-word-filter":
 					if(_message.equalsIgnoreCase("continue")) {
-						ArrayList<String> words = new ArrayList<String>();
-						words = FileSetting.readFileIntoArray("./files/words.txt");
-						Azrael.SQLDeleteLangWordFilter("rus", _e.getGuild().getIdLong());
-						Azrael.SQLReplaceWordFilter("rus", words, _e.getGuild().getIdLong());
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted words from a file into the russian word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
+						loadLangWords(_e, message, logger, file_path, file_value.split("-")[0]);
 					}
 					break;
 				case "spanish-load-word-filter":
 					if(_message.equalsIgnoreCase("continue")) {
-						ArrayList<String> words = new ArrayList<String>();
-						words = FileSetting.readFileIntoArray("./files/words.txt");
-						Azrael.SQLDeleteLangWordFilter("spa", _e.getGuild().getIdLong());
-						Azrael.SQLReplaceWordFilter("spa", words, _e.getGuild().getIdLong());
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted words from a file into the spanish word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
+						loadLangWords(_e, message, logger, file_path, file_value.split("-")[0]);
 					}
 					break;
 				case "portuguese-load-word-filter":
 					if(_message.equalsIgnoreCase("continue")) {
-						ArrayList<String> words = new ArrayList<String>();
-						words = FileSetting.readFileIntoArray("./files/words.txt");
-						Azrael.SQLDeleteLangWordFilter("por", _e.getGuild().getIdLong());
-						Azrael.SQLReplaceWordFilter("por", words, _e.getGuild().getIdLong());
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted words from a file into the portuguese word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
+						loadLangWords(_e, message, logger, file_path, file_value.split("-")[0]);
 					}
 					break;
 				case "italian-load-word-filter":
 					if(_message.equalsIgnoreCase("continue")) {
-						ArrayList<String> words = new ArrayList<String>();
-						words = FileSetting.readFileIntoArray("./files/words.txt");
-						Azrael.SQLDeleteLangWordFilter("ita", _e.getGuild().getIdLong());
-						Azrael.SQLReplaceWordFilter("ita", words, _e.getGuild().getIdLong());
-						message.setTitle("Success!");
-						_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-						Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
-						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-						logger.debug("{} has inserted words from a file into the italian word filter", _e.getMember().getUser().getIdLong());
-						FileSetting.createFile(file_path, "complete");
+						loadLangWords(_e, message, logger, file_path, file_value.split("-")[0]);
 					}
 					break;
 				case "insert-name-filter":
@@ -937,5 +432,95 @@ public class FilterExecution {
 					break;
 			}
 		}
+	}
+	
+	private static void callFilterLangContent(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String file_path, final String lang) {
+		var langAbbreviation = "";
+		var definitiveLang = "";
+		switch(lang) {
+			case "english":    langAbbreviation = "eng";  definitiveLang = "English";    break;
+			case "german":     langAbbreviation = "ger";  definitiveLang = "German";     break;
+			case "french":     langAbbreviation = "fre";  definitiveLang = "French";     break;
+			case "turkish":    langAbbreviation = "tur";  definitiveLang = "Turkish";    break;
+			case "russian":    langAbbreviation = "rus";  definitiveLang = "Russian";    break;
+			case "spanish":    langAbbreviation = "spa";  definitiveLang = "Spanish";    break;
+			case "portuguese": langAbbreviation = "por";  definitiveLang = "Portuguese"; break;
+			case "italian":    langAbbreviation = "ita";  definitiveLang = "Italian";    break;
+		}
+		
+		Azrael.SQLgetFilter(langAbbreviation, _e.getGuild().getIdLong());
+		StringBuilder out = new StringBuilder();
+		for(String word : Hashes.getQuerryResult(langAbbreviation+"_"+_e.getGuild().getIdLong())) {
+			out.append(word+"\n");
+		}
+		String paste_link = Pastebin.unlistedPaste(definitiveLang+" word filter", out.toString(), _e.getGuild().getIdLong());
+		message.setTitle(definitiveLang+" word filter!");
+		out.setLength(0);
+		_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
+		logger.debug("{} has called the "+lang+" word filter", _e.getMember().getUser().getIdLong());
+		FileSetting.createFile(file_path, "complete");
+	}
+	
+	private static void insertLangWord(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String file_path, final String lang, String word) {
+		if(Azrael.SQLInsertWordFilter(lang.substring(0, 3), word, _e.getGuild().getIdLong()) > 0) {
+			message.setTitle("Success!");
+			_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the "+lang+" word filter!").build()).queue();
+			clearHash(_e, lang, true);
+			Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
+			logger.debug("{} has inserted the word {} into the "+lang+" word filter", _e.getMember().getUser().getIdLong(), word);
+			FileSetting.createFile(file_path, "complete");
+		}
+		else {
+			_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be inserted into the word-filter table.").queue();
+			logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
+		}
+	}
+	
+	private static void removeLangWord(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String file_path, final String lang, String word) {
+		if(Azrael.SQLDeleteWordFilter(lang.substring(0, 3), word, _e.getGuild().getIdLong()) > 0) {
+			message.setTitle("Success!");
+			_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the "+lang+" word filter!").build()).queue();
+			clearHash(_e, lang, true);
+			Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
+			logger.debug("{} has removed the word {} from the english word filter", _e.getMember().getUser().getIdLong(), word);
+			FileSetting.createFile(file_path, "complete");
+		}
+		else {
+			_e.getTextChannel().sendMessage("An internal error occurred. Word couldn't be removed from the word-filter").queue();
+			logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
+		}
+	}
+	
+	private static void loadLangWords(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String file_path, final String lang) {
+		var langAbbreviation = lang.substring(0, 3);
+		ArrayList<String> words = new ArrayList<String>();
+		words = FileSetting.readFileIntoArray("./files/words.txt");
+		Azrael.SQLDeleteLangWordFilter(langAbbreviation, _e.getGuild().getIdLong());
+		Azrael.SQLReplaceWordFilter(langAbbreviation, words, _e.getGuild().getIdLong());
+		message.setTitle("Success!");
+		_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
+		clearHash(_e, lang, false);
+		Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
+		logger.debug("{} has inserted words from a file into the "+lang+" word filter", _e.getMember().getUser().getIdLong());
+		FileSetting.createFile(file_path, "complete");
+	}
+	
+	private static void clearHash(MessageReceivedEvent _e, final String lang, final boolean allowAll) {
+		if(lang.equals("english") || (allowAll && lang.equals("all")))
+			Hashes.removeQuerryResult("eng_"+_e.getGuild().getId());
+		if(lang.equals("german") || (allowAll && lang.equals("all")))
+			Hashes.removeQuerryResult("ger_"+_e.getGuild().getId());
+		if(lang.equals("french") || (allowAll && lang.equals("all")))
+			Hashes.removeQuerryResult("fre_"+_e.getGuild().getId());
+		if(lang.equals("turkish") || (allowAll && lang.equals("all")))
+			Hashes.removeQuerryResult("tur_"+_e.getGuild().getId());
+		if(lang.equals("russian") || (allowAll && lang.equals("all")))
+			Hashes.removeQuerryResult("rus_"+_e.getGuild().getId());
+		if(lang.equals("spanish") || (allowAll && lang.equals("all")))
+			Hashes.removeQuerryResult("spa_"+_e.getGuild().getId());
+		if(lang.equals("portuguese") || (allowAll && lang.equals("all")))
+			Hashes.removeQuerryResult("por_"+_e.getGuild().getId());
+		if(lang.equals("italian") || (allowAll && lang.equals("all")))
+			Hashes.removeQuerryResult("ita_"+_e.getGuild().getId());
 	}
 }

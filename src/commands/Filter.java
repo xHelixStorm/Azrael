@@ -23,13 +23,12 @@ public class Filter implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(GuildIni.getFilterCommand(e.getGuild().getIdLong())) {			
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-			final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
 				if(args.length == 0) {
 					FilterExecution.runHelp(e);
 				}
 				else if(args.length > 0) {
-					FilterExecution.runTask(e, e.getMessage().getContentRaw().substring(prefix.length()+7));
+					FilterExecution.runTask(e, args[0]);
 				}
 			}
 			else {
