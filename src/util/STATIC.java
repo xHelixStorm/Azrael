@@ -6,7 +6,7 @@ import core.Channels;
 
 public class STATIC {
 	
-	private static final String VERSION = "5.8.254";
+	private static final String VERSION = "5.8.255";
 	
 	public static String getVersion() {
 		return VERSION;

@@ -1038,7 +1038,7 @@ public class Azrael {
 		}
 	}
 	
-	public synchronized static void SQLgetFilter(String _filter_lang, long _guild_id){
+	public synchronized static ArrayList<String> SQLgetFilter(String _filter_lang, long _guild_id){
 		logger.debug("SQLgetFilter launched. Passed params {}, {}", _filter_lang, _guild_id);
 		if(Hashes.getQuerryResult(_filter_lang+"_"+_guild_id) == null) {
 			Connection myConn = null;
@@ -1064,6 +1064,7 @@ public class Azrael {
 					filter_words.add(rs.getString(1));
 				}
 				Hashes.addQuerryResult(_filter_lang+"_"+_guild_id, filter_words);
+				return filter_words;
 			} catch (SQLException e) {
 				logger.error("SQLgetFilter Exception", e);
 			} finally {
@@ -1072,6 +1073,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
+		return Hashes.getQuerryResult(_filter_lang+"_"+_guild_id);
 	}
 	
 	public static int SQLInsertWordFilter(String _lang, String _word, long _guild_id) {
@@ -1082,7 +1084,7 @@ public class Azrael {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			var sql = "";
 			if(!_lang.equals("all"))
-				sql = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv, fk_guild_id) VALUES(NULL, ?, ?, ?) ON DUPLICATE KEY UPDATE word=VALUES(word)");
+				sql = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv, fk_guild_id) VALUES(NULL, ?, ?, ?)");
 			else {
 				sql = ("INSERT INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES"
 						+ "(?, \"eng\", ?),"
@@ -1171,25 +1173,6 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLDeleteLangWordFilter(String _lang, long _guild_id) {
-		logger.debug("SQLDeleteLangWordFilter launched. Passed params {}, {}", _lang, _guild_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("DELETE FROM filter WHERE fk_lang_abbrv LIKE ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _lang);
-			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLDeleteLangWordFilter Exception", e);
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public synchronized static ArrayList<String> SQLgetStaffNames(long _guild_id){
 		if(Hashes.getQuerryResult("staff-names_"+_guild_id) == null) {
 			logger.debug("SQLgetStaffNames launched. Passed params {}", _guild_id);
@@ -1226,7 +1209,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO staff_name_filter (name_id, name, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			String sql = ("INSERT INTO staff_name_filter (name_id, name, fk_guild_id) VALUES(NULL, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word.toLowerCase());
 			stmt.setLong(2, _guild_id);
@@ -1260,33 +1243,21 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLDeleteWholeStaffNames(long _guild_id) {
-		logger.debug("SQLDeleteWholeStaffNames launched. Passed params {}", _guild_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("DELETE FROM staff_name_filter WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLDeleteWholeStaffNames Exception", e);
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static void SQLBatchInsertStaffNames(ArrayList<String> _words, long _guild_id) {
+	@SuppressWarnings("resource")
+	public static int SQLReplaceStaffNames(String [] _words, long _guild_id) {
 		logger.debug("SQLBatchInsertStaffNames launched. Passed params array, {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("INSERT INTO staff_name_filter (name_id, name, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			String sql = ("DELETE FROM staff_name_filter WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.executeUpdate();
+			
+			String sql2 = ("INSERT INTO staff_name_filter (name_id, name, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			stmt = myConn.prepareStatement(sql2);
 			for(String word : _words){
 				stmt.setString(1, word.toLowerCase());
 				stmt.setLong(2, _guild_id);
@@ -1294,8 +1265,16 @@ public class Azrael {
 			}
 			stmt.executeBatch();
 			myConn.commit();
+			return 0;
 		} catch (SQLException e) {
-			logger.error("SQLBatchInsertStaffNames Exception", e);
+			try {
+				logger.error("SQLBatchInsertStaffNames Exception", e);
+				myConn.rollback();
+				return 1;
+			} catch (SQLException e1) {
+				logger.error("SQLBatchInsertStaffNames roll back Exception", e1);
+				return 2;
+			}
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1375,7 +1354,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO names (name_id, name, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			String sql = ("INSERT INTO names (name_id, name, fk_guild_id) VALUES(NULL, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
@@ -1403,24 +1382,6 @@ public class Azrael {
 		} catch (SQLException e) {
 			logger.error("SQLDeleteFunnyNames Exception", e);
 			return 0;
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static void SQLDeleteWholeFunnyNames(long _guild_id) {
-		logger.debug("SQLDeleteWholeFunnyNames launched. Passed params {}", _guild_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("DELETE FROM names WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLDeleteWholeFunnyNames Exception", e);
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1462,7 +1423,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO name_filter (word_id, word, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE word=VALUES(word)");
+			String sql = ("INSERT INTO name_filter (word_id, word, fk_guild_id) VALUES(NULL, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
@@ -1490,24 +1451,6 @@ public class Azrael {
 		} catch (SQLException e) {
 			logger.error("SQLDeleteNameFilter Exception", e);
 			return 0;
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static void SQLDeleteWholeNameFilter(long _guild_id) {
-		logger.debug("SQLDeleteWholeNameFilter launched. Passed params {}", _guild_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("DELETE FROM name_filter WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLDeleteWholeNameFilter Exception", e);
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1692,13 +1635,20 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLReplaceWordFilter(String _lang, ArrayList<String> _words, long _guild_id){
+	@SuppressWarnings("resource")
+	public static int SQLReplaceWordFilter(String _lang, String [] _words, long _guild_id){
 		logger.debug("SQLReplaceWordFilter launched. Passed params {}, array, {}", _lang, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
+			String sql = ("DELETE FROM filter WHERE fk_lang_abbrv LIKE ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _lang);
+			stmt.setLong(2, _guild_id);
+			stmt.executeUpdate();
+			
 			String sql2 = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv, fk_guild_id) VALUES(NULL, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);
 			
@@ -1709,13 +1659,16 @@ public class Azrael {
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
-			myConn.commit();	
+			myConn.commit();
+			return 0;
 		} catch (SQLException e) {
 			logger.error("SQLReplaceWordFilter Exception", e);
 			try {
 				myConn.rollback();
+				return 1;
 			} catch (SQLException e1) {
 				logger.error("SQLReplaceWordFilter rollback Exception", e);
+				return 2;
 			}
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1723,13 +1676,19 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLReplaceNameFilter(ArrayList<String> _words, long _guild_id){
+	@SuppressWarnings("resource")
+	public static int SQLReplaceNameFilter(String [] _words, long _guild_id){
 		logger.debug("SQLReplaceNameFilter launched. Passed params array, {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
+			String sql = ("DELETE FROM name_filter WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.executeUpdate();
+			
 			String sql2 = ("INSERT INTO name_filter (word_id, word, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE word=VALUES(word)");
 			stmt = myConn.prepareStatement(sql2);
 			
@@ -1739,13 +1698,16 @@ public class Azrael {
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
-			myConn.commit();	
+			myConn.commit();
+			return 0;
 		} catch (SQLException e) {
 			logger.error("SQLReplaceNameFilter Exception", e);
 			try {
 				myConn.rollback();
+				return 1;
 			} catch (SQLException e1) {
 				logger.error("SQLReplaceNameFilter rollback Exception", e);
+				return 2;
 			}
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1753,13 +1715,18 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLReplaceFunnyNames(ArrayList<String> _words, long _guild_id){
+	@SuppressWarnings("resource")
+	public static int SQLReplaceFunnyNames(String [] _words, long _guild_id){
 		logger.debug("SQLReplaceFunnyNames launched. Passed params array, {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
+			String sql = ("DELETE FROM names WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			
 			String sql2 = ("INSERT INTO names (name_id, name, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql2);;
 			
@@ -1769,13 +1736,16 @@ public class Azrael {
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
-			myConn.commit();	
+			myConn.commit();
+			return 0;
 		} catch (SQLException e) {
 			logger.error("SQLReplaceFunnyNames Exception", e);
 			try {
 				myConn.rollback();
+				return 1;
 			} catch (SQLException e1) {
 				logger.error("SQLReplaceFunnyNames rollback Exception", e);
+				return 2;
 			}
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
