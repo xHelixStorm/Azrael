@@ -15,13 +15,14 @@ public class ClearHashes extends TimerTask{
 
 	@Override
 	public void run() {
-		Hashes.clearRankList();
-		Hashes.clearShopContent();
+		Hashes.clearWeaponAbbreviations();
 		Hashes.clearWeaponShopContent();
 		Hashes.clearWeaponCategories();
-		Hashes.clearWeaponAbbreviations();
+		Hashes.clearExpiredTempCache();
 		Hashes.clearWeaponStats();
+		Hashes.clearShopContent();
 		Hashes.clearDailyItems();
+		Hashes.clearRankList();
 		Hashes.clearThemes();
 		
 		Logger logger = LoggerFactory.getLogger(ClearHashes.class);

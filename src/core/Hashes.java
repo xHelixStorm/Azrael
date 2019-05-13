@@ -58,6 +58,7 @@ public class Hashes {
     private static final Map<String, Integer> themes = new HashMap<String, Integer>();
     private static final Map<Long, ArrayList<Channels>> channels = new HashMap<Long, ArrayList<Channels>>();
     private static final ConcurrentHashMap<String, String> commentedUsers = new ConcurrentHashMap<String, String>();
+    private static final ConcurrentHashMap<String, Cache> tempCache = new ConcurrentHashMap<String, Cache>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -130,6 +131,9 @@ public class Hashes {
 	}
 	public static void addCommentedUser(String _key, String _name) {
 		commentedUsers.put(_key, _name);
+	}
+	public static void addTempCache(String _key, Cache _cache) {
+		tempCache.put(_key, _cache);
 	}
 	
 	
@@ -217,6 +221,9 @@ public class Hashes {
 	public static String getCommentedUser(String _key) {
 		return commentedUsers.get(_key);
 	}
+	public static Cache getTempCache(String _key) {
+		return tempCache.get(_key);
+	}
 	
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
@@ -292,5 +299,16 @@ public class Hashes {
 	}
 	public static void clearCommentedUsers() {
 		commentedUsers.clear();
+	}
+	public static void clearTempCache(String _key) {
+		tempCache.remove(_key);
+	}
+	public static void clearExpiredTempCache() {
+		var now = System.currentTimeMillis();
+		for(final var key : tempCache.keySet()) {
+			if(tempCache.get(key).getExpiration() - now <= 0) {
+				tempCache.remove(key);
+			}
+		}
 	}
 }
