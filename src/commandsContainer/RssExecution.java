@@ -124,7 +124,9 @@ public class RssExecution {
 						out = out.replace("{description}", description);
 						out = out.replace("{pubDate}", pubDate);
 						out = out.replace("{link}", link);
-						e.getGuild().getTextChannelById(rss_channel.getChannel_ID()).sendMessage(out).queue();
+						out = out.replaceAll("&#039;", "'");
+						final String outMessage = EmojiParser.parseToUnicode(out);
+						e.getGuild().getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
 					}
 					else {
 						e.getTextChannel().sendMessage("No feed could be found").queue();

@@ -38,6 +38,7 @@ public class RoleListener extends ListenerAdapter{
 		long mute_id;
 		long mute_time;
 		double unmute;
+		boolean customTimeMute = false;
 		
 		if(UserPrivs.isUserMuted(e.getMember().getUser(), e.getGuild().getIdLong())){
 			var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
@@ -58,6 +59,8 @@ public class RoleListener extends ListenerAdapter{
 			}
 			else{
 				mute_id = DiscordRoles.SQLgetRole(guild_id, "mut");
+				if(warnedUser.getCustomTime())
+					customTimeMute = true;
 				try {
 					for(Role r : e.getMember().getRoles()){
 						if(r.getIdLong() != mute_id){
@@ -128,6 +131,8 @@ public class RoleListener extends ListenerAdapter{
 						}
 					}
 				} catch (HierarchyException hye) {
+					if(customTimeMute)
+						Azrael.SQLUpdateUnmute(user_id, guild_id, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false);
 					e.getJDA().getGuildById(guild_id).getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
 					logger.warn("{} received a mute role that has been instantly removed", e.getMember().getUser().getId(), hye);
 					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message2.setDescription("The mute role has been set on someone with higher privileges. Mute role removed!").build()).queue();

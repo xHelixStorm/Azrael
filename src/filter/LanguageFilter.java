@@ -1,25 +1,20 @@
 package filter;
 
 import java.awt.Color;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Cache;
 import core.Hashes;
 import core.UserPrivs;
-import fileManagement.FileSetting;
-import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import sql.DiscordRoles;
 import sql.Azrael;
-import threads.DelayDelete;
 import util.CharacterReplacer;
 
 public class LanguageFilter extends ListenerAdapter implements Runnable{
@@ -64,8 +59,6 @@ public class LanguageFilter extends ListenerAdapter implements Runnable{
 			String channel = e.getTextChannel().getName();
 			String thisMessage;
 			String name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
-			String filename = e.getMember().getUser().getId();
-			String report;
 			
 			thisMessage = CharacterReplacer.replace(getMessage);
 			final var parseMessage = thisMessage.toLowerCase();
@@ -77,7 +70,7 @@ public class LanguageFilter extends ListenerAdapter implements Runnable{
 				}
 			}
 			
-			if(exceptionFound == false){
+			if(exceptionFound == false) {
 				find: for(String filter : filter_lang){
 					Azrael.SQLgetFilter(filter, e.getGuild().getIdLong());
 					if(wordFound == false && letterCounter > 1) {
@@ -95,25 +88,23 @@ public class LanguageFilter extends ListenerAdapter implements Runnable{
 				}
 			}
 			
-			if(wordFound == true){
+			if(wordFound == true) {
 				Logger logger = LoggerFactory.getLogger(LanguageFilter.class);
-				logger.debug("Message removed from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
-				Path path = Paths.get(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");
+				logger.debug("Edited message removed from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+				var cache = Hashes.getTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 				
-				if(Files.notExists(path)){
+				if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
 					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" "+output[0]).queue();
-					FileSetting.createFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr", "1");
-					new Thread(new DelayDelete(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr", 300000)).start();
+					Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "1"));
 				}
-				else if (Files.exists(path)){
-					report = FileSetting.readFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");
-					if(report.contains("1")){
+				else if(cache != null) {
+					if(cache.getAdditionalInfo().equals("1")) {
 						e.getTextChannel().sendMessage(e.getMember().getAsMention()+" "+output[1]).queue();
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr", "2");
+						Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "2"));
 					}
-					else if (report.contains("2")){
-						FileSetting.deleteFile(IniFileReader.getTempDirectory()+"Reports/"+filename.toString()+".azr");
+					else if(cache.getAdditionalInfo().equals("2")) {
 						e.getGuild().getController().addRolesToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
+						Hashes.clearTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 					}
 				}
 			}

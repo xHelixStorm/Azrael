@@ -124,6 +124,7 @@ public class MessageListener extends ListenerAdapter{
 				if(createTemp == true) {
 					Hashes.addTempCache("inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id, new Cache(0, current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab));
 				}
+				Hashes.clearTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId());
 			}
 			
 			if(randomshop_bot != null && UserPrivs.isUserBot(e.getMember().getUser(), guild_id) && randomshop_bot.getExpiration() - System.currentTimeMillis() > 0) {
@@ -134,18 +135,19 @@ public class MessageListener extends ListenerAdapter{
 				final String input = array[2];
 				final int last_page = Integer.parseInt(array[3]);
 				
-				boolean createFile = false;
+				boolean createCache = false;
 				if(current_page > 1) {
 					e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).complete();
-					createFile = true;
+					createCache = true;
 				}
 				if(current_page < last_page) {
 					e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).complete();
-					createFile = true;
+					createCache = true;
 				}
-				if(createFile == true) {
+				if(createCache == true) {
 					Hashes.addTempCache("randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id, new Cache(0, current_page+"_"+last_page+"_"+input));
 				}
+				Hashes.clearTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId());
 			}
 			
 			if(reaction != null && UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
