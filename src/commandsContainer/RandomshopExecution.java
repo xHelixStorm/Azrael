@@ -14,8 +14,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Cache;
 import core.Guilds;
-import fileManagement.FileSetting;
+import core.Hashes;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -87,7 +88,7 @@ public class RandomshopExecution {
 	}
 	
 	public static void runRound(MessageReceivedEvent e, List<WeaponAbbvs> abbreviations, List<String> categories, String input) {
-		String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_randomshop_play.azr";
+		var fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_randomshop_play.azr";
 		File file = new File(fileName);
 		if(!file.exists()) {
 			try {
@@ -155,7 +156,7 @@ public class RandomshopExecution {
 								//draw won item from the Randomshop
 								final int weapon = weapon_id;
 								RandomshopRewardDrawer.drawReward(e, RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(w -> w.getWeaponID() == weapon).findAny().orElse(null), user_details.getCurrency());
-								FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_play_"+e.getMember().getUser().getId(), input);
+								Hashes.addTempCache("randomshop_play_"+e.getMember().getUser().getId(), new Cache(180000, input));
 							}
 							else if(weapon_id > 0){
 								EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle("Randomshop failed");
@@ -231,11 +232,11 @@ public class RandomshopExecution {
 						final int last_page = ((weapons.size()-1)/maxItems)+1; //using modulo for the page size
 						//draw page
 						if(e != null) {
-							FileSetting.createFile(IniFileReader.getTempDirectory()+"/AutoDelFiles/randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+page+"_"+input+"_"+last_page);
+							Hashes.addTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId(), new Cache(180000, e.getMember().getUser().getId()+"_"+page+"_"+input+"_"+last_page));
 							RandomshopItemDrawer.drawItems(e, null, filteredWeapons, page, last_page);
 						}
 						else {
-							FileSetting.createFile(IniFileReader.getTempDirectory()+"/AutoDelFiles/randomshop_bot_gu"+e2.getGuild().getId()+"ch"+e2.getChannel().getId()+".azr", e2.getMember().getUser().getId()+"_"+page+"_"+input+"_"+last_page);
+							Hashes.addTempCache("randomshop_bot_gu"+e2.getGuild().getId()+"ch"+e2.getChannel().getId(), new Cache(180000, e2.getMember().getUser().getId()+"_"+page+"_"+input+"_"+last_page));
 							RandomshopItemDrawer.drawItems(null, e2, filteredWeapons, page, last_page);
 						}
 					}

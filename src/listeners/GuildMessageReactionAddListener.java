@@ -1,6 +1,5 @@
 package listeners;
 
-import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -10,11 +9,10 @@ import org.slf4j.LoggerFactory;
 import com.vdurmont.emoji.EmojiParser;
 
 import commandsContainer.RandomshopExecution;
+import core.Cache;
 import core.Hashes;
 import core.UserPrivs;
-import fileManagement.FileSetting;
 import fileManagement.GuildIni;
-import fileManagement.IniFileReader;
 import inventory.InventoryBuilder;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -71,15 +69,15 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 			
 			if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:")) {
 				//inventory reactions
-				File inventory = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId()+".azr");
+				var inventory = Hashes.getTempCache("inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId());
 				//randomshop reactions
-				File randomshop = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId()+".azr");
+				var randomshop = Hashes.getTempCache("randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId());
 				
-				if(inventory.exists()) {
+				if(inventory != null) {
 					ExecutorService executor = Executors.newSingleThreadExecutor();
 					executor.execute(() -> {
-						String file_content = FileSetting.readFile(inventory.getAbsolutePath());
-						String [] array = file_content.split("_");
+						String cache_content = inventory.getAdditionalInfo();
+						String [] array = cache_content.split("_");
 						int current_page = Integer.parseInt(array[0]);
 						final int last_page = Integer.parseInt(array[1]);
 						final String inventory_tab = array[2];
@@ -89,8 +87,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 						else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && current_page != last_page)
 							current_page++;
 						e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
-						inventory.delete();
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab);
+						Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab));
 						final int maxItems = GuildIni.getInventoryMaxItems(e.getGuild().getIdLong());
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 						if(inventory_tab.equalsIgnoreCase("weapons")) {
@@ -105,9 +102,9 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page);
 					});
 				}
-				else if(randomshop.exists()) {
-					String file_content = FileSetting.readFile(randomshop.getAbsolutePath());
-					String [] array = file_content.split("_");
+				else if(randomshop != null) {
+					String cache_content = randomshop.getAdditionalInfo();
+					String [] array = cache_content.split("_");
 					int current_page = Integer.parseInt(array[0]);
 					final int last_page = Integer.parseInt(array[1]);
 					final String input = array[2];
@@ -116,7 +113,6 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 					else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && current_page != last_page)
 						current_page++;
 					e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
-					randomshop.delete();
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					RandomshopExecution.inspectItems(null, e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), theme), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme), input, current_page);
 				}

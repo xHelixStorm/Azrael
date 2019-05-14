@@ -1,20 +1,17 @@
 package commandsContainer;
 
 import java.awt.Color;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Cache;
 import core.Hashes;
-import fileManagement.FileSetting;
-import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
-import threads.DelayDelete;
 import util.Pastebin;
 
 public class FilterExecution {
@@ -24,60 +21,41 @@ public class FilterExecution {
 	}
 	
 	public static void runTask(MessageReceivedEvent _e, String _message) {
+		String key = "filter_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId();
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
-		File file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+"_0.azr");
-		String file_name = IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+"_0.azr";
-		boolean break_while = false;
-		int i = 0;
-		
-		while(i < 19 && break_while == false){
-			if(file.exists()){
-				file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+"_"+(i+1)+".azr");
-				file_name = IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+"_"+(i+1)+".azr";
-			}
-			else{
-				break_while = true;
-			}
-			i++;
-		}
 		
 		switch(_message) {
 			case "word-filter":
 				message.setTitle("You chose the word-filter!");
 				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nload-pastebin**").build()).queue();
-				FileSetting.createFile(file_name, "word-filter");
-				new Thread(new DelayDelete(file_name, 180000)).start();
+				Hashes.addTempCache(key, new Cache(180000, "word-filter"));
 				break;
 			case "name-filter":
 				message.setTitle("You chose the name-filter!");
 				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nload-pastebin**").build()).queue();
-				FileSetting.createFile(file_name, "name-filter");
-				new Thread(new DelayDelete(file_name, 180000)).start();
+				Hashes.addTempCache(key, new Cache(180000, "name-filter"));
 				break;
 			case "funny-names":
 				message.setTitle("You chose funny-names!");
 				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nload-pastebin**").build()).queue();
-				FileSetting.createFile(file_name, "funny-names");
-				new Thread(new DelayDelete(file_name, 180000)).start();
+				Hashes.addTempCache(key, new Cache(180000, "funny_names"));
 				break;
 			case "staff-names":
 				message.setTitle("You chose staff-names!");
 				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nload-pastebin**").build()).queue();
-				FileSetting.createFile(file_name, "staff-names");
-				new Thread(new DelayDelete(file_name, 180000)).start();
+				Hashes.addTempCache(key, new Cache(180000, "staff-names"));
 				break;
 			default:
 				_e.getTextChannel().sendMessage("Please choose between word-filter, name-filter, funny-names or staff-names").queue();
 		}
 	}
 	
-	public static void performAction(MessageReceivedEvent _e, String _message, String _file_name) {
+	public static void performAction(MessageReceivedEvent _e, String _message, Cache cache) {
+		String key = "filter_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId();
 		Logger logger = LoggerFactory.getLogger(FilterExecution.class);
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
-		String file_path = _file_name;
-		String file_value = FileSetting.readFile(file_path);
-		if(!file_value.equals("complete")) {
-			switch(file_value) {
+		if(cache.getExpiration() - System.currentTimeMillis() > 0) {
+			switch(cache.getAdditionalInfo()) {
 				case "word-filter":
 					if(_message.equalsIgnoreCase("display")) {
 						message.setTitle("You chose to display the current word filter!");
@@ -86,8 +64,8 @@ public class FilterExecution {
 							out.append(lang+"\n");
 						}
 						_e.getTextChannel().sendMessage(message.setDescription("Please choose one of the available languages to display the filter!\n\n**"+(out.length() > 0 ? out.toString() : "<no languages available>")+"**").build()).queue();
-						out.setLength(0);
-						FileSetting.createFile(file_path, "display-word-filter");
+						cache.updateDescription("display-word-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase("insert")) {
 						message.setTitle("You chose to insert a new word into the filter!");
@@ -96,8 +74,8 @@ public class FilterExecution {
 							out.append(lang+"\n");
 						}
 						_e.getTextChannel().sendMessage(message.setDescription("Please choose a language for the new word!\n\n**"+(out.length() > 0 ? out.toString()+"All" : "<no languages available>")+"**").build()).queue();
-						out.setLength(0);
-						FileSetting.createFile(file_path, "insert-word-filter");
+						cache.updateDescription("insert-word-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase("remove")) {
 						message.setTitle("You chose to remove a word from the filter!");
@@ -106,8 +84,8 @@ public class FilterExecution {
 							out.append(lang+"\n");
 						}
 						_e.getTextChannel().sendMessage(message.setDescription("Please choose a language for the word you want to remove!\n\n**"+(out.length() > 0 ? out.toString()+"All" : "<no languages available>")+"**").build()).queue();
-						out.setLength(0);
-						FileSetting.createFile(file_path, "remove-word-filter");
+						cache.updateDescription("remove-word-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase("load-file")) {
 						message.setTitle("You chose to load a file which contains filter words!");
@@ -116,8 +94,8 @@ public class FilterExecution {
 							out.append(lang+"\n");
 						}
 						_e.getTextChannel().sendMessage(message.setDescription("Please choose a language for the words in the file you want to add!\n\n**"+(out.length() > 0 ? out.toString() : "<no languages available>")+"**").build()).queue();
-						out.setLength(0);
-						FileSetting.createFile(file_path, "load-word-filter");
+						cache.updateDescription("load-word-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					break;
 				case "name-filter":
@@ -142,22 +120,25 @@ public class FilterExecution {
 							message.setColor(Color.RED).setTitle("No results have been returned!");
 							_e.getTextChannel().sendMessage("The name-filter is empty! Nothing to display!").queue();
 						}
-						FileSetting.createFile(file_path, "complete");
+						Hashes.clearTempCache(key);
 					}
 					else if(_message.equalsIgnoreCase("insert")) {
 						message.setTitle("You chose to insert a new word into the name filter!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please insert a word into the text field!").build()).queue();
-						FileSetting.createFile(file_path, "insert-name-filter");
+						cache.updateDescription("insert-name-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase("remove")) {
 						message.setTitle("You chose to remove a word from the name filter!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please insert a word into the text field!").build()).queue();
-						FileSetting.createFile(file_path, "remove-name-filter");
+						cache.updateDescription("remove-name-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase("load-file")) {
 						message.setTitle("You chose to add the words from a file into the name filter!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
-						FileSetting.createFile(file_path, "load-name-filter");
+						cache.updateDescription("load-name-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					break;
 				case "funny-names":
@@ -182,22 +163,25 @@ public class FilterExecution {
 							message.setColor(Color.RED).setTitle("No results have been returned!");
 							_e.getTextChannel().sendMessage("The funny-names is empty! Nothing to display!").queue();
 						}
-						FileSetting.createFile(file_path, "complete");
+						Hashes.clearTempCache(key);
 					}
 					else if(_message.equalsIgnoreCase("insert")) {
 						message.setTitle("You chose to insert a new name into the funny names for the name filter!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please insert a name into the text field!").build()).queue();
-						FileSetting.createFile(file_path, "insert-funny-names");
+						cache.updateDescription("insert-funny-names").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase("remove")) {
 						message.setTitle("You chose to remove a name out of the funny names!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please insert a name into the text field!").build()).queue();
-						FileSetting.createFile(file_path, "remove-funny-names");
+						cache.updateDescription("remove-funny-names").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase("load-file")) {
 						message.setTitle("You chose to add the names from a file into the funny names list!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
-						FileSetting.createFile(file_path, "load-funny-names");
+						cache.updateDescription("load-funny-names").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					break;
 				case "staff-names":
@@ -222,26 +206,29 @@ public class FilterExecution {
 							message.setColor(Color.RED).setTitle("No results have been returned!");
 							_e.getTextChannel().sendMessage("The staff-names is empty! Nothing to display!").queue();
 						}
-						FileSetting.createFile(file_path, "complete");
+						Hashes.clearTempCache(key);
 					}
 					else if(_message.equalsIgnoreCase("insert")) {
 						message.setTitle("You chose to insert a new name into the staff names for the name filter!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please insert a name into the text field!").build()).queue();
-						FileSetting.createFile(file_path, "insert-staff-names");
+						cache.updateDescription("insert-staff-names").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase("remove")) {
 						message.setTitle("You chose to remove a name out of the staff names!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please insert a name into the text field!").build()).queue();
-						FileSetting.createFile(file_path, "remove-staff-names");
+						cache.updateDescription("remove-staff-names").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase("load-file")) {
 						message.setTitle("You chose to add the names from a file into the staff names list!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
-						FileSetting.createFile(file_path, "load-staff-names");
+						cache.updateDescription("load-staff-names").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					break;
 				case "display-word-filter":
-					callFilterLangContent(_e, message, logger, file_path, _message.toLowerCase());
+					callFilterLangContent(_e, message, logger, key, _message.toLowerCase());
 					break;
 				case "insert-word-filter":
 					var langInsert = _message.toLowerCase();
@@ -249,35 +236,36 @@ public class FilterExecution {
 							langInsert.equalsIgnoreCase("spanish") || langInsert.equalsIgnoreCase("portuguese") || langInsert.equalsIgnoreCase("italian") || langInsert.equalsIgnoreCase("all")) {
 						message.setTitle("You chose to insert an "+langInsert+" word!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, langInsert+"-insert-word-filter");
+						cache.updateDescription(langInsert+"-insert-word-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					break;
 				case "english-insert-word-filter":
-					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "german-insert-word-filter":
-					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "french-insert-word-filter":
-					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "turkish-insert-word-filter":
-					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "russian-insert-word-filter":
-					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "spanish-insert-word-filter":
-					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "portuguese-insert-word-filter":
-					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "italian-insert-word-filter":
-					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "all-insert-word-filter":
-					insertLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "remove-word-filter":
 					var langRemove = _message.toLowerCase();
@@ -285,35 +273,36 @@ public class FilterExecution {
 							langRemove.equalsIgnoreCase("spanish") || langRemove.equalsIgnoreCase("portuguese") || langRemove.equalsIgnoreCase("italian") || langRemove.equalsIgnoreCase("all")) {
 						message.setTitle("You chose to remove an "+langRemove+" word!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please type the word").build()).queue();
-						FileSetting.createFile(file_path, langRemove+"-remove-word-filter");
+						cache.updateDescription(langRemove+"-remove-word-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					break;
 				case "english-remove-word-filter":
-					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "german-remove-word-filter":
-					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "french-remove-word-filter":
-					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "turkish-remove-word-filter":
-					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "russian-remove-word-filter":
-					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "spanish-remove-word-filter":
-					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "portuguese-remove-word-filter":
-					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "italian-remove-word-filter":
-					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "all-remove-word-filter":
-					removeLangWord(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "load-word-filter":
 					var langLoad = _message.toLowerCase();
@@ -321,32 +310,33 @@ public class FilterExecution {
 							langLoad.equalsIgnoreCase("spanish") || langLoad.equalsIgnoreCase("portuguese") || langLoad.equalsIgnoreCase("italian")) {
 						message.setTitle("You chose to add "+langLoad+" words!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required words to upload.").build()).queue();
-						FileSetting.createFile(file_path, langLoad+"-load-word-filter");
+						cache.updateDescription(langLoad+"-load-word-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
 					break;
 				case "english-load-word-filter":
-					loadLangWords(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "german-load-word-filter":
-					loadLangWords(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "french-load-word-filter":
-					loadLangWords(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "turkish-load-word-filter":
-					loadLangWords(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "russian-load-word-filter":
-					loadLangWords(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "spanish-load-word-filter":
-					loadLangWords(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "portuguese-load-word-filter":
-					loadLangWords(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "italian-load-word-filter":
-					loadLangWords(_e, message, logger, file_path, file_value.split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "insert-name-filter":
 					if(Azrael.SQLInsertNameFilter(_message, _e.getGuild().getIdLong()) > 0) {
@@ -360,7 +350,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage("Name couldn't be inserted into Azrael.name_filter. Either the name already exists or an internal error has occurred!").queue();
 						logger.error("Name couldn't be inserted into Azrael.name_filter for guild {}", _e.getGuild().getName());
 					}
-					FileSetting.createFile(file_path, "complete");
+					Hashes.clearTempCache(key);
 					break;
 				case "remove-name-filter":
 					if(Azrael.SQLDeleteNameFilter(_message, _e.getGuild().getIdLong()) > 0) {
@@ -374,7 +364,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Name couldn't be removed. Name doesn't exist or an internal error occurred!").build()).queue();
 						logger.error("Name couldn't be removed from Azrael.name_filter for guild {}", _e.getGuild().getName());
 					}
-					FileSetting.createFile(file_path, "complete");
+					Hashes.clearTempCache(key);
 					break;
 				case "load-name-filter":
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
@@ -414,7 +404,7 @@ public class FilterExecution {
 							message.setColor(Color.RED).setTitle("Invalid pastebin link!");
 							_e.getTextChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
 						}
-						FileSetting.createFile(file_path, "complete");
+						Hashes.clearTempCache(key);
 					}
 					break;
 				case "insert-funny-names":
@@ -429,7 +419,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Name couldn't be inserted into Azrael.names. Either the name already exists or an internal error has occurred!").build()).queue();
 						logger.error("Name couldn't be inserted into Azrael.names for guild {}", _e.getGuild().getName());
 					}
-					FileSetting.createFile(file_path, "complete");
+					Hashes.clearTempCache(key);
 					break;
 				case "remove-funny-names":
 					if(Azrael.SQLDeleteFunnyNames(_message, _e.getGuild().getIdLong()) > 0) {
@@ -443,7 +433,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Name couldn't be removed. Name doesn't exist or an internal error occurred!").build()).queue();
 						logger.error("Name couldn't be removed from Azrael.names for guild {}", _e.getGuild().getName());
 					}
-					FileSetting.createFile(file_path, "complete");
+					Hashes.clearTempCache(key);
 					break;
 				case "load-funny-names":
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
@@ -483,7 +473,7 @@ public class FilterExecution {
 							message.setColor(Color.RED).setTitle("Invalid pastebin link!");
 							_e.getTextChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
 						}
-						FileSetting.createFile(file_path, "complete");
+						Hashes.clearTempCache(key);
 					}
 					break;
 				case "insert-staff-names":
@@ -498,7 +488,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Name couldn't be inserted into Azrael.staff_name_filter. Either the name already exists or an internal error has occurred!").build()).queue();
 						logger.error("Name couldn't be inserted into Azrael.staff_name_filter for guild {}", _e.getGuild().getName());
 					}
-					FileSetting.createFile(file_path, "complete");
+					Hashes.clearTempCache(key);
 					break;
 				case "remove-staff-names":
 					if(Azrael.SQLDeleteStaffNames(_message, _e.getGuild().getIdLong()) > 0) {
@@ -512,7 +502,7 @@ public class FilterExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Name couldn't be removed from Azrael.staff_names. Name doesn't exist or an internal error occurred!").build()).queue();
 						logger.error("Name couldn't be removed from Azrael.staff_names for guild {}", _e.getGuild().getName());
 					}
-					FileSetting.createFile(file_path, "complete");
+					Hashes.clearTempCache(key);
 					break;
 				case "load-staff-names":
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
@@ -552,14 +542,17 @@ public class FilterExecution {
 							message.setColor(Color.RED).setTitle("Invalid pastebin link!");
 							_e.getTextChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
 						}
-						FileSetting.createFile(file_path, "complete");
+						Hashes.clearTempCache(key);
 					}
 					break;
 			}
 		}
+		else {
+			Hashes.clearTempCache(key);
+		}
 	}
 	
-	private static void callFilterLangContent(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String file_path, final String lang) {
+	private static void callFilterLangContent(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String key, final String lang) {
 		var langAbbreviation = "";
 		var definitiveLang = "";
 		switch(lang) {
@@ -592,12 +585,12 @@ public class FilterExecution {
 		}
 		else {
 			message.setColor(Color.RED).setTitle("No results have been returned!");
-			_e.getTextChannel().sendMessage("The filter for this language is empty! Nothing to display!").queue();
+			_e.getTextChannel().sendMessage(message.setDescription("The filter for this language is empty! Nothing to display!").build()).queue();
 		}
-		FileSetting.createFile(file_path, "complete");
+		Hashes.clearTempCache(key);
 	}
 	
-	private static void insertLangWord(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String file_path, final String lang, String word) {
+	private static void insertLangWord(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String key, final String lang, String word) {
 		if(Azrael.SQLInsertWordFilter(lang.substring(0, 3), word, _e.getGuild().getIdLong()) > 0) {
 			message.setTitle("Success!");
 			_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into the "+lang+" word filter!").build()).queue();
@@ -610,10 +603,10 @@ public class FilterExecution {
 			_e.getTextChannel().sendMessage(message.setDescription("Word couldn't be inserted into the word-filter table. Either the word already exists or an internal error has occurred!").build()).queue();
 			logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
 		}
-		FileSetting.createFile(file_path, "complete");
+		Hashes.clearTempCache(key);
 	}
 	
-	private static void removeLangWord(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String file_path, final String lang, String word) {
+	private static void removeLangWord(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String key, final String lang, String word) {
 		if(Azrael.SQLDeleteWordFilter(lang.substring(0, 3), word, _e.getGuild().getIdLong()) > 0) {
 			message.setTitle("Success!");
 			_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the "+lang+" word filter!").build()).queue();
@@ -626,10 +619,10 @@ public class FilterExecution {
 			_e.getTextChannel().sendMessage(message.setDescription("An internal error occurred. Word couldn't be removed from the word-filter. Either the word wasn't inside the filter or an internal error occurred!").build()).queue();
 			logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
 		}
-		FileSetting.createFile(file_path, "complete");
+		Hashes.clearTempCache(key);
 	}
 	
-	private static void loadLangWords(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String file_path, final String lang, String _message) {
+	private static void loadLangWords(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String key, final String lang, String _message) {
 		if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 			var langAbbreviation = lang.substring(0, 3);
 			String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
@@ -669,7 +662,7 @@ public class FilterExecution {
 				message.setColor(Color.RED).setTitle("Invalid pastebin link!");
 				_e.getTextChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
 			}
-			FileSetting.createFile(file_path, "complete");
+			Hashes.clearTempCache(key);
 		}
 	}
 	

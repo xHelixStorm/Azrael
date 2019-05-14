@@ -7,10 +7,10 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Cache;
 import core.Channels;
 import core.Hashes;
 import core.UserPrivs;
-import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -86,7 +86,7 @@ public class RegisterChannel {
 						//create message in the channel and create an auto-delete-file so that the MessageListener can create the needed reactions
 						if(Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), 0, true) > 0) {
 							String count = ""+ReactionMessage.print(_e, channel_id);
-							FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+_e.getGuild().getId()+"ch"+channel+".azr", count);
+							Hashes.addTempCache("reaction_gu"+_e.getGuild().getId()+"ch"+channel, new Cache(0, count));
 						}
 						else {
 							logger.error("Role reactions couldn't be set to enable for guild {}", _e.getGuild().getName());

@@ -1,6 +1,5 @@
 package commands;
 
-import java.io.File;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -8,9 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import commandsContainer.RandomshopExecution;
 import core.Guilds;
-import fileManagement.FileSetting;
+import core.Hashes;
 import fileManagement.GuildIni;
-import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
 import sql.RankingSystem;
@@ -42,15 +40,15 @@ public class Randomshop implements Command{
 					RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()), bundleArguments(args, 1));
 				}
 				else if(args[0].equalsIgnoreCase("-replay")) {
-					//play another round if a match occurred within 10 minutes
-					File file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_play_"+e.getMember().getUser().getId());
-					if(file.exists() && System.currentTimeMillis() - file.lastModified() < 600000) {
-						RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()), FileSetting.readFile(file.getAbsolutePath()));
+					//play another round if a match occurred within 3 minutes
+					var cache = Hashes.getTempCache("randomshop_play_"+e.getMember().getUser().getId());
+					if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
+						RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()), cache.getAdditionalInfo());
 					}
 					else {
 						e.getTextChannel().sendMessage("You haven't played one round yet or the last time you played was over 10 minutes ago. Please rewrite the full command").queue();
-						if(file.exists())
-							file.delete();
+						if(cache != null)
+							Hashes.clearTempCache("randomshop_play_"+e.getMember().getUser().getId());
 					}
 				}
 				else if(args.length > 0) {

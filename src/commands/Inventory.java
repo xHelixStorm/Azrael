@@ -6,10 +6,10 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Cache;
 import core.Guilds;
-import fileManagement.FileSetting;
+import core.Hashes;
 import fileManagement.GuildIni;
-import fileManagement.IniFileReader;
 import inventory.InventoryBuilder;
 import inventory.InventoryContent;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -104,7 +104,7 @@ public class Inventory implements Command{
 							InventoryBuilder.DrawInventory(e, null, "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems, guild_settings.getThemeID()), limit/maxItems+1, itemNumber+1);
 						}
 						
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", e.getMember().getUser().getId()+"_"+(limit/maxItems+1)+"_"+(itemNumber+1)+"_"+drawTab);
+						Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+(limit/maxItems+1)+"_"+(itemNumber+1)+"_"+drawTab));
 					}
 				}
 				else{

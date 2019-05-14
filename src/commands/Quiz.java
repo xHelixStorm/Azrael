@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commandsContainer.QuizExecution;
+import core.Cache;
 import core.Hashes;
 import core.UserPrivs;
-import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -29,10 +29,9 @@ public class Quiz implements Command{
 			Logger logger = LoggerFactory.getLogger(Quiz.class);
 			logger.debug("{} has used Quiz command", e.getMember().getUser().getId());
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setTitle("Access denied!").setThumbnail(IniFileReader.getDeniedThumbnail());
-			if(!new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr").exists()) {
+			if(Hashes.getTempCache("quiztime"+e.getGuild().getId()) == null) {
 				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
 					EmbedBuilder message = new EmbedBuilder().setTitle("It's Quiz time!").setColor(Color.BLUE);
-					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 					if(args.length == 0) {
 						e.getTextChannel().sendMessage(message.setDescription("The Quiz command will allow you to register questions to provide the best quiz experience in a Discord server! At your disposal are parameters to register questions from a pastebin link, register rewards in form of codes that get sent to the user who answers a question correctly in private message and to start and interrupt the quiz session.\n\n"
 								+ "If a question gets answered, the next questions will appear after a 20 seconds and if they don't get replied within 20 seconds, users will receive a reminder that no one has yet answered the question and if available, it will write a hint to facilitate the question. These are the available parameters. Use them together with the quiz command:\n\n"
@@ -52,7 +51,7 @@ public class Quiz implements Command{
 								+ "write one reward per line so that the bot can recognize every single reward!").queue();
 					}
 					else if(args.length > 1 && args[0].equalsIgnoreCase("-register-rewards")) {
-						QuizExecution.registerRewards(e, args[2]);
+						QuizExecution.registerRewards(e, args[1]);
 					}
 					else if(args.length == 1 && args[0].equalsIgnoreCase("-register-questions")) {
 						e.getTextChannel().sendMessage("To register questions, attach a pastebin link after the full command. The pastebin format should look like this:\n"
@@ -71,7 +70,7 @@ public class Quiz implements Command{
 					}
 					else if(args.length > 1 && args[0].equalsIgnoreCase("-register-questions")) {
 						logger.debug("{} performed the registration of questions and rewards for the Quiz", e.getMember().getUser().getId());
-						QuizExecution.registerQuestions(e, e.getMessage().getContentRaw().substring(prefix.length()+25), false);
+						QuizExecution.registerQuestions(e, args[1], false);
 					}
 					else if(args[0].equalsIgnoreCase("-clear")) {
 						logger.debug("{} cleared all quiz questions and rewards", e.getMember().getUser().getId());
@@ -92,7 +91,7 @@ public class Quiz implements Command{
 											+ "1: **no restrictions**\n"
 											+ "2: **participants will receive a 3 questions threshold on right answer**\n"
 											+ "3: **participants win only once for the entire quiz**").build()).queue();
-									FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quizstarter.azr", e.getMember().getUser().getId());
+									Hashes.addTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId(), new Cache(180000, e.getMember().getUser().getId()));
 								}
 								else {
 									e.getTextChannel().sendMessage("Please register a quiz channel before starting the quiz!").queue();
@@ -114,7 +113,7 @@ public class Quiz implements Command{
 						}
 					}
 					else if(args[0].equalsIgnoreCase("-load")) {
-						File file = new File("./files/QuizBackup/quizsettings.azr");
+						File file = new File("./files/QuizBackup/quizsettings"+e.getGuild().getId()+".azr");
 						if(file.exists()) {
 							QuizExecution.registerQuestions(e, "", true);
 							logger.debug("{} has loaded the quiz questions and rewards from file", e.getMember().getUser().getId());

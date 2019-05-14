@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiParser;
 
+import core.Cache;
 import core.Hashes;
 import core.RSS;
-import fileManagement.FileSetting;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
@@ -45,12 +45,12 @@ public class RssExecution {
 		}
 	}
 	
-	public static void currentFormat(MessageReceivedEvent e, int feed, String filePath) {
+	public static void currentFormat(MessageReceivedEvent e, int feed, String key) {
 		EmbedBuilder message = new EmbedBuilder();
 		ArrayList<RSS> rss = Hashes.getFeed(e.getGuild().getIdLong());
 		if(rss.size() >= feed+1) {
 			e.getTextChannel().sendMessage("This is the curring setting for this feed. Type your desired template for this feed or type exit to interrupt. Key values are `{pubDate}`, `{title}`, `{description}`, `{link}`\n```"+rss.get(feed).getFormat()+"```").queue();
-			FileSetting.createFile(filePath, "updateformat"+feed);
+			Hashes.addTempCache(key, new Cache(180000, "updateformat"+feed));
 		}
 		else {
 			e.getTextChannel().sendMessage(message.setColor(Color.RED).setDescription("Please select an available digit").build()).queue();

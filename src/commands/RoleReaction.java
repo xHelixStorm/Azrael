@@ -5,9 +5,9 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Cache;
 import core.Hashes;
 import core.UserPrivs;
-import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -30,7 +30,7 @@ public class RoleReaction implements Command{
 			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) == true || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
 				if(args.length > 0 && args[0].equalsIgnoreCase("enable")) {
 					Logger logger = LoggerFactory.getLogger(RoleReaction.class);
-					logger.debug("{} has used RoleReaction command to enable", e.getMember().getUser().getId());
+					logger.debug("{} has used RoleReaction command to enable self assigning roles!", e.getMember().getUser().getId());
 					
 					if(Azrael.SQLgetCommandExecutionReaction(e.getGuild().getIdLong()) == true) {
 						e.getTextChannel().sendMessage(e.getMember().getUser().getAsMention()+" Role reactions are already enabled!").queue();
@@ -41,7 +41,7 @@ public class RoleReaction implements Command{
 							if(Azrael.SQLUpdateReaction(e.getGuild().getIdLong(), true) > 0) {
 								e.getTextChannel().sendMessage("Role Reactions have been enabled!").queue();
 								String count = ""+ReactionMessage.print(e, rea_channel.getChannel_ID());
-								FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getId()+"ch"+rea_channel.getChannel_ID()+".azr", count);
+								Hashes.addTempCache("reaction_gu"+e.getGuild().getId()+"ch"+rea_channel.getChannel_ID(), new Cache(0, count));
 							}
 							else {
 								e.getTextChannel().sendMessage("An internal error occurred. Role reactions couldn't be enabled in Azrael.commands").queue();

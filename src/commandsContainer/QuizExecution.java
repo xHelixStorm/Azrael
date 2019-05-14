@@ -236,7 +236,7 @@ public class QuizExecution {
 		
 		if(!sb.toString().equals("No questions!") && !sb.toString().equals("No rewards!")) {
 			new File("./files/QuizBackup").mkdirs();
-			FileSetting.createFile("./files/QuizBackup/quizsettings.azr", sb.toString());
+			FileSetting.createFile("./files/QuizBackup/quizsettings"+e.getGuild().getId()+".azr", sb.toString());
 			e.getTextChannel().sendMessage("Quiz settings have been saved successfully!").queue();
 			logger.debug("The settings for the quiz have been registered");
 		}

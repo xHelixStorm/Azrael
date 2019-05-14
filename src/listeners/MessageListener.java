@@ -1,7 +1,6 @@
 package listeners;
 
 import java.awt.Color;
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,6 +15,7 @@ import commandsContainer.FilterExecution;
 import commandsContainer.RssExecution;
 import commandsContainer.SetWarning;
 import commandsContainer.UserExecution;
+import core.Cache;
 import core.CommandHandler;
 import core.CommandParser;
 import core.Guilds;
@@ -24,7 +24,6 @@ import core.Messages;
 import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
-import fileManagement.IniFileReader;
 import filter.LanguageFilter;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -55,15 +54,15 @@ public class MessageListener extends ListenerAdapter{
 				}
 			}
 			
-			File warning = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+".azr");
-			File user = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
-			File filter = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr");
-			File inventory_bot = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
-			File randomshop_bot = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
-			File reaction = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
-			File rss = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
-			File quiz = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quizstarter.azr");
-			File runquiz = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr");
+			var warning = Hashes.getTempCache("warnings_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId());
+			var user = Hashes.getTempCache("user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId());
+			var filter = Hashes.getTempCache("filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId());
+			var inventory_bot = Hashes.getTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId());
+			var randomshop_bot = Hashes.getTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId());
+			var reaction = Hashes.getTempCache("reaction_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId());
+			var rss = Hashes.getTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId());
+			var quiz = Hashes.getTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId());
+			var runquiz = Hashes.getTempCache("quiztime"+e.getGuild().getId());
 			
 			long user_id = e.getMember().getUser().getIdLong();
 			long guild_id = e.getGuild().getIdLong();
@@ -92,47 +91,44 @@ public class MessageListener extends ListenerAdapter{
 				}
 			}
 			
-			if(warning.exists()) {
-				SetWarning.performUpdate(e, message);
+			if(warning != null) {
+				SetWarning.performUpdate(e, message, warning, "warnings_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 			
-			if(filter.exists()) {
-				String file_name = getFileName(new File(IniFileReader.getTempDirectory()+"AutoDelFiles/filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_1.azr"), 20, "filter", e);
-				FilterExecution.performAction(e, message, file_name);
+			if(filter != null) {
+				FilterExecution.performAction(e, message, filter);
 			}
 			
-			if(user.exists()){
-				String file_name = getFileName(new File(IniFileReader.getTempDirectory()+"AutoDelFiles/user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_1.azr"), 20, "user", e);
-				UserExecution.performAction(e, message, file_name);
+			if(user != null){
+				UserExecution.performAction(e, message, user);
 			}
 			
-			if(inventory_bot.exists() && UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
-				String file_content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
-				String [] array = file_content.split("_");
+			if(inventory_bot != null && UserPrivs.isUserBot(e.getMember().getUser(), guild_id) && inventory_bot.getExpiration() - System.currentTimeMillis() > 0) {
+				String cache_content = inventory_bot.getAdditionalInfo();
+				String [] array = cache_content.split("_");
 				final long member_id = Long.parseLong(array[0]);
 				final int current_page = Integer.parseInt(array[1]);
 				final int last_page = Integer.parseInt(array[2]);
 				final String inventory_tab = array[3];
 				final String sub_tab = array[4];
 				
-				boolean createFile = false;
+				boolean createTemp = false;
 				if(current_page > 1) {
 					e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).complete();
-					createFile = true;
+					createTemp = true;
 				}
 				if(current_page < last_page) {
 					e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).complete();
-					createFile = true;
+					createTemp = true;
 				}
-				if(createFile == true) {
-					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id+".azr", current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab);
+				if(createTemp == true) {
+					Hashes.addTempCache("inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id, new Cache(0, current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab));
 				}
-				inventory_bot.delete();
 			}
 			
-			if(randomshop_bot.exists() && UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
-				String file_content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr");
-				String [] array = file_content.split("_");
+			if(randomshop_bot != null && UserPrivs.isUserBot(e.getMember().getUser(), guild_id) && randomshop_bot.getExpiration() - System.currentTimeMillis() > 0) {
+				String cache_content = randomshop_bot.getAdditionalInfo();
+				String [] array = cache_content.split("_");
 				final long member_id = Long.parseLong(array[0]);
 				final int current_page = Integer.parseInt(array[1]);
 				final String input = array[2];
@@ -148,14 +144,12 @@ public class MessageListener extends ListenerAdapter{
 					createFile = true;
 				}
 				if(createFile == true) {
-					FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id+".azr", current_page+"_"+last_page+"_"+input);
+					Hashes.addTempCache("randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id, new Cache(0, current_page+"_"+last_page+"_"+input));
 				}
-				randomshop_bot.delete();
-				
 			}
 			
-			if(reaction.exists() && UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
-				int counter = Integer.parseInt(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/reaction_gu"+e.getGuild().getIdLong()+"ch"+e.getTextChannel().getId()+".azr"));
+			if(reaction != null && UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
+				int counter = Integer.parseInt(reaction.getAdditionalInfo());
 				Message m = e.getMessage();
 				String [] reactions = GuildIni.getReactions(guild_id);
 				for(int i = 1; i <= counter; i++) {
@@ -176,26 +170,27 @@ public class MessageListener extends ListenerAdapter{
 					}
 				}
 				Hashes.addReactionMessage(e.getGuild().getIdLong(), e.getMessage().getIdLong());
-				reaction.delete();
+				Hashes.clearTempCache("reaction_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId());
 			}
 			
-			if(rss.exists() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
-				String task = FileSetting.readFile(rss.getAbsolutePath());
+			if(rss != null && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id) && rss.getExpiration() - System.currentTimeMillis() > 0) {
+				var key = "rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId();
+				String task = rss.getAdditionalInfo();
 				if(!message.equalsIgnoreCase("exit")) {
 					if(task.equals("remove") && message.replaceAll("[0-9]", "").length() == 0) {
 						if(RssExecution.removeFeed(e, Integer.parseInt(message)-1))
-							rss.delete();
+							Hashes.clearTempCache(key);
 					}
 					else if(task.equals("format") && message.replaceAll("[0-9]", "").length() == 0) {
-						RssExecution.currentFormat(e, Integer.parseInt(message)-1, rss.getAbsolutePath());
+						RssExecution.currentFormat(e, Integer.parseInt(message)-1, key);
 					}
 					else if(task.contains("updateformat")) {
 						if(RssExecution.updateFormat(e, Integer.parseInt(task.replaceAll("[^0-9]", "")), message))
-							rss.delete();
+							Hashes.clearTempCache(key);
 					}
 					else if(task.equals("test") && message.replaceAll("[0-9]", "").length() == 0) {
 						if(RssExecution.runTest(e, Integer.parseInt(message)-1))
-							rss.delete();
+							Hashes.clearTempCache(key);
 					}
 				}
 				else {
@@ -204,8 +199,8 @@ public class MessageListener extends ListenerAdapter{
 				}
 			}
 			
-			if(quiz.exists()) {
-				String content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quizstarter.azr");
+			if(quiz != null && quiz.getExpiration() - System.currentTimeMillis() > 0) {
+				String content = quiz.getAdditionalInfo();
 				if(e.getMember().getUser().getId().equals(content) && (message.equals("1") || message.equals("2") || message.equals("3"))) {
 					//run the quiz in a thread. // retrieve the log channel and quiz channel at the same time and pass them over to the new Thread
 					var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log") || f.getChannel_Type().equals("qui")).collect(Collectors.toList());
@@ -219,18 +214,18 @@ public class MessageListener extends ListenerAdapter{
 					//execute independent Quiz Thread
 					new Thread(new RunQuiz(e, qui_channel.getChannel_ID(), log_channel.getChannel_ID(), Integer.parseInt(message))).start();
 					//remove the file after starting 
-					quiz.delete();
+					Hashes.clearTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId());
 				}
 			}
 			
-			if(runquiz.exists()) {
-				String content = FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr");
+			if(runquiz != null) {
+				String content = runquiz.getAdditionalInfo();
 				if(!content.equals("skip-question") || !content.equals("interrupt-questions")) {
 					var qui_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("qui")).findAny().orElse(null);
 					if(qui_channel != null && qui_channel.getChannel_ID() == e.getTextChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
 						if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
 							if(message.equals("skip-question") || message.equals("interrupt-questions")) {
-								FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr", message);
+								Hashes.addTempCache("quiztime"+e.getGuild().getId(), new Cache(0, message));
 							}
 						}
 						if(!(content.length() == 7) || !(content.length() == 8)) {
@@ -239,7 +234,7 @@ public class MessageListener extends ListenerAdapter{
 							   Hashes.getQuiz(Integer.parseInt(content)).getAnswer3().trim().equalsIgnoreCase(message)) {
 								Integer hash = Hashes.getQuizWinners(e.getMember());
 								if(hash == null) {
-									FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr", e.getMember().getUser().getId());
+									Hashes.addTempCache("quiztime"+e.getGuild().getId(), new Cache(0, e.getMember().getUser().getId()));
 								}
 							}
 						}
@@ -294,22 +289,5 @@ public class MessageListener extends ListenerAdapter{
 			//play with your thumbs 
 		}
 		executor.shutdown();
-	}
-	
-	private String getFileName(File file, int max_count, String name, MessageReceivedEvent e) {
-		String file_name = IniFileReader.getTempDirectory()+"AutoDelFiles/"+name+"_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_0.azr";
-		int counter = 1;
-		boolean break_while = false;
-		while(counter < max_count && break_while == false){
-			if(file.exists()){
-				file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/"+name+"_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_"+(counter+1)+".azr");
-				file_name = IniFileReader.getTempDirectory()+"AutoDelFiles/"+name+"_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId()+"_"+counter+".azr";
-			}
-			else{
-				break_while = true;
-			}
-			counter++;
-		}
-		return file_name;
 	}
 }

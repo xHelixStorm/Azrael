@@ -7,10 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Bancollect;
+import core.Hashes;
 import core.UserPrivs;
 import core.Warning;
-import fileManagement.FileSetting;
-import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.Role;
@@ -79,7 +78,8 @@ public class RoleListener extends ListenerAdapter{
 							logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getName());
 							if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The mute state couldn't be updated in table Azrael.bancollect").queue();
 						}
-						mute_time = Long.parseLong(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/mute_time_"+e.getMember().getUser().getId()));
+						mute_time = Long.parseLong(Hashes.getTempCache("mute_time_"+e.getMember().getUser().getId()).getAdditionalInfo());
+						Hashes.clearTempCache("mute_time_"+e.getMember().getUser().getId());
 						long hours = (mute_time/1000/60/60);
 						long minutes = (mute_time/1000/60%60);
 						String hour_add = hours != 0 ? hours+" hours" : "";
@@ -92,7 +92,6 @@ public class RoleListener extends ListenerAdapter{
 						pc.close();
 						new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, log_channel.getChannel_ID(), mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0)).start();
 						logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getName());
-						FileSetting.deleteFile(IniFileReader.getTempDirectory()+"AutoDelFiles/mute_time_"+e.getMember().getUser().getId());
 					}
 					else {
 						Warning warn = Azrael.SQLgetWarning(e.getGuild().getIdLong(), (warning_id+1));

@@ -5,9 +5,10 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Cache;
+import core.Hashes;
 import core.RSS;
 import core.UserPrivs;
-import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -66,7 +67,7 @@ public class Rss implements Command{
 					e.getTextChannel().sendMessage(message.setDescription("Please select a digit for the RSS feed to be removed:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
 					logger.debug("{} chose to remove a feed", e.getMember().getUser().getId());
 					if(out.length() > 0)
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", "remove");
+						Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId(), new Cache(180000, "remove"));
 				}
 				else if(args[0].equalsIgnoreCase("-format")) {
 					int counter = 1;
@@ -79,7 +80,7 @@ public class Rss implements Command{
 					e.getTextChannel().sendMessage(message.setDescription("Please select a digit for the RSS feed to be personalized:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
 					logger.debug("{} chose to change the format of a feed", e.getMember().getUser().getId());
 					if(out.length() > 0)
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", "format");
+						Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId(), new Cache(180000, "format"));
 				}
 				else if(args[0].equalsIgnoreCase("-test")) {
 					//test a feed
@@ -93,7 +94,7 @@ public class Rss implements Command{
 					e.getTextChannel().sendMessage(message.setDescription("Please select a digit for the RSS that needs to be tested:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
 					logger.debug("{} chose to change the format of a feed", e.getMember().getUser().getId());
 					if(out.length() > 0)
-						FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+".azr", "test");
+						Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId(), new Cache(180000, "test"));
 				}
 				else if(args[0].equalsIgnoreCase("-display")) {
 					//display the registered feeds
