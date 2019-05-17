@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import core.Cache;
 import core.Hashes;
-import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -79,7 +78,7 @@ public class SetWarning {
 					if(Azrael.SQLUpdateMuteTimeOfWarning(_e.getGuild().getIdLong(), value, (Long.parseLong(_message)*60*1000)) > 0) {
 						_e.getTextChannel().sendMessage("The warnings have been configured successfully!").queue();
 						logger.debug("Warnings have been configured");
-						FileSetting.deleteFile(IniFileReader.getTempDirectory()+"AutoDelFiles/warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()+".azr");
+						Hashes.clearTempCache("warnings_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId());
 					}
 					else {
 						logger.error("warning timer couldn't be updated in guild {}", _e.getGuild().getName());

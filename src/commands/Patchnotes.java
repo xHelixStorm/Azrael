@@ -229,7 +229,7 @@ public class Patchnotes implements Command {
 	private void printPatchNotes(MessageReceivedEvent e, Patchnote note, EmbedBuilder message) {
 		message.setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the requested patch notes!");
 		e.getTextChannel().sendMessage(message.setDescription("Bot patch notes version **"+note.getTitle()+"** "+note.getDate()+"\n\n"+note.getMessage1()).build()).complete();
-		if(note.getMessage2() != null || note.getMessage2().length() > 0) {
+		if(note.getMessage2() != null && note.getMessage2().length() > 0) {
 			message.setTitle("Requested patch notes part two!");
 			e.getTextChannel().sendMessage(message.setDescription(note.getMessage2()).build()).complete();
 		}

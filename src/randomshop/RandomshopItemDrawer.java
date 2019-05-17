@@ -61,10 +61,10 @@ public class RandomshopItemDrawer {
 			}
 			g.setFont(new Font("Nexa Bold", Font.BOLD, generalFontSize));
 			g.drawString(current_page+" / "+ last_page, pageX+getCenteredString(current_page+" / "+ last_page, 0, g), pageY);
-			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_items_"+(e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId())+".png"));
+			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"randomshop_items_gu"+(e != null ? e.getGuild().getId() : e2.getGuild().getId())+"us"+(e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId())+".png"));
 			g.dispose();
 			
-			File file1 = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_items_"+(e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId())+".png");
+			File file1 = new File(IniFileReader.getTempDirectory()+"randomshop_items_gu"+(e != null ? e.getGuild().getId() : e2.getGuild().getId())+"us"+(e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId())+".png");
 			if(e != null)
 				e.getTextChannel().sendFile(file1, "randomshop.png", null).complete();
 			else

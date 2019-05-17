@@ -4,14 +4,12 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import core.Cache;
+import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import preparedMessages.MeowUsage;
-import threads.DelayDelete;
 
 public class MeowExecution {
 	private static String commandInfo = MeowUsage.getMeowInfos();
@@ -21,10 +19,9 @@ public class MeowExecution {
 		var variable = _variable;
 		String path = _path;
 		String pictureName = "";
-		String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_meow.azr";
-		File file = new File(fileName);
+		var cache = Hashes.getTempCache("meowDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 		
-		if(!file.exists()){			
+		if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
 			if(variable.length == 0) {
 				long channel = e.getTextChannel().getIdLong();
 				if(channel == channel_id || channel_id == 0){
@@ -35,13 +32,8 @@ public class MeowExecution {
 				}
 			}
 			else {
-				try {
-					file.createNewFile();
-					new Thread(new DelayDelete(fileName, 20000)).start();
-				} catch (IOException e2) {
-					Logger logger = LoggerFactory.getLogger(MeowExecution.class);
-					logger.warn("{} couldn't be created", fileName, e2);
-				}
+				Hashes.addTempCache("meowDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(30000));
+				File file;
 				
 				if(variable[0].equalsIgnoreCase("meow")){
 					file = new File(path+"meow01.png");
@@ -733,7 +725,7 @@ public class MeowExecution {
 				}
 				else {
 					e.getTextChannel().sendMessage("Cat not found. Please try again!").queue();
-					file.delete();
+					Hashes.clearTempCache("meowDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 		}

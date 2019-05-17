@@ -138,10 +138,6 @@ public class FileSetting {
 	}
 	
 	public static void createTemp(){
-		boolean [] dir = new boolean[4];
-		dir[0] = (new File(IniFileReader.getTempDirectory())).mkdirs();
-		dir[1] = (new File(IniFileReader.getTempDirectory()+"Reports")).mkdirs();
-		dir[2] = (new File(IniFileReader.getTempDirectory()+"CommandDelay")).mkdirs();
-		dir[3] = (new File(IniFileReader.getTempDirectory()+"AutoDelFiles")).mkdirs();
+		(new File(IniFileReader.getTempDirectory())).mkdirs();
 	}
 }

@@ -91,21 +91,21 @@ public class InventoryBuilder{
 				}
 				
 				if(_e != null)
-					ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/"+_e.getMember().getUser().getId()+"_inventory.png"));
+					ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png"));
 				else
-					ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/"+_e2.getMember().getUser().getId()+"_inventory.png"));
+					ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+_e2.getGuild().getId()+"us"+_e2.getMember().getUser().getId()+".png"));
 			} catch(IOException ioe){
 				Logger logger = LoggerFactory.getLogger(InventoryBuilder.class);
 				logger.warn("Inventory tab not found", ioe);
 			}
 			
 			if(_e != null) {
-				File upload = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/"+_e.getMember().getUser().getId()+"_inventory.png");
+				File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png");
 				_e.getTextChannel().sendFile(upload, "inventory.png", null).complete();
 				upload.delete();
 			}
 			else {
-				File upload = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/"+_e2.getMember().getUser().getId()+"_inventory.png");
+				File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+_e2.getGuild().getId()+"us"+_e2.getMember().getUser().getId()+".png");
 				_e2.getChannel().sendFile(upload, "inventory.png", null).complete();
 				upload.delete();
 			}

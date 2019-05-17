@@ -49,13 +49,13 @@ public class DrawDaily {
 				g.drawString(_reward, descriptionStartX+getCenteredString(_reward, fieldSizeX, g), descriptionY);
 			else if(descriptionMode == 2)
 				g.drawString(_reward, getRightString(_reward, descriptionX, g),  descriptionY);
-			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/daily.png"));
+			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"daily_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png"));
 			g.dispose();
 		} catch(IOException ioe){
 			Logger logger = LoggerFactory.getLogger(DrawDaily.class);
 			logger.error("Error on daily reward drawing", ioe);
 		}
-		File file1 = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/daily.png");
+		File file1 = new File(IniFileReader.getTempDirectory()+"daily_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png");
 		_e.getTextChannel().sendFile(file1, "daily.png", null).complete();
 		file1.delete();
 	}

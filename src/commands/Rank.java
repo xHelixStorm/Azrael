@@ -1,8 +1,6 @@
 package commands;
 
 import java.awt.Color;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -10,14 +8,14 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Cache;
 import core.Guilds;
+import core.Hashes;
 import fileManagement.GuildIni;
-import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import rankingSystem.RankingMethods;
 import sql.RankingSystem;
-import threads.DelayDelete;
 
 public class Rank implements Command{
 
@@ -51,21 +49,14 @@ public class Rank implements Command{
 				
 				long guild_id = e.getGuild().getIdLong();
 				var rank = 0;
-				String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_rank.azr";
-				File file = new File(fileName);
 				
 				Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 				rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
 				
-				if(guild_settings.getRankingState()){				
-					if(!file.exists()){
-						try {
-							file.createNewFile();
-						} catch (IOException e2) {
-							logger.error("{} file couldn't be created", fileName, e2);
-						}
-						
-						new Thread(new DelayDelete(fileName, 30000)).start();
+				if(guild_settings.getRankingState()) {
+					var cache = Hashes.getTempCache("rankDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
+					if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
+						Hashes.addTempCache("rankDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(30000));
 						
 						float experienceCounter;
 						int convertedExperience;

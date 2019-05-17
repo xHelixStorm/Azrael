@@ -1,8 +1,6 @@
 package commandsContainer;
 
 import java.awt.Color;
-import java.io.File;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +16,6 @@ import core.Cache;
 import core.Guilds;
 import core.Hashes;
 import fileManagement.GuildIni;
-import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -30,7 +27,6 @@ import rankingSystem.WeaponStats;
 import rankingSystem.Weapons;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
-import threads.DelayDelete;
 
 public class RandomshopExecution {
 	private static final Logger logger = LoggerFactory.getLogger(RandomshopExecution.class);
@@ -88,15 +84,9 @@ public class RandomshopExecution {
 	}
 	
 	public static void runRound(MessageReceivedEvent e, List<WeaponAbbvs> abbreviations, List<String> categories, String input) {
-		var fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_randomshop_play.azr";
-		File file = new File(fileName);
-		if(!file.exists()) {
-			try {
-				file.createNewFile();
-				new Thread(new DelayDelete(fileName, 3000)).start();
-			} catch (IOException e2) {
-				logger.error("{} file couldn't be created", fileName, e2);
-			}
+		var cache = Hashes.getTempCache("randomshop_playDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
+		if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
+			Hashes.addTempCache("randomshop_playDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(3000));
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
 				//first, search for results from the available lists
@@ -181,15 +171,9 @@ public class RandomshopExecution {
 	}
 	
 	public static void inspectItems(MessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<WeaponAbbvs> abbreviations, List<String> categories, String input, int page) {
-		String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+(e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId())+"_randomshop_play.azr";
-		File file = new File(fileName);
-		if(!file.exists() || e2 != null) {
-			try {
-				file.createNewFile();
-				new Thread(new DelayDelete(fileName, 3000)).start();
-			} catch (IOException e3) {
-				logger.error("{} file couldn't be created", fileName, e2);
-			}
+		var cache = Hashes.getTempCache("randomshop_playDelay_gu"+(e != null ? e.getGuild().getId() : e2.getGuild().getId())+"us"+(e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId()));
+		if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0 || e2 != null) {
+			Hashes.addTempCache("randomshop_playDelay_gu"+(e != null ? e.getGuild().getId() : e2.getGuild().getId())+"us"+(e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId()), new Cache(3000));
 			
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {

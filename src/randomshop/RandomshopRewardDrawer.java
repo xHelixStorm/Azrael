@@ -33,10 +33,10 @@ public class RandomshopRewardDrawer {
 			Graphics2D g = overlay.createGraphics();
 			g.drawImage(rewardOverlay, 0, 0, null);
 			g.drawImage(drawWeapon, rewardX, rewardY, (itemSizeX != 0 ? itemSizeX : drawWeapon.getWidth()), (itemSizeY != 0 ? itemSizeY : drawWeapon.getHeight()), null);
-			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_reward_"+e.getMember().getUser().getId()+".png"));
+			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"randomshop_reward_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 			g.dispose();
 			
-			File file1 = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/randomshop_reward_"+e.getMember().getUser().getId()+".png");
+			File file1 = new File(IniFileReader.getTempDirectory()+"randomshop_reward_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
 			e.getTextChannel().sendFile(file1, "reward.png", null).complete();
 			file1.delete();
 			

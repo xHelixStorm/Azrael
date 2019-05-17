@@ -36,7 +36,7 @@ public class RunQuiz implements Runnable{
 			long channel = channel_id;
 			long log_channel = log_channel_id;
 			int modality = mode;
-			FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr", ""+0);
+			FileSetting.createFile(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr", ""+0);
 			Thread.sleep(3000);
 			//send the starting messages with delays in sending them
 			e.getGuild().getTextChannelById(channel).sendMessage("Hello everyone! The quiz will begin in one minute. Prepare for the questions!").queue();
@@ -46,7 +46,7 @@ public class RunQuiz implements Runnable{
 			int hints = 0;
 			int index = 1;
 			while(true) {
-				FileSetting.createFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr", ""+index);
+				FileSetting.createFile(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr", ""+index);
 				Quizes quiz = Hashes.getQuiz(index);
 				
 				//check if there are still questions left by checking, if quiz is empty. If empty, terminate the program
@@ -56,8 +56,8 @@ public class RunQuiz implements Runnable{
 					Thread.sleep(20000);
 					
 					//check the created file if someone was able to answer the question
-					if(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr").length() == 18 || FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr").length() == 17) {
-						long user_id = Long.parseLong(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr"));
+					if(FileSetting.readFile(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr").length() == 18 || FileSetting.readFile(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr").length() == 17) {
+						long user_id = Long.parseLong(FileSetting.readFile(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr"));
 						logger.debug("{} received the reward {} out of the quiz in guild {}", e.getMember().getUser().getId(), quiz.getReward(), e.getGuild().getName());
 						e.getGuild().getTextChannelById(channel).sendMessage("Question number "+index+" goes to "+e.getGuild().getMemberById(user_id).getAsMention()+". Congratulations!").queue();
 						try {
@@ -87,13 +87,13 @@ public class RunQuiz implements Runnable{
 						Thread.sleep(5000);
 					}
 					//skip the question when an administrator types skip-question
-					else if(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr").equals("skip-question")) {
+					else if(FileSetting.readFile(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr").equals("skip-question")) {
 						e.getGuild().getTextChannelById(channel).sendMessage("Question skipped! Here is the next questions!").queue();
 						index++;
 						Thread.sleep(5000);
 					}
 					//interrupt the quiz when an administrator types interrupt-questions
-					else if(FileSetting.readFile(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr").equals("interrupt-questions")) {
+					else if(FileSetting.readFile(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr").equals("interrupt-questions")) {
 						e.getGuild().getTextChannelById(channel).sendMessage("The quiz has been interrupted! Thank you all for participating! See you next time!").queue();
 						break;
 					}
@@ -125,7 +125,7 @@ public class RunQuiz implements Runnable{
 			
 			//remove the temp file that shows the task for still running and clear the winners cache
 			Hashes.clearQuizWinners();
-			File file = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/quiztime.azr");
+			File file = new File(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr");
 			file.delete();
 		} catch (InterruptedException e) {
 			logger.error("Thread sleep has been interrupted on RunQuiz", e);

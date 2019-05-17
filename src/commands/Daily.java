@@ -1,8 +1,6 @@
 package commands;
 
 import java.awt.Color;
-import java.io.File;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,9 +15,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Cache;
 import core.Hashes;
 import fileManagement.GuildIni;
-import fileManagement.IniFileReader;
 import inventory.Dailies;
 import inventory.DrawDaily;
 import inventory.InventoryContent;
@@ -28,7 +26,6 @@ import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
 import sql.Azrael;
-import threads.DelayDelete;
 import util.STATIC;
 
 public class Daily implements Command{
@@ -44,15 +41,9 @@ public class Daily implements Command{
 			Logger logger = LoggerFactory.getLogger(Daily.class);
 			logger.debug("{} has used Daily command", e.getMember().getUser().getId());
 			
-			String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser().getId()+"_daily.azr";
-			File file = new File(fileName);
-			if(!file.exists()){
-				try {
-					file.createNewFile();
-					new Thread(new DelayDelete(fileName, 3000)).start();
-				} catch (IOException e2) {
-					logger.error("{} file couldn't be created", fileName, e2);
-				}
+			var cache = Hashes.getTempCache("dailyDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
+			if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
+				Hashes.addTempCache("dailyDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(3000));
 				
 				ExecutorService executor = Executors.newSingleThreadExecutor();
 				executor.execute(() -> {

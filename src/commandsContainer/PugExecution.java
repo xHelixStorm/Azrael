@@ -4,14 +4,12 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import core.Cache;
+import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import preparedMessages.PugUsage;
-import threads.DelayDelete;
 
 public class PugExecution {
 	private static String commandInfo = PugUsage.getPugInfos();
@@ -21,10 +19,9 @@ public class PugExecution {
 		var variable = _variable;
 		String path = _path;
 		String pictureName = "";
-		String fileName = IniFileReader.getTempDirectory()+"CommandDelay/"+e.getMember().getUser()+"_pug.azr";
-		File file = new File(fileName);
+		var cache = Hashes.getTempCache("pugDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 		
-		if(!file.exists()){			
+		if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {			
 			if(variable.length == 0){
 				long channel = e.getTextChannel().getIdLong();
 				if(channel == channel_id || channel_id == 0){
@@ -35,13 +32,8 @@ public class PugExecution {
 				}
 			}
 			else {
-				try {
-					file.createNewFile();
-					new Thread(new DelayDelete(fileName, 20000)).start();
-				} catch (IOException e2) {
-					Logger logger = LoggerFactory.getLogger(PugExecution.class);
-					logger.warn("{} file couldn't be created", fileName, e2);
-				}
+				Hashes.addTempCache("meowDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(30000));
+				File file;
 				
 				if(variable[0].equalsIgnoreCase("pug")){
 					file = new File(path+"pug01.png");
@@ -974,7 +966,7 @@ public class PugExecution {
 				}
 				else {
 					e.getTextChannel().sendMessage("Pug not found. Please try again!").queue();
-					file.delete();
+					Hashes.clearTempCache("meowDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 		}

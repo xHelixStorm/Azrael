@@ -79,10 +79,10 @@ public class RankingMethods extends ListenerAdapter{
 			g.drawString(levelS1+""+levelS2, getCenteredString(levelS1+""+levelS2, 103, g), 65);
 			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
 			g.drawString(name, 137, 68);
-			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/lvup_"+e.getMember().getUser().getId()+".png"));
+			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"lvup_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 			g.dispose();
 			
-			File file1 = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/lvup_"+e.getMember().getUser().getId()+".png");
+			File file1 = new File(IniFileReader.getTempDirectory()+"lvup_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
 			e.getTextChannel().sendFile(file1, "level_up.png", null).complete();
 			file1.delete();
 		} catch (IOException e1) {
@@ -147,10 +147,10 @@ public class RankingMethods extends ListenerAdapter{
 			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
 			g.drawString(name, 117, 38);
 			
-			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/rank_"+e.getMember().getUser().getId()+".png"));
+			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 			g.dispose();
 			
-			File file2 = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/rank_"+e.getMember().getUser().getId()+".png");
+			File file2 = new File(IniFileReader.getTempDirectory()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
 			e.getTextChannel().sendFile(file2, "rank.png", null).complete();
 			file2.delete();
 		} catch (IOException e1) {
@@ -255,10 +255,10 @@ public class RankingMethods extends ListenerAdapter{
 			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
 			g.drawString(name, 126, 56);
 			
-			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"AutoDelFiles/profile_"+e.getMember().getUser().getId()+".png"));
+			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 			g.dispose();
 			
-			File file3 = new File(IniFileReader.getTempDirectory()+"AutoDelFiles/profile_"+e.getMember().getUser().getId()+".png");
+			File file3 = new File(IniFileReader.getTempDirectory()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
 			e.getTextChannel().sendFile(file3, "profile.png", null).complete();
 			file3.delete();
 		} catch (IOException e1) {
