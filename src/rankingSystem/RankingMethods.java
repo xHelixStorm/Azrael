@@ -43,7 +43,7 @@ public class RankingMethods extends ListenerAdapter{
 			StringBuilder sb = new StringBuilder();
 			StringBuilder sb2 = new StringBuilder();
 			
-			int[] lev = GuildIni.getWholeProfile(e.getGuild().getIdLong());
+			int[] lev = GuildIni.getWholeLevel(e.getGuild().getIdLong());
 			final var nameLengthLimit = lev[0];
 			final var generalTextFontSize = lev[1];
 			final var nameTextFontSize = lev[2];
@@ -76,7 +76,7 @@ public class RankingMethods extends ListenerAdapter{
 			g.setColor(color);
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setFont(new Font("Nexa Bold", Font.BOLD, generalTextFontSize));
-			g.drawString(levelS1+""+levelS2, getCenteredString(levelS1+""+levelS2, 103, g), 65);
+			g.drawString(levelS1+""+levelS2, getCenteredString(levelS1+""+levelS2, 205, g), 69);
 			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
 			g.drawString(name, 137, 68);
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"lvup_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
