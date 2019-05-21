@@ -96,13 +96,21 @@ public class GuildListener extends ListenerAdapter {
 		}
 		if(badName == false){
 			Azrael.SQLgetNameFilter(e.getGuild().getIdLong());
-			check: for(String word : Hashes.getQuerryResult("bad-names_"+guild_id)){
-				if(lc_user_name.contains(word)){
-					nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
-					e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
-					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this Server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
-					logger.info("Improper name found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
-					badName = true;
+			check: for(var word : Hashes.getNameFilter(guild_id)){
+				if(lc_user_name.contains(word.getName())) {
+					if(!word.getKick()) {
+						nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
+						e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
+						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
+						logger.info("Improper name found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+						badName = true;
+					}
+					else {
+						e.getMember().getUser().openPrivateChannel().complete().sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").complete();
+						e.getGuild().getController().kick(e.getMember()).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
+						nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("User kicked for having a not allowed name!");
+						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. The user has been kicked automatically from the server due to this word: **"+word.getName().toUpperCase()+"**").build()).queue();
+					}
 					break check;
 				}
 			}

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
+import core.UserPrivs;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -54,22 +55,37 @@ public class NameListener extends ListenerAdapter{
 			for(Guild guild : e.getJDA().getGuilds()){
 				long guild_id = guild.getIdLong();
 				Azrael.SQLgetNameFilter(guild_id);
-				check: for(String word : Hashes.getQuerryResult("bad-names_"+guild_id)){
-					if(nameCheck.contains(word)){
+				check: for(var word : Hashes.getNameFilter(guild_id)){
+					if(nameCheck.contains(word.getName())){
 						Member member = e.getJDA().getGuildById(guild_id).getMemberById(user_id);
 						
 						if(member.getUser().getIdLong() != 0){
 							var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 							try {
-								String nickname = Azrael.SQLgetRandomName(guild_id);
-								e.getJDA().getGuildById(guild_id).getController().setNickname(member, nickname).queue();
-								message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
-								if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
-								updateNickname(member, guild, nickname, logger);
+								if(!word.getKick()) {
+									String nickname = Azrael.SQLgetRandomName(guild_id);
+									e.getJDA().getGuildById(guild_id).getController().setNickname(member, nickname).queue();
+									message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
+									if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
+									updateNickname(member, guild, nickname, logger);
+								}
+								else {
+									if(!UserPrivs.isUserAdmin(member.getUser(), guild_id) && !UserPrivs.isUserMod(member.getUser(), guild_id)) {
+										e.getUser().openPrivateChannel().complete().sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").complete();
+										e.getJDA().getGuildById(guild_id).getController().kick(member).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
+										message.setColor(Color.RED).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("User kicked for having a not allowed name!");
+										if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** and was kicked for containing the following word in his name: **"+word.getName().toUpperCase()+"**").build()).queue();
+									}
+								}
 								break check;
-							} catch (HierarchyException hye){
-								message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getFalseAlarmThumbnail()).setTitle("You know that you shouldn't do it :/");
-								e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** but had a higher role than myself. Hence, name won't be changed").queue();
+							} catch (HierarchyException hye) {
+								if(!word.getKick()) {
+									message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getFalseAlarmThumbnail()).setTitle("You know that you shouldn't do it :/");
+									e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** but had a higher role than myself. Hence, name won't be changed").queue();
+								}
+								else {
+									//ignore that anything happened
+								}
 								break check;
 							}
 						}

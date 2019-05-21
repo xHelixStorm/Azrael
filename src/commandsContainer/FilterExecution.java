@@ -35,6 +35,11 @@ public class FilterExecution {
 				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nload-pastebin**").build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "name-filter"));
 				break;
+			case "name-kick":
+				message.setTitle("You chose name-kick!");
+				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nload-pastebin**").build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "name-kick"));
+				break;
 			case "funny-names":
 				message.setTitle("You chose funny-names!");
 				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nload-pastebin**").build()).queue();
@@ -101,8 +106,9 @@ public class FilterExecution {
 				case "name-filter":
 					if(_message.equalsIgnoreCase("display")) {
 						StringBuilder out = new StringBuilder();
-						for(String word : Azrael.SQLgetNameFilter(_e.getGuild().getIdLong())) {
-							out.append(word+"\n");
+						for(var word : Azrael.SQLgetNameFilter(_e.getGuild().getIdLong())) {
+							if(!word.getKick())
+								out.append(word.getName()+"\n");
 						}
 						if(out.length() > 0) {
 							String paste_link = Pastebin.unlistedPaste("Name filter", out.toString(), _e.getGuild().getIdLong());
@@ -138,6 +144,50 @@ public class FilterExecution {
 						message.setTitle("You chose to add the words from a file into the name filter!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
 						cache.updateDescription("load-name-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					break;
+				case "name-kick":
+					if(_message.equalsIgnoreCase("display")) {
+						StringBuilder out = new StringBuilder();
+						for(var word : Azrael.SQLgetNameFilter(_e.getGuild().getIdLong())) {
+							if(word.getKick())
+								out.append(word.getName()+"\n");
+						}
+						if(out.length() > 0) {
+							String paste_link = Pastebin.unlistedPaste("Name-kick filter", out.toString(), _e.getGuild().getIdLong());
+							if(!paste_link.equals("Creating paste failed!")) {
+								message.setTitle("Name-kick filter!");
+								out.setLength(0);
+								_e.getTextChannel().sendMessage(message.setDescription("Every name that includes one of this words, will be automatically kicked from the server: "+paste_link).build()).queue();
+							}
+							else {
+								message.setColor(Color.RED).setTitle(paste_link);
+								_e.getTextChannel().sendMessage(message.setDescription("An error occurred with posting on pastebin. Please verify that the login credentials are set correctly!").build()).queue();
+							}
+						}
+						else {
+							message.setColor(Color.RED).setTitle("No results have been returned!");
+							_e.getTextChannel().sendMessage("Name-kick is empty! Nothing to display!").queue();
+						}
+						Hashes.clearTempCache(key);
+					}
+					else if(_message.equalsIgnoreCase("insert")) {
+						message.setTitle("You chose to insert a new word into name-kick!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please insert a word into the text field!").build()).queue();
+						cache.updateDescription("insert-name-kick").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("remove")) {
+						message.setTitle("You chose to remove a word from name-kick!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please insert a word into the text field!").build()).queue();
+						cache.updateDescription("remove-name-kick").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("load-file")) {
+						message.setTitle("You chose to add the words from a file into name-kick!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
+						cache.updateDescription("load-name-kick").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
 					break;
@@ -339,10 +389,10 @@ public class FilterExecution {
 					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
 				case "insert-name-filter":
-					if(Azrael.SQLInsertNameFilter(_message, _e.getGuild().getIdLong()) > 0) {
+					if(Azrael.SQLInsertNameFilter(_message, false, _e.getGuild().getIdLong()) > 0) {
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into name filter!").build()).queue();
-						Hashes.removeQuerryResult("bad-names_"+_e.getGuild().getId());
+						Hashes.removeNameFilter(_e.getGuild().getIdLong());
 						logger.debug("{} has inserted the word {} into the name filter", _e.getMember().getUser().getIdLong(), _message);
 					}
 					else {
@@ -353,10 +403,10 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 					break;
 				case "remove-name-filter":
-					if(Azrael.SQLDeleteNameFilter(_message, _e.getGuild().getIdLong()) > 0) {
+					if(Azrael.SQLDeleteNameFilter(_message, false, _e.getGuild().getIdLong()) > 0) {
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the name filter!").build()).queue();
-						Hashes.removeQuerryResult("bad-names_"+_e.getGuild().getId());
+						Hashes.removeNameFilter(_e.getGuild().getIdLong());
 						logger.debug("{} has removed the word {} from the name filter", _e.getMember().getUser().getIdLong(), _message);
 					}
 					else {
@@ -370,11 +420,11 @@ public class FilterExecution {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
 						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
-							var querryResult = Azrael.SQLReplaceNameFilter(words, _e.getGuild().getIdLong());
+							var querryResult = Azrael.SQLReplaceNameFilter(words, false, _e.getGuild().getIdLong());
 							if(querryResult == 0) {
 								message.setTitle("Success!");
 								_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-								Hashes.removeQuerryResult("bad-names_"+_e.getGuild().getId());
+								Hashes.removeNameFilter(_e.getGuild().getIdLong());
 								logger.debug("{} has inserted words out of pastebin into the name filter", _e.getMember().getUser().getIdLong());
 							}
 							else if(querryResult == 1) {
@@ -384,6 +434,75 @@ public class FilterExecution {
 								if(duplicates == null || duplicates.size() == 0) {
 									_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current name-filter with the names from inside the pastebin link!").build()).queue();
 									logger.warn("The name-filter couldn't be updated in guild {}", _e.getGuild().getId());
+								}
+								else {
+									StringBuilder out = new StringBuilder();
+									for(var word : duplicates) {
+										out.append("**"+word+"**\n");
+									}
+									_e.getTextChannel().sendMessage(message.setDescription("Words couldn't be loaded from the pastebin link because duplicates have been found. Please remove these duplicates and then try again!\n\n").build()).queue();
+								}
+							}
+							else {
+								//thow error for failing the rollback
+								message.setColor(Color.RED).setTitle("Execution failed");
+								_e.getTextChannel().sendMessage(message.setDescription("A critical error occurred. The filter table has been altered but couldn't be reverted on error. Current filter data could have been lost!").build()).queue();
+								logger.error("Update on name-filter table couldn't be rolled back on error. Affected guild {}", _e.getGuild().getId());
+							}
+						}
+						else {
+							message.setColor(Color.RED).setTitle("Invalid pastebin link!");
+							_e.getTextChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
+						}
+						Hashes.clearTempCache(key);
+					}
+					break;
+				case "insert-name-kick":
+					if(Azrael.SQLInsertNameFilter(_message, true, _e.getGuild().getIdLong()) > 0) {
+						message.setTitle("Success!");
+						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into name-kick!").build()).queue();
+						Hashes.removeNameFilter(_e.getGuild().getIdLong());
+						logger.debug("{} has inserted the word {} into name-kick", _e.getMember().getUser().getIdLong(), _message);
+					}
+					else {
+						message.setColor(Color.RED).setTitle("Name couldn't be inserted!");
+						_e.getTextChannel().sendMessage("Name couldn't be inserted into Azrael.name_filter. Either the name already exists or an internal error has occurred!").queue();
+						logger.error("Name couldn't be inserted into Azrael.name_filter for guild {}", _e.getGuild().getName());
+					}
+					Hashes.clearTempCache(key);
+					break;
+				case "remove-name-kick":
+					if(Azrael.SQLDeleteNameFilter(_message, true, _e.getGuild().getIdLong()) > 0) {
+						message.setTitle("Success!");
+						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from name-kick!").build()).queue();
+						Hashes.removeNameFilter(_e.getGuild().getIdLong());
+						logger.debug("{} has removed the word {} from name-kick", _e.getMember().getUser().getIdLong(), _message);
+					}
+					else {
+						message.setColor(Color.RED).setTitle("Name couldn't be removed!");
+						_e.getTextChannel().sendMessage(message.setDescription("Name couldn't be removed. Name doesn't exist or an internal error occurred!").build()).queue();
+						logger.error("Name couldn't be removed from Azrael.name_filter for guild {}", _e.getGuild().getName());
+					}
+					Hashes.clearTempCache(key);
+					break;
+				case "load-name-kick":
+					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
+						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
+						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
+							var querryResult = Azrael.SQLReplaceNameFilter(words, false, _e.getGuild().getIdLong());
+							if(querryResult == 0) {
+								message.setTitle("Success!");
+								_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
+								Hashes.removeNameFilter(_e.getGuild().getIdLong());
+								logger.debug("{} has inserted words out of pastebin into name-kick", _e.getMember().getUser().getIdLong());
+							}
+							else if(querryResult == 1) {
+								//throw error for failing the db replacement
+								message.setColor(Color.RED).setTitle("Execution failed");
+								var duplicates = checkDuplicates(words);
+								if(duplicates == null || duplicates.size() == 0) {
+									_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current name-kick with the names from inside the pastebin link!").build()).queue();
+									logger.warn("The name-kick couldn't be updated in guild {}", _e.getGuild().getId());
 								}
 								else {
 									StringBuilder out = new StringBuilder();

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import filter.NameFilter;
 import inventory.Dailies;
 import net.dv8tion.jda.core.entities.Member;
 import rankingSystem.Rank;
@@ -37,6 +38,7 @@ public class Hashes {
     };
     
     private static final ConcurrentMap<String, ArrayList<String>> querry_result = new ConcurrentHashMap<String, ArrayList<String>>();
+    private static final ConcurrentMap<Long, ArrayList<NameFilter>> name_filter = new ConcurrentHashMap<Long, ArrayList<NameFilter>>();
     private static final Map<Long, ArrayList<String>> filter_lang = new HashMap<Long, ArrayList<String>>();
     private static final Map<Long, Integer> message_removed = new HashMap<Long, Integer>();
     private static final ConcurrentHashMap<Long, Guilds> status = new ConcurrentHashMap<Long, Guilds>();
@@ -68,6 +70,9 @@ public class Hashes {
 	}
 	public static void addQuerryResult(String _key, ArrayList<String> _result) {
 		querry_result.put(_key, _result);
+	}
+	public static void addNameFilter(Long _key, ArrayList<NameFilter> _names) {
+		name_filter.putIfAbsent(_key, _names);
 	}
 	public static void addMessageRemoved(Long _key, Integer _count){
 		message_removed.put(_key, _count);
@@ -148,6 +153,9 @@ public class Hashes {
 	}
 	public static ArrayList<String> getQuerryResult(String _key) {
 		return querry_result.get(_key);
+	}
+	public static ArrayList<NameFilter> getNameFilter(Long _key) {
+		return name_filter.get(_key);
 	}
 	public static Integer getMessageRemoved(long _key){
 		return message_removed.get(_key);
@@ -230,6 +238,9 @@ public class Hashes {
 	}
 	public static void removeQuerryResult(String _key) {
 		querry_result.remove(_key);
+	}
+	public static void removeNameFilter(Long _key) {
+		name_filter.remove(_key);
 	}
 	public static void removeMessageRemoved(long _key){
 		message_removed.remove(_key);

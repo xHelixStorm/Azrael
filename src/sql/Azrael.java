@@ -20,6 +20,7 @@ import core.RSS;
 import core.User;
 import core.Warning;
 import fileManagement.IniFileReader;
+import filter.NameFilter;
 import net.dv8tion.jda.core.entities.Member;
 
 public class Azrael {
@@ -1256,7 +1257,7 @@ public class Azrael {
 			stmt.setLong(1, _guild_id);
 			stmt.executeUpdate();
 			
-			String sql2 = ("INSERT INTO staff_name_filter (name_id, name, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			String sql2 = ("INSERT INTO staff_name_filter (name_id, name, fk_guild_id) VALUES(NULL, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);
 			for(String word : _words){
 				stmt.setString(1, word.toLowerCase());
@@ -1388,22 +1389,22 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<String> SQLgetNameFilter(long _guild_id) {
+	public static ArrayList<NameFilter> SQLgetNameFilter(long _guild_id) {
 		logger.debug("SQLgetNameFilter launched. Passed params {}", _guild_id);
-		ArrayList<String> names = new ArrayList<String>();
-		if(Hashes.getQuerryResult("bad-names_"+_guild_id) == null) {
+		ArrayList<NameFilter> names = new ArrayList<NameFilter>();
+		if(Hashes.getNameFilter(_guild_id) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT word FROM name_filter");
+				String sql = ("SELECT word, kick FROM name_filter");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
 				while(rs.next()){
-					names.add(rs.getString(1));
+					names.add(new NameFilter(rs.getString(1), rs.getBoolean(2)));
 				}
-				Hashes.addQuerryResult("bad-names_"+_guild_id, names);
+				Hashes.addNameFilter(_guild_id, names);
 				return names;
 			} catch (SQLException e) {
 				logger.error("SQLgetNameFilter Exception", e);
@@ -1414,19 +1415,20 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getQuerryResult("bad-names_"+_guild_id);
+		return Hashes.getNameFilter(_guild_id);
 	}
 	
-	public static int SQLInsertNameFilter(String _word, long _guild_id) {
-		logger.debug("SQLInsertNameFilter launched. Passed params {}, {}", _word, _guild_id);
+	public static int SQLInsertNameFilter(String _word, boolean _kick, long _guild_id) {
+		logger.debug("SQLInsertNameFilter launched. Passed params {}, {}, {}", _word, _kick, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO name_filter (word_id, word, fk_guild_id) VALUES(NULL, ?, ?)");
+			String sql = ("INSERT INTO name_filter (word_id, word, kick, fk_guild_id) VALUES(NULL, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
-			stmt.setLong(2, _guild_id);
+			stmt.setBoolean(2, _kick);
+			stmt.setLong(3, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertNameFilter Exception", e);
@@ -1437,16 +1439,17 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLDeleteNameFilter(String _word, long _guild_id) {
-		logger.debug("SQLDeleteNameFilter launched. Passed params {}, {}", _word, _guild_id);
+	public static int SQLDeleteNameFilter(String _word, boolean _kick, long _guild_id) {
+		logger.debug("SQLDeleteNameFilter launched. Passed params {}, {}, {}", _word, _kick, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("DELETE FROM name_filter WHERE word LIKE ? && fk_guild_id = ?");
+			String sql = ("DELETE FROM name_filter WHERE word LIKE ? && fk_guild_id = ? && kick = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
+			stmt.setBoolean(3, _kick);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteNameFilter Exception", e);
@@ -1677,24 +1680,26 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceNameFilter(String [] _words, long _guild_id){
-		logger.debug("SQLReplaceNameFilter launched. Passed params array, {}", _guild_id);
+	public static int SQLReplaceNameFilter(String [] _words, boolean _kick, long _guild_id){
+		logger.debug("SQLReplaceNameFilter launched. Passed params array, {}, {}", _kick, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("DELETE FROM name_filter WHERE fk_guild_id = ?");
+			String sql = ("DELETE FROM name_filter WHERE fk_guild_id = ? && kick = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
+			stmt.setBoolean(2, _kick);
 			stmt.executeUpdate();
 			
-			String sql2 = ("INSERT INTO name_filter (word_id, word, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE word=VALUES(word)");
+			String sql2 = ("INSERT INTO name_filter (word_id, word, kick, fk_guild_id) VALUES(NULL, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);
 			
 			for(String word : _words) {
 				stmt.setString(1, word);
-				stmt.setLong(2, _guild_id);
+				stmt.setBoolean(2, _kick);
+				stmt.setLong(3, _guild_id);
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
@@ -1727,7 +1732,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			
-			String sql2 = ("INSERT INTO names (name_id, name, fk_guild_id) VALUES(NULL, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			String sql2 = ("INSERT INTO names (name_id, name, fk_guild_id) VALUES(NULL, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);;
 			
 			for(String word : _words) {
