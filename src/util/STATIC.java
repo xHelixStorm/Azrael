@@ -1,12 +1,13 @@
 package util;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import core.Channels;
 
 public class STATIC {
 	
-	private static final String VERSION = "5.9.261";
+	private static final String VERSION = "5.9.264";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	
 	public static String getVersion() {

@@ -26,6 +26,7 @@ import sql.RankingSystem;
 import sql.DiscordRoles;
 import sql.Azrael;
 import util.Pastebin;
+import util.STATIC;
 
 public class UserExecution {
 	private static final Logger logger = LoggerFactory.getLogger(UserExecution.class);
@@ -67,6 +68,7 @@ public class UserExecution {
 						+ "**delete-messages**: To remove up to 100 messages from the selected user\n"
 						+ "**warning**: To change the current warning value\n"
 						+ "**mute**: To assign the mute role\n"
+						+ "**unmute** To unmute the member and terminate running task\n"
 						+ "**ban**: To ban the user\n"
 						+ "**kick**: To kick the user\n"
 						+ "**gift-experience**: To gift experience points\n"
@@ -91,7 +93,7 @@ public class UserExecution {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
 			Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
-			if(_message.equalsIgnoreCase("information") || _message.equalsIgnoreCase("delete-messages") || _message.equalsIgnoreCase("warning") || _message.equalsIgnoreCase("mute") || _message.equalsIgnoreCase("ban") || _message.equalsIgnoreCase("kick") || _message.equalsIgnoreCase("gift-experience") || _message.equalsIgnoreCase("set-experience") || _message.equalsIgnoreCase("set-level") || _message.equalsIgnoreCase("gift-currency") || _message.equalsIgnoreCase("set-currency")) {
+			if(_message.equalsIgnoreCase("information") || _message.equalsIgnoreCase("delete-messages") || _message.equalsIgnoreCase("warning") || _message.equalsIgnoreCase("mute") || _message.equalsIgnoreCase("unmute") || _message.equalsIgnoreCase("ban") || _message.equalsIgnoreCase("kick") || _message.equalsIgnoreCase("gift-experience") || _message.equalsIgnoreCase("set-experience") || _message.equalsIgnoreCase("set-level") || _message.equalsIgnoreCase("gift-currency") || _message.equalsIgnoreCase("set-currency")) {
 				var user_id = Long.parseLong(cache.getAdditionalInfo());
 				switch(_message) {
 					case "information": 
@@ -166,6 +168,52 @@ public class UserExecution {
 						_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a self chosen mute timer? By providing a self chosen mute timer, the warning value won't increment unless the user has been never warned before!").build()).queue();
 						cache.updateDescription("mute"+user_id).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
+						break;
+					case "unmute":
+						if(!Azrael.SQLisBanned(user_id, _e.getGuild().getIdLong())) {
+							EmbedBuilder notice = new EmbedBuilder().setColor(Color.BLUE);
+							if(Azrael.SQLgetCustomMuted(user_id, _e.getGuild().getIdLong())) {
+								if(STATIC.killThread("mute_gu"+_e.getGuild().getId()+"us"+user_id)) {
+									notice.setTitle("Unmute action issued!");
+									_e.getTextChannel().sendMessage(notice.setDescription("Action issued to interrupt the mute! Please note that warnings don't get reverted while applying a custom mute time!").build()).queue();
+								}
+								else {
+									notice.setColor(Color.RED).setTitle("Member is not muted!");
+									_e.getTextChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
+								}
+							}
+							else if(Azrael.SQLgetMuted(user_id, _e.getGuild().getIdLong())) {
+								if(STATIC.killThread("mute_gu"+_e.getGuild().getId()+"us"+user_id)) {
+									notice.setTitle("Unmute action issued!");
+									_e.getTextChannel().sendMessage(notice.setDescription("Action issued to interrupt the mute! Undoing the previous warning!").build()).queue();
+									var warning = Azrael.SQLgetWarning(user_id, _e.getGuild().getIdLong());
+									if(warning == 1) {
+										Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
+									}
+									else if(warning > 1) {
+										Azrael.SQLUpdateUnmute(user_id, _e.getGuild().getIdLong(), new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false);
+									}
+									else {
+										notice.setColor(Color.RED).setTitle("Member is not muted!");
+										_e.getTextChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
+									}
+								}
+								else {
+									notice.setColor(Color.RED).setTitle("Member is not muted!");
+									_e.getTextChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
+								}
+							}
+							else {
+								notice.setColor(Color.RED).setTitle("Member is not muted!");
+								_e.getTextChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
+							}
+						}
+						else {
+							EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
+							_e.getTextChannel().sendMessage(error.setDescription("Action can't be executed! The user is currently banned").build()).queue();
+						}
+						logger.debug("{} has used the unmute action on {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo());
+						Hashes.clearTempCache(key);
 						break;
 					case "ban":
 						message.setTitle("You chose to ban!");

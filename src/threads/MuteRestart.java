@@ -6,12 +6,14 @@ import java.sql.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Channels;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import sql.Azrael;
+import util.STATIC;
 
 public class MuteRestart implements Runnable{
 	private EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setThumbnail(IniFileReader.getUnmuteThumbnail()).setTitle("User unmuted!");
@@ -19,17 +21,17 @@ public class MuteRestart implements Runnable{
 	private ReadyEvent e;
 	private Member member;
 	private long guild_id;
-	private long channel_id;
+	private Channels channel;
 	private Role mute_role;
 	private long unmute;
 	private long assignedRole;
 	private boolean ranking_state;
 	
-	public MuteRestart(ReadyEvent _e, Member _member, long _guild_id, long _channel_id, Role _mute_role, long _unmute, long _assignedRole, boolean _ranking_state){
+	public MuteRestart(ReadyEvent _e, Member _member, long _guild_id, Channels _channel, Role _mute_role, long _unmute, long _assignedRole, boolean _ranking_state){
 		this.e = _e;
 		this.member = _member;
 		this.guild_id = _guild_id;
-		this.channel_id = _channel_id;
+		this.channel = _channel;
 		this.mute_role = _mute_role;
 		this.unmute = _unmute;
 		this.assignedRole = _assignedRole;
@@ -38,18 +40,32 @@ public class MuteRestart implements Runnable{
 
 	@Override
 	public void run() {
+		STATIC.addThread(Thread.currentThread(), "mute_gu"+guild_id+"us"+member.getUser().getId());
 		try {
 			Thread.sleep(unmute);
-			if(channel_id != 0 && Azrael.SQLgetMuted(member.getUser().getIdLong(), guild_id) == true){
-				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-				e.getJDA().getGuildById(guild_id).getTextChannelById(channel_id).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator() + "** with the ID Number **" + member.getUser().getId() + "** has been unmuted").build()).queue();
+			if(!Azrael.SQLisBanned(member.getUser().getIdLong(), guild_id)) {
+				if(channel != null && Azrael.SQLgetMuted(member.getUser().getIdLong(), guild_id) == true) {
+					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+					e.getJDA().getGuildById(guild_id).getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator() + "** with the ID Number **" + member.getUser().getId() + "** has been unmuted").build()).queue();
+				}
+				e.getJDA().getGuildById(guild_id).getController().removeSingleRoleFromMember(member, mute_role).queue();
+				if(assignedRole != 0 && ranking_state == true){e.getJDA().getGuildById(guild_id).getController().addSingleRoleToMember(member, e.getJDA().getGuildById(guild_id).getRoleById(assignedRole)).queue();}
+			}			
+		} catch (InterruptedException e2) {
+			//launch when the sleep has been interrupted
+			if(!Azrael.SQLisBanned(member.getUser().getIdLong(), guild_id)) {
+				Logger logger = LoggerFactory.getLogger(MuteRestart.class);
+				logger.info("The mute of {} ing guild {} has been interrupted!", member.getUser().getId(), e.getJDA().getGuildById(guild_id).getName());
+				if(channel != null && Azrael.SQLgetMuted(member.getUser().getIdLong(), guild_id) == true) {
+					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+					e.getJDA().getGuildById(guild_id).getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator() + "** with the ID Number **" + member.getUser().getId() + "** has been unmuted and the timer has been interrupted!").build()).queue();
+				}
+				if(e.getJDA().getGuildById(guild_id).getMembers().parallelStream().filter(f -> f.getUser().getIdLong() == member.getUser().getIdLong()).findAny().orElse(null) != null) {
+					e.getJDA().getGuildById(guild_id).getController().removeSingleRoleFromMember(member, mute_role).queue();
+					if(assignedRole != 0 && ranking_state == true){e.getJDA().getGuildById(guild_id).getController().addSingleRoleToMember(member, e.getJDA().getGuildById(guild_id).getRoleById(assignedRole)).queue();}
+				}
 			}
-			e.getJDA().getGuildById(guild_id).getController().removeSingleRoleFromMember(member, mute_role).queue();
-			if(assignedRole != 0 && ranking_state == true){e.getJDA().getGuildById(guild_id).getController().addSingleRoleToMember(member, e.getJDA().getGuildById(guild_id).getRoleById(assignedRole)).queue();}
-			
-		} catch (InterruptedException e) {
-			Logger logger = LoggerFactory.getLogger(MuteRestart.class);
-			logger.error("The mute restart has been interrupted", e);
 		}
+		STATIC.removeThread(Thread.currentThread());
 	}
 }

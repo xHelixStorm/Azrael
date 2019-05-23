@@ -443,7 +443,7 @@ public class Azrael {
 		}
 	}
 	
-	public static boolean SQLgetMuted(long _user_id, long _guild_id){
+	public static boolean SQLgetMuted(long _user_id, long _guild_id) {
 		logger.debug("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -462,6 +462,87 @@ public class Azrael {
 		} catch (SQLException e) {
 			logger.error("SQLgetMuted Exception", e);
 			return false;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLgetCustomMuted(long _user_id, long _guild_id) {
+		logger.debug("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT custom_time FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return rs.getBoolean(1);
+			}
+			return false;
+		} catch (SQLException e) {
+			logger.error("SQLgetMuted Exception", e);
+			return false;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLisBanned(long _user_id, long _guild_id){
+		logger.debug("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT fk_ban_id FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				if(rs.getInt(1) == 1)
+					return false;
+				else
+					return true;
+			}
+			return false;
+		} catch (SQLException e) {
+			logger.error("SQLgetMuted Exception", e);
+			return false;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLgetWarning(long _user_id, long _guild_id){
+		logger.debug("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT fk_warning_id FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return rs.getInt(1);
+			}
+			return 0;
+		} catch (SQLException e) {
+			logger.error("SQLgetMuted Exception", e);
+			return 0;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

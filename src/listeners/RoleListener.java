@@ -93,7 +93,7 @@ public class RoleListener extends ListenerAdapter{
 						pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+hour_add+and_add+minute_add+"** . Except for the first mute, your warning counter won't increase.\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
 								+ "On a important note, this is an automated reply. You'll receive no reply in any way.").queue();
 						pc.close();
-						new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, log_channel.getChannel_ID(), mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0)).start();
+						new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, log_channel, mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0)).start();
 						logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getName());
 					}
 					else {
@@ -118,7 +118,7 @@ public class RoleListener extends ListenerAdapter{
 							pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+hour_add+and_add+minute_add+"** for being your "+warn.getDescription()+". Warning **"+(warning_id+1)+"**/**"+max_warning+"**\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
 									+ "On a important note, this is an automated reply. You'll receive no reply in any way.").queue();
 							pc.close();
-							new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, log_channel.getChannel_ID(), mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning)).start();
+							new Thread(new RoleTimer(e, guild_id, name_id, user_name, mute_time, log_channel, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning)).start();
 							logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getName());
 						}
 						else if((warning_id+1) > max_warning) {

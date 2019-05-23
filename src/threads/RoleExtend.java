@@ -52,7 +52,7 @@ public class RoleExtend implements Runnable{
 			}
 			users.add(member);
 			banHammerFound = true;
-			new Thread(new MuteRestart(e, member, guild_id, log_channel.getChannel_ID(), mute_role, unmute, assignedRole, rankingState)).start();
+			new Thread(new MuteRestart(e, member, guild_id, log_channel, mute_role, unmute, assignedRole, rankingState)).start();
 			i++;
 		}
 		if(banHammerFound == true && log_channel != null){
