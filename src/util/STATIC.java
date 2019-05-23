@@ -7,9 +7,29 @@ import core.Channels;
 public class STATIC {
 	
 	private static final String VERSION = "5.9.261";
+	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	
 	public static String getVersion() {
 		return VERSION;
+	}
+	
+	public static void addThread(Thread thread, final String name) {
+		thread.setName(name);
+		threads.add(thread);
+	}
+	public static boolean killThread(final String name) {
+		var thread = threads.parallelStream().filter(f -> f.getName().equals(name)).findAny().orElse(null);
+		if(thread != null) {
+			thread.interrupt();
+			threads.remove(thread);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	public static void removeThread(final Thread thread) {
+		threads.remove(thread);
 	}
 	
 	public static String getChannels(List<Channels> channels) {
