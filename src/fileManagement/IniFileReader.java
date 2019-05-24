@@ -7,6 +7,8 @@ import org.ini4j.Ini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import enums.Weekday;
+
 public class IniFileReader {
 	
 	private static Ini ini;
@@ -47,6 +49,21 @@ public class IniFileReader {
 	public static String getTempDirectory(){
 		readConfig();
 		return ini.get("Bot", "TempDirectory");
+	}
+	
+	public static boolean getDoubleExpEnabled() {
+		readConfig();
+		return ini.get("DoubleExperience", "Enabled", boolean.class);
+	}
+	
+	public static Weekday getDoubleExpStart() {
+		readConfig();
+		return ini.get("DoubleExperience", "Start", Weekday.class);
+	}
+	
+	public static Weekday getDoubleExpEnd() {
+		readConfig();
+		return ini.get("DoubleExperience", "End", Weekday.class);
 	}
 	public static boolean getAllowPatchNotes(){
 		readConfig();

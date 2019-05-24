@@ -1,9 +1,6 @@
 package rankingSystem;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,7 +9,10 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fileManagement.FileSetting;
+import core.Cache;
+import core.Hashes;
+import enums.Weekday;
+import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import sql.Azrael;
@@ -28,16 +28,15 @@ public class DoubleExperienceStart extends TimerTask{
 	
 	@Override
 	public void run() {
-		Path path = Paths.get("./files/double.azr");
 		long guild_id;
 		
-		if(!Files.exists(path)){
+		if(Hashes.getTempCache("doubleExp") == null || Hashes.getTempCache("doubleExp").getAdditionalInfo().equals("off")) {
 			File doubleEvent = new File("./files/RankingSystem/doubleweekend.jpg");
-			FileSetting.createFile("files/double.azr", "This file is for the purpose of enabling the double exp event.");
-			for(Guild g : e.getJDA().getGuilds()){
+			Hashes.addTempCache("doubleExp", new Cache(0, "on"));
+			for(Guild g : e.getJDA().getGuilds()) {
 				guild_id = g.getIdLong();
 				
-				if(RankingSystem.SQLgetGuild(guild_id).getRankingState()){
+				if(RankingSystem.SQLgetGuild(guild_id).getRankingState()) {
 					var bot_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).findAny().orElse(null);
 					if(bot_channel != null) {
 						e.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg", null).complete();
@@ -47,16 +46,14 @@ public class DoubleExperienceStart extends TimerTask{
 			}
 		}
 		Logger logger = LoggerFactory.getLogger(DoubleExperienceStart.class);
-		logger.debug("Double experience weekend is running");
+		logger.debug("Double experience is running");
 	}
 	
 	public static void runTask(ReadyEvent _e){
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+		calendar.set(Calendar.DAY_OF_WEEK, Weekday.getDay(IniFileReader.getDoubleExpStart()));
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
-		calendar.set(Calendar.MINUTE, 1);
-		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 0);
+		calendar.set(Calendar.MINUTE, 0);
 		
 		Timer time = new Timer();
 		time.schedule(new DoubleExperienceStart(_e), calendar.getTime(), TimeUnit.DAYS.toMillis(7));

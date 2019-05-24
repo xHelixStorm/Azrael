@@ -2,15 +2,19 @@ package listeners;
 
 import java.awt.Color;
 import java.io.File;
+import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Cache;
 import core.Channels;
 import core.Guilds;
+import core.Hashes;
 import core.Patchnote;
+import enums.Weekday;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
@@ -160,8 +164,14 @@ public class ReadyListener extends ListenerAdapter {
 			}
 		}
 		
-		DoubleExperienceStart.runTask(e);
-		DoubleExperienceOff.runTask();
+		if(IniFileReader.getDoubleExpEnabled()) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.set(Calendar.DAY_OF_WEEK, Weekday.getDay(IniFileReader.getDoubleExpStart()));
+			if(calendar.getTime().getTime() < System.currentTimeMillis())
+				Hashes.addTempCache("doubleExp", new Cache(0, "on"));
+			DoubleExperienceStart.runTask(e);
+			DoubleExperienceOff.runTask();
+		}
 		ClearHashes.runTask();
 		
 		var timeout = IniFileReader.getMessageTimeout();

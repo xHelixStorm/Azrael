@@ -1,9 +1,6 @@
 package rankingSystem;
 
 import java.awt.Color;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,7 +24,6 @@ public class RankingThreadExecution {
 	public static void setProgress(MessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, int percent_multiplier, Rank user_details, Guilds guild_settings){
 		RankingSystem.SQLDeleteInventory();
 		int multiplier = 1;
-		Path path = Paths.get("./files/double.azr");
 		
 		long experience = user_details.getExperience();
 		int currentExperience = user_details.getCurrentExperience();
@@ -52,7 +48,7 @@ public class RankingThreadExecution {
 		else if(messageLength >= 41 && messageLength <= 50){adder = ThreadLocalRandom.current().nextInt(41, 51);}
 		else if(messageLength > 50){adder = ThreadLocalRandom.current().nextInt(51, 71);}
 		
-		if(Files.exists(path)){
+		if(Hashes.getTempCache("doubleExp").getAdditionalInfo().equals("on")) {
 			multiplier*=2;
 			adder*=2;
 		}
