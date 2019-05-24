@@ -52,6 +52,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setTitle("User muted!");
 		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN).setThumbnail(IniFileReader.getUnmuteThumbnail()).setTitle("User unmuted!");
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		long user_id = Long.parseLong(name_id);
 		
 		try {
 			if(UserPrivs.isUserMuted(e.getMember().getUser(), e.getGuild().getIdLong()) == true) {
@@ -64,8 +65,8 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 					}
 				}
 				Thread.sleep(timer);
-				if(Azrael.SQLisBanned(Long.parseLong(name_id), guild_id)) {
-					if(channel != null && Azrael.SQLgetMuted(Long.parseLong(name_id), guild_id) == true) {
+				if(!Azrael.SQLisBanned(user_id, guild_id)) {
+					if(channel != null && Azrael.SQLgetMuted(user_id, guild_id) == true) {
 						timestamp = new Timestamp(System.currentTimeMillis());
 						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted").build()).queue();
 					}
@@ -78,9 +79,10 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 		} catch (InterruptedException e1) {
 			Logger logger = LoggerFactory.getLogger(RoleTimer.class);
 			logger.info("The mute of {} ing guild {} has been interrupted!", e.getMember().getUser().getId(), e.getGuild().getName());
-			if(Azrael.SQLisBanned(Long.parseLong(name_id), guild_id)) {
-				if(channel != null && Azrael.SQLgetMuted(Long.parseLong(name_id), guild_id) == true) {
+			if(!Azrael.SQLisBanned(user_id, guild_id)) {
+				if(channel != null && (Azrael.SQLgetMuted(user_id, guild_id) == true || Azrael.SQLgetData(user_id, guild_id).getUserID() == 0)) {
 					timestamp = new Timestamp(System.currentTimeMillis());
+					Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp);
 					e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator() + "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted and the timer has been interrupted!").build()).queue();
 				}
 				if(e.getJDA().getGuildById(guild_id).getMembers().parallelStream().filter(f -> f.getUser().getIdLong() == e.getMember().getUser().getIdLong()).findAny().orElse(null) != null) {

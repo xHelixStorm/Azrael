@@ -68,7 +68,7 @@ public class UserExecution {
 						+ "**delete-messages**: To remove up to 100 messages from the selected user\n"
 						+ "**warning**: To change the current warning value\n"
 						+ "**mute**: To assign the mute role\n"
-						+ "**unmute** To unmute the member and terminate running task\n"
+						+ "**unmute** To unmute the member and to terminate the running task\n"
 						+ "**ban**: To ban the user\n"
 						+ "**kick**: To kick the user\n"
 						+ "**gift-experience**: To gift experience points\n"
@@ -191,7 +191,8 @@ public class UserExecution {
 										Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
 									}
 									else if(warning > 1) {
-										Azrael.SQLUpdateUnmute(user_id, _e.getGuild().getIdLong(), new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false);
+										Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+										Azrael.SQLInsertData(user_id, _e.getGuild().getIdLong(), warning-1, 1, timestamp, timestamp, false, false);
 									}
 									else {
 										notice.setColor(Color.RED).setTitle("Member is not muted!");
@@ -428,13 +429,13 @@ public class UserExecution {
 					
 					_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getRoleById(DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut"))).queue();
 					if(Azrael.SQLgetData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong()).getWarningID() != 0) {
-						if(Azrael.SQLUpdateUnmute(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), timestamp, unmute_timestamp, false, true) == 0) {
+						if(Azrael.SQLUpdateUnmute(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), timestamp, unmute_timestamp, true, true) == 0) {
 							logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", cache.getAdditionalInfo().replaceAll("[^0-9]*", ""), _e.getGuild().getName());
 							_e.getTextChannel().sendMessage("An internal error occurred. The unmute time couldn't be updated on Azrael.bancollect").queue();
 						}
 					}
 					else {
-						if(Azrael.SQLInsertData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), 1, 1, timestamp, unmute_timestamp, false, true) == 0) {
+						if(Azrael.SQLInsertData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), 1, 1, timestamp, unmute_timestamp, true, true) == 0) {
 							logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 							_e.getTextChannel().sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
 						}

@@ -596,8 +596,29 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateMuted(long _user_id, long _guild_id, boolean _muted, boolean _custom_time){
-		logger.debug("SQLUpdateMuted launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _muted, _custom_time);
+	public static int SQLUpdateMuted(long _user_id, long _guild_id, boolean _muted){
+		logger.debug("SQLUpdateMuted launched. Passed params {}, {}, {}", _user_id, _guild_id, _muted);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE bancollect SET muted = ? WHERE fk_user_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setBoolean(1, _muted);
+			stmt.setLong(2, _user_id);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateMuted Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateMutedAndCustomMuted(long _user_id, long _guild_id, boolean _muted, boolean _custom_time){
+		logger.debug("SQLUpdateMutedAndCustomMuted launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _muted, _custom_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -610,7 +631,7 @@ public class Azrael {
 			stmt.setLong(4, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLUpdateMuted Exception", e);
+			logger.error("SQLUpdateMutedAndCustomMuted Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -825,6 +846,27 @@ public class Azrael {
 			stmt.setBoolean(4, _custom_time);
 			stmt.setLong(5, _user_id);
 			stmt.setLong(6, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateUnmute Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateUnmute(Long _user_id, Long _guild_id, Timestamp _unmute) {
+		logger.debug("SQLUpdateUnmute launched. Passed params {}, {}, {}", _user_id, _guild_id, _unmute);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE bancollect SET unmute = ? WHERE fk_user_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setTimestamp(1, _unmute);
+			stmt.setLong(2, _user_id);
+			stmt.setLong(3, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateUnmute Exception", e);

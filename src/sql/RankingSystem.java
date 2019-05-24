@@ -403,6 +403,32 @@ public class RankingSystem {
 		}
 	}
 	
+	public static long SQLgetAssignedRole(long _user_id, long _guild_id) {
+		logger.debug("SQLgetAssignedRole launched. Passed params {}, {}", _user_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT `current_role` FROM `user_details` WHERE fk_user_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return rs.getLong(1);
+			}
+			return 0;
+		} catch(SQLException e) {
+			logger.error("SQLgetAssignedRole Exception", e);
+			return 0;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLUpdateExperience(long _user_id, long _guild_id, long _experience){
 		logger.debug("SQLUpdateExperience launched. Passed params {}, {}, {}", _user_id, _guild_id, _experience);
 		Connection myConn = null;

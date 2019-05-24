@@ -22,7 +22,7 @@ import sql.Azrael;
 public class GuildListener extends ListenerAdapter {
 	
 	@Override
-	public void onGuildMemberJoin(GuildMemberJoinEvent e){
+	public void onGuildMemberJoin(GuildMemberJoinEvent e) {
 		Logger logger = LoggerFactory.getLogger(GuildListener.class);
 		logger.debug("{} has joined the guild {}", e.getUser().getId(), e.getGuild().getName());
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
@@ -43,7 +43,7 @@ public class GuildListener extends ListenerAdapter {
 			logger.error("User {} couldn't be inserted into the table Azrael.users for guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 		}
 		Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
-		if(guild_settings.getRankingState() == true){
+		if(guild_settings.getRankingState() == true) {
 			if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
 				if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, 50000, 0) == 0) {
 					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **RankingSystem.user_details** table").build()).queue();
@@ -60,31 +60,30 @@ public class GuildListener extends ListenerAdapter {
 		
 		Bancollect warnedUser = Azrael.SQLgetData(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		muted = warnedUser.getMuted();
-		boolean custom_time = warnedUser.getCustomTime();
-		if(GuildIni.getJoinMessage(guild_id)){
-			if(log_channel != null && muted == false){e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(":warning: The user **" + user_name + "** with the ID Number **" + user_id + "** joined **" + e.getGuild().getName() + "**").build()).queue();}
+		if(GuildIni.getJoinMessage(guild_id)) {
+			if(log_channel != null && muted == false) {e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(":warning: The user **" + user_name + "** with the ID Number **" + user_id + "** joined **" + e.getGuild().getName() + "**").build()).queue();}
 		}
 		
 		try{
 			unmute = warnedUser.getUnmute().getTime();
-		} catch(NullPointerException npe){			
+		} catch(NullPointerException npe) {			
 			unmute = 0;
 		}
 		
-		if((unmute - currentTime) > 0 && (muted == true || custom_time == true)){
+		if((unmute - currentTime) > 0 && muted) {
 			e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
 		}
 		else{
-			if(guild_settings.getRankingState()){
+			if(guild_settings.getRankingState()) {
 				Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
-				if(user_details.getCurrentRole() != 0){e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(user_details.getCurrentRole())).queue();}
+				if(user_details.getCurrentRole() != 0) {e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(user_details.getCurrentRole())).queue();}
 			}
 		}
 		
 		String nickname = null;
 		String lc_user_name = user_name.toLowerCase();
-		check: for(String name : Azrael.SQLgetStaffNames(guild_id)){
-			if(lc_user_name.matches(name+"#[0-9]{4}")){
+		check: for(String name : Azrael.SQLgetStaffNames(guild_id)) {
+			if(lc_user_name.matches(name+"#[0-9]{4}")) {
 				nick_assign.setColor(Color.RED).setTitle("Impersonation attempt found!").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
 				nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
 				e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
@@ -94,9 +93,9 @@ public class GuildListener extends ListenerAdapter {
 				break check;
 			}
 		}
-		if(badName == false){
+		if(badName == false) {
 			Azrael.SQLgetNameFilter(e.getGuild().getIdLong());
-			check: for(var word : Hashes.getNameFilter(guild_id)){
+			check: for(var word : Hashes.getNameFilter(guild_id)) {
 				if(lc_user_name.contains(word.getName())) {
 					if(!word.getKick()) {
 						nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
@@ -115,11 +114,11 @@ public class GuildListener extends ListenerAdapter {
 				}
 			}
 		}
-		if(badName == false){
+		if(badName == false) {
 			Azrael.SQLDeleteNickname(user_id, guild_id);
 		}
 		else {
-			if(Azrael.SQLgetNickname(user_id, guild_id).length() > 0 && nickname != null){
+			if(Azrael.SQLgetNickname(user_id, guild_id).length() > 0 && nickname != null) {
 				if(Azrael.SQLUpdateNickname(user_id, guild_id, nickname) == 0) {
 					logger.error("User nickname of {} couldn't be updated in Azrael.nickname", user_id);
 				}

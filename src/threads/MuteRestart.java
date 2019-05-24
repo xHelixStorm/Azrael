@@ -56,8 +56,9 @@ public class MuteRestart implements Runnable{
 			if(!Azrael.SQLisBanned(member.getUser().getIdLong(), guild_id)) {
 				Logger logger = LoggerFactory.getLogger(MuteRestart.class);
 				logger.info("The mute of {} ing guild {} has been interrupted!", member.getUser().getId(), e.getJDA().getGuildById(guild_id).getName());
-				if(channel != null && Azrael.SQLgetMuted(member.getUser().getIdLong(), guild_id) == true) {
+				if(channel != null && (Azrael.SQLgetMuted(member.getUser().getIdLong(), guild_id) == true || Azrael.SQLgetData(member.getUser().getIdLong(), guild_id).getUserID() == 0)) {
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+					Azrael.SQLUpdateUnmute(member.getUser().getIdLong(), guild_id, timestamp);
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator() + "** with the ID Number **" + member.getUser().getId() + "** has been unmuted and the timer has been interrupted!").build()).queue();
 				}
 				if(e.getJDA().getGuildById(guild_id).getMembers().parallelStream().filter(f -> f.getUser().getIdLong() == member.getUser().getIdLong()).findAny().orElse(null) != null) {

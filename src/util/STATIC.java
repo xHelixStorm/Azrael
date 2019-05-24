@@ -7,7 +7,7 @@ import core.Channels;
 
 public class STATIC {
 	
-	private static final String VERSION = "5.9.264";
+	private static final String VERSION = "5.9.265";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	
 	public static String getVersion() {
