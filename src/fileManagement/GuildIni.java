@@ -21,6 +21,7 @@ public class GuildIni {
 			ini.add("General", "LeaveMessage", "false");
 			ini.add("General", "ChannelLog", "false");
 			ini.add("General", "CacheLog", "false");
+			ini.add("General", "DoubleExperience", "auto");
 			
 			//Pastebin
 			ini.add("Pastebin", "Key", "");
@@ -40,29 +41,30 @@ public class GuildIni {
 			ini.add("Reactions", "Emoji9", "");
 			
 			//Commands
-			ini.add("Commands", "About", "true");
-			ini.add("Commands", "Commands", "true");
-			ini.add("Commands", "Daily", "true");
-			ini.add("Commands", "Display", "true");
-			ini.add("Commands", "Help", "true");
-			ini.add("Commands", "Inventory", "true");
-			ini.add("Commands", "Meow", "true");
-			ini.add("Commands", "Profile", "true");
-			ini.add("Commands", "Pug", "true");
-			ini.add("Commands", "Purchase", "true");
-			ini.add("Commands", "Rank", "true");
-			ini.add("Commands", "Register", "true");
-			ini.add("Commands", "Set", "true");
-			ini.add("Commands", "Shop", "true");
-			ini.add("Commands", "Top", "true");
-			ini.add("Commands", "Use", "true");
-			ini.add("Commands", "User", "true");
-			ini.add("Commands", "Filter", "true");
-			ini.add("Commands", "Quiz", "true");
-			ini.add("Commands", "RoleReaction", "true");
-			ini.add("Commands", "Rss", "true");
-			ini.add("Commands", "Randomshop", "true");
-			ini.add("Commands", "Patchnotes", "true");
+			ini.add("Commands", "About", "false");
+			ini.add("Commands", "Commands", "false");
+			ini.add("Commands", "Daily", "false");
+			ini.add("Commands", "Display", "false");
+			ini.add("Commands", "Help", "false");
+			ini.add("Commands", "Inventory", "false");
+			ini.add("Commands", "Meow", "false");
+			ini.add("Commands", "Profile", "false");
+			ini.add("Commands", "Pug", "false");
+			ini.add("Commands", "Purchase", "false");
+			ini.add("Commands", "Rank", "false");
+			ini.add("Commands", "Register", "false");
+			ini.add("Commands", "Set", "false");
+			ini.add("Commands", "Shop", "false");
+			ini.add("Commands", "Top", "false");
+			ini.add("Commands", "Use", "false");
+			ini.add("Commands", "User", "false");
+			ini.add("Commands", "Filter", "false");
+			ini.add("Commands", "Quiz", "false");
+			ini.add("Commands", "RoleReaction", "false");
+			ini.add("Commands", "Rss", "false");
+			ini.add("Commands", "Randomshop", "false");
+			ini.add("Commands", "Patchnotes", "false");
+			ini.add("Commands", "DoubleExperience", "false");
 			
 			//Inventory
 			ini.add("Inventory", "startX", "0");
@@ -130,7 +132,7 @@ public class GuildIni {
 			
 			ini.store(new File("./ini/"+guild_id+".ini"));
 		} catch (IOException e) {
-			logger.error("Error while creating guild ini file {}.ini", guild_id);
+			logger.error("Error while creating guild ini file {}.ini", guild_id, e);
 		}
 	}
 	
@@ -138,7 +140,7 @@ public class GuildIni {
 		try {
 			return new Ini(new File("./ini/"+guild_id+".ini"));
 		} catch (IOException e) {
-			logger.error("Error while reading guild ini file {}.ini", guild_id);
+			logger.error("Error while reading guild ini file {}.ini", guild_id, e);
 			return null;
 		}
 	}
@@ -153,24 +155,39 @@ public class GuildIni {
 		return ini.get("General", "CommandPrefix");
 	}
 	
-	public static boolean getJoinMessage(long guild_id){
+	public static boolean getJoinMessage(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "JoinMessage", boolean.class);
 	}
 	
-	public static boolean getLeaveMessage(long guild_id){
+	public static boolean getLeaveMessage(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "LeaveMessage", boolean.class);
 	}
 	
-	public static boolean getChannelLog(long guild_id){
+	public static boolean getChannelLog(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "ChannelLog", boolean.class);
 	}
 	
-	public static boolean getCacheLog(long guild_id){
+	public static boolean getCacheLog(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "CacheLog", boolean.class);
+	}
+	
+	public static void setDoubleExperienceMode(long guild_id, final String mode) {
+		try {
+			Ini ini = readIni(guild_id);
+			ini.put("General", "DoubleExperience", mode);
+			ini.store(new File("./ini/"+guild_id+".ini"));
+		} catch (IOException e) {
+			logger.error("Error while overwriting guild ini file {}.ini", guild_id, e);
+		}
+	}
+	
+	public static String getDoubleExperienceMode(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "DoubleExperience");
 	}
 	
 	public static String[] getWholePastebin(long guild_id) {
@@ -204,87 +221,87 @@ public class GuildIni {
 		return reaction;
 	}
 	
-	public static boolean getAboutCommand(long guild_id){
+	public static boolean getAboutCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "About", boolean.class);
 	}
-	public static boolean getCommandsCommand(long guild_id){
+	public static boolean getCommandsCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Commands", boolean.class);
 	}
-	public static boolean getDailyCommand(long guild_id){
+	public static boolean getDailyCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Daily", boolean.class);
 	}
-	public static boolean getDisplayCommand(long guild_id){
+	public static boolean getDisplayCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Display", boolean.class);
 	}
-	public static boolean getHelpCommand(long guild_id){
+	public static boolean getHelpCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Help", boolean.class);
 	}
-	public static boolean getInventoryCommand(long guild_id){
+	public static boolean getInventoryCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Inventory", boolean.class);
 	}
-	public static boolean getMeowCommand(long guild_id){
+	public static boolean getMeowCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Meow", boolean.class);
 	}
-	public static boolean getProfileCommand(long guild_id){
+	public static boolean getProfileCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Profile", boolean.class);
 	}
-	public static boolean getPugCommand(long guild_id){
+	public static boolean getPugCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Pug", boolean.class);
 	}
-	public static boolean getPurchaseCommand(long guild_id){
+	public static boolean getPurchaseCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Purchase", boolean.class);
 	}
-	public static boolean getRankCommand(long guild_id){
+	public static boolean getRankCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Rank", boolean.class);
 	}
-	public static boolean getRebootCommand(long guild_id){
+	public static boolean getRebootCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Reboot", boolean.class);
 	}
-	public static boolean getRegisterCommand(long guild_id){
+	public static boolean getRegisterCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Register", boolean.class);
 	}
-	public static boolean getSetCommand(long guild_id){
+	public static boolean getSetCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Set", boolean.class);
 	}
-	public static boolean getShopCommand(long guild_id){
+	public static boolean getShopCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Shop", boolean.class);
 	}
-	public static boolean getShutDownCommand(long guild_id){
+	public static boolean getShutDownCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "ShutDown", boolean.class);
 	}
-	public static boolean getTopCommand(long guild_id){
+	public static boolean getTopCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Top", boolean.class);
 	}
-	public static boolean getUseCommand(long guild_id){
+	public static boolean getUseCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Use", boolean.class);
 	}
-	public static boolean getUserCommand(long guild_id){
+	public static boolean getUserCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "User", boolean.class);
 	}
-	public static boolean getFilterCommand(long guild_id){
+	public static boolean getFilterCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Filter", boolean.class);
 	}
-	public static boolean getQuizCommand(long guild_id){
+	public static boolean getQuizCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Quiz", boolean.class);
 	}
@@ -303,6 +320,10 @@ public class GuildIni {
 	public static boolean getPatchnotesCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Patchnotes", boolean.class);
+	}
+	public static boolean getDoubleExperienceCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DoubleExperience", boolean.class);
 	}
 	
 	public static int[] getWholeInventory(long guild_id) {

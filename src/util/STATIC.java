@@ -1,20 +1,25 @@
 package util;
 
 import java.util.List;
+import java.util.Timer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import core.Channels;
 
 public class STATIC {
 	
-	private static final String VERSION = "5.9.266";
+	private static final String VERSION = "5.10.267";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
+	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	
 	public static String getVersion() {
 		return VERSION;
 	}
 	
 	public static void addThread(Thread thread, final String name) {
+		if(threads.parallelStream().filter(f -> f.getName().equals(name)).findAny().orElse(null) != null)
+			return;
+		
 		thread.setName(name);
 		threads.add(thread);
 	}
@@ -31,6 +36,20 @@ public class STATIC {
 	}
 	public static void removeThread(final Thread thread) {
 		threads.remove(thread);
+	}
+	
+	public static void addTimer(Timer timer) {
+		if(timers.parallelStream().filter(f -> f.equals(timer)).findAny().orElse(null) != null)
+			return;
+		
+		timers.add(timer);
+	}
+	
+	public static void killAllTimers() {
+		for(Timer timer : timers) {
+			timer.cancel();
+		}
+		timers.clear();
 	}
 	
 	public static String getChannels(List<Channels> channels) {

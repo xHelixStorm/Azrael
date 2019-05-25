@@ -34,7 +34,7 @@ public class ClearHashes extends TimerTask{
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 		
-		Timer time = new Timer();
+		Timer time = new Timer("ClearHashes");
 		time.schedule(new ClearHashes(), calendar.getTime(), TimeUnit.HOURS.toMillis(4));
 	}
 }

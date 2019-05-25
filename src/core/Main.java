@@ -15,6 +15,7 @@ import commands.About;
 import commands.Commands;
 import commands.Daily;
 import commands.Display;
+import commands.DoubleExperience;
 import commands.Filter;
 import commands.Help;
 import commands.Inventory;
@@ -50,6 +51,8 @@ import listeners.MessageRemovedListener;
 import listeners.NameListener;
 import listeners.NicknameListener;
 import listeners.ReadyListener;
+import listeners.ReconnectedListener;
+import listeners.ResumedListener;
 import listeners.RoleListener;
 import listeners.RoleRemovedListener;
 import listeners.ShutdownListener;
@@ -129,6 +132,7 @@ public class Main {
 		CommandHandler.commands.put("rss", new Rss());
 		CommandHandler.commands.put("randomshop", new Randomshop());
 		CommandHandler.commands.put("patchnotes", new Patchnotes());
+		CommandHandler.commands.put("doubleexperience", new DoubleExperience());
 	}
 	
 	public static void addListeners(){
@@ -151,5 +155,7 @@ public class Main {
 		builder.addEventListener(new GuildMessageReactionAddListener());
 		builder.addEventListener(new GuildMessageReactionRemoveListener());
 		builder.addEventListener(new StatusListener());
+		builder.addEventListener(new ReconnectedListener());
+		builder.addEventListener(new ResumedListener());
 	}
 }

@@ -88,8 +88,8 @@ public class RoleListener extends ListenerAdapter{
 					}
 					
 					if(warnedUser.getCustomTime()) {
-						mute_time = Long.parseLong(Hashes.getTempCache("mute_time_"+e.getMember().getUser().getId()).getAdditionalInfo());
-						Hashes.clearTempCache("mute_time_"+e.getMember().getUser().getId());
+						mute_time = Long.parseLong(Hashes.getTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()).getAdditionalInfo());
+						Hashes.clearTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 						long hours = (mute_time/1000/60/60);
 						long minutes = (mute_time/1000/60%60);
 						String hour_add = hours != 0 ? hours+" hours" : "";

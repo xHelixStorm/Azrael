@@ -73,7 +73,7 @@ public class ReadyListener extends ListenerAdapter {
 			themesRetrieved = false;
 			logger.error("Themes couldn't be retried from RankingSystem.themes");
 		}
-		for(Guild g : e.getJDA().getGuilds()){
+		for(Guild g : e.getJDA().getGuilds()) {
 			long guild_id = g.getIdLong();
 			if(!new File("./ini/"+guild_id+".ini").exists()) {
 				GuildIni.createIni(guild_id);
@@ -150,6 +150,11 @@ public class ReadyListener extends ListenerAdapter {
 			if(published) {
 				Patchnotes.SQLInsertPublishedPatchnotes(guild_id);
 			}
+			
+			//check if the double exp should be enabled or disabled for the current guild
+			var doubleExp = GuildIni.getDoubleExperienceMode(guild_id);
+			if(!doubleExp.equals("auto"))
+				Hashes.addTempCache("doubleExp_gu"+guild_id, new Cache(0, doubleExp));
 		}
 		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		
@@ -168,8 +173,8 @@ public class ReadyListener extends ListenerAdapter {
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(Calendar.DAY_OF_WEEK, Weekday.getDay(IniFileReader.getDoubleExpStart()));
 			if(calendar.getTime().getTime() < System.currentTimeMillis())
-				Hashes.addTempCache("doubleExp", new Cache(0, "on"));
-			DoubleExperienceStart.runTask(e);
+				Hashes.addTempCache("doubleExp", new Cache("on"));
+			DoubleExperienceStart.runTask(e, null, null, null);
 			DoubleExperienceOff.runTask();
 		}
 		ClearHashes.runTask();

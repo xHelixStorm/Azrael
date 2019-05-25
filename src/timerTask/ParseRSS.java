@@ -121,7 +121,7 @@ public class ParseRSS extends TimerTask{
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 		
-		Timer time = new Timer();
+		Timer time = new Timer("ParseRSS");
 		time.schedule(new ParseRSS(_e, _guild_id), calendar.getTime(), TimeUnit.MINUTES.toMillis(10));
 	}
 }

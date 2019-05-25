@@ -1368,17 +1368,19 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceStaffNames(String [] _words, long _guild_id) {
-		logger.debug("SQLBatchInsertStaffNames launched. Passed params array, {}", _guild_id);
+	public static int SQLReplaceStaffNames(String [] _words, long _guild_id, boolean delete) {
+		logger.debug("SQLBatchInsertStaffNames launched. Passed params array, {}, {}", _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("DELETE FROM staff_name_filter WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.executeUpdate();
+			if(delete) {
+				String sql = ("DELETE FROM staff_name_filter WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				stmt.executeUpdate();
+			}
 			
 			String sql2 = ("INSERT INTO staff_name_filter (name_id, name, fk_guild_id) VALUES(NULL, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);
@@ -1762,18 +1764,20 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceWordFilter(String _lang, String [] _words, long _guild_id){
-		logger.debug("SQLReplaceWordFilter launched. Passed params {}, array, {}", _lang, _guild_id);
+	public static int SQLReplaceWordFilter(String _lang, String [] _words, long _guild_id, boolean delete){
+		logger.debug("SQLReplaceWordFilter launched. Passed params {}, array, {}, {}", _lang, _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("DELETE FROM filter WHERE fk_lang_abbrv LIKE ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _lang);
-			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
+			if(delete) {
+				String sql = ("DELETE FROM filter WHERE fk_lang_abbrv LIKE ? && fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setString(1, _lang);
+				stmt.setLong(2, _guild_id);
+				stmt.executeUpdate();
+			}
 			
 			String sql2 = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv, fk_guild_id) VALUES(NULL, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);
@@ -1803,18 +1807,20 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceNameFilter(String [] _words, boolean _kick, long _guild_id){
-		logger.debug("SQLReplaceNameFilter launched. Passed params array, {}, {}", _kick, _guild_id);
+	public static int SQLReplaceNameFilter(String [] _words, boolean _kick, long _guild_id, boolean delete){
+		logger.debug("SQLReplaceNameFilter launched. Passed params array, {}, {}, {}", _kick, _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("DELETE FROM name_filter WHERE fk_guild_id = ? && kick = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setBoolean(2, _kick);
-			stmt.executeUpdate();
+			if(delete) {
+				String sql = ("DELETE FROM name_filter WHERE fk_guild_id = ? && kick = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				stmt.setBoolean(2, _kick);
+				stmt.executeUpdate();
+			}
 			
 			String sql2 = ("INSERT INTO name_filter (word_id, word, kick, fk_guild_id) VALUES(NULL, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);
@@ -1844,16 +1850,18 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceFunnyNames(String [] _words, long _guild_id){
-		logger.debug("SQLReplaceFunnyNames launched. Passed params array, {}", _guild_id);
+	public static int SQLReplaceFunnyNames(String [] _words, long _guild_id, boolean delete){
+		logger.debug("SQLReplaceFunnyNames launched. Passed params array, {}, {}", _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("DELETE FROM names WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			if(delete) {
+				String sql = ("DELETE FROM names WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+			}
 			
 			String sql2 = ("INSERT INTO names (name_id, name, fk_guild_id) VALUES(NULL, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);;

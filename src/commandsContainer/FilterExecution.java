@@ -92,6 +92,16 @@ public class FilterExecution {
 						cache.updateDescription("remove-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
+					else if(_message.equalsIgnoreCase("add-file")) {
+						message.setTitle("You chose to add words from a file!");
+						StringBuilder out = new StringBuilder();
+						for(String lang : Azrael.SQLgetFilterLanguages()) {
+							out.append(lang+"\n");
+						}
+						_e.getTextChannel().sendMessage(message.setDescription("Please choose a language for the words in the file you want to add!\n\n**"+(out.length() > 0 ? out.toString() : "<no languages available>")+"**").build()).queue();
+						cache.updateDescription("add-load-word-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
 					else if(_message.equalsIgnoreCase("load-file")) {
 						message.setTitle("You chose to load a file which contains filter words!");
 						StringBuilder out = new StringBuilder();
@@ -140,6 +150,12 @@ public class FilterExecution {
 						cache.updateDescription("remove-name-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
+					else if(_message.equalsIgnoreCase("add-file")) {
+						message.setTitle("You chose to add the words from a file into the name filter!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
+						cache.updateDescription("add-load-name-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
 					else if(_message.equalsIgnoreCase("load-file")) {
 						message.setTitle("You chose to add the words from a file into the name filter!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
@@ -182,6 +198,12 @@ public class FilterExecution {
 						message.setTitle("You chose to remove a word from name-kick!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please insert a word into the text field!").build()).queue();
 						cache.updateDescription("remove-name-kick").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("add-file")) {
+						message.setTitle("You chose to add the words from a file into name-kick!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
+						cache.updateDescription("add-load-name-kick").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase("load-file")) {
@@ -227,6 +249,12 @@ public class FilterExecution {
 						cache.updateDescription("remove-funny-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
+					else if(_message.equalsIgnoreCase("add-file")) {
+						message.setTitle("You chose to add the names from a file into the funny names list!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
+						cache.updateDescription("add-load-funny-names").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
 					else if(_message.equalsIgnoreCase("load-file")) {
 						message.setTitle("You chose to add the names from a file into the funny names list!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
@@ -268,6 +296,12 @@ public class FilterExecution {
 						message.setTitle("You chose to remove a name out of the staff names!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please insert a name into the text field!").build()).queue();
 						cache.updateDescription("remove-staff-names").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("add-file")) {
+						message.setTitle("You chose to add the names from a file into the staff names list!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
+						cache.updateDescription("add-load-staff-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase("load-file")) {
@@ -354,6 +388,40 @@ public class FilterExecution {
 				case "all-remove-word-filter":
 					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
 					break;
+				case "add-load-word-filter":
+					var addLangLoad = _message.toLowerCase();
+					if(addLangLoad.equalsIgnoreCase("english") || addLangLoad.equalsIgnoreCase("german") || addLangLoad.equalsIgnoreCase("french") || addLangLoad.equalsIgnoreCase("turkish") || addLangLoad.equalsIgnoreCase("russian") || 
+							addLangLoad.equalsIgnoreCase("spanish") || addLangLoad.equalsIgnoreCase("portuguese") || addLangLoad.equalsIgnoreCase("italian")) {
+						message.setTitle("You chose to add "+addLangLoad+" words!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required words to upload.").build()).queue();
+						cache.updateDescription(addLangLoad+"-add-load-word-filter").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					break;
+				case "english-add-load-word-filter":
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+					break;
+				case "german-add-load-word-filter":
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+					break;
+				case "french-add-load-word-filter":
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+					break;
+				case "turkish-add-load-word-filter":
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+					break;
+				case "russian-add-load-word-filter":
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+					break;
+				case "spanish-add-load-word-filter":
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+					break;
+				case "portuguese-add-load-word-filter":
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+					break;
+				case "italian-add-load-word-filter":
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+					break;
 				case "load-word-filter":
 					var langLoad = _message.toLowerCase();
 					if(langLoad.equalsIgnoreCase("english") || langLoad.equalsIgnoreCase("german") || langLoad.equalsIgnoreCase("french") || langLoad.equalsIgnoreCase("turkish") || langLoad.equalsIgnoreCase("russian") || 
@@ -365,28 +433,28 @@ public class FilterExecution {
 					}
 					break;
 				case "english-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
 					break;
 				case "german-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
 					break;
 				case "french-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
 					break;
 				case "turkish-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
 					break;
 				case "russian-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
 					break;
 				case "spanish-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
 					break;
 				case "portuguese-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
 					break;
 				case "italian-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
 					break;
 				case "insert-name-filter":
 					if(Azrael.SQLInsertNameFilter(_message, false, _e.getGuild().getIdLong()) > 0) {
@@ -417,10 +485,11 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 					break;
 				case "load-name-filter":
+				case "add-load-name-filter":
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
 						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
-							var querryResult = Azrael.SQLReplaceNameFilter(words, false, _e.getGuild().getIdLong());
+							var querryResult = Azrael.SQLReplaceNameFilter(words, false, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								message.setTitle("Success!");
 								_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
@@ -432,7 +501,7 @@ public class FilterExecution {
 								message.setColor(Color.RED).setTitle("Execution failed");
 								var duplicates = checkDuplicates(words);
 								if(duplicates == null || duplicates.size() == 0) {
-									_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current name-filter with the names from inside the pastebin link!").build()).queue();
+									_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current name-filter with the names from inside the pastebin link! Please verify that the words aren't already registered!").build()).queue();
 									logger.warn("The name-filter couldn't be updated in guild {}", _e.getGuild().getId());
 								}
 								else {
@@ -486,10 +555,11 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 					break;
 				case "load-name-kick":
+				case "add-load-name-kick":
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
 						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
-							var querryResult = Azrael.SQLReplaceNameFilter(words, false, _e.getGuild().getIdLong());
+							var querryResult = Azrael.SQLReplaceNameFilter(words, false, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								message.setTitle("Success!");
 								_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
@@ -501,7 +571,7 @@ public class FilterExecution {
 								message.setColor(Color.RED).setTitle("Execution failed");
 								var duplicates = checkDuplicates(words);
 								if(duplicates == null || duplicates.size() == 0) {
-									_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current name-kick with the names from inside the pastebin link!").build()).queue();
+									_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current name-kick with the names from inside the pastebin link! Please verify that the words aren't already registered!").build()).queue();
 									logger.warn("The name-kick couldn't be updated in guild {}", _e.getGuild().getId());
 								}
 								else {
@@ -555,10 +625,11 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 					break;
 				case "load-funny-names":
+				case "add-load-funny-names":
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
 						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
-							var querryResult = Azrael.SQLReplaceFunnyNames(words, _e.getGuild().getIdLong());
+							var querryResult = Azrael.SQLReplaceFunnyNames(words, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								message.setTitle("Success!");
 								_e.getTextChannel().sendMessage(message.setDescription("Names have been inserted!").build()).queue();
@@ -570,7 +641,7 @@ public class FilterExecution {
 								message.setColor(Color.RED).setTitle("Execution failed");
 								var duplicates = checkDuplicates(words);
 								if(duplicates == null || duplicates.size() == 0) {
-									_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current funny-names with the names from inside the pastebin link!").build()).queue();
+									_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current funny-names with the names from inside the pastebin link! Please verify that the names aren't already registered!").build()).queue();
 									logger.warn("The name-filter couldn't be updated in guild {}", _e.getGuild().getId());
 								}
 								else {
@@ -624,10 +695,11 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 					break;
 				case "load-staff-names":
+				case "add-load-staff-names":
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
 						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
-							var querryResult = Azrael.SQLReplaceStaffNames(words, _e.getGuild().getIdLong());
+							var querryResult = Azrael.SQLReplaceStaffNames(words, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								message.setTitle("Success!");
 								_e.getTextChannel().sendMessage(message.setDescription("Names have been inserted!").build()).queue();
@@ -639,7 +711,7 @@ public class FilterExecution {
 								message.setColor(Color.RED).setTitle("Execution failed");
 								var duplicates = checkDuplicates(words);
 								if(duplicates == null || duplicates.size() == 0) {
-									_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current staff-names with the names from inside the pastebin link!").build()).queue();
+									_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current staff-names with the names from inside the pastebin link! Please verify that the names aren't already registered!").build()).queue();
 									logger.warn("The staff-names couldn't be updated in guild {}", _e.getGuild().getId());
 								}
 								else {
@@ -741,12 +813,12 @@ public class FilterExecution {
 		Hashes.clearTempCache(key);
 	}
 	
-	private static void loadLangWords(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String key, final String lang, String _message) {
+	private static void loadLangWords(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String key, final String lang, String _message, boolean replace) {
 		if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 			var langAbbreviation = lang.substring(0, 3);
 			String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
 			if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
-				var querryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, _e.getGuild().getIdLong());
+				var querryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, _e.getGuild().getIdLong(), replace);
 				if(querryResult == 0) {
 					message.setTitle("Success!");
 					_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
@@ -759,7 +831,7 @@ public class FilterExecution {
 					message.setColor(Color.RED).setTitle("Execution failed");
 					var duplicates = checkDuplicates(words);
 					if(duplicates == null || duplicates.size() == 0) {
-						_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current lang filter with the words from inside the pastebin link!").build()).queue();
+						_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current lang filter with the words from inside the pastebin link! Please verify that the words you try to insert aren't already registered!").build()).queue();
 						logger.warn("The {} filter couldn't be updated in guild {}", lang, _e.getGuild().getId());
 					}
 					else {

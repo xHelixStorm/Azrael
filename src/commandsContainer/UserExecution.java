@@ -443,7 +443,7 @@ public class UserExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
 					logger.debug("{} has muted {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 					Hashes.clearTempCache(key);
-					Hashes.addTempCache("mute_time_"+cache.getAdditionalInfo().replaceAll("[^0-9]*", ""), new Cache(0, ""+mute_time));
+					Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+cache.getAdditionalInfo().replaceAll("[^0-9]*", ""), new Cache(""+mute_time));
 				}
 				else {
 					_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a numerical value in minutes!").queue();

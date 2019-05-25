@@ -48,9 +48,13 @@ public class RankingThreadExecution {
 		else if(messageLength >= 41 && messageLength <= 50){adder = ThreadLocalRandom.current().nextInt(41, 51);}
 		else if(messageLength > 50){adder = ThreadLocalRandom.current().nextInt(51, 71);}
 		
-		if(Hashes.getTempCache("doubleExp").getAdditionalInfo().equals("on")) {
-			multiplier*=2;
-			adder*=2;
+		var doubleExperience = Hashes.getTempCache("doubleExp");
+		var doubleExperienceGuild = Hashes.getTempCache("doubleExp_gu"+guild_id);
+		if((doubleExperience != null && doubleExperience.getAdditionalInfo().equals("on")) || (doubleExperienceGuild != null && doubleExperienceGuild.getAdditionalInfo().equals("on"))) {
+			if(doubleExperienceGuild == null || (doubleExperienceGuild != null && !doubleExperienceGuild.getAdditionalInfo().equals("off"))) {
+				multiplier*=2;
+				adder*=2;
+			}
 		}
 		
 		multiplier += multiplier*(percent_multiplier/100);

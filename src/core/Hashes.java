@@ -317,7 +317,7 @@ public class Hashes {
 	public static void clearExpiredTempCache() {
 		var now = System.currentTimeMillis();
 		for(final var key : tempCache.keySet()) {
-			if(tempCache.get(key).getExpiration() - now <= 0) {
+			if(tempCache.get(key).getExpiration() - now <= 0 && tempCache.get(key).getExpire()) {
 				tempCache.remove(key);
 			}
 		}

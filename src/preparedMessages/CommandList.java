@@ -34,6 +34,7 @@ public class CommandList {
 			if(GuildIni.getFilterCommand(guild_id))textCollector.add("**-"+prefix+"filter**\ndecide to view, add or remove words/names from various filters or funky names\n\n");
 			if(GuildIni.getRoleReactionCommand(guild_id))textCollector.add("**-"+prefix+"roleReaction**\nenable / disable the role reaction and remove roles on disable\n\n");
 			if(GuildIni.getRssCommand(guild_id))textCollector.add("**-"+prefix+"rss**\ninsert rss feeds \n\n");
+			if(GuildIni.getDoubleExperienceCommand(guild_id))textCollector.add("**-"+prefix+"doubleExperience**\nenable, disable or set the double experience mode to auto \n\n");
 		}
 		if(entertainment == true) {
 			textCollector.add("**_Entertainment:_**\n");
