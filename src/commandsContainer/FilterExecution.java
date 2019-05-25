@@ -17,7 +17,7 @@ import util.Pastebin;
 public class FilterExecution {
 	public static void runHelp(MessageReceivedEvent _e) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle("Actions for the filter command!");
-		_e.getTextChannel().sendMessage(message.setDescription("Type one of the following word types right after the command to choose a respective action! These types are available:\n\n**word-filter\nname-filter\nfunny-names\nstaff-names**").build()).queue();
+		_e.getTextChannel().sendMessage(message.setDescription("Type one of the following word types right after the command to choose a respective action! These types are available:\n\n**word-filter\nname-filter\nname-kick\nfunny-names\nstaff-names**").build()).queue();
 	}
 	
 	public static void runTask(MessageReceivedEvent _e, String _message) {
@@ -27,27 +27,27 @@ public class FilterExecution {
 		switch(_message) {
 			case "word-filter":
 				message.setTitle("You chose the word-filter!");
-				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nload-pastebin**").build()).queue();
+				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "word-filter"));
 				break;
 			case "name-filter":
 				message.setTitle("You chose the name-filter!");
-				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nload-pastebin**").build()).queue();
+				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "name-filter"));
 				break;
 			case "name-kick":
 				message.setTitle("You chose name-kick!");
-				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nload-pastebin**").build()).queue();
+				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "name-kick"));
 				break;
 			case "funny-names":
 				message.setTitle("You chose funny-names!");
-				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nload-pastebin**").build()).queue();
+				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "funny_names"));
 				break;
 			case "staff-names":
 				message.setTitle("You chose staff-names!");
-				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nload-pastebin**").build()).queue();
+				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "staff-names"));
 				break;
 			default:
@@ -92,7 +92,7 @@ public class FilterExecution {
 						cache.updateDescription("remove-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-file")) {
+					else if(_message.equalsIgnoreCase("add-pastebin")) {
 						message.setTitle("You chose to add words from a file!");
 						StringBuilder out = new StringBuilder();
 						for(String lang : Azrael.SQLgetFilterLanguages()) {
@@ -102,7 +102,7 @@ public class FilterExecution {
 						cache.updateDescription("add-load-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-file")) {
+					else if(_message.equalsIgnoreCase("load-pastebin")) {
 						message.setTitle("You chose to load a file which contains filter words!");
 						StringBuilder out = new StringBuilder();
 						for(String lang : Azrael.SQLgetFilterLanguages()) {
@@ -150,13 +150,13 @@ public class FilterExecution {
 						cache.updateDescription("remove-name-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-file")) {
+					else if(_message.equalsIgnoreCase("add-pastebin")) {
 						message.setTitle("You chose to add the words from a file into the name filter!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
 						cache.updateDescription("add-load-name-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-file")) {
+					else if(_message.equalsIgnoreCase("load-pastebin")) {
 						message.setTitle("You chose to add the words from a file into the name filter!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
 						cache.updateDescription("load-name-filter").setExpiration(180000);
@@ -200,13 +200,13 @@ public class FilterExecution {
 						cache.updateDescription("remove-name-kick").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-file")) {
+					else if(_message.equalsIgnoreCase("add-pastebin")) {
 						message.setTitle("You chose to add the words from a file into name-kick!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
 						cache.updateDescription("add-load-name-kick").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-file")) {
+					else if(_message.equalsIgnoreCase("load-pastebin")) {
 						message.setTitle("You chose to add the words from a file into name-kick!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
 						cache.updateDescription("load-name-kick").setExpiration(180000);
@@ -249,13 +249,13 @@ public class FilterExecution {
 						cache.updateDescription("remove-funny-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-file")) {
+					else if(_message.equalsIgnoreCase("add-pastebin")) {
 						message.setTitle("You chose to add the names from a file into the funny names list!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
 						cache.updateDescription("add-load-funny-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-file")) {
+					else if(_message.equalsIgnoreCase("load-pastebin")) {
 						message.setTitle("You chose to add the names from a file into the funny names list!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
 						cache.updateDescription("load-funny-names").setExpiration(180000);
@@ -298,13 +298,13 @@ public class FilterExecution {
 						cache.updateDescription("remove-staff-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-file")) {
+					else if(_message.equalsIgnoreCase("add-pastebin")) {
 						message.setTitle("You chose to add the names from a file into the staff names list!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
 						cache.updateDescription("add-load-staff-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-file")) {
+					else if(_message.equalsIgnoreCase("load-pastebin")) {
 						message.setTitle("You chose to add the names from a file into the staff names list!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
 						cache.updateDescription("load-staff-names").setExpiration(180000);
@@ -559,7 +559,7 @@ public class FilterExecution {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
 						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
-							var querryResult = Azrael.SQLReplaceNameFilter(words, false, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+							var querryResult = Azrael.SQLReplaceNameFilter(words, true, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								message.setTitle("Success!");
 								_e.getTextChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
