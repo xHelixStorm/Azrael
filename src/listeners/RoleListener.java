@@ -51,14 +51,14 @@ public class RoleListener extends ListenerAdapter{
 			} catch(NullPointerException npe) {
 				unmute_time = -1;
 			}
-			if(unmute_time - System.currentTimeMillis() > 0 && warnedUser.getMuted() == false) {
+			if(unmute_time - System.currentTimeMillis() > 0 && !warnedUser.getMuted()) {
 				if(Azrael.SQLUpdateMuted(user_id, guild_id, true) == 0) {
 					logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getName());
 					if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The mute state couldn't be updated in table Azrael.bancollect").queue();
 				}
 				if(log_channel != null) {
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-					e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned before the mute time elapsed! Reason may be due to rejoining or manual role reassignment!").build()).queue();
+					e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned before the mute time elapsed! Reason may be due to manually reassigning the mute role!").build()).queue();
 				}
 				//remove all roles on mute role reassign
 				mute_id = DiscordRoles.SQLgetRole(guild_id, "mut");
@@ -66,6 +66,12 @@ public class RoleListener extends ListenerAdapter{
 					if(role.getIdLong() != mute_id) {
 						e.getGuild().getController().removeSingleRoleFromMember(e.getMember(), role).queue();
 					}
+				}
+			}
+			else if(unmute_time - System.currentTimeMillis() > 0 && warnedUser.getMuted()) {
+				if(log_channel != null) {
+					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+					e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned before the mute time elapsed! Reason may be due to leaving and rejoining the server!").build()).queue();
 				}
 			}
 			else{
