@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import core.Cache;
 import core.Hashes;
+import core.UserPrivs;
+import fileManagement.GuildIni;
+import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
@@ -26,29 +29,54 @@ public class FilterExecution {
 		
 		switch(_message) {
 			case "word-filter":
-				message.setTitle("You chose the word-filter!");
-				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
-				Hashes.addTempCache(key, new Cache(180000, "word-filter"));
+				if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getFilterWordFilterLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+					message.setTitle("You chose the word-filter!");
+					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
+					Hashes.addTempCache(key, new Cache(180000, "word-filter"));
+				}
+				else {
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+				}
 				break;
 			case "name-filter":
-				message.setTitle("You chose the name-filter!");
-				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
-				Hashes.addTempCache(key, new Cache(180000, "name-filter"));
+				if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getFilterNameFilterLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+					message.setTitle("You chose the name-filter!");
+					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
+					Hashes.addTempCache(key, new Cache(180000, "name-filter"));
+				}
+				else {
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+				}
 				break;
 			case "name-kick":
-				message.setTitle("You chose name-kick!");
-				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
-				Hashes.addTempCache(key, new Cache(180000, "name-kick"));
+				if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getFilterNameKickLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+					message.setTitle("You chose name-kick!");
+					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
+					Hashes.addTempCache(key, new Cache(180000, "name-kick"));
+				}
+				else {
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+				}
 				break;
 			case "funny-names":
-				message.setTitle("You chose funny-names!");
-				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
-				Hashes.addTempCache(key, new Cache(180000, "funny_names"));
+				if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getFilterFunnyNamesLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+					message.setTitle("You chose funny-names!");
+					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
+					Hashes.addTempCache(key, new Cache(180000, "funny_names"));
+				}
+				else {
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+				}
 				break;
 			case "staff-names":
-				message.setTitle("You chose staff-names!");
-				_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
-				Hashes.addTempCache(key, new Cache(180000, "staff-names"));
+				if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getFilterStaffNamesLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+					message.setTitle("You chose staff-names!");
+					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
+					Hashes.addTempCache(key, new Cache(180000, "staff-names"));
+				}
+				else {
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+				}
 				break;
 			default:
 				_e.getTextChannel().sendMessage("Please choose between word-filter, name-filter, funny-names or staff-names").queue();

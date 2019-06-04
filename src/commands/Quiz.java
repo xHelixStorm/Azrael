@@ -29,8 +29,8 @@ public class Quiz implements Command{
 			Logger logger = LoggerFactory.getLogger(Quiz.class);
 			logger.debug("{} has used Quiz command", e.getMember().getUser().getId());
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setTitle("Access denied!").setThumbnail(IniFileReader.getDeniedThumbnail());
-			if(Hashes.getTempCache("quiztime"+e.getGuild().getId()) == null) {
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
+			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getQuizLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+				if(Hashes.getTempCache("quiztime"+e.getGuild().getId()) == null) {
 					EmbedBuilder message = new EmbedBuilder().setTitle("It's Quiz time!").setColor(Color.BLUE);
 					if(args.length == 0) {
 						e.getTextChannel().sendMessage(message.setDescription("The Quiz command will allow you to register questions to provide the best quiz experience in a Discord server! At your disposal are parameters to register questions from a pastebin link, register rewards in form of codes that get sent to the user who answers a question correctly in private message and to start and interrupt the quiz session.\n\n"
@@ -124,11 +124,11 @@ public class Quiz implements Command{
 					}
 				}
 				else {
-					e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+					e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **A quiz process is already running. It cannot run twice!**").build()).queue();
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **A quiz process is already running. It cannot run twice!**").build()).queue();
+				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
 			}
 		}
 	}

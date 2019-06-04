@@ -13,6 +13,8 @@ import core.Guilds;
 import core.Hashes;
 import core.Messages;
 import core.User;
+import core.UserPrivs;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -97,102 +99,135 @@ public class UserExecution {
 				var user_id = Long.parseLong(cache.getAdditionalInfo());
 				switch(_message) {
 					case "information": 
-						User user = Azrael.SQLgetUserThroughID(cache.getAdditionalInfo());
-						message.setTitle("Here the requested information!");
-						if(user.getAvatar() != null)
-							message.setThumbnail(user.getAvatar());
-						message.setAuthor(user.getUserName());
-						message.setDescription("Here you can inspect all current information for this user!");
-						message.addBlankField(false);
-						Bancollect warnedUser = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong());
-						message.addField("CURRENT WARNING", "**"+warnedUser.getWarningID()+"**/**"+Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong())+"**", true);
-						message.addField("TOTAL WARNINGS", "**"+Azrael.SQLgetSingleActionEventCount("MEMBER_MUTE_ADD", user_id, _e.getGuild().getIdLong())+"**", true);
-						message.addField("TOTAL BANS", "**"+Azrael.SQLgetSingleActionEventCount("MEMBER_BAN_ADD", user_id, _e.getGuild().getIdLong())+"**", true);
-						message.addField("BANNED", warnedUser.getBanID() == 2 ? "**YES**" : "**NO**", true);
-						message.addField("JOIN DATE", "**"+user.getJoinDate()+"**", true);
-						message.addField("USER ID", "**"+cache.getAdditionalInfo()+"**", true);
-						message.addBlankField(false);
-						Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong(), guild_settings.getThemeID());
-						if(guild_settings.getRankingState() == true) {
-							message.addField("LEVEL", "**"+user_details.getLevel()+"**/**"+guild_settings.getMaxLevel()+"**", true);
-							message.addField("EXPERIENCE", "**"+user_details.getCurrentExperience()+"**/**"+user_details.getRankUpExperience()+"**", true);
-							if(user_details.getCurrentRole() != 0){
-								message.addField("UNLOCKED ROLE", _e.getGuild().getRoleById(user_details.getCurrentRole()).getAsMention(), true);
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserInformationLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							User user = Azrael.SQLgetUserThroughID(cache.getAdditionalInfo());
+							message.setTitle("Here the requested information!");
+							if(user.getAvatar() != null)
+								message.setThumbnail(user.getAvatar());
+							message.setAuthor(user.getUserName());
+							message.setDescription("Here you can inspect all current information for this user!");
+							message.addBlankField(false);
+							Bancollect warnedUser = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong());
+							message.addField("CURRENT WARNING", "**"+warnedUser.getWarningID()+"**/**"+Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong())+"**", true);
+							message.addField("TOTAL WARNINGS", "**"+Azrael.SQLgetSingleActionEventCount("MEMBER_MUTE_ADD", user_id, _e.getGuild().getIdLong())+"**", true);
+							message.addField("TOTAL BANS", "**"+Azrael.SQLgetSingleActionEventCount("MEMBER_BAN_ADD", user_id, _e.getGuild().getIdLong())+"**", true);
+							message.addField("BANNED", warnedUser.getBanID() == 2 ? "**YES**" : "**NO**", true);
+							message.addField("JOIN DATE", "**"+user.getJoinDate()+"**", true);
+							message.addField("USER ID", "**"+cache.getAdditionalInfo()+"**", true);
+							message.addBlankField(false);
+							Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong(), guild_settings.getThemeID());
+							if(guild_settings.getRankingState() == true) {
+								message.addField("LEVEL", "**"+user_details.getLevel()+"**/**"+guild_settings.getMaxLevel()+"**", true);
+								message.addField("EXPERIENCE", "**"+user_details.getCurrentExperience()+"**/**"+user_details.getRankUpExperience()+"**", true);
+								if(user_details.getCurrentRole() != 0){
+									message.addField("UNLOCKED ROLE", _e.getGuild().getRoleById(user_details.getCurrentRole()).getAsMention(), true);
+								}
+								else{
+									message.addField("UNLOCKED ROLE", "**N/A**", true);
+								}
+								message.addField("TOTAL EXPERIENCE", "**"+user_details.getExperience()+"**", true);
 							}
-							else{
-								message.addField("UNLOCKED ROLE", "**N/A**", true);
+							StringBuilder out = new StringBuilder();
+							for(String description : Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, _e.getGuild().getIdLong())) {
+								out.append("[`"+description+"`] ");
 							}
-							message.addField("TOTAL EXPERIENCE", "**"+user_details.getExperience()+"**", true);
+							out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
+							message.addField("USED NAMES", out.toString(), false);
+							out.setLength(0);
+							for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, _e.getGuild().getIdLong())) {
+								out.append("[`"+description+"`] ");
+							}
+							out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
+							message.addField("USED NICKNAMES", out.toString(), false);
+							out.setLength(0);
+							_e.getTextChannel().sendMessage(message.build()).queue();
+							message.clear();
+							message.setColor(Color.BLUE).setTitle("EVENTS");
+							for(String description : Azrael.SQLgetCriticalActionEvents(user_id, _e.getGuild().getIdLong())) {
+								out.append(description+"\n");
+							}
+							message.setDescription(out);
+							out.setLength(0);
+							_e.getTextChannel().sendMessage(message.build()).queue();
+							logger.debug("{} has displayed information of the user {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo());
 						}
-						StringBuilder out = new StringBuilder();
-						for(String description : Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, _e.getGuild().getIdLong())) {
-							out.append("[`"+description+"`] ");
+						else {
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
 						}
-						out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
-						message.addField("USED NAMES", out.toString(), false);
-						out.setLength(0);
-						for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, _e.getGuild().getIdLong())) {
-							out.append("[`"+description+"`] ");
-						}
-						out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
-						message.addField("USED NICKNAMES", out.toString(), false);
-						out.setLength(0);
-						_e.getTextChannel().sendMessage(message.build()).queue();
-						message.clear();
-						message.setColor(Color.BLUE).setTitle("EVENTS");
-						for(String description : Azrael.SQLgetCriticalActionEvents(user_id, _e.getGuild().getIdLong())) {
-							out.append(description+"\n");
-						}
-						message.setDescription(out);
-						out.setLength(0);
-						_e.getTextChannel().sendMessage(message.build()).queue();
-						logger.debug("{} has displayed information of the user {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo());
 						Hashes.clearTempCache(key);
 						break;
 					case "delete-messages":
-						message.setTitle("You chose to delete a number of messages!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
-						cache.updateDescription("delete-messages"+user_id).setExpiration(180000);
-						Hashes.addTempCache(key, cache);
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserDeleteMessagesLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							message.setTitle("You chose to delete a number of messages!");
+							_e.getTextChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
+							cache.updateDescription("delete-messages"+user_id).setExpiration(180000);
+							Hashes.addTempCache(key, cache);
+						}
+						else {
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							Hashes.clearTempCache(key);
+						}
 						break;
 					case "warning":
-						message.setTitle("You chose to set a warning value!");
-						_e.getTextChannel().sendMessage(message.setDescription("Please choose a numerical warning value that is lower or identical to the max warning value!").build()).queue();
-						cache.updateDescription("warning"+user_id).setExpiration(180000);
-						Hashes.addTempCache(key, cache);
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserWarningLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							message.setTitle("You chose to set a warning value!");
+							_e.getTextChannel().sendMessage(message.setDescription("Please choose a numerical warning value that is lower or identical to the max warning value!").build()).queue();
+							cache.updateDescription("warning"+user_id).setExpiration(180000);
+							Hashes.addTempCache(key, cache);
+						}
+						else {
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							Hashes.clearTempCache(key);
+						}
 						break;
 					case "mute":
-						message.setTitle("You chose to mute!");
-						message.addField("YES", "Provide a mute time", true);
-						message.addField("NO", "Don't provide a mute time", true);
-						_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a self chosen mute timer? By providing a self chosen mute timer, the warning value won't increment unless the user has been never warned before!").build()).queue();
-						cache.updateDescription("mute"+user_id).setExpiration(180000);
-						Hashes.addTempCache(key, cache);
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserMuteLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							message.setTitle("You chose to mute!");
+							message.addField("YES", "Provide a mute time", true);
+							message.addField("NO", "Don't provide a mute time", true);
+							_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a self chosen mute timer? By providing a self chosen mute timer, the warning value won't increment unless the user has been never warned before!").build()).queue();
+							cache.updateDescription("mute"+user_id).setExpiration(180000);
+							Hashes.addTempCache(key, cache);
+						}
+						else {
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							Hashes.clearTempCache(key);
+						}
 						break;
 					case "unmute":
-						if(!Azrael.SQLisBanned(user_id, _e.getGuild().getIdLong())) {
-							EmbedBuilder notice = new EmbedBuilder().setColor(Color.BLUE);
-							if(Azrael.SQLgetCustomMuted(user_id, _e.getGuild().getIdLong())) {
-								if(STATIC.killThread("mute_gu"+_e.getGuild().getId()+"us"+user_id)) {
-									notice.setTitle("Unmute action issued!");
-									_e.getTextChannel().sendMessage(notice.setDescription("Action issued to interrupt the mute! Please note that warnings don't get reverted while applying a custom mute time!").build()).queue();
-								}
-								else {
-									notice.setColor(Color.RED).setTitle("Member is not muted!");
-									_e.getTextChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
-								}
-							}
-							else if(Azrael.SQLgetMuted(user_id, _e.getGuild().getIdLong())) {
-								if(STATIC.killThread("mute_gu"+_e.getGuild().getId()+"us"+user_id)) {
-									notice.setTitle("Unmute action issued!");
-									_e.getTextChannel().sendMessage(notice.setDescription("Action issued to interrupt the mute! Undoing the previous warning!").build()).queue();
-									var warning = Azrael.SQLgetWarning(user_id, _e.getGuild().getIdLong());
-									if(warning == 1) {
-										Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserUnmuteLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							if(!Azrael.SQLisBanned(user_id, _e.getGuild().getIdLong())) {
+								EmbedBuilder notice = new EmbedBuilder().setColor(Color.BLUE);
+								if(Azrael.SQLgetCustomMuted(user_id, _e.getGuild().getIdLong())) {
+									if(STATIC.killThread("mute_gu"+_e.getGuild().getId()+"us"+user_id)) {
+										notice.setTitle("Unmute action issued!");
+										_e.getTextChannel().sendMessage(notice.setDescription("Action issued to interrupt the mute! Please note that warnings don't get reverted while applying a custom mute time!").build()).queue();
 									}
-									else if(warning > 1) {
-										Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-										Azrael.SQLInsertData(user_id, _e.getGuild().getIdLong(), warning-1, 1, timestamp, timestamp, false, false);
+									else {
+										notice.setColor(Color.RED).setTitle("Member is not muted!");
+										_e.getTextChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
+									}
+								}
+								else if(Azrael.SQLgetMuted(user_id, _e.getGuild().getIdLong())) {
+									if(STATIC.killThread("mute_gu"+_e.getGuild().getId()+"us"+user_id)) {
+										notice.setTitle("Unmute action issued!");
+										_e.getTextChannel().sendMessage(notice.setDescription("Action issued to interrupt the mute! Undoing the previous warning!").build()).queue();
+										var warning = Azrael.SQLgetWarning(user_id, _e.getGuild().getIdLong());
+										if(warning == 1) {
+											Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
+										}
+										else if(warning > 1) {
+											Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+											Azrael.SQLInsertData(user_id, _e.getGuild().getIdLong(), warning-1, 1, timestamp, timestamp, false, false);
+										}
+										else {
+											notice.setColor(Color.RED).setTitle("Member is not muted!");
+											_e.getTextChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
+										}
 									}
 									else {
 										notice.setColor(Color.RED).setTitle("Member is not muted!");
@@ -205,91 +240,140 @@ public class UserExecution {
 								}
 							}
 							else {
-								notice.setColor(Color.RED).setTitle("Member is not muted!");
-								_e.getTextChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
+								EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
+								_e.getTextChannel().sendMessage(error.setDescription("Action can't be executed! The user is currently banned").build()).queue();
 							}
+							logger.debug("{} has used the unmute action on {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo());
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
-							_e.getTextChannel().sendMessage(error.setDescription("Action can't be executed! The user is currently banned").build()).queue();
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
 						}
-						logger.debug("{} has used the unmute action on {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo());
 						Hashes.clearTempCache(key);
 						break;
 					case "ban":
-						message.setTitle("You chose to ban!");
-						message.addField("YES", "Provide a reason", true);
-						message.addField("NO", "Don't provide a reason", true);
-						_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the ban?").build()).queue();
-						cache.updateDescription("ban"+user_id).setExpiration(180000);
-						Hashes.addTempCache(key, cache);
-						break;
-					case "kick":
-						message.setTitle("You chose to kick!");
-						message.addField("YES", "Provide a reason", true);
-						message.addField("NO", "Don't provide a reason", true);
-						_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the kick?").build()).queue();
-						cache.updateDescription("kick"+user_id).setExpiration(180000);
-						Hashes.addTempCache(key, cache);
-						break;
-					case "gift-experience":
-						if(guild_settings.getRankingState()) {
-							message.setTitle("You chose to gift experience points!");
-							_e.getTextChannel().sendMessage(message.setDescription("Choose a number of experience points to add to the total number of experience points").build()).queue();
-							cache.updateDescription("gift-experience"+user_id).setExpiration(180000);
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserBanLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							message.setTitle("You chose to ban!");
+							message.addField("YES", "Provide a reason", true);
+							message.addField("NO", "Don't provide a reason", true);
+							_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the ban?").build()).queue();
+							cache.updateDescription("ban"+user_id).setExpiration(180000);
 							Hashes.addTempCache(key, cache);
 						}
 						else {
-							denied.setTitle("Access Denied!");
-							_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							Hashes.clearTempCache(key);
+						}
+						break;
+					case "kick":
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserKickLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							message.setTitle("You chose to kick!");
+							message.addField("YES", "Provide a reason", true);
+							message.addField("NO", "Don't provide a reason", true);
+							_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the kick?").build()).queue();
+							cache.updateDescription("kick"+user_id).setExpiration(180000);
+							Hashes.addTempCache(key, cache);
+						}
+						else {
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							Hashes.clearTempCache(key);
+						}
+						break;
+					case "gift-experience":
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserGiftExperienceLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							if(guild_settings.getRankingState()) {
+								message.setTitle("You chose to gift experience points!");
+								_e.getTextChannel().sendMessage(message.setDescription("Choose a number of experience points to add to the total number of experience points").build()).queue();
+								cache.updateDescription("gift-experience"+user_id).setExpiration(180000);
+								Hashes.addTempCache(key, cache);
+							}
+							else {
+								denied.setTitle("Access Denied!");
+								_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+							}
+						}
+						else {
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							Hashes.clearTempCache(key);
 						}
 						break;
 					case "set-experience":
-						if(guild_settings.getRankingState()) {
-							message.setTitle("You chose to set experience points!");
-							_e.getTextChannel().sendMessage(message.setDescription("Choose a number of experience points to set for the user").build()).queue();
-							cache.updateDescription("set-experience"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserSetExperienceLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							if(guild_settings.getRankingState()) {
+								message.setTitle("You chose to set experience points!");
+								_e.getTextChannel().sendMessage(message.setDescription("Choose a number of experience points to set for the user").build()).queue();
+								cache.updateDescription("set-experience"+user_id).setExpiration(180000);
+								Hashes.addTempCache(key, cache);
+							}
+							else {
+								denied.setTitle("Access Denied!");
+								_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+							}
 						}
 						else {
-							denied.setTitle("Access Denied!");
-							_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							Hashes.clearTempCache(key);
 						}
 						break;
 					case "set-level":
-						if(guild_settings.getRankingState()) {
-							message.setTitle("You chose to set a level!");
-							_e.getTextChannel().sendMessage(message.setDescription("Choose a level to assign the user").build()).queue();
-							cache.updateDescription("set-level"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserSetLevelLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							if(guild_settings.getRankingState()) {
+								message.setTitle("You chose to set a level!");
+								_e.getTextChannel().sendMessage(message.setDescription("Choose a level to assign the user").build()).queue();
+								cache.updateDescription("set-level"+user_id).setExpiration(180000);
+								Hashes.addTempCache(key, cache);
+							}
+							else {
+								denied.setTitle("Access Denied!");
+								_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+							}
 						}
 						else {
-							denied.setTitle("Access Denied!");
-							_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							Hashes.clearTempCache(key);
 						}
 						break;
 					case "gift-currency":
-						if(guild_settings.getRankingState()) {
-							message.setTitle("You chose to gift money!");
-							_e.getTextChannel().sendMessage(message.setDescription("Choose the amount of money to gift the user").build()).queue();
-							cache.updateDescription("gift-currency"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserGiftCurrencyLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							if(guild_settings.getRankingState()) {
+								message.setTitle("You chose to gift money!");
+								_e.getTextChannel().sendMessage(message.setDescription("Choose the amount of money to gift the user").build()).queue();
+								cache.updateDescription("gift-currency"+user_id).setExpiration(180000);
+								Hashes.addTempCache(key, cache);
+							}
+							else {
+								denied.setTitle("Access Denied!");
+								_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+							}
 						}
 						else {
-							denied.setTitle("Access Denied!");
-							_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							Hashes.clearTempCache(key);
 						}
 						break;
 					case "set-currency":
-						if(guild_settings.getRankingState()) {
-							message.setTitle("You chose to set money!");
-							_e.getTextChannel().sendMessage(message.setDescription("Choose the amount of money to set for the user").build()).queue();
-							cache.updateDescription("set-currency"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserSetCurrencyLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							if(guild_settings.getRankingState()) {
+								message.setTitle("You chose to set money!");
+								_e.getTextChannel().sendMessage(message.setDescription("Choose the amount of money to set for the user").build()).queue();
+								cache.updateDescription("set-currency"+user_id).setExpiration(180000);
+								Hashes.addTempCache(key, cache);
+							}
+							else {
+								denied.setTitle("Access Denied!");
+								_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+							}
 						}
 						else {
-							denied.setTitle("Access Denied!");
-							_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							Hashes.clearTempCache(key);
 						}
 						break;
 				}

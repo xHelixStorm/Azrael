@@ -15,14 +15,14 @@ import sql.RankingSystem;
 
 public class RegisterRankingRole {
 	
-	public static void RegisterRankingRoleHelper(MessageReceivedEvent _e){
+	public static void RegisterRankingRoleHelper(MessageReceivedEvent _e) {
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register roles for the ranking system!");
 		final String prefix = GuildIni.getCommandPrefix(_e.getGuild().getIdLong());
 		_e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, write the role_id right after the command and add the required level to unlock this role in this format:\n"
 				+ "**"+prefix+"register -ranking-role <role_id> <level>**\n\n To display all roles, type the command **"+prefix+"display -roles**. To remove all registered roles, type **"+prefix+"register -ranking-role -clear**").build()).queue();
 	}
 	
-	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String [] _args){
+	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String [] _args, boolean adminPermission) {
 		Logger logger = LoggerFactory.getLogger(RegisterRankingRole.class);
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied");
 		long guild_id = _e.getGuild().getIdLong();
@@ -31,7 +31,7 @@ public class RegisterRankingRole {
 		String level = "";
 		int level_requirement = 0;
 		
-		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)){
+		if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getRegisterRankingRoleLevel(_e.getGuild().getIdLong())) || adminPermission) {
 			if(_args.length > 1 && _args[1].equalsIgnoreCase("-clear")) {
 				if(RankingSystem.SQLclearRoles(guild_id) > 0) {
 					Hashes.removeRankingRoles();
@@ -66,7 +66,7 @@ public class RegisterRankingRole {
 						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Something went wrong. Please recheck the syntax!").queue();
 						return;
 					}
-					if(level.length() < 1 || level.length() > 10000){
+					if(level.length() < 1 || level.length() > 10000) {
 						_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a level between 1 and 9999!").queue();
 					}
 					else{
@@ -90,13 +90,13 @@ public class RegisterRankingRole {
 							RankingSystem.SQLInsertActionLog("High", role_id, guild_id, "Role couldn't be registered as ranking role", "The role "+role_name+" couldn't be inserted into the RankingSystem.roles table");
 						}
 					}
-				} catch(NullPointerException npe){
+				} catch(NullPointerException npe) {
 					_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();
 				}
 			}
 		}
 		else {
-			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").build()).queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
 		}
 	}
 }

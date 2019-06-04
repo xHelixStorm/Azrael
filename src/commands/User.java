@@ -27,7 +27,7 @@ public class User implements Command{
 		if(GuildIni.getUserCommand(e.getGuild().getIdLong())) {
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
-				if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
+				if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUserLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 					if(args.length == 0) {
 						UserExecution.getHelp(e);
@@ -37,7 +37,7 @@ public class User implements Command{
 					}
 				}
 				else {
-					e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+					e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
 				}
 			});
 			executor.shutdown();

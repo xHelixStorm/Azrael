@@ -22,13 +22,13 @@ import sql.Azrael;
 public class RegisterChannel {
 	private static final Logger logger = LoggerFactory.getLogger(RegisterChannel.class);
 	
-	public static void RegisterChannelHelper(MessageReceivedEvent _e){
+	public static void RegisterChannelHelper(MessageReceivedEvent _e) {
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register text channels to give them unique functions!");
 		StringBuilder strB = new StringBuilder();
 		String parseMessage = null;
 		
 		parseMessage = "Please write the command in this format:\n**"+GuildIni.getCommandPrefix(_e.getGuild().getIdLong())+"register -text-channel <channel-type> #channel-name/channel-id**\n\nHere are all available channel-types:\n\n";
-		for(Channels channels : Azrael.SQLgetChannelTypes()){
+		for(Channels channels : Azrael.SQLgetChannelTypes()) {
 			strB.append("**"+channels.getChannel_Type()+"** for a **"+channels.getChannel_Type_Name()+"**\n");
 		}
 		if(strB.length() == 0)
@@ -36,21 +36,21 @@ public class RegisterChannel {
 		_e.getTextChannel().sendMessage(messageBuild.setDescription(parseMessage+strB.toString()).build()).queue();
 	}
 	
-	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String [] _args){
+	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String [] _args, boolean adminPermission) {
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 		String channel;
 		long channel_id;
 		String channel_type;
 		
-		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == GuildIni.getAdmin(_e.getGuild().getIdLong())){
+		if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getRegisterTextChannelLevel(_e.getGuild().getIdLong())) || adminPermission) {
 			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss)");
 			Matcher matcher = pattern.matcher(_args[1]);
-			if(_args.length > 2 && matcher.find()){
+			if(_args.length > 2 && matcher.find()) {
 				channel_type = matcher.group();
 				channel = _args[2].replaceAll("[^0-9]*", "");
-				if(channel.length() == 18){
+				if(channel.length() == 18) {
 					channel_id = Long.parseLong(channel);
-					switch(channel_type){
+					switch(channel_type) {
 						case "eng":
 						case "ger":
 						case "fre":
@@ -100,14 +100,14 @@ public class RegisterChannel {
 			}
 		}
 		else {
-			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").build()).queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
 		}
 	}
 	
-	public static void runChannelsRegistration(MessageReceivedEvent _e, long _guild_id){
+	public static void runChannelsRegistration(MessageReceivedEvent _e, long _guild_id, boolean adminPermission) {
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()){
-			for(TextChannel tc : _e.getGuild().getTextChannels()){
+		if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getRegisterTextChannelsLevel(_e.getGuild().getIdLong())) || adminPermission) {
+			for(TextChannel tc : _e.getGuild().getTextChannels()) {
 				if(Azrael.SQLInsertChannels(tc.getIdLong(), tc.getName()) == 0) {
 					logger.error("channel {} couldn't be registered", tc.getId());
 					_e.getTextChannel().sendMessage("An internal error occurred. Channel "+tc.getName()+" couldn't be inserted into Azrael.channels").queue();
@@ -117,7 +117,7 @@ public class RegisterChannel {
 			_e.getTextChannel().sendMessage("**All text channels have been registered!**").queue();
 		}
 		else {
-			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").build()).queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
 		}
 	}
 }

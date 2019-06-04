@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import core.Patchnote;
 import core.UserPrivs;
 import fileManagement.GuildIni;
+import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;
@@ -24,184 +25,189 @@ public class Patchnotes implements Command {
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		Logger logger = LoggerFactory.getLogger(Patchnotes.class);
-		logger.debug("{} has used Patchnotes command", e.getMember().getUser().getId());
-		
 		if(GuildIni.getPatchnotesCommand(e.getGuild().getIdLong())) {
-			var allowed_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot") || f.getChannel_Type().equals("log")).collect(Collectors.toList());
-			var bot_channels = allowed_channels.parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
-			var this_channel = allowed_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null);
-			if(this_channel == null && allowed_channels.size() > 0){
-				e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
-				logger.warn("Patchnotes command used in a not bot channel");
+			Logger logger = LoggerFactory.getLogger(Patchnotes.class);
+			logger.debug("{} has used Patchnotes command", e.getMember().getUser().getId());
+			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getPatchnotesLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+				var allowed_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot") || f.getChannel_Type().equals("log")).collect(Collectors.toList());
+				var bot_channels = allowed_channels.parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+				var this_channel = allowed_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null);
+				if(this_channel == null && allowed_channels.size() > 0){
+					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
+					logger.warn("Patchnotes command used in a not bot channel");
+				}
+				else {
+					EmbedBuilder message = new EmbedBuilder();
+					ArrayList<Patchnote> priv_notes = null;
+					ArrayList<Patchnote> publ_notes = null;
+					ArrayList<Patchnote> game_notes = null;
+					var modRights = false;
+					//retrieve patchnotes
+					if(UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+						modRights = true;
+					}
+					if(modRights)
+						priv_notes = sql.Patchnotes.SQLgetPrivatePatchnotesArray();
+					publ_notes = sql.Patchnotes.SQLgetPublicPatchnotesArray();
+					game_notes = sql.Patchnotes.SQLgetGamePatchnotesArray(e.getGuild().getIdLong());
+					
+					if(priv_notes == null && publ_notes == null && game_notes == null) {
+						message.setTitle("No patch notes are available!").setColor(Color.RED);
+						e.getTextChannel().sendMessage(message.setDescription("Patch notes need to be registered before displaying them!").build()).queue();
+					}
+					else if((priv_notes != null || publ_notes != null) && game_notes == null) {
+						if(modRights) {
+							if(args.length == 0)
+								e.getTextChannel().sendMessage("Please select if you want to display the public or private patch notes!").queue();
+							else if(args.length == 1 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public"))) {
+								ArrayList<Patchnote> display_notes = null;
+								if(args[0].equalsIgnoreCase("private"))
+									display_notes = priv_notes;
+								else
+									display_notes = publ_notes;
+								
+								if(display_notes == null || display_notes.size() == 0) {
+									message.setTitle("No patch notes available!").setColor(Color.RED);
+									e.getTextChannel().sendMessage(message.setDescription("No Patchnotes available for this filter option").build()).queue();
+								}
+								else {
+									collectPatchNotes(e, display_notes, message);
+								}
+							}
+							else if(args.length == 2 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public"))) {
+								Patchnote note = null;
+								if(args[0].equalsIgnoreCase("private"))
+									note = priv_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
+								else if(args[0].equalsIgnoreCase("public"))
+									note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
+								if(note == null) {
+									e.getTextChannel().sendMessage("Patch notes not found!").queue();
+								}
+								else {
+									printPatchNotes(e, note, message);
+								}
+							}
+							else {
+								message.setTitle("Wrong parameter!").setColor(Color.RED);
+								e.getTextChannel().sendMessage(message.setDescription("Please either write private or public as first parameter!").build()).queue();
+							}
+						}
+						else {
+							if(args.length == 0) {
+								collectPatchNotes(e, publ_notes, message);
+							}
+							else if(args.length == 1) {
+								var note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[0])).findAny().orElse(null);
+								if(note == null) {
+									message.setTitle("No patch notes are available!").setColor(Color.RED);
+									e.getTextChannel().sendMessage(message.setDescription("Patch notes need to be registered before displaying them!").build()).queue();
+								}
+								else {
+									printPatchNotes(e, note, message);
+								}
+							}
+						}
+					}
+					else if(priv_notes == null && publ_notes == null && game_notes != null) {
+						if(args.length == 0) {
+							collectPatchNotes(e, game_notes, message);
+						}
+						else if(args.length == 1) {
+							var note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[0])).findAny().orElse(null);
+							if(note == null) {
+								message.setTitle("No patch notes are available!").setColor(Color.RED);
+								e.getTextChannel().sendMessage(message.setDescription("Patch notes need to be registered before displaying them!").build()).queue();
+							}
+							else {
+								printPatchNotes(e, note, message);
+							}
+						}
+					}
+					else {
+						if(modRights) {
+							if(args.length == 0)
+								e.getTextChannel().sendMessage("Please select if you want to display the public, private or game patch notes!").queue();
+							else if(args.length == 1 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public") || args[0].equalsIgnoreCase("game"))) {
+								ArrayList<Patchnote> display_notes = null;
+								if(args[0].equalsIgnoreCase("private"))
+									display_notes = priv_notes;
+								else if(args[0].equalsIgnoreCase("public"))
+									display_notes = publ_notes;
+								else
+									display_notes = game_notes;
+								
+								if(display_notes == null || display_notes.size() == 0) {
+									message.setTitle("No patch notes available!").setColor(Color.RED);
+									e.getTextChannel().sendMessage(message.setDescription("No Patchnotes available for this filter option").build()).queue();
+								}
+								else {
+									collectPatchNotes(e, display_notes, message);
+								}
+							}
+							else if(args.length == 2 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public") || args[0].equalsIgnoreCase("game"))) {
+								Patchnote note = null;
+								if(args[0].equalsIgnoreCase("private"))
+									note = priv_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
+								else if(args[0].equalsIgnoreCase("public"))
+									note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
+								else if(args[0].equalsIgnoreCase("game"))
+									note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
+								if(note == null) {
+									message.setTitle("No patch notes are available!").setColor(Color.RED);
+									e.getTextChannel().sendMessage(message.setDescription("Patch notes need to be registered before displaying them!").build()).queue();
+								}
+								else {
+									printPatchNotes(e, note, message);
+								}
+							}
+							else {
+								message.setTitle("Wrong parameter!").setColor(Color.RED);
+								e.getTextChannel().sendMessage(message.setDescription("Please either write private, public or game as first parameter!").build()).queue();
+							}
+						}
+						else {
+							if(args.length == 0)
+								e.getTextChannel().sendMessage("Please select if you want to display the bot or game patch notes!").queue();
+							else if(args.length == 1 && (args[0].equalsIgnoreCase("bot") || args[0].equalsIgnoreCase("game"))) {
+								ArrayList<Patchnote> display_notes = null;
+								if(args[0].equalsIgnoreCase("bot"))
+									display_notes = publ_notes;
+								else
+									display_notes = game_notes;
+								
+								if(display_notes == null || display_notes.size() == 0) {
+									message.setTitle("No patch notes available!").setColor(Color.RED);
+									e.getTextChannel().sendMessage(message.setDescription("No Patchnotes available for this filter option").build()).queue();
+								}
+								else {
+									collectPatchNotes(e, display_notes, message);
+								}
+							}
+							else if(args.length == 2 && (args[0].equalsIgnoreCase("bot") || args[0].equalsIgnoreCase("game"))) {
+								Patchnote note = null;
+								if(args[0].equalsIgnoreCase("bot"))
+									note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
+								else if(args[0].equalsIgnoreCase("game"))
+									note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
+								if(note == null) {
+									message.setTitle("No patch notes are available!").setColor(Color.RED);
+									e.getTextChannel().sendMessage(message.setDescription("Patch notes need to be registered before displaying them!").build()).queue();
+								}
+								else {
+									printPatchNotes(e, note, message);
+								}
+							}
+							else {
+								message.setTitle("Wrong parameter!").setColor(Color.RED);
+								e.getTextChannel().sendMessage(message.setDescription("Please either write private, public or game as first parameter!").build()).queue();
+							}
+						}
+					}
+				}
 			}
 			else {
 				EmbedBuilder message = new EmbedBuilder();
-				ArrayList<Patchnote> priv_notes = null;
-				ArrayList<Patchnote> publ_notes = null;
-				ArrayList<Patchnote> game_notes = null;
-				var modRights = false;
-				//retrieve patchnotes
-				if(UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-					modRights = true;
-				}
-				if(modRights)
-					priv_notes = sql.Patchnotes.SQLgetPrivatePatchnotesArray();
-				publ_notes = sql.Patchnotes.SQLgetPublicPatchnotesArray();
-				game_notes = sql.Patchnotes.SQLgetGamePatchnotesArray(e.getGuild().getIdLong());
-				
-				if(priv_notes == null && publ_notes == null && game_notes == null) {
-					message.setTitle("No patch notes are available!").setColor(Color.RED);
-					e.getTextChannel().sendMessage(message.setDescription("Patch notes need to be registered before displaying them!").build()).queue();
-				}
-				else if((priv_notes != null || publ_notes != null) && game_notes == null) {
-					if(modRights) {
-						if(args.length == 0)
-							e.getTextChannel().sendMessage("Please select if you want to display the public or private patch notes!").queue();
-						else if(args.length == 1 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public"))) {
-							ArrayList<Patchnote> display_notes = null;
-							if(args[0].equalsIgnoreCase("private"))
-								display_notes = priv_notes;
-							else
-								display_notes = publ_notes;
-							
-							if(display_notes == null || display_notes.size() == 0) {
-								message.setTitle("No patch notes available!").setColor(Color.RED);
-								e.getTextChannel().sendMessage(message.setDescription("No Patchnotes available for this filter option").build()).queue();
-							}
-							else {
-								collectPatchNotes(e, display_notes, message);
-							}
-						}
-						else if(args.length == 2 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public"))) {
-							Patchnote note = null;
-							if(args[0].equalsIgnoreCase("private"))
-								note = priv_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
-							else if(args[0].equalsIgnoreCase("public"))
-								note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
-							if(note == null) {
-								e.getTextChannel().sendMessage("Patch notes not found!").queue();
-							}
-							else {
-								printPatchNotes(e, note, message);
-							}
-						}
-						else {
-							message.setTitle("Wrong parameter!").setColor(Color.RED);
-							e.getTextChannel().sendMessage(message.setDescription("Please either write private or public as first parameter!").build()).queue();
-						}
-					}
-					else {
-						if(args.length == 0) {
-							collectPatchNotes(e, publ_notes, message);
-						}
-						else if(args.length == 1) {
-							var note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[0])).findAny().orElse(null);
-							if(note == null) {
-								message.setTitle("No patch notes are available!").setColor(Color.RED);
-								e.getTextChannel().sendMessage(message.setDescription("Patch notes need to be registered before displaying them!").build()).queue();
-							}
-							else {
-								printPatchNotes(e, note, message);
-							}
-						}
-					}
-				}
-				else if(priv_notes == null && publ_notes == null && game_notes != null) {
-					if(args.length == 0) {
-						collectPatchNotes(e, game_notes, message);
-					}
-					else if(args.length == 1) {
-						var note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[0])).findAny().orElse(null);
-						if(note == null) {
-							message.setTitle("No patch notes are available!").setColor(Color.RED);
-							e.getTextChannel().sendMessage(message.setDescription("Patch notes need to be registered before displaying them!").build()).queue();
-						}
-						else {
-							printPatchNotes(e, note, message);
-						}
-					}
-				}
-				else {
-					if(modRights) {
-						if(args.length == 0)
-							e.getTextChannel().sendMessage("Please select if you want to display the public, private or game patch notes!").queue();
-						else if(args.length == 1 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public") || args[0].equalsIgnoreCase("game"))) {
-							ArrayList<Patchnote> display_notes = null;
-							if(args[0].equalsIgnoreCase("private"))
-								display_notes = priv_notes;
-							else if(args[0].equalsIgnoreCase("public"))
-								display_notes = publ_notes;
-							else
-								display_notes = game_notes;
-							
-							if(display_notes == null || display_notes.size() == 0) {
-								message.setTitle("No patch notes available!").setColor(Color.RED);
-								e.getTextChannel().sendMessage(message.setDescription("No Patchnotes available for this filter option").build()).queue();
-							}
-							else {
-								collectPatchNotes(e, display_notes, message);
-							}
-						}
-						else if(args.length == 2 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public") || args[0].equalsIgnoreCase("game"))) {
-							Patchnote note = null;
-							if(args[0].equalsIgnoreCase("private"))
-								note = priv_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
-							else if(args[0].equalsIgnoreCase("public"))
-								note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
-							else if(args[0].equalsIgnoreCase("game"))
-								note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
-							if(note == null) {
-								message.setTitle("No patch notes are available!").setColor(Color.RED);
-								e.getTextChannel().sendMessage(message.setDescription("Patch notes need to be registered before displaying them!").build()).queue();
-							}
-							else {
-								printPatchNotes(e, note, message);
-							}
-						}
-						else {
-							message.setTitle("Wrong parameter!").setColor(Color.RED);
-							e.getTextChannel().sendMessage(message.setDescription("Please either write private, public or game as first parameter!").build()).queue();
-						}
-					}
-					else {
-						if(args.length == 0)
-							e.getTextChannel().sendMessage("Please select if you want to display the bot or game patch notes!").queue();
-						else if(args.length == 1 && (args[0].equalsIgnoreCase("bot") || args[0].equalsIgnoreCase("game"))) {
-							ArrayList<Patchnote> display_notes = null;
-							if(args[0].equalsIgnoreCase("bot"))
-								display_notes = publ_notes;
-							else
-								display_notes = game_notes;
-							
-							if(display_notes == null || display_notes.size() == 0) {
-								message.setTitle("No patch notes available!").setColor(Color.RED);
-								e.getTextChannel().sendMessage(message.setDescription("No Patchnotes available for this filter option").build()).queue();
-							}
-							else {
-								collectPatchNotes(e, display_notes, message);
-							}
-						}
-						else if(args.length == 2 && (args[0].equalsIgnoreCase("bot") || args[0].equalsIgnoreCase("game"))) {
-							Patchnote note = null;
-							if(args[0].equalsIgnoreCase("bot"))
-								note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
-							else if(args[0].equalsIgnoreCase("game"))
-								note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
-							if(note == null) {
-								message.setTitle("No patch notes are available!").setColor(Color.RED);
-								e.getTextChannel().sendMessage(message.setDescription("Patch notes need to be registered before displaying them!").build()).queue();
-							}
-							else {
-								printPatchNotes(e, note, message);
-							}
-						}
-						else {
-							message.setTitle("Wrong parameter!").setColor(Color.RED);
-							e.getTextChannel().sendMessage(message.setDescription("Please either write private, public or game as first parameter!").build()).queue();
-						}
-					}
-				}
+				e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
 			}
 		}
 	}

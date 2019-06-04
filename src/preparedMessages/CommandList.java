@@ -13,7 +13,7 @@ public class CommandList {
 		boolean entertainment = false;
 		boolean other = false;
 		
-		if(permissionGranted && GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getRssCommand(guild_id)){
+		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getRssCommand(guild_id))){
 			administration = true;
 		}
 		

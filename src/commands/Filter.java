@@ -22,8 +22,7 @@ public class Filter implements Command{
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(GuildIni.getFilterCommand(e.getGuild().getIdLong())) {			
-			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
+			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getFilterLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				if(args.length == 0) {
 					FilterExecution.runHelp(e);
 				}
@@ -32,7 +31,8 @@ public class Filter implements Command{
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() +" **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+				EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
+				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() +" **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
 			}
 		}
 	}

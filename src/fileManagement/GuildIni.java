@@ -42,29 +42,94 @@ public class GuildIni {
 			
 			//Commands
 			ini.add("Commands", "About", "false");
+			ini.add("Commands", "AboutLevel", "1");
 			ini.add("Commands", "Commands", "false");
+			ini.add("Commands", "CommandsLevel", "1");
+			ini.add("Commands", "CommandsAdminLevel", "20");
 			ini.add("Commands", "Daily", "false");
+			ini.add("Commands", "DailyLevel", "1");
 			ini.add("Commands", "Display", "false");
+			ini.add("Commands", "DisplayLevel", "1");
+			ini.add("Commands", "DisplayRolesLevel", "1");
+			ini.add("Commands", "DisplayRegisteredRolesLevel", "1");
+			ini.add("Commands", "DisplayRankingRolesLevel", "1");
+			ini.add("Commands", "DisplayTextChannelsLevel", "1");
+			ini.add("Commands", "DisplayVoiceChannelsLevel", "1");
+			ini.add("Commands", "DisplayRegisteredChannelsLevel", "1");
+			ini.add("Commands", "DisplayDailiesLevel", "1");
 			ini.add("Commands", "Help", "false");
+			ini.add("Commands", "HelpLevel", "1");
 			ini.add("Commands", "Inventory", "false");
+			ini.add("Commands", "InventoryLevel", "1");
 			ini.add("Commands", "Meow", "false");
+			ini.add("Commands", "MeowLevel", "1");
 			ini.add("Commands", "Profile", "false");
+			ini.add("Commands", "ProfileLevel", "1");
 			ini.add("Commands", "Pug", "false");
+			ini.add("Commands", "PugLevel", "1");
 			ini.add("Commands", "Purchase", "false");
+			ini.add("Commands", "PurchaseLevel", "1");
 			ini.add("Commands", "Rank", "false");
+			ini.add("Commands", "RankLevel", "1");
 			ini.add("Commands", "Register", "false");
+			ini.add("Commands", "RegisterLevel", "20");
+			ini.add("Commands", "RegisterRoleLevel", "20");
+			ini.add("Commands", "RegisterTextChannelLevel", "20");
+			ini.add("Commands", "RegisterRankingRoleLevel", "20");
+			ini.add("Commands", "RegisterTextChannelsLevel", "20");
+			ini.add("Commands", "RegisterUsersLevel", "20");
 			ini.add("Commands", "Set", "false");
+			ini.add("Commands", "SetLevel", "20");
+			ini.add("Commands", "SetChannelFilterLevel", "20");
+			ini.add("Commands", "SetWarningsLevel", "20");
+			ini.add("Commands", "SetCommandsLevel", "20");
+			ini.add("Commands", "SetRankingLevel", "20");
+			ini.add("Commands", "SetMaxExperienceLevel", "20");
+			ini.add("Commands", "SetDefaultLevelSkinLevel", "20");
+			ini.add("Commands", "SetDefaultRankSkinLevel", "20");
+			ini.add("Commands", "SetDefaultProfileSkinLevel", "20");
+			ini.add("Commands", "SetDefaultIconSkinLevel", "20");
+			ini.add("Commands", "SetDailyItemLevel", "20");
+			ini.add("Commands", "SetGiveawayItemsLevel", "20");
 			ini.add("Commands", "Shop", "false");
+			ini.add("Commands", "ShopLevel", "1");
 			ini.add("Commands", "Top", "false");
+			ini.add("Commands", "TopLevel", "1");
 			ini.add("Commands", "Use", "false");
+			ini.add("Commands", "UseLevel", "1");
 			ini.add("Commands", "User", "false");
+			ini.add("Commands", "UserLevel", "20");
+			ini.add("Commands", "UserInformationLevel", "20");
+			ini.add("Commands", "UserDeleteMessagesLevel", "20");
+			ini.add("Commands", "UserWarningLevel", "20");
+			ini.add("Commands", "UserMuteLevel", "20");
+			ini.add("Commands", "UserUnmuteLevel", "20");
+			ini.add("Commands", "UserBanLevel", "20");
+			ini.add("Commands", "UserKickLevel", "20");
+			ini.add("Commands", "UserGiftExperienceLevel", "20");
+			ini.add("Commands", "UserSetExperienceLevel", "20");
+			ini.add("Commands", "UserSetLevelLevel", "20");
+			ini.add("Commands", "UserGiftCurrencyLevel", "20");
+			ini.add("Commands", "UserSetCurrencyLevel", "20");
 			ini.add("Commands", "Filter", "false");
+			ini.add("Commands", "FilterLevel", "20");
+			ini.add("Commands", "FilterWordFilterLevel", "20");
+			ini.add("Commands", "FilterNameFilterLevel", "20");
+			ini.add("Commands", "FilterNameKickLevel", "20");
+			ini.add("Commands", "FilterFunnyNamesLevel", "20");
+			ini.add("Commands", "FilterStaffNamesLevel", "20");
 			ini.add("Commands", "Quiz", "false");
+			ini.add("Commands", "QuizLevel", "20");
 			ini.add("Commands", "RoleReaction", "false");
+			ini.add("Commands", "RoleReactionLevel", "20");
 			ini.add("Commands", "Rss", "false");
+			ini.add("Commands", "RssLevel", "20");
 			ini.add("Commands", "Randomshop", "false");
+			ini.add("Commands", "RandomshopLevel", "1");
 			ini.add("Commands", "Patchnotes", "false");
+			ini.add("Commands", "PatchnotesLevel", "1");
 			ini.add("Commands", "DoubleExperience", "false");
+			ini.add("Commands", "DoubleExperienceLevel", "20");
 			
 			//Inventory
 			ini.add("Inventory", "startX", "0");
@@ -225,105 +290,357 @@ public class GuildIni {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "About", boolean.class);
 	}
+	public static int getAboutLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "AboutLevel", int.class);
+	}
 	public static boolean getCommandsCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Commands", boolean.class);
+	}
+	public static int getCommandsLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "CommandsLevel", int.class);
+	}
+	public static int getCommandsAdminLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "CommandsAdminLevel", int.class);
 	}
 	public static boolean getDailyCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Daily", boolean.class);
 	}
+	public static int getDailyLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DailyLevel", int.class);
+	}
 	public static boolean getDisplayCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Display", boolean.class);
+	}
+	public static int getDisplayLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DisplayLevel", int.class);
+	}
+	public static int getDisplayRolesLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DisplayRolesLevel", int.class);
+	}
+	public static int getDisplayRegisteredRolesLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DisplayRegisteredRolesLevel", int.class);
+	}
+	public static int getDisplayRankingRolesLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DisplayRankingRolesLevel", int.class);
+	}
+	public static int getDisplayTextChannelsLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DisplayTextChannelsLevel", int.class);
+	}
+	public static int getDisplayVoiceChannelsLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DisplayVoiceChannelsLevel", int.class);
+	}
+	public static int getDisplayRegisteredChannelsLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DisplayRegisteredChannelsLevel", int.class);
+	}
+	public static int getDisplayDailiesLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DisplayDailiesLevel", int.class);
 	}
 	public static boolean getHelpCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Help", boolean.class);
 	}
+	public static int getHelpLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "HelpLevel", int.class);
+	}
 	public static boolean getInventoryCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Inventory", boolean.class);
+	}
+	public static int getInventoryLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "InventoryLevel", int.class);
 	}
 	public static boolean getMeowCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Meow", boolean.class);
 	}
+	public static int getMeowLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "MeowLevel", int.class);
+	}
 	public static boolean getProfileCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Profile", boolean.class);
+	}
+	public static int getProfileLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "ProfileLevel", int.class);
 	}
 	public static boolean getPugCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Pug", boolean.class);
 	}
+	public static int getPugLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "PugLevel", int.class);
+	}
 	public static boolean getPurchaseCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Purchase", boolean.class);
+	}
+	public static int getPurchaseLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "PurchaseLevel", int.class);
 	}
 	public static boolean getRankCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Rank", boolean.class);
 	}
-	public static boolean getRebootCommand(long guild_id) {
+	public static int getRankLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("Commands", "Reboot", boolean.class);
+		return ini.get("Commands", "RankLevel", int.class);
 	}
 	public static boolean getRegisterCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Register", boolean.class);
 	}
+	public static int getRegisterLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "RegisterLevel", int.class);
+	}
+	public static int getRegisterRoleLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "RegisterRoleLevel", int.class);
+	}
+	public static int getRegisterTextChannelLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "RegisterTextChannelLevel", int.class);
+	}
+	public static int getRegisterRankingRoleLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "RegisterRankingRoleLevel", int.class);
+	}
+	public static int getRegisterTextChannelsLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "RegisterTextChannelsLevel", int.class);
+	}
+	public static int getRegisterUsersLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "RegisterUsersLevel", int.class);
+	}
 	public static boolean getSetCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Set", boolean.class);
+	}
+	public static int getSetLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "SetLevel", int.class);
+	}
+	public static int getSetChannelFilterLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "SetChannelFilterLevel", int.class);
+	}
+	public static int getSetWarningsLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "SetWarningsLevel", int.class);
+	}
+	public static int getSetCommandsLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "SetCommandsLevel", int.class);
+	}
+	public static int getSetRankingLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "SetRankingLevel", int.class);
+	}
+	public static int getSetMaxExperienceLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "SetMaxExperienceLevel", int.class);
+	}
+	public static int getSetDefaultLevelSkinLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "SetDefaultLevelSkinLevel", int.class);
+	}
+	public static int getSetDefaultRankSkinLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "SetDefaultRankSkinLevel", int.class);
+	}
+	public static int getSetDefaultProfileSkinLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "SetDefaultProfileSkinLevel", int.class);
+	}
+	public static int getSetDefaultIconSkinLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "SetDefaultIconSkinLevel", int.class);
+	}
+	public static int getSetDailyItemLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "SetDailyItemLevel", int.class);
+	}
+	public static int getSetGiveawayItemsLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "SetGiveawayItemsLevel", int.class);
 	}
 	public static boolean getShopCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Shop", boolean.class);
 	}
-	public static boolean getShutDownCommand(long guild_id) {
+	public static int getShopLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("Commands", "ShutDown", boolean.class);
+		return ini.get("Commands", "ShopLevel", int.class);
 	}
 	public static boolean getTopCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Top", boolean.class);
 	}
+	public static int getTopLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "TopLevel", int.class);
+	}
 	public static boolean getUseCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Use", boolean.class);
+	}
+	public static int getUseLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UseLevel", int.class);
 	}
 	public static boolean getUserCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "User", boolean.class);
 	}
+	public static int getUserLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserLevel", int.class);
+	}
+	public static int getUserInformationLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserInformationLevel", int.class);
+	}
+	public static int getUserDeleteMessagesLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserDeleteMessagesLevel", int.class);
+	}
+	public static int getUserWarningLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserWarningLevel", int.class);
+	}
+	public static int getUserMuteLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserMuteLevel", int.class);
+	}
+	public static int getUserUnmuteLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserUnmuteLevel", int.class);
+	}
+	public static int getUserBanLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserBanLevel", int.class);
+	}
+	public static int getUserKickLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserKickLevel", int.class);
+	}
+	public static int getUserGiftExperienceLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserGiftExperienceLevel", int.class);
+	}
+	public static int getUserSetExperienceLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserSetExperienceLevel", int.class);
+	}
+	public static int getUserSetLevelLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserSetLevelLevel", int.class);
+	}
+	public static int getUserGiftCurrencyLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserGiftCurrencyLevel", int.class);
+	}
+	public static int getUserSetCurrencyLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserSetCurrencyLevel", int.class);
+	}
 	public static boolean getFilterCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Filter", boolean.class);
+	}
+	public static int getFilterLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "FilterLevel", int.class);
+	}
+	public static int getFilterWordFilterLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "FilterWordFilterLevel", int.class);
+	}
+	public static int getFilterNameFilterLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "FilterNameFilterLevel", int.class);
+	}
+	public static int getFilterNameKickLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "FilterNameKickLevel", int.class);
+	}
+	public static int getFilterFunnyNamesLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "FilterFunnyNamesLevel", int.class);
+	}
+	public static int getFilterStaffNamesLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "FilterStaffNamesLevel", int.class);
 	}
 	public static boolean getQuizCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Quiz", boolean.class);
 	}
+	public static int getQuizLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "QuizLevel", int.class);
+	}
 	public static boolean getRoleReactionCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "RoleReaction", boolean.class);
+	}
+	public static int getRoleReactionLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "RoleReactionLevel", int.class);
 	}
 	public static boolean getRssCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Rss", boolean.class);
 	}
+	public static int getRssLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "RssLevel", int.class);
+	}
 	public static boolean getRandomshopCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Randomshop", boolean.class);
+	}
+	public static int getRandomshopLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "RandomshopLevel", int.class);
 	}
 	public static boolean getPatchnotesCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Patchnotes", boolean.class);
 	}
+	public static int getPatchnotesLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "PatchnotesLevel", int.class);
+	}
 	public static boolean getDoubleExperienceCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "DoubleExperience", boolean.class);
+	}
+	public static int getDoubleExperienceLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DoubleExperienceLevel", int.class);
 	}
 	
 	public static int[] getWholeInventory(long guild_id) {

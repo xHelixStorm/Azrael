@@ -24,7 +24,7 @@ public class ShutDown implements Command{
 		Logger logger = LoggerFactory.getLogger(ShutDown.class);
 		logger.debug("{} has used ShutDown command", e.getMember().getUser().getId());
 		
-		if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()){
+		if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 			FileSetting.createFile("./files/running.azr", "0");
 			e.getTextChannel().sendMessage("**shutting down now. Cya later!**").queue();
 			e.getJDA().shutdown();

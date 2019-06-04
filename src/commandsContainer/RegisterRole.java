@@ -33,13 +33,13 @@ public class RegisterRole {
 		_e.getTextChannel().sendMessage(messageBuild.setDescription(parseMessage+strB.toString()).build()).queue();
 	}
 	
-	public static void runCommandWithAdminFirst(MessageReceivedEvent _e, long _guild_id, String [] _args){
+	public static void runCommandWithAdminFirst(MessageReceivedEvent _e, long _guild_id, String [] _args, boolean adminPermission){
 		String category_abv = null;
 		String role;
 		String role_name;
 		long role_id;
 		
-		if(GuildIni.getAdmin(_guild_id) == _e.getMember().getUser().getIdLong()) {
+		if(adminPermission) {
 			if(_args.length > 2 && _args[1].equalsIgnoreCase("adm")) {
 				category_abv = "adm";
 				role = _args[2].replaceAll("[^0-9]*", "");
@@ -47,7 +47,7 @@ public class RegisterRole {
 					try {
 						role_id = Long.parseLong(role);
 						role_name = _e.getGuild().getRoleById(role_id).getName();
-						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, role_name, category_abv) > 0) {
+						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, 100, role_name, category_abv) > 0) {
 							logger.debug("Administrator role registered {} for guild {}", role_id, _e.getGuild().getName());
 							_e.getTextChannel().sendMessage("**The primary Administrator role has been registered!**").queue();
 							DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong());
@@ -66,17 +66,17 @@ public class RegisterRole {
 			}
 		}
 		else {
-			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").build()).queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
 		}
 	}
 
-	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String [] _args){
+	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String [] _args, boolean adminPermission){
 		String category_abv = null;
 		String role;
 		String role_name;
 		long role_id;
 		
-		if(UserPrivs.isUserAdmin(_e.getMember().getUser(), _guild_id) || _e.getMember().getUser().getIdLong() == GuildIni.getAdmin(_guild_id)){
+		if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getRegisterRoleLevel(_e.getGuild().getIdLong())) || adminPermission){
 			Pattern pattern = Pattern.compile("(adm|mod|com|bot|mut|rea)");
 			Matcher matcher = pattern.matcher(_args[1].toLowerCase());
 			if(_args.length > 2 && matcher.find()){
@@ -86,7 +86,8 @@ public class RegisterRole {
 					try {
 						role_id = Long.parseLong(role);
 						role_name = _e.getGuild().getRoleById(role_id).getName();
-						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, role_name, category_abv) > 0) {
+						var level = getLevel(category_abv);
+						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, level, role_name, category_abv) > 0) {
 							logger.debug("{} has registered the role {} with the category {} in guild {}", _e.getMember().getUser().getId(), role_name, category_abv, _e.getGuild().getName());
 							_e.getTextChannel().sendMessage("**The role has been registered!**").queue();
 							if(category_abv.equals("rea")) {
@@ -111,7 +112,19 @@ public class RegisterRole {
 			}
 		}
 		else {
-			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator. Here a cookie** :cookie:").build()).queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+		}
+	}
+	
+	private static int getLevel(String category) {
+		switch(category) {
+			case "adm": return 100;
+			case "mod": return 20;
+			case "com": return 1;
+			case "bot": return 10;
+			case "mut": return 0;
+			case "rea": return 1;
+			default : 	return 0;
 		}
 	}
 }

@@ -27,7 +27,7 @@ public class RoleReaction implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		//after a channel has been registered for self role assignment, it can be disabled and enabled with this command
 		if(GuildIni.getRoleReactionCommand(e.getGuild().getIdLong())) 
-			if(UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) == true || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
+			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getRoleReactionLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				if(args.length > 0 && args[0].equalsIgnoreCase("enable")) {
 					Logger logger = LoggerFactory.getLogger(RoleReaction.class);
 					logger.debug("{} has used RoleReaction command to enable self assigning roles!", e.getMember().getUser().getId());
@@ -88,7 +88,7 @@ public class RoleReaction implements Command{
 			}
 			else {
 				EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
 			}
 		
 	}
