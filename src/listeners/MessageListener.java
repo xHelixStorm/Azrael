@@ -263,7 +263,7 @@ public class MessageListener extends ListenerAdapter{
 					if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) == null){
 						int roleAssignLevel = 0;
 						long role_id = 0;
-						Rank ranking_levels = Hashes.getRankingRoles(guild_id+"_"+(user_details.getLevel()+1));
+						Rank ranking_levels = RankingSystem.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getLevel_Requirement() == (user_details.getLevel()+1)).findAny().orElse(null);
 						if(ranking_levels != null){
 							if(ranking_levels.getGuildID() == guild_id){
 								roleAssignLevel = ranking_levels.getLevel_Requirement();

@@ -28,7 +28,7 @@ public class RankingSystem {
 	private static String username = IniFileReader.getSQLUsername2();
 	private static String password = IniFileReader.getSQLPassword2();
 		
-	public static void SQLconnection(){
+	public static void SQLconnection() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
@@ -37,7 +37,7 @@ public class RankingSystem {
 	}
 	
 	//action_log
-	public static void SQLInsertActionLog(String _warning_level, long _entity, long _guild_id, String _event, String _notes){
+	public static void SQLInsertActionLog(String _warning_level, long _entity, long _guild_id, String _event, String _notes) {
 		logger.debug("SQLInsertActionLog launched. Passed params {}, {}, {}, {}, {}", _warning_level, _entity, _guild_id, _event, _notes);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -60,7 +60,7 @@ public class RankingSystem {
 	}
 	
 	//users table
-	public static int SQLInsertUser(long _user_id, long _guild_id, String _name, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin){
+	public static int SQLInsertUser(long _user_id, long _guild_id, String _name, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin) {
 		logger.debug("SQLInsertUser launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _name, _level_skin, _rank_skin, _profile_skin, _icon_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -89,7 +89,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateUserLevelSkin(long _user_id, long _guild_id, String _name, int _skin_id){
+	public static int SQLUpdateUserLevelSkin(long _user_id, long _guild_id, String _name, int _skin_id) {
 		logger.debug("SQLUpdateUserLevelSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -111,7 +111,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateUserRankSkin(long _user_id, long _guild_id, String _name, int _skin_id){
+	public static int SQLUpdateUserRankSkin(long _user_id, long _guild_id, String _name, int _skin_id) {
 		logger.debug("SQLUpdateUserRankSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -133,7 +133,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateUserProfileSkin(long _user_id, long _guild_id, String _name, int _skin_id){
+	public static int SQLUpdateUserProfileSkin(long _user_id, long _guild_id, String _name, int _skin_id) {
 		logger.debug("SQLUpdateUserProfileSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -155,7 +155,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateUserIconSkin(long _user_id, long _guild_id, String _name, int _skin_id){
+	public static int SQLUpdateUserIconSkin(long _user_id, long _guild_id, String _name, int _skin_id) {
 		logger.debug("SQLUpdateUserIconSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -178,7 +178,7 @@ public class RankingSystem {
 	}
 	
 	//guilds table 
-	public static int SQLInsertGuild(long _guild_id, String _name, boolean _enabled){
+	public static int SQLInsertGuild(long _guild_id, String _name, boolean _enabled) {
 		logger.debug("SQLInsertGuild launched. Passed params {}, {}, {}", _guild_id, _name, _enabled);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -199,7 +199,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateRankingSystem(long _guild_id, String _guild_name, boolean _ranking_state){
+	public static int SQLUpdateRankingSystem(long _guild_id, String _guild_name, boolean _ranking_state) {
 		logger.debug("SQLUpdateRankingSystem launched. Passed params {}, {}, {}", _guild_id, _guild_name, _ranking_state);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -220,7 +220,7 @@ public class RankingSystem {
 		}	
 	}
 	
-	public static int SQLUpdateLevelDefaultSkin(long _guild_id, String _guild_name, int _level_skin){
+	public static int SQLUpdateLevelDefaultSkin(long _guild_id, String _guild_name, int _level_skin) {
 		logger.debug("SQLUpdateLevelDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _level_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -241,7 +241,7 @@ public class RankingSystem {
 		}	
 	}
 	
-	public static int SQLUpdateRankDefaultSkin(long _guild_id, String _guild_name, int _rank_skin){
+	public static int SQLUpdateRankDefaultSkin(long _guild_id, String _guild_name, int _rank_skin) {
 		logger.debug("SQLUpdateRankDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _rank_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -262,7 +262,7 @@ public class RankingSystem {
 		}	
 	}
 	
-	public static int SQLUpdateProfileDefaultSkin(long _guild_id, String _guild_name, int _profile_skin){
+	public static int SQLUpdateProfileDefaultSkin(long _guild_id, String _guild_name, int _profile_skin) {
 		logger.debug("SQLUpdateProfileDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _profile_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -283,7 +283,7 @@ public class RankingSystem {
 		}	
 	}
 	
-	public static int SQLUpdateIconDefaultSkin(long _guild_id, String _guild_name, int _icon_skin){
+	public static int SQLUpdateIconDefaultSkin(long _guild_id, String _guild_name, int _icon_skin) {
 		logger.debug("SQLUpdateIconDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _icon_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -305,7 +305,7 @@ public class RankingSystem {
 	}
 	
 	//roles table
-	public static int SQLInsertRoles(long _role_id, String _name, int _role_level_requirement, long _guild_id){
+	public static int SQLInsertRoles(long _role_id, String _name, int _role_level_requirement, long _guild_id) {
 		logger.debug("SQLInsertRoles launched. Passed params {}, {}, {}, {}", _role_id, _name, _role_level_requirement, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -327,7 +327,27 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLclearRoles(long _guild_id){
+	public static int SQLremoveSingleRole(long _role_id, long _guild_id) {
+		logger.debug("SQLremoveSingleRole launched. Passed params {}, {}", _role_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM roles WHERE role_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _role_id);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLremoveSingleRole Exception", e);
+			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLclearRoles(long _guild_id) {
 		logger.debug("SQLclearRoles launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -346,30 +366,59 @@ public class RankingSystem {
 		}
 	}
 	
-	public static boolean SQLgetRoles(long _guild_id){
-		logger.debug("SQLgetRoles launched. Passed params {}", _guild_id);
+	public static ArrayList<Rank> SQLgetRoles(long _guild_id) {
+		if(Hashes.getRankingRoles(_guild_id) == null) {
+			logger.debug("SQLgetRoles launched. Passed params {}", _guild_id);
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			ArrayList<Rank> ranks = new ArrayList<Rank>();
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT * FROM roles WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()) {
+					Rank rank = new Rank();
+					rank.setRoleID(rs.getLong(1));
+					rank.setRole_Name(rs.getString(2));
+					rank.setLevel_Requirement(rs.getInt(3));
+					rank.setGuildID(rs.getLong(4));
+					ranks.add(rank);
+				}
+				Hashes.addRankingRoles(_guild_id, ranks);
+				return ranks;
+			} catch (SQLException e) {
+				logger.error("SQLgetRoles Exception", e);
+				return null;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		return Hashes.getRankingRoles(_guild_id);
+	}
+	
+	public static boolean SQLgetRole(long _role_id, long _guild_id) {
+		logger.debug("SQLgetRole launched. Passed params {}, {}", _role_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM roles WHERE fk_guild_id = ?");
-			var success = false;
+			String sql = ("SELECT * FROM roles WHERE role_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt.setLong(1, _role_id);
+			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			while(rs.next()){
-				Rank ranks = new Rank();
-				ranks.setRoleID(rs.getLong(1));
-				ranks.setRole_Name(rs.getString(2));
-				ranks.setLevel_Requirement(rs.getInt(3));
-				ranks.setGuildID(rs.getLong(4));
-				Hashes.addRankingRoles(_guild_id+"_"+ranks.getLevel_Requirement(), ranks);
-				success = true;
+			while(rs.next()) {
+				return true;
 			}
-			return success;
+			return false;
 		} catch (SQLException e) {
-			logger.error("SQLgetRoles Exception", e);
+			logger.error("SQLgetRole Exception", e);
 			return false;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -379,7 +428,7 @@ public class RankingSystem {
 	}
 	
 	//user_details table
-	public static int SQLInsertUserDetails(long _user_id, long _guild_id, int _level, long _experience, long _currency, long _assigned_role){
+	public static int SQLInsertUserDetails(long _user_id, long _guild_id, int _level, long _experience, long _currency, long _assigned_role) {
 		logger.debug("SQLInsertUserDetails launched. Passed params {}, {}, {}, {}, {}", _user_id, _level, _experience, _currency, _assigned_role);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -415,7 +464,7 @@ public class RankingSystem {
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getLong(1);
 			}
 			return 0;
@@ -429,7 +478,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateExperience(long _user_id, long _guild_id, long _experience){
+	public static int SQLUpdateExperience(long _user_id, long _guild_id, long _experience) {
 		logger.debug("SQLUpdateExperience launched. Passed params {}, {}, {}", _user_id, _guild_id, _experience);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -450,7 +499,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLsetLevelUp(long _user_id, long _guild_id, int _level, long _experience, long _currency, long _assigned_role){
+	public static int SQLsetLevelUp(long _user_id, long _guild_id, int _level, long _experience, long _currency, long _assigned_role) {
 		logger.debug("SQLsetLevelUp launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _level, _experience, _currency, _assigned_role);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -474,7 +523,27 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateCurrency(long _user_id, long _guild_id, long _currency){
+	public static int SQLUpdateCurrentRole(long _guild_id, long _role_assign) {
+		logger.debug("SQLUpdateCurrentRole launched. Passed params {}, {}", _guild_id, _role_assign);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE user_details SET `current_role` = ? WHERE `fk_guild_id` = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _role_assign);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateCurrentRole Exception", e);
+			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateCurrency(long _user_id, long _guild_id, long _currency) {
 		logger.debug("SQLUpdateCurrency launched. Passed params {}, {}, {}", _user_id, _guild_id, _currency);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -495,7 +564,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<Rank> SQLRanking(long _guild_id){
+	public static ArrayList<Rank> SQLRanking(long _guild_id) {
 		if(Hashes.getRankList("ranking_"+_guild_id) == null) {
 			logger.debug("SQLgetRanking launched. Passed params {}", _guild_id);
 			ArrayList<Rank> rankList = new ArrayList<Rank>();
@@ -508,7 +577,7 @@ public class RankingSystem {
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					Rank rank = new Rank();
 					rank.setUser_ID(rs.getLong(1));
 					rank.setLevel(rs.getInt(2));
@@ -531,7 +600,7 @@ public class RankingSystem {
 	}
 	
 	//max_exp table
-	public static int SQLInsertMaxExperience(long _experience, boolean _enabled, long _guild_id){
+	public static int SQLInsertMaxExperience(long _experience, boolean _enabled, long _guild_id) {
 		logger.debug("SQLInsertMaxExperience launched. Passed params {}, {}, {}", _experience, _enabled, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -553,7 +622,7 @@ public class RankingSystem {
 	}
 	
 	//daily_experience table
-	public static int SQLInsertDailyExperience(long _experience, long _user_id, long _guild_id, Timestamp _reset){
+	public static int SQLInsertDailyExperience(long _experience, long _user_id, long _guild_id, Timestamp _reset) {
 		logger.debug("SQLInsertDailyExperience launched. Passed params {}, {}, {}, {}", _experience, _user_id, _guild_id, _reset);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -575,7 +644,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLDeleteDailyExperience(long _user_id, long _guild_id){
+	public static int SQLDeleteDailyExperience(long _user_id, long _guild_id) {
 		logger.debug("SQLDeleteDailyExperience launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -596,7 +665,7 @@ public class RankingSystem {
 	}
 	
 	//ranking_level
-	public static ArrayList<Rank> SQLgetRankingLevel(){
+	public static ArrayList<Rank> SQLgetRankingLevel() {
 		if(Hashes.getRankList("ranking-level") == null) {
 			logger.debug("SQLgetRankingLevel launched. No params passed");
 			ArrayList<Rank> rankList = new ArrayList<Rank>();
@@ -608,7 +677,7 @@ public class RankingSystem {
 				String sql = ("SELECT * FROM ranking_level");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					Rank rankingSystem = new Rank();
 					rankingSystem.setRankingLevel(rs.getInt(1));
 					rankingSystem.setLevelDescription(rs.getString(2));
@@ -637,7 +706,7 @@ public class RankingSystem {
 	}
 	
 	//ranking_rank
-	public static ArrayList<Rank> SQLgetRankingRank(){
+	public static ArrayList<Rank> SQLgetRankingRank() {
 		if(Hashes.getRankList("ranking-rank") == null) {
 			logger.debug("SQLgetRankingRank launched. No params passed");
 			ArrayList<Rank> rankList = new ArrayList<Rank>();
@@ -649,7 +718,7 @@ public class RankingSystem {
 				String sql = ("SELECT * FROM ranking_rank");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					Rank rankingSystem = new Rank();
 					rankingSystem.setRankingRank(rs.getInt(1));
 					rankingSystem.setRankDescription(rs.getString(2));
@@ -681,7 +750,7 @@ public class RankingSystem {
 	}
 	
 	//ranking_profile
-	public static ArrayList<Rank> SQLgetRankingProfile(){
+	public static ArrayList<Rank> SQLgetRankingProfile() {
 		if(Hashes.getRankList("ranking-profile") == null) {
 			logger.debug("SQLgetRankingProfile launched. No params passed");
 			ArrayList<Rank> rankList = new ArrayList<Rank>();
@@ -693,7 +762,7 @@ public class RankingSystem {
 				String sql = ("SELECT * FROM ranking_profile");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					Rank rankingSystem = new Rank();
 					rankingSystem.setRankingProfile(rs.getInt(1));
 					rankingSystem.setProfileDescription(rs.getString(2));
@@ -725,7 +794,7 @@ public class RankingSystem {
 	}
 	
 	//ranking_icon
-	public static ArrayList<Rank> SQLgetRankingIcons(){
+	public static ArrayList<Rank> SQLgetRankingIcons() {
 		if(Hashes.getRankList("ranking-icons") == null) {
 			logger.debug("SQLgetRankingIcons launched. No params passed");
 			ArrayList<Rank> rankList = new ArrayList<Rank>();
@@ -737,7 +806,7 @@ public class RankingSystem {
 				String sql = ("SELECT * FROM ranking_icons");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					Rank rankingSystem = new Rank();
 					rankingSystem.setRankingIcon(rs.getInt(1));
 					rankingSystem.setIconDescription(rs.getString(2));
@@ -759,7 +828,7 @@ public class RankingSystem {
 	}
 	
 	//daily_items
-	public static int SQLInsertDailyItems(String _description, int _weight, String _type, long _guild_id, int _theme_id){
+	public static int SQLInsertDailyItems(String _description, int _weight, String _type, long _guild_id, int _theme_id) {
 		logger.debug("SQLInsertDailyItems launched. Passed params {}, {}, {}, {}, {}", _description, _weight, _type, _guild_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -782,7 +851,7 @@ public class RankingSystem {
 	}
 	
 	//inventory
-	public static int SQLInsertInventory(long _user_id, long _guild_id, int _item_id, Timestamp _position, int _number, String _status, int _theme_id){
+	public static int SQLInsertInventory(long _user_id, long _guild_id, int _item_id, Timestamp _position, int _number, String _status, int _theme_id) {
 		logger.debug("SQLInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _item_id, _position, _number, _status, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -807,7 +876,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLInsertInventoryWithLimit(long _user_id, long _guild_id, int _item_id, Timestamp _position, int _number, String _status, Timestamp _expires, int _theme_id){
+	public static int SQLInsertInventoryWithLimit(long _user_id, long _guild_id, int _item_id, Timestamp _position, int _number, String _status, Timestamp _expires, int _theme_id) {
 		logger.debug("SQLInsertInventoryWithLimit launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _item_id, _position, _number, _status, _expires, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -833,7 +902,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetNumberLimitFromInventory(long _user_id, long _guild_id, int _item_id, int _theme_id){
+	public static int SQLgetNumberLimitFromInventory(long _user_id, long _guild_id, int _item_id, int _theme_id) {
 		logger.debug("SQLgetNumberLimitFromInventory launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _item_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -847,7 +916,7 @@ public class RankingSystem {
 			stmt.setLong(3, _guild_id);
 			stmt.setInt(4, _theme_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getInt(1);
 			}
 			return 0;
@@ -861,7 +930,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static Timestamp SQLgetExpirationFromInventory(long _user_id, long _guild_id, int _item_id, int _theme_id){
+	public static Timestamp SQLgetExpirationFromInventory(long _user_id, long _guild_id, int _item_id, int _theme_id) {
 		logger.debug("SQLgetExpirationFromInventory launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _item_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -875,7 +944,7 @@ public class RankingSystem {
 			stmt.setLong(3, _guild_id);
 			stmt.setInt(4, _theme_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getTimestamp(1);
 			}
 			return null;
@@ -889,7 +958,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static void SQLDeleteInventory(){
+	public static void SQLDeleteInventory() {
 		logger.debug("SQLDeleteInventory launched. No params passed");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -906,7 +975,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, int _theme_id){
+	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, int _theme_id) {
 		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}", _user_id, _guild_id, _maxItems, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -919,7 +988,7 @@ public class RankingSystem {
 			stmt.setLong(2, _guild_id);
 			stmt.setInt(3, _theme_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getInt(1)/_maxItems;
 			}
 			return 0;
@@ -933,7 +1002,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, String _type, int _maxItems, int _theme_id){
+	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, String _type, int _maxItems, int _theme_id) {
 		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _type, _maxItems, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -947,7 +1016,7 @@ public class RankingSystem {
 			stmt.setInt(3, _theme_id);
 			stmt.setString(4, _type);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getInt(1)/_maxItems;
 			}
 			return 0;
@@ -961,7 +1030,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, String _ignore, boolean _boolIgnore, int _theme_id){
+	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, String _ignore, boolean _boolIgnore, int _theme_id) {
 		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _maxItems, _ignore, _boolIgnore, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -975,7 +1044,7 @@ public class RankingSystem {
 			stmt.setInt(3, _theme_id);
 			stmt.setString(4, _ignore);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getInt(1)/_maxItems;
 			}
 			return 0;
@@ -989,7 +1058,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, boolean _oneType, int _theme_id){
+	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, boolean _oneType, int _theme_id) {
 		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _maxItems, _oneType, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1002,7 +1071,7 @@ public class RankingSystem {
 			stmt.setLong(2, _guild_id);
 			stmt.setInt(3, _theme_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getInt(1)/_maxItems;
 			}
 			return 0;
@@ -1016,7 +1085,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, boolean _oneType, String _category, int _theme_id){
+	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, boolean _oneType, String _category, int _theme_id) {
 		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _maxItems, _oneType, _category, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1030,7 +1099,7 @@ public class RankingSystem {
 			stmt.setString(3, _category);
 			stmt.setInt(4, _theme_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getInt(1)/_maxItems;
 			}
 			return 0;
@@ -1045,7 +1114,7 @@ public class RankingSystem {
 	}
 	
 	//dailies_usage
-	public static Timestamp SQLgetDailiesUsage(long _user_id, long _guild_id){
+	public static Timestamp SQLgetDailiesUsage(long _user_id, long _guild_id) {
 		logger.debug("SQLgetDailiesUsage launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1057,7 +1126,7 @@ public class RankingSystem {
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getTimestamp(1);
 			}
 			return null;
@@ -1071,7 +1140,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLInsertDailiesUsage(long _user_id, long _guild_id, Timestamp _opened, Timestamp _next_daily){
+	public static int SQLInsertDailiesUsage(long _user_id, long _guild_id, Timestamp _opened, Timestamp _next_daily) {
 		logger.debug("SQLInsertDailiesUsage launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _opened, _next_daily);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1094,7 +1163,7 @@ public class RankingSystem {
 	}
 	
 	//giveaway
-	public static boolean SQLBulkInsertGiveawayRewards(String [] rewards, Timestamp timestamp, long _guild_id){
+	public static boolean SQLBulkInsertGiveawayRewards(String [] rewards, Timestamp timestamp, long _guild_id) {
 		logger.debug("SQLbulkInsertGiveawayRewards launched. Passed params {}, {}, {}", rewards, timestamp, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1103,7 +1172,7 @@ public class RankingSystem {
 			myConn.setAutoCommit(false); 
 			String sql = ("INSERT INTO giveaway (code, enabled, used, expires, fk_guild_id) VALUES (?, ?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
-			for(String reward : rewards){
+			for(String reward : rewards) {
 				stmt.setString(1, reward);
 				stmt.setBoolean(2, true);
 				stmt.setBoolean(3, false);
@@ -1135,7 +1204,7 @@ public class RankingSystem {
 			stmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getString(1);
 			}
 			else
@@ -1182,7 +1251,7 @@ public class RankingSystem {
 			var success = false;
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				Hashes.addTheme(rs.getString(1), rs.getInt(2));
 				success = true;
 			}
@@ -1198,8 +1267,8 @@ public class RankingSystem {
 	}
 	
 	//JOINS
-	public synchronized static Rank SQLgetWholeRankView(long _user_id, long _guild_id, int _theme_id){
-		if(Hashes.getRanking(_guild_id+"_"+_user_id) == null){
+	public synchronized static Rank SQLgetWholeRankView(long _user_id, long _guild_id, int _theme_id) {
+		if(Hashes.getRanking(_guild_id+"_"+_user_id) == null) {
 			logger.debug("SQLgetWholeRankView launched. Passed params {}, {}, {}", _user_id, _guild_id, _theme_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1214,7 +1283,7 @@ public class RankingSystem {
 				stmt.setLong(4, _guild_id);
 				stmt.setLong(5, _guild_id);
 				rs = stmt.executeQuery();
-				if(rs.next()){
+				if(rs.next()) {
 					Rank rank = new Rank();
 					rank.setUser_ID(rs.getLong(1));
 					rank.setLevel(rs.getInt(2));
@@ -1276,7 +1345,7 @@ public class RankingSystem {
 		return Hashes.getRanking(_guild_id+"_"+_user_id);
 	}
 	
-	public static Guilds SQLgetGuild(long _guild_id){
+	public static Guilds SQLgetGuild(long _guild_id) {
 		if(Hashes.getStatus(_guild_id) == null) {
 			logger.debug("SQLgetGuild launched. Passed params {}", _guild_id);
 			Connection myConn = null;
@@ -1288,7 +1357,7 @@ public class RankingSystem {
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
-				if(rs.next()){
+				if(rs.next()) {
 					Guilds guild = new Guilds();
 					guild.setName(rs.getString(2));
 					guild.setMaxLevel(rs.getInt(3));
@@ -1323,7 +1392,7 @@ public class RankingSystem {
 		return Hashes.getStatus(_guild_id);
 	}
 	
-	public static int SQLgetLevels(long _guild_id, int _theme_id){
+	public static int SQLgetLevels(long _guild_id, int _theme_id) {
 		logger.debug("SQLgetLevels launched. Passed params {}, {}", _guild_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1336,7 +1405,7 @@ public class RankingSystem {
 			stmt.setInt(1, _theme_id);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				Ranks ranks = new Ranks();
 				ranks.setLevel(rs.getInt(1));
 				ranks.setExperience(rs.getInt(2));
@@ -1356,7 +1425,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<Skins> SQLgetSkinshopContentAndType(long _guild_id, int _theme_id){
+	public static ArrayList<Skins> SQLgetSkinshopContentAndType(long _guild_id, int _theme_id) {
 		logger.debug("SQLgetSkinshopContentAndType launched. Params passed {}, {}", _guild_id, _theme_id);
 		ArrayList<Skins> set_skin = new ArrayList<Skins>();
 		if(Hashes.getShopContent(_guild_id) == null) {
@@ -1369,7 +1438,7 @@ public class RankingSystem {
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _theme_id);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					Skins insert_skin = new Skins();
 					insert_skin.setItemID(rs.getInt(1));
 					insert_skin.setShopDescription(rs.getString(2));
@@ -1392,7 +1461,7 @@ public class RankingSystem {
 		return Hashes.getShopContent(_guild_id);
 	}
 	
-	public static int SQLgetItemID(long _user_id, long _guild_id, int _item_id, int _theme_id){
+	public static int SQLgetItemID(long _user_id, long _guild_id, int _item_id, int _theme_id) {
 		logger.debug("SQLgetItemID launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _item_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1406,7 +1475,7 @@ public class RankingSystem {
 			stmt.setLong(3, _guild_id);
 			stmt.setInt(4, _theme_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getInt(1);
 			}
 			return 0;
@@ -1420,7 +1489,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static Inventory SQLgetItemIDAndSkinType(long _user_id, long _guild_id, String _description, int _theme_id){
+	public static Inventory SQLgetItemIDAndSkinType(long _user_id, long _guild_id, String _description, int _theme_id) {
 		logger.debug("SQLgetItemIDAndSkinType launched. Passed params {}, {}, {}", _user_id, _guild_id, _description, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1434,7 +1503,7 @@ public class RankingSystem {
 			stmt.setLong(3, _guild_id);
 			stmt.setInt(4, _theme_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return new Inventory(rs.getInt(1), rs.getString(2), rs.getString(3));
 			}
 			return null;
@@ -1448,7 +1517,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLgetInventoryNumber(long _user_id, long _guild_id, String _description, String _status, int _theme_id){
+	public static int SQLgetInventoryNumber(long _user_id, long _guild_id, String _description, String _status, int _theme_id) {
 		logger.debug("SQLgetInventoryNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _description, _status, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1463,7 +1532,7 @@ public class RankingSystem {
 			stmt.setLong(4, _guild_id);
 			stmt.setInt(5, _theme_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getInt(1);
 			}
 			return 0;
@@ -1477,7 +1546,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptions(long _user_id, long _guild_id, int _limit, int _maxItems, int _theme_id){
+	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptions(long _user_id, long _guild_id, int _limit, int _maxItems, int _theme_id) {
 		logger.debug("SQLgetInventoryAndDescriptions launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _theme_id);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
@@ -1493,7 +1562,7 @@ public class RankingSystem {
 			stmt.setInt(4, _limit);
 			stmt.setInt(5, _maxItems);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				InventoryContent setInventory = new InventoryContent();
 				setInventory.setUserID(rs.getLong(1));
 				setInventory.setTimestamp(rs.getTimestamp(2));
@@ -1519,7 +1588,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionsItems(long _user_id, long _guild_id, int _limit, int _maxItems, int _theme_id){
+	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionsItems(long _user_id, long _guild_id, int _limit, int _maxItems, int _theme_id) {
 		logger.debug("SQLgetInventoryAndDescriptionsItems launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _theme_id);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
@@ -1535,7 +1604,7 @@ public class RankingSystem {
 			stmt.setInt(4, _limit);
 			stmt.setInt(5, _maxItems);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				InventoryContent setInventory = new InventoryContent();
 				setInventory.setUserID(rs.getLong(1));
 				setInventory.setTimestamp(rs.getTimestamp(2));
@@ -1577,7 +1646,7 @@ public class RankingSystem {
 			stmt.setInt(4, _limit);
 			stmt.setInt(5, _maxItems);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				InventoryContent setInventory = new InventoryContent();
 				setInventory.setUserID(rs.getLong(1));
 				setInventory.setTimestamp(rs.getTimestamp(2));
@@ -1620,7 +1689,7 @@ public class RankingSystem {
 			stmt.setInt(5, _limit);
 			stmt.setInt(6, _maxItems);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				InventoryContent setInventory = new InventoryContent();
 				setInventory.setUserID(rs.getLong(1));
 				setInventory.setTimestamp(rs.getTimestamp(2));
@@ -1646,7 +1715,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionsSkins(long _user_id, long _guild_id, int _limit, int _maxItems, int _theme_id){
+	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionsSkins(long _user_id, long _guild_id, int _limit, int _maxItems, int _theme_id) {
 		logger.debug("SQLgetInventoryAndDescriptions launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _theme_id);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
@@ -1662,7 +1731,7 @@ public class RankingSystem {
 			stmt.setInt(4, _limit);
 			stmt.setInt(5, _maxItems);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				InventoryContent setInventory = new InventoryContent();
 				setInventory.setUserID(rs.getLong(1));
 				setInventory.setTimestamp(rs.getTimestamp(2));
@@ -1684,7 +1753,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionWithoutLimit(long _user_id, long _guild_id, int _theme_id){
+	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionWithoutLimit(long _user_id, long _guild_id, int _theme_id) {
 		logger.debug("SQLgetInventoryAndDescritpionWithoutLimit launched. Passed params {}, {}, {}", _user_id, _guild_id, _theme_id);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
@@ -1698,7 +1767,7 @@ public class RankingSystem {
 			stmt.setLong(2, _guild_id);
 			stmt.setInt(3, _theme_id);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				InventoryContent setInventory = new InventoryContent();
 				setInventory.setUserID(rs.getLong(1));
 				setInventory.setTimestamp(rs.getTimestamp(2));
@@ -1716,7 +1785,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static InventoryContent SQLgetNumberAndExpirationFromInventory(long _user_id, long _guild_id, String _description, String _status, int _theme_id){
+	public static InventoryContent SQLgetNumberAndExpirationFromInventory(long _user_id, long _guild_id, String _description, String _status, int _theme_id) {
 		logger.debug("SQLgetNumberAndExpirationFromInventory launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _description, _status, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1731,7 +1800,7 @@ public class RankingSystem {
 			stmt.setLong(4, _guild_id);
 			stmt.setInt(5, _theme_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				InventoryContent inventory = new InventoryContent();
 				inventory.setNumber(rs.getInt(1));
 				inventory.setExpiration(rs.getTimestamp(2));
@@ -1748,7 +1817,7 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<Dailies> SQLgetDailiesAndType(long _guild_id, int _theme_id){
+	public static ArrayList<Dailies> SQLgetDailiesAndType(long _guild_id, int _theme_id) {
 		if(Hashes.getDailyItems("dailies") == null) {
 			logger.debug("SQLgetDailiesAndType launched. Params passed {}, {}", _guild_id, _theme_id);
 			ArrayList<Dailies> dailies = new ArrayList<Dailies>();
@@ -1761,7 +1830,7 @@ public class RankingSystem {
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _theme_id);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					Dailies setDaily = new Dailies();
 					setDaily.setItemId(rs.getInt(1));
 					setDaily.setDescription(rs.getString(2));
@@ -1787,7 +1856,7 @@ public class RankingSystem {
 	
 	//Transaction
 	@SuppressWarnings("resource")
-	public static int SQLUpdateCurrencyAndInsertInventory(long _user_id, long _guild_id, long _currency, int _item_id, Timestamp _position, int _number, int _theme_id){
+	public static int SQLUpdateCurrencyAndInsertInventory(long _user_id, long _guild_id, long _currency, int _item_id, Timestamp _position, int _number, int _theme_id) {
 		logger.debug("SQLUpdateCurrencyAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _position, _number, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1827,7 +1896,7 @@ public class RankingSystem {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLUpdateAndInsertInventory(long _user_id, long _guild_id, int _number, int _number_limit, int _item_id, Timestamp _position, Timestamp _expiration, int _theme_id){
+	public static int SQLUpdateAndInsertInventory(long _user_id, long _guild_id, int _number, int _number_limit, int _item_id, Timestamp _position, Timestamp _expiration, int _theme_id) {
 		logger.debug("SQLUpdateAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _number, _number_limit, _item_id, _position, _expiration, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1870,7 +1939,7 @@ public class RankingSystem {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLDeleteAndInsertInventory(long _user_id, long _guild_id, int _number, int _item_id, Timestamp _position, Timestamp _expiration, int _theme_id){
+	public static int SQLDeleteAndInsertInventory(long _user_id, long _guild_id, int _number, int _item_id, Timestamp _position, Timestamp _expiration, int _theme_id) {
 		logger.debug("SQLDeleteAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _number, _item_id, _position, _expiration, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1912,7 +1981,7 @@ public class RankingSystem {
 	}
 	
 	//EXISTS
-	public static String SQLExpBoosterExistsInInventory(long _user_id, long _guild_id, int _theme_id){
+	public static String SQLExpBoosterExistsInInventory(long _user_id, long _guild_id, int _theme_id) {
 		logger.debug("SQLExpBoosterExistsInInventory launched. Passed params {}, {}, {}", _user_id, _guild_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1927,7 +1996,7 @@ public class RankingSystem {
 			stmt.setLong(3, _guild_id);
 			stmt.setInt(4, _theme_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				description = rs.getString(1);
 			}
 			return description;

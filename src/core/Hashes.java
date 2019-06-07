@@ -42,7 +42,7 @@ public class Hashes {
     private static final Map<Long, ArrayList<String>> filter_lang = new HashMap<Long, ArrayList<String>>();
     private static final Map<Long, Integer> message_removed = new HashMap<Long, Integer>();
     private static final ConcurrentHashMap<Long, Guilds> status = new ConcurrentHashMap<Long, Guilds>();
-    private static final Map<String, Rank> ranking_roles = new HashMap<String, Rank>();
+    private static final Map<Long, ArrayList<Rank>> ranking_roles = new HashMap<Long, ArrayList<Rank>>();
     private static final LinkedHashMap<String, Ranks> ranking_levels = new LinkedHashMap<String, Ranks>();
     private static final Map<String, Roles> roles = new HashMap<String, Roles>();
     private static final Map<Long, Long> reaction_message = new HashMap<Long, Long>();
@@ -83,7 +83,7 @@ public class Hashes {
 	public static void addRanking(String _key, Rank _details){
 		ranking.put(_key, _details);
 	}
-	public static void addRankingRoles(String _key, Rank _details){
+	public static void addRankingRoles(Long _key, ArrayList<Rank> _details){
 		ranking_roles.put(_key, _details);
 	}
 	public static void addRankingLevels(String _key, Ranks _levels){
@@ -166,11 +166,8 @@ public class Hashes {
 	public static Rank getRanking(String _key){
 		return ranking.get(_key);
 	}
-	public static Rank getRankingRoles(String _key){
+	public static ArrayList<Rank> getRankingRoles(Long _key){
 		return ranking_roles.get(_key);
-	}
-	public static Map<String, Rank> getMapOfRankingRoles(){
-		return ranking_roles;
 	}
 	public static Map<String, Ranks> getMapOfRankingLevels(){
 		return ranking_levels;
@@ -251,8 +248,8 @@ public class Hashes {
 	public static void removeRoles() {
 		roles.clear();
 	}
-	public static void removeRankingRoles() {
-		ranking_roles.clear();
+	public static void removeRankingRoles(long _key) {
+		ranking_roles.remove(_key);
 	}
 	public static void removeQuiz(int _key) {
 		quiz.remove(_key);

@@ -53,6 +53,7 @@ import listeners.NicknameListener;
 import listeners.ReadyListener;
 import listeners.ReconnectedListener;
 import listeners.ResumedListener;
+import listeners.RoleCreateListener;
 import listeners.RoleListener;
 import listeners.RoleRemovedListener;
 import listeners.ShutdownListener;
@@ -157,5 +158,6 @@ public class Main {
 		builder.addEventListener(new StatusListener());
 		builder.addEventListener(new ReconnectedListener());
 		builder.addEventListener(new ResumedListener());
+		builder.addEventListener(new RoleCreateListener());
 	}
 }

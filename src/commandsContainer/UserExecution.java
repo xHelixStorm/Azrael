@@ -635,7 +635,7 @@ public class UserExecution {
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						try {
 							for(Role r : _e.getMember().getRoles()){
-								for(Rank role : Hashes.getMapOfRankingRoles().values()){
+								for(Rank role : RankingSystem.SQLgetRoles(_e.getGuild().getIdLong())) {
 									if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()){
 										_e.getGuild().getController().removeSingleRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
 									}
@@ -695,7 +695,7 @@ public class UserExecution {
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						try {
 							for(Role r : _e.getMember().getRoles()){
-								for(Rank role : Hashes.getMapOfRankingRoles().values()){
+								for(Rank role : RankingSystem.SQLgetRoles(_e.getGuild().getIdLong())) {
 									if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()) {
 										_e.getGuild().getController().removeSingleRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
 									}
@@ -749,8 +749,8 @@ public class UserExecution {
 							Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 							try {
 								for(Role r : _e.getMember().getRoles()){
-									for(Rank role : Hashes.getMapOfRankingRoles().values()){
-										if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()){
+									for(Rank role : RankingSystem.SQLgetRoles(_e.getGuild().getIdLong())){
+										if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()) {
 											_e.getGuild().getController().removeSingleRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
 										}
 									}

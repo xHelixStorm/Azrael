@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Channels;
-import core.Hashes;
 import core.Roles;
 import core.UserPrivs;
 import fileManagement.GuildIni;
@@ -75,7 +74,7 @@ public class Display implements Command{
 				else if(args[0].equalsIgnoreCase("-ranking-roles")) {
 					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong())) || adminPermission) {
 						if(RankingSystem.SQLgetGuild(guild_id).getRankingState()) {
-							for(rankingSystem.Rank r : Hashes.getMapOfRankingRoles().values()) {
+							for(rankingSystem.Rank r : RankingSystem.SQLgetRoles(guild_id)) {
 								if(r.getGuildID() == guild_id) {
 									out += r.getRole_Name() + " (" + r.getRoleID() + ") \nlevel to unlock: " + r.getLevel_Requirement() + "\n";
 								}

@@ -34,7 +34,7 @@ public class RegisterRankingRole {
 		if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getRegisterRankingRoleLevel(_e.getGuild().getIdLong())) || adminPermission) {
 			if(_args.length > 1 && _args[1].equalsIgnoreCase("-clear")) {
 				if(RankingSystem.SQLclearRoles(guild_id) > 0) {
-					Hashes.removeRankingRoles();
+					Hashes.removeRankingRoles(guild_id);
 					_e.getTextChannel().sendMessage("All registered ranking roles have been cleared from the database!").queue();
 				}
 				else {
@@ -73,7 +73,8 @@ public class RegisterRankingRole {
 						if(RankingSystem.SQLInsertRoles(role_id, role_name, level_requirement, guild_id) > 0) {
 							logger.debug("{} has registered the ranking role {} with the level requirement {} in the guild {}", _e.getMember().getUser().getId(), role_name, level_requirement, _e.getGuild().getName());
 							_e.getTextChannel().sendMessage("**The role named "+role_name+" can now be unlocked by reaching level "+level_requirement+"**").queue();
-							if(RankingSystem.SQLgetRoles(guild_id)) {
+							Hashes.removeRankingRoles(guild_id);
+							if(RankingSystem.SQLgetRoles(guild_id) != null) {
 								if(RankingSystem.SQLgetLevels(guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID()) == 0) {
 									logger.error("Levels for the ranking system from RankingSystem.level_list couldn't be retrieved and cached");
 									_e.getTextChannel().sendMessage("An internal error occurred. All levels for the ranking system couldn't be retrieved from the table RankingSystem.level_list").queue();

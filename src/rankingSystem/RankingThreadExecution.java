@@ -111,17 +111,18 @@ public class RankingThreadExecution {
 				rankUpExperience = 0;
 			}
 			
-			long current_role = 0;
+			Rank current_role = null;
 			if(level == roleAssignLevel){
 				for(Role r : e.getMember().getRoles()){
-					for(Rank role : Hashes.getMapOfRankingRoles().values()){
-						if(r.getIdLong() == role.getRoleID() && role.getGuildID() == e.getGuild().getIdLong()){
+					for(Rank role : RankingSystem.SQLgetRoles(e.getGuild().getIdLong())) {
+						if(r.getIdLong() == role.getRoleID() && role.getGuildID() == e.getGuild().getIdLong()) {
 							e.getGuild().getController().removeSingleRoleFromMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(r.getIdLong())).queue();
 						}
 					}
 				}
-				current_role = Hashes.getRankingRoles(e.getGuild().getIdLong()+"_"+level).getRoleID();
-				e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(current_role)).queue();
+				final var newLevel = level;
+				current_role = RankingSystem.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getLevel() == newLevel).findAny().orElse(null);
+				if(current_role != null) e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(current_role.getRoleID())).queue();
 			}
 			
 			user_details.setLevel(level);
@@ -130,8 +131,8 @@ public class RankingThreadExecution {
 			user_details.setExperience(experience);
 			user_details.setCurrency(currency);
 			
-			if(current_role != 0){
-				user_details.setCurrentRole(current_role);
+			if(current_role != null){
+				user_details.setCurrentRole(current_role.getRoleID());
 			}
 			
 			var editedRows = 0;

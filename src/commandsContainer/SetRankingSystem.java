@@ -39,7 +39,7 @@ public class SetRankingSystem {
 				_e.getTextChannel().sendMessage(message).queue();
 				
 				if(ranking_state == true) {
-					if(RankingSystem.SQLgetRoles(_e.getGuild().getIdLong()) == false) {
+					if(RankingSystem.SQLgetRoles(_e.getGuild().getIdLong()) == null) {
 						logger.error("Roles from RankingSystem.roles couldn't be called and cached");
 						_e.getTextChannel().sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
 					}
