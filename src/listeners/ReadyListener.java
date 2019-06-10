@@ -73,14 +73,13 @@ public class ReadyListener extends ListenerAdapter {
 			themesRetrieved = false;
 			logger.error("Themes couldn't be retried from RankingSystem.themes");
 		}
-		for(Guild g : e.getJDA().getGuilds()) {
-			long guild_id = g.getIdLong();
-			if(!new File("./ini/"+guild_id+".ini").exists()) {
-				GuildIni.createIni(guild_id);
+		for(Guild guild : e.getJDA().getGuilds()) {
+			if(!new File("./ini/"+guild.getId()+".ini").exists()) {
+				GuildIni.createIni(guild.getIdLong());
 			}
 			Channels log_channel = null;
 			Channels bot_channel = null;
-			var channels = Azrael.SQLgetChannels(guild_id);
+			var channels = Azrael.SQLgetChannels(guild.getIdLong());
 			if(channels == null) {
 				logger.error("Channel information from Azrael.channels couldn't be retrieved and cached");
 			}
@@ -88,34 +87,42 @@ public class ReadyListener extends ListenerAdapter {
 				log_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 				bot_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals("bot")).findAny().orElse(null);
 			}
-			if(DiscordRoles.SQLgetRoles(guild_id).size() == 0) {
-				logger.error("Roles information from DiscordRoles.roles couldn't be retrieved and cached");
-				if(log_channel != null)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Roles information from DiscordRoles.roles couldn't be called and cached").queue();
+			if(DiscordRoles.SQLgetRoles(guild.getIdLong()).size() == 0) {
+				var result = DiscordRoles.SQLInsertRoles(guild.getIdLong(), guild.getRoles());
+				if(result != null && result[0] == 1) {
+					logger.debug("Roles information from DiscordRoles.roles couldn't be retrieved and cached for guild {}. Hence all available roles have been inserted as default roles.", guild.getName());
+					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage("Roles information from DiscordRoles.roles couldn't be called and cached. Hence all roles have been inserted under the default role!").queue();
+					DiscordRoles.SQLgetRoles(guild.getIdLong());
+				}
+				else {
+					logger.error("Roles for DiscordRoles.roles couldn't be inserted for guild {}", guild.getName());
+					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occured. Roles for DiscordRoles.roles couldn't be inserted!").queue();
+				}
 			}
-			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
+			Guilds guild_settings = RankingSystem.SQLgetGuild(guild.getIdLong());
 			if(guild_settings == null) {
 				logger.error("Guild information from RankingSystem.guilds couldn't be retrieved and cached");
-				if(log_channel != null)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Guild information from RankingSystem.guilds couldn't be called and cached").queue();
+				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Guild information from RankingSystem.guilds couldn't be called and cached").queue();
 			}
-			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetRoles(guild_id) == null) {
+			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetRoles(guild.getIdLong()) == null) {
 				logger.error("Roles from RankingSystem.roles couldn't be called and cached");
-				if(log_channel != null)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
+				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
 			}
-			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetLevels(guild_id, guild_settings.getThemeID()) == 0) {
+			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetLevels(guild.getIdLong(), guild_settings.getThemeID()) == 0) {
 				logger.error("Levels from RankingSystem.level_list couldn't be called and cached");
-				if(log_channel != null)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
+				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
 			}
 			if(themesRetrieved == false) {
-				if(log_channel != null)e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Themes from RankingSystem.themes couldn't be called and cached").queue();
+				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Themes from RankingSystem.themes couldn't be called and cached").queue();
 			}
-			Azrael.SQLgetRSSFeeds(guild_id);
-			ParseRSS.runTask(e, guild_id);
+			Azrael.SQLgetRSSFeeds(guild.getIdLong());
+			ParseRSS.runTask(e, guild.getIdLong());
 			
-			if(log_channel != null){e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage("Bot is now operational!").queue();}
+			if(log_channel != null){e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("Bot is now operational!").queue();}
 			
 			Patchnote priv_notes = null;
 			Patchnote publ_notes = null;
-			if(!Patchnotes.SQLcheckPublishedPatchnotes(guild_id)) {
+			if(!Patchnotes.SQLcheckPublishedPatchnotes(guild.getIdLong())) {
 				priv_notes = Patchnotes.SQLgetPrivatePatchnotes();
 				publ_notes = Patchnotes.SQLgetPublicPatchnotes();
 			}
@@ -123,11 +130,11 @@ public class ReadyListener extends ListenerAdapter {
 			var published = false;
 			if(priv_notes != null && allowPatchNotes) {
 				if(log_channel != null) {
-					e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
+					e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
 							messageBuild.setDescription("Bot patch notes version **"+STATIC.getVersion()+"** "+priv_notes.getDate()+"\n"+priv_notes.getMessage1())
 							.build()).complete();
 					if(priv_notes.getMessage2() != null && priv_notes.getMessage2().length() > 0) {
-						e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
+						e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
 								messageBuild.setDescription(priv_notes.getMessage2())
 								.build()).complete();
 					}
@@ -136,11 +143,11 @@ public class ReadyListener extends ListenerAdapter {
 			}
 			if(publ_notes != null && allowPublicPatchNotes) {
 				if(bot_channel != null) {
-					e.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
+					e.getJDA().getGuildById(guild.getId()).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
 							messageBuild.setDescription("Bot patch notes version **"+STATIC.getVersion()+"** "+publ_notes.getDate()+"\n"+publ_notes.getMessage1())
 							.build()).complete();
 					if(publ_notes.getMessage2() != null && publ_notes.getMessage2().length() > 0) {
-						e.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
+						e.getJDA().getGuildById(guild.getId()).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
 								messageBuild.setDescription(publ_notes.getMessage2())
 								.build()).complete();
 					}
@@ -148,13 +155,13 @@ public class ReadyListener extends ListenerAdapter {
 				}
 			}
 			if(published) {
-				Patchnotes.SQLInsertPublishedPatchnotes(guild_id);
+				Patchnotes.SQLInsertPublishedPatchnotes(guild.getIdLong());
 			}
 			
 			//check if the double exp should be enabled or disabled for the current guild
-			var doubleExp = GuildIni.getDoubleExperienceMode(guild_id);
+			var doubleExp = GuildIni.getDoubleExperienceMode(guild.getIdLong());
 			if(!doubleExp.equals("auto"))
-				Hashes.addTempCache("doubleExp_gu"+guild_id, new Cache(0, doubleExp));
+				Hashes.addTempCache("doubleExp_gu"+guild.getId(), new Cache(0, doubleExp));
 		}
 		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		

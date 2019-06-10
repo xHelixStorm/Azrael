@@ -15,6 +15,7 @@ import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.DiscordRoles;
+import util.STATIC;
 
 public class RegisterRole {
 	private static final Logger logger = LoggerFactory.getLogger(RegisterRole.class);
@@ -47,7 +48,7 @@ public class RegisterRole {
 					try {
 						role_id = Long.parseLong(role);
 						role_name = _e.getGuild().getRoleById(role_id).getName();
-						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, 100, role_name, category_abv) > 0) {
+						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, STATIC.getLevel(category_abv), role_name, category_abv) > 0) {
 							logger.debug("Administrator role registered {} for guild {}", role_id, _e.getGuild().getName());
 							_e.getTextChannel().sendMessage("**The primary Administrator role has been registered!**").queue();
 							DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong());
@@ -76,7 +77,7 @@ public class RegisterRole {
 		String role_name;
 		long role_id;
 		
-		if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getRegisterRoleLevel(_e.getGuild().getIdLong())) || adminPermission){
+		if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getRegisterRoleLevel(_e.getGuild().getIdLong())) || adminPermission) {
 			Pattern pattern = Pattern.compile("(adm|mod|com|bot|mut|rea)");
 			Matcher matcher = pattern.matcher(_args[1].toLowerCase());
 			if(_args.length > 2 && matcher.find()){
@@ -86,7 +87,7 @@ public class RegisterRole {
 					try {
 						role_id = Long.parseLong(role);
 						role_name = _e.getGuild().getRoleById(role_id).getName();
-						var level = getLevel(category_abv);
+						var level = STATIC.getLevel(category_abv);
 						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, level, role_name, category_abv) > 0) {
 							logger.debug("{} has registered the role {} with the category {} in guild {}", _e.getMember().getUser().getId(), role_name, category_abv, _e.getGuild().getName());
 							_e.getTextChannel().sendMessage("**The role has been registered!**").queue();
@@ -113,18 +114,6 @@ public class RegisterRole {
 		}
 		else {
 			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
-		}
-	}
-	
-	private static int getLevel(String category) {
-		switch(category) {
-			case "adm": return 100;
-			case "mod": return 20;
-			case "com": return 1;
-			case "bot": return 10;
-			case "mut": return 0;
-			case "rea": return 1;
-			default : 	return 0;
 		}
 	}
 }

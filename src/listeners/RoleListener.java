@@ -68,7 +68,8 @@ public class RoleListener extends ListenerAdapter{
 					}
 				}
 			}
-			else if(unmute_time - System.currentTimeMillis() > 0 && warnedUser.getMuted()) {
+			else if(unmute_time - System.currentTimeMillis() > 0 && warnedUser.getMuted() && warnedUser.getGuildLeft()) {
+				Azrael.SQLUpdateGuildLeft(user_id, guild_id, false);
 				if(log_channel != null) {
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned before the mute time elapsed! Reason may be due to leaving and rejoining the server!").build()).queue();

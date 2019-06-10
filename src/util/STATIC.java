@@ -8,7 +8,7 @@ import core.Channels;
 
 public class STATIC {
 	
-	private static final String VERSION = "5.10.271";
+	private static final String VERSION = "5.10.272";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	
@@ -65,5 +65,17 @@ public class STATIC {
 				out.append(", <#"+channel.getChannel_ID()+">");
 		}
 		return out.toString();
+	}
+	
+	public static int getLevel(String category) {
+		switch(category) {
+			case "adm": return 100;
+			case "mod": return 20;
+			case "com": return 1;
+			case "bot": return 10;
+			case "mut": return 0;
+			case "rea": return 1;
+			default : 	return 0;
+		}
 	}
 }

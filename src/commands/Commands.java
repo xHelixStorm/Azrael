@@ -27,7 +27,8 @@ public class Commands implements Command{
 		if(GuildIni.getCommandsCommand(e.getGuild().getIdLong())) {
 			Logger logger = LoggerFactory.getLogger(Commands.class);
 			logger.debug("{} has used Commands command", e.getMember().getUser().getId());
-			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getCommandsLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+			var admin = GuildIni.getAdmin(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getCommandsLevel(e.getGuild().getIdLong())) || admin == e.getMember().getUser().getIdLong()) {
 				EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here are all available commands!");
 				long guild_id = e.getGuild().getIdLong();
 				var allowed_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("bot") || f.getChannel_Type().equals("log")).collect(Collectors.toList());
@@ -39,7 +40,7 @@ public class Commands implements Command{
 					logger.warn("Commands command was used in a not bot channel");
 				}
 				else {
-					e.getTextChannel().sendMessage(messageBuild.setDescription(CommandList.getHelp(guild_id, (UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)))).build()).queue();		
+					e.getTextChannel().sendMessage(messageBuild.setDescription(CommandList.getHelp(guild_id, (UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || e.getMember().getUser().getIdLong() == admin))).build()).queue();		
 				}
 			}
 			else {

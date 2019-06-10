@@ -11,6 +11,7 @@ public class Bancollect {
 	private Timestamp unmute;
 	private boolean muted;
 	private boolean customTime;
+	private boolean guildLeft;
 	
 	public Bancollect() {
 		this.user_id = 0;
@@ -21,9 +22,10 @@ public class Bancollect {
 		this.unmute = null;
 		this.muted = false;
 		this.customTime = false;
+		this.guildLeft = false;
 	}
 	
-	public Bancollect(long _user_id, long _guild_id, int _warning_id, int _ban_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted, boolean _customTime) {
+	public Bancollect(long _user_id, long _guild_id, int _warning_id, int _ban_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted, boolean _customTime, boolean _guildLeft) {
 		this.user_id = _user_id;
 		this.guild_id = _guild_id;
 		this.warning_id = _warning_id;
@@ -32,6 +34,7 @@ public class Bancollect {
 		this.unmute = _unmute;
 		this.muted = _muted;
 		this.customTime = _customTime;
+		this.guildLeft = _guildLeft;
 	}
 	
 	public long getUserID() {
@@ -57,5 +60,8 @@ public class Bancollect {
 	}
 	public boolean getCustomTime() {
 		return customTime;
+	}
+	public boolean getGuildLeft() {
+		return guildLeft;
 	}
 }

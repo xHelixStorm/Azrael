@@ -73,6 +73,7 @@ public class UserExecution {
 						+ "**unmute** To unmute the member and to terminate the running task\n"
 						+ "**ban**: To ban the user\n"
 						+ "**kick**: To kick the user\n"
+						+ "**history**: To display the whole kick/ban/mute history with reasons\n"
 						+ "**gift-experience**: To gift experience points\n"
 						+ "**set-experience**: To set an experience value\n"
 						+ "**set-level**: To assign a level\n"
@@ -95,7 +96,7 @@ public class UserExecution {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
 			Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
-			if(_message.equalsIgnoreCase("information") || _message.equalsIgnoreCase("delete-messages") || _message.equalsIgnoreCase("warning") || _message.equalsIgnoreCase("mute") || _message.equalsIgnoreCase("unmute") || _message.equalsIgnoreCase("ban") || _message.equalsIgnoreCase("kick") || _message.equalsIgnoreCase("gift-experience") || _message.equalsIgnoreCase("set-experience") || _message.equalsIgnoreCase("set-level") || _message.equalsIgnoreCase("gift-currency") || _message.equalsIgnoreCase("set-currency")) {
+			if(_message.equalsIgnoreCase("information") || _message.equalsIgnoreCase("delete-messages") || _message.equalsIgnoreCase("warning") || _message.equalsIgnoreCase("mute") || _message.equalsIgnoreCase("unmute") || _message.equalsIgnoreCase("ban") || _message.equalsIgnoreCase("kick") || _message.equalsIgnoreCase("history") || _message.equalsIgnoreCase("gift-experience") || _message.equalsIgnoreCase("set-experience") || _message.equalsIgnoreCase("set-level") || _message.equalsIgnoreCase("gift-currency") || _message.equalsIgnoreCase("set-currency")) {
 				var user_id = Long.parseLong(cache.getAdditionalInfo());
 				switch(_message) {
 					case "information": 
@@ -186,9 +187,9 @@ public class UserExecution {
 					case "mute":
 						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserMuteLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							message.setTitle("You chose to mute!");
-							message.addField("YES", "Provide a mute time", true);
-							message.addField("NO", "Don't provide a mute time", true);
-							_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a self chosen mute timer? By providing a self chosen mute timer, the warning value won't increment unless the user has been never warned before!").build()).queue();
+							message.addField("YES", "Provide a reason", true);
+							message.addField("NO", "Don't provide a reason", true);
+							_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a reason to the mute?").build()).queue();
 							cache.updateDescription("mute"+user_id).setExpiration(180000);
 							Hashes.addTempCache(key, cache);
 						}
@@ -274,6 +275,22 @@ public class UserExecution {
 							_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the kick?").build()).queue();
 							cache.updateDescription("kick"+user_id).setExpiration(180000);
 							Hashes.addTempCache(key, cache);
+						}
+						else {
+							EmbedBuilder error = new EmbedBuilder();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							Hashes.clearTempCache(key);
+						}
+						break;
+					case "history":
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserHistoryLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							message.setTitle("You chose to display the history!");
+							StringBuilder out = new StringBuilder();
+							for(var history : Azrael.SQLgetHistory(user_id, _e.getGuild().getIdLong())) {
+								out.append(history.getTime()+": **"+history.getType()+"**\nReason: **"+history.getReason()+"**\n\n");
+							}
+							_e.getTextChannel().sendMessage(message.setDescription("Here the requested history of this user\n\n"+out.toString()).build()).queue();
+							Hashes.clearTempCache(key);
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
@@ -482,6 +499,30 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equalsIgnoreCase("mute")) {
 				if(_message.equalsIgnoreCase("yes")) {
+					message.setTitle("You chose to provide a reason!");
+					_e.getTextChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
+					cache.updateDescription("mute-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+					Hashes.addTempCache(key, cache);
+				}
+				else if(_message.equalsIgnoreCase("no")) {
+					message.setTitle("Mute action!");
+					message.addField("YES", "Provide a mute time", true);
+					message.addField("NO", "Don't provide a mute time", true);
+					_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a self chosen mute timer? By providing a self chosen mute timer, the warning value won't increment unless the user has been never warned before!").build()).queue();
+					cache.updateDescription("mute-action"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+					Hashes.addTempCache(key, cache);
+				}
+			}
+			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equalsIgnoreCase("mute-reason")) {
+				message.setTitle("Mute action!");
+				message.addField("YES", "Provide a mute time", true);
+				message.addField("NO", "Don't provide a mute time", true);
+				_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a self chosen mute timer? By providing a self chosen mute timer, the warning value won't increment unless the user has been never warned before!").build()).queue();
+				cache.updateDescription("mute-action"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).updateDescription2(_message).setExpiration(180000);
+				Hashes.addTempCache(key, cache);
+			}
+			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equalsIgnoreCase("mute-action")) {
+				if(_message.equalsIgnoreCase("yes")) {
 					message.setTitle("You chose to provide a mute time!");
 					_e.getTextChannel().sendMessage(message.setDescription("Please provide a mute time in the following format:\n\n"
 							+ "to set the time in minutes: eg. **1m**\n"
@@ -497,7 +538,7 @@ public class UserExecution {
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equalsIgnoreCase("mute-time")) {
-				if(_message.replaceAll("[0-9]*", "").length() == 1 && (_message.endsWith("m") || _message.endsWith("h") || _message.endsWith("d"))) {					
+				if(_message.replaceAll("[0-9]*", "").length() == 1 && (_message.endsWith("m") || _message.endsWith("h") || _message.endsWith("d"))) {
 					long mute_time = (Long.parseLong(_message.replaceAll("[^0-9]*", ""))*1000);
 					if(_message.endsWith("m")) {
 						mute_time *= 60;
@@ -512,6 +553,12 @@ public class UserExecution {
 					Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
 					
 					_e.getGuild().getController().addSingleRoleToMember(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getRoleById(DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut"))).queue();
+					if(cache.getAdditionalInfo2().length() > 0) {
+						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2());
+					}
+					else {
+						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", "User has been muted with the bot command!");
+					}
 					if(Azrael.SQLgetData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong()).getWarningID() != 0) {
 						if(Azrael.SQLUpdateUnmute(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), timestamp, unmute_timestamp, true, true) == 0) {
 							logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", cache.getAdditionalInfo().replaceAll("[^0-9]*", ""), _e.getGuild().getName());
@@ -556,6 +603,7 @@ public class UserExecution {
 					}
 					_e.getTextChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
 					_e.getGuild().getController().ban(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), 0).reason("User has been banned with the bot command!").queue();
+					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", "User has been banned with the bot command!");
 					Hashes.clearTempCache(key);
 				}
 			}
@@ -575,6 +623,7 @@ public class UserExecution {
 					logger.debug("{} has banned {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 				}
 				_e.getGuild().getController().ban(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), 0).reason(_message).queue();
+				Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", _message);
 				Hashes.clearTempCache(key);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equalsIgnoreCase("kick")) {
@@ -587,6 +636,7 @@ public class UserExecution {
 				else if(_message.equalsIgnoreCase("no")) {
 					_e.getTextChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
 					_e.getGuild().getController().kick(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""))).reason("User has been kicked with the bot command!").queue();
+					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", "User has been kicked with the bot command!");
 					logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 					Hashes.clearTempCache(key);
 				}
@@ -594,6 +644,7 @@ public class UserExecution {
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equalsIgnoreCase("kick-reason")) {
 				_e.getTextChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
 				_e.getGuild().getController().kick(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""))).reason(_message).queue();
+				Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", _message);
 				logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 				Hashes.clearTempCache(key);
 			}

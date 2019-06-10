@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import core.Hashes;
 import core.Roles;
 import fileManagement.IniFileReader;
+import net.dv8tion.jda.core.entities.Role;
 
 public class DiscordRoles {
 	private static final Logger logger = LoggerFactory.getLogger(DiscordRoles.class);
@@ -96,6 +98,59 @@ public class DiscordRoles {
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
+	
+	public static int[] SQLInsertRoles(long _guild_id, List<Role> roles) {
+		logger.debug("SQLInsertRole launched. Passed params {}, roles array", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false);
+			String sql = ("INSERT INTO roles(role_id, name, level, fk_category_abv, fk_guild_id) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name), level=VALUES(level), fk_category_abv=VALUES(fk_category_abv)");
+			stmt = myConn.prepareStatement(sql);
+			for(var role : roles) {
+				if(!role.getName().equals("@everyone")) {
+					stmt.setLong(1, role.getIdLong());
+					stmt.setString(2, role.getName());
+					stmt.setInt(3, 0);
+					stmt.setString(4, "def");
+					stmt.setLong(5, _guild_id);
+					stmt.addBatch();
+				}
+			}
+			var result = stmt.executeBatch();
+			myConn.commit();
+			return result;
+		} catch (SQLException e) {
+			logger.error("SQLInsertRole Exception", e);
+			return null;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateLevel(long _guild_id, long _role_id, int _level) {
+		logger.debug("SQLInsertRole launched. Passed params {}, {}, {}", _guild_id, _role_id, _level);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE roles SET level = ? WHERE role_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setInt(1, _level);
+			stmt.setLong(2, _role_id);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertRole Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+
 	
 	public static ArrayList<Roles> SQLgetRoles(long _guild_id) {
 		logger.debug("SQLgetRoles launched. Passed params {}", _guild_id);

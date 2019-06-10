@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import core.Bancollect;
 import core.Channels;
 import core.Hashes;
+import core.History;
 import core.RSS;
 import core.User;
 import core.Warning;
@@ -46,13 +47,12 @@ public class Azrael {
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 				String sql = ("INSERT INTO action_log (log_id, event, target_id, guild_id, description, timestamp) VALUES(null, ?, ?, ?, ?, ?)");
-				Timestamp action_time = new Timestamp(System.currentTimeMillis());
 				stmt = myConn.prepareStatement(sql);
 				stmt.setString(1, _event);
 				stmt.setLong(2, _target_id);
 				stmt.setLong(3, _guild_id);
 				stmt.setString(4, _description);
-				stmt.setTimestamp(5, action_time);
+				stmt.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
 				stmt.executeUpdate();
 			} catch (SQLException e) {
 				logger.error("SQLInsertActionLog Exception", e);
@@ -60,6 +60,61 @@ public class Azrael {
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
+		}
+	}
+	
+	public static void SQLInsertHistory(long _user_id, long _guild_id, String _type, String _reason) {
+		logger.debug("SQLInsertHistory launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _type, _reason);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO history (fk_user_id, fk_guild_id, type, reason, time) VALUES(?, ?, ?, ?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, _type);
+			stmt.setString(4, _reason);
+			stmt.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertActionLog Exception", e);
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<History> SQLgetHistory(long _user_id, long _guild_id) {
+		logger.debug("SQLgetHistory launched. Passed params {}, {}", _user_id, _guild_id);
+		ArrayList<History> history = new ArrayList<History>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT type, reason, time FROM history WHERE fk_user_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				history.add(
+					new History(
+						rs.getString(1),
+						rs.getString(2),
+						rs.getTimestamp(3)
+					)	
+				);
+			}
+			return history;
+		} catch (SQLException e) {
+			logger.error("SQLgetHistory Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	
@@ -424,13 +479,13 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, fk_guild_id, fk_warning_id, fk_ban_id, timestamp, unmute, muted, custom_time FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
+			String sql = ("SELECT fk_user_id, fk_guild_id, fk_warning_id, fk_ban_id, timestamp, unmute, muted, custom_time, guild_left FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
-				return new Bancollect(rs.getLong(1), rs.getLong(2), rs.getInt(3), rs.getInt(4), rs.getTimestamp(5), rs.getTimestamp(6), rs.getBoolean(7), rs.getBoolean(8));
+				return new Bancollect(rs.getLong(1), rs.getLong(2), rs.getInt(3), rs.getInt(4), rs.getTimestamp(5), rs.getTimestamp(6), rs.getBoolean(7), rs.getBoolean(8), rs.getBoolean(9));
 			}
 			return new Bancollect();
 		} catch (SQLException e) {
@@ -550,13 +605,13 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertData(long _user_id, long _guild_id, int _warning_id, int _ban_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted, boolean _custom_time){
+	public static int SQLInsertData(long _user_id, long _guild_id, int _warning_id, int _ban_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted, boolean _custom_time) {
 		logger.debug("SQLInsertData launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _warning_id, _ban_id, _timestamp, _unmute, _muted, _custom_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO bancollect VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE fk_warning_id=VALUES(fk_warning_id), fk_ban_id=VALUES(fk_ban_id), timestamp=VALUES(timestamp), unmute=VALUES(unmute), muted=VALUES(muted), custom_time=VALUES(custom_time)");
+			String sql = ("INSERT INTO bancollect VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, 0) ON DUPLICATE KEY UPDATE fk_warning_id=VALUES(fk_warning_id), fk_ban_id=VALUES(fk_ban_id), timestamp=VALUES(timestamp), unmute=VALUES(unmute), muted=VALUES(muted), custom_time=VALUES(custom_time), guild_left=VALUES(guild_left)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -655,6 +710,27 @@ public class Azrael {
 		} catch (SQLException e) {
 			logger.error("SQLUpdateMuted Exception", e);
 			return 999;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateGuildLeft(long _user_id, long _guild_id, boolean _guildLeft){
+		logger.debug("SQLUpdateGuildLeft launched. Passed params {}, {}, {}", _user_id, _guild_id, _guildLeft);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE bancollect SET guild_left = ? WHERE fk_user_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setBoolean(1, _guildLeft);
+			stmt.setLong(2, _user_id);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateGuildLeft Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
