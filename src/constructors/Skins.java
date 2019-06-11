@@ -1,4 +1,4 @@
-package rankingSystem;
+package constructors;
 
 public class Skins {
 	private int item_id;

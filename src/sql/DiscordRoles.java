@@ -11,8 +11,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.Roles;
 import core.Hashes;
-import core.Roles;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.entities.Role;
 

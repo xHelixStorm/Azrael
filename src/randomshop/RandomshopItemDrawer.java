@@ -13,11 +13,11 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.Weapons;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import rankingSystem.Weapons;
 
 public class RandomshopItemDrawer {
 	public static void drawItems(MessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<Weapons> weapons, int current_page, int last_page) {

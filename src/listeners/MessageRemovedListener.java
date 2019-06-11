@@ -2,8 +2,8 @@ package listeners;
 
 import java.awt.Color;
 
+import constructors.Messages;
 import core.Hashes;
-import core.Messages;
 import core.UserPrivs;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.audit.AuditLogEntry;

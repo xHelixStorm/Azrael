@@ -7,16 +7,16 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Guilds;
+import constructors.Guilds;
+import constructors.InventoryContent;
+import constructors.Skins;
+import constructors.Weapons;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import inventory.InventoryContent;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import rankingSystem.Skins;
-import rankingSystem.Weapons;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
 import util.STATIC;
@@ -55,7 +55,7 @@ public class Purchase implements Command{
 									if(skin.getShopDescription().length() > 0){
 										if(!input.equalsIgnoreCase(setting.getLevelDescription()) && !input.equalsIgnoreCase(setting.getRankDescription()) && !input.equalsIgnoreCase(setting.getProfileDescription()) && !input.equalsIgnoreCase(setting.getIconDescription())){
 											if(RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input, setting.getThemeID()) == null || skin.getSkinType().equals("ite")){
-												rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), setting.getThemeID());
+												constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), setting.getThemeID());
 												if(user_details.getCurrency() >= skin.getPrice()){
 													long new_currency = user_details.getCurrency() - skin.getPrice();
 													var editedRows = 0;
@@ -94,7 +94,7 @@ public class Purchase implements Command{
 								}
 								else if(weapon != null) {
 									if(weapon.getDescription().length() > 0) {
-										rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), setting.getThemeID());
+										constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), setting.getThemeID());
 										if(user_details.getCurrency() >= weapon.getPrice()) {
 											long new_currency = user_details.getCurrency() - weapon.getPrice();
 											var editedRows = 0;

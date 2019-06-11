@@ -12,15 +12,15 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Guilds;
+import constructors.Dailies;
+import constructors.Guilds;
+import constructors.Inventory;
+import constructors.InventoryContent;
+import constructors.Rank;
+import constructors.Ranks;
+import constructors.Skins;
 import core.Hashes;
 import fileManagement.IniFileReader;
-import inventory.Dailies;
-import inventory.Inventory;
-import inventory.InventoryContent;
-import rankingSystem.Rank;
-import rankingSystem.Ranks;
-import rankingSystem.Skins;
 
 public class RankingSystem {
 	private static final Logger logger = LoggerFactory.getLogger(RankingSystem.class);

@@ -5,9 +5,9 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Cache;
+import constructors.Cache;
+import constructors.RSS;
 import core.Hashes;
-import core.RSS;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;

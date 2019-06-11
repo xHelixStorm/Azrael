@@ -1,4 +1,4 @@
-package inventory;
+package constructors;
 
 public class Inventory {
 	private int item_id;

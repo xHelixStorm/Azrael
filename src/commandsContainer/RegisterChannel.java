@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Cache;
-import core.Channels;
+import constructors.Cache;
+import constructors.Channels;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;

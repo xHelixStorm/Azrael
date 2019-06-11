@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Patchnote;
+import constructors.Patchnote;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;

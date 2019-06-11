@@ -10,10 +10,10 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.Weapons;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import rankingSystem.Weapons;
 
 public class RandomshopRewardDrawer {
 	public static void drawReward(MessageReceivedEvent e, Weapons weapon, long currency) {

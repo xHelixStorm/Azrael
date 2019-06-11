@@ -13,15 +13,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Bancollect;
-import core.Channels;
+import constructors.Bancollect;
+import constructors.Channels;
+import constructors.History;
+import constructors.NameFilter;
+import constructors.RSS;
+import constructors.User;
+import constructors.Warning;
 import core.Hashes;
-import core.History;
-import core.RSS;
-import core.User;
-import core.Warning;
 import fileManagement.IniFileReader;
-import filter.NameFilter;
 import net.dv8tion.jda.core.entities.Member;
 
 public class Azrael {

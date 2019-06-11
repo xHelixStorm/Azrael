@@ -15,14 +15,14 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Cache;
+import constructors.Cache;
+import constructors.Dailies;
+import constructors.InventoryContent;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import inventory.Dailies;
 import inventory.DrawDaily;
-import inventory.InventoryContent;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -64,7 +64,7 @@ public class Daily implements Command{
 								if(cod_reward.length() == 0)
 									exclude_cod = true;
 								//
-								core.Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
+								constructors.Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 								List<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong(), guild_settings.getThemeID());
 								var tot_weight = 0;
 								if(exclude_cod == true) {
@@ -98,7 +98,7 @@ public class Daily implements Command{
 								Timestamp timestamp2 = Timestamp.valueOf(tomorrowMidnight);
 								var editedRows = 0;
 								if(list.get(random).getType().equals("cur")){
-									rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
+									constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
 									user_details.setCurrency(user_details.getCurrency()+Long.parseLong(list.get(random).getDescription().replaceAll("[^0-9]*", "")));
 									editedRows = RankingSystem.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency());
 									if(editedRows > 0)

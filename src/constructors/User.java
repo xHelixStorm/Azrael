@@ -1,4 +1,4 @@
-package core;
+package constructors;
 
 public class User {
 	private long user_id;

@@ -22,6 +22,7 @@ public class GuildIni {
 			ini.add("General", "ChannelLog", "false");
 			ini.add("General", "CacheLog", "false");
 			ini.add("General", "DoubleExperience", "auto");
+			ini.add("General", "ForceReason", "true");
 			
 			//Pastebin
 			ini.add("Pastebin", "Key", "");
@@ -255,6 +256,11 @@ public class GuildIni {
 	public static String getDoubleExperienceMode(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "DoubleExperience");
+	}
+	
+	public static boolean getForceReason(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "ForceReason", boolean.class);
 	}
 	
 	public static String[] getWholePastebin(long guild_id) {

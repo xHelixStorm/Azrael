@@ -5,12 +5,12 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Channels;
-import core.Roles;
+import constructors.Channels;
+import constructors.Dailies;
+import constructors.Roles;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import inventory.Dailies;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -74,7 +74,7 @@ public class Display implements Command{
 				else if(args[0].equalsIgnoreCase("-ranking-roles")) {
 					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong())) || adminPermission) {
 						if(RankingSystem.SQLgetGuild(guild_id).getRankingState()) {
-							for(rankingSystem.Rank r : RankingSystem.SQLgetRoles(guild_id)) {
+							for(constructors.Rank r : RankingSystem.SQLgetRoles(guild_id)) {
 								if(r.getGuildID() == guild_id) {
 									out += r.getRole_Name() + " (" + r.getRoleID() + ") \nlevel to unlock: " + r.getLevel_Requirement() + "\n";
 								}

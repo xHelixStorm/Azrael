@@ -1,4 +1,4 @@
-package core;
+package constructors;
 
 public class Quizes {
 	private String question = "";

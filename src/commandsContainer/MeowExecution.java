@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 
-import core.Cache;
+import constructors.Cache;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;

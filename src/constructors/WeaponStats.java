@@ -1,4 +1,4 @@
-package rankingSystem;
+package constructors;
 
 public class WeaponStats {
 	int id;

@@ -3,7 +3,7 @@ package commands;
 import java.awt.Color;
 import java.io.File;
 
-import core.Cache;
+import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;

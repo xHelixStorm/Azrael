@@ -6,15 +6,15 @@ import java.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Bancollect;
-import core.Guilds;
+import constructors.Bancollect;
+import constructors.Guilds;
+import constructors.Rank;
 import core.Hashes;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import rankingSystem.Rank;
 import sql.RankingSystem;
 import sql.DiscordRoles;
 import sql.Azrael;

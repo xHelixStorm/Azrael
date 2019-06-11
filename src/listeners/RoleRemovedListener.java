@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Bancollect;
+import constructors.Bancollect;
 import core.UserPrivs;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.audit.AuditLogEntry;

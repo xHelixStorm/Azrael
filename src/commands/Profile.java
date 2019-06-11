@@ -8,8 +8,8 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Cache;
-import core.Guilds;
+import constructors.Cache;
+import constructors.Guilds;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
@@ -53,7 +53,7 @@ public class Profile implements Command{
 					int rank = 0;
 					
 					Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
-					rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
+					constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
 					
 					if(guild_settings.getRankingState()){				
 						var cache = Hashes.getTempCache("profileDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
@@ -93,9 +93,9 @@ public class Profile implements Command{
 									convertedExperience = 100;
 								}
 								
-								ArrayList<rankingSystem.Rank> rankList = RankingSystem.SQLRanking(guild_id);
+								ArrayList<constructors.Rank> rankList = RankingSystem.SQLRanking(guild_id);
 								if(rankList.size() > 0) {
-									search: for(rankingSystem.Rank ranking : rankList){
+									search: for(constructors.Rank ranking : rankList){
 										if(user_id == ranking.getUser_ID()){
 											rank = ranking.getRank();
 											break search;

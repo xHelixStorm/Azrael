@@ -1,4 +1,4 @@
-package inventory;
+package constructors;
 
 import java.sql.Timestamp;
 

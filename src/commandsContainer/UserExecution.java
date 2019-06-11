@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Bancollect;
-import core.Cache;
-import core.Guilds;
+import constructors.Bancollect;
+import constructors.Cache;
+import constructors.Guilds;
+import constructors.Messages;
+import constructors.Rank;
+import constructors.Ranks;
+import constructors.User;
 import core.Hashes;
-import core.Messages;
-import core.User;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
@@ -22,8 +24,6 @@ import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
-import rankingSystem.Rank;
-import rankingSystem.Ranks;
 import sql.RankingSystem;
 import sql.DiscordRoles;
 import sql.Azrael;
@@ -187,11 +187,18 @@ public class UserExecution {
 					case "mute":
 						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserMuteLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							message.setTitle("You chose to mute!");
-							message.addField("YES", "Provide a reason", true);
-							message.addField("NO", "Don't provide a reason", true);
-							_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a reason to the mute?").build()).queue();
-							cache.updateDescription("mute"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
+							if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
+								_e.getTextChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
+								cache.updateDescription("mute-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+								Hashes.addTempCache(key, cache);
+							}
+							else {
+								message.addField("YES", "Provide a reason", true);
+								message.addField("NO", "Don't provide a reason", true);
+								_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a reason to the mute?").build()).queue();
+								cache.updateDescription("mute"+user_id).setExpiration(180000);
+								Hashes.addTempCache(key, cache);
+							}
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
@@ -255,11 +262,18 @@ public class UserExecution {
 					case "ban":
 						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserBanLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							message.setTitle("You chose to ban!");
-							message.addField("YES", "Provide a reason", true);
-							message.addField("NO", "Don't provide a reason", true);
-							_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the ban?").build()).queue();
-							cache.updateDescription("ban"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
+							if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
+								_e.getTextChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
+								cache.updateDescription("ban-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+								Hashes.addTempCache(key, cache);
+							}
+							else {
+								message.addField("YES", "Provide a reason", true);
+								message.addField("NO", "Don't provide a reason", true);
+								_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the ban?").build()).queue();
+								cache.updateDescription("ban"+user_id).setExpiration(180000);
+								Hashes.addTempCache(key, cache);
+							}
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
@@ -270,11 +284,18 @@ public class UserExecution {
 					case "kick":
 						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserKickLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							message.setTitle("You chose to kick!");
-							message.addField("YES", "Provide a reason", true);
-							message.addField("NO", "Don't provide a reason", true);
-							_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the kick?").build()).queue();
-							cache.updateDescription("kick"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
+							if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
+								_e.getTextChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
+								cache.updateDescription("kick-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+								Hashes.addTempCache(key, cache);
+							}
+							else {
+								message.addField("YES", "Provide a reason", true);
+								message.addField("NO", "Don't provide a reason", true);
+								_e.getTextChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the kick?").build()).queue();
+								cache.updateDescription("kick"+user_id).setExpiration(180000);
+								Hashes.addTempCache(key, cache);
+							}
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();

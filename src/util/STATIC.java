@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import core.Channels;
+import constructors.Channels;
 
 public class STATIC {
 	
-	private static final String VERSION = "5.10.272";
+	private static final String VERSION = "5.11.273";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	

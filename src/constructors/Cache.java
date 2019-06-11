@@ -1,4 +1,4 @@
-package core;
+package constructors;
 
 public class Cache {
 	private long expiration;

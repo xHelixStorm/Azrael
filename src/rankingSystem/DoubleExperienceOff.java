@@ -5,7 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-import core.Cache;
+import constructors.Cache;
 import core.Hashes;
 import enums.Weekday;
 import fileManagement.IniFileReader;

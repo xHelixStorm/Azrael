@@ -1,4 +1,4 @@
-package rankingSystem;
+package constructors;
 
 import java.sql.Timestamp;
 

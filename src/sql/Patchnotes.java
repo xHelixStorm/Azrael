@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Patchnote;
+import constructors.Patchnote;
 import fileManagement.IniFileReader;
 import util.STATIC;
 

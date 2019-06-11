@@ -10,7 +10,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Guilds;
+import constructors.Guilds;
+import constructors.Rank;
 import core.Hashes;
 import fileManagement.FileSetting;
 import net.dv8tion.jda.core.EmbedBuilder;

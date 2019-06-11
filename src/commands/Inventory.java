@@ -6,14 +6,14 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Cache;
-import core.Guilds;
+import constructors.Cache;
+import constructors.Guilds;
+import constructors.InventoryContent;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import inventory.InventoryBuilder;
-import inventory.InventoryContent;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;

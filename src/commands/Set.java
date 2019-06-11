@@ -19,10 +19,10 @@ import commandsContainer.SetProfileDefaultSkin;
 import commandsContainer.SetRankDefaultSkin;
 import commandsContainer.SetRankingSystem;
 import commandsContainer.SetWarning;
+import constructors.Dailies;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import inventory.Dailies;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
@@ -166,7 +166,7 @@ public class Set implements Command{
 					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong())) || adminPermission) {
 						String out = "";
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-						for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingLevel().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
+						for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingLevel().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
 							out+= "Theme "+rankingSystem.getRankingLevel()+":\t"+rankingSystem.getLevelDescription()+"\n";
 						}
 						if(out.length() > 0)
@@ -200,7 +200,7 @@ public class Set implements Command{
 					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong())) || adminPermission) {
 						String out = "";
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-						for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingRank().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
+						for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingRank().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
 							out+= "Theme "+rankingSystem.getRankingRank()+":\t"+rankingSystem.getRankDescription()+"\n";
 						}
 						if(out.length() > 0)
@@ -234,7 +234,7 @@ public class Set implements Command{
 					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong())) || adminPermission) {
 						String out = "";
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-						for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingProfile().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
+						for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingProfile().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
 							out+= "Theme "+rankingSystem.getRankingProfile()+":\t"+rankingSystem.getProfileDescription()+"\n";
 						}
 						if(out.length() > 0)
@@ -268,7 +268,7 @@ public class Set implements Command{
 					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong())) || adminPermission) {
 						String out = "";
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-						for(rankingSystem.Rank rankingSystem : RankingSystem.SQLgetRankingIcons().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
+						for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingIcons().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
 							out+= "Theme "+rankingSystem.getRankingIcon()+":\t"+rankingSystem.getIconDescription()+"\n";
 						}
 						if(out.length() > 0)

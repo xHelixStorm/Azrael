@@ -7,8 +7,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.Quizes;
 import core.Hashes;
-import core.Quizes;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;

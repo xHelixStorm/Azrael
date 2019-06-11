@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.vdurmont.emoji.EmojiParser;
 
 import commandsContainer.RandomshopExecution;
-import core.Cache;
+import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;

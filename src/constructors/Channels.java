@@ -1,4 +1,4 @@
-package core;
+package constructors;
 
 public class Channels {
 	private long guild_id;

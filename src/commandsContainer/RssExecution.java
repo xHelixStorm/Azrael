@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiParser;
 
-import core.Cache;
+import constructors.Cache;
+import constructors.RSS;
 import core.Hashes;
-import core.RSS;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.Azrael;

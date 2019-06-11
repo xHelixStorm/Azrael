@@ -4,13 +4,13 @@ import java.awt.Color;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import core.Guilds;
+import constructors.Guilds;
+import constructors.Skins;
+import constructors.Weapons;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import rankingSystem.Skins;
-import rankingSystem.Weapons;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
 

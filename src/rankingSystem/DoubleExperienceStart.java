@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Cache;
+import constructors.Cache;
 import core.Hashes;
 import enums.Weekday;
 import fileManagement.GuildIni;

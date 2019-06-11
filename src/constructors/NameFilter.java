@@ -1,4 +1,4 @@
-package filter;
+package constructors;
 
 public class NameFilter {
 	private String name;

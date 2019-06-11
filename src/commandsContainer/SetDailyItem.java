@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import inventory.Dailies;
+import constructors.Dailies;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
 

@@ -6,14 +6,14 @@ import java.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Guilds;
+import constructors.Guilds;
+import constructors.Rank;
 import core.UserPrivs;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
-import rankingSystem.Rank;
 import sql.RankingSystem;
 import sql.Azrael;
 

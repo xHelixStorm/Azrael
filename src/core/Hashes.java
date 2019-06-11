@@ -7,15 +7,22 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import filter.NameFilter;
-import inventory.Dailies;
+import constructors.Cache;
+import constructors.Channels;
+import constructors.Dailies;
+import constructors.Guilds;
+import constructors.Messages;
+import constructors.NameFilter;
+import constructors.Quizes;
+import constructors.RSS;
+import constructors.Rank;
+import constructors.Ranks;
+import constructors.Roles;
+import constructors.Skins;
+import constructors.WeaponAbbvs;
+import constructors.WeaponStats;
+import constructors.Weapons;
 import net.dv8tion.jda.core.entities.Member;
-import rankingSystem.Rank;
-import rankingSystem.Ranks;
-import rankingSystem.Skins;
-import rankingSystem.WeaponAbbvs;
-import rankingSystem.WeaponStats;
-import rankingSystem.Weapons;
 
 public class Hashes {
 	private static final int max_message_pool_size = 100000;

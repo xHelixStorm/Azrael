@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiParser;
 
+import constructors.RSS;
 import core.Hashes;
-import core.RSS;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageHistory;

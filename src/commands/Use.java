@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Guilds;
+import constructors.Guilds;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
@@ -32,7 +32,7 @@ public class Use implements Command{
 			logger.debug("{} has used Use command", e.getMember().getUser().getId());
 			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUseLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-				rankingSystem.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
+				constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
 				if(guild_settings.getRankingState()){
 					var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 					if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null) {
@@ -42,7 +42,7 @@ public class Use implements Command{
 							e.getTextChannel().sendMessage("write the description of the item/skin together with this command to use it!\nTo reset your choice use either default-level, default-rank, default-profile or default-icons to reset your settings!").queue();
 						}
 						else if(args[0].equalsIgnoreCase("default-level")){
-							rankingSystem.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(guild_settings.getLevelDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
+							constructors.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(guild_settings.getLevelDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 							user_details.setRankingLevel(rank.getRankingLevel());
 							user_details.setLevelDescription(rank.getLevelDescription());
 							user_details.setColorRLevel(rank.getColorRLevel());
@@ -71,7 +71,7 @@ public class Use implements Command{
 							}
 						}
 						else if(args[0].equalsIgnoreCase("default-rank")){
-							rankingSystem.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(guild_settings.getRankDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
+							constructors.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(guild_settings.getRankDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 							user_details.setRankingRank(rank.getRankingRank());
 							user_details.setRankDescription(rank.getRankDescription());
 							user_details.setBarColorRank(rank.getBarColorRank());
@@ -103,7 +103,7 @@ public class Use implements Command{
 							}
 						}
 						else if(args[0].equalsIgnoreCase("default-profile")){
-							rankingSystem.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(guild_settings.getProfileDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
+							constructors.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(guild_settings.getProfileDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 							user_details.setRankingProfile(rank.getRankingProfile());
 							user_details.setProfileDescription(rank.getProfileDescription());
 							user_details.setBarColorProfile(rank.getBarColorProfile());
@@ -135,7 +135,7 @@ public class Use implements Command{
 							}
 						}
 						else if(args[0].equalsIgnoreCase("default-icons")){
-							rankingSystem.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(guild_settings.getIconDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
+							constructors.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(guild_settings.getIconDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 							user_details.setRankingIcon(rank.getRankingIcon());
 							user_details.setIconDescription(rank.getIconDescription());
 							if(user_details.getRankingIcon() != 0) {
@@ -158,11 +158,11 @@ public class Use implements Command{
 						}
 						else {
 							input = input.substring(prefix.length()+4);
-							inventory.Inventory inventory = RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input, guild_settings.getThemeID());
+							constructors.Inventory inventory = RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input, guild_settings.getThemeID());
 							if(inventory != null && inventory.getItemID() != 0 && inventory.getStatus().equals("perm")){
 								if(inventory.getSkinType().equals("lev")){
 									final String filter = input;
-									rankingSystem.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+									constructors.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 									user_details.setRankingLevel(rank.getRankingLevel());
 									user_details.setLevelDescription(rank.getLevelDescription());
 									user_details.setColorRLevel(rank.getColorRLevel());
@@ -184,7 +184,7 @@ public class Use implements Command{
 								}
 								else if(inventory.getSkinType().equals("ran")){
 									final String filter = input;
-									rankingSystem.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+									constructors.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 									user_details.setRankingRank(rank.getRankingRank());
 									user_details.setRankDescription(rank.getRankDescription());
 									user_details.setBarColorRank(rank.getBarColorRank());
@@ -209,7 +209,7 @@ public class Use implements Command{
 								}
 								else if(inventory.getSkinType().equals("pro")){
 									final String filter = input;
-									rankingSystem.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+									constructors.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 									user_details.setRankingProfile(rank.getRankingProfile());
 									user_details.setProfileDescription(rank.getProfileDescription());
 									user_details.setBarColorProfile(rank.getBarColorProfile());
@@ -234,7 +234,7 @@ public class Use implements Command{
 								}
 								else if(inventory.getSkinType().equals("ico")){
 									final String filter = input;
-									rankingSystem.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+									constructors.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 									user_details.setRankingIcon(rank.getRankingIcon());
 									user_details.setIconDescription(rank.getIconDescription());
 									if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon()) > 0) {

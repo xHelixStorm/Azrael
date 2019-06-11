@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commandsContainer.RandomshopExecution;
-import core.Guilds;
+import constructors.Guilds;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;

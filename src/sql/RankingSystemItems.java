@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.InventoryContent;
+import constructors.WeaponAbbvs;
+import constructors.WeaponStats;
+import constructors.Weapons;
 import core.Hashes;
 import fileManagement.IniFileReader;
-import inventory.InventoryContent;
-import rankingSystem.WeaponAbbvs;
-import rankingSystem.WeaponStats;
-import rankingSystem.Weapons;
 
 public class RankingSystemItems {
 	private static final Logger logger = LoggerFactory.getLogger(RankingSystemItems.class);

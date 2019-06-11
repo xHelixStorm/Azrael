@@ -12,8 +12,12 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Cache;
-import core.Guilds;
+import constructors.Cache;
+import constructors.Guilds;
+import constructors.Rank;
+import constructors.WeaponAbbvs;
+import constructors.WeaponStats;
+import constructors.Weapons;
 import core.Hashes;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -21,10 +25,6 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import randomshop.RandomshopItemDrawer;
 import randomshop.RandomshopRewardDrawer;
-import rankingSystem.Rank;
-import rankingSystem.WeaponAbbvs;
-import rankingSystem.WeaponStats;
-import rankingSystem.Weapons;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
 

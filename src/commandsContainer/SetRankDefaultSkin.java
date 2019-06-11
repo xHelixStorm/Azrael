@@ -3,7 +3,7 @@ package commandsContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Guilds;
+import constructors.Guilds;
 import core.Hashes;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import sql.RankingSystem;

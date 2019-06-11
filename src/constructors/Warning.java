@@ -1,4 +1,4 @@
-package core;
+package constructors;
 
 public class Warning {
 	private int warning_id;
