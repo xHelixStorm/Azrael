@@ -58,6 +58,7 @@ public class GuildIni {
 			ini.add("Commands", "DisplayVoiceChannelsLevel", "1");
 			ini.add("Commands", "DisplayRegisteredChannelsLevel", "1");
 			ini.add("Commands", "DisplayDailiesLevel", "1");
+			ini.add("Commands", "DisplayCommandLevelsLevel", "1");
 			ini.add("Commands", "Help", "false");
 			ini.add("Commands", "HelpLevel", "1");
 			ini.add("Commands", "Inventory", "false");
@@ -357,6 +358,10 @@ public class GuildIni {
 	public static int getDisplayDailiesLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "DisplayDailiesLevel", int.class);
+	}
+	public static int getDisplayCommandLevelsLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DisplayCommandLevelsLevel", int.class);
 	}
 	public static boolean getHelpCommand(long guild_id) {
 		Ini ini = readIni(guild_id);

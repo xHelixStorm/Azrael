@@ -50,6 +50,32 @@ public class DiscordRoles {
 		}
 	}
 	
+	public static long SQLgetRole(long _guild_id, long _role_id) {
+		logger.debug("SQLgetRole launched. Passed params {}, {}", _guild_id, _role_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT role_id FROM roles WHERE fk_guild_id = ? && role_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setLong(2, _role_id);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return rs.getLong(1);
+			}
+			return 0;
+		} catch (SQLException e) {
+			logger.error("SQLgetRole Exception", e);
+			return 0;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static long SQLgetRole(long _guild_id, String _category_abv) {
 		logger.debug("SQLgetRole launched. Passed params {}, {}", _guild_id, _category_abv);
 		Connection myConn = null;
