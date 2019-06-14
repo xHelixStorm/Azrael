@@ -30,7 +30,8 @@ public class Use implements Command{
 		if(GuildIni.getUseCommand(e.getGuild().getIdLong())){
 			Logger logger = LoggerFactory.getLogger(Use.class);
 			logger.debug("{} has used Use command", e.getMember().getUser().getId());
-			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUseLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+			final var commandLevel = GuildIni.getUseLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 				constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
 				if(guild_settings.getRankingState()){
@@ -305,7 +306,7 @@ public class Use implements Command{
 			}
 			else {
 				EmbedBuilder message = new EmbedBuilder();
-				e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+				e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
 			}
 		}
 	}

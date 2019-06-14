@@ -29,7 +29,8 @@ public class Top implements Command{
 		if(GuildIni.getTopCommand(e.getGuild().getIdLong())){
 			Logger logger = LoggerFactory.getLogger(Top.class);
 			logger.debug("{} has used Top command", e.getMember().getUser().getId());
-			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getTopLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+			final var commandLevel = GuildIni.getTopLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				long member_id = e.getMember().getUser().getIdLong();
 				int rank = 0;
 				StringBuilder message = new StringBuilder();
@@ -109,7 +110,7 @@ public class Top implements Command{
 			}
 			else {
 				EmbedBuilder message = new EmbedBuilder();
-				e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+				e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
 			}
 		}
 	}

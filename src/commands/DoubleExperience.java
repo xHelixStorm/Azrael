@@ -22,7 +22,8 @@ public class DoubleExperience implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(GuildIni.getDoubleExperienceCommand(e.getGuild().getIdLong())) {
 			EmbedBuilder message = new EmbedBuilder();
-			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDoubleExperienceLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+			final var commandLevel = GuildIni.getDoubleExperienceLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				if(args.length == 0) {
 					message.setColor(Color.BLUE).setTitle("Command details!");
 					e.getTextChannel().sendMessage(message.setDescription("Use this command to change the setting of the double experience event for this guild. These are the options: \n"
@@ -68,7 +69,7 @@ public class DoubleExperience implements Command{
 			}
 			else {
 				message.setColor(Color.RED).setTitle("Access Denied!");
-				e.getTextChannel().sendMessage(message.setDescription(e.getMember().getAsMention() +" **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+				e.getTextChannel().sendMessage(message.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
 			}
 		}
 	}

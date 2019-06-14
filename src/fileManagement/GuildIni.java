@@ -105,6 +105,7 @@ public class GuildIni {
 			ini.add("Commands", "UserInformationLevel", "20");
 			ini.add("Commands", "UserDeleteMessagesLevel", "20");
 			ini.add("Commands", "UserWarningLevel", "20");
+			ini.add("Commands", "UserWarningForceLevel", "20");
 			ini.add("Commands", "UserMuteLevel", "20");
 			ini.add("Commands", "UserUnmuteLevel", "20");
 			ini.add("Commands", "UserBanLevel", "20");
@@ -546,6 +547,10 @@ public class GuildIni {
 	public static int getUserWarningLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "UserWarningLevel", int.class);
+	}
+	public static int getUserWarningForceLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserWarningForceLevel", int.class);
 	}
 	public static int getUserMuteLevel(long guild_id) {
 		Ini ini = readIni(guild_id);

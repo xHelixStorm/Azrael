@@ -31,7 +31,8 @@ public class RegisterRankingRole {
 		String level = "";
 		int level_requirement = 0;
 		
-		if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getRegisterRankingRoleLevel(_e.getGuild().getIdLong())) || adminPermission) {
+		var commandLevel = GuildIni.getRegisterRankingRoleLevel(_e.getGuild().getIdLong());
+		if(UserPrivs.comparePrivilege(_e.getMember(), commandLevel) || adminPermission) {
 			if(_args.length > 1 && _args[1].equalsIgnoreCase("-clear")) {
 				if(RankingSystem.SQLclearRoles(guild_id) > 0) {
 					Hashes.removeRankingRoles(guild_id);
@@ -97,7 +98,7 @@ public class RegisterRankingRole {
 			}
 		}
 		else {
-			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild().getRoles())).build()).queue();
 		}
 	}
 }

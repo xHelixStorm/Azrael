@@ -99,8 +99,9 @@ public class UserExecution {
 			if(_message.equalsIgnoreCase("information") || _message.equalsIgnoreCase("delete-messages") || _message.equalsIgnoreCase("warning") || _message.equalsIgnoreCase("mute") || _message.equalsIgnoreCase("unmute") || _message.equalsIgnoreCase("ban") || _message.equalsIgnoreCase("kick") || _message.equalsIgnoreCase("history") || _message.equalsIgnoreCase("gift-experience") || _message.equalsIgnoreCase("set-experience") || _message.equalsIgnoreCase("set-level") || _message.equalsIgnoreCase("gift-currency") || _message.equalsIgnoreCase("set-currency")) {
 				var user_id = Long.parseLong(cache.getAdditionalInfo());
 				switch(_message) {
-					case "information": 
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserInformationLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+					case "information":
+						final var informationLevel = GuildIni.getUserInformationLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), informationLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							User user = Azrael.SQLgetUserThroughID(cache.getAdditionalInfo());
 							message.setTitle("Here the requested information!");
 							if(user.getAvatar() != null)
@@ -154,12 +155,13 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(informationLevel, _e.getGuild().getRoles())).build()).queue();
 						}
 						Hashes.clearTempCache(key);
 						break;
 					case "delete-messages":
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserDeleteMessagesLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+						final var deleteMessagesLevel = GuildIni.getUserDeleteMessagesLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), deleteMessagesLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							message.setTitle("You chose to delete a number of messages!");
 							_e.getTextChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
 							cache.updateDescription("delete-messages"+user_id).setExpiration(180000);
@@ -167,12 +169,13 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(deleteMessagesLevel, _e.getGuild().getRoles())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
 					case "warning":
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserWarningLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+						final var warningLevel = GuildIni.getUserWarningLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), warningLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							message.setTitle("You chose to set a warning value!");
 							_e.getTextChannel().sendMessage(message.setDescription("Please choose a numerical warning value that is lower or identical to the max warning value!").build()).queue();
 							cache.updateDescription("warning"+user_id).setExpiration(180000);
@@ -180,12 +183,13 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(warningLevel, _e.getGuild().getRoles())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
 					case "mute":
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserMuteLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+						final var muteLevel = GuildIni.getUserMuteLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), muteLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							message.setTitle("You chose to mute!");
 							if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
 								_e.getTextChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
@@ -202,12 +206,13 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(muteLevel, _e.getGuild().getRoles())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
 					case "unmute":
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserUnmuteLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+						final var unmuteLevel = GuildIni.getUserUnmuteLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), unmuteLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							if(!Azrael.SQLisBanned(user_id, _e.getGuild().getIdLong())) {
 								EmbedBuilder notice = new EmbedBuilder().setColor(Color.BLUE);
 								if(Azrael.SQLgetCustomMuted(user_id, _e.getGuild().getIdLong())) {
@@ -255,12 +260,13 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(unmuteLevel, _e.getGuild().getRoles())).build()).queue();
 						}
 						Hashes.clearTempCache(key);
 						break;
 					case "ban":
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserBanLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+						final var banLevel = GuildIni.getUserBanLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), banLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							message.setTitle("You chose to ban!");
 							if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
 								_e.getTextChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
@@ -277,12 +283,13 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(banLevel, _e.getGuild().getRoles())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
 					case "kick":
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserKickLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+						final var kickLevel = GuildIni.getUserKickLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), kickLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							message.setTitle("You chose to kick!");
 							if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
 								_e.getTextChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
@@ -299,12 +306,13 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(kickLevel, _e.getGuild().getRoles())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
 					case "history":
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserHistoryLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+						final var historyLevel = GuildIni.getUserHistoryLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), historyLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							message.setTitle("You chose to display the history!");
 							StringBuilder out = new StringBuilder();
 							for(var history : Azrael.SQLgetHistory(user_id, _e.getGuild().getIdLong())) {
@@ -315,12 +323,13 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(historyLevel, _e.getGuild().getRoles())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
 					case "gift-experience":
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserGiftExperienceLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+						final var giftExperienceLevel = GuildIni.getUserGiftExperienceLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), giftExperienceLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							if(guild_settings.getRankingState()) {
 								message.setTitle("You chose to gift experience points!");
 								_e.getTextChannel().sendMessage(message.setDescription("Choose a number of experience points to add to the total number of experience points").build()).queue();
@@ -334,12 +343,13 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(giftExperienceLevel, _e.getGuild().getRoles())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
 					case "set-experience":
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserSetExperienceLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+						final var setExperienceLevel = GuildIni.getUserSetExperienceLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), setExperienceLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							if(guild_settings.getRankingState()) {
 								message.setTitle("You chose to set experience points!");
 								_e.getTextChannel().sendMessage(message.setDescription("Choose a number of experience points to set for the user").build()).queue();
@@ -353,12 +363,13 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(setExperienceLevel, _e.getGuild().getRoles())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
 					case "set-level":
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserSetLevelLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+						final var setLevelLevel = GuildIni.getUserSetLevelLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), setLevelLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							if(guild_settings.getRankingState()) {
 								message.setTitle("You chose to set a level!");
 								_e.getTextChannel().sendMessage(message.setDescription("Choose a level to assign the user").build()).queue();
@@ -372,12 +383,13 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(setLevelLevel, _e.getGuild().getRoles())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
 					case "gift-currency":
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserGiftCurrencyLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+						final var giftCurrencyLevel = GuildIni.getUserGiftCurrencyLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), giftCurrencyLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							if(guild_settings.getRankingState()) {
 								message.setTitle("You chose to gift money!");
 								_e.getTextChannel().sendMessage(message.setDescription("Choose the amount of money to gift the user").build()).queue();
@@ -391,12 +403,13 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(giftCurrencyLevel, _e.getGuild().getRoles())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
 					case "set-currency":
-						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserSetCurrencyLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+						final var setCurrencyLevel = GuildIni.getUserSetCurrencyLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), setCurrencyLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							if(guild_settings.getRankingState()) {
 								message.setTitle("You chose to set money!");
 								_e.getTextChannel().sendMessage(message.setDescription("Choose the amount of money to set for the user").build()).queue();
@@ -405,7 +418,7 @@ public class UserExecution {
 							}
 							else {
 								denied.setTitle("Access Denied!");
-								_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention()+" This action can't be used because the ranking system is disabled! Please choose a different action!").build()).queue();
+								_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(setCurrencyLevel, _e.getGuild().getRoles())).build()).queue();
 							}
 						}
 						else {
@@ -480,7 +493,7 @@ public class UserExecution {
 					if(db_warning != 0) {
 						int warning_id = Integer.parseInt(_message.replaceAll("[^0-9]*", ""));
 						int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
-						if(warning_id == 0){
+						if(warning_id == 0) {
 							if(Azrael.SQLDeleteData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong()) > 0) {
 								_e.getTextChannel().sendMessage("The warnings of this user has been cleared!").queue();
 								logger.debug("{} has cleared the warnings from {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
@@ -512,8 +525,34 @@ public class UserExecution {
 						}
 					}
 					else {
-						_e.getTextChannel().sendMessage("A custom warning can't be set because the player was never muted or was freshly unbanned!").queue();
-						logger.warn("{} got no available warnings to be edited", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""));
+						if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserWarningForceLevel(_e.getGuild().getIdLong())) || _e.getGuild().getIdLong() == GuildIni.getAdmin(_e.getGuild().getIdLong())) {
+							int warning_id = Integer.parseInt(_message.replaceAll("[^0-9]*", ""));
+							int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
+							if(warning_id <= max_warning_id) {
+								if(Azrael.SQLInsertData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong(), warning_id, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false) > 0) {
+									_e.getTextChannel().sendMessage("Warning value "+warning_id+" has been set!").queue();
+									logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+								}
+								else {
+									_e.getTextChannel().sendMessage("An internal error occurred. The warning level of the selected user couldn't be inserted in Azrael.bancollect").queue();
+									logger.error("Warning on user {} couldn't be inserted in Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+								}
+							}
+							else {
+								if(Azrael.SQLInsertData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong(), max_warning_id, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false) > 0) {
+									_e.getTextChannel().sendMessage("The max possible value "+max_warning_id+" has been set because your input exceeded the max possible warning!").queue();
+									logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), max_warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+								}
+								else {
+									_e.getTextChannel().sendMessage("An internal error occurred. The warning level of the selected user couldn't be inserted in Azrael.bancollect").queue();
+									logger.error("Warning on user {} couldn't be inserted in Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+								}
+							}
+						}
+						else {
+							_e.getTextChannel().sendMessage("A custom warning can't be set because the player was never muted or was freshly unbanned!").queue();
+							logger.warn("{} got no available warnings to be edit", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""));
+						}
 					}
 					Hashes.clearTempCache(key);
 				}

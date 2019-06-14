@@ -28,7 +28,8 @@ public class Commands implements Command{
 			Logger logger = LoggerFactory.getLogger(Commands.class);
 			logger.debug("{} has used Commands command", e.getMember().getUser().getId());
 			var admin = GuildIni.getAdmin(e.getGuild().getIdLong());
-			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getCommandsLevel(e.getGuild().getIdLong())) || admin == e.getMember().getUser().getIdLong()) {
+			final var commandLevel = GuildIni.getCommandsLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || admin == e.getMember().getUser().getIdLong()) {
 				EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here are all available commands!");
 				long guild_id = e.getGuild().getIdLong();
 				var allowed_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("bot") || f.getChannel_Type().equals("log")).collect(Collectors.toList());
@@ -45,7 +46,7 @@ public class Commands implements Command{
 			}
 			else {
 				EmbedBuilder message = new EmbedBuilder();
-				e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+				e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
 			}
 		}
 	}

@@ -1,5 +1,7 @@
 package core;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,5 +105,13 @@ public class UserPrivs {
 			}
 		}
 		return (highestLevel >= requiredLevel);
+	}
+	
+	public static String retrieveRequiredRoles(int requiredLevel, List<Role> roles) {
+		var out = "";
+		for(final var role : roles) {
+			out += (!role.getName().equals("@everyone") && Hashes.getDiscordRole(role.getIdLong()).getLevel() >= requiredLevel ? "`"+role.getName()+"` " : "");
+		}
+		return out;
 	}
 }

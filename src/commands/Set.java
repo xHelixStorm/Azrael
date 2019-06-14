@@ -44,6 +44,7 @@ public class Set implements Command{
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 			
 			var adminPermission = (GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong());
+			final var commandLevel = GuildIni.getSetLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetLevel(e.getGuild().getIdLong())) || adminPermission) {
 				final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 				if(args.length == 0) {
@@ -63,79 +64,89 @@ public class Set implements Command{
 							+ "Write the full command with one parameter to return more information. E.g **"+prefix+"set -channel-filter**").build()).queue();
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-privilege-level")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						e.getTextChannel().sendMessage(messageBuild.setDescription("Use this command to change the right level from a role between 0 (lowest) to 100 (highest). Write the command as the following example:\n\n**"+prefix+"set -privilege-level <role-id> 50**").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-privilege-level")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						SetPrivilegeLevel.runTask(e, args);
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-channel-filter")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetChannelFilterLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetChannelFilterLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						e.getTextChannel().sendMessage(messageBuild.setDescription("Use the command with this parameter to set one or few self chosen filters on a channel. Write the command as the following example:\n\n**"+prefix+"set -channel-filter #yourchannel eng,ger,fre**\nThese languages can be added to the filter:\n**eng** for English\n**ger** for German\n**fre** for French\n**tur** for Turkish\n**rus** for Russian").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-channel-filter")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetChannelFilterLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetChannelFilterLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						SetChannelFilter.runTask(e, args);
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-warnings")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetWarningsLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetWarningsLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						SetWarning.runHelp(e);
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-warnings")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetWarningsLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetWarningsLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						SetWarning.runTask(e, args[1]);
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-commands")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetCommandsLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetCommandsLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						e.getTextChannel().sendMessage(messageBuild.setDescription("To change the level on how the commands are allowed to be used, try to use the following:\n\n**"+prefix+"set -commands disable** to disable specific commands in all channels\n**"+prefix+"set -commands bot** to enable specific commands only in bot channel\n**"+prefix+"set -commands enable** to enable specific commands in all channels").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-commands")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetCommandsLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetCommandsLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						SetCommandLevel.runTask(e, args[1]);
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-ranking")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetRankingLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetRankingLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						e.getTextChannel().sendMessage(messageBuild.setDescription("Enable or disable the ranking system with the following command:\n\n**"+prefix+"set -ranking enable**: To enable the ranking system\n**"+prefix+"set -ranking disable**: To disable the ranking system").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-ranking")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetRankingLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetRankingLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						if(RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getMaxLevel() != 0) {
 							SetRankingSystem.runTask(e, args[1]);
 						}
@@ -144,26 +155,29 @@ public class Set implements Command{
 						}
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-max-experience")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetMaxExperienceLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetMaxExperienceLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						e.getTextChannel().sendMessage(messageBuild.setDescription("To use this command, type one of the following parameters after the syntax:\n\n**"+prefix+"set -max-experience <experience>**: To set an experience limit per day\n"
 								+ "**"+prefix+"set -max-experience enable**: To enable the experience limit\n"
 								+ "**"+prefix+"set -max-experience disable**: To disable the experience limit").build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-max-experience")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetMaxExperienceLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetMaxExperienceLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						SetMaxExperience.runTask(e, args[1], RankingSystem.SQLgetGuild(e.getGuild().getIdLong()));
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-default-level-skin")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						String out = "";
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 						for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingLevel().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
@@ -175,11 +189,12 @@ public class Set implements Command{
 							e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_level couldn't be loaded").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-default-level-skin")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 						int last_theme = RankingSystem.SQLgetRankingLevel().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 						if(last_theme > 0) {
@@ -193,11 +208,12 @@ public class Set implements Command{
 						}
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-default-rank-skin")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						String out = "";
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 						for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingRank().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
@@ -209,11 +225,12 @@ public class Set implements Command{
 							e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_rank couldn't be loaded").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-default-rank-skin")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 						int last_theme = RankingSystem.SQLgetRankingRank().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 						if(last_theme > 0) {
@@ -227,11 +244,12 @@ public class Set implements Command{
 						}
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-default-profile-skin")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						String out = "";
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 						for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingProfile().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
@@ -243,11 +261,12 @@ public class Set implements Command{
 							e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_profile couldn't be loaded").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-default-profile-skin")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 						int last_theme = RankingSystem.SQLgetRankingProfile().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 						if(last_theme > 0) {
@@ -261,11 +280,12 @@ public class Set implements Command{
 						}
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-default-icon-skin")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						String out = "";
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 						for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingIcons().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
@@ -277,11 +297,12 @@ public class Set implements Command{
 							e.getTextChannel().sendMessage(messageBuild.setDescription("An internal error occurred. Themes from table RankingSystem.ranking_icons couldn't be loaded").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-default-icon-skin")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 						int last_theme = RankingSystem.SQLgetRankingIcons().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 						if(last_theme > 0) {
@@ -294,41 +315,45 @@ public class Set implements Command{
 							e.getTextChannel().sendMessage("An internal error occurred. Themes from table RankingSystem.ranking_icons couldn't be loaded").queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-daily-item")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDailyItemLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetDailyItemLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						e.getTextChannel().sendMessage(messageBuild.setDescription("Write the name of the daily reward you want to make available for dailies together with the weight and type of the item. For example:\n**"+prefix+"set -daily-item \"5000 "+RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getCurrency()+"\" -weight 70 -type cur**\nNote that the total weight can't exceed 100 and that the currently available types are **cur** for currency , **exp** for experience enhancement items and **cod** for code giveaways.").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-daily-item")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetDailyItemLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetDailyItemLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						ArrayList<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong(), RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID());
 						var tot_weight = daily_items.parallelStream().mapToInt(i -> i.getWeight()).sum();
 						SetDailyItem.runTask(e, e.getMessage().getContentRaw().substring(16+prefix.length()), daily_items, tot_weight);
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-giveaway-items")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						e.getTextChannel().sendMessage(messageBuild.setDescription("Please past a pastebin link, together with the command, that contains all giveaway codes for the current month").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-giveaway-items")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var thisLevel = GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), thisLevel) || adminPermission) {
 						SetGiveawayItems.runTask(e, args[1]);
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(thisLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else {
@@ -336,7 +361,7 @@ public class Set implements Command{
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
 			}
 		}
 	}

@@ -21,8 +21,9 @@ public class Filter implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(GuildIni.getFilterCommand(e.getGuild().getIdLong())) {			
-			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getFilterLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+		if(GuildIni.getFilterCommand(e.getGuild().getIdLong())) {
+			final var commandLevel = GuildIni.getFilterLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				if(args.length == 0) {
 					FilterExecution.runHelp(e);
 				}
@@ -32,7 +33,7 @@ public class Filter implements Command{
 			}
 			else {
 				EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() +" **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
 			}
 		}
 	}

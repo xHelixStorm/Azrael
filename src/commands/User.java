@@ -27,7 +27,8 @@ public class User implements Command{
 		if(GuildIni.getUserCommand(e.getGuild().getIdLong())) {
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
-				if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUserLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+				final var commandLevel = GuildIni.getUserLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 					if(args.length == 0) {
 						UserExecution.getHelp(e);
@@ -37,7 +38,7 @@ public class User implements Command{
 					}
 				}
 				else {
-					e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+					e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
 				}
 			});
 			executor.shutdown();

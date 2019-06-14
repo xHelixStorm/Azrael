@@ -30,7 +30,7 @@ public class ShutDown implements Command{
 			e.getJDA().shutdown();
 		}
 		else {
-			e.getTextChannel().sendMessage(message.setDescription("**" + e.getMember().getAsMention() + ", you don't have the force to command me this. Join the dark side first!**").build()).queue();
+			e.getTextChannel().sendMessage(message.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. The highest instance privilege is required. Here a cookie** :cookie:").build()).queue();
 		}
 	}
 

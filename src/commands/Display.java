@@ -33,7 +33,8 @@ public class Display implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(GuildIni.getDisplayCommand(e.getGuild().getIdLong())) {
 			var adminPermission = e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong());
-			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayLevel(e.getGuild().getIdLong())) || adminPermission) {
+			var commandLevel = GuildIni.getDisplayLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 				long guild_id = e.getGuild().getIdLong();
 				String out = "";
 				
@@ -51,29 +52,32 @@ public class Display implements Command{
 					e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 				}
 				else if(args[0].equalsIgnoreCase("-roles")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var rolesLevel = GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), rolesLevel) || adminPermission) {
 						for(Role r : e.getGuild().getRoles()) {
 							out += r.getName() + " (" + r.getId() + ") \n";
 						}
 						e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(rolesLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-registered-roles")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRegisteredRolesLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var registeredRolesLevel = GuildIni.getDisplayRegisteredRolesLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), registeredRolesLevel) || adminPermission) {
 						for(Roles r : DiscordRoles.SQLgetRoles(guild_id)) {
 							out += r.getRole_Name() + " (" + r.getRole_ID() + ") \nrole type: "+r.getCategory_Name()+"\nPrivilege level: "+r.getLevel()+"\n\n";
 						}
 						e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(registeredRolesLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-ranking-roles")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var rankingRolesLevel = GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), rankingRolesLevel) || adminPermission) {
 						if(RankingSystem.SQLgetGuild(guild_id).getRankingState()) {
 							for(constructors.Rank r : RankingSystem.SQLgetRoles(guild_id)) {
 								if(r.getGuildID() == guild_id) {
@@ -87,33 +91,36 @@ public class Display implements Command{
 						e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No ranking role has been registered!").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(rankingRolesLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-textchannels")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayTextChannelsLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var textChannelsLevel = GuildIni.getDisplayTextChannelsLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), textChannelsLevel) || adminPermission) {
 						for(TextChannel tc : e.getGuild().getTextChannels()) {
 							out += tc.getName() + " (" + tc.getId() + ") \n";
 						}
 						e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "Textchannels don't exist in this server!").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(textChannelsLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-voicechannels")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayVoiceChannelsLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var voiceChannelsLevel = GuildIni.getDisplayVoiceChannelsLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), voiceChannelsLevel) || adminPermission) {
 						for(VoiceChannel vc : e.getGuild().getVoiceChannels()) {
 							out += vc.getName() + " (" + vc.getId() + ") \n";
 						}
 						e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "Voicechannels don't exist in this server!").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(voiceChannelsLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-registered-channels")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRegisteredChannelsLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var registeredChannelsLevel = GuildIni.getDisplayRegisteredChannelsLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), registeredChannelsLevel) || adminPermission) {
 						for(Channels ch : Azrael.SQLgetChannels(guild_id)) {
 							if(!out.contains(""+ch.getChannel_ID())) {
 								out += "\n\n"+ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \nChannel type: "+ch.getChannel_Type_Name()+" Channel\nFilter(s) in use: "+ch.getLang_Filter();
@@ -125,11 +132,12 @@ public class Display implements Command{
 						e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No channel has been registered!").build()).queue();
 					}
 					else{
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(registeredChannelsLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-dailies")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong())) || adminPermission) {
+					final var dailiesLevel = GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), dailiesLevel) || adminPermission) {
 						for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID())) {
 							out+= daily.getDescription()+"\nWeight: "+daily.getWeight()+"\n\n";
 						}
@@ -140,7 +148,8 @@ public class Display implements Command{
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-command-levels")) {
-					if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong())) || adminPermission) {
+					var commandsLevel = GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), commandsLevel) || adminPermission) {
 						out += "About command: "+GuildIni.getAboutLevel(e.getGuild().getIdLong())+"\n";
 						out += "Commands command: "+GuildIni.getCommandsLevel(e.getGuild().getIdLong())+"\n";
 						out += "Hidden commands: "+GuildIni.getCommandsAdminLevel(e.getGuild().getIdLong())+"\n";
@@ -188,6 +197,7 @@ public class Display implements Command{
 						out += "User information subcommand: "+GuildIni.getUserInformationLevel(e.getGuild().getIdLong())+"\n";
 						out += "User delete messages subcommand: "+GuildIni.getUserDeleteMessagesLevel(e.getGuild().getIdLong())+"\n";
 						out += "User warning subcommand: "+GuildIni.getUserWarningLevel(e.getGuild().getIdLong())+"\n";
+						out += "User forced warning subcommand: "+GuildIni.getUserWarningForceLevel(e.getGuild().getIdLong())+"\n";
 						out += "User mute subcommand: "+GuildIni.getUserMuteLevel(e.getGuild().getIdLong())+"\n";
 						out += "User unmute subcommand: "+GuildIni.getUserUnmuteLevel(e.getGuild().getIdLong())+"\n";
 						out += "User ban subcommand: "+GuildIni.getUserBanLevel(e.getGuild().getIdLong())+"\n";
@@ -213,15 +223,15 @@ public class Display implements Command{
 						e.getTextChannel().sendMessage("`"+out+"`").queue();
 					}
 					else{
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandsLevel, e.getGuild().getRoles())).build()).queue();
 					}
 				}
 				else {
-					e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+					e.getTextChannel().sendMessage(denied.setDescription("**"+e.getMember().getAsMention()+" Something went wrong. Please recheck the syntax and try again!**").build()).queue();
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
 			}
 		}
 	}

@@ -29,53 +29,58 @@ public class FilterExecution {
 		
 		switch(_message) {
 			case "word-filter":
-				if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getFilterWordFilterLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+				final var wordFilterLevel = GuildIni.getFilterWordFilterLevel(_e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(_e.getMember(), wordFilterLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 					message.setTitle("You chose the word-filter!");
 					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
 					Hashes.addTempCache(key, new Cache(180000, "word-filter"));
 				}
 				else {
-					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(wordFilterLevel, _e.getGuild().getRoles())).build()).queue();
 				}
 				break;
 			case "name-filter":
-				if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getFilterNameFilterLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+				final var nameFilterLevel = GuildIni.getFilterNameFilterLevel(_e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(_e.getMember(), nameFilterLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 					message.setTitle("You chose the name-filter!");
 					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
 					Hashes.addTempCache(key, new Cache(180000, "name-filter"));
 				}
 				else {
-					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(nameFilterLevel, _e.getGuild().getRoles())).build()).queue();
 				}
 				break;
 			case "name-kick":
-				if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getFilterNameKickLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+				final var nameKickLevel = GuildIni.getFilterNameKickLevel(_e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(_e.getMember(), nameKickLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 					message.setTitle("You chose name-kick!");
 					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
 					Hashes.addTempCache(key, new Cache(180000, "name-kick"));
 				}
 				else {
-					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(nameKickLevel, _e.getGuild().getRoles())).build()).queue();
 				}
 				break;
 			case "funny-names":
-				if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getFilterFunnyNamesLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+				final var funnyNamesLevel = GuildIni.getFilterFunnyNamesLevel(_e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(_e.getMember(), funnyNamesLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 					message.setTitle("You chose funny-names!");
 					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
 					Hashes.addTempCache(key, new Cache(180000, "funny_names"));
 				}
 				else {
-					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(funnyNamesLevel, _e.getGuild().getRoles())).build()).queue();
 				}
 				break;
 			case "staff-names":
-				if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getFilterStaffNamesLevel(_e.getGuild().getIdLong())) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+				final var staffNamesLevel = GuildIni.getFilterStaffNamesLevel(_e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(_e.getMember(), staffNamesLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 					message.setTitle("You chose staff-names!");
 					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
 					Hashes.addTempCache(key, new Cache(180000, "staff-names"));
 				}
 				else {
-					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. This command can be used only from an Administrator or an Moderator. Here a cookie** :cookie:").build()).queue();
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(staffNamesLevel, _e.getGuild().getRoles())).build()).queue();
 				}
 				break;
 			default:

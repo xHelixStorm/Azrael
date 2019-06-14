@@ -42,7 +42,8 @@ public class RegisterChannel {
 		long channel_id;
 		String channel_type;
 		
-		if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getRegisterTextChannelLevel(_e.getGuild().getIdLong())) || adminPermission) {
+		final var commandLevel = GuildIni.getRegisterTextChannelLevel(_e.getGuild().getIdLong());
+		if(UserPrivs.comparePrivilege(_e.getMember(), commandLevel) || adminPermission) {
 			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss)");
 			Matcher matcher = pattern.matcher(_args[1]);
 			if(_args.length > 2 && matcher.find()) {
@@ -100,13 +101,14 @@ public class RegisterChannel {
 			}
 		}
 		else {
-			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild().getRoles())).build()).queue();
 		}
 	}
 	
 	public static void runChannelsRegistration(MessageReceivedEvent _e, long _guild_id, boolean adminPermission) {
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-		if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getRegisterTextChannelsLevel(_e.getGuild().getIdLong())) || adminPermission) {
+		final var commandLevel = GuildIni.getRegisterTextChannelsLevel(_e.getGuild().getIdLong());
+		if(UserPrivs.comparePrivilege(_e.getMember(), commandLevel) || adminPermission) {
 			for(TextChannel tc : _e.getGuild().getTextChannels()) {
 				if(Azrael.SQLInsertChannels(tc.getIdLong(), tc.getName()) == 0) {
 					logger.error("channel {} couldn't be registered", tc.getId());
@@ -117,7 +119,7 @@ public class RegisterChannel {
 			_e.getTextChannel().sendMessage("**All text channels have been registered!**").queue();
 		}
 		else {
-			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild().getRoles())).build()).queue();
 		}
 	}
 }

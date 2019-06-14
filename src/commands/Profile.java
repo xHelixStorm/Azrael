@@ -33,7 +33,8 @@ public class Profile implements Command{
 			executor.execute(() -> {
 				Logger logger = LoggerFactory.getLogger(Profile.class);
 				logger.debug("{} has used Profile command", e.getMember().getUser().getId());
-				if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getProfileLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+				final var commandLevel = GuildIni.getProfileLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 					long user_id = 0;
 					if(args.length > 0) {
 						String id = args[0];
@@ -128,7 +129,7 @@ public class Profile implements Command{
 				}
 				else {
 					EmbedBuilder message = new EmbedBuilder();
-					e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+					e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
 				}
 			});
 			executor.shutdown();

@@ -26,7 +26,8 @@ public class Rss implements Command{
 	public void action(String[] args, MessageReceivedEvent e) {
 		if(GuildIni.getRssCommand(e.getGuild().getIdLong())) {
 			EmbedBuilder message = new EmbedBuilder();
-			if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getRssLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+			final var commandLevel = GuildIni.getRssLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				Logger logger = LoggerFactory.getLogger(Rss.class);
 				if(args.length == 0) {
 					//throw default message with instructions
@@ -112,7 +113,7 @@ public class Rss implements Command{
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+				e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
 			}
 		}
 	}
