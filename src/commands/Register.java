@@ -84,7 +84,7 @@ public class Register implements Command{
 						RegisterRole.RegisterRoleHelper(e);
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-role")) {
@@ -96,7 +96,7 @@ public class Register implements Command{
 						RegisterChannel.RegisterChannelHelper(e);
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-text-channels")) {
@@ -111,7 +111,7 @@ public class Register implements Command{
 						RegisterRankingRole.RegisterRankingRoleHelper(e);
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild())).build()).queue();
 					}
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-ranking-role")) {
@@ -125,7 +125,7 @@ public class Register implements Command{
 						executor.shutdown();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild())).build()).queue();
 					}
 				}
 				else {
@@ -133,7 +133,7 @@ public class Register implements Command{
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(GuildIni.getRegisterLevel(e.getGuild().getIdLong()), e.getGuild().getRoles())).build()).queue();
+				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(GuildIni.getRegisterLevel(e.getGuild().getIdLong()), e.getGuild())).build()).queue();
 			}
 		}
 	}

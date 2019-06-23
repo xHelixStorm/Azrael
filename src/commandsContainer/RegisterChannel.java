@@ -101,7 +101,7 @@ public class RegisterChannel {
 			}
 		}
 		else {
-			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild().getRoles())).build()).queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild())).build()).queue();
 		}
 	}
 	
@@ -119,7 +119,7 @@ public class RegisterChannel {
 			_e.getTextChannel().sendMessage("**All text channels have been registered!**").queue();
 		}
 		else {
-			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild().getRoles())).build()).queue();
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild())).build()).queue();
 		}
 	}
 }

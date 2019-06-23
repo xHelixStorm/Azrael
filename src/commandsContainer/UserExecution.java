@@ -155,7 +155,7 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(informationLevel, _e.getGuild().getRoles())).build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(informationLevel, _e.getGuild())).build()).queue();
 						}
 						Hashes.clearTempCache(key);
 						break;
@@ -169,7 +169,7 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(deleteMessagesLevel, _e.getGuild().getRoles())).build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(deleteMessagesLevel, _e.getGuild())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
@@ -183,7 +183,7 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(warningLevel, _e.getGuild().getRoles())).build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(warningLevel, _e.getGuild())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
@@ -206,7 +206,7 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(muteLevel, _e.getGuild().getRoles())).build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(muteLevel, _e.getGuild())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
@@ -260,7 +260,7 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(unmuteLevel, _e.getGuild().getRoles())).build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(unmuteLevel, _e.getGuild())).build()).queue();
 						}
 						Hashes.clearTempCache(key);
 						break;
@@ -283,7 +283,7 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(banLevel, _e.getGuild().getRoles())).build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(banLevel, _e.getGuild())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
@@ -306,7 +306,7 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(kickLevel, _e.getGuild().getRoles())).build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(kickLevel, _e.getGuild())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
@@ -323,7 +323,7 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(historyLevel, _e.getGuild().getRoles())).build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(historyLevel, _e.getGuild())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
@@ -343,7 +343,7 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(giftExperienceLevel, _e.getGuild().getRoles())).build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(giftExperienceLevel, _e.getGuild())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
@@ -363,7 +363,7 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(setExperienceLevel, _e.getGuild().getRoles())).build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(setExperienceLevel, _e.getGuild())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
@@ -383,7 +383,7 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(setLevelLevel, _e.getGuild().getRoles())).build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(setLevelLevel, _e.getGuild())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
@@ -403,7 +403,7 @@ public class UserExecution {
 						}
 						else {
 							EmbedBuilder error = new EmbedBuilder();
-							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(giftCurrencyLevel, _e.getGuild().getRoles())).build()).queue();
+							_e.getTextChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(giftCurrencyLevel, _e.getGuild())).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						break;
@@ -418,7 +418,7 @@ public class UserExecution {
 							}
 							else {
 								denied.setTitle("Access Denied!");
-								_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(setCurrencyLevel, _e.getGuild().getRoles())).build()).queue();
+								_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(setCurrencyLevel, _e.getGuild())).build()).queue();
 							}
 						}
 						else {
@@ -683,7 +683,7 @@ public class UserExecution {
 					logger.debug("{} has banned {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
 				}
 				_e.getGuild().getController().ban(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), 0).reason(_message).queue();
-				Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", _message);
+				Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", _message);
 				Hashes.clearTempCache(key);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equalsIgnoreCase("kick")) {

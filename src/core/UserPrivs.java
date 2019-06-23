@@ -1,17 +1,18 @@
 package core;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Roles;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
 import sql.DiscordRoles;
 
 public class UserPrivs {
+	final static private Logger logger = LoggerFactory.getLogger(UserPrivs.class);
+	
 	public static boolean isUserAdmin(User user, long _guild_id) {
 		for(Role r : user.getJDA().getGuildById(_guild_id).getMember(user).getRoles()) {
 			Roles category = Hashes.getDiscordRole(r.getIdLong());
@@ -75,42 +76,34 @@ public class UserPrivs {
 	public static boolean comparePrivilege(Member member, int requiredLevel) {
 		var highestLevel = 0;
 		for(final var role : member.getRoles()) {
-			var level = Hashes.getDiscordRole(role.getIdLong());
+			var level = DiscordRoles.SQLgetRole(member.getGuild().getIdLong(), role.getIdLong());
 			if(level != null) {
-				var currentLevel = level.getLevel();
-				if(currentLevel > highestLevel) {
-					highestLevel = currentLevel;
+				if(level.getLevel() > highestLevel) {
+					highestLevel = level.getLevel();
 				}
 			}
 			else {
-				if(DiscordRoles.SQLgetRole(member.getGuild().getIdLong(), role.getIdLong()) != 0) {
-					DiscordRoles.SQLgetRoles(member.getGuild().getIdLong());
-					level = Hashes.getDiscordRole(role.getIdLong());
-					if(level != null) {
-						var currentLevel = level.getLevel();
-						if(currentLevel > highestLevel) {
-							highestLevel = currentLevel;
-						}
-					}
-				}
-				else {
-					if(DiscordRoles.SQLInsertRole(member.getGuild().getIdLong(), role.getIdLong(), 0, role.getName(), "def") > 0) {
-						DiscordRoles.SQLgetRoles(member.getGuild().getIdLong());
-					}
-					else {
-						Logger logger = LoggerFactory.getLogger(UserPrivs.class);
-						logger.error("Role {} couldn't be inserted into DiscordRoles.roles table", role.getId());
-					}
+				if(DiscordRoles.SQLInsertRole(member.getGuild().getIdLong(), role.getIdLong(), 0, role.getName(), "def") == 0) {
+					logger.error("The role id {} couldn't be inserted into DiscordRoles.roles table", role.getId());
 				}
 			}
 		}
 		return (highestLevel >= requiredLevel);
 	}
 	
-	public static String retrieveRequiredRoles(int requiredLevel, List<Role> roles) {
+	public static String retrieveRequiredRoles(int requiredLevel, Guild guild) {
 		var out = "";
-		for(final var role : roles) {
-			out += (!role.getName().equals("@everyone") && Hashes.getDiscordRole(role.getIdLong()).getLevel() >= requiredLevel ? "`"+role.getName()+"` " : "");
+		for(final var role : guild.getRoles()) {
+			try {
+				out += (!role.getName().equals("@everyone") && Hashes.getDiscordRole(role.getIdLong()).getLevel() >= requiredLevel ? "`"+role.getName()+"` " : "");
+			} catch(NullPointerException npe) {
+				if(DiscordRoles.SQLInsertRole(guild.getIdLong(), role.getIdLong(), 0, role.getName(), "def") > 0) {
+					Hashes.addDiscordRole(role.getIdLong(), new Roles(role.getIdLong(), role.getName(), 0, "def", "Default"));
+				}
+				else {
+					logger.error("The role id {} couldn't be inserted into DiscordRoles.roles table", role.getId());
+				}
+			}
 		}
 		return out;
 	}

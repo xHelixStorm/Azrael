@@ -490,7 +490,7 @@ public class Azrael {
 			return new Bancollect();
 		} catch (SQLException e) {
 			logger.error("SQLgetData Exception", e);
-			return null;
+			return new Bancollect();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

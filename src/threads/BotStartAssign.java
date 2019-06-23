@@ -41,10 +41,10 @@ public class BotStartAssign implements Runnable{
 			if(guild_settings.getRankingState() == true){
 				rankingIncluded = true;
 				for(Member member : (e != null ? e.getJDA().getGuildById(g.getIdLong()).getMembers() : e2.getJDA().getGuildById(g.getIdLong()).getMembers())) {
-					if(member.getRoles().size() == 0 && !UserPrivs.isUserBot(member.getUser(), guild_id) && !UserPrivs.isUserMuted(member.getUser(), guild_id) && !UserPrivs.isUserCommunity(member.getUser(), guild_id)) {
+					if(!UserPrivs.isUserBot(member.getUser(), guild_id) && !UserPrivs.isUserMuted(member.getUser(), guild_id)) {
 						Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), guild_id, guild_settings.getThemeID());
-						if(user_details != null){
-							if(user_details.getCurrentRole() != 0){
+						if(user_details != null) {
+							if(user_details.getCurrentRole() != 0 && member.getRoles().parallelStream().filter(f -> f.getIdLong() == user_details.getCurrentRole()).findAny().orElse(null) == null) {
 								g.getController().addSingleRoleToMember(member, g.getRoleById(user_details.getCurrentRole())).queue();
 								if(Azrael.SQLInsertUser(member.getUser().getIdLong(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getUser().getEffectiveAvatarUrl(), member.getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
 									logger.error("User {} couldn't be inserted into the table Azrael.users for guild {}", member.getUser().getId(), g.getName());
@@ -88,7 +88,7 @@ public class BotStartAssign implements Runnable{
 			logger.debug("Start up user registration complete in {}", g.getName());
 			var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 			if(i != 0 && log_channel != null){
-				g.getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(i+" User(s) received the community role on bot start up").build()).queue();
+				g.getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(i+" User(s) received the earned ranking role on bot start up").build()).queue();
 			}
 			if((errUsers != 0 || errUserDetails != 0 || errAzraelUsers != 0) && log_channel != null && rankingIncluded) {
 				EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle("Users couldn't be registered!");

@@ -60,7 +60,7 @@ public class Display implements Command{
 						e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(rolesLevel, e.getGuild().getRoles())).build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(rolesLevel, e.getGuild())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-registered-roles")) {
@@ -72,7 +72,7 @@ public class Display implements Command{
 						e.getTextChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(registeredRolesLevel, e.getGuild().getRoles())).build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(registeredRolesLevel, e.getGuild())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-ranking-roles")) {
@@ -91,7 +91,7 @@ public class Display implements Command{
 						e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No ranking role has been registered!").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(rankingRolesLevel, e.getGuild().getRoles())).build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(rankingRolesLevel, e.getGuild())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-textchannels")) {
@@ -103,7 +103,7 @@ public class Display implements Command{
 						e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "Textchannels don't exist in this server!").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(textChannelsLevel, e.getGuild().getRoles())).build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(textChannelsLevel, e.getGuild())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-voicechannels")) {
@@ -115,7 +115,7 @@ public class Display implements Command{
 						e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "Voicechannels don't exist in this server!").build()).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(voiceChannelsLevel, e.getGuild().getRoles())).build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(voiceChannelsLevel, e.getGuild())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-registered-channels")) {
@@ -132,7 +132,7 @@ public class Display implements Command{
 						e.getTextChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No channel has been registered!").build()).queue();
 					}
 					else{
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(registeredChannelsLevel, e.getGuild().getRoles())).build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(registeredChannelsLevel, e.getGuild())).build()).queue();
 					}
 				}
 				else if(args[0].equalsIgnoreCase("-dailies")) {
@@ -223,7 +223,7 @@ public class Display implements Command{
 						e.getTextChannel().sendMessage("`"+out+"`").queue();
 					}
 					else{
-						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandsLevel, e.getGuild().getRoles())).build()).queue();
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandsLevel, e.getGuild())).build()).queue();
 					}
 				}
 				else {
@@ -231,7 +231,7 @@ public class Display implements Command{
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild().getRoles())).build()).queue();
+				e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild())).build()).queue();
 			}
 		}
 	}

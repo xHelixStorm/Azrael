@@ -17,7 +17,7 @@ public class Bancollect {
 		this.user_id = 0;
 		this.guild_id = 0;
 		this.warning_id = 0;
-		this.ban_id = 0;
+		this.ban_id = 1;
 		this.timestamp = null;
 		this.unmute = null;
 		this.muted = false;

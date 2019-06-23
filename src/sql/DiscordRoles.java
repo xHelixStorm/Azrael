@@ -50,30 +50,41 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static long SQLgetRole(long _guild_id, long _role_id) {
-		logger.debug("SQLgetRole launched. Passed params {}, {}", _guild_id, _role_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT role_id FROM roles WHERE fk_guild_id = ? && role_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _role_id);
-			rs = stmt.executeQuery();
-			if(rs.next()) {
-				return rs.getLong(1);
+	public static Roles SQLgetRole(long _guild_id, long _role_id) {
+		if(Hashes.getDiscordRole(_role_id) == null) {
+			logger.debug("SQLgetRole launched. Passed params {}, {}", _guild_id, _role_id);
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT roles.role_id, roles.name, roles.level, role_category.category_abv, role_category.rank FROM guilds INNER JOIN roles ON guilds.guild_id = roles.fk_guild_id INNER JOIN role_category ON roles.fk_category_abv = role_category.category_abv WHERE guild_id = ? && roles.role_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				stmt.setLong(2, _role_id);
+				rs = stmt.executeQuery();
+				if(rs.next()) {
+					var role = new Roles(
+						rs.getLong(1),
+						rs.getString(2),
+						rs.getInt(3),
+						rs.getString(4),
+						rs.getString(5)
+					);
+					Hashes.addDiscordRole(role.getRole_ID(), role);
+					return role;
+				}
+				return null;
+			} catch (SQLException e) {
+				logger.error("SQLgetRole Exception", e);
+				return null;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-			return 0;
-		} catch (SQLException e) {
-			logger.error("SQLgetRole Exception", e);
-			return 0;
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
+		return Hashes.getDiscordRole(_role_id);
 	}
 	
 	public static long SQLgetRole(long _guild_id, String _category_abv) {

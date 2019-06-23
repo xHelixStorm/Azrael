@@ -18,10 +18,10 @@ public class BanListener extends ListenerAdapter{
 		long user_id = e.getUser().getIdLong();
 		long guild_id = e.getGuild().getIdLong();
 		
-		int ban_id = Azrael.SQLgetData(user_id, guild_id).getBanID();
+		var user = Azrael.SQLgetData(user_id, guild_id);
 		var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 		
-		if(ban_id == 1){
+		if(user.getBanID() == 1 && user.getWarningID() > 0) {
 			if(Azrael.SQLUpdateBan(user_id, guild_id, 2) == 0) {
 				logger.error("banned user {} couldn't be marked as banned on Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
 				if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. User couldn't be marked as banned in Azrael.bancollect").queue();

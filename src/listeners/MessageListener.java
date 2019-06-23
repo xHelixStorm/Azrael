@@ -44,9 +44,10 @@ public class MessageListener extends ListenerAdapter{
 	public void onMessageReceived(MessageReceivedEvent e){
 		ExecutorService executor = Executors.newFixedThreadPool(2);
 		
-		try {
+		//allow to intercept only messages within a guild and not private messages
+		if(e.getChannelType().isGuild()) {
 			//execute commands first
-			if(e.getMessage().getContentRaw().startsWith(GuildIni.getCommandPrefix(e.getGuild().getIdLong())) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()){
+			if(e.getMessage().getContentRaw().startsWith(GuildIni.getCommandPrefix(e.getGuild().getIdLong())) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
 				var prefixLength = GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length();
 				if(!CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength).toLowerCase(), e))) {
 					Logger logger = LoggerFactory.getLogger(MessageListener.class);
@@ -287,9 +288,7 @@ public class MessageListener extends ListenerAdapter{
 			if(Hashes.getFilterLang(channel_id).size() > 0){
 				executor.execute(new LanguageFilter(e, Hashes.getFilterLang(channel_id)));
 			}
-		} catch(NullPointerException npe){
-			//play with your thumbs 
+			executor.shutdown();
 		}
-		executor.shutdown();
 	}
 }

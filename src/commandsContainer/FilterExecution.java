@@ -36,7 +36,7 @@ public class FilterExecution {
 					Hashes.addTempCache(key, new Cache(180000, "word-filter"));
 				}
 				else {
-					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(wordFilterLevel, _e.getGuild().getRoles())).build()).queue();
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(wordFilterLevel, _e.getGuild())).build()).queue();
 				}
 				break;
 			case "name-filter":
@@ -47,7 +47,7 @@ public class FilterExecution {
 					Hashes.addTempCache(key, new Cache(180000, "name-filter"));
 				}
 				else {
-					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(nameFilterLevel, _e.getGuild().getRoles())).build()).queue();
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(nameFilterLevel, _e.getGuild())).build()).queue();
 				}
 				break;
 			case "name-kick":
@@ -58,7 +58,7 @@ public class FilterExecution {
 					Hashes.addTempCache(key, new Cache(180000, "name-kick"));
 				}
 				else {
-					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(nameKickLevel, _e.getGuild().getRoles())).build()).queue();
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(nameKickLevel, _e.getGuild())).build()).queue();
 				}
 				break;
 			case "funny-names":
@@ -69,7 +69,7 @@ public class FilterExecution {
 					Hashes.addTempCache(key, new Cache(180000, "funny_names"));
 				}
 				else {
-					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(funnyNamesLevel, _e.getGuild().getRoles())).build()).queue();
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(funnyNamesLevel, _e.getGuild())).build()).queue();
 				}
 				break;
 			case "staff-names":
@@ -80,7 +80,7 @@ public class FilterExecution {
 					Hashes.addTempCache(key, new Cache(180000, "staff-names"));
 				}
 				else {
-					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(staffNamesLevel, _e.getGuild().getRoles())).build()).queue();
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(staffNamesLevel, _e.getGuild())).build()).queue();
 				}
 				break;
 			default:

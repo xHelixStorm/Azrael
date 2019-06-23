@@ -8,7 +8,7 @@ import constructors.Channels;
 
 public class STATIC {
 	
-	private static final String VERSION = "5.11.275";
+	private static final String VERSION = "5.12.277";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	
