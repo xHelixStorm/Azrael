@@ -130,11 +130,56 @@ public class UserExecution {
 								message.addField("TOTAL EXPERIENCE", "**"+user_details.getExperience()+"**", true);
 							}
 							StringBuilder out = new StringBuilder();
-							for(String description : Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, _e.getGuild().getIdLong())) {
-								out.append("[`"+description+"`] ");
+							try {
+								for(String description : Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, _e.getGuild().getIdLong())) {
+									out.append("[`"+description+"`] ");
+								}
+								out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
+								message.addField("USED NAMES", out.toString(), false);
+								out.setLength(0);
+								for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, _e.getGuild().getIdLong())) {
+									out.append("[`"+description+"`] ");
+								}
+								out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
+								message.addField("USED NICKNAMES", out.toString(), false);
+								out.setLength(0);
+								_e.getTextChannel().sendMessage(message.build()).queue();
+							} catch(IllegalArgumentException iae) {
+								_e.getTextChannel().sendMessage(message.build()).queue();
+								message.clear();
+								out.setLength(0);
+								for(String description : Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, _e.getGuild().getIdLong())) {
+									out.append("[`"+description+"`] ");
+								}
+								out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
+								try {
+									message.setColor(Color.BLUE).setTitle("USED NAMES").setDescription(out.toString());
+								} catch(IllegalArgumentException iae2) {
+									var pastebin_link = Pastebin.unlistedPaste("USED NAMES", out.toString(), _e.getGuild().getIdLong());
+									if(!pastebin_link.equals("Creating paste failed!"))
+										message.setColor(Color.BLUE).setTitle("USED NAMES").setDescription("Names posted on Pastebin as unlisted: "+pastebin_link);
+									else {
+										message.setColor(Color.BLUE).setTitle("USED NAMES").setDescription("Names couldn't be displayed because it exceeded the limit of characters. Please bind the bot with a Pastebin account to display the names on Pastebin!");
+									}
+								}
+								_e.getTextChannel().sendMessage(message.build()).queue();
+								message.clear();
+								for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, _e.getGuild().getIdLong())) {
+									out.append("[`"+description+"`] ");
+								}
+								out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
+								try {
+									message.setColor(Color.BLUE).setTitle("USED NICKNAMES").setDescription(out.toString());
+								} catch(IllegalArgumentException iae2) {
+									var pastebin_link = Pastebin.unlistedPaste("USED NICKNAMES", out.toString(), _e.getGuild().getIdLong());
+									if(!pastebin_link.equals("Creating paste failed!"))
+										message.setColor(Color.BLUE).setTitle("USED NICKNAMES").setDescription("Nicknames posted on Pastebin as unlisted: "+pastebin_link);
+									else {
+										message.setColor(Color.BLUE).setTitle("USED NICKNAMES").setDescription("Nicknames couldn't be displayed because it exceeded the limit of characters. Please bind the bot with a Pastebin account to display the names on Pastebin!");
+									}
+								}
+								_e.getTextChannel().sendMessage(message.build()).queue();
 							}
-							out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
-							message.addField("USED NAMES", out.toString(), false);
 							out.setLength(0);
 							for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, _e.getGuild().getIdLong())) {
 								out.append("[`"+description+"`] ");
