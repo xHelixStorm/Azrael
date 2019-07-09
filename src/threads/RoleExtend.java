@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
 import constructors.Rank;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import sql.RankingSystem;
 import sql.DiscordRoles;
 import sql.Azrael;

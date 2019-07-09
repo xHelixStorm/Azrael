@@ -18,9 +18,9 @@ import com.vdurmont.emoji.EmojiParser;
 import constructors.RSS;
 import core.Hashes;
 import fileManagement.GuildIni;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageHistory;
-import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageHistory;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import sql.Azrael;
 
 public class ParseRSS extends TimerTask{

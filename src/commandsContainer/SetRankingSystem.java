@@ -5,28 +5,29 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
 import core.Hashes;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
 
 public class SetRankingSystem {
+	@SuppressWarnings("preview")
 	public static void runTask(MessageReceivedEvent _e, String _input){
 		boolean ranking_state = false;
 		boolean wrongInput = false;
 		String message;
 		
-		switch(_input){
-			case "enable":
+		switch(_input) {
+			case "enable" -> {
 				ranking_state = true;
 				message = "**Ranking system has been succesfully enabled!**";
-				break;
-			case "disable":
+			}
+			case "disable" -> {
 				ranking_state = false;
 				message = "**Ranking system has been succesfully disabled!**";
-				break;
-			default:
+			}
+			default -> {
 				wrongInput = true;
 				message = "**"+_e.getMember().getAsMention()+" Something went wrong. Please recheck the syntax and try again!**";
-				break;
+			}
 		}
 		
 		if(wrongInput == false){

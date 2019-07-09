@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.role.RoleDeleteEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 import sql.DiscordRoles;
 import sql.RankingSystem;

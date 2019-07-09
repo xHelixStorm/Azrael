@@ -59,10 +59,10 @@ import listeners.RoleRemovedListener;
 import listeners.ShutdownListener;
 import listeners.StatusListener;
 import listeners.UnbanListener;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.OnlineStatus;
+import net.dv8tion.jda.api.AccountType;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
 
 public class Main {
 	static {System.setProperty("logback.configurationFile", "./logback.xml");}
@@ -136,28 +136,29 @@ public class Main {
 		CommandHandler.commands.put("doubleexperience", new DoubleExperience());
 	}
 	
-	public static void addListeners(){
-		
-		builder.addEventListener(new ReadyListener());
-		builder.addEventListener(new GuildListener());
-		builder.addEventListener(new RoleListener());
-		builder.addEventListener(new BanListener());
-		builder.addEventListener(new UnbanListener());
-		builder.addEventListener(new MessageListener());
-		builder.addEventListener(new GuildLeaveListener());
-		builder.addEventListener(new MessageEditListener());
-		builder.addEventListener(new NameListener());
-		builder.addEventListener(new GuildJoinListener());
-		builder.addEventListener(new ShutdownListener());
-		builder.addEventListener(new RoleRemovedListener());
-		builder.addEventListener(new NicknameListener());
-		builder.addEventListener(new MessageRemovedListener());
-		builder.addEventListener(new AvatarUpdateListener());
-		builder.addEventListener(new GuildMessageReactionAddListener());
-		builder.addEventListener(new GuildMessageReactionRemoveListener());
-		builder.addEventListener(new StatusListener());
-		builder.addEventListener(new ReconnectedListener());
-		builder.addEventListener(new ResumedListener());
-		builder.addEventListener(new RoleCreateListener());
+	public static void addListeners() {
+		builder.addEventListeners(
+				new ReadyListener(),
+				new GuildListener(),
+				new RoleListener(),
+				new BanListener(),
+				new UnbanListener(),
+				new MessageListener(),
+				new GuildLeaveListener(),
+				new MessageEditListener(),
+				new NameListener(),
+				new GuildJoinListener(),
+				new ShutdownListener(),
+				new RoleRemovedListener(),
+				new NicknameListener(),
+				new MessageRemovedListener(),
+				new AvatarUpdateListener(),
+				new GuildMessageReactionAddListener(),
+				new GuildMessageReactionRemoveListener(),
+				new StatusListener(),
+				new ReconnectedListener(),
+				new ResumedListener(),
+				new RoleCreateListener()
+		);
 	}
 }

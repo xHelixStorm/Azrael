@@ -5,8 +5,8 @@ import java.sql.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.dv8tion.jda.core.events.guild.GuildBanEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.guild.GuildBanEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 
 public class BanListener extends ListenerAdapter{

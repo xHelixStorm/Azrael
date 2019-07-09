@@ -5,8 +5,8 @@ import java.util.concurrent.Executors;
 
 import core.Hashes;
 import filter.LanguageEditFilter;
-import net.dv8tion.jda.core.events.message.MessageUpdateEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 
 public class MessageEditListener extends ListenerAdapter{

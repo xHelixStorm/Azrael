@@ -12,8 +12,8 @@ import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import sql.Azrael;
 import util.Pastebin;
 
@@ -23,12 +23,13 @@ public class FilterExecution {
 		_e.getTextChannel().sendMessage(message.setDescription("Type one of the following word types right after the command to choose a respective action! These types are available:\n\n**word-filter\nname-filter\nname-kick\nfunny-names\nstaff-names**").build()).queue();
 	}
 	
+	@SuppressWarnings("preview")
 	public static void runTask(MessageReceivedEvent _e, String _message) {
 		String key = "filter_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId();
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		
 		switch(_message) {
-			case "word-filter":
+			case "word-filter" -> {
 				final var wordFilterLevel = GuildIni.getFilterWordFilterLevel(_e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(_e.getMember(), wordFilterLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 					message.setTitle("You chose the word-filter!");
@@ -38,8 +39,9 @@ public class FilterExecution {
 				else {
 					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(wordFilterLevel, _e.getGuild())).build()).queue();
 				}
-				break;
-			case "name-filter":
+			}
+				
+			case "name-filter" -> {
 				final var nameFilterLevel = GuildIni.getFilterNameFilterLevel(_e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(_e.getMember(), nameFilterLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 					message.setTitle("You chose the name-filter!");
@@ -49,8 +51,8 @@ public class FilterExecution {
 				else {
 					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(nameFilterLevel, _e.getGuild())).build()).queue();
 				}
-				break;
-			case "name-kick":
+			}
+			case "name-kick" -> {
 				final var nameKickLevel = GuildIni.getFilterNameKickLevel(_e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(_e.getMember(), nameKickLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 					message.setTitle("You chose name-kick!");
@@ -60,8 +62,8 @@ public class FilterExecution {
 				else {
 					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(nameKickLevel, _e.getGuild())).build()).queue();
 				}
-				break;
-			case "funny-names":
+			}
+			case "funny-names" -> {
 				final var funnyNamesLevel = GuildIni.getFilterFunnyNamesLevel(_e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(_e.getMember(), funnyNamesLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 					message.setTitle("You chose funny-names!");
@@ -71,8 +73,8 @@ public class FilterExecution {
 				else {
 					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(funnyNamesLevel, _e.getGuild())).build()).queue();
 				}
-				break;
-			case "staff-names":
+			}
+			case "staff-names" -> {
 				final var staffNamesLevel = GuildIni.getFilterStaffNamesLevel(_e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(_e.getMember(), staffNamesLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 					message.setTitle("You chose staff-names!");
@@ -82,19 +84,19 @@ public class FilterExecution {
 				else {
 					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(staffNamesLevel, _e.getGuild())).build()).queue();
 				}
-				break;
-			default:
-				_e.getTextChannel().sendMessage("Please choose between word-filter, name-filter, funny-names or staff-names").queue();
+			}
+			default -> _e.getTextChannel().sendMessage("Please choose between word-filter, name-filter, funny-names or staff-names").queue();
 		}
 	}
 	
+	@SuppressWarnings("preview")
 	public static void performAction(MessageReceivedEvent _e, String _message, Cache cache) {
 		String key = "filter_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId();
 		Logger logger = LoggerFactory.getLogger(FilterExecution.class);
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		if(cache.getExpiration() - System.currentTimeMillis() > 0) {
 			switch(cache.getAdditionalInfo()) {
-				case "word-filter":
+				case "word-filter" -> {
 					if(_message.equalsIgnoreCase("display")) {
 						message.setTitle("You chose to display the current word filter!");
 						StringBuilder out = new StringBuilder();
@@ -145,8 +147,8 @@ public class FilterExecution {
 						cache.updateDescription("load-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					break;
-				case "name-filter":
+				}
+				case "name-filter" -> {
 					if(_message.equalsIgnoreCase("display")) {
 						StringBuilder out = new StringBuilder();
 						for(var word : Azrael.SQLgetNameFilter(_e.getGuild().getIdLong())) {
@@ -195,8 +197,8 @@ public class FilterExecution {
 						cache.updateDescription("load-name-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					break;
-				case "name-kick":
+				}
+				case "name-kick" -> {
 					if(_message.equalsIgnoreCase("display")) {
 						StringBuilder out = new StringBuilder();
 						for(var word : Azrael.SQLgetNameFilter(_e.getGuild().getIdLong())) {
@@ -245,8 +247,8 @@ public class FilterExecution {
 						cache.updateDescription("load-name-kick").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					break;
-				case "funny-names":
+				}
+				case "funny-names" -> {
 					if(_message.equalsIgnoreCase("display")) {
 						StringBuilder out = new StringBuilder();
 						for(String word : Azrael.SQLgetFunnyNames(_e.getGuild().getIdLong())) {
@@ -294,8 +296,8 @@ public class FilterExecution {
 						cache.updateDescription("load-funny-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					break;
-				case "staff-names":
+				}
+				case "staff-names" -> {
 					if(_message.equalsIgnoreCase("display")) {
 						StringBuilder out = new StringBuilder();
 						for(String word : Azrael.SQLgetStaffNames(_e.getGuild().getIdLong())) {
@@ -343,11 +345,9 @@ public class FilterExecution {
 						cache.updateDescription("load-staff-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					break;
-				case "display-word-filter":
-					callFilterLangContent(_e, message, logger, key, _message.toLowerCase());
-					break;
-				case "insert-word-filter":
+				}
+				case "display-word-filter" -> callFilterLangContent(_e, message, logger, key, _message.toLowerCase());
+				case "insert-word-filter" -> {
 					var langInsert = _message.toLowerCase();
 					if(langInsert.equalsIgnoreCase("english") || langInsert.equalsIgnoreCase("german") || langInsert.equalsIgnoreCase("french") || langInsert.equalsIgnoreCase("turkish") || langInsert.equalsIgnoreCase("russian") || 
 							langInsert.equalsIgnoreCase("spanish") || langInsert.equalsIgnoreCase("portuguese") || langInsert.equalsIgnoreCase("italian") || langInsert.equalsIgnoreCase("all")) {
@@ -356,35 +356,17 @@ public class FilterExecution {
 						cache.updateDescription(langInsert+"-insert-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					break;
-				case "english-insert-word-filter":
-					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "german-insert-word-filter":
-					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "french-insert-word-filter":
-					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "turkish-insert-word-filter":
-					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "russian-insert-word-filter":
-					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "spanish-insert-word-filter":
-					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "portuguese-insert-word-filter":
-					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "italian-insert-word-filter":
-					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "all-insert-word-filter":
-					insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "remove-word-filter":
+				}
+				case "english-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "german-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "french-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "turkish-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "russian-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "spanish-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "portuguese-insert-word-filter" 	-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "italian-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "all-insert-word-filter" 			-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "remove-word-filter" -> {
 					var langRemove = _message.toLowerCase();
 					if(langRemove.equalsIgnoreCase("english") || langRemove.equalsIgnoreCase("german") || langRemove.equalsIgnoreCase("french") || langRemove.equalsIgnoreCase("turkish") || langRemove.equalsIgnoreCase("russian") || 
 							langRemove.equalsIgnoreCase("spanish") || langRemove.equalsIgnoreCase("portuguese") || langRemove.equalsIgnoreCase("italian") || langRemove.equalsIgnoreCase("all")) {
@@ -393,35 +375,17 @@ public class FilterExecution {
 						cache.updateDescription(langRemove+"-remove-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					break;
-				case "english-remove-word-filter":
-					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "german-remove-word-filter":
-					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "french-remove-word-filter":
-					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "turkish-remove-word-filter":
-					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "russian-remove-word-filter":
-					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "spanish-remove-word-filter":
-					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "portuguese-remove-word-filter":
-					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "italian-remove-word-filter":
-					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "all-remove-word-filter":
-					removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-					break;
-				case "add-load-word-filter":
+				}
+				case "english-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "german-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "french-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "turkish-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "russian-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "spanish-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "portuguese-remove-word-filter" 	-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "italian-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "all-remove-word-filter" 			-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "add-load-word-filter" -> {
 					var addLangLoad = _message.toLowerCase();
 					if(addLangLoad.equalsIgnoreCase("english") || addLangLoad.equalsIgnoreCase("german") || addLangLoad.equalsIgnoreCase("french") || addLangLoad.equalsIgnoreCase("turkish") || addLangLoad.equalsIgnoreCase("russian") || 
 							addLangLoad.equalsIgnoreCase("spanish") || addLangLoad.equalsIgnoreCase("portuguese") || addLangLoad.equalsIgnoreCase("italian")) {
@@ -430,32 +394,16 @@ public class FilterExecution {
 						cache.updateDescription(addLangLoad+"-add-load-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					break;
-				case "english-add-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-					break;
-				case "german-add-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-					break;
-				case "french-add-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-					break;
-				case "turkish-add-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-					break;
-				case "russian-add-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-					break;
-				case "spanish-add-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-					break;
-				case "portuguese-add-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-					break;
-				case "italian-add-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-					break;
-				case "load-word-filter":
+				}
+				case "english-add-load-word-filter" 	-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "german-add-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "french-add-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "turkish-add-load-word-filter" 	-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "russian-add-load-word-filter" 	-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "spanish-add-load-word-filter" 	-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "portuguese-add-load-word-filter" 	-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "italian-add-load-word-filter" 	-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "load-word-filter" -> {
 					var langLoad = _message.toLowerCase();
 					if(langLoad.equalsIgnoreCase("english") || langLoad.equalsIgnoreCase("german") || langLoad.equalsIgnoreCase("french") || langLoad.equalsIgnoreCase("turkish") || langLoad.equalsIgnoreCase("russian") || 
 							langLoad.equalsIgnoreCase("spanish") || langLoad.equalsIgnoreCase("portuguese") || langLoad.equalsIgnoreCase("italian")) {
@@ -464,32 +412,16 @@ public class FilterExecution {
 						cache.updateDescription(langLoad+"-load-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					break;
-				case "english-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-					break;
-				case "german-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-					break;
-				case "french-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-					break;
-				case "turkish-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-					break;
-				case "russian-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-					break;
-				case "spanish-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-					break;
-				case "portuguese-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-					break;
-				case "italian-load-word-filter":
-					loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-					break;
-				case "insert-name-filter":
+				}
+				case "english-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "german-load-word-filter" 			-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "french-load-word-filter" 			-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "turkish-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "russian-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "spanish-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "portuguese-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "italian-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "insert-name-filter" -> {
 					if(Azrael.SQLInsertNameFilter(_message, false, _e.getGuild().getIdLong()) > 0) {
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into name filter!").build()).queue();
@@ -502,8 +434,8 @@ public class FilterExecution {
 						logger.error("Name couldn't be inserted into Azrael.name_filter for guild {}", _e.getGuild().getName());
 					}
 					Hashes.clearTempCache(key);
-					break;
-				case "remove-name-filter":
+				}
+				case "remove-name-filter" -> {
 					if(Azrael.SQLDeleteNameFilter(_message, false, _e.getGuild().getIdLong()) > 0) {
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from the name filter!").build()).queue();
@@ -516,9 +448,8 @@ public class FilterExecution {
 						logger.error("Name couldn't be removed from Azrael.name_filter for guild {}", _e.getGuild().getName());
 					}
 					Hashes.clearTempCache(key);
-					break;
-				case "load-name-filter":
-				case "add-load-name-filter":
+				}
+				case "load-name-filter", "add-load-name-filter" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
 						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
@@ -558,8 +489,8 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
-					break;
-				case "insert-name-kick":
+				}
+				case "insert-name-kick" -> {
 					if(Azrael.SQLInsertNameFilter(_message, true, _e.getGuild().getIdLong()) > 0) {
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("The word has been inserted into name-kick!").build()).queue();
@@ -572,8 +503,8 @@ public class FilterExecution {
 						logger.error("Name couldn't be inserted into Azrael.name_filter for guild {}", _e.getGuild().getName());
 					}
 					Hashes.clearTempCache(key);
-					break;
-				case "remove-name-kick":
+				}
+				case "remove-name-kick" -> {
 					if(Azrael.SQLDeleteNameFilter(_message, true, _e.getGuild().getIdLong()) > 0) {
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("The word has been removed from name-kick!").build()).queue();
@@ -586,9 +517,8 @@ public class FilterExecution {
 						logger.error("Name couldn't be removed from Azrael.name_filter for guild {}", _e.getGuild().getName());
 					}
 					Hashes.clearTempCache(key);
-					break;
-				case "load-name-kick":
-				case "add-load-name-kick":
+				}
+				case "load-name-kick", "add-load-name-kick" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
 						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
@@ -628,8 +558,8 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
-					break;
-				case "insert-funny-names":
+				}
+				case "insert-funny-names" -> {
 					if(Azrael.SQLInsertFunnyNames(_message, _e.getGuild().getIdLong()) > 0) {
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("The name has been inserted into the funny names list!").build()).queue();
@@ -642,8 +572,8 @@ public class FilterExecution {
 						logger.error("Name couldn't be inserted into Azrael.names for guild {}", _e.getGuild().getName());
 					}
 					Hashes.clearTempCache(key);
-					break;
-				case "remove-funny-names":
+				}
+				case "remove-funny-names" -> {
 					if(Azrael.SQLDeleteFunnyNames(_message, _e.getGuild().getIdLong()) > 0) {
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("The name has been removed from the funny names list!").build()).queue();
@@ -656,9 +586,8 @@ public class FilterExecution {
 						logger.error("Name couldn't be removed from Azrael.names for guild {}", _e.getGuild().getName());
 					}
 					Hashes.clearTempCache(key);
-					break;
-				case "load-funny-names":
-				case "add-load-funny-names":
+				}
+				case "load-funny-names", "add-load-funny-names" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
 						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
@@ -698,8 +627,8 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
-					break;
-				case "insert-staff-names":
+				}
+				case "insert-staff-names" -> {
 					if(Azrael.SQLInsertStaffName(_message, _e.getGuild().getIdLong()) > 0) {
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("The name has been inserted into the staff names list!").build()).queue();
@@ -712,8 +641,8 @@ public class FilterExecution {
 						logger.error("Name couldn't be inserted into Azrael.staff_name_filter for guild {}", _e.getGuild().getName());
 					}
 					Hashes.clearTempCache(key);
-					break;
-				case "remove-staff-names":
+				}
+				case "remove-staff-names" -> {
 					if(Azrael.SQLDeleteStaffNames(_message, _e.getGuild().getIdLong()) > 0) {
 						message.setTitle("Success!");
 						_e.getTextChannel().sendMessage(message.setDescription("The name has been removed from the staff names list!").build()).queue();
@@ -726,9 +655,8 @@ public class FilterExecution {
 						logger.error("Name couldn't be removed from Azrael.staff_names for guild {}", _e.getGuild().getName());
 					}
 					Hashes.clearTempCache(key);
-					break;
-				case "load-staff-names":
-				case "add-load-staff-names":
+				}
+				case "load-staff-names", "add-load-staff-names" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
 						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
@@ -768,7 +696,7 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
-					break;
+				}
 			}
 		}
 		else {
@@ -776,18 +704,19 @@ public class FilterExecution {
 		}
 	}
 	
+	@SuppressWarnings("preview")
 	private static void callFilterLangContent(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String key, final String lang) {
 		var langAbbreviation = "";
 		var definitiveLang = "";
 		switch(lang) {
-			case "english":    langAbbreviation = "eng";  definitiveLang = "English";    break;
-			case "german":     langAbbreviation = "ger";  definitiveLang = "German";     break;
-			case "french":     langAbbreviation = "fre";  definitiveLang = "French";     break;
-			case "turkish":    langAbbreviation = "tur";  definitiveLang = "Turkish";    break;
-			case "russian":    langAbbreviation = "rus";  definitiveLang = "Russian";    break;
-			case "spanish":    langAbbreviation = "spa";  definitiveLang = "Spanish";    break;
-			case "portuguese": langAbbreviation = "por";  definitiveLang = "Portuguese"; break;
-			case "italian":    langAbbreviation = "ita";  definitiveLang = "Italian";    break;
+			case "english" 		-> {langAbbreviation = "eng";  definitiveLang = "English";}
+			case "german" 		-> {langAbbreviation = "ger";  definitiveLang = "German";}
+			case "french" 		-> {langAbbreviation = "fre";  definitiveLang = "French";}
+			case "turkish" 		-> {langAbbreviation = "tur";  definitiveLang = "Turkish";}
+			case "russian" 		-> {langAbbreviation = "rus";  definitiveLang = "Russian";}
+			case "spanish" 		-> {langAbbreviation = "spa";  definitiveLang = "Spanish";}
+			case "portuguese" 	-> {langAbbreviation = "por";  definitiveLang = "Portuguese";}
+			case "italian" 		-> {langAbbreviation = "ita";  definitiveLang = "Italian";}
 		}
 		
 		StringBuilder out = new StringBuilder();

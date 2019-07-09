@@ -11,12 +11,12 @@ import constructors.Rank;
 import constructors.Warning;
 import core.Hashes;
 import core.UserPrivs;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.PrivateChannel;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
-import net.dv8tion.jda.core.exceptions.HierarchyException;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.RankingSystem;
 import sql.DiscordRoles;
 import sql.Azrael;
@@ -64,7 +64,7 @@ public class RoleListener extends ListenerAdapter{
 				mute_id = DiscordRoles.SQLgetRole(guild_id, "mut");
 				for(Role role : e.getMember().getRoles()) {
 					if(role.getIdLong() != mute_id) {
-						e.getGuild().getController().removeSingleRoleFromMember(e.getMember(), role).queue();
+						e.getGuild().removeRoleFromMember(e.getMember(), role).queue();
 					}
 				}
 			}
@@ -82,7 +82,7 @@ public class RoleListener extends ListenerAdapter{
 				try {
 					for(Role r : e.getMember().getRoles()) {
 						if(r.getIdLong() != mute_id) {
-							e.getGuild().getController().removeSingleRoleFromMember(e.getMember(), r).queue();
+							e.getGuild().removeRoleFromMember(e.getMember(), r).queue();
 						}
 					}
 					
@@ -141,13 +141,13 @@ public class RoleListener extends ListenerAdapter{
 									+ "On a important note, this is an automated reply. You'll receive no reply in any way.").complete();
 							pc.close();
 							logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
-							e.getJDA().getGuildById(guild_id).getController().ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").complete();
+							e.getJDA().getGuildById(guild_id).ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").complete();
 						}
 					}
 				} catch (HierarchyException hye) {
 					if(customTimeMute)
 						Azrael.SQLUpdateUnmute(user_id, guild_id, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false);
-					e.getJDA().getGuildById(guild_id).getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
+					e.getJDA().getGuildById(guild_id).removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
 					logger.warn("{} received a mute role that has been instantly removed", e.getMember().getUser().getId(), hye);
 					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message2.setDescription("The mute role has been set on someone with higher privileges. Mute role removed!").build()).queue();
 					

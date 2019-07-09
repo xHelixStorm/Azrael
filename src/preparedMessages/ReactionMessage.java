@@ -10,8 +10,8 @@ import com.vdurmont.emoji.EmojiManager;
 import core.Hashes;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import sql.DiscordRoles;
 
 public class ReactionMessage {
@@ -63,28 +63,19 @@ public class ReactionMessage {
 		}
 	}
 	
+	@SuppressWarnings("preview")
 	public static String getReaction(int counter) {
-		switch(counter) {
-			case 1:
-				return ":one:";
-			case 2:
-				return ":two:";
-			case 3:
-				return ":three:";
-			case 4:
-				return ":four:";
-			case 5:
-				return ":five:";
-			case 6:
-				return ":six:";
-			case 7:
-				return ":seven:";
-			case 8:
-				return ":eight:";
-			case 9:
-				return ":nine:";
-			default:
-				return "empty";
-		}
+		return switch(counter) {
+			case 1  -> ":one:";
+			case 2  -> ":two:";
+			case 3  -> ":three:";
+			case 4  -> ":four:";
+			case 5  -> ":five:";
+			case 6  -> ":six:";
+			case 7  -> ":seven:";
+			case 8  ->":eight:";
+			case 9  -> ":nine:";
+			default -> "empty";
+		};
 	}
 }

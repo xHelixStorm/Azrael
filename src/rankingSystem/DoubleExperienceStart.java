@@ -14,11 +14,11 @@ import core.Hashes;
 import enums.Weekday;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.events.ReconnectedEvent;
-import net.dv8tion.jda.core.events.ResumedEvent;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.ReconnectedEvent;
+import net.dv8tion.jda.api.events.ResumedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import sql.Azrael;
 import sql.RankingSystem;
 import util.STATIC;
@@ -50,7 +50,7 @@ public class DoubleExperienceStart extends TimerTask{
 				if(RankingSystem.SQLgetGuild(guild_id).getRankingState() || GuildIni.getDoubleExperienceMode(guild_id).equals("auto")) {
 					var bot_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).findAny().orElse(null);
 					if(bot_channel != null) {
-						event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg", null).complete();
+						event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg").complete();
 						event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\nThe double EXP weekend is here\nUse the chance to gain more experience points than usual to reach new heights. See you at the top!\nThe event will stay up from Saturday 00:01 cest till Sunday 23:59 cest!```").queue();
 					}
 				}

@@ -11,9 +11,9 @@ import constructors.Quizes;
 import core.Hashes;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.PrivateChannel;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class RunQuiz implements Runnable{
 	private final Logger logger = LoggerFactory.getLogger(RunQuiz.class);
@@ -132,12 +132,13 @@ public class RunQuiz implements Runnable{
 		}
 	}
 	
+	@SuppressWarnings("preview")
 	private String replyList(int digit) {
-		switch(digit) {
-			case 1: return "I didn't see any valid replies yet. See you again in 20 seconds.";
-			case 2: return "Retry again! No one got it right yet!";
-			case 3: return "Sadly no hints are availale... Keep on trying!";
-			default: return "";
-		}
+		return switch(digit) {
+			case 1  -> "I didn't see any valid replies yet. See you again in 20 seconds.";
+			case 2  -> "Retry again! No one got it right yet!";
+			case 3  -> "Sadly no hints are availale... Keep on trying!";
+			default -> "";
+		};
 	}
 }

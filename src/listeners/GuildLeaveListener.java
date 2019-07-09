@@ -9,11 +9,11 @@ import org.slf4j.LoggerFactory;
 import constructors.Bancollect;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.audit.AuditLogEntry;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.dv8tion.jda.core.requests.restaction.pagination.AuditLogPaginationAction;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.audit.AuditLogEntry;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import sql.Azrael;
 
 public class GuildLeaveListener extends ListenerAdapter{
@@ -29,7 +29,7 @@ public class GuildLeaveListener extends ListenerAdapter{
 		String trigger_user_name = "";
 		String kick_reason = "";
 		String ban_reason = "";
-		AuditLogPaginationAction logs = e.getGuild().getAuditLogs();
+		AuditLogPaginationAction logs = e.getGuild().retrieveAuditLogs();
 		first_entry: for (AuditLogEntry entry : logs)
 		{
 			if(entry.getType().toString().equals("KICK") && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {

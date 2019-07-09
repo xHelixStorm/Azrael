@@ -18,11 +18,11 @@ import enums.Weekday;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import rankingSystem.DoubleExperienceOff;
 import rankingSystem.DoubleExperienceStart;
 import sql.RankingSystem;
@@ -40,12 +40,14 @@ public class ReadyListener extends ListenerAdapter {
 	
 	@Override
 	public void onReady(ReadyEvent e) {
-		if(FileSetting.readFile("./files/running.azr").contains("1")) {
-			FileSetting.createFile("./files/running.azr", "2");
+		FileSetting.createTemp(e);
+		if(FileSetting.readFile(IniFileReader.getTempDirectory()+"running.azr").contains("1")) {
+			FileSetting.createFile(IniFileReader.getTempDirectory()+"running.azr", "2");
 			e.getJDA().shutdownNow();
 			return;
 		}
-		FileSetting.createFile("./files/running.azr", "1");
+		FileSetting.createFile(IniFileReader.getTempDirectory()+"running.azr", "1");
+		
 		Logger logger = LoggerFactory.getLogger(ReadyListener.class);
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the latest patch notes!");
 		System.out.println();
@@ -66,7 +68,6 @@ public class ReadyListener extends ListenerAdapter {
 			out += g.getName() + " (" + g.getId() + ") \n";
 		}
 		System.out.println(out);
-		FileSetting.createTemp();
 
 		var themesRetrieved = true;
 		if(RankingSystem.SQLgetThemes() == false) {
@@ -76,6 +77,26 @@ public class ReadyListener extends ListenerAdapter {
 		for(Guild guild : e.getJDA().getGuilds()) {
 			if(!new File("./ini/"+guild.getId()+".ini").exists()) {
 				GuildIni.createIni(guild.getIdLong());
+			}
+			if(Azrael.SQLgetGuild(guild.getIdLong()) == 0) {
+				if(Azrael.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
+					logger.error("Azrael.guild is empty and couldn't be filled!");
+				}
+			}
+			if(DiscordRoles.SQLgetGuild(guild.getIdLong()) == 0) {
+				if(DiscordRoles.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
+					logger.error("DiscordRoles.guilds is empty and couldn't be filled!");
+				}
+			}
+			if(RankingSystem.SQLgetGuild(guild.getIdLong()) == null) {
+				if(RankingSystem.SQLInsertGuild(guild.getIdLong(), guild.getName(), false) == 0) {
+					logger.error("RankingSystem.guild is empty and couldn't be filled!");
+				}
+			}
+			if(Patchnotes.SQLgetGuild(guild.getIdLong()) == 0) {
+				if(Patchnotes.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
+					logger.error("Patchnotes.guilds is empty and couldn't be filled!");
+				}
 			}
 			Channels log_channel = null;
 			Channels bot_channel = null;

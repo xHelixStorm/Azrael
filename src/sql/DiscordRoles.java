@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Roles;
 import core.Hashes;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.api.entities.Role;
 
 public class DiscordRoles {
 	private static final Logger logger = LoggerFactory.getLogger(DiscordRoles.class);
@@ -27,6 +27,31 @@ public class DiscordRoles {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			logger.error("JDBC driver couldn't be loaded", e);
+		}
+	}
+	
+	public static long SQLgetGuild(long _guild_id) {
+		logger.debug("SQLgetGuild launched. Passed params {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT guild_id FROM guilds WHERE guild_id= ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return rs.getLong(1);
+			}
+			return 0;
+		} catch (SQLException e) {
+			logger.error("SQLgetGuild Exception", e);
+			return 0;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
 	

@@ -3,8 +3,8 @@ package listeners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.user.update.UserUpdateAvatarEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 
 public class AvatarUpdateListener extends ListenerAdapter{

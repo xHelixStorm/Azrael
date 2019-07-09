@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class RankingMethods extends ListenerAdapter{
 	private final static Logger logger = LoggerFactory.getLogger(RankingMethods.class);
@@ -83,7 +83,7 @@ public class RankingMethods extends ListenerAdapter{
 			g.dispose();
 			
 			File file1 = new File(IniFileReader.getTempDirectory()+"lvup_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
-			e.getTextChannel().sendFile(file1, "level_up.png", null).complete();
+			e.getTextChannel().sendFile(file1, "level_up.png").complete();
 			file1.delete();
 		} catch (IOException e1) {
 			logger.error("RankUp couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
@@ -151,7 +151,7 @@ public class RankingMethods extends ListenerAdapter{
 			g.dispose();
 			
 			File file2 = new File(IniFileReader.getTempDirectory()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
-			e.getTextChannel().sendFile(file2, "rank.png", null).complete();
+			e.getTextChannel().sendFile(file2, "rank.png").complete();
 			file2.delete();
 		} catch (IOException e1) {
 			logger.error("Rank couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
@@ -259,7 +259,7 @@ public class RankingMethods extends ListenerAdapter{
 			g.dispose();
 			
 			File file3 = new File(IniFileReader.getTempDirectory()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
-			e.getTextChannel().sendFile(file3, "profile.png", null).complete();
+			e.getTextChannel().sendFile(file3, "profile.png").complete();
 			file3.delete();
 		} catch (IOException e1) {
 			logger.error("Profile couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);

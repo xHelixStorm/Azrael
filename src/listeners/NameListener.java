@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.events.user.update.UserUpdateNameEvent;
-import net.dv8tion.jda.core.exceptions.HierarchyException;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 
 public class NameListener extends ListenerAdapter{
@@ -38,7 +38,7 @@ public class NameListener extends ListenerAdapter{
 					var log_channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 					try {
 						String nickname = Azrael.SQLgetRandomName(guild.getIdLong());
-						e.getJDA().getGuildById(guild.getIdLong()).getController().setNickname(member, nickname).queue();
+						e.getJDA().getGuildById(guild.getIdLong()).modifyNickname(member, nickname).queue();
 						message.setColor(Color.RED).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle("Impersonation attempt found!");
 						if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**\nPlease review in case of impersonation!").build()).queue();
 						updateNickname(member, guild, nickname, logger);
@@ -64,7 +64,7 @@ public class NameListener extends ListenerAdapter{
 							try {
 								if(!word.getKick()) {
 									String nickname = Azrael.SQLgetRandomName(guild_id);
-									e.getJDA().getGuildById(guild_id).getController().setNickname(member, nickname).queue();
+									e.getJDA().getGuildById(guild_id).modifyNickname(member, nickname).queue();
 									message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
 									if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
 									updateNickname(member, guild, nickname, logger);
@@ -72,7 +72,7 @@ public class NameListener extends ListenerAdapter{
 								else {
 									if(!UserPrivs.isUserAdmin(member.getUser(), guild_id) && !UserPrivs.isUserMod(member.getUser(), guild_id)) {
 										e.getUser().openPrivateChannel().complete().sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").complete();
-										e.getJDA().getGuildById(guild_id).getController().kick(member).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
+										e.getJDA().getGuildById(guild_id).kick(member).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
 										message.setColor(Color.RED).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("User kicked for having a not allowed name!");
 										if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** and was kicked for containing the following word in his name: **"+word.getName().toUpperCase()+"**").build()).queue();
 									}

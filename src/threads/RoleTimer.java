@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import constructors.Channels;
 import core.UserPrivs;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 import util.STATIC;
 
@@ -71,8 +71,8 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted").build()).queue();
 					}
 					if(e.getJDA().getGuildById(guild_id).getMembers().parallelStream().filter(f -> f.getUser().getIdLong() == e.getGuild().getMemberById(name_id).getUser().getIdLong()).findAny().orElse(null) != null) {
-						e.getJDA().getGuildById(e.getGuild().getIdLong()).getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).complete();
-						if(assignedRole != 0){e.getJDA().getGuildById(e.getGuild().getId()).getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
+						e.getJDA().getGuildById(e.getGuild().getIdLong()).removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).complete();
+						if(assignedRole != 0){e.getJDA().getGuildById(e.getGuild().getId()).addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
 					}
 				}
 			}
@@ -86,8 +86,8 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 					e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator() + "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted and the timer has been interrupted!").build()).queue();
 				}
 				if(e.getJDA().getGuildById(guild_id).getMembers().parallelStream().filter(f -> f.getUser().getIdLong() == e.getMember().getUser().getIdLong()).findAny().orElse(null) != null) {
-					e.getJDA().getGuildById(e.getGuild().getIdLong()).getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).complete();
-					if(assignedRole != 0){e.getJDA().getGuildById(e.getGuild().getId()).getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
+					e.getJDA().getGuildById(e.getGuild().getIdLong()).removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).complete();
+					if(assignedRole != 0){e.getJDA().getGuildById(e.getGuild().getId()).addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
 				}
 			}
 		}

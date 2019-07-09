@@ -9,11 +9,11 @@ import org.slf4j.LoggerFactory;
 import constructors.Guilds;
 import constructors.Rank;
 import core.UserPrivs;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import sql.RankingSystem;
 import sql.Azrael;
 
@@ -45,8 +45,8 @@ public class BotStartAssign implements Runnable{
 						Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), guild_id, guild_settings.getThemeID());
 						if(user_details != null) {
 							if(user_details.getCurrentRole() != 0 && member.getRoles().parallelStream().filter(f -> f.getIdLong() == user_details.getCurrentRole()).findAny().orElse(null) == null) {
-								g.getController().addSingleRoleToMember(member, g.getRoleById(user_details.getCurrentRole())).queue();
-								if(Azrael.SQLInsertUser(member.getUser().getIdLong(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getUser().getEffectiveAvatarUrl(), member.getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
+								g.addRoleToMember(member, g.getRoleById(user_details.getCurrentRole())).queue();
+								if(Azrael.SQLInsertUser(member.getUser().getIdLong(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getUser().getEffectiveAvatarUrl(), member.getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
 									logger.error("User {} couldn't be inserted into the table Azrael.users for guild {}", member.getUser().getId(), g.getName());
 									errAzraelUsers++;
 								}
@@ -54,7 +54,7 @@ public class BotStartAssign implements Runnable{
 							}
 						}
 						else{
-							if(Azrael.SQLInsertUser(member.getUser().getIdLong(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getUser().getEffectiveAvatarUrl(), member.getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
+							if(Azrael.SQLInsertUser(member.getUser().getIdLong(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getUser().getEffectiveAvatarUrl(), member.getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
 								logger.error("User {} couldn't be updated into the table Azrael.users for guild {}", member.getUser().getId(), g.getName());
 								errAzraelUsers++;
 							}
@@ -78,7 +78,7 @@ public class BotStartAssign implements Runnable{
 			else {
 				for(Member member : e.getJDA().getGuildById(g.getIdLong()).getMembers()){
 					if(!UserPrivs.isUserBot(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong()) && !UserPrivs.isUserMuted(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong()) && !UserPrivs.isUserCommunity(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong())){
-						if(Azrael.SQLInsertUser(member.getUser().getIdLong(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getUser().getEffectiveAvatarUrl(), member.getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
+						if(Azrael.SQLInsertUser(member.getUser().getIdLong(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getUser().getEffectiveAvatarUrl(), member.getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
 							logger.error("User {} couldn't be updated into the table Azrael.users for guild {}", member.getUser().getId(), g.getName());
 							errAzraelUsers++;
 						}

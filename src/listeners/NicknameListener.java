@@ -3,18 +3,18 @@ package listeners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 
 public class NicknameListener extends ListenerAdapter{
 	
 	@Override
-	public void onGuildMemberNickChange(GuildMemberNickChangeEvent e){
+	public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent e) {
 		Logger logger = LoggerFactory.getLogger(NameListener.class);
 		long user_id = e.getMember().getUser().getIdLong();
 		long guild_id = e.getGuild().getIdLong();
-		String nickname = e.getNewNick();
+		String nickname = e.getNewNickname();
 		
 		if(nickname == null) {
 			if(Azrael.SQLDeleteNickname(user_id, guild_id) == 0) {

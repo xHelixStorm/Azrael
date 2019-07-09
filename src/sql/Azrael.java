@@ -22,7 +22,7 @@ import constructors.User;
 import constructors.Warning;
 import core.Hashes;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.api.entities.Member;
 
 public class Azrael {
 	private static final Logger logger = LoggerFactory.getLogger(Azrael.class);
@@ -263,7 +263,7 @@ public class Azrael {
 				stmt.setLong(1, member.getUser().getIdLong());
 				stmt.setString(2, member.getUser().getName()+"#"+member.getUser().getDiscriminator());
 				stmt.setString(3, member.getUser().getEffectiveAvatarUrl());
-				stmt.setString(4, member.getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
+				stmt.setString(4, member.getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE));
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
@@ -364,13 +364,38 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertGuild(Long _guild_id, String _guild_name){
+	public static long SQLgetGuild(long _guild_id) {
+		logger.debug("SQLgetGuild launched. Passed params {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT guild_id FROM guild WHERE guild_id= ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return rs.getLong(1);
+			}
+			return 0;
+		} catch (SQLException e) {
+			logger.error("SQLgetGuild Exception", e);
+			return 0;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLInsertGuild(Long _guild_id, String _guild_name) {
 		logger.debug("SQLInsertGuild launched. Passed params {}, {}", _guild_id, _guild_name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO guild VALUES (?, ?)");
+			String sql = ("INSERT INTO guild VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setString(2, _guild_name);
@@ -788,6 +813,7 @@ public class Azrael {
 		}
 	}
 	
+	@SuppressWarnings("preview")
 	public static int SQLInsertWarning(long _guild_id, int _warning_id) {
 		logger.debug("SQLInsertWarning launched. Passed params {}, {}", _guild_id, _warning_id);
 		Connection myConn = null;
@@ -796,15 +822,15 @@ public class Azrael {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 			String sql = "";
 			switch(_warning_id) {
-				case 1: 
+				case 1 -> {
 					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
 							+ "(?, 0, 0, \"no warning\"),"
 							+ "(?, 1, 0, \"first warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
 					stmt = myConn.prepareStatement(sql);
 					stmt.setLong(1, _guild_id);
 					stmt.setLong(2, _guild_id);
-					break;
-				case 2:
+				}
+				case 2 -> {
 					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
 							+ "(?, 0, 0, \"no warning\"),"
 							+ "(?, 1, 0, \"first warning\"),"
@@ -813,8 +839,8 @@ public class Azrael {
 					stmt.setLong(1, _guild_id);
 					stmt.setLong(2, _guild_id);
 					stmt.setLong(3, _guild_id);
-					break;
-				case 3:
+				}
+				case 3 -> {
 					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
 							+ "(?, 0, 0, \"no warning\"),"
 							+ "(?, 1, 0, \"first warning\"),"
@@ -825,8 +851,8 @@ public class Azrael {
 					stmt.setLong(2, _guild_id);
 					stmt.setLong(3, _guild_id);
 					stmt.setLong(4, _guild_id);
-					break;
-				case 4:
+				}
+				case 4 -> {
 					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
 							+ "(?, 0, 0, \"no warning\"),"
 							+ "(?, 1, 0, \"first warning\"),"
@@ -839,8 +865,8 @@ public class Azrael {
 					stmt.setLong(3, _guild_id);
 					stmt.setLong(4, _guild_id);
 					stmt.setLong(5, _guild_id);
-					break;
-				case 5:
+				}
+				case 5 -> {
 					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
 							+ "(?, 0, 0, \"no warning\"),"
 							+ "(?, 1, 0, \"first warning\"),"
@@ -855,6 +881,7 @@ public class Azrael {
 					stmt.setLong(4, _guild_id);
 					stmt.setLong(5, _guild_id);
 					stmt.setLong(6, _guild_id);
+				}
 			}
 			return stmt.executeUpdate();
 		} catch (SQLException e) {

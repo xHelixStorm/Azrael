@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class DrawDaily {
 	public static void draw(MessageReceivedEvent _e, String _reward) {
@@ -56,7 +56,7 @@ public class DrawDaily {
 			logger.error("Error on daily reward drawing", ioe);
 		}
 		File file1 = new File(IniFileReader.getTempDirectory()+"daily_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png");
-		_e.getTextChannel().sendFile(file1, "daily.png", null).complete();
+		_e.getTextChannel().sendFile(file1, "daily.png").complete();
 		file1.delete();
 	}
 	

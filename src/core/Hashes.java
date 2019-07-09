@@ -22,7 +22,7 @@ import constructors.Skins;
 import constructors.WeaponAbbvs;
 import constructors.WeaponStats;
 import constructors.Weapons;
-import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.api.entities.Member;
 
 public class Hashes {
 	private static final int max_message_pool_size = 100000;

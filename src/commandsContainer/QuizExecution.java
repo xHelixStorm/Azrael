@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import constructors.Quizes;
 import core.Hashes;
 import fileManagement.FileSetting;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import util.Pastebin;
 
 public class QuizExecution {
@@ -84,6 +84,7 @@ public class QuizExecution {
 		}
 	}
 	
+	@SuppressWarnings("preview")
 	public static void registerQuestions(MessageReceivedEvent e, String _link, boolean _readFile) {
 		//check if it is a link that was inserted and if yes call readPublicPasteLink and then
 		//split the returned String in an array. Or if it's being registered from a file, the file should be checked
@@ -124,17 +125,17 @@ public class QuizExecution {
 						}
 						else if(line.startsWith(":") && answers != 3) {
 							switch(answers) {
-								case 0: quiz.setAnswer1(line.substring(1)); break;
-								case 1: quiz.setAnswer2(line.substring(1)); break;
-								case 2: quiz.setAnswer3(line.substring(1)); break;
+								case 0 -> quiz.setAnswer1(line.substring(1));
+								case 1 -> quiz.setAnswer2(line.substring(1));
+								case 2 -> quiz.setAnswer3(line.substring(1));
 							}
 							answers++;
 						}
 						else if(line.startsWith(";") && hints != 3) {
 							switch(hints) {
-								case 0: quiz.setHint1(line.substring(1)); break;
-								case 1: quiz.setHint2(line.substring(1)); break;
-								case 2: quiz.setHint3(line.substring(1)); break;
+								case 0 -> quiz.setHint1(line.substring(1));
+								case 1 -> quiz.setHint2(line.substring(1));
+								case 2 -> quiz.setHint3(line.substring(1));
 							}
 							hints++;
 						}

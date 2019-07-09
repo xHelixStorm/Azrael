@@ -12,9 +12,9 @@ import constructors.Rank;
 import core.Hashes;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.RankingSystem;
 import sql.DiscordRoles;
 import sql.Azrael;
@@ -38,7 +38,7 @@ public class GuildListener extends ListenerAdapter {
 		boolean muted;
 		
 		var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
-		if(Azrael.SQLInsertUser(user_id, user_name, e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getJoinDate().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
+		if(Azrael.SQLInsertUser(user_id, user_name, e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
 			if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **Azrael.users** table").build()).queue();
 			logger.error("User {} couldn't be inserted into the table Azrael.users for guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 		}
@@ -71,12 +71,12 @@ public class GuildListener extends ListenerAdapter {
 		}
 		
 		if((unmute - currentTime) > 0 && muted) {
-			e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
+			e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
 		}
 		else{
 			if(guild_settings.getRankingState()) {
 				Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
-				if(user_details.getCurrentRole() != 0) {e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(user_details.getCurrentRole())).queue();}
+				if(user_details.getCurrentRole() != 0) {e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(user_details.getCurrentRole())).queue();}
 			}
 		}
 		
@@ -86,7 +86,7 @@ public class GuildListener extends ListenerAdapter {
 			if(lc_user_name.matches(name+"#[0-9]{4}")) {
 				nick_assign.setColor(Color.RED).setTitle("Impersonation attempt found!").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
 				nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
-				e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
+				e.getGuild().modifyNickname(e.getMember(), nickname).queue();
 				if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server and tried to impersonate a staff member. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
 				logger.info("Impersonation attempt found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 				badName = true;
@@ -99,14 +99,14 @@ public class GuildListener extends ListenerAdapter {
 				if(lc_user_name.contains(word.getName())) {
 					if(!word.getKick()) {
 						nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
-						e.getGuild().getController().setNickname(e.getMember(), nickname).queue();
+						e.getGuild().modifyNickname(e.getMember(), nickname).queue();
 						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
 						logger.info("Improper name found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 						badName = true;
 					}
 					else {
 						e.getMember().getUser().openPrivateChannel().complete().sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").complete();
-						e.getGuild().getController().kick(e.getMember()).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
+						e.getGuild().kick(e.getMember()).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
 						nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("User kicked for having a not allowed name!");
 						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. The user has been kicked automatically from the server due to this word: **"+word.getName().toUpperCase()+"**").build()).queue();
 					}

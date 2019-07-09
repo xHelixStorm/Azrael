@@ -1,8 +1,8 @@
 package listeners;
 
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.events.ResumedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.ResumedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import rankingSystem.DoubleExperienceOff;
 import rankingSystem.DoubleExperienceStart;
 import util.STATIC;

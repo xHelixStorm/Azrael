@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
 import core.Hashes;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
 
 public class SetLevelDefaultSkin {

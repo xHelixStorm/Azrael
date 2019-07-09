@@ -3,7 +3,7 @@ package commandsContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import sql.DiscordRoles;
 
 public class SetPrivilegeLevel {

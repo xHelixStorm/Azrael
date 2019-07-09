@@ -8,7 +8,7 @@ import constructors.Channels;
 
 public class STATIC {
 	
-	private static final String VERSION = "5.12.278";
+	private static final String VERSION = "6.0.279";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	
@@ -67,15 +67,14 @@ public class STATIC {
 		return out.toString();
 	}
 	
+	@SuppressWarnings("preview")
 	public static int getLevel(String category) {
-		switch(category) {
-			case "adm": return 100;
-			case "mod": return 20;
-			case "com": return 1;
-			case "bot": return 10;
-			case "mut": return 0;
-			case "rea": return 0;
-			default : 	return 0;
-		}
+		return switch(category) {
+			case "adm" -> 100;
+			case "mod" -> 20;
+			case "bot" -> 10;
+			case "com" -> 1;
+			default    -> 0;
+		};
 	}
 }

@@ -8,8 +8,8 @@ import com.vdurmont.emoji.EmojiParser;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.DiscordRoles;
 import sql.Azrael;
 
@@ -37,19 +37,19 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter{
 							if(reactions[0].equals("true")) {
 								for(int i = 1; i < 10; i++) {
 									if(reactions[i].length() > 0 && (reactionName.equals(reactions[i]) || EmojiParser.parseToAliases(reactionName).replaceAll(":", "").equals(reactions[i]))) {
-										e.getGuild().getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(i+"_"+e.getGuild().getId()).getRole_ID())).queue();
+										e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(i+"_"+e.getGuild().getId()).getRole_ID())).queue();
 										emoteFound = true;
 										break;
 									}
 								}
 								if(emoteFound == false) {
 									int emote = returnEmote(reactionName);
-									e.getGuild().getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(emote+"_"+e.getGuild().getId()).getRole_ID())).queue();
+									e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(emote+"_"+e.getGuild().getId()).getRole_ID())).queue();
 								}
 							}
 							else {
 								int emote = returnEmote(reactionName);
-								e.getGuild().getController().removeSingleRoleFromMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(emote+"_"+e.getGuild().getId()).getRole_ID())).queue();
+								e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(emote+"_"+e.getGuild().getId()).getRole_ID())).queue();
 							}
 						}
 						logger.debug("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getName());
@@ -61,28 +61,19 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter{
 		}
 	}
 	
+	@SuppressWarnings("preview")
 	private int returnEmote(String reactionName) {
-		switch(reactionName) {
-			case "one":
-				return 1;
-			case "two":
-				return 2;
-			case "three":
-				return 3;
-			case "four":
-				return 4;
-			case "five":
-				return 5;
-			case "six":
-				return 6;
-			case "seven":
-				return 7;
-			case "eight":
-				return 8;
-			case "nine":
-				return 9;
-			default:
-				return 0;
-		}
+		return switch(reactionName) {
+			case "one" 	 -> 1;
+			case "two"   -> 2;
+			case "three" -> 3;
+			case "four"  -> 4;
+			case "five"  -> 5;
+			case "six" 	 -> 6;
+			case "seven" -> 7;
+			case "eight" -> 8;
+			case "nine"  -> 9;
+			default 	 -> 0;
+		};
 	}
 }

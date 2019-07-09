@@ -7,10 +7,11 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import sql.Azrael;
 
 public class SetChannelFilter {
+	@SuppressWarnings("preview")
 	public static void runTask(MessageReceivedEvent _e, String [] _input){
 		int i = 0;
 		ArrayList<String> filter_lang = new ArrayList<String>();
@@ -29,19 +30,9 @@ public class SetChannelFilter {
 					}
 					else{
 						switch(filter_lang.get(i)) {
-						case "all":
-						case "eng":
-						case "ger":
-						case "fre":
-						case "tur":
-						case "rus":
-						case "spa":
-						case "por":
-						case "ita":
+						case "all", "eng", "ger", "fre", "tur", "rus", "spa", "por", "ita" ->
 							languageError = false;
-							break;
-						default:
-							languageError = true;
+						default -> languageError = true;
 						}
 					}
 					i++;

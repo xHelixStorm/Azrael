@@ -9,8 +9,8 @@ import constructors.Skins;
 import constructors.Weapons;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
 

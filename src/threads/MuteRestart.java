@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Channels;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import sql.Azrael;
 import util.STATIC;
 
@@ -48,8 +48,8 @@ public class MuteRestart implements Runnable{
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator() + "** with the ID Number **" + member.getUser().getId() + "** has been unmuted").build()).queue();
 				}
-				e.getJDA().getGuildById(guild_id).getController().removeSingleRoleFromMember(member, mute_role).queue();
-				if(assignedRole != 0 && ranking_state == true){e.getJDA().getGuildById(guild_id).getController().addSingleRoleToMember(member, e.getJDA().getGuildById(guild_id).getRoleById(assignedRole)).queue();}
+				e.getJDA().getGuildById(guild_id).removeRoleFromMember(member, mute_role).queue();
+				if(assignedRole != 0 && ranking_state == true){e.getJDA().getGuildById(guild_id).addRoleToMember(member, e.getJDA().getGuildById(guild_id).getRoleById(assignedRole)).queue();}
 			}			
 		} catch (InterruptedException e2) {
 			//launch when the sleep has been interrupted
@@ -62,8 +62,8 @@ public class MuteRestart implements Runnable{
 					e.getJDA().getGuildById(guild_id).getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator() + "** with the ID Number **" + member.getUser().getId() + "** has been unmuted and the timer has been interrupted!").build()).queue();
 				}
 				if(e.getJDA().getGuildById(guild_id).getMembers().parallelStream().filter(f -> f.getUser().getIdLong() == member.getUser().getIdLong()).findAny().orElse(null) != null) {
-					e.getJDA().getGuildById(guild_id).getController().removeSingleRoleFromMember(member, mute_role).queue();
-					if(assignedRole != 0 && ranking_state == true){e.getJDA().getGuildById(guild_id).getController().addSingleRoleToMember(member, e.getJDA().getGuildById(guild_id).getRoleById(assignedRole)).queue();}
+					e.getJDA().getGuildById(guild_id).removeRoleFromMember(member, mute_role).queue();
+					if(assignedRole != 0 && ranking_state == true){e.getJDA().getGuildById(guild_id).addRoleToMember(member, e.getJDA().getGuildById(guild_id).getRoleById(assignedRole)).queue();}
 				}
 			}
 		}

@@ -13,9 +13,9 @@ import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import preparedMessages.ReactionMessage;
 import sql.Azrael;
 
@@ -36,6 +36,7 @@ public class RegisterChannel {
 		_e.getTextChannel().sendMessage(messageBuild.setDescription(parseMessage+strB.toString()).build()).queue();
 	}
 	
+	@SuppressWarnings("preview")
 	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String [] _args, boolean adminPermission) {
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 		String channel;
@@ -52,33 +53,20 @@ public class RegisterChannel {
 				if(channel.length() == 18) {
 					channel_id = Long.parseLong(channel);
 					switch(channel_type) {
-						case "eng":
-						case "ger":
-						case "fre":
-						case "tur":
-						case "rus":
-						case "spa":
-						case "por":
-						case "ita":
-						case "all":
+						case "eng", "ger", "fre", "tur", "rus", "spa", "por", "ita", "all" -> {
 							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
 							Azrael.SQLDeleteChannel_Filter(channel_id);
 							Azrael.SQLInsertChannel_Filter(channel_id, channel_type);
-							break;
-						case "bot":
-						case "mus":
+						}
+						case "bot", "mus" -> {
 							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
 							Azrael.SQLDeleteChannel_Filter(channel_id);
 							Azrael.SQLInsertChannel_Filter(channel_id, "all");
-							break;
-						case "log":
-						case "tra":
-						case "rea":
-						case "qui":
-						case "rss":
+						}
+						case "log", "tra", "rea", "qui", "rss" -> {
 							Azrael.SQLDeleteChannelType(channel_type, _guild_id);
 							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
-							break;
+						}
 					}
 					Hashes.removeChannels(_guild_id);
 					logger.debug("{} has registered the channel {} as {} channel in the guild {}", _e.getMember().getUser().getId(), channel_type, channel_type, _e.getGuild().getName());

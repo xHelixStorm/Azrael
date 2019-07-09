@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
 import constructors.InventoryContent;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
 public class InventoryBuilder{
 	public static void DrawInventory(MessageReceivedEvent _e, GuildMessageReactionAddEvent _e2, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page){
@@ -102,12 +102,12 @@ public class InventoryBuilder{
 			
 			if(_e != null) {
 				File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png");
-				_e.getTextChannel().sendFile(upload, "inventory.png", null).complete();
+				_e.getTextChannel().sendFile(upload, "inventory.png").complete();
 				upload.delete();
 			}
 			else {
 				File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+_e2.getGuild().getId()+"us"+_e2.getMember().getUser().getId()+".png");
-				_e2.getChannel().sendFile(upload, "inventory.png", null).complete();
+				_e2.getChannel().sendFile(upload, "inventory.png").complete();
 				upload.delete();
 			}
 		});

@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Weapons;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class RandomshopRewardDrawer {
 	public static void drawReward(MessageReceivedEvent e, Weapons weapon, long currency) {
@@ -37,7 +37,7 @@ public class RandomshopRewardDrawer {
 			g.dispose();
 			
 			File file1 = new File(IniFileReader.getTempDirectory()+"randomshop_reward_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
-			e.getTextChannel().sendFile(file1, "reward.png", null).complete();
+			e.getTextChannel().sendFile(file1, "reward.png").complete();
 			file1.delete();
 			
 			e.getTextChannel().sendMessage("Congratulations "+e.getMember().getEffectiveName()+", you have received **"+weapon.getDescription()+" "+weapon.getStatDescription()+"**. Remaining balance: **"+currency+"**").queue();

@@ -5,11 +5,11 @@ import java.awt.Color;
 import constructors.Messages;
 import core.Hashes;
 import core.UserPrivs;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.audit.AuditLogEntry;
-import net.dv8tion.jda.core.events.message.MessageDeleteEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.dv8tion.jda.core.requests.restaction.pagination.AuditLogPaginationAction;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.audit.AuditLogEntry;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import sql.Azrael;
 
 public class MessageRemovedListener extends ListenerAdapter{
@@ -24,7 +24,7 @@ public class MessageRemovedListener extends ListenerAdapter{
 		long removed_from = 0;
 		boolean send_message = false;
 		long audit_id = 0;
-		AuditLogPaginationAction logs = e.getGuild().getAuditLogs();
+		AuditLogPaginationAction logs = e.getGuild().retrieveAuditLogs();
 		end_entry: for (AuditLogEntry entry : logs)
 		{
 			if(audit_counter != 3){

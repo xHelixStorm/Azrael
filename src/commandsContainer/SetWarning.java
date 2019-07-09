@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import constructors.Cache;
 import core.Hashes;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import sql.Azrael;
 
 public class SetWarning {

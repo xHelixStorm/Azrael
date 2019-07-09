@@ -10,9 +10,9 @@ import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import preparedMessages.ReactionMessage;
 import sql.Azrael;
 
@@ -71,7 +71,7 @@ public class RoleReaction implements Command{
 								if(Hashes.getRoles(i+"_"+e.getGuild().getId()) != null) {
 									long role_id = Hashes.getRoles(i+"_"+e.getGuild().getId()).getRole_ID();
 									for(Member m : e.getGuild().getMembersWithRoles(e.getGuild().getRoleById(role_id))) {
-										e.getGuild().getController().removeSingleRoleFromMember(m, e.getGuild().getRoleById(role_id)).queue();
+										e.getGuild().removeRoleFromMember(m, e.getGuild().getRoleById(role_id)).queue();
 									}
 								}
 							}

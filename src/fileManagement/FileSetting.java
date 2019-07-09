@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.dv8tion.jda.api.events.ReadyEvent;
+
 public class FileSetting {
 	private static final Logger logger = LoggerFactory.getLogger(FileSetting.class);
 	private static PrintWriter pw;
@@ -132,12 +134,12 @@ public class FileSetting {
 		return null;
 	}
 	
-	public static void deleteFile(String name){
+	public static void deleteFile(String name) {
 		File file = new File(name);
 		file.delete();
 	}
 	
-	public static void createTemp(){
+	public static void createTemp(ReadyEvent e) {
 		(new File(IniFileReader.getTempDirectory())).mkdirs();
 	}
 }

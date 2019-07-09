@@ -14,8 +14,8 @@ import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import inventory.InventoryBuilder;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.DiscordRoles;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
@@ -45,19 +45,19 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 							if(reactions[0].equals("true")) {
 								for(int i = 1; i < 10; i++) {
 									if(reactions[i].length() > 0 && (reactionName.equals(reactions[i]) || EmojiParser.parseToAliases(reactionName).replaceAll(":", "").equals(reactions[i]))) {
-										e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(i+"_"+e.getGuild().getId()).getRole_ID())).queue();
+										e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(i+"_"+e.getGuild().getId()).getRole_ID())).queue();
 										emoteFound = true;
 										break;
 									}
 								}
 								if(emoteFound == false) {
 									int emote = returnEmote(reactionName);
-									e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(emote+"_"+e.getGuild().getId()).getRole_ID())).queue();
+									e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(emote+"_"+e.getGuild().getId()).getRole_ID())).queue();
 								}
 							}
 							else {
 								int emote = returnEmote(reactionName);
-								e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(emote+"_"+e.getGuild().getId()).getRole_ID())).queue();
+								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(emote+"_"+e.getGuild().getId()).getRole_ID())).queue();
 							}
 							logger.debug("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getName());
 						}
@@ -86,7 +86,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 							current_page--;
 						else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && current_page != last_page)
 							current_page++;
-						e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
+						e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
 						Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab));
 						final int maxItems = GuildIni.getInventoryMaxItems(e.getGuild().getIdLong());
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
@@ -112,7 +112,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 						current_page--;
 					else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && current_page != last_page)
 						current_page++;
-					e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
+					e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					RandomshopExecution.inspectItems(null, e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), theme), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme), input, current_page);
 				}
@@ -120,28 +120,19 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 		}
 	}
 	
+	@SuppressWarnings("preview")
 	private int returnEmote(String reactionName) {
-		switch(reactionName) {
-			case "one":
-				return 1;
-			case "two":
-				return 2;
-			case "three":
-				return 3;
-			case "four":
-				return 4;
-			case "five":
-				return 5;
-			case "six":
-				return 6;
-			case "seven":
-				return 7;
-			case "eight":
-				return 8;
-			case "nine":
-				return 9;
-			default:
-				return 0;
-		}
+		return switch(reactionName) {
+			case "one" 	 -> 1;
+			case "two"   -> 2;
+			case "three" -> 3;
+			case "four"  -> 4;
+			case "five"  -> 5;
+			case "six" 	 -> 6;
+			case "seven" -> 7;
+			case "eight" -> 8;
+			case "nine"  -> 9;
+			default 	 -> 0;
+		};
 	}
 }

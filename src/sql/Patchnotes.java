@@ -131,6 +131,31 @@ public class Patchnotes {
 		}
 	}
 	
+	public static long SQLgetGuild(long _guild_id) {
+		logger.debug("SQLgetGuild launched. Passed params {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT guild_id FROM guilds WHERE guild_id= ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return rs.getLong(1);
+			}
+			return 0;
+		} catch (SQLException e) {
+			logger.error("SQLgetGuild Exception", e);
+			return 0;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLInsertGuild(long _guild_id, String _name) {
 		logger.debug("SQLInsertGuilds launched. Params passed {}, {}", _guild_id, _name);
 		Connection myConn = null;

@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Bancollect;
 import core.UserPrivs;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.audit.AuditLogEntry;
-import net.dv8tion.jda.core.audit.AuditLogKey;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleRemoveEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.dv8tion.jda.core.requests.restaction.pagination.AuditLogPaginationAction;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.audit.AuditLogEntry;
+import net.dv8tion.jda.api.audit.AuditLogKey;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import sql.DiscordRoles;
 import sql.RankingSystem;
 import sql.Azrael;
@@ -25,7 +25,7 @@ public class RoleRemovedListener extends ListenerAdapter{
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle("Mute role has been manually removed!");
 		
 		String trigger_user_name = "";
-		AuditLogPaginationAction logs = e.getGuild().getAuditLogs();
+		AuditLogPaginationAction logs = e.getGuild().retrieveAuditLogs();
 		first_entry: for (AuditLogEntry entry : logs)
 		{
 			if(entry.getChangeByKey(AuditLogKey.MEMBER_ROLES_REMOVE) != null) {
@@ -53,7 +53,7 @@ public class RoleRemovedListener extends ListenerAdapter{
 					}
 				}
 				var assignedRole = RankingSystem.SQLgetAssignedRole(user_id, guild_id);
-				if(assignedRole != 0) e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
+				if(assignedRole != 0) e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				if(log_channel != null) {e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** has manually removed the mute role from **"+member_name+"** with the ID number **"+user_id+"**!").build()).queue();}
 				logger.debug("{} got the mute role removed before the time expired in guild {}", e.getUser().getId(), e.getGuild().getName());

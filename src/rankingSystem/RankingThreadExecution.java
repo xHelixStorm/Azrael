@@ -14,10 +14,10 @@ import constructors.Guilds;
 import constructors.Rank;
 import core.Hashes;
 import fileManagement.FileSetting;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.PrivateChannel;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
 
 public class RankingThreadExecution {
@@ -36,9 +36,9 @@ public class RankingThreadExecution {
 		message = message.replaceAll("<:[a-zA-Z0-9]*:[0-9]{18,18}>", ""); //Edit custom images
 		message = message.replaceAll("<a:[a-zA-Z0-9]*:[0-9]{18,18}>", ""); //Edit custom animated images
 		message = message.replaceAll("<@[0-9!]{18,19}>", ""); //Edit tags
-		message = message.replaceAll("[\\s]{2,}", " "); //Edit every multiple whitespace type to a single whitespace
 		message = message.replaceAll("[^\\w\\d\\s]", ""); //Edit all special characters
 		message = message.replaceAll("[_]", ""); // Edit all underscores
+		message = message.replaceAll("[\\s]{2,}", " "); //Edit every multiple whitespace type to a single whitespace
 		int messageLength = message.length();
 		
 		int adder = 0;
@@ -118,13 +118,13 @@ public class RankingThreadExecution {
 				for(Role r : e.getMember().getRoles()){
 					for(Rank role : rankingRoles) {
 						if(r.getIdLong() == role.getRoleID() && role.getGuildID() == e.getGuild().getIdLong()) {
-							e.getGuild().getController().removeSingleRoleFromMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(r.getIdLong())).queue();
+							e.getGuild().removeRoleFromMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(r.getIdLong())).queue();
 						}
 					}
 				}
 				final var newLevel = level;
 				current_role = rankingRoles.parallelStream().filter(f -> f.getLevel_Requirement() == newLevel).findAny().orElse(null);
-				if(current_role != null) e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(current_role.getRoleID())).queue();
+				if(current_role != null) e.getGuild().addRoleToMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(current_role.getRoleID())).queue();
 			}
 			
 			user_details.setLevel(level);
