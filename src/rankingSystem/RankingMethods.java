@@ -29,10 +29,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class RankingMethods extends ListenerAdapter{
 	private final static Logger logger = LoggerFactory.getLogger(RankingMethods.class);
 	
-	public static void getRankUp(MessageReceivedEvent e , int _level, int _level_skin, int _icon_skin, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
+	public static void getRankUp(MessageReceivedEvent e , int _level, int _level_skin, int _icon_skin, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id){		
 		try {
-			BufferedImage rankUp = ImageIO.read(new File("./files/RankingSystem/levelup"+_level_skin+"_blank.png"));
-			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".png"));
+			BufferedImage rankUp = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"Skins/levelup"+_level_skin+"_blank.png"));
+			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+_icon_skin+"_"+_level+".png"));
 			String name = e.getMember().getEffectiveName();
 			int characterCounter = name.length();
 			int level = _level;
@@ -90,18 +90,18 @@ public class RankingMethods extends ListenerAdapter{
 		}
 	}
 	
-	public static void getRank(MessageReceivedEvent e, String _name, String _avatar, int _experience, int _level, int _rank, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_exp_text, boolean _additional_percent_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
+	public static void getRank(MessageReceivedEvent e, String _name, String _avatar, int _experience, int _level, int _rank, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_exp_text, boolean _additional_percent_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id){		
 		try{
-			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/rank"+_rank_skin+"_blank.png"));
+			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/rank"+_rank_skin+"_blank.png"));
 			BufferedImage experienceBar;
 			if(_experience != 0) {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+_bar_color+"_"+100+".png"));
+				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+_bar_color+"_"+100+".png"));
 				experienceBar = experienceBar.getSubimage(0, 0, 2*_experience, experienceBar.getHeight());
 			}
 			else {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+0+"_"+0+".png"));
+				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+0+"_"+0+".png"));
 			}
-			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".png"));
+			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+_icon_skin+"_"+_level+".png"));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -158,18 +158,18 @@ public class RankingMethods extends ListenerAdapter{
 		}
 	}
 	
-	public static void getProfile(MessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _level, float _currentExperience, float _rankUpExperience, long _experience, long _currency, int _rank, int _profile_skin, int _icon_skin, int _bar_color, boolean _additional_exp_text, boolean _additional_percent_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height){		
+	public static void getProfile(MessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _level, float _currentExperience, float _rankUpExperience, long _experience, long _currency, int _rank, int _profile_skin, int _icon_skin, int _bar_color, boolean _additional_exp_text, boolean _additional_percent_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id) {		
 		try{
-			BufferedImage profile = ImageIO.read(new File("./files/RankingSystem/profile"+_profile_skin+"_blank.png"));
+			BufferedImage profile = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/profile"+_profile_skin+"_blank.png"));
 			BufferedImage experienceBar;
 			if(_experiencePercentage != 0) {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+_bar_color+"_"+100+".png"));
+				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+_bar_color+"_"+100+".png"));
 				experienceBar = experienceBar.getSubimage(0, 0, 2*_experiencePercentage, experienceBar.getHeight());
 			}
 			else {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+0+"_"+0+".png"));
+				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+0+"_"+0+".png"));
 			}
-			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/Rank/level_"+_icon_skin+"_"+_level+".png"));
+			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+_icon_skin+"_"+_level+".png"));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();

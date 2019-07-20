@@ -90,16 +90,17 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 						Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab));
 						final int maxItems = GuildIni.getInventoryMaxItems(e.getGuild().getIdLong());
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
+						var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 						if(inventory_tab.equalsIgnoreCase("weapons")) {
 							if(!sub_tab.equalsIgnoreCase("total"))
-								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, sub_tab, theme), current_page, last_page);
+								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, sub_tab, theme), current_page, last_page, guild_settings.getThemeID());
 							else
-								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page);
+								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings.getThemeID());
 						}
 						else if(inventory_tab.equalsIgnoreCase("skins"))
-							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page);
+							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings.getThemeID());
 						else
-							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page);
+							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings.getThemeID());
 					});
 				}
 				else if(randomshop != null) {

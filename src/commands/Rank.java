@@ -103,7 +103,7 @@ public class Rank implements Command{
 								}
 								
 								if(currentExperience >= 0) {
-									RankingMethods.getRank(e, name, avatar, convertedExperience, level, rank, rank_skin, icon_skin, bar_color, additional_exp_text, additional_percent_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height);
+									RankingMethods.getRank(e, name, avatar, convertedExperience, level, rank, rank_skin, icon_skin, bar_color, additional_exp_text, additional_percent_text, color_r, color_g, color_b, rankx, ranky, rank_width, rank_height, guild_settings.getThemeID());
 								}
 								else {
 									EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");

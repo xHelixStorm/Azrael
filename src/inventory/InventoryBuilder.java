@@ -22,12 +22,12 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
 public class InventoryBuilder{
-	public static void DrawInventory(MessageReceivedEvent _e, GuildMessageReactionAddEvent _e2, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page){
+	public static void DrawInventory(MessageReceivedEvent _e, GuildMessageReactionAddEvent _e2, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, int theme_id){
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.execute(() -> {
 			try{
-				BufferedImage blank_inventory = ImageIO.read(new File("./files/RankingSystem/Inventory/inventory_blank.png"));
-				BufferedImage inventory_tab = ImageIO.read(new File("./files/RankingSystem/Inventory/inventory_"+_inventory_tab+"_"+_sub_tab+".png"));
+				BufferedImage blank_inventory = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/inventory_blank.png"));
+				BufferedImage inventory_tab = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/inventory_"+_inventory_tab+"_"+_sub_tab+".png"));
 				
 				int [] inven = GuildIni.getWholeInventory((_e != null ? _e.getGuild().getIdLong() : _e2.getGuild().getIdLong()));
 				final int startX = inven[0];
@@ -65,11 +65,11 @@ public class InventoryBuilder{
 					i++;
 					BufferedImage item;
 					if(inventory.getType() != null)
-						item = ImageIO.read(new File("./files/RankingSystem/Inventory/items/"+inventory.getDescription()+".png"));
+						item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/items/"+inventory.getDescription()+".png"));
 					else if(inventory.getSkillDescription() == null)
-						item = ImageIO.read(new File("./files/RankingSystem/Inventory/weapons/"+inventory.getWeaponDescription()+".png"));
+						item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/weapons/"+inventory.getWeaponDescription()+".png"));
 					else
-						item = ImageIO.read(new File("./files/RankingSystem/Inventory/skills/"+inventory.getSkillDescription()+".png"));
+						item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/skills/"+inventory.getSkillDescription()+".png"));
 					g.drawImage(item, currentX+(boxSizeX/2)-(item.getWidth()/2), currentY+boxSizeY-(item.getHeight()/2), (itemSizeX != 0 ? itemSizeX : item.getWidth()), (itemSizeY != 0 ? itemSizeY : item.getHeight()), null);
 					g.drawString((inventory.getDescription() != null ? inventory.getDescription() : (inventory.getWeaponDescription() != null ? inventory.getWeaponDescription()+" "+inventory.getStat() : inventory.getSkillDescription())), currentX+getCenteredString(inventory.getDescription() != null ? inventory.getDescription() : (inventory.getWeaponDescription() != null ? inventory.getWeaponDescription()+ " "+inventory.getStat() : inventory.getSkillDescription()), boxSizeX, g), currentY+boxSizeY+descriptionY);
 					if(inventory.getType() == null || inventory.getType().equals("ite")){

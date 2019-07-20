@@ -42,11 +42,10 @@ public class DoubleExperienceStart extends TimerTask{
 		long guild_id;
 		var event = (e != null ? e : (e2 != null ? e2 : (e3 != null ? e3 : e4)));
 		if(Hashes.getTempCache("doubleExp") == null || Hashes.getTempCache("doubleExp").getAdditionalInfo().equals("off")) {
-			File doubleEvent = new File("./files/RankingSystem/doubleweekend.jpg");
 			Hashes.addTempCache("doubleExp", new Cache(0, "on"));
 			for(Guild g : event.getJDA().getGuilds()) {
 				guild_id = g.getIdLong();
-				
+				File doubleEvent = new File("./files/RankingSystem/"+RankingSystem.SQLgetGuild(guild_id).getThemeID()+"/doubleweekend.jpg");
 				if(RankingSystem.SQLgetGuild(guild_id).getRankingState() || GuildIni.getDoubleExperienceMode(guild_id).equals("auto")) {
 					var bot_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).findAny().orElse(null);
 					if(bot_channel != null) {

@@ -182,14 +182,6 @@ public class UserExecution {
 								}
 								_e.getTextChannel().sendMessage(message.build()).queue();
 							}
-							out.setLength(0);
-							for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, _e.getGuild().getIdLong())) {
-								out.append("[`"+description+"`] ");
-							}
-							out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
-							message.addField("USED NICKNAMES", out.toString(), false);
-							out.setLength(0);
-							_e.getTextChannel().sendMessage(message.build()).queue();
 							message.clear();
 							message.setColor(Color.BLUE).setTitle("EVENTS");
 							for(String description : Azrael.SQLgetCriticalActionEvents(user_id, _e.getGuild().getIdLong())) {

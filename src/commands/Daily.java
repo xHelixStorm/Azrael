@@ -90,7 +90,7 @@ public class Daily implements Command{
 											list.add(this_daily);
 									}
 								}
-								DrawDaily.draw(e, list.get(random).getDescription());
+								DrawDaily.draw(e, list.get(random).getDescription(), guild_settings.getThemeID());
 								long time = System.currentTimeMillis();
 								Timestamp timestamp = new Timestamp(time);
 								LocalTime midnight = LocalTime.MIDNIGHT;

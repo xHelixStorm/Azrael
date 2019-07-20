@@ -20,9 +20,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
 public class RandomshopItemDrawer {
-	public static void drawItems(MessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<Weapons> weapons, int current_page, int last_page) {
+	public static void drawItems(MessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<Weapons> weapons, int current_page, int last_page, int theme_id) {
 		try {
-			BufferedImage randomshop = ImageIO.read(new File("./files/RankingSystem/Inventory/randomshop_blank.png"));
+			BufferedImage randomshop = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/randomshop_blank.png"));
 			
 			int [] rand = GuildIni.getWholeRandomshopItems((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()));
 			final var startX = rand[0];

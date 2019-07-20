@@ -145,7 +145,7 @@ public class RandomshopExecution {
 							if(editedRows > 0) {
 								//draw won item from the Randomshop
 								final int weapon = weapon_id;
-								RandomshopRewardDrawer.drawReward(e, RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(w -> w.getWeaponID() == weapon).findAny().orElse(null), user_details.getCurrency());
+								RandomshopRewardDrawer.drawReward(e, RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(w -> w.getWeaponID() == weapon).findAny().orElse(null), user_details.getCurrency(), guild_settings.getThemeID());
 								Hashes.addTempCache("randomshop_play_"+e.getMember().getUser().getId(), new Cache(180000, input));
 							}
 							else if(weapon_id > 0){
@@ -217,11 +217,11 @@ public class RandomshopExecution {
 						//draw page
 						if(e != null) {
 							Hashes.addTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId(), new Cache(180000, e.getMember().getUser().getId()+"_"+page+"_"+input+"_"+last_page));
-							RandomshopItemDrawer.drawItems(e, null, filteredWeapons, page, last_page);
+							RandomshopItemDrawer.drawItems(e, null, filteredWeapons, page, last_page, RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID());
 						}
 						else {
 							Hashes.addTempCache("randomshop_bot_gu"+e2.getGuild().getId()+"ch"+e2.getChannel().getId(), new Cache(180000, e2.getMember().getUser().getId()+"_"+page+"_"+input+"_"+last_page));
-							RandomshopItemDrawer.drawItems(null, e2, filteredWeapons, page, last_page);
+							RandomshopItemDrawer.drawItems(null, e2, filteredWeapons, page, last_page, RankingSystem.SQLgetGuild(e2.getGuild().getIdLong()).getThemeID());
 						}
 					}
 					else {
