@@ -40,7 +40,7 @@ public class BotStartAssign implements Runnable{
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 			if(guild_settings.getRankingState() == true){
 				rankingIncluded = true;
-				for(Member member : (e != null ? e.getJDA().getGuildById(g.getIdLong()).getMembers() : e2.getJDA().getGuildById(g.getIdLong()).getMembers())) {
+				for(Member member : g.getMembers()) {
 					if(!UserPrivs.isUserBot(member.getUser(), guild_id) && !UserPrivs.isUserMuted(member.getUser(), guild_id)) {
 						Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), guild_id, guild_settings.getThemeID());
 						if(user_details != null) {
@@ -76,8 +76,8 @@ public class BotStartAssign implements Runnable{
 				}
 			}
 			else {
-				for(Member member : e.getJDA().getGuildById(g.getIdLong()).getMembers()){
-					if(!UserPrivs.isUserBot(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong()) && !UserPrivs.isUserMuted(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong()) && !UserPrivs.isUserCommunity(member.getUser(), e.getJDA().getGuildById(guild_id).getIdLong())){
+				for(Member member : g.getMembers()) {
+					if(!UserPrivs.isUserBot(member.getUser(), g.getIdLong()) && !UserPrivs.isUserMuted(member.getUser(), g.getIdLong()) && !UserPrivs.isUserCommunity(member.getUser(), g.getIdLong())){
 						if(Azrael.SQLInsertUser(member.getUser().getIdLong(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getUser().getEffectiveAvatarUrl(), member.getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
 							logger.error("User {} couldn't be updated into the table Azrael.users for guild {}", member.getUser().getId(), g.getName());
 							errAzraelUsers++;

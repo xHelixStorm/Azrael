@@ -114,7 +114,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 						current_page++;
 					e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					RandomshopExecution.inspectItems(null, e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), theme), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme), input, current_page);
+					RandomshopExecution.inspectItems(null, e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), theme), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme, false), input, current_page);
 				}
 			}
 		}

@@ -1,11 +1,13 @@
 package listeners;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fileManagement.GuildIni;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.RankingSystem;
@@ -38,6 +40,8 @@ public class GuildJoinListener extends ListenerAdapter{
 		if(Patchnotes.SQLInsertGuild(guild_id, guild_name) == 0) {
 			logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", guild_name);
 		}
+		if(!new File("./ini/"+guild_id+".ini").exists())
+			GuildIni.createIni(e.getGuild().getIdLong());
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.execute(new BotStartAssign(null, e));
 		executor.shutdown();

@@ -6,8 +6,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import commandsContainer.ShopExecution;
+import constructors.Cache;
 import constructors.Guilds;
+import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
@@ -15,7 +16,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import sql.Azrael;
 import sql.RankingSystem;
-import sql.RankingSystemItems;
 import util.STATIC;
 
 public class Shop implements Command{
@@ -36,35 +36,16 @@ public class Shop implements Command{
 				if(guild_settings.getRankingState() == true) {
 					var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 					if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null) {
-						final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-						if(args.length > 1 && args[0].equalsIgnoreCase("level") && args[1].equalsIgnoreCase("ups")) {
-							ShopExecution.displayPartOfShop(e, "lev", guild_settings.getLevelDescription());
-						}
-						else if(args.length > 0 && args[0].equalsIgnoreCase("ranks")) {
-							ShopExecution.displayPartOfShop(e, "ran", guild_settings.getRankDescription());
-						}
-						else if(args.length > 0 && args[0].equalsIgnoreCase("profiles")) {
-							ShopExecution.displayPartOfShop(e, "pro", guild_settings.getProfileDescription());
-						}
-						else if(args.length > 0 && args[0].equalsIgnoreCase("icons")) {
-							ShopExecution.displayPartOfShop(e, "ico", guild_settings.getIconDescription());
-						}
-						else if(args.length > 0 && args[0].equalsIgnoreCase("items")) {
-							ShopExecution.displayPartOfShop(e, "ite", "");
-						}
-						else if(args.length == 1 && args[0].equalsIgnoreCase("weapons")) {
-							StringBuilder builder = new StringBuilder();
-							for(String category : RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID())) {
-								builder.append(category+", ");
-							}
-							e.getTextChannel().sendMessage("Use these weapon sections to filter the weapons you wish to purchase together with the command:\n**"+builder.toString()+"**").queue();
-						}
-						else if(args.length > 1 && args[0].equalsIgnoreCase("weapons")) {
-							ShopExecution.displayPartOfShopWeapons(e, args[1]);
-						}
-						else {
-							e.getTextChannel().sendMessage("Write the shop command together with the category of the shop you want to visit. For example "+prefix+"shop **level ups** / **ranks** / **profiles** / **icons** / **items** / **weapons**").queue();
-						}
+						e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Welcome, step in!").setThumbnail(IniFileReader.getShopThumbnail())
+								.setDescription("Welcome to my shop! Have a look around! Write out the section that you wish to take a closer look into and type 'exit' when you wish to leave!\n\n"
+										+ "**level ups\n"
+										+ "ranks\n"
+										+ "profiles\n"
+										+ "icons\n"
+										+ "items\n"
+										+ "weapons\n"
+										+ "skills**").build()).queue();
+						Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
 					}
 					else{
 						e.getTextChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
@@ -72,7 +53,7 @@ public class Shop implements Command{
 					}
 				}
 				else {
-					e.getTextChannel().sendMessage("Ranking system isn't enabled! Please ask an administrator to enable it before executing!").queue();
+					e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Ranking system isn't enabled! Please ask an administrator to enable it before executing!").build()).queue();
 				}
 			}
 			else {

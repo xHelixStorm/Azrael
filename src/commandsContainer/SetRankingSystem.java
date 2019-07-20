@@ -7,6 +7,7 @@ import constructors.Guilds;
 import core.Hashes;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import sql.RankingSystem;
+import threads.CollectUsers;
 
 public class SetRankingSystem {
 	@SuppressWarnings("preview")
@@ -48,6 +49,7 @@ public class SetRankingSystem {
 						logger.error("Levels from RankingSystem.level_list couldn't be called and cached");
 						_e.getTextChannel().sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
 					}
+					new Thread(new CollectUsers(_e)).start();
 				}
 			}
 			else {

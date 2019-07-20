@@ -67,18 +67,24 @@ public class RankingSystem {
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql;
-			if(_level_skin != 0 && _rank_skin != 0 && _profile_skin != 0 && _icon_skin != 0)
+			if(_level_skin != 0 && _rank_skin != 0 && _profile_skin != 0 && _icon_skin != 0) {
 				sql = ("INSERT INTO users (user_id, name, level_skin, rank_skin, profile_skin, icon_skin, fk_guild_id) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
-			else
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _user_id);
+				stmt.setString(2, _name);
+				stmt.setInt(3, _level_skin);
+				stmt.setInt(4, _rank_skin);
+				stmt.setInt(5, _profile_skin);
+				stmt.setInt(6, _icon_skin);
+				stmt.setLong(7, _guild_id);
+			}
+			else {
 				sql = ("INSERT INTO users (user_id, name, fk_guild_id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
-			stmt.setString(2, _name);
-			stmt.setInt(3, _level_skin);
-			stmt.setInt(4, _rank_skin);
-			stmt.setInt(5, _profile_skin);
-			stmt.setInt(6, _icon_skin);
-			stmt.setLong(7, _guild_id);
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _user_id);
+				stmt.setString(2, _name);
+				stmt.setLong(3, _guild_id);
+			}
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertUser Exception", e);
@@ -434,7 +440,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO user_details (`fk_user_id`, `level`, `experience`, `currency`, `current_role`, `fk_guild_id`) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE fk_user_id=VALUES(fk_user_id)");
+			String sql = ("INSERT IGNORE INTO user_details (`fk_user_id`, `level`, `experience`, `currency`, `current_role`, `fk_guild_id`) VALUES (?, ?, ?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _level);
@@ -1275,13 +1281,12 @@ public class RankingSystem {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT user_details.fk_user_id, user_details.level, (SELECT (user_details.experience - level_list.experience) FROM level_list WHERE level_list.level = user_details.level AND level_list.fk_theme_id = ?) AS `current_experience`, (SELECT (level_list.experience - (SELECT level_list.experience FROM level_list WHERE level_list.level = user_details.level)) FROM level_list WHERE level_list.level = (user_details.level+1) AND level_list.fk_theme_id = ?) AS `rank_up_experience`, user_details.experience, user_details.currency, user_details.current_role, users.level_skin, ranking_level.description, users.rank_skin, ranking_rank.description, users.profile_skin, ranking_profile.description, users.icon_skin, ranking_icons.description, ranking_profile.fk_bar_id, ranking_rank.fk_bar_id, ranking_profile.exp_txt, ranking_profile.percent_txt, ranking_rank.exp_txt, ranking_rank.percent_txt, ranking_profile.tcolor_r, ranking_rank.tcolor_r, ranking_level.tcolor_r, ranking_profile.tcolor_g, ranking_rank.tcolor_g, ranking_level.tcolor_g, ranking_profile.tcolor_b, ranking_rank.tcolor_b, ranking_level.tcolor_b, ranking_level.rankx, ranking_level.ranky, ranking_level.rank_width, ranking_level.rank_height, ranking_rank.rankx, ranking_rank.ranky, ranking_rank.rank_width, ranking_rank.rank_height, ranking_profile.rankx, ranking_profile.ranky, ranking_profile.rank_width, ranking_profile.rank_height, daily_experience.experience, daily_experience.reset FROM user_details INNER JOIN users ON user_details.fk_user_id = users.user_id INNER JOIN ranking_level ON level_skin = level_id INNER JOIN ranking_rank ON rank_skin = rank_id INNER JOIN ranking_profile ON profile_skin = profile_id INNER JOIN ranking_icons ON icon_skin = icon_id INNER JOIN guilds ON user_details.fk_guild_id = guilds.guild_id LEFT JOIN daily_experience ON guilds.guild_id = daily_experience.fk_guild_id WHERE users.user_id = ? && users.fk_guild_id = ? && user_details.fk_guild_id = ?");
+				String sql = ("SELECT user_details.fk_user_id, user_details.level, (SELECT (user_details.experience - level_list.experience) FROM level_list WHERE level_list.level = user_details.level AND level_list.fk_theme_id = ?) AS `current_experience`, (SELECT (level_list.experience - (SELECT level_list.experience FROM level_list WHERE level_list.level = user_details.level)) FROM level_list WHERE level_list.level = (user_details.level+1) AND level_list.fk_theme_id = ?) AS `rank_up_experience`, user_details.experience, user_details.currency, user_details.current_role, users.level_skin, ranking_level.description, users.rank_skin, ranking_rank.description, users.profile_skin, ranking_profile.description, users.icon_skin, ranking_icons.description, ranking_profile.fk_bar_id, ranking_rank.fk_bar_id, ranking_profile.exp_txt, ranking_profile.percent_txt, ranking_rank.exp_txt, ranking_rank.percent_txt, ranking_profile.tcolor_r, ranking_rank.tcolor_r, ranking_level.tcolor_r, ranking_profile.tcolor_g, ranking_rank.tcolor_g, ranking_level.tcolor_g, ranking_profile.tcolor_b, ranking_rank.tcolor_b, ranking_level.tcolor_b, ranking_level.rankx, ranking_level.ranky, ranking_level.rank_width, ranking_level.rank_height, ranking_rank.rankx, ranking_rank.ranky, ranking_rank.rank_width, ranking_rank.rank_height, ranking_profile.rankx, ranking_profile.ranky, ranking_profile.rank_width, ranking_profile.rank_height, daily_experience.experience, daily_experience.reset, users.weapon1, users.weapon2, users.weapon3, users.skill FROM user_details INNER JOIN users ON user_details.fk_user_id = users.user_id LEFT JOIN ranking_level ON level_skin = level_id LEFT JOIN ranking_rank ON rank_skin = rank_id LEFT JOIN ranking_profile ON profile_skin = profile_id LEFT JOIN ranking_icons ON icon_skin = icon_id INNER JOIN guilds ON user_details.fk_guild_id = guilds.guild_id LEFT JOIN daily_experience ON guilds.guild_id = daily_experience.fk_guild_id WHERE users.user_id = ? && users.fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _theme_id);
 				stmt.setInt(2, _theme_id);
 				stmt.setLong(3, _user_id);
 				stmt.setLong(4, _guild_id);
-				stmt.setLong(5, _guild_id);
 				rs = stmt.executeQuery();
 				if(rs.next()) {
 					Rank rank = new Rank();
@@ -1329,6 +1334,10 @@ public class RankingSystem {
 					rank.setRankHeightProfile(rs.getInt(42));
 					rank.setDailyExperience(rs.getInt(43));
 					rank.setDailyReset(rs.getTimestamp(44));
+					rank.setWeapon1(rs.getInt(45));
+					rank.setWeapon2(rs.getInt(46));
+					rank.setWeapon3(rs.getInt(47));
+					rank.setSkill(rs.getInt(48));
 					Hashes.addRanking(_guild_id+"_"+_user_id, rank);
 					return rank;
 				}
@@ -1434,7 +1443,7 @@ public class RankingSystem {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT item_id, shop_content.description, price, skin, skin_type.description FROM shop_content INNER JOIN skin_type ON fk_skin = skin WHERE fk_theme_id = ? && shop_content.enabled = 1");
+				String sql = ("SELECT item_id, shop_content.description, price, skin, skin_type.description, full_description, thumbnail FROM shop_content INNER JOIN skin_type ON fk_skin = skin WHERE fk_theme_id = ? && shop_content.enabled = 1");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _theme_id);
 				rs = stmt.executeQuery();
@@ -1445,6 +1454,8 @@ public class RankingSystem {
 					insert_skin.setPrice(rs.getLong(3));
 					insert_skin.setSkinType(rs.getString(4));
 					insert_skin.setSkinDescription(rs.getString(5));
+					insert_skin.setSkinFullDescription(rs.getString(6));
+					insert_skin.setThumbnail(rs.getString(7));
 					set_skin.add(insert_skin);
 				}
 				Hashes.addShopContent(_guild_id, set_skin);
@@ -1554,7 +1565,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? ORDER BY position desc LIMIT ?, ?");
+			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name, skill_shop_content.description FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id LEFT JOIN skill_shop_content ON inventory.fk_skill_id = skill_shop_content.skill_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? ORDER BY position desc LIMIT ?, ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -1575,6 +1586,7 @@ public class RankingSystem {
 				setInventory.setStat(rs.getString(9));
 				setInventory.setWeaponCategoryID(rs.getInt(10));
 				setInventory.setWeaponCategoryDescription(rs.getString(11));
+				setInventory.setSkillDescription(rs.getString(12));
 				inventory.add(setInventory);
 			}
 			return inventory;
@@ -1617,6 +1629,7 @@ public class RankingSystem {
 				setInventory.setStat(rs.getString(9));
 				setInventory.setWeaponCategoryID(rs.getInt(10));
 				setInventory.setWeaponCategoryDescription(rs.getString(11));
+				setInventory.setSkillDescription(rs.getString(12));
 				inventory.add(setInventory);
 			}
 			return inventory;
@@ -1638,7 +1651,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? AND inventory.fk_weapon_id IS NOT NULL ORDER BY position desc LIMIT ?, ?");
+			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name, skill_shop_content.description FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id LEFT JOIN skill_shop_content ON inventory.fk_skill_id = skill_shop_content.skill_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? AND (inventory.fk_weapon_id IS NOT NULL OR inventory.fk_skill_id IS NOT NULL) ORDER BY position desc LIMIT ?, ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -1659,6 +1672,7 @@ public class RankingSystem {
 				setInventory.setStat(rs.getString(9));
 				setInventory.setWeaponCategoryID(rs.getInt(10));
 				setInventory.setWeaponCategoryDescription(rs.getString(11));
+				setInventory.setSkillDescription(rs.getString(12));
 				inventory.add(setInventory);
 			}
 			return inventory;
@@ -1680,14 +1694,23 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? AND inventory.fk_weapon_id IS NOT NULL AND weapon_category.name LIKE ? ORDER BY position desc LIMIT ?, ?");
-			stmt = myConn.prepareStatement(sql);
+			String sql = "";
+			if(!_category.equalsIgnoreCase("skill")) {
+				sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name, skill_shop_content.description FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id LEFT JOIN skill_shop_content ON inventory.fk_skill_id = skill_shop_content.skill_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? AND inventory.fk_weapon_id IS NOT NULL AND weapon_category.name LIKE ? ORDER BY position desc LIMIT ?, ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setString(4, _category);
+				stmt.setInt(5, _limit);
+				stmt.setInt(6, _maxItems);
+			}
+			else {
+				sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name, skill_shop_content.description FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id LEFT JOIN skill_shop_content ON inventory.fk_skill_id = skill_shop_content.skill_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? AND inventory.fk_skill_id IS NOT NULL ORDER BY position desc LIMIT ?, ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setInt(4, _limit);
+				stmt.setInt(5, _maxItems);
+			}
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			stmt.setInt(3, _theme_id);
-			stmt.setString(4, _category);
-			stmt.setInt(5, _limit);
-			stmt.setInt(6, _maxItems);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				InventoryContent setInventory = new InventoryContent();
@@ -1702,6 +1725,7 @@ public class RankingSystem {
 				setInventory.setStat(rs.getString(9));
 				setInventory.setWeaponCategoryID(rs.getInt(10));
 				setInventory.setWeaponCategoryDescription(rs.getString(11));
+				setInventory.setSkillDescription(rs.getString(12));
 				inventory.add(setInventory);
 			}
 			return inventory;

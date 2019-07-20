@@ -20,6 +20,13 @@ public class Cache {
 		this.expire = true;
 	}
 	
+	public Cache(long _expiration, String _additionalInfo, String _additionalInfo2) {
+		this.expiration = System.currentTimeMillis() + _expiration;
+		this.additionalInfo = _additionalInfo;
+		this.additionalInfo2 = _additionalInfo2;
+		this.expire = true;
+	}
+	
 	public Cache(String _additionalInfo) {
 		this.expiration = System.currentTimeMillis();
 		this.additionalInfo = _additionalInfo;

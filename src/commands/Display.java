@@ -169,7 +169,6 @@ public class Display implements Command{
 						out += "Pug command: "+GuildIni.getPugLevel(e.getGuild().getIdLong())+"\n";
 						out += "Profile command: "+GuildIni.getProfileLevel(e.getGuild().getIdLong())+"\n";
 						out += "Rank command: "+GuildIni.getRankLevel(e.getGuild().getIdLong())+"\n";
-						out += "Purchase command: "+GuildIni.getPurchaseLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register command: "+GuildIni.getRegisterLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register role subcommand: "+GuildIni.getRegisterRoleLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register text channel subcommand: "+GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong())+"\n";
@@ -218,7 +217,8 @@ public class Display implements Command{
 						out += "Rss command: "+GuildIni.getRssLevel(e.getGuild().getIdLong())+"\n";
 						out += "Randomshop command: "+GuildIni.getRandomshopLevel(e.getGuild().getIdLong())+"\n";
 						out += "Patchnotes command: "+GuildIni.getPatchnotesLevel(e.getGuild().getIdLong())+"\n";
-						out += "Doubleexperience command: "+GuildIni.getDoubleExperienceLevel(e.getGuild().getIdLong());
+						out += "Doubleexperience command: "+GuildIni.getDoubleExperienceLevel(e.getGuild().getIdLong())+"\n";
+						out += "Equip command: "+GuildIni.getEquipLevel(e.getGuild().getIdLong());
 						
 						e.getTextChannel().sendMessage("`"+out+"`").queue();
 					}

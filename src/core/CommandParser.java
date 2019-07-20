@@ -9,7 +9,7 @@ public class CommandParser {
 	
 	public static CommandContainer parser(String raw, MessageReceivedEvent e){
 		
-		String beheaded = raw.replaceFirst(GuildIni.getCommandPrefix(e.getGuild().getIdLong()), "");
+		String beheaded = (e.getChannelType().isGuild() ? raw.replaceFirst(GuildIni.getCommandPrefix(e.getGuild().getIdLong()), "") : raw);
 		String[] splitBeheaded = beheaded.split(" ");
 		String invoke = splitBeheaded[0];
 		ArrayList <String> split = new ArrayList <String>();

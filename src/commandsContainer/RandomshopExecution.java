@@ -120,7 +120,7 @@ public class RandomshopExecution {
 							var editedRows = 0;
 							//get a random weapon id basing of either abbreviation or category and the random stat
 							if(abbv != null) {
-								weapon_id = RankingSystemItems.SQLgetRandomWeaponIDByAbbv(e.getGuild().getIdLong(), abbv, stats.get(rand).getID(), guild_settings.getThemeID());
+								weapon_id = RankingSystemItems.SQLgetRandomWeaponIDByAbbv(abbv, stats.get(rand).getID(), guild_settings.getThemeID());
 								final var number = RankingSystemItems.SQLgetNumberOfWeaponID(e.getGuild().getIdLong(), weapon_id, guild_settings.getThemeID());
 								if(weapon_id > 0) {
 									editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1), guild_settings.getThemeID());

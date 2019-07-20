@@ -162,7 +162,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO guilds (guild_id, name) VALUES(?, ?)");
+			String sql = ("INSERT INTO guilds (guild_id, name) VALUES(?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setString(2, _name);

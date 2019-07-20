@@ -16,6 +16,7 @@ import commands.Commands;
 import commands.Daily;
 import commands.Display;
 import commands.DoubleExperience;
+import commands.Equip;
 import commands.Filter;
 import commands.Help;
 import commands.Inventory;
@@ -134,6 +135,7 @@ public class Main {
 		CommandHandler.commands.put("randomshop", new Randomshop());
 		CommandHandler.commands.put("patchnotes", new Patchnotes());
 		CommandHandler.commands.put("doubleexperience", new DoubleExperience());
+		CommandHandler.commands.put("equip", new Equip());
 	}
 	
 	public static void addListeners() {

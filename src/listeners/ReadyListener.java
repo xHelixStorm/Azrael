@@ -41,7 +41,7 @@ public class ReadyListener extends ListenerAdapter {
 	@Override
 	public void onReady(ReadyEvent e) {
 		FileSetting.createTemp(e);
-		if(FileSetting.readFile(IniFileReader.getTempDirectory()+"running.azr").contains("1")) {
+		if(new File(IniFileReader.getTempDirectory()+"running.azr").exists() && FileSetting.readFile(IniFileReader.getTempDirectory()+"running.azr").contains("1")) {
 			FileSetting.createFile(IniFileReader.getTempDirectory()+"running.azr", "2");
 			e.getJDA().shutdownNow();
 			return;
@@ -110,7 +110,7 @@ public class ReadyListener extends ListenerAdapter {
 			}
 			if(DiscordRoles.SQLgetRoles(guild.getIdLong()).size() == 0) {
 				var result = DiscordRoles.SQLInsertRoles(guild.getIdLong(), guild.getRoles());
-				if(result != null && result[0] == 1) {
+				if(result != null && result.length > 0 && result[0] == 1) {
 					logger.debug("Roles information from DiscordRoles.roles couldn't be retrieved and cached for guild {}. Hence all available roles have been inserted as default roles.", guild.getName());
 					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage("Roles information from DiscordRoles.roles couldn't be called and cached. Hence all roles have been inserted under the default role!").queue();
 					DiscordRoles.SQLgetRoles(guild.getIdLong());

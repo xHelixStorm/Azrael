@@ -17,7 +17,7 @@ public class CommandList {
 			administration = true;
 		}
 		
-		if(GuildIni.getPugCommand(guild_id) || GuildIni.getMeowCommand(guild_id) || GuildIni.getRankCommand(guild_id) || GuildIni.getProfileCommand(guild_id) || GuildIni.getTopCommand(guild_id) || GuildIni.getUseCommand(guild_id) || GuildIni.getShopCommand(guild_id) || GuildIni.getInventoryCommand(guild_id) || GuildIni.getPurchaseCommand(guild_id) || GuildIni.getDailyCommand(guild_id) || GuildIni.getQuizCommand(guild_id) || GuildIni.getRandomshopCommand(guild_id)){
+		if(GuildIni.getEquipCommand(guild_id) || GuildIni.getPugCommand(guild_id) || GuildIni.getMeowCommand(guild_id) || GuildIni.getRankCommand(guild_id) || GuildIni.getProfileCommand(guild_id) || GuildIni.getTopCommand(guild_id) || GuildIni.getUseCommand(guild_id) || GuildIni.getShopCommand(guild_id) || GuildIni.getInventoryCommand(guild_id) || GuildIni.getDailyCommand(guild_id) || GuildIni.getQuizCommand(guild_id) || GuildIni.getRandomshopCommand(guild_id)){
 			entertainment = true;
 		}
 		
@@ -44,12 +44,12 @@ public class CommandList {
 			if(GuildIni.getProfileCommand(guild_id))textCollector.add("**-"+prefix+"profile**\nshows the players actual rank with more informations\n\n");
 			if(GuildIni.getTopCommand(guild_id))textCollector.add("**-"+prefix+"top**\nshows the top 10 ranking\n\n");
 			if(GuildIni.getUseCommand(guild_id))textCollector.add("**-"+prefix+"use**\nto use an item from your inventory\n\n");
-			if(GuildIni.getShopCommand(guild_id))textCollector.add("**-"+prefix+"shop**\ndisplay the content in the shop\n\n");
+			if(GuildIni.getShopCommand(guild_id))textCollector.add("**-"+prefix+"shop**\ndisplay the content in the shop and purchase\n\n");
 			if(GuildIni.getInventoryCommand(guild_id))textCollector.add("**-"+prefix+"inventory**\ndisplays the content inside your inventory\n\n");
-			if(GuildIni.getPurchaseCommand(guild_id))textCollector.add("**-"+prefix+"purchase**\nto purchase and item or skin from the shop\n\n");
 			if(GuildIni.getDailyCommand(guild_id))textCollector.add("**-"+prefix+"daily**\nto get a daily reward\n\n");
 			if(GuildIni.getQuizCommand(guild_id))textCollector.add("**-"+prefix+"quiz**\nto initialize a question and answer session with rewards\n\n");
 			if(GuildIni.getRandomshopCommand(guild_id))textCollector.add("**-"+prefix+"randomshop**\nto receive a random weapon from the randomshop\n\n");
+			if(GuildIni.getEquipCommand(guild_id))textCollector.add("**-"+prefix+"equip**\nto equip purchased weapons and skills. To use only in private message without prefix\n\n");
 		}
 		if(other == true) {
 			textCollector.add("**_Other:_**\n");

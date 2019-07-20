@@ -63,6 +63,11 @@ public class Rank {
 	
 	private int theme_id;
 	
+	private int weapon1;
+	private int weapon2;
+	private int weapon3;
+	private int skill;
+	
 	public void setUser_ID(long _user_id) {
 		user_id = _user_id;
 	}
@@ -215,6 +220,18 @@ public class Rank {
 	}
 	public void setThemeID(int _theme_id) {
 		theme_id = _theme_id;
+	}
+	public void setWeapon1(int _weapon1) {
+		weapon1 = _weapon1;
+	}
+	public void setWeapon2(int _weapon2) {
+		weapon2 = _weapon2;
+	}
+	public void setWeapon3(int _weapon3) {
+		weapon3 = _weapon3;
+	}
+	public void setSkill(int _skill) {
+		skill = _skill;
 	}
 	
 	public long getUser_ID() {
@@ -369,5 +386,17 @@ public class Rank {
 	}
 	public int getThemeID() {
 		return theme_id;
+	}
+	public int getWeapon1() {
+		return weapon1;
+	}
+	public int getWeapon2() {
+		return weapon2;
+	}
+	public int getWeapon3() {
+		return weapon3;
+	}
+	public int getSkill() {
+		return skill;
 	}
 }

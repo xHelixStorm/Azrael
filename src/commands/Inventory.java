@@ -57,7 +57,7 @@ public class Inventory implements Command{
 						else{
 							int limit = 0;
 							int itemNumber;
-							String sub_cat = RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(c -> c.equalsIgnoreCase((args.length > 1 ? args[1] : ""))).findAny().orElse(null);
+							String sub_cat = RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), true).parallelStream().filter(c -> c.equalsIgnoreCase((args.length > 1 ? args[1] : ""))).findAny().orElse(null);
 							final var maxItems = GuildIni.getInventoryMaxItems(e.getGuild().getIdLong());
 							if(e.getMessage().getContentRaw().toLowerCase().contains("items"))
 								itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "ite", maxItems, guild_settings.getThemeID());

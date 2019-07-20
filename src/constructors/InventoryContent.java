@@ -14,6 +14,7 @@ public class InventoryContent {
 	private String stat;
 	private int weapon_category_id;
 	private String weapon_category_description;
+	private String skill_description;
 	
 	public void setUserID(long _user_id){
 		user_id = _user_id;
@@ -48,6 +49,9 @@ public class InventoryContent {
 	public void setWeaponCategoryDescription(String _weapon_category_description) {
 		weapon_category_description = _weapon_category_description;
 	}
+	public void setSkillDescription(String _skill_description) {
+		skill_description = _skill_description;
+	}
 	
 	public long getUserID(){
 		return user_id;
@@ -81,5 +85,8 @@ public class InventoryContent {
 	}
 	public String getWeaponCategoryDescription() {
 		return weapon_category_description;
+	}
+	public String getSkillDescription() {
+		return skill_description;
 	}
 }

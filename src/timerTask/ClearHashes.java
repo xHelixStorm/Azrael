@@ -22,6 +22,7 @@ public class ClearHashes extends TimerTask{
 		Hashes.clearWeaponStats();
 		Hashes.clearShopContent();
 		Hashes.clearDailyItems();
+		Hashes.clearSkillShop();
 		Hashes.clearRankList();
 		Hashes.clearThemes();
 		

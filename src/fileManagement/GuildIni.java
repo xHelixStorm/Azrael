@@ -69,8 +69,6 @@ public class GuildIni {
 			ini.add("Commands", "ProfileLevel", "1");
 			ini.add("Commands", "Pug", "false");
 			ini.add("Commands", "PugLevel", "1");
-			ini.add("Commands", "Purchase", "false");
-			ini.add("Commands", "PurchaseLevel", "1");
 			ini.add("Commands", "Rank", "false");
 			ini.add("Commands", "RankLevel", "1");
 			ini.add("Commands", "Register", "false");
@@ -135,6 +133,8 @@ public class GuildIni {
 			ini.add("Commands", "PatchnotesLevel", "1");
 			ini.add("Commands", "DoubleExperience", "false");
 			ini.add("Commands", "DoubleExperienceLevel", "20");
+			ini.add("Commands", "Equip", "false");
+			ini.add("Commands", "EquipLevel", "1");
 			
 			//Inventory
 			ini.add("Inventory", "startX", "0");
@@ -404,14 +404,6 @@ public class GuildIni {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "PugLevel", int.class);
 	}
-	public static boolean getPurchaseCommand(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("Commands", "Purchase", boolean.class);
-	}
-	public static int getPurchaseLevel(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("Commands", "PurchaseLevel", int.class);
-	}
 	public static boolean getRankCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Rank", boolean.class);
@@ -667,6 +659,14 @@ public class GuildIni {
 	public static int getDoubleExperienceLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "DoubleExperienceLevel", int.class);
+	}
+	public static boolean getEquipCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Equip", boolean.class);
+	}
+	public static int getEquipLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "EquipLevel", int.class);
 	}
 	
 	public static int[] getWholeInventory(long guild_id) {

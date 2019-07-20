@@ -2,6 +2,7 @@ package listeners;
 
 import java.awt.Color;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -11,9 +12,12 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiManager;
 
+import commandsContainer.EquipExecution;
 import commandsContainer.FilterExecution;
+import commandsContainer.PurchaseExecution;
 import commandsContainer.RssExecution;
 import commandsContainer.SetWarning;
+import commandsContainer.ShopExecution;
 import commandsContainer.UserExecution;
 import constructors.Cache;
 import constructors.Guilds;
@@ -39,7 +43,7 @@ import threads.RunQuiz;
 
 public class MessageListener extends ListenerAdapter{
 	
-	@SuppressWarnings("null")
+	@SuppressWarnings({ "preview", "null" })
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e){
 		ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -55,9 +59,11 @@ public class MessageListener extends ListenerAdapter{
 				}
 			}
 			
+			Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 			var warning = Hashes.getTempCache("warnings_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId());
 			var user = Hashes.getTempCache("user_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId());
 			var filter = Hashes.getTempCache("filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId());
+			var shop = Hashes.getTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId());
 			var inventory_bot = Hashes.getTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId());
 			var randomshop_bot = Hashes.getTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId());
 			var reaction = Hashes.getTempCache("reaction_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId());
@@ -98,6 +104,94 @@ public class MessageListener extends ListenerAdapter{
 			
 			if(filter != null) {
 				FilterExecution.performAction(e, message, filter);
+			}
+			
+			if(shop != null && shop.getExpiration() - System.currentTimeMillis() > 0) {
+				if(message.equalsIgnoreCase("exit")) {
+					e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Thanks for the visit! See you again!").build()).queue();
+					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId());
+				}
+				else if(shop.getAdditionalInfo().length() == 0) {
+					if(message.equalsIgnoreCase("level ups")) {
+						ShopExecution.displayShop(e, "lev", guild_settings.getLevelDescription());
+					}
+					else if(message.equalsIgnoreCase("ranks")) {
+						ShopExecution.displayShop(e, "ran", guild_settings.getRankDescription());
+					}
+					else if(message.equalsIgnoreCase("profiles")) {
+						ShopExecution.displayShop(e, "pro", guild_settings.getProfileDescription());
+					}
+					else if(message.equalsIgnoreCase("icons")) {
+						ShopExecution.displayShop(e, "ico", guild_settings.getIconDescription());
+					}
+					else if(message.equalsIgnoreCase("items")) {
+						ShopExecution.displayShop(e, "ite", "");
+					}
+					else if(message.equalsIgnoreCase("weapons")) {
+						ShopExecution.displayWeaponCategories(e, guild_settings.getThemeID());
+					}
+					else if(message.equalsIgnoreCase("skills")) {
+						ShopExecution.displaySkills(e, guild_settings);
+					}
+				}
+				else if(shop.getAdditionalInfo().matches("(lev|ran|pro|ico|ite)") && !shop.getAdditionalInfo2().contains("%") && !shop.getAdditionalInfo2().contains("$")) {
+					if(!message.matches("[^\\d]*") && message.length() <= 9) {
+						ShopExecution.displaySingleItem(e, shop.getAdditionalInfo(), shop.getAdditionalInfo2().split("-"), guild_settings, Integer.parseInt(message)-1);
+					}
+				}
+				else if(shop.getAdditionalInfo().matches("(lev|ran|pro|ico|ite)") && (shop.getAdditionalInfo2().contains("%") || shop.getAdditionalInfo2().contains("$"))) {
+					if(message.equalsIgnoreCase("purchase") && shop.getAdditionalInfo2().contains("%")) {
+						PurchaseExecution.purchase(e, shop.getAdditionalInfo(), shop.getAdditionalInfo2().replaceAll("%", ""), guild_settings);
+					}
+					else if(message.equalsIgnoreCase("return")) {
+						switch(shop.getAdditionalInfo()) {
+							case "lev" -> ShopExecution.displayShop(e, "lev", guild_settings.getLevelDescription());
+							case "ran" -> ShopExecution.displayShop(e, "ran", guild_settings.getRankDescription());
+							case "pro" -> ShopExecution.displayShop(e, "pro", guild_settings.getProfileDescription());
+							case "ico" -> ShopExecution.displayShop(e, "ico", guild_settings.getIconDescription());
+							case "ite" -> ShopExecution.displayShop(e, "ite", "");
+						}
+					}
+				}
+				else if(shop.getAdditionalInfo().equals("wea") && shop.getAdditionalInfo2().contains("-") && !shop.getAdditionalInfo2().matches("[\\d]")) {
+					var categories = shop.getAdditionalInfo2().split("-");
+					var categoryFound = false;
+					for(final var category : categories) {
+						if(category.equalsIgnoreCase(message)) {
+							categoryFound = true;
+							break;
+						}
+					}
+					if(categoryFound) {
+						ShopExecution.displayShopWeapons(e, message);
+					}
+				}
+				else if(shop.getAdditionalInfo().contains("wea-") && !shop.getAdditionalInfo2().contains("%")) {
+					if(!message.matches("[^\\d]") && message.length() <= 9) {
+						ShopExecution.displaySingleWeapon(e, shop.getAdditionalInfo(), shop.getAdditionalInfo2().split("-"), guild_settings, Integer.parseInt(message)-1);
+					}
+				}
+				else if(shop.getAdditionalInfo().contains("wea-") && shop.getAdditionalInfo2().contains("%")) {
+					if(message.equalsIgnoreCase("purchase")) {
+						PurchaseExecution.purchase(e, "wep", shop.getAdditionalInfo2().replaceAll("%", ""), guild_settings);
+					}
+					else if(message.equalsIgnoreCase("return")) {
+						ShopExecution.displayShopWeapons(e, shop.getAdditionalInfo().split("-")[1]);
+					}
+				}
+				else if(shop.getAdditionalInfo().equals("ski") && !shop.getAdditionalInfo2().contains("%")) {
+					if(!message.matches("[^\\d]") && message.length() <= 9) {
+						ShopExecution.displaySingleSkill(e, guild_settings, shop.getAdditionalInfo2().split("-"), Integer.parseInt(message)-1);
+					}
+				}
+				else if(shop.getAdditionalInfo().equals("ski") && shop.getAdditionalInfo2().contains("%")) {
+					if(message.equalsIgnoreCase("purchase")) {
+						PurchaseExecution.purchase(e, "ski", shop.getAdditionalInfo2().replaceAll("%", ""), guild_settings);
+					}
+					else if(message.equalsIgnoreCase("return")) {
+						ShopExecution.displaySkills(e, guild_settings);
+					}
+				}
 			}
 			
 			if(user != null){
@@ -245,7 +339,6 @@ public class MessageListener extends ListenerAdapter{
 				}
 			}
 			
-			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 			if(guild_settings.getRankingState() == true && (Hashes.getCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId()) == null || guild_settings.getMessageTimeout() == 0)){
 				Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
 				if(user_details == null){
@@ -289,6 +382,90 @@ public class MessageListener extends ListenerAdapter{
 				executor.execute(new LanguageFilter(e, Hashes.getFilterLang(channel_id)));
 			}
 			executor.shutdown();
+		}
+		else {
+			//handle private messages commands
+			var message = e.getMessage().getContentRaw().toLowerCase();
+			if(message.equalsIgnoreCase("equip")) {
+				if(e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
+					if(!CommandHandler.handleCommand(CommandParser.parser(message, e))) {
+						Logger logger = LoggerFactory.getLogger(MessageListener.class);
+						logger.debug("Private message command {} doesn't exist!", e.getMessage().getContentRaw());
+					}
+				}
+			}
+			
+			var equip = Hashes.getTempCache("equip_us"+e.getAuthor().getId());
+			
+			if(equip != null && equip.getExpiration() - System.currentTimeMillis() > 0) {
+				if(e.getMessage().getContentRaw().equalsIgnoreCase("exit")) {
+					//interrupt or complete equip setup
+					e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Equip setup terminated!").build()).queue();
+					Hashes.clearTempCache("equip_us"+e.getAuthor());
+				}
+				else if(equip.getAdditionalInfo2().length() == 0) {
+					if(equip.getAdditionalInfo().length() == 18) {
+						if(e.getMessage().getContentRaw().equalsIgnoreCase("show")) {
+							
+						}
+						else if(e.getMessage().getContentRaw().equalsIgnoreCase("set")) {
+							EquipExecution.equipItemScreen(e, equip.getAdditionalInfo());
+						}
+						else if(e.getMessage().getContentRaw().equalsIgnoreCase("remove")) {
+							
+						}
+						else if(e.getMessage().getContentRaw().equalsIgnoreCase("remove-all")) {
+							
+						}
+					}
+					else if(equip.getAdditionalInfo().length() > 18) {
+						//run action to select one displayed guild on the screen
+						if(!e.getMessage().getContentRaw().matches("[^\\d]*"))
+							EquipExecution.selectAvailableGuilds(e, equip.getAdditionalInfo(), Integer.parseInt(e.getMessage().getContentRaw())-1);
+						else
+							e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select one of the visible digits on the screen!").build()).queue();
+					}
+				}
+				else {
+					if(equip.getAdditionalInfo2().equals("err") && equip.getAdditionalInfo().length() > 18) {
+						//run action to filter the guild by name or id in case all available guilds with enabled ranking system couldn't be displayed
+						EquipExecution.findGuild(e, Arrays.asList(equip.getAdditionalInfo().split("-")), e.getMessage().getContentRaw().toLowerCase());
+					}
+					else if(equip.getAdditionalInfo2().equals("wait")) {
+						equip.updateDescription2("").setExpiration(180000);
+						Hashes.addTempCache("equip_us"+e.getAuthor().getId(), equip);
+					}
+					else if(equip.getAdditionalInfo2().equals("set")) {
+						if(!e.getMessage().getContentRaw().matches("[^\\d]"))
+							EquipExecution.slotSelection(e, equip.getAdditionalInfo(), Integer.parseInt(e.getMessage().getContentRaw()));
+						else
+							e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select one of the visible digits on the screen!").build()).queue();
+					}
+					else if(equip.getAdditionalInfo2().matches("^(set-)[1-4]$")) {
+						if(message.equalsIgnoreCase("return")) {
+							EquipExecution.equipItemScreen(e, equip.getAdditionalInfo());
+						}
+						else {
+							EquipExecution.searchInventory(e, equip.getAdditionalInfo(), Integer.parseInt(equip.getAdditionalInfo2().split("-")[1]), e.getMessage().getContentRaw().toLowerCase());
+						}
+					}
+					else if(equip.getAdditionalInfo2().matches("^(set-)[1-4](_)[\\d-]*$")) {
+						if(message.equalsIgnoreCase("return")) {
+							EquipExecution.equipItemScreen(e, equip.getAdditionalInfo());
+						}
+						else {
+							if(!e.getMessage().getContentRaw().matches("[^\\d]") && message.length() <= 9) {
+								var information = equip.getAdditionalInfo2().split("_");
+								var slot = Integer.parseInt(information[0].split("-")[1]);
+								var weapons = information[1].split("-");
+								EquipExecution.selectItem(e, equip.getAdditionalInfo(), slot, Integer.parseInt(e.getMessage().getContentRaw())-1, weapons);
+							}
+							else 
+								e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select one of the visible digits on the screen!").build()).queue();
+						}
+					}
+				}
+			}
 		}
 	}
 }

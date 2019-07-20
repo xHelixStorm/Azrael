@@ -28,7 +28,7 @@ public class Rank implements Command{
 
 	@Override
 	public void action(String[] args, MessageReceivedEvent e) {
-		if(GuildIni.getPurchaseCommand(e.getGuild().getIdLong())){
+		if(GuildIni.getRankCommand(e.getGuild().getIdLong())){
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.execute(() -> {
 				Logger logger = LoggerFactory.getLogger(Rank.class);
