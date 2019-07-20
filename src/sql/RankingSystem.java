@@ -1920,6 +1920,44 @@ public class RankingSystem {
 	}
 	
 	@SuppressWarnings("resource")
+	public static int SQLUpdateCurrencyAndRemoveInventory(long _user_id, long _guild_id, long _currency, int _item_id, int _theme_id) {
+		logger.debug("SQLUpdateCurrencyAndRemoveInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _theme_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false);
+			String sql = ("UPDATE user_details SET currency = ? WHERE fk_user_id = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _currency);
+			stmt.setLong(2, _user_id);
+			stmt.setLong(3, _guild_id);
+			stmt.executeUpdate();
+			
+			String sql2 = ("DELETE FROM inventory WHERE fk_user_id = ? AND fk_item_id = ? AND fk_guild_id = ? AND fk_theme_id = ?");
+			stmt = myConn.prepareStatement(sql2);
+			stmt.setLong(1, _user_id);
+			stmt.setInt(2, _item_id);
+			stmt.setLong(3, _guild_id);
+			stmt.setInt(4, _theme_id);
+			var editedRows = stmt.executeUpdate();
+			myConn.commit();	
+			return editedRows;
+		} catch (SQLException e) {
+			logger.error("SQLUpdateCurrencyAndRemoveInventory Exception", e);
+			try {
+				myConn.rollback();
+			} catch (SQLException e1) {
+				logger.error("SQLUpdateCurrencyAndRemoveInventory rollback Exception", e);
+			}
+			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	@SuppressWarnings("resource")
 	public static int SQLUpdateAndInsertInventory(long _user_id, long _guild_id, int _number, int _number_limit, int _item_id, Timestamp _position, Timestamp _expiration, int _theme_id) {
 		logger.debug("SQLUpdateAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _number, _number_limit, _item_id, _position, _expiration, _theme_id);
 		Connection myConn = null;

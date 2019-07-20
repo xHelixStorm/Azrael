@@ -49,12 +49,13 @@ public class ShopExecution {
 			final var item = Integer.parseInt(_items[selection]);
 			var shopItem = RankingSystem.SQLgetSkinshopContentAndType(_e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(f -> f.getItemID() == item).findAny().orElse(null);
 			var defaultSkin = false;
+			var alreadyPurchased = false;
 			var terminator = "%";
 			if(guild_settings.getLevelDescription().equals(shopItem.getShopDescription()) || guild_settings.getRankDescription().equals(shopItem.getShopDescription()) || guild_settings.getProfileDescription().equals(shopItem.getShopDescription()) || guild_settings.getIconDescription().equals(shopItem.getShopDescription())) {
 				defaultSkin = true;
 			}
 			if(RankingSystem.SQLgetItemIDAndSkinType(_e.getMember().getUser().getIdLong(), _e.getGuild().getIdLong(), shopItem.getShopDescription(), guild_settings.getThemeID()) != null && !shopItem.getSkinType().equals("ite")) {
-				defaultSkin = true;
+				alreadyPurchased = true;
 			}
 			EmbedBuilder embed = new EmbedBuilder();
 			if(shopItem.getThumbnail().contains("http"))
@@ -63,12 +64,18 @@ public class ShopExecution {
 			if(defaultSkin) {
 				terminator = "$";
 				embed.setColor(Color.YELLOW);
-				embed.addField("Return", "", false);
+				embed.addField("Return", "Skin selection page", false);
+			}
+			else if(alreadyPurchased) {
+				terminator = "#";
+				embed.setColor(Color.YELLOW);
+				embed.addField("Sell", (shopItem.getPrice()/10)+" "+guild_settings.getCurrency(), true);
+				embed.addField("Return", "Skin selection page", true);
 			}
 			else {
 				embed.setColor(Color.BLUE);
-				embed.addField("Purchase", "", true);
-				embed.addField("Return", "", true);
+				embed.addField("Purchase", shopItem.getPrice()+" "+guild_settings.getCurrency(), true);
+				embed.addField("Return", "Skin selection page", true);
 			}
 			_e.getTextChannel().sendMessage(embed.build()).queue();
 			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, _type, shopItem.getItemID()+terminator));
@@ -126,8 +133,8 @@ public class ShopExecution {
 				embed.setThumbnail(shopItem.getThumbnail());
 			embed.setDescription("**"+shopItem.getDescription()+" "+shopItem.getStatDescription()+"**\n"+(shopItem.getFullDescription() != null && shopItem.getFullDescription().length() > 0 ? shopItem.getFullDescription() : ""));
 			embed.setColor(Color.BLUE);
-			embed.addField("Purchase", "", true);
-			embed.addField("Return", "", true);
+			embed.addField("Purchase", shopItem.getPrice()+" "+guild_settings.getCurrency(), true);
+			embed.addField("Return", "Return to weapon selection", true);
 			_e.getTextChannel().sendMessage(embed.build()).queue();
 			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, _type, shopItem.getWeaponID()+"%"));
 		}
@@ -168,7 +175,7 @@ public class ShopExecution {
 				embed.setThumbnail(shopItem.getThumbnail());
 			embed.setDescription("**"+shopItem.getDescription()+"**\n"+(shopItem.getFullDescription() != null && shopItem.getFullDescription().length() > 0 ? shopItem.getFullDescription() : ""));
 			embed.setColor(Color.BLUE);
-			embed.addField("Purchase", "", true);
+			embed.addField("Purchase", shopItem.getPrice()+" "+guild_settings.getCurrency(), true);
 			embed.addField("Return", "", true);
 			_e.getTextChannel().sendMessage(embed.build()).queue();
 			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, "ski", shopItem.getSkillId()+"%"));

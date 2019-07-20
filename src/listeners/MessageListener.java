@@ -134,14 +134,17 @@ public class MessageListener extends ListenerAdapter{
 						ShopExecution.displaySkills(e, guild_settings);
 					}
 				}
-				else if(shop.getAdditionalInfo().matches("(lev|ran|pro|ico|ite)") && !shop.getAdditionalInfo2().contains("%") && !shop.getAdditionalInfo2().contains("$")) {
+				else if(shop.getAdditionalInfo().matches("(lev|ran|pro|ico|ite)") && !shop.getAdditionalInfo2().contains("%") && !shop.getAdditionalInfo2().contains("$") && !shop.getAdditionalInfo2().contains("#")) {
 					if(!message.matches("[^\\d]*") && message.length() <= 9) {
 						ShopExecution.displaySingleItem(e, shop.getAdditionalInfo(), shop.getAdditionalInfo2().split("-"), guild_settings, Integer.parseInt(message)-1);
 					}
 				}
-				else if(shop.getAdditionalInfo().matches("(lev|ran|pro|ico|ite)") && (shop.getAdditionalInfo2().contains("%") || shop.getAdditionalInfo2().contains("$"))) {
+				else if(shop.getAdditionalInfo().matches("(lev|ran|pro|ico|ite)") && (shop.getAdditionalInfo2().contains("%") || shop.getAdditionalInfo2().contains("$") || shop.getAdditionalInfo2().contains("#"))) {
 					if(message.equalsIgnoreCase("purchase") && shop.getAdditionalInfo2().contains("%")) {
 						PurchaseExecution.purchase(e, shop.getAdditionalInfo(), shop.getAdditionalInfo2().replaceAll("%", ""), guild_settings);
+					}
+					else if(message.equalsIgnoreCase("sell") && shop.getAdditionalInfo2().contains("#")) {
+						PurchaseExecution.sell(e, shop.getAdditionalInfo(), shop.getAdditionalInfo2().replaceAll("#", ""), guild_settings);
 					}
 					else if(message.equalsIgnoreCase("return")) {
 						switch(shop.getAdditionalInfo()) {

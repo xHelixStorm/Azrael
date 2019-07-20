@@ -109,6 +109,53 @@ public class PurchaseExecution {
 		}
 	}
 	
+	public static void sell(MessageReceivedEvent e, final String type, final String item_number, Guilds guild_settings) {
+		Logger logger = LoggerFactory.getLogger(PurchaseExecution.class);
+		final var item_id = Integer.parseInt(item_number);
+		var user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
+		if(!type.equals("wep") && !type.equals("ski")) {
+			var skin = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(s -> s.getItemID() == item_id).findAny().orElse(null);
+			var newCurrency = user_details.getCurrency()+(skin.getPrice()/10);
+			if(RankingSystem.SQLUpdateCurrencyAndRemoveInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), newCurrency, skin.getItemID(), guild_settings.getThemeID()) > 0) {
+				user_details.setCurrency(newCurrency);
+				if(user_details.getLevelDescription().equals(skin.getShopDescription())) {
+					user_details.setLevelDescription(guild_settings.getLevelDescription());
+					if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID()) == 0) {
+						e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized level up skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
+						logger.error("The RankingSystem.users table couldn't be updated with the default level up skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+					}
+				}
+				if(user_details.getRankDescription().equals(skin.getShopDescription())) {
+					user_details.setRankDescription(guild_settings.getRankDescription());
+					if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getRankID()) == 0) {
+						e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized rank skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
+						logger.error("The RankingSystem.users table couldn't be updated with the default rank skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+					}
+				}
+				if(user_details.getProfileDescription().equals(skin.getShopDescription())) {
+					user_details.setProfileDescription(guild_settings.getProfileDescription());
+					if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getProfileID()) == 0) {
+						e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized profile skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
+						logger.error("The RankingSystem.users table couldn't be updated with the default profile skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+					}
+				}
+				if(user_details.getIconDescription().equals(skin.getShopDescription())) {
+					user_details.setIconDescription(guild_settings.getIconDescription());
+					if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getIconID()) == 0) {
+						e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized icon skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
+						logger.error("The RankingSystem.users table couldn't be updated with the default icon skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+					}
+				}
+				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
+				e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Item has been sold succesfully").build()).queue();
+				returnSkinMenu(e, guild_settings, type);
+			}
+			else {
+				returnSkinMenu(e, guild_settings, type);
+			}
+		}
+	}
+	
 	@SuppressWarnings("preview")
 	private static void returnSkinMenu(MessageReceivedEvent e, Guilds guild_settings, final String type) {
 		switch(type) {
