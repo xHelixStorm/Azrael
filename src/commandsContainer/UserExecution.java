@@ -13,6 +13,7 @@ import constructors.Guilds;
 import constructors.Messages;
 import constructors.Rank;
 import constructors.Ranks;
+import constructors.RejoinTask;
 import constructors.User;
 import core.Hashes;
 import core.UserPrivs;
@@ -631,9 +632,24 @@ public class UserExecution {
 					Hashes.addTempCache(key, cache);
 				}
 				else if(comment.equals("no")) {
-					_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getRoleById(DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut"))).queue();
-					_e.getTextChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
-					Hashes.clearTempCache(key);
+					var mute_role_id = DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut");
+					if(mute_role_id != 0) {
+						try {
+							var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
+							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id)).queue();
+							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "mute", (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "User has been muted with the bot command!"));
+							_e.getTextChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
+							Hashes.clearTempCache(key);
+						} catch(IllegalArgumentException iae) {
+							_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the mute role after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
+							cache.updateDescription("mute-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+							Hashes.addTempCache(key, cache);
+						}
+					}
+					else {
+						_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("No mute role has been registered! Please register a mute role before applying a mute on a user!").build()).queue();
+						Hashes.clearTempCache(key);
+					}
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("mute-time")) {
@@ -650,33 +666,58 @@ public class UserExecution {
 					}
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
+					var mute_role_id = DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut");
 					
-					_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getRoleById(DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut"))).queue();
-					if(cache.getAdditionalInfo2().length() > 0) {
-						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2());
-					}
-					else {
-						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", "User has been muted with the bot command!");
-					}
-					if(Azrael.SQLgetData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong()).getWarningID() != 0) {
-						if(Azrael.SQLUpdateUnmute(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), timestamp, unmute_timestamp, true, true) == 0) {
-							logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", cache.getAdditionalInfo().replaceAll("[^0-9]*", ""), _e.getGuild().getName());
-							_e.getTextChannel().sendMessage("An internal error occurred. The unmute time couldn't be updated on Azrael.bancollect").queue();
+					if(mute_role_id != 0) {
+						try {
+							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getRoleById(mute_role_id)).queue();
+							if(cache.getAdditionalInfo2().length() > 0) {
+								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2());
+							}
+							else {
+								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", "User has been muted with the bot command!");
+							}
+							if(Azrael.SQLgetData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong()).getWarningID() != 0) {
+								if(Azrael.SQLUpdateUnmute(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), timestamp, unmute_timestamp, true, true) == 0) {
+									logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", cache.getAdditionalInfo().replaceAll("[^0-9]*", ""), _e.getGuild().getName());
+									_e.getTextChannel().sendMessage("An internal error occurred. The unmute time couldn't be updated on Azrael.bancollect").queue();
+								}
+							}
+							else {
+								if(Azrael.SQLInsertData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), 1, 1, timestamp, unmute_timestamp, true, true) == 0) {
+									logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+									_e.getTextChannel().sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
+								}
+							}
+							_e.getTextChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
+							logger.debug("{} has muted {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+							Hashes.clearTempCache(key);
+							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+cache.getAdditionalInfo().replaceAll("[^0-9]*", ""), new Cache(""+mute_time));
+						} catch(IllegalArgumentException iae) {
+							_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the mute role after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
+							cache.updateDescription("mute-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000).updateDescription3(""+mute_time);
+							Hashes.addTempCache(key, cache);
 						}
 					}
 					else {
-						if(Azrael.SQLInsertData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), 1, 1, timestamp, unmute_timestamp, true, true) == 0) {
-							logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
-							_e.getTextChannel().sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
-						}
+						_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("No mute role has been registered! Please register a mute role before applying a mute on a user!").build()).queue();
+						Hashes.clearTempCache(key);
 					}
-					_e.getTextChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
-					logger.debug("{} has muted {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
-					Hashes.clearTempCache(key);
-					Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+cache.getAdditionalInfo().replaceAll("[^0-9]*", ""), new Cache(""+mute_time));
 				}
 				else {
 					_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a numerical value in minutes!").queue();
+				}
+			}
+			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("mute-delay")) {
+				if(_message.equalsIgnoreCase("yes")) {
+					_e.getTextChannel().sendMessage(message.setDescription("Mute reminder has been set!").build()).queue();
+					var user_id = cache.getAdditionalInfo().replaceAll("[^0-9]*", "");
+					Hashes.addRejoinTask(_e.getGuild().getId()+"_"+user_id, new RejoinTask(Long.parseLong(user_id), _e.getGuild().getIdLong(), cache.getAdditionalInfo3(), "mute", cache.getAdditionalInfo2()));
+					Hashes.clearTempCache(key);
+				}
+				else if(_message.equalsIgnoreCase("no")) {
+					_e.getTextChannel().sendMessage(message.setDescription("Action aborted!").build()).queue();
+					Hashes.clearTempCache(key);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban")) {
@@ -689,41 +730,67 @@ public class UserExecution {
 				else if(comment.equals("no")) {
 					int warning_id = Azrael.SQLgetData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong()).getWarningID();
 					int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
-					if(warning_id == max_warning_id) {
-						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-						denied.setThumbnail(IniFileReader.getBanThumbnail()).setTitle("User Banned!");
-						var log_channel = Azrael.SQLgetChannels(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
-						if(log_channel != null) {_e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(denied.setDescription("["+timestamp.toString()+"] **" + _e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getName()+"#"+_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getDiscriminator() + " with the ID Number " + cache.getAdditionalInfo().replaceAll("[^0-9]*", "") + " Has been banned after reaching the limit of allowed mutes on this server!**\nReason: User has been banned with the bot command!").build()).queue();}
+					try {
 						PrivateChannel pc = _e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().openPrivateChannel().complete();
-						pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
-								+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
-						pc.close();
+						if(warning_id == max_warning_id) {
+							pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
+									+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
+							pc.close();
+						}
+						else {
+							pc.sendMessage("You have been banned from "+_e.getGuild().getName()+". Thank you for your understanding.\n"
+									+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
+							pc.close();
+						}
+						_e.getTextChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
+						_e.getGuild().ban(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), 0).reason("User has been banned with the bot command!").queue();
+						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", "User has been banned with the bot command!");
 						logger.debug("{} has banned {} from guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+						Hashes.clearTempCache(key);
+					} catch(IllegalArgumentException | NullPointerException iae) {
+						_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the ban after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
+						cache.updateDescription("ban-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 					}
-					_e.getTextChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
-					_e.getGuild().ban(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), 0).reason("User has been banned with the bot command!").queue();
-					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", "User has been banned with the bot command!");
-					Hashes.clearTempCache(key);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban-reason")) {
 				int warning_id = Azrael.SQLgetData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong()).getWarningID();
 				int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
-				if(warning_id == max_warning_id) {
-					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-					denied.setThumbnail(IniFileReader.getBanThumbnail()).setTitle("User Banned!");
-					var log_channel = Azrael.SQLgetChannels(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
-					if(log_channel != null) {_e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(denied.setDescription("["+timestamp.toString()+"] **" + _e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getName()+"#"+_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getDiscriminator() + " with the ID Number " + cache.getAdditionalInfo().replaceAll("[^0-9]*", "") + " Has been banned after reaching the limit of allowed mutes on this server!**\nReason: "+_message).build()).queue();}
+				try {
 					PrivateChannel pc = _e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().openPrivateChannel().complete();
-					pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
-							+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
-					pc.close();
+					if(warning_id == max_warning_id) {
+						pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
+								+ "On an important note, this is an automatic reply. You'll receive no reply in any way.").queue();
+						pc.close();
+					}
+					else {
+						pc.sendMessage("You have been banned from "+_e.getGuild().getName()+". Thank you for your understanding.\n"
+								+ "On an important note, this is an automatic reply. You'll receive no reply in any way.").queue();
+						pc.close();
+					}
 					_e.getTextChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
+					_e.getGuild().ban(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), 0).reason(_message).queue();
+					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", _message);
 					logger.debug("{} has banned {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+					Hashes.clearTempCache(key);
+				} catch(IllegalArgumentException | NullPointerException iae) {
+					_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the ban after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
+					cache.updateDescription("ban-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000).updateDescription2(_message);
+					Hashes.addTempCache(key, cache);
 				}
-				_e.getGuild().ban(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), 0).reason(_message).queue();
-				Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", _message);
-				Hashes.clearTempCache(key);
+			}
+			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban-delay")) {
+				if(_message.equalsIgnoreCase("yes")) {
+					_e.getTextChannel().sendMessage(message.setDescription("Ban reminder has been set!").build()).queue();
+					var user_id = cache.getAdditionalInfo().replaceAll("[^0-9]*", "");
+					Hashes.addRejoinTask(_e.getGuild().getId()+"_"+user_id, new RejoinTask(Long.parseLong(user_id), _e.getGuild().getIdLong(), "", "ban", cache.getAdditionalInfo2()));
+					Hashes.clearTempCache(key);
+				}
+				else if(_message.equalsIgnoreCase("no")) {
+					_e.getTextChannel().sendMessage(message.setDescription("Action aborted!").build()).queue();
+					Hashes.clearTempCache(key);
+				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("kick")) {
 				if(comment.equals("yes")) {
@@ -734,17 +801,25 @@ public class UserExecution {
 				}
 				else if(comment.equals("no")) {
 					_e.getTextChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
-					_e.getGuild().kick(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""))).reason("User has been kicked with the bot command!").queue();
-					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", "User has been kicked with the bot command!");
-					logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+					try {
+						_e.getGuild().kick(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""))).reason("User has been kicked with the bot command!").queue();
+						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", "User has been kicked with the bot command!");
+						logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+					} catch(IllegalArgumentException iae) {
+						_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed because the user can't be found on the server!").build()).queue();
+					}
 					Hashes.clearTempCache(key);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("kick-reason")) {
 				_e.getTextChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
-				_e.getGuild().kick(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""))).reason(_message).queue();
-				Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", _message);
-				logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+				try {
+					_e.getGuild().kick(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""))).reason(_message).queue();
+					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", _message);
+					logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+				} catch(IllegalArgumentException iae) {
+					_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed because the user can't be found on the server!").build()).queue();
+				}
 				Hashes.clearTempCache(key);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*",	"").equals("gift-experience")) {

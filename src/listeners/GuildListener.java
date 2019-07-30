@@ -1,12 +1,14 @@
 package listeners;
 
 import java.awt.Color;
+import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Bancollect;
+import constructors.Cache;
 import constructors.Guilds;
 import constructors.Rank;
 import core.Hashes;
@@ -45,11 +47,7 @@ public class GuildListener extends ListenerAdapter {
 		Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 		if(guild_settings.getRankingState() == true) {
 			if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
-				if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, 50000, 0) == 0) {
-					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **RankingSystem.user_details** table").build()).queue();
-					logger.error("Failed to insert joined user into RankingSystem.user_details");
-					RankingSystem.SQLInsertActionLog("high", user_id, guild_id, "User wasn't inserted into user_details table", "This user couldn't be inserted into the user_details table. Please verify and eventually insert it manually into the table!");
-				}
+				RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, 50000, 0);
 			}
 			else {
 				if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **RankingSystem.users** table").build()).queue();
@@ -73,63 +71,100 @@ public class GuildListener extends ListenerAdapter {
 		if((unmute - currentTime) > 0 && muted) {
 			e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
 		}
-		else{
+		else {
 			if(guild_settings.getRankingState()) {
 				Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
 				if(user_details.getCurrentRole() != 0) {e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(user_details.getCurrentRole())).queue();}
 			}
 		}
 		
-		String nickname = null;
-		String lc_user_name = user_name.toLowerCase();
-		check: for(String name : Azrael.SQLgetStaffNames(guild_id)) {
-			if(lc_user_name.matches(name+"#[0-9]{4}")) {
-				nick_assign.setColor(Color.RED).setTitle("Impersonation attempt found!").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
-				nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
-				e.getGuild().modifyNickname(e.getMember(), nickname).queue();
-				if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server and tried to impersonate a staff member. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
-				logger.info("Impersonation attempt found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
-				badName = true;
-				break check;
-			}
-		}
-		if(badName == false) {
-			Azrael.SQLgetNameFilter(e.getGuild().getIdLong());
-			check: for(var word : Hashes.getNameFilter(guild_id)) {
-				if(lc_user_name.contains(word.getName())) {
-					if(!word.getKick()) {
-						nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
-						e.getGuild().modifyNickname(e.getMember(), nickname).queue();
-						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
-						logger.info("Improper name found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
-						badName = true;
+		var rejoinAction = Hashes.getRejoinTask(e.getGuild().getId()+"_"+e.getMember().getUser().getId());
+		if(rejoinAction != null) {
+			if(rejoinAction.getType().equals("mute")) {
+				if(rejoinAction.getInfo().length() == 0) {
+					e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
+					Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "User has been muted with the bot command!"));
+				}
+				else {
+					var mute_time = Long.parseLong(rejoinAction.getInfo());
+					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+					Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
+					e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
+					Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "User has been muted with the bot command!"));
+					if(Azrael.SQLgetData(user_id, guild_id).getWarningID() != 0) {
+						if(Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp, unmute_timestamp, true, true) == 0) {
+							logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, guild_id);
+							if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The unmute time couldn't be updated on Azrael.bancollect").queue();
+						}
 					}
 					else {
-						e.getMember().getUser().openPrivateChannel().complete().sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").complete();
-						e.getGuild().kick(e.getMember()).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
-						nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("User kicked for having a not allowed name!");
-						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. The user has been kicked automatically from the server due to this word: **"+word.getName().toUpperCase()+"**").build()).queue();
+						if(Azrael.SQLInsertData(user_id, guild_id, 1, 1, timestamp, unmute_timestamp, true, true) == 0) {
+							logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", user_id, guild_id);
+							if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
+						}
 					}
+					Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time));
+				}
+			}
+			else if(rejoinAction.getType().equals("ban")) {
+				e.getUser().openPrivateChannel().complete().sendMessage("You have been banned from "+e.getGuild().getName()+". Thank you for your understanding.\n"
+						+ "On an important note, this is an automatic reply. You'll receive no reply in any way.").queue();
+				e.getGuild().ban(e.getMember(), 0).reason((rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "User has been banned with the bot command!")).queue();
+				Azrael.SQLInsertHistory(user_id, guild_id, "ban", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "User has been banned with the bot command!"));
+			}
+		}
+		else {
+			String nickname = null;
+			String lc_user_name = user_name.toLowerCase();
+			check: for(String name : Azrael.SQLgetStaffNames(guild_id)) {
+				if(lc_user_name.matches(name+"#[0-9]{4}")) {
+					nick_assign.setColor(Color.RED).setTitle("Impersonation attempt found!").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
+					nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
+					e.getGuild().modifyNickname(e.getMember(), nickname).queue();
+					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server and tried to impersonate a staff member. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
+					logger.info("Impersonation attempt found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+					badName = true;
 					break check;
 				}
 			}
-		}
-		if(badName == false) {
-			Azrael.SQLDeleteNickname(user_id, guild_id);
-		}
-		else {
-			if(Azrael.SQLgetNickname(user_id, guild_id).length() > 0 && nickname != null) {
-				if(Azrael.SQLUpdateNickname(user_id, guild_id, nickname) == 0) {
-					logger.error("User nickname of {} couldn't be updated in Azrael.nickname", user_id);
+			if(badName == false) {
+				Azrael.SQLgetNameFilter(e.getGuild().getIdLong());
+				check: for(var word : Hashes.getNameFilter(guild_id)) {
+					if(lc_user_name.contains(word.getName())) {
+						if(!word.getKick()) {
+							nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
+							e.getGuild().modifyNickname(e.getMember(), nickname).queue();
+							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
+							logger.info("Improper name found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+							badName = true;
+						}
+						else {
+							e.getMember().getUser().openPrivateChannel().complete().sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").complete();
+							e.getGuild().kick(e.getMember()).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
+							nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("User kicked for having a not allowed name!");
+							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. The user has been kicked automatically from the server due to this word: **"+word.getName().toUpperCase()+"**").build()).queue();
+						}
+						break check;
+					}
 				}
 			}
-			else if(nickname != null) {
-				if(Azrael.SQLInsertNickname(user_id, guild_id, nickname) == 0) {
-					logger.error("User nickname of {} couldn't be inserted into Azrael.nickname", user_id);
-				}
+			if(badName == false) {
+				Azrael.SQLDeleteNickname(user_id, guild_id);
 			}
-			logger.debug("{} received the nickname {} in guild {}", e.getUser().getId(), nickname, e.getGuild().getName());
-			Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild_id, nickname);
+			else {
+				if(Azrael.SQLgetNickname(user_id, guild_id).length() > 0 && nickname != null) {
+					if(Azrael.SQLUpdateNickname(user_id, guild_id, nickname) == 0) {
+						logger.error("User nickname of {} couldn't be updated in Azrael.nickname", user_id);
+					}
+				}
+				else if(nickname != null) {
+					if(Azrael.SQLInsertNickname(user_id, guild_id, nickname) == 0) {
+						logger.error("User nickname of {} couldn't be inserted into Azrael.nickname", user_id);
+					}
+				}
+				logger.debug("{} received the nickname {} in guild {}", e.getUser().getId(), nickname, e.getGuild().getName());
+				Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild_id, nickname);
+			}
 		}
 		
 		Azrael.SQLInsertActionLog("GUILD_MEMBER_JOIN", user_id, guild_id, user_name);

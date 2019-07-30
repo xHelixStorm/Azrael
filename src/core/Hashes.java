@@ -17,6 +17,7 @@ import constructors.Quizes;
 import constructors.RSS;
 import constructors.Rank;
 import constructors.Ranks;
+import constructors.RejoinTask;
 import constructors.Roles;
 import constructors.Skills;
 import constructors.Skins;
@@ -70,6 +71,7 @@ public class Hashes {
     private static final ConcurrentHashMap<String, String> commentedUsers = new ConcurrentHashMap<String, String>();
     private static final ConcurrentHashMap<String, Cache> tempCache = new ConcurrentHashMap<String, Cache>();
     private static final Map<Long, ArrayList<Skills>> skillShop = new HashMap<Long, ArrayList<Skills>>();
+    private static final Map<String, RejoinTask> rejoinTask = new HashMap<String, RejoinTask>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -151,6 +153,9 @@ public class Hashes {
 	}
 	public static void addSkillShop(Long _key, ArrayList<Skills> skill) {
 		skillShop.put(_key, skill);
+	}
+	public static void addRejoinTask(String _key, RejoinTask task) {
+		rejoinTask.put(_key, task);
 	}
 	
 	
@@ -244,6 +249,9 @@ public class Hashes {
 	public static ArrayList<Skills> getSkillShop(Long _key) {
 		return skillShop.get(_key);
 	}
+	public static RejoinTask getRejoinTask(String _key) {
+		return rejoinTask.get(_key);
+	}
 	
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
@@ -336,5 +344,8 @@ public class Hashes {
 	}
 	public static void clearSkillShop() {
 		skillShop.clear();
+	}
+	public static void removeRejoinTask(String _key) {
+		rejoinTask.remove(_key);
 	}
 }

@@ -4,12 +4,14 @@ public class Cache {
 	private long expiration;
 	private String additionalInfo;
 	private String additionalInfo2;
+	private String additionalInfo3;
 	private boolean expire;
 	
 	public Cache(long _expiration) {
 		this.expiration = System.currentTimeMillis() + _expiration;
 		this.additionalInfo = "";
 		this.additionalInfo2 = "";
+		this.additionalInfo3 = "";
 		this.expire = true;
 	}
 	
@@ -17,6 +19,7 @@ public class Cache {
 		this.expiration = System.currentTimeMillis() + _expiration;
 		this.additionalInfo = _additionalInfo;
 		this.additionalInfo2 = "";
+		this.additionalInfo3 = "";
 		this.expire = true;
 	}
 	
@@ -24,6 +27,7 @@ public class Cache {
 		this.expiration = System.currentTimeMillis() + _expiration;
 		this.additionalInfo = _additionalInfo;
 		this.additionalInfo2 = _additionalInfo2;
+		this.additionalInfo3 = "";
 		this.expire = true;
 	}
 	
@@ -31,6 +35,7 @@ public class Cache {
 		this.expiration = System.currentTimeMillis();
 		this.additionalInfo = _additionalInfo;
 		this.additionalInfo2 = "";
+		this.additionalInfo3 = "";
 		this.expire = false;
 	}
 	
@@ -42,6 +47,9 @@ public class Cache {
 	}
 	public String getAdditionalInfo2() {
 		return additionalInfo2;
+	}
+	public String getAdditionalInfo3() {
+		return additionalInfo3;
 	}
 	public boolean getExpire() {
 		return expire;
@@ -57,6 +65,10 @@ public class Cache {
 	}
 	public Cache updateDescription2(String description) {
 		this.additionalInfo2 = description;
+		return this;
+	}
+	public Cache updateDescription3(String description) {
+		this.additionalInfo3 = description;
 		return this;
 	}
 }
