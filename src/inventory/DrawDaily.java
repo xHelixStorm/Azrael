@@ -22,7 +22,7 @@ public class DrawDaily {
 	public static void draw(MessageReceivedEvent _e, String _reward, int theme_id) {
 		try {
 			BufferedImage daily = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/daily_blank.png"));
-			BufferedImage reward = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"Dailies/"+_reward+".png"));
+			BufferedImage reward = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/"+_reward+".png"));
 			
 			int [] dail = GuildIni.getWholeDaily(_e.getGuild().getIdLong());
 			final int rewardX = dail[0];

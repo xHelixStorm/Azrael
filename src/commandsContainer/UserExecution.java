@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import sql.RankingSystem;
 import sql.DiscordRoles;
@@ -751,6 +752,9 @@ public class UserExecution {
 						_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the ban after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
 						cache.updateDescription("ban-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
+					} catch(HierarchyException hye) {
+						_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The user you tried to ban has higher privileges than the bot. Action aborted!").build()).queue();
+						Hashes.clearTempCache(key);
 					}
 				}
 			}
@@ -778,6 +782,9 @@ public class UserExecution {
 					_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the ban after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
 					cache.updateDescription("ban-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000).updateDescription2(_message);
 					Hashes.addTempCache(key, cache);
+				} catch(HierarchyException hye) {
+					_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The user you tried to ban has higher privileges than the bot. Action aborted!").build()).queue();
+					Hashes.clearTempCache(key);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban-delay")) {

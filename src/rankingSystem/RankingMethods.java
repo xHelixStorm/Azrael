@@ -31,7 +31,7 @@ public class RankingMethods extends ListenerAdapter{
 	
 	public static void getRankUp(MessageReceivedEvent e , int _level, int _level_skin, int _icon_skin, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id){		
 		try {
-			BufferedImage rankUp = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"Skins/levelup"+_level_skin+"_blank.png"));
+			BufferedImage rankUp = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/levelup"+_level_skin+"_blank.png"));
 			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+_icon_skin+"_"+_level+".png"));
 			String name = e.getMember().getEffectiveName();
 			int characterCounter = name.length();
