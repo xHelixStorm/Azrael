@@ -11,18 +11,19 @@ import org.jpaste.pastebin.account.PastebinAccount;
 import org.jpaste.pastebin.exceptions.LoginException;
 
 import fileManagement.GuildIni;
+import fileManagement.IniFileReader;
 
 public class Pastebin {
 	public static String unlistedPaste(String _title, String _contents, long guild_id) {
 		String return_link = "";
 		try {
-			String[] credentials = GuildIni.getWholePastebin(guild_id);
+			String[] credentials = GuildIni.getPastebinCredentials(guild_id);
 			
 			String title = _title; // insert your own title
 			String contents = _contents; // insert your own paste contents
 			int visibility = PastebinPaste.VISIBILITY_UNLISTED; // makes paste unlisted
 			
-			PastebinAccount account = new PastebinAccount(credentials[0], credentials[1], credentials[2]);
+			PastebinAccount account = new PastebinAccount(IniFileReader.getPastebinDeveloperKey(), credentials[0], credentials[1]);
 			// fetches an user session id
 			account.login();
 			
@@ -45,13 +46,13 @@ public class Pastebin {
 	public static String unlistedPermanentPaste(String _title, String _contents, long guild_id) {
 		String return_link = "";
 		try {
-			String[] credentials = GuildIni.getWholePastebin(guild_id);
+			String[] credentials = GuildIni.getPastebinCredentials(guild_id);
 			
 			String title = _title; // insert your own title
 			String contents = _contents; // insert your own paste contents
 			int visibility = PastebinPaste.VISIBILITY_UNLISTED; // makes paste unlisted
 			
-			PastebinAccount account = new PastebinAccount(credentials[0], credentials[1], credentials[2]);
+			PastebinAccount account = new PastebinAccount(IniFileReader.getPastebinDeveloperKey(), credentials[0], credentials[1]);
 			// fetches an user session id
 			account.login();
 			

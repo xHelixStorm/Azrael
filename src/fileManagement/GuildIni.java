@@ -26,7 +26,6 @@ public class GuildIni {
 			ini.add("General", "OverrideBan", "false");
 			
 			//Pastebin
-			ini.add("Pastebin", "Key", "");
 			ini.add("Pastebin", "Username", "");
 			ini.add("Pastebin", "Password", "");
 			
@@ -271,13 +270,12 @@ public class GuildIni {
 		return ini.get("General", "OverrideBan", boolean.class);
 	}
 	
-	public static String[] getWholePastebin(long guild_id) {
+	public static String[] getPastebinCredentials(long guild_id) {
 		Ini ini = readIni(guild_id);
 		Ini.Section pastebin = ini.get("Pastebin");
-		String[] credentials = new String[3];
-		credentials[0] = pastebin.get("Key");
-		credentials[1] = pastebin.get("Username");
-		credentials[2] = pastebin.get("Password");
+		String[] credentials = new String[2];
+		credentials[0] = pastebin.get("Username");
+		credentials[1] = pastebin.get("Password");
 		return credentials;
 	}
 	

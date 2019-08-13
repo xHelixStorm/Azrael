@@ -51,6 +51,11 @@ public class IniFileReader {
 		return ini.get("Bot", "TempDirectory");
 	}
 	
+	public static String getPastebinDeveloperKey() {
+		readConfig();
+		return ini.get("Pastebin", "DeveloperKey");
+	}
+	
 	public static boolean getDoubleExpEnabled() {
 		readConfig();
 		return ini.get("DoubleExperience", "Enabled", boolean.class);
