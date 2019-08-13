@@ -1,9 +1,12 @@
 package commandsContainer;
 
 import java.awt.Color;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jpaste.exceptions.PasteException;
+import org.jpaste.pastebin.exceptions.LoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,14 +159,14 @@ public class FilterExecution {
 								out.append(word.getName()+"\n");
 						}
 						if(out.length() > 0) {
-							String paste_link = Pastebin.unlistedPaste("Name filter", out.toString(), _e.getGuild().getIdLong());
-							if(!paste_link.equals("Creating paste failed!")) {
+							try {
+								String paste_link = Pastebin.unlistedPaste("Name filter", out.toString(), _e.getGuild().getIdLong());
 								message.setTitle("Name filter!");
 								out.setLength(0);
 								_e.getTextChannel().sendMessage(message.setDescription("Every name that includes one of this words, will receive a funny name: "+paste_link).build()).queue();
-							}
-							else {
-								message.setColor(Color.RED).setTitle(paste_link);
+							} catch (IllegalStateException | LoginException | PasteException e) {
+								logger.warn("Error on creating paste!", e);
+								message.setColor(Color.RED).setTitle("Creating paste failed!");
 								_e.getTextChannel().sendMessage(message.setDescription("An error occurred with posting on pastebin. Please verify that the login credentials are set correctly!").build()).queue();
 							}
 						}
@@ -206,14 +209,14 @@ public class FilterExecution {
 								out.append(word.getName()+"\n");
 						}
 						if(out.length() > 0) {
-							String paste_link = Pastebin.unlistedPaste("Name-kick filter", out.toString(), _e.getGuild().getIdLong());
-							if(!paste_link.equals("Creating paste failed!")) {
+							try {
+								String paste_link = Pastebin.unlistedPaste("Name-kick filter", out.toString(), _e.getGuild().getIdLong());
 								message.setTitle("Name-kick filter!");
 								out.setLength(0);
 								_e.getTextChannel().sendMessage(message.setDescription("Every name that includes one of this words, will be automatically kicked from the server: "+paste_link).build()).queue();
-							}
-							else {
-								message.setColor(Color.RED).setTitle(paste_link);
+							} catch (IllegalStateException | LoginException | PasteException e) {
+								logger.warn("Error on creating paste!", e);
+								message.setColor(Color.RED).setTitle("Creating paste failed!");
 								_e.getTextChannel().sendMessage(message.setDescription("An error occurred with posting on pastebin. Please verify that the login credentials are set correctly!").build()).queue();
 							}
 						}
@@ -255,20 +258,20 @@ public class FilterExecution {
 							out.append(word+"\n");
 						}
 						if(out.length() > 0) {
-							String paste_link = Pastebin.unlistedPaste("Funny names for the name filter", out.toString(), _e.getGuild().getIdLong());
-							if(!paste_link.equals("Creating paste failed!")) {
+							try {
+								String paste_link = Pastebin.unlistedPaste("Funny names for the name filter", out.toString(), _e.getGuild().getIdLong());
 								message.setTitle("Funny names!");
 								out.setLength(0);
 								_e.getTextChannel().sendMessage(message.setDescription("A user will receive one of these names, if the name filter gets triggered: "+paste_link).build()).queue();
-							}
-							else {
-								message.setColor(Color.RED).setTitle(paste_link);
+							} catch (IllegalStateException | LoginException | PasteException e) {
+								logger.warn("Error on creating paste!", e);
+								message.setColor(Color.RED).setTitle("Creating paste failed!");
 								_e.getTextChannel().sendMessage(message.setDescription("An error occurred with posting on pastebin. Please verify that the login credentials are set correctly!").build()).queue();
 							}
 						}
 						else {
 							message.setColor(Color.RED).setTitle("No results have been returned!");
-							_e.getTextChannel().sendMessage("The funny-names is empty! Nothing to display!").queue();
+							_e.getTextChannel().sendMessage("The funny-names list is empty! Nothing to display!").queue();
 						}
 						Hashes.clearTempCache(key);
 					}
@@ -304,14 +307,14 @@ public class FilterExecution {
 							out.append(word+"\n");
 						}
 						if(out.length() > 0) {
-							String paste_link = Pastebin.unlistedPaste("Staff names for the name filter", out.toString(), _e.getGuild().getIdLong());
-							if(!paste_link.equals("Creating paste failed!")) {
+							try {
+								String paste_link = Pastebin.unlistedPaste("Staff names for the name filter", out.toString(), _e.getGuild().getIdLong());
 								message.setTitle("Staff names!");
 								out.setLength(0);
 								_e.getTextChannel().sendMessage(message.setDescription("Here the list to censor names containing staff names: "+paste_link).build()).queue();
-							}
-							else {
-								message.setColor(Color.RED).setTitle(paste_link);
+							} catch (IllegalStateException | LoginException | PasteException e) {
+								logger.warn("Error on creating paste!", e);
+								message.setColor(Color.RED).setTitle("Creating paste failed!");
 								_e.getTextChannel().sendMessage(message.setDescription("An error occurred with posting on pastebin. Please verify that the login credentials are set correctly!").build()).queue();
 							}
 						}
@@ -451,8 +454,8 @@ public class FilterExecution {
 				}
 				case "load-name-filter", "add-load-name-filter" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
-						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
-						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
+						try {
+							String [] words = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
 							var querryResult = Azrael.SQLReplaceNameFilter(words, false, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								message.setTitle("Success!");
@@ -482,8 +485,8 @@ public class FilterExecution {
 								_e.getTextChannel().sendMessage(message.setDescription("A critical error occurred. The filter table has been altered but couldn't be reverted on error. Current filter data could have been lost!").build()).queue();
 								logger.error("Update on name-filter table couldn't be rolled back on error. Affected guild {}", _e.getGuild().getId());
 							}
-						}
-						else {
+						} catch (MalformedURLException | RuntimeException e) {
+							logger.error("Reading paste failed!", e);
 							message.setColor(Color.RED).setTitle("Invalid pastebin link!");
 							_e.getTextChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
 						}
@@ -520,8 +523,8 @@ public class FilterExecution {
 				}
 				case "load-name-kick", "add-load-name-kick" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
-						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
-						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
+						try {
+							String [] words = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
 							var querryResult = Azrael.SQLReplaceNameFilter(words, true, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								message.setTitle("Success!");
@@ -551,8 +554,8 @@ public class FilterExecution {
 								_e.getTextChannel().sendMessage(message.setDescription("A critical error occurred. The filter table has been altered but couldn't be reverted on error. Current filter data could have been lost!").build()).queue();
 								logger.error("Update on name-filter table couldn't be rolled back on error. Affected guild {}", _e.getGuild().getId());
 							}
-						}
-						else {
+						} catch (MalformedURLException | RuntimeException e) {
+							logger.error("Reading paste failed!", e);
 							message.setColor(Color.RED).setTitle("Invalid pastebin link!");
 							_e.getTextChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
 						}
@@ -589,8 +592,8 @@ public class FilterExecution {
 				}
 				case "load-funny-names", "add-load-funny-names" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
-						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
-						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
+						try {
+							String [] words = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
 							var querryResult = Azrael.SQLReplaceFunnyNames(words, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								message.setTitle("Success!");
@@ -620,8 +623,8 @@ public class FilterExecution {
 								_e.getTextChannel().sendMessage(message.setDescription("A critical error occurred. The filter table has been altered but couldn't be reverted on error. Current filter data could have been lost!").build()).queue();
 								logger.error("Update on funny-names table couldn't be rolled back on error. Affected guild {}", _e.getGuild().getId());
 							}
-						}
-						else {
+						} catch (MalformedURLException | RuntimeException e) {
+							logger.error("Reading paste failed!", e);
 							message.setColor(Color.RED).setTitle("Invalid pastebin link!");
 							_e.getTextChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
 						}
@@ -658,8 +661,8 @@ public class FilterExecution {
 				}
 				case "load-staff-names", "add-load-staff-names" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
-						String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
-						if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
+						try {
+							String [] words = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
 							var querryResult = Azrael.SQLReplaceStaffNames(words, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								message.setTitle("Success!");
@@ -689,8 +692,8 @@ public class FilterExecution {
 								_e.getTextChannel().sendMessage(message.setDescription("A critical error occurred. The staf-names table has been altered but couldn't be reverted on error. Current names data could have been lost!").build()).queue();
 								logger.error("Update on staff-names table couldn't be rolled back on error. Affected guild {}", _e.getGuild().getId());
 							}
-						}
-						else {
+						} catch (MalformedURLException | RuntimeException e) {
+							logger.error("Reading paste failed!", e);
 							message.setColor(Color.RED).setTitle("Invalid pastebin link!");
 							_e.getTextChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
 						}
@@ -724,15 +727,14 @@ public class FilterExecution {
 			out.append(word+"\n");
 		}
 		if(out.length() > 0) {
-			String paste_link = Pastebin.unlistedPaste(definitiveLang+" word filter", out.toString(), _e.getGuild().getIdLong());
-			if(!paste_link.equals("Creating paste failed!")) {
+			try {
+				String paste_link = Pastebin.unlistedPaste(definitiveLang+" word filter", out.toString(), _e.getGuild().getIdLong());
 				message.setTitle(definitiveLang+" word filter!");
 				out.setLength(0);
 				_e.getTextChannel().sendMessage(message.setDescription("Here is the requested word filter: "+paste_link).build()).queue();
 				logger.debug("{} has called the "+lang+" word filter", _e.getMember().getUser().getIdLong());
-			}
-			else {
-				message.setColor(Color.RED).setTitle(paste_link);
+			} catch (IllegalStateException | LoginException | PasteException e) {
+				message.setColor(Color.RED).setTitle("Creating paste failed!");
 				_e.getTextChannel().sendMessage(message.setDescription("An error occurred with posting on pastebin. Please verify that the login credentials are set correctly!").build()).queue();
 			}
 		}
@@ -778,8 +780,9 @@ public class FilterExecution {
 	private static void loadLangWords(MessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String key, final String lang, String _message, boolean replace) {
 		if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 			var langAbbreviation = lang.substring(0, 3);
-			String [] words = Pastebin.readPublicPasteLink(_message, _e.getGuild().getIdLong()).split("[\\r\\n]+");
-			if(!words[0].equals("Reading paste failed!") && !words[0].equals("Error with this ID!")) {
+			String[] words;
+			try {
+				words = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
 				var querryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, _e.getGuild().getIdLong(), replace);
 				if(querryResult == 0) {
 					message.setTitle("Success!");
@@ -810,8 +813,8 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setDescription("A critical error occurred. The filter table has been altered but couldn't be reverted on error. Current filter data could have been lost!").build()).queue();
 					logger.error("Update on filter table couldn't be rolled back on error. Affected language is {} for guild {}", lang, _e.getGuild().getId());
 				}
-			}
-			else {
+			} catch (MalformedURLException | RuntimeException e) {
+				logger.error("Reading paste failed!", e);
 				message.setColor(Color.RED).setTitle("Invalid pastebin link!");
 				_e.getTextChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
 			}

@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import org.jpaste.exceptions.PasteException;
+import org.jpaste.pastebin.exceptions.LoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,11 +161,12 @@ public class UserExecution {
 								try {
 									message.setColor(Color.BLUE).setTitle("USED NAMES").setDescription(out.toString());
 								} catch(IllegalArgumentException iae2) {
-									var pastebin_link = Pastebin.unlistedPaste("USED NAMES", out.toString(), _e.getGuild().getIdLong());
-									if(!pastebin_link.equals("Creating paste failed!"))
+									try {
+										String pastebin_link = Pastebin.unlistedPaste("USED NAMES", out.toString(), _e.getGuild().getIdLong());
 										message.setColor(Color.BLUE).setTitle("USED NAMES").setDescription("Names posted on Pastebin as unlisted: "+pastebin_link);
-									else {
-										message.setColor(Color.BLUE).setTitle("USED NAMES").setDescription("Names couldn't be displayed because it exceeded the limit of characters. Please bind the bot with a Pastebin account to display the names on Pastebin!");
+									} catch (IllegalStateException | LoginException | PasteException e) {
+										logger.warn("Error on creating paste!", e);
+										message.setColor(Color.RED).setTitle("USED NAMES").setDescription("Names couldn't be displayed because it exceeded the limit of characters. Please bind the bot with a Pastebin account to display the names on Pastebin!");
 									}
 								}
 								_e.getTextChannel().sendMessage(message.build()).queue();
@@ -175,11 +178,12 @@ public class UserExecution {
 								try {
 									message.setColor(Color.BLUE).setTitle("USED NICKNAMES").setDescription(out.toString());
 								} catch(IllegalArgumentException iae2) {
-									var pastebin_link = Pastebin.unlistedPaste("USED NICKNAMES", out.toString(), _e.getGuild().getIdLong());
-									if(!pastebin_link.equals("Creating paste failed!"))
+									try {
+										String pastebin_link = Pastebin.unlistedPaste("USED NICKNAMES", out.toString(), _e.getGuild().getIdLong());
 										message.setColor(Color.BLUE).setTitle("USED NICKNAMES").setDescription("Nicknames posted on Pastebin as unlisted: "+pastebin_link);
-									else {
-										message.setColor(Color.BLUE).setTitle("USED NICKNAMES").setDescription("Nicknames couldn't be displayed because it exceeded the limit of characters. Please bind the bot with a Pastebin account to display the names on Pastebin!");
+									} catch (IllegalStateException | LoginException | PasteException e) {
+										logger.warn("Error on creating paste!", e);
+										message.setColor(Color.RED).setTitle("USED NICKNAMES").setDescription("Nicknames couldn't be displayed because it exceeded the limit of characters. Please bind the bot with a Pastebin account to display the names on Pastebin!");
 									}
 								}
 								_e.getTextChannel().sendMessage(message.build()).queue();
@@ -520,15 +524,14 @@ public class UserExecution {
 						}
 						
 						if(messages.size() > 0) {
-							String paste_link = Pastebin.unlistedPermanentPaste("Messages from "+messages.get(0).getUserName()+" in guild"+_e.getGuild().getId(), hash_counter+" messages from "+messages.get(0).getUserName()+" have been removed:\n\n"+collected_messages.toString(), _e.getGuild().getIdLong());
-							if(!paste_link.equals("Creating paste failed!")) {
+							try {
+								String paste_link = Pastebin.unlistedPermanentPaste("Messages from "+messages.get(0).getUserName()+" in guild"+_e.getGuild().getId(), hash_counter+" messages from "+messages.get(0).getUserName()+" have been removed:\n\n"+collected_messages.toString(), _e.getGuild().getIdLong());
 								_e.getTextChannel().sendMessage(message.setDescription("The comments of the selected user have been succesfully removed: "+paste_link).build()).queue();
 								logger.debug("{} has bulk deleted messages from {}", _e.getMember().getUser().getId(), messages.get(0).getUserID());
-							}
-							else {
+							} catch (IllegalStateException | LoginException | PasteException e) {
+								logger.warn("Error on creating paste", e);
 								error.setTitle("New Paste couldn't be created!");
 								_e.getTextChannel().sendMessage(error.setDescription("A new Paste couldn't be created. Please ensure that valid login credentials and a valid Pastebing API key has been inserted into the config.ini file!").build()).queue();
-								logger.error("New paste couldn't be created. Missing login information");
 							}
 						}
 						else {
