@@ -71,7 +71,7 @@ public class FilterExecution {
 				if(UserPrivs.comparePrivilege(_e.getMember(), funnyNamesLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 					message.setTitle("You chose funny-names!");
 					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
-					Hashes.addTempCache(key, new Cache(180000, "funny_names"));
+					Hashes.addTempCache(key, new Cache(180000, "funny-names"));
 				}
 				else {
 					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(funnyNamesLevel, _e.getGuild())).build()).queue();

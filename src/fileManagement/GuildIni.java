@@ -24,6 +24,7 @@ public class GuildIni {
 			ini.add("General", "DoubleExperience", "auto");
 			ini.add("General", "ForceReason", "true");
 			ini.add("General", "OverrideBan", "false");
+			ini.add("General", "URLBlacklist", "false");
 			
 			//Pastebin
 			ini.add("Pastebin", "Username", "");
@@ -243,6 +244,11 @@ public class GuildIni {
 	public static boolean getCacheLog(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "CacheLog", boolean.class);
+	}
+	
+	public static boolean getURLBlacklist(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "URLBlacklist", boolean.class);
 	}
 	
 	public static void setDoubleExperienceMode(long guild_id, final String mode) {

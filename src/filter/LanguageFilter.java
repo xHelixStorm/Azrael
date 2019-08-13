@@ -12,12 +12,11 @@ import core.Hashes;
 import core.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.DiscordRoles;
 import sql.Azrael;
 import util.CharacterReplacer;
 
-public class LanguageFilter extends ListenerAdapter implements Runnable{
+public class LanguageFilter implements Runnable {
 	
 	private MessageReceivedEvent e;
 	private ArrayList<String> filter_lang;

@@ -1064,7 +1064,6 @@ public class UserExecution {
 			}
 		}
 		else {
-			_e.getTextChannel().sendMessage(denied.setDescription("Session has expired! Please retype the command!").build()).queue();
 			Hashes.clearTempCache(key);
 		}
 	}
