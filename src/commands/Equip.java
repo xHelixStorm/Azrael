@@ -31,7 +31,7 @@ public class Equip implements Command{
 				if(mutualGuilds.size() == 1) {
 					if(UserPrivs.comparePrivilege(e.getJDA().getGuildById(mutualGuilds.get(0).getId()).getMemberById(e.getAuthor().getId()), GuildIni.getEquipLevel(mutualGuilds.get(0).getIdLong()))) {
 						//directly make the selection screen appear (e.g. equip, unequip, etc)
-						e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.blue).setTitle("Equip command").setDescription("Write one of the following available options to equip a weapon and/or skill. You have 3 minutes to select an option or use 'exit' to terminate!\n\n"
+						e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Equip command").setDescription("Write one of the following available options to equip a weapon and/or skill. You have 3 minutes to select an option or use 'exit' to terminate!\n\n"
 								+ "**show**\n"
 								+ "**set**\n"
 								+ "**remove**\n"
@@ -71,12 +71,12 @@ public class Equip implements Command{
 				}
 			}
 			else {
-				e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.red).setDescription(e.getAuthor().getAsMention()+" The ranking system is disabled on all servers. Please contact an administrator to enable the feature!").build()).queue();
+				e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getAuthor().getAsMention()+" The ranking system is disabled on all servers. Please contact an administrator to enable the feature!").build()).queue();
 			}
 		}
 		else {
 			if(GuildIni.getEquipCommand(e.getGuild().getIdLong()))
-				e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.red).setDescription(e.getMember().getAsMention()+" My apologies young padawan, please try to use this command in a private message to me by just writing equip without prefix!").build()).queue();
+				e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" My apologies young padawan, please try to use this command in a private message to me by just writing equip without prefix!").build()).queue();
 		}
 	}
 

@@ -92,7 +92,7 @@ public class EquipExecution {
 		}
 	}
 	
-	public static void equipItemScreen(MessageReceivedEvent e, final String guild_id) {
+	public static void equipmentItemScreen(MessageReceivedEvent e, final String guild_id, String action) {
 		final long guild = guild_id.transform(v -> Long.valueOf(v));
 		var guild_settings = RankingSystem.SQLgetGuild(guild);
 		var theme_id = (guild_settings != null ? guild_settings.getThemeID() : 0);
@@ -154,21 +154,82 @@ public class EquipExecution {
 				+ "slot 2: **"+weapon2+"**\n"
 				+ "slot 3: **"+weapon3+"**\n"
 				+ "skill   : **"+skill+"**").build()).queue();
-		Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id, "set"));
+		Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id, action));
+	}
+	
+	public static void removeWholeEquipment(MessageReceivedEvent e, final long guild_id) {
+		var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID());
+		if(user_details.getWeapon1() != 0 || user_details.getWeapon2() != 0 || user_details.getWeapon3() != 0 || user_details.getSkill() != 0) {
+			if(RankingSystemItems.SQLUnequipWholeEquipment(e.getAuthor().getIdLong(), guild_id) > 0) {
+				user_details.setWeapon1(0);
+				user_details.setWeapon2(0);
+				user_details.setWeapon3(0);
+				user_details.setSkill(0);
+				e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Unequipment successfull").setDescription("Weapons and skill have been successfully unequipped!").build()).queue();
+			}
+			else {
+				e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Unequip error!").setDescription("An internal error occurred. Items couldn't be unequipped!").build()).queue();
+			}
+		}
+		else {
+			e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Equipment empty!").setDescription("There is nothing to unequip!").build()).queue();
+		}
 	}
 	
 	@SuppressWarnings("preview")
-	public static void slotSelection(MessageReceivedEvent e, final String guild_id, final int selection) {
+	public static void slotSelection(MessageReceivedEvent e, final String guild_id, final int selection, String action) {
 		if(selection > 0 && selection <= 4) {
-			switch(selection) {
-				case 1, 2, 3 -> {
-					e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Weapon slot "+selection+" selected!").setDescription("Now type the name of the weapon! If more options appear, select one with a digit!").build()).queue();
+			if(action.equals("set")) {
+				switch(selection) {
+					case 1, 2, 3 -> {
+						e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Weapon slot "+selection+" selected!").setDescription("Now type the name of the weapon! If more options appear, select one with a digit!").build()).queue();
+					}
+					case 4 -> {
+						e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Skill slot selected!").setDescription("Now type the name of the skill! If more options appear, select one with a digit!").build()).queue();
+					}
 				}
-				case 4 -> {
-					e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Skill slot selected!").setDescription("Now type the name of the skill! If more options appear, select one with a digit!").build()).queue();
+				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id, "set-"+selection));
+			}
+			else if(action.equals("remove")) {
+				int itemID = 0;
+				long guild = Long.parseLong(guild_id);
+				var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild, RankingSystem.SQLgetGuild(guild).getThemeID());
+				switch(selection) {
+					case 1 -> itemID = user_details.getWeapon1();
+					case 2 -> itemID = user_details.getWeapon2();
+					case 3 -> itemID = user_details.getWeapon3();
+					case 4 -> itemID = user_details.getSkill();
+				}
+				if(itemID != 0) {
+					if(RankingSystemItems.SQLUnequipWeapon(e.getAuthor().getIdLong(), guild, selection) > 0) {
+						switch(selection) {
+							case 1 -> {
+								e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Unequip sucessfull!").setDescription("Weapon has been unequipped!").build()).queue();
+								user_details.setWeapon1(0);
+							}
+							case 2 -> {
+								e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Unequip sucessfull!").setDescription("Weapon has been unequipped!").build()).queue();
+								user_details.setWeapon2(0);
+							}
+							case 3 -> {
+								e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Unequip sucessfull!").setDescription("Weapon has been unequipped!").build()).queue();
+								user_details.setWeapon3(0);
+							}
+							case 4 -> {
+								e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Unequip sucessfull!").setDescription("Skill has been unequipped!").build()).queue();
+								user_details.setSkill(0);
+							}
+						}
+						equipmentItemScreen(e, guild_id, "remove");
+					}
+					else
+						e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Update failed!").setDescription("An internal error occurred and the item couldn't be unequipped!").build()).queue();
+				}
+				else {
+					e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Empty slot!").setDescription("You don't have anything equipped on this slot already!").build()).queue();
+					equipmentItemScreen(e, guild_id, "remove");
 				}
 			}
-			Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id, "set-"+selection));
 		}
 		else {
 			e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select a slot with a digit between 1 and 4").build()).queue();
@@ -201,7 +262,7 @@ public class EquipExecution {
 							Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
 							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
 							e.getPrivateChannel().sendMessage(embed.setDescription("Weapon equipped!").build()).complete();
-							equipItemScreen(e, guild_id);
+							equipmentItemScreen(e, guild_id, "set");
 						}
 						else {
 							e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Weapon couldn't be equipped. Please retry later again!").build()).queue();
@@ -253,7 +314,7 @@ public class EquipExecution {
 						Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
 						EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
 						e.getPrivateChannel().sendMessage(embed.setDescription("Skill equipped!").build()).complete();
-						equipItemScreen(e, guild_id);
+						equipmentItemScreen(e, guild_id, "set");
 					}
 					else {
 						e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Weapon couldn't be equipped. Please retry later again!").build()).queue();
@@ -313,7 +374,7 @@ public class EquipExecution {
 								Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
 								EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
 								e.getPrivateChannel().sendMessage(embed.setDescription("Weapon equipped!").build()).complete();
-								equipItemScreen(e, guild_id);
+								equipmentItemScreen(e, guild_id, "set");
 							}
 							else {
 								e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Weapon couldn't be equipped. Please retry later again!").build()).queue();
@@ -341,7 +402,7 @@ public class EquipExecution {
 							Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
 							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
 							e.getPrivateChannel().sendMessage(embed.setDescription("Skill equipped!").build()).complete();
-							equipItemScreen(e, guild_id);
+							equipmentItemScreen(e, guild_id, "set");
 						}
 						else {
 							e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Skill couldn't be equipped. Please retry later again!").build()).queue();

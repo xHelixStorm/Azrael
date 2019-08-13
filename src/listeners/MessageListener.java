@@ -55,7 +55,7 @@ public class MessageListener extends ListenerAdapter{
 				var prefixLength = GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length();
 				if(!CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength).toLowerCase(), e))) {
 					Logger logger = LoggerFactory.getLogger(MessageListener.class);
-					logger.debug("Command {} doesn't exist!", e.getMessage().getContentRaw());
+					logger.warn("Command {} doesn't exist!", e.getMessage().getContentRaw());
 				}
 			}
 			
@@ -393,7 +393,7 @@ public class MessageListener extends ListenerAdapter{
 				if(e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
 					if(!CommandHandler.handleCommand(CommandParser.parser(message, e))) {
 						Logger logger = LoggerFactory.getLogger(MessageListener.class);
-						logger.debug("Private message command {} doesn't exist!", e.getMessage().getContentRaw());
+						logger.warn("Private message command {} doesn't exist!", e.getMessage().getContentRaw());
 					}
 				}
 			}
@@ -412,13 +412,13 @@ public class MessageListener extends ListenerAdapter{
 							
 						}
 						else if(e.getMessage().getContentRaw().equalsIgnoreCase("set")) {
-							EquipExecution.equipItemScreen(e, equip.getAdditionalInfo());
+							EquipExecution.equipmentItemScreen(e, equip.getAdditionalInfo(), "set");
 						}
 						else if(e.getMessage().getContentRaw().equalsIgnoreCase("remove")) {
-							
+							EquipExecution.equipmentItemScreen(e, equip.getAdditionalInfo(), "remove");
 						}
 						else if(e.getMessage().getContentRaw().equalsIgnoreCase("remove-all")) {
-							
+							EquipExecution.removeWholeEquipment(e, Long.parseLong(equip.getAdditionalInfo()));
 						}
 					}
 					else if(equip.getAdditionalInfo().length() > 18) {
@@ -440,13 +440,13 @@ public class MessageListener extends ListenerAdapter{
 					}
 					else if(equip.getAdditionalInfo2().equals("set")) {
 						if(!e.getMessage().getContentRaw().matches("[^\\d]"))
-							EquipExecution.slotSelection(e, equip.getAdditionalInfo(), Integer.parseInt(e.getMessage().getContentRaw()));
+							EquipExecution.slotSelection(e, equip.getAdditionalInfo(), Integer.parseInt(e.getMessage().getContentRaw()), "set");
 						else
 							e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select one of the visible digits on the screen!").build()).queue();
 					}
 					else if(equip.getAdditionalInfo2().matches("^(set-)[1-4]$")) {
 						if(message.equalsIgnoreCase("return")) {
-							EquipExecution.equipItemScreen(e, equip.getAdditionalInfo());
+							EquipExecution.equipmentItemScreen(e, equip.getAdditionalInfo(), "set");
 						}
 						else {
 							EquipExecution.searchInventory(e, equip.getAdditionalInfo(), Integer.parseInt(equip.getAdditionalInfo2().split("-")[1]), e.getMessage().getContentRaw().toLowerCase());
@@ -454,7 +454,7 @@ public class MessageListener extends ListenerAdapter{
 					}
 					else if(equip.getAdditionalInfo2().matches("^(set-)[1-4](_)[\\d-]*$")) {
 						if(message.equalsIgnoreCase("return")) {
-							EquipExecution.equipItemScreen(e, equip.getAdditionalInfo());
+							EquipExecution.equipmentItemScreen(e, equip.getAdditionalInfo(), "set");
 						}
 						else {
 							if(!e.getMessage().getContentRaw().matches("[^\\d]") && message.length() <= 9) {
@@ -466,6 +466,12 @@ public class MessageListener extends ListenerAdapter{
 							else 
 								e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select one of the visible digits on the screen!").build()).queue();
 						}
+					}
+					else if(equip.getAdditionalInfo2().equals("remove")) {
+						if(!e.getMessage().getContentRaw().matches("[^\\d]"))
+							EquipExecution.slotSelection(e, equip.getAdditionalInfo(), Integer.parseInt(e.getMessage().getContentRaw()), "remove");
+						else
+							e.getPrivateChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select one of the visible digits on the screen!").build()).queue();
 					}
 				}
 			}

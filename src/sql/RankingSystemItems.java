@@ -96,6 +96,46 @@ public class RankingSystemItems {
 		}
 	}
 	
+	public static int SQLUnequipWeapon(long _user_id, long _guild_id, int _slot) {
+		logger.debug("SQLUnequipWeapon launched. Passed params {}, {}, {}", _user_id, _guild_id, _slot);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE users SET "+(_slot == 1 ? "weapon1" : (_slot == 2 ? "weapon2" : "weapon3"))+" = NULL WHERE user_id = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUnequipWeapon Exception", e);
+			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUnequipWholeEquipment(long _user_id, long _guild_id) {
+		logger.debug("SQLUnequipWeapon launched. Passed params {}, {}", _user_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("UPDATE users SET weapon1 = NULL, weapon2 = NULL, weapon3 = NULL, skill = NULL WHERE user_id = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUnequipWholeEquipment Exception", e);
+			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLEquipSkill(long _user_id, long _guild_id, int _item_id) {
 		logger.debug("SQLEquipSkill launched. Passed params {}, {}, {}", _user_id, _guild_id, _item_id);
 		Connection myConn = null;
