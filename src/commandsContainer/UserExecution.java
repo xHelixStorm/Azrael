@@ -189,14 +189,25 @@ public class UserExecution {
 								}
 								_e.getTextChannel().sendMessage(message.build()).queue();
 							}
-							message.clear();
-							message.setColor(Color.BLUE).setTitle("EVENTS");
-							for(String description : Azrael.SQLgetCriticalActionEvents(user_id, _e.getGuild().getIdLong())) {
-								out.append(description+"\n");
+							if(IniFileReader.getActionLog()) {
+								message.clear();
+								message.setColor(Color.BLUE).setTitle("DELETED MESSAGES ON PASTEBIN");
+								out.setLength(0);
+								for(String description : Azrael.SQLgetSingleActionEventDescriptionsOrdered("MESSAGES_DELETED", user_id, _e.getGuild().getIdLong())) {
+									out.append(description+"\n");
+								}
+								message.setDescription(out);
+								if(out.length() > 0)_e.getTextChannel().sendMessage(message.build()).queue();
+								
+								message.clear();
+								message.setColor(Color.BLUE).setTitle("EVENTS");
+								out.setLength(0);
+								for(String description : Azrael.SQLgetCriticalActionEvents(user_id, _e.getGuild().getIdLong())) {
+									out.append(description+"\n");
+								}
+								message.setDescription(out);
+								if(out.length() > 0)_e.getTextChannel().sendMessage(message.build()).queue();
 							}
-							message.setDescription(out);
-							out.setLength(0);
-							_e.getTextChannel().sendMessage(message.build()).queue();
 							logger.debug("{} has displayed information of the user {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo());
 						}
 						else {
@@ -1104,6 +1115,7 @@ public class UserExecution {
 					try {
 						String paste_link = Pastebin.unlistedPermanentPaste("Messages from "+messages.get(0).getUserName()+" in guild"+_e.getGuild().getId(), hash_counter+" messages from "+messages.get(0).getUserName()+" have been removed:\n\n"+collected_messages.toString(), _e.getGuild().getIdLong());
 						_e.getTextChannel().sendMessage(message.setDescription("The comments of the selected user have been succesfully removed: "+paste_link).build()).queue();
+						Azrael.SQLInsertActionLog("MESSAGES_DELETED", user_id, _e.getGuild().getIdLong(), paste_link);
 						logger.debug("{} has bulk deleted messages from {}", _e.getMember().getUser().getId(), messages.get(0).getUserID());
 					} catch (IllegalStateException | LoginException | PasteException e) {
 						logger.warn("Error on creating paste", e);

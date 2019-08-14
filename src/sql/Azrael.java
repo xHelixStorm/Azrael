@@ -228,6 +228,34 @@ public class Azrael {
 		}
 	}
 	
+	public static ArrayList<String> SQLgetSingleActionEventDescriptionsOrdered(String _event, long _target_id, long _guild_id) {
+		logger.debug("SQLgetSingleActionEventDescriptions launched. Passed params {}, {}, {}", _event, _target_id, _guild_id);
+		ArrayList<String> descriptions = new ArrayList<String>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT timestamp, description FROM action_log WHERE target_id = ? && guild_id = ? && event LIKE ? ORDER BY timestamp desc LIMIT 30");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _target_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, _event);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				descriptions.add(rs.getString(1)+": "+rs.getString(2));
+			}
+			return descriptions;
+		} catch (SQLException e) {
+			logger.error("SQLgetSingleActionEventDescriptions Exception", e);
+			return descriptions;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLInsertUser(long _user_id, String _name, String _avatar, String _join_date){
 		logger.debug("SQLInsertUser launched. Passed params {}, {}, {}, {}", _user_id, _name, _avatar, _join_date);
 		Connection myConn = null;
