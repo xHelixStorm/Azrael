@@ -26,6 +26,21 @@ public class GuildIni {
 			ini.add("General", "OverrideBan", "false");
 			ini.add("General", "URLBlacklist", "false");
 			
+			//Mute
+			ini.add("Mute", "MessageDeleteEnabled", "false");
+			ini.add("Mute", "ForceMessageDeletion", "false");
+			ini.add("Mute", "AutoDeleteMessages", "0");
+			
+			//Kick
+			ini.add("Kick", "MessageDeleteEnabled", "false");
+			ini.add("Kick", "ForceMessageDeletion", "false");
+			ini.add("Kick", "AutoDeleteMessages", "0");
+			
+			//Ban
+			ini.add("Ban", "MessageDeleteEnabled", "false");
+			ini.add("Ban", "ForceMessageDeletion", "false");
+			ini.add("Ban", "AutoDeleteMessages", "0");
+			
 			//Pastebin
 			ini.add("Pastebin", "Username", "");
 			ini.add("Pastebin", "Password", "");
@@ -274,6 +289,51 @@ public class GuildIni {
 	public static boolean getOverrideBan(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "OverrideBan", boolean.class);
+	}
+	
+	public static boolean getMuteMessageDeleteEnabled(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Mute", "MessageDeleteEnabled", boolean.class);
+	}
+	
+	public static boolean getMuteForceMessageDeletion(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Mute", "ForceMessageDeletion", boolean.class);
+	}
+	
+	public static int getMuteAutoDeleteMessages(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Mute", "AutoDeleteMessages", int.class);
+	}
+	
+	public static boolean getKickMessageDeleteEnabled(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Kick", "MessageDeleteEnabled", boolean.class);
+	}
+	
+	public static boolean getKickForceMessageDeletion(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Kick", "ForceMessageDeletion", boolean.class);
+	}
+	
+	public static int getKickAutoDeleteMessages(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Kick", "AutoDeleteMessages", int.class);
+	}
+	
+	public static boolean getBanMessageDeleteEnabled(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Ban", "MessageDeleteEnabled", boolean.class);
+	}
+	
+	public static boolean getBanForceMessageDeletion(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Ban", "ForceMessageDeletion", boolean.class);
+	}
+	
+	public static int getBanAutoDeleteMessages(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Ban", "AutoDeleteMessages", int.class);
 	}
 	
 	public static String[] getPastebinCredentials(long guild_id) {

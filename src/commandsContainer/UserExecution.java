@@ -3,6 +3,7 @@ package commandsContainer;
 import java.awt.Color;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import org.jpaste.exceptions.PasteException;
 import org.jpaste.pastebin.exceptions.LoginException;
@@ -485,62 +486,22 @@ public class UserExecution {
 					}
 				}
 			}
-			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("delete-messages")) {
-				var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
-				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
-					int value = Integer.parseInt(_message);
-					if(value == 0){
-						_e.getTextChannel().sendMessage("You chose to not remove any messages at all!").queue();
-					}
-					else if(value > 100){
-						_e.getTextChannel().sendMessage("Please choose a number between 1 and 100!").queue();
-					}
-					else{
-						ArrayList<Messages> messages = new ArrayList<Messages>();
-						for(Messages collectedMessage : Hashes.getWholeMessagePool().values()) {
-							if(collectedMessage.getUserID() == user_id && collectedMessage.getGuildID() == _e.getGuild().getIdLong()) {
-								messages.add(collectedMessage);
-							}
-						}
-						
-						int hash_counter = 0;
-						StringBuilder collected_messages = new StringBuilder();
-						for(int i = messages.size()-1; i >= 0; i--) {
-							hash_counter++;
-							try {
-								Message m = _e.getGuild().getTextChannelById(messages.get(i).getChannelID()).retrieveMessageById(messages.get(i).getMessageID()).complete();
-								collected_messages.append("["+messages.get(i).getTime().toString()+"]: "+messages.get(i).getMessage());
-								Hashes.removeMessagePool(messages.get(i).getMessageID());
-								m.delete().queue();
-								if(i == 0 || hash_counter == value) {
-									break;
-								}
-							}catch(InsufficientPermissionException ipe) {
-								error.setTitle("Message couldn't be removed");
-								_e.getTextChannel().sendMessage(error.setDescription("Message couldn't be removed from <#"+messages.get(i).getChannelID()+"> due to lack of permissions: **"+ipe.getPermission().getName()+"**").build()).queue();
-								hash_counter--;
-							}
-						}
-						
-						if(messages.size() > 0) {
-							try {
-								String paste_link = Pastebin.unlistedPermanentPaste("Messages from "+messages.get(0).getUserName()+" in guild"+_e.getGuild().getId(), hash_counter+" messages from "+messages.get(0).getUserName()+" have been removed:\n\n"+collected_messages.toString(), _e.getGuild().getIdLong());
-								_e.getTextChannel().sendMessage(message.setDescription("The comments of the selected user have been succesfully removed: "+paste_link).build()).queue();
-								logger.debug("{} has bulk deleted messages from {}", _e.getMember().getUser().getId(), messages.get(0).getUserID());
-							} catch (IllegalStateException | LoginException | PasteException e) {
-								logger.warn("Error on creating paste", e);
-								error.setTitle("New Paste couldn't be created!");
-								_e.getTextChannel().sendMessage(error.setDescription("A new Paste couldn't be created. Please ensure that valid login credentials and a valid Pastebing API key has been inserted into the config.ini file!").build()).queue();
-							}
-						}
-						else {
-							_e.getTextChannel().sendMessage(message.setDescription("Nothing has been found to delete....\nPlease check the config file if the Bot is allowed to cache messages").build()).queue();
-							logger.warn("No message deleted");
-						}
-					}
+			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("delete-messages-question")) {
+				if(_message.equalsIgnoreCase("yes")) {
+					message.setTitle("You chose to delete a number of messages!");
+					_e.getTextChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
+					cache.updateDescription("delete-messages"+Integer.parseInt(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""))).setExpiration(180000);
+					Hashes.addTempCache(key, cache);
+				}
+				else if(_message.equalsIgnoreCase("no")) {
+					_e.getTextChannel().sendMessage(message.setDescription("Delete messages action aborted!").build()).queue();
 					Hashes.clearTempCache(key);
 				}
+			}
+			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("delete-messages")) {
+				var passValue = (cache.getAdditionalInfo3().length() > 0 ? true : false);
+				var messagesToDelete = (cache.getAdditionalInfo3().length() > 0 ? Integer.parseInt(cache.getAdditionalInfo3()): 0);
+				deleteMessages(_e, Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _message, messagesToDelete, message, key, passValue);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("warning")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
@@ -659,7 +620,7 @@ public class UserExecution {
 							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id)).queue();
 							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "mute", (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "User has been muted with the bot command!"));
 							_e.getTextChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
-							Hashes.clearTempCache(key);
+							checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 						} catch(IllegalArgumentException iae) {
 							_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the mute role after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
 							cache.updateDescription("mute-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
@@ -690,28 +651,29 @@ public class UserExecution {
 					
 					if(mute_role_id != 0) {
 						try {
-							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getRoleById(mute_role_id)).queue();
+							long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
+							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id)).queue();
 							if(cache.getAdditionalInfo2().length() > 0) {
-								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2());
+								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2());
 							}
 							else {
-								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", "User has been muted with the bot command!");
+								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", "User has been muted with the bot command!");
 							}
-							if(Azrael.SQLgetData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong()).getWarningID() != 0) {
-								if(Azrael.SQLUpdateUnmute(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), timestamp, unmute_timestamp, true, true) == 0) {
-									logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", cache.getAdditionalInfo().replaceAll("[^0-9]*", ""), _e.getGuild().getName());
+							if(Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID() != 0) {
+								if(Azrael.SQLUpdateUnmute(user_id, _e.getGuild().getIdLong(), timestamp, unmute_timestamp, true, true) == 0) {
+									logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, _e.getGuild().getName());
 									_e.getTextChannel().sendMessage("An internal error occurred. The unmute time couldn't be updated on Azrael.bancollect").queue();
 								}
 							}
 							else {
-								if(Azrael.SQLInsertData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), 1, 1, timestamp, unmute_timestamp, true, true) == 0) {
-									logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+								if(Azrael.SQLInsertData(user_id, _e.getGuild().getIdLong(), 1, 1, timestamp, unmute_timestamp, true, true) == 0) {
+									logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", user_id, _e.getGuild().getName());
 									_e.getTextChannel().sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
 								}
 							}
 							_e.getTextChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
-							logger.debug("{} has muted {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
-							Hashes.clearTempCache(key);
+							logger.debug("{} has muted {} in guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getName());
+							checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+cache.getAdditionalInfo().replaceAll("[^0-9]*", ""), new Cache(""+mute_time));
 						} catch(IllegalArgumentException iae) {
 							_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the mute role after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
@@ -741,17 +703,18 @@ public class UserExecution {
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban")) {
+				long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 				if(comment.equals("yes")) {
 					message.setTitle("You chose to provide a reason!");
 					_e.getTextChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
-					cache.updateDescription("ban-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+					cache.updateDescription("ban-reason"+user_id).setExpiration(180000);
 					Hashes.addTempCache(key, cache);
 				}
 				else if(comment.equals("no")) {
-					int warning_id = Azrael.SQLgetData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong()).getWarningID();
+					int warning_id = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID();
 					int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
 					try {
-						PrivateChannel pc = _e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().openPrivateChannel().complete();
+						PrivateChannel pc = _e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete();
 						if(warning_id == max_warning_id) {
 							pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 									+ "On a important note, this is an automatic reply. You'll receive no reply in any way.").queue();
@@ -763,10 +726,10 @@ public class UserExecution {
 							pc.close();
 						}
 						_e.getTextChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
-						_e.getGuild().ban(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), 0).reason("User has been banned with the bot command!").queue();
-						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", "User has been banned with the bot command!");
-						logger.debug("{} has banned {} from guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
-						Hashes.clearTempCache(key);
+						_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason("User has been banned with the bot command!").queue();
+						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", "User has been banned with the bot command!");
+						logger.debug("{} has banned {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getName());
+						checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 					} catch(IllegalArgumentException | NullPointerException iae) {
 						_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the ban after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
 						cache.updateDescription("ban-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
@@ -778,10 +741,11 @@ public class UserExecution {
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban-reason")) {
-				int warning_id = Azrael.SQLgetData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong()).getWarningID();
+				long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
+				int warning_id = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID();
 				int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
 				try {
-					PrivateChannel pc = _e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().openPrivateChannel().complete();
+					PrivateChannel pc = _e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete();
 					if(warning_id == max_warning_id) {
 						pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 								+ "On an important note, this is an automatic reply. You'll receive no reply in any way.").queue();
@@ -793,10 +757,10 @@ public class UserExecution {
 						pc.close();
 					}
 					_e.getTextChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
-					_e.getGuild().ban(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), 0).reason(_message).queue();
-					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", _message);
+					_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
+					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", _message);
 					logger.debug("{} has banned {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
-					Hashes.clearTempCache(key);
+					checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 				} catch(IllegalArgumentException | NullPointerException iae) {
 					_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the ban after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
 					cache.updateDescription("ban-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000).updateDescription2(_message);
@@ -826,27 +790,31 @@ public class UserExecution {
 					Hashes.addTempCache(key, cache);
 				}
 				else if(comment.equals("no")) {
+					long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 					_e.getTextChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
 					try {
-						_e.getGuild().kick(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""))).reason("User has been kicked with the bot command!").queue();
-						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", "User has been kicked with the bot command!");
-						logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+						_e.getGuild().kick(_e.getGuild().getMemberById(user_id)).reason("User has been kicked with the bot command!").queue();
+						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", "User has been kicked with the bot command!");
+						logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getName());
+						checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 					} catch(IllegalArgumentException iae) {
 						_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed because the user can't be found on the server!").build()).queue();
+						Hashes.clearTempCache(key);
 					}
-					Hashes.clearTempCache(key);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("kick-reason")) {
+				long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 				_e.getTextChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
 				try {
-					_e.getGuild().kick(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""))).reason(_message).queue();
-					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", _message);
-					logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+					_e.getGuild().kick(_e.getGuild().getMemberById(user_id)).reason(_message).queue();
+					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", _message);
+					logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getName());
+					checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 				} catch(IllegalArgumentException iae) {
 					_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed because the user can't be found on the server!").build()).queue();
+					Hashes.clearTempCache(key);
 				}
-				Hashes.clearTempCache(key);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*",	"").equals("gift-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
@@ -1064,6 +1032,90 @@ public class UserExecution {
 			}
 		}
 		else {
+			Hashes.clearTempCache(key);
+		}
+	}
+	
+	private static void checkIfDeleteMessagesAfterAction(MessageReceivedEvent _e, Cache cache, long user_id, String _message, EmbedBuilder message, String key) {
+		if(!GuildIni.getMuteMessageDeleteEnabled(_e.getGuild().getIdLong()))
+			Hashes.clearTempCache(key);
+		else {
+			var removeMessages = GuildIni.getMuteAutoDeleteMessages(_e.getGuild().getIdLong());
+			if(GuildIni.getMuteForceMessageDeletion(_e.getGuild().getIdLong())) {
+				if(removeMessages > 0) {
+					deleteMessages(_e, user_id, _message, removeMessages, message, key, true);
+				}
+				else {
+					message.setTitle("Delete messages!");
+					_e.getTextChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
+					cache.updateDescription("delete-messages"+user_id).setExpiration(180000);
+					Hashes.addTempCache(key, cache);
+				}
+			}
+			else {
+				message.setTitle("Delete messages!").setDescription("Do you wish to delete messages?");
+				message.addField("YES", "", true);
+				message.addField("No", "", true);
+				cache.updateDescription("delete-messages-question"+user_id).updateDescription3((removeMessages > 0 ? ""+removeMessages : "")).setExpiration(180000);
+				Hashes.addTempCache(key, cache);
+				_e.getTextChannel().sendMessage(message.build()).queueAfter(1, TimeUnit.SECONDS);
+			}
+		}
+	}
+	
+	private static void deleteMessages(MessageReceivedEvent _e, long user_id, String _message, int messagesCount, EmbedBuilder message, String key, boolean passValue) {
+		if(_message.replaceAll("[0-9]*", "").length() == 0 || passValue) {
+			EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
+			int value = (passValue ? messagesCount : Integer.parseInt(_message));
+			if(value == 0){
+				_e.getTextChannel().sendMessage("You chose to not remove any messages at all!").queue();
+			}
+			else if(value > 100){
+				_e.getTextChannel().sendMessage("Please choose a number between 1 and 100!").queue();
+			}
+			else{
+				ArrayList<Messages> messages = new ArrayList<Messages>();
+				for(Messages collectedMessage : Hashes.getWholeMessagePool().values()) {
+					if(collectedMessage.getUserID() == user_id && collectedMessage.getGuildID() == _e.getGuild().getIdLong()) {
+						messages.add(collectedMessage);
+					}
+				}
+				
+				int hash_counter = 0;
+				StringBuilder collected_messages = new StringBuilder();
+				for(int i = messages.size()-1; i >= 0; i--) {
+					hash_counter++;
+					try {
+						Message m = _e.getGuild().getTextChannelById(messages.get(i).getChannelID()).retrieveMessageById(messages.get(i).getMessageID()).complete();
+						collected_messages.append("["+messages.get(i).getTime().toString()+"]: "+messages.get(i).getMessage());
+						Hashes.removeMessagePool(messages.get(i).getMessageID());
+						m.delete().queue();
+						if(i == 0 || hash_counter == value) {
+							break;
+						}
+					}catch(InsufficientPermissionException ipe) {
+						error.setTitle("Message couldn't be removed");
+						_e.getTextChannel().sendMessage(error.setDescription("Message couldn't be removed from <#"+messages.get(i).getChannelID()+"> due to lack of permissions: **"+ipe.getPermission().getName()+"**").build()).queue();
+						hash_counter--;
+					}
+				}
+				
+				if(messages.size() > 0) {
+					try {
+						String paste_link = Pastebin.unlistedPermanentPaste("Messages from "+messages.get(0).getUserName()+" in guild"+_e.getGuild().getId(), hash_counter+" messages from "+messages.get(0).getUserName()+" have been removed:\n\n"+collected_messages.toString(), _e.getGuild().getIdLong());
+						_e.getTextChannel().sendMessage(message.setDescription("The comments of the selected user have been succesfully removed: "+paste_link).build()).queue();
+						logger.debug("{} has bulk deleted messages from {}", _e.getMember().getUser().getId(), messages.get(0).getUserID());
+					} catch (IllegalStateException | LoginException | PasteException e) {
+						logger.warn("Error on creating paste", e);
+						error.setTitle("New Paste couldn't be created!");
+						_e.getTextChannel().sendMessage(error.setDescription("A new Paste couldn't be created. Please ensure that valid login credentials and a valid Pastebing API key has been inserted into the config.ini file!").build()).queue();
+					}
+				}
+				else {
+					_e.getTextChannel().sendMessage(message.setDescription("Nothing has been found to delete....\nPlease check the config file if the Bot is allowed to cache messages").build()).queue();
+					logger.warn("No message deleted");
+				}
+			}
 			Hashes.clearTempCache(key);
 		}
 	}
