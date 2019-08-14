@@ -64,22 +64,22 @@ public class ParseRSS extends TimerTask{
 								else if(line.endsWith("</item>"))
 									break;
 								if(itemTagFound == true) {
-									if(line.contains("<title>")) {
+									if(line.contains("<title>") && line.contains("</title>")) {
 										int firstPos = line.indexOf("<title>");
 										int lastPos = line.indexOf("</title>");
 										title = line.substring(firstPos, lastPos).replaceAll("(<title>|</title>)", "");
 									}
-									if(line.contains("<description>")) {
+									if(line.contains("<description>") && line.contains("</description>")) {
 										int firstPos = line.indexOf("<description>");
 										int lastPos = line.indexOf("</description>");
 										description = line.substring(firstPos, lastPos).replaceAll("(<description>|</descrption>)", "");
 									}
-									if(line.contains("<pubDate>")) {
+									if(line.contains("<pubDate>") && line.contains("</pubDate>")) {
 										int firstPos = line.indexOf("<pubDate>");
 										int lastPos = line.indexOf("</pubDate>");
 										pubDate = line.substring(firstPos, lastPos).replaceAll("(<pubDate>|</pubDate>)", "");
 									}
-									if(line.contains("<link>")) {
+									if(line.contains("<link>") && line.contains("</link>")) {
 										int firstPos = line.indexOf("<link>");
 										int lastPos = line.indexOf("</link>");
 										link = line.substring(firstPos, lastPos).replaceAll("(<link>|</link>)", "");
