@@ -499,10 +499,17 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("delete-messages-question")) {
 				if(_message.equalsIgnoreCase("yes")) {
-					message.setTitle("You chose to delete a number of messages!");
-					_e.getTextChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
-					cache.updateDescription("delete-messages"+Integer.parseInt(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""))).setExpiration(180000);
-					Hashes.addTempCache(key, cache);
+					if(cache.getAdditionalInfo3().length() == 0) {
+						message.setTitle("You chose to delete a number of messages!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
+						cache.updateDescription("delete-messages"+Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""))).setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else {
+						message.setTitle("Delete Messages!");
+						_e.getTextChannel().sendMessage(message.setDescription("Messages are being deleted...").build()).queue();
+						deleteMessages(_e, Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _message, Integer.parseInt(cache.getAdditionalInfo3()), message, key, true);
+					}
 				}
 				else if(_message.equalsIgnoreCase("no")) {
 					_e.getTextChannel().sendMessage(message.setDescription("Delete messages action aborted!").build()).queue();
@@ -510,9 +517,7 @@ public class UserExecution {
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("delete-messages")) {
-				var passValue = (cache.getAdditionalInfo3().length() > 0 ? true : false);
-				var messagesToDelete = (cache.getAdditionalInfo3().length() > 0 ? Integer.parseInt(cache.getAdditionalInfo3()): 0);
-				deleteMessages(_e, Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _message, messagesToDelete, message, key, passValue);
+				deleteMessages(_e, Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _message, 0, message, key, false);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("warning")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
@@ -1058,7 +1063,7 @@ public class UserExecution {
 				}
 				else {
 					message.setTitle("Delete messages!");
-					_e.getTextChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
+					_e.getTextChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queueAfter(1, TimeUnit.SECONDS);
 					cache.updateDescription("delete-messages"+user_id).setExpiration(180000);
 					Hashes.addTempCache(key, cache);
 				}

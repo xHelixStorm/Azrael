@@ -243,7 +243,7 @@ public class Azrael {
 			stmt.setString(3, _event);
 			rs = stmt.executeQuery();
 			while(rs.next()){
-				descriptions.add(rs.getString(1)+": "+rs.getString(2));
+				descriptions.add("`["+rs.getString(1)+"] -` "+rs.getString(2));
 			}
 			return descriptions;
 		} catch (SQLException e) {
