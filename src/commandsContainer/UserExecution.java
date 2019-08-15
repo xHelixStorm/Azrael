@@ -1071,7 +1071,7 @@ public class UserExecution {
 			else {
 				message.setTitle("Delete messages!").setDescription("Do you wish to delete messages?");
 				message.addField("YES", "", true);
-				message.addField("No", "", true);
+				message.addField("NO", "", true);
 				cache.updateDescription("delete-messages-question"+user_id).updateDescription3((removeMessages > 0 ? ""+removeMessages : "")).setExpiration(180000);
 				Hashes.addTempCache(key, cache);
 				_e.getTextChannel().sendMessage(message.build()).queueAfter(1, TimeUnit.SECONDS);
