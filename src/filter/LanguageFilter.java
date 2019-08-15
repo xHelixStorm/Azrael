@@ -109,6 +109,9 @@ public class LanguageFilter implements Runnable {
 					}
 				}
 			}
+			else {
+				URLFilter.searchURL(e);
+			}
 		}
 	}
 }

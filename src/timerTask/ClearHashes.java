@@ -16,9 +16,12 @@ public class ClearHashes extends TimerTask{
 	@Override
 	public void run() {
 		Hashes.clearWeaponAbbreviations();
+		Hashes.clearGlobalURLBlacklist();
 		Hashes.clearWeaponShopContent();
 		Hashes.clearWeaponCategories();
 		Hashes.clearExpiredTempCache();
+		Hashes.clearURLBlacklist();
+		Hashes.clearURLWhitelist();
 		Hashes.clearWeaponStats();
 		Hashes.clearShopContent();
 		Hashes.clearDailyItems();

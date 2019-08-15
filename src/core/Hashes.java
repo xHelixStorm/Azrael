@@ -2,8 +2,10 @@ package core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -72,6 +74,9 @@ public class Hashes {
     private static final ConcurrentHashMap<String, Cache> tempCache = new ConcurrentHashMap<String, Cache>();
     private static final Map<Long, ArrayList<Skills>> skillShop = new HashMap<Long, ArrayList<Skills>>();
     private static final Map<String, RejoinTask> rejoinTask = new HashMap<String, RejoinTask>();
+    private static final Set<String> globalURLBlacklist = new HashSet<String>();
+    private static final ConcurrentHashMap<Long, ArrayList<String>> urlBlacklist = new ConcurrentHashMap<Long, ArrayList<String>>();
+    private static final ConcurrentHashMap<Long, ArrayList<String>> urlWhitelist = new ConcurrentHashMap<Long, ArrayList<String>>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -156,6 +161,15 @@ public class Hashes {
 	}
 	public static void addRejoinTask(String _key, RejoinTask task) {
 		rejoinTask.put(_key, task);
+	}
+	public static void addGlobalURLBlacklist(String _url) {
+		globalURLBlacklist.add(_url);
+	}
+	public static void addURLBlacklist(Long _key, ArrayList<String> _value) {
+		urlBlacklist.put(_key, _value);
+	}
+	public static void addURLWhitelist(Long _key, ArrayList<String> _value) {
+		urlWhitelist.put(_key, _value);
 	}
 	
 	
@@ -252,6 +266,18 @@ public class Hashes {
 	public static RejoinTask getRejoinTask(String _key) {
 		return rejoinTask.get(_key);
 	}
+	public static boolean findGlobalURLBlacklist(String _url) {
+		return globalURLBlacklist.contains(_url);
+	}
+	public static boolean globalURLBlacklistEmpty() {
+		return globalURLBlacklist.isEmpty();
+	}
+	public static ArrayList<String> getURLBlacklist(Long _key) {
+		return urlBlacklist.get(_key);
+	}
+	public static ArrayList<String> getURLWhitelist(Long _key) {
+		return urlWhitelist.get(_key);
+	}
 	
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
@@ -347,5 +373,14 @@ public class Hashes {
 	}
 	public static void removeRejoinTask(String _key) {
 		rejoinTask.remove(_key);
+	}
+	public static void clearGlobalURLBlacklist() {
+		globalURLBlacklist.clear();
+	}
+	public static void clearURLBlacklist() {
+		urlBlacklist.clear();
+	}
+	public static void clearURLWhitelist() {
+		urlWhitelist.clear();
 	}
 }

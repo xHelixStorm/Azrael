@@ -1858,6 +1858,107 @@ public class Azrael {
 		}
 	}
 	
+	public static synchronized void SQLgetGlobalURLBlacklist() {
+		if(!Hashes.globalURLBlacklistEmpty()) {
+			logger.debug("SQLgetGlobalURLBlacklist launched. No params passed");
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT url FROM global_url_blacklist");
+				stmt = myConn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					Hashes.addGlobalURLBlacklist(rs.getString(1));
+				}
+			} catch (SQLException e) {
+				logger.error("SQLgetGlobalURLBlacklist Exception", e);
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+	}
+	
+	public static synchronized int SQLInsertGlobalURLBlacklist(String _url) {
+		logger.debug("SQLInsertGlobalURLBlacklist launched. Params passed {}", _url);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO global_url_blacklist (url) VALUES(?)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _url);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertGlobalURLBlacklist Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static synchronized ArrayList<String> SQLgetURLBlacklist(long _guild_id) {
+		if(Hashes.getURLBlacklist(_guild_id) == null) {
+			logger.debug("SQLgetURLBlacklist launched. Passed params {}", _guild_id);
+			ArrayList<String> urls = new ArrayList<String>();
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT url FROM url_blacklist WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					urls.add(rs.getString(1));
+				}
+				Hashes.addURLBlacklist(_guild_id, urls);
+				return urls;
+			} catch (SQLException e) {
+				logger.error("SQLgetURLBlacklist Exception", e);
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		return Hashes.getURLBlacklist(_guild_id);
+	}
+	
+	public static synchronized ArrayList<String> SQLgetURLWhitelist(long _guild_id) {
+		if(Hashes.getURLBlacklist(_guild_id) == null) {
+			logger.debug("SQLgetURLWhitelist launched. Passed params {}", _guild_id);
+			ArrayList<String> urls = new ArrayList<String>();
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT url FROM url_whitelist WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()){
+					urls.add(rs.getString(1));
+				}
+				Hashes.addURLWhitelist(_guild_id, urls);
+				return urls;
+			} catch (SQLException e) {
+				logger.error("SQLgetURLWhitelist Exception", e);
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		return Hashes.getURLWhitelist(_guild_id);
+	}
+	
 	//Transactions
 	@SuppressWarnings("resource")
 	public static int SQLLowerTotalWarning(long _guild_id, int _warning_id){

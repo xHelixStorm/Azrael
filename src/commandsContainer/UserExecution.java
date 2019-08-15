@@ -703,7 +703,7 @@ public class UserExecution {
 					}
 				}
 				else {
-					_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a numerical value in minutes!").queue();
+					_e.getTextChannel().sendMessage(_e.getMember().getAsMention()+" Please type a numerical value together with a time unit m, h or d!").queue();
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("mute-delay")) {
