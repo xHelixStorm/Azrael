@@ -30,6 +30,7 @@ import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import filter.LanguageFilter;
+import filter.URLFilter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
@@ -46,7 +47,7 @@ public class MessageListener extends ListenerAdapter{
 	@SuppressWarnings({ "preview", "null" })
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e){
-		ExecutorService executor = Executors.newFixedThreadPool(2);
+		ExecutorService executor = Executors.newSingleThreadExecutor();
 		
 		//allow to intercept only messages within a guild and not private messages
 		if(e.getChannelType().isGuild()) {
@@ -380,9 +381,14 @@ public class MessageListener extends ListenerAdapter{
 				}
 			}
 			
-			Azrael.SQLgetChannel_Filter(channel_id);
-			if(Hashes.getFilterLang(channel_id).size() > 0){
-				executor.execute(new LanguageFilter(e, Hashes.getFilterLang(channel_id)));
+			var filter_lang = Azrael.SQLgetChannel_Filter(channel_id);
+			if(filter_lang.size() > 0) {
+				executor.execute(new LanguageFilter(e, filter_lang));
+				executor.execute(new URLFilter(e, null, filter_lang));
+			}
+			else {
+				filter_lang.add("eng");
+				executor.execute(new URLFilter(e, null, filter_lang));
 			}
 			executor.shutdown();
 		}

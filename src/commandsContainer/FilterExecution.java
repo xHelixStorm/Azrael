@@ -23,7 +23,7 @@ import util.Pastebin;
 public class FilterExecution {
 	public static void runHelp(MessageReceivedEvent _e) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle("Actions for the filter command!");
-		_e.getTextChannel().sendMessage(message.setDescription("Type one of the following word types right after the command to choose a respective action! These types are available:\n\n**word-filter\nname-filter\nname-kick\nfunny-names\nstaff-names**").build()).queue();
+		_e.getTextChannel().sendMessage(message.setDescription("Type one of the following word types right after the command to choose a respective action! These types are available:\n\n**word-filter\nname-filter\nname-kick\nfunny-names\nstaff-names\nurl-blacklist\nurl-whitelist**").build()).queue();
 	}
 	
 	@SuppressWarnings("preview")
@@ -88,7 +88,29 @@ public class FilterExecution {
 					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(staffNamesLevel, _e.getGuild())).build()).queue();
 				}
 			}
-			default -> _e.getTextChannel().sendMessage("Please choose between word-filter, name-filter, funny-names or staff-names").queue();
+			case "url-blacklist" -> {
+				final var urlBlacklistLevel = GuildIni.getFilterURLBlacklistLevel(_e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(_e.getMember(), urlBlacklistLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+					message.setTitle("You chose url-blacklist!");
+					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
+					Hashes.addTempCache(key, new Cache(180000, "url-blacklist"));
+				}
+				else {
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(urlBlacklistLevel, _e.getGuild())).build()).queue();
+				}
+			}
+			case "url-whitelist" -> {
+				final var urlWhitelistLevel = GuildIni.getFilterURLWhitelistLevel(_e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(_e.getMember(), urlWhitelistLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+					message.setTitle("You chose url-blacklist!");
+					_e.getTextChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
+					Hashes.addTempCache(key, new Cache(180000, "url-blacklist"));
+				}
+				else {
+					_e.getTextChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(urlWhitelistLevel, _e.getGuild())).build()).queue();
+				}
+			}
+			default -> _e.getTextChannel().sendMessage("Please choose between word-filter, name-filter, funny-names, staff-names, url-blacklist or url-whitelist").queue();
 		}
 	}
 	
@@ -346,6 +368,104 @@ public class FilterExecution {
 						message.setTitle("You chose to add the names from a file into the staff names list!");
 						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required names to upload.").build()).queue();
 						cache.updateDescription("load-staff-names").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+				}
+				case "url-blacklist" -> {
+					if(_message.equalsIgnoreCase("display")) {
+						StringBuilder out = new StringBuilder();
+						for(String word : Azrael.SQLgetURLBlacklist(_e.getGuild().getIdLong())) {
+							out.append(word+"\n");
+						}
+						if(out.length() > 0) {
+							try {
+								String paste_link = Pastebin.unlistedPaste("URL Blacklist", out.toString(), _e.getGuild().getIdLong());
+								message.setTitle("URL Blacklist!");
+								out.setLength(0);
+								_e.getTextChannel().sendMessage(message.setDescription("Here the current present url blacklist: "+paste_link).build()).queue();
+							} catch (IllegalStateException | LoginException | PasteException e) {
+								logger.warn("Error on creating paste!", e);
+								message.setColor(Color.RED).setTitle("Creating paste failed!");
+								_e.getTextChannel().sendMessage(message.setDescription("An error occurred with posting on pastebin. Please verify that the login credentials are set correctly!").build()).queue();
+							}
+						}
+						else {
+							message.setColor(Color.RED).setTitle("No results have been returned!");
+							_e.getTextChannel().sendMessage("The url-blacklist list is empty! Nothing to display!").queue();
+						}
+						Hashes.clearTempCache(key);
+					}
+					else if(_message.equalsIgnoreCase("insert")) {
+						message.setTitle("You chose to insert a url into the url blacklist to censor!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please insert a fully qualified domain name. For example: **https://www.google.com**\n Please don't add anything after the top level domain (e.g. com, de, org)").build()).queue();
+						cache.updateDescription("insert-url-blacklist").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("remove")) {
+						message.setTitle("You chose to remove a url out of the url blacklist!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please insert a fully qualified domain name. For example: **https://www.google.com**\n Please don't add anything after the top level domain (e.g. com, de, org)").build()).queue();
+						cache.updateDescription("remove-url-blacklist").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("add-pastebin")) {
+						message.setTitle("You chose to add the urls from a pastebin link into the url-blacklist!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required urls to upload.").build()).queue();
+						cache.updateDescription("add-load-url-blacklist").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("load-pastebin")) {
+						message.setTitle("You chose to add the names from a pastebin link into the url-blacklist!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required urls to upload.").build()).queue();
+						cache.updateDescription("load-url-blacklist").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+				}
+				case "url-whitelist" -> {
+					if(_message.equalsIgnoreCase("display")) {
+						StringBuilder out = new StringBuilder();
+						for(String word : Azrael.SQLgetURLWhitelist(_e.getGuild().getIdLong())) {
+							out.append(word+"\n");
+						}
+						if(out.length() > 0) {
+							try {
+								String paste_link = Pastebin.unlistedPaste("URL Whitelist", out.toString(), _e.getGuild().getIdLong());
+								message.setTitle("URL Whitelist!");
+								out.setLength(0);
+								_e.getTextChannel().sendMessage(message.setDescription("Here the current present url whitelist: "+paste_link).build()).queue();
+							} catch (IllegalStateException | LoginException | PasteException e) {
+								logger.warn("Error on creating paste!", e);
+								message.setColor(Color.RED).setTitle("Creating paste failed!");
+								_e.getTextChannel().sendMessage(message.setDescription("An error occurred with posting on pastebin. Please verify that the login credentials are set correctly!").build()).queue();
+							}
+						}
+						else {
+							message.setColor(Color.RED).setTitle("No results have been returned!");
+							_e.getTextChannel().sendMessage("The url-whitelist list is empty! Nothing to display!").queue();
+						}
+						Hashes.clearTempCache(key);
+					}
+					else if(_message.equalsIgnoreCase("insert")) {
+						message.setTitle("You chose to insert a url into the url whitelist as exception!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please insert a fully qualified domain name. For example: **https://www.google.com**\n Please don't add anything after the top level domain (e.g. com, de, org)").build()).queue();
+						cache.updateDescription("insert-url-whitelist").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("remove")) {
+						message.setTitle("You chose to remove a url out of the url whitelist!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please insert a fully qualified domain name. For example: **https://www.google.com**\n Please don't add anything after the top level domain (e.g. com, de, org)").build()).queue();
+						cache.updateDescription("remove-url-whitelist").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("add-pastebin")) {
+						message.setTitle("You chose to add the urls from a pastebin link into the url-whitelist!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required urls to upload.").build()).queue();
+						cache.updateDescription("add-load-url-whitelist").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("load-pastebin")) {
+						message.setTitle("You chose to add the names from a pastebin link into the url-whitelist!");
+						_e.getTextChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required urls to upload.").build()).queue();
+						cache.updateDescription("load-url-whitelist").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
 				}
@@ -699,6 +819,84 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
+				}
+				case "insert-url-blacklist" -> {
+					if((_message.startsWith("http://") || _message.startsWith("https://")) && !_message.matches("[\\s]")) {
+						if(Azrael.SQLInsertURLBlacklist(_message, _e.getGuild().getIdLong()) > 0) {
+							message.setTitle("Success!");
+							_e.getTextChannel().sendMessage(message.setDescription("The url has been inserted into the url-blacklist!").build()).queue();
+							Hashes.removeURLBlacklist(_e.getGuild().getIdLong());
+							logger.debug("{} has inserted the url {} into the url-blacklist", _e.getMember().getUser().getIdLong(), _message);
+						}
+						else {
+							message.setColor(Color.RED).setTitle("URL couldn't be inserted!");
+							_e.getTextChannel().sendMessage(message.setDescription("URL couldn't be inserted into Azrael.url_blacklist. Either the url already exists or an internal error has occurred!").build()).queue();
+							logger.error("URL couldn't be inserted into Azrael.url_blacklist for guild {}", _e.getGuild().getName());
+						}
+						Hashes.clearTempCache(key);
+					}
+					else {
+						message.setColor(Color.RED).setTitle("Invalid URL!");
+						_e.getTextChannel().sendMessage(message.setDescription("An invalid url has been inserted! Please submit a valid internet site url!").build()).queue();
+						cache.setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+				}
+				case "remove-url-blacklist" -> {
+					if(Azrael.SQLDeleteURLBlacklist(_message, _e.getGuild().getIdLong()) > 0) {
+						message.setTitle("Success!");
+						_e.getTextChannel().sendMessage(message.setDescription("The url has been removed from the url blacklist!").build()).queue();
+						Hashes.removeURLBlacklist(_e.getGuild().getIdLong());
+						logger.debug("{} has removed the url {} from the url blacklist", _e.getMember().getUser().getIdLong(), _message);
+					}
+					else {
+						message.setColor(Color.RED).setTitle("URL couldn't be removed!");
+						_e.getTextChannel().sendMessage(message.setDescription("URL couldn't be removed from Azrael.url_blacklist. URL doesn't exist or an internal error occurred!").build()).queue();
+						logger.error("Name couldn't be removed from Azrael.url_blacklist for guild {}", _e.getGuild().getName());
+					}
+					Hashes.clearTempCache(key);
+				}
+				case "add-load-url-blacklist", "load-url-blacklist" -> {
+					
+				}
+				case "insert-url-whitelist" -> {
+					if((_message.startsWith("http://") || _message.startsWith("https://")) && !_message.matches("[\\s]")) {
+						if(Azrael.SQLInsertURLWhitelist(_message, _e.getGuild().getIdLong()) > 0) {
+							message.setTitle("Success!");
+							_e.getTextChannel().sendMessage(message.setDescription("The url has been inserted into the url-whitelist!").build()).queue();
+							Hashes.removeURLBlacklist(_e.getGuild().getIdLong());
+							logger.debug("{} has inserted the url {} into the url-whitelist", _e.getMember().getUser().getIdLong(), _message);
+						}
+						else {
+							message.setColor(Color.RED).setTitle("URL couldn't be inserted!");
+							_e.getTextChannel().sendMessage(message.setDescription("URL couldn't be inserted into Azrael.url_whitelist. Either the url already exists or an internal error has occurred!").build()).queue();
+							logger.error("URL couldn't be inserted into Azrael.url_whitelist for guild {}", _e.getGuild().getName());
+						}
+						Hashes.clearTempCache(key);
+					}
+					else {
+						message.setColor(Color.RED).setTitle("Invalid URL!");
+						_e.getTextChannel().sendMessage(message.setDescription("An invalid url has been inserted! Please submit a valid internet site url!").build()).queue();
+						cache.setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+				}
+				case "remove-url-whitelist" -> {
+					if(Azrael.SQLDeleteURLWhitelist(_message, _e.getGuild().getIdLong()) > 0) {
+						message.setTitle("Success!");
+						_e.getTextChannel().sendMessage(message.setDescription("The url has been removed from the url whitelist!").build()).queue();
+						Hashes.removeURLBlacklist(_e.getGuild().getIdLong());
+						logger.debug("{} has removed the url {} from the url whitelist", _e.getMember().getUser().getIdLong(), _message);
+					}
+					else {
+						message.setColor(Color.RED).setTitle("URL couldn't be removed!");
+						_e.getTextChannel().sendMessage(message.setDescription("URL couldn't be removed from Azrael.url_whitelist. URL doesn't exist or an internal error occurred!").build()).queue();
+						logger.error("Name couldn't be removed from Azrael.url_whitelist for guild {}", _e.getGuild().getName());
+					}
+					Hashes.clearTempCache(key);
+				}
+				case "add-load-url-whitelist", "load-url-whitelist" -> {
+					
 				}
 			}
 		}

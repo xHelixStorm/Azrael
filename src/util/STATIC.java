@@ -4,11 +4,19 @@ import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import constructors.Cache;
 import constructors.Channels;
+import core.Hashes;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
+import sql.DiscordRoles;
 
 public class STATIC {
 	
-	private static final String VERSION = "6.2.297";
+	private static final String VERSION = "6.2.298";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	
@@ -76,5 +84,36 @@ public class STATIC {
 			case "com" -> 1;
 			default    -> 0;
 		};
+	}
+	
+	@SuppressWarnings("unused")
+	public static void handleRemovedMessages(MessageReceivedEvent e, MessageUpdateEvent e2, String [] output) {
+		Logger logger = LoggerFactory.getLogger(STATIC.class);
+		logger.debug("Message removed from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+		var muteRole = DiscordRoles.SQLgetRole((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()), "mut");
+		if(muteRole == 0) {
+			if(e != null)e.getTextChannel().sendMessage(e.getMember().getAsMention()+" "+output[0]).queue();
+			else 		 e2.getTextChannel().sendMessage(e2.getMember().getAsMention()+" "+output[0]).queue();
+		}
+		else {
+			var cache = Hashes.getTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
+			if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
+				if(e != null)e.getTextChannel().sendMessage(e.getMember().getAsMention()+" "+output[0]).queue();
+				else 		 e2.getTextChannel().sendMessage(e2.getMember().getAsMention()+" "+output[0]).queue();
+				Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "1"));
+			}
+			else if(cache != null) {
+				if(cache.getAdditionalInfo().equals("1")) {
+					if(e != null)e.getTextChannel().sendMessage(e.getMember().getAsMention()+" "+output[1]).queue();
+					else 		 e2.getTextChannel().sendMessage(e2.getMember().getAsMention()+" "+output[1]).queue();
+					Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "2"));
+				}
+				else if(cache.getAdditionalInfo().equals("2")) {
+					if(e != null)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
+					else		 e.getGuild().addRoleToMember(e2.getMember(), e2.getGuild().getRoleById(DiscordRoles.SQLgetRole(e2.getGuild().getIdLong(), "mut"))).queue();
+					Hashes.clearTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
+				}
+			}
+		}
 	}
 }

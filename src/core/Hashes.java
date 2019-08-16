@@ -377,8 +377,14 @@ public class Hashes {
 	public static void clearGlobalURLBlacklist() {
 		globalURLBlacklist.clear();
 	}
+	public static void removeURLBlacklist(Long _key) {
+		urlBlacklist.remove(_key);
+	}
 	public static void clearURLBlacklist() {
 		urlBlacklist.clear();
+	}
+	public static void removeURLWhitelist(Long _key) {
+		urlWhitelist.remove(_key);
 	}
 	public static void clearURLWhitelist() {
 		urlWhitelist.clear();

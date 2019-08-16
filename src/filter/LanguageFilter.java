@@ -4,16 +4,12 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import sql.DiscordRoles;
 import sql.Azrael;
+import util.STATIC;
 import util.CharacterReplacer;
 
 public class LanguageFilter implements Runnable {
@@ -90,27 +86,7 @@ public class LanguageFilter implements Runnable {
 			}
 			
 			if(wordFound == true) {
-				Logger logger = LoggerFactory.getLogger(LanguageFilter.class);
-				logger.debug("Edited message removed from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
-				var cache = Hashes.getTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
-				
-				if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
-					e.getTextChannel().sendMessage(e.getMember().getAsMention()+" "+output[0]).queue();
-					Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "1"));
-				}
-				else if(cache != null) {
-					if(cache.getAdditionalInfo().equals("1")) {
-						e.getTextChannel().sendMessage(e.getMember().getAsMention()+" "+output[1]).queue();
-						Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "2"));
-					}
-					else if(cache.getAdditionalInfo().equals("2")) {
-						e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
-						Hashes.clearTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
-					}
-				}
-			}
-			else {
-				URLFilter.searchURL(e);
+				STATIC.handleRemovedMessages(e, null, output);
 			}
 		}
 	}

@@ -112,7 +112,7 @@ public class DiscordRoles {
 		return Hashes.getDiscordRole(_role_id);
 	}
 	
-	public static long SQLgetRole(long _guild_id, String _category_abv) {
+	public static synchronized long SQLgetRole(long _guild_id, String _category_abv) {
 		logger.debug("SQLgetRole launched. Passed params {}, {}", _guild_id, _category_abv);
 		Connection myConn = null;
 		PreparedStatement stmt = null;

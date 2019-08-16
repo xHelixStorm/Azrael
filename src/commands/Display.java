@@ -212,6 +212,8 @@ public class Display implements Command{
 						out += "Filter name kick subcommand: "+GuildIni.getFilterNameKickLevel(e.getGuild().getIdLong())+"\n";
 						out += "Filter funny names subcommand: "+GuildIni.getFilterFunnyNamesLevel(e.getGuild().getIdLong())+"\n";
 						out += "Filter staff names subcommand: "+GuildIni.getFilterStaffNamesLevel(e.getGuild().getIdLong())+"\n";
+						out += "Filter url blacklist subcommand: "+GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong())+"\n";
+						out += "Filter url whitelist subcommand: "+GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong())+"\n";
 						out += "Quiz command: "+GuildIni.getQuizLevel(e.getGuild().getIdLong())+"\n";
 						out += "Rolereaction command: "+GuildIni.getRoleReactionLevel(e.getGuild().getIdLong())+"\n";
 						out += "Rss command: "+GuildIni.getRssLevel(e.getGuild().getIdLong())+"\n";
