@@ -1,7 +1,9 @@
 package filter;
 
 import java.awt.Color;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -37,51 +39,78 @@ public class URLFilter implements Runnable{
 	@Override
 	public void run() {
 		var guild_id = (e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong());
-		Pattern urlPattern = Pattern.compile("[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b");
-		Matcher matcher = urlPattern.matcher((e != null ? e.getMessage().getContentRaw() : e2.getMessage().getContentRaw()));
-		if(matcher.find()) {
-			var foundURL = matcher.group(1);
-			var fullBlacklist = GuildIni.getURLBlacklist(guild_id);
-			if(fullBlacklist) {
-				Azrael.SQLgetGlobalURLBlacklist();
-				if(Hashes.findGlobalURLBlacklist(foundURL)) {
-					//Whitelist check, if this url should be ignored
-					var whitelist = Azrael.SQLgetURLWhitelist(guild_id);
-					if(whitelist == null || whitelist.parallelStream().filter(f -> f.equals(foundURL)).findAny().orElse(null) == null)
-						printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang));
-				}
-				else {
-					//Do a web check and confirm that the url is valid or not and then insert into global blacklist
-					try {
-						pingHost(foundURL);
-						if(Azrael.SQLInsertGlobalURLBlacklist(foundURL) > 0)
-							Hashes.addGlobalURLBlacklist(foundURL);
-						//check the url with the whitelist and don't delete message if found
+		if(verifyChannel((e != null ? e.getTextChannel().getIdLong() : e2.getTextChannel().getIdLong()), guild_id)) {
+			Pattern urlPattern = Pattern.compile("[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b");
+			Matcher matcher = urlPattern.matcher((e != null ? e.getMessage().getContentRaw() : e2.getMessage().getContentRaw()));
+			if(matcher.find()) {
+				var foundURL = matcher.group(0);
+				var fullBlacklist = GuildIni.getURLBlacklist(guild_id);
+				if(fullBlacklist) {
+					if(Hashes.findGlobalURLBlacklist(foundURL)) {
+						//Whitelist check, if this url should be ignored
 						var whitelist = Azrael.SQLgetURLWhitelist(guild_id);
-						if(whitelist == null || whitelist.parallelStream().filter(f -> f.equals(foundURL)).findAny().orElse(null) == null)
+						if(whitelist == null || whitelist.parallelStream().filter(f -> foundURL.contains(f)).findAny().orElse(null) == null)
 							printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang));
-					} catch (MalformedURLException e1) {
-						logger.error("URL malformed error", e1);
-					} catch (IOException e1) {
-						logger.warn("Invalid URL");
+					}
+					else {
+						//Do a web check and confirm that the url is valid or not and then insert into global blacklist
+						try {
+							if(pingHost(foundURL)) {
+								Hashes.addGlobalURLBlacklist(foundURL);
+								//check the url with the whitelist and don't delete message if found
+								var whitelist = Azrael.SQLgetURLWhitelist(guild_id);
+								if(whitelist == null || whitelist.parallelStream().filter(f -> foundURL.contains(foundURL)).findAny().orElse(null) == null)
+									printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang));
+							}
+						} catch (MalformedURLException e1) {
+							logger.error("URL malformed error", e1);
+						} catch (IOException e1) {
+							logger.warn("Invalid URL");
+						}
 					}
 				}
-			}
-			else {
-				//confront link with the blacklist table and delete if found
-				var blacklist = Azrael.SQLgetURLBlacklist(guild_id);
-				if(blacklist != null && blacklist.parallelStream().filter(f -> f.equalsIgnoreCase(foundURL)).findAny().orElse(null) != null)
-					printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang));
+				else {
+					//confront link with the blacklist table and delete if found
+					var blacklist = Azrael.SQLgetURLBlacklist(guild_id);
+					if(blacklist != null && blacklist.size() > 0 && blacklist.parallelStream().filter(f -> foundURL.contains(f)).findAny().orElse(null) != null)
+						printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang));
+				}
 			}
 		}
 	}
 	
-	private static void pingHost(String foundURL) throws MalformedURLException, IOException {
-		URL url = new URL(foundURL);
+	private static boolean verifyChannel(long channel_id, long guild_id) {
+		var channels = Azrael.SQLgetChannels(guild_id);
+		var channel = channels.parallelStream().filter(f -> f.getURLCensoring() && f.getChannel_ID() == channel_id).findAny().orElse(null);
+		if(channel != null)
+			return true;
+		else
+			return false;
+	}
+	
+	private static boolean pingHost(String foundURL) throws MalformedURLException, IOException {
+		//http ping
+		URL url = new URL("http://"+foundURL);
 		URLConnection con = url.openConnection();
 		con.setConnectTimeout(5000);
 		con.setReadTimeout(5000);
 		con.connect();
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		if(in.readLine() != null) {
+			return true;
+		}
+		
+		//https ping
+		url = new URL("https://"+foundURL);
+		con = url.openConnection();
+		con.setConnectTimeout(5000);
+		con.setReadTimeout(5000);
+		con.connect();
+		in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		if(in.readLine() != null) {
+			return true;
+		}
+		return false;
 	}
 	
 	@SuppressWarnings("preview")
@@ -95,7 +124,7 @@ public class URLFilter implements Runnable{
 					output[2] = " Die Eingabe von URLs ist auf diesem Server nicht gestattet! URL entfernt!";
 				}
 				case "fre" -> {
-					output[0] = " Votre message à été supprimé pour mauvais comportement !";
+					output[0] = " Le message a été supprimé pour l'affichage d'une url non autorisée !";
 					output[1] = " C'est votre deuxième avertissement. Encore une fois et vous serez **mis sous silence** sur le serveur !";
 					output[2] = " La saisie d'URLs n'est pas autorisée sur ce serveur ! URL supprimée !";
 				}

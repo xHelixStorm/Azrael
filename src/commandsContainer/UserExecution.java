@@ -386,7 +386,10 @@ public class UserExecution {
 							for(var history : Azrael.SQLgetHistory(user_id, _e.getGuild().getIdLong())) {
 								out.append(history.getTime()+": **"+history.getType()+"**\nReason: **"+history.getReason()+"**\n\n");
 							}
-							_e.getTextChannel().sendMessage(message.setDescription("Here the requested history of this user\n\n"+out.toString()).build()).queue();
+							if(out.length() > 0)
+								_e.getTextChannel().sendMessage(message.setDescription("Here the requested history of this user\n\n"+out.toString()).build()).queue();
+							else
+								_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("History is empty!").setDescription("The history of this user is empty! Nothing to display!").build()).queue();
 							Hashes.clearTempCache(key);
 						}
 						else {

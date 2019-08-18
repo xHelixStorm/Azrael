@@ -200,7 +200,12 @@ public class ReadyListener extends ListenerAdapter {
 		if(IniFileReader.getDoubleExpEnabled()) {
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(Calendar.DAY_OF_WEEK, Weekday.getDay(IniFileReader.getDoubleExpStart()));
-			if(calendar.getTime().getTime() < System.currentTimeMillis())
+			Calendar calendar2 = Calendar.getInstance();
+			calendar2.set(Calendar.DAY_OF_WEEK, Weekday.getDay(IniFileReader.getDoubleExpEnd()));
+			calendar2.set(Calendar.HOUR_OF_DAY, 23);
+			calendar2.set(Calendar.MINUTE, 59);
+			var currentTime = System.currentTimeMillis();
+			if(calendar.getTime().getTime() < currentTime && calendar2.getTime().getTime() > currentTime)
 				Hashes.addTempCache("doubleExp", new Cache("on"));
 			DoubleExperienceStart.runTask(e, null, null, null);
 			DoubleExperienceOff.runTask();

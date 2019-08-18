@@ -374,9 +374,6 @@ public class Hashes {
 	public static void removeRejoinTask(String _key) {
 		rejoinTask.remove(_key);
 	}
-	public static void clearGlobalURLBlacklist() {
-		globalURLBlacklist.clear();
-	}
 	public static void removeURLBlacklist(Long _key) {
 		urlBlacklist.remove(_key);
 	}

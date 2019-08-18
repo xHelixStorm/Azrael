@@ -31,7 +31,7 @@ public class Azrael {
 	private static String password = IniFileReader.getSQLPassword();
 	
 	
-	public static void SQLconnection(){
+	public static void SQLconnection() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
@@ -98,7 +98,7 @@ public class Azrael {
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				history.add(
 					new History(
 						rs.getString(1),
@@ -131,7 +131,7 @@ public class Azrael {
 			stmt.setLong(2, _guild_id);
 			stmt.setString(3, _event);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getInt(1);
 			}
 			return 0;
@@ -160,7 +160,7 @@ public class Azrael {
 			stmt.setString(3, _event);
 			stmt.setString(4, _event2);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				descriptions.add(rs.getString(1));
 			}
 			return descriptions;
@@ -188,7 +188,7 @@ public class Azrael {
 			stmt.setLong(2, _guild_id);
 			stmt.setString(3, _event);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				descriptions.add(rs.getString(1));
 			}
 			return descriptions;
@@ -214,7 +214,7 @@ public class Azrael {
 			stmt.setLong(1, _target_id);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				descriptions.add("`["+rs.getTimestamp(2).toString()+"] - "+rs.getString(1)+"`");
 			}
 			return descriptions;
@@ -242,7 +242,7 @@ public class Azrael {
 			stmt.setLong(2, _guild_id);
 			stmt.setString(3, _event);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				descriptions.add("`["+rs.getString(1)+"] -` "+rs.getString(2));
 			}
 			return descriptions;
@@ -256,7 +256,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertUser(long _user_id, String _name, String _avatar, String _join_date){
+	public static int SQLInsertUser(long _user_id, String _name, String _avatar, String _join_date) {
 		logger.debug("SQLInsertUser launched. Passed params {}, {}, {}, {}", _user_id, _name, _avatar, _join_date);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -278,7 +278,7 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLBulkInsertUsers(List<Member> members){
+	public static void SQLBulkInsertUsers(List<Member> members) {
 		logger.debug("SQLBulkInsertUsers launched. Passed member list params");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -287,7 +287,7 @@ public class Azrael {
 			myConn.setAutoCommit(false); 
 			String sql = ("INSERT INTO users (user_id, name, avatar_url, join_date) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
 			stmt = myConn.prepareStatement(sql);
-			for(Member member : members){
+			for(Member member : members) {
 				stmt.setLong(1, member.getUser().getIdLong());
 				stmt.setString(2, member.getUser().getName()+"#"+member.getUser().getDiscriminator());
 				stmt.setString(3, member.getUser().getEffectiveAvatarUrl());
@@ -304,7 +304,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateAvatar(long _user_id, String _avatar){
+	public static int SQLUpdateAvatar(long _user_id, String _avatar) {
 		logger.debug("SQLUpdateAvatar launched. Passed params {}, {}", _user_id, _avatar);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -324,7 +324,7 @@ public class Azrael {
 		}
 	}
 	
-	public static User SQLgetUser(String _name){
+	public static User SQLgetUser(String _name) {
 		logger.debug("SqlgetUser launched. Passed params {}", _name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -335,7 +335,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _name);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return new User(rs.getLong(1), rs.getString(2));
 			}
 			return null;
@@ -348,7 +348,7 @@ public class Azrael {
 		}
 	}
 	
-	public static User SQLgetUserThroughID(String _user_id){
+	public static User SQLgetUserThroughID(String _user_id) {
 		logger.debug("SQLgetUserThroughID launched. Passed params {}");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -359,7 +359,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _user_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return new User(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4));
 			}
 			return null;
@@ -372,7 +372,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateUser(Long _user_id, String _name){
+	public static int SQLUpdateUser(Long _user_id, String _name) {
 		logger.debug("SQLUpdateUser launched. Passed params {}, {}", _user_id, _name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -403,7 +403,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getLong(1);
 			}
 			return 0;
@@ -437,7 +437,7 @@ public class Azrael {
 		}
 	}
 	
-	public static String SQLgetNickname(Long _user_id, Long _guild_id){
+	public static String SQLgetNickname(Long _user_id, Long _guild_id) {
 		logger.debug("SQLgetNickname launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -449,7 +449,7 @@ public class Azrael {
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getString(1);
 			}
 			return "";
@@ -463,7 +463,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertNickname(Long _user_id, Long _guild_id, String _nickname){
+	public static int SQLInsertNickname(Long _user_id, Long _guild_id, String _nickname) {
 		logger.debug("SQLInsertNickname launched. Passed params {}, {}, {}", _user_id, _guild_id, _nickname);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -484,7 +484,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateNickname(Long _user_id, Long _guild_id, String _nickname){
+	public static int SQLUpdateNickname(Long _user_id, Long _guild_id, String _nickname) {
 		logger.debug("SQLUpdateNickname launched. Passed params {}, {}", _user_id, _guild_id, _nickname);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -505,7 +505,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLDeleteNickname(Long _user_id, Long _guild_id){
+	public static int SQLDeleteNickname(Long _user_id, Long _guild_id) {
 		logger.debug("SQLDeleteNickname launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -525,7 +525,7 @@ public class Azrael {
 		}
 	}
 	
-	public static Bancollect SQLgetData(Long _user_id, Long _guild_id){
+	public static Bancollect SQLgetData(Long _user_id, Long _guild_id) {
 		logger.debug("SQLgetData launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -537,7 +537,7 @@ public class Azrael {
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return new Bancollect(rs.getLong(1), rs.getLong(2), rs.getInt(3), rs.getInt(4), rs.getTimestamp(5), rs.getTimestamp(6), rs.getBoolean(7), rs.getBoolean(8), rs.getBoolean(9));
 			}
 			return new Bancollect();
@@ -563,7 +563,7 @@ public class Azrael {
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getBoolean(1);
 			}
 			return false;
@@ -589,7 +589,7 @@ public class Azrael {
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getBoolean(1);
 			}
 			return false;
@@ -603,7 +603,7 @@ public class Azrael {
 		}
 	}
 	
-	public static boolean SQLisBanned(long _user_id, long _guild_id){
+	public static boolean SQLisBanned(long _user_id, long _guild_id) {
 		logger.debug("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -615,7 +615,7 @@ public class Azrael {
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				if(rs.getInt(1) == 1)
 					return false;
 				else
@@ -632,7 +632,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLgetWarning(long _user_id, long _guild_id){
+	public static int SQLgetWarning(long _user_id, long _guild_id) {
 		logger.debug("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -644,7 +644,7 @@ public class Azrael {
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getInt(1);
 			}
 			return 0;
@@ -704,7 +704,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateMuted(long _user_id, long _guild_id, boolean _muted){
+	public static int SQLUpdateMuted(long _user_id, long _guild_id, boolean _muted) {
 		logger.debug("SQLUpdateMuted launched. Passed params {}, {}, {}", _user_id, _guild_id, _muted);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -725,7 +725,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateMutedAndCustomMuted(long _user_id, long _guild_id, boolean _muted, boolean _custom_time){
+	public static int SQLUpdateMutedAndCustomMuted(long _user_id, long _guild_id, boolean _muted, boolean _custom_time) {
 		logger.debug("SQLUpdateMutedAndCustomMuted launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _muted, _custom_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -747,7 +747,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateMutedOnEnd(long _user_id, long _guild_id, boolean _muted, boolean _custom_time){
+	public static int SQLUpdateMutedOnEnd(long _user_id, long _guild_id, boolean _muted, boolean _custom_time) {
 		logger.debug("SQLUpdateMutedOnEnd launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _muted, _custom_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -769,7 +769,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateGuildLeft(long _user_id, long _guild_id, boolean _guildLeft){
+	public static int SQLUpdateGuildLeft(long _user_id, long _guild_id, boolean _guildLeft) {
 		logger.debug("SQLUpdateGuildLeft launched. Passed params {}, {}, {}", _user_id, _guild_id, _guildLeft);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -802,7 +802,7 @@ public class Azrael {
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _warning_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return new Warning(rs.getInt(1), rs.getDouble(2), rs.getString(3));
 			}
 			return new Warning();
@@ -827,7 +827,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getInt(1);
 			}
 			return 0;
@@ -921,7 +921,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateWarning(long _user_id, long _guild_id, int _warning_id){
+	public static int SQLUpdateWarning(long _user_id, long _guild_id, int _warning_id) {
 		logger.debug("SQLUpdateWarning launched. Passed params {}, {}", _user_id, _guild_id, _warning_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1008,7 +1008,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateBan(Long _user_id, Long _guild_id, Integer _ban_id){
+	public static int SQLUpdateBan(Long _user_id, Long _guild_id, Integer _ban_id) {
 		logger.debug("SQLUpdateban launched. Passed params {}, {}, {}", _user_id, _guild_id, _ban_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1029,7 +1029,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertChannels(long _channel_id, String _channel_name){
+	public static int SQLInsertChannels(long _channel_id, String _channel_name) {
 		logger.debug("SQLInsertChannels launched. Passed params {}, {}", _channel_id, _channel_name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1049,13 +1049,13 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertChannel_Conf(long _channel_id, long _guild_id, String _channel_type){
-		logger.debug("SQLInsertChannel launched. Passed params {}, {}", _channel_id, _guild_id, _channel_type);
+	public static int SQLInsertChannel_Conf(long _channel_id, long _guild_id, String _channel_type) {
+		logger.debug("SQLInsertChannel launched. Passed params {}, {}, {}, {}", _channel_id, _guild_id, _channel_type);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_channel_type, fk_guild_id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE fk_channel_type = VALUES(fk_channel_type)");
+			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_channel_type, fk_guild_id, url_censoring) VALUES (?, ?, ?, 0) ON DUPLICATE KEY UPDATE fk_channel_type = VALUES(fk_channel_type)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
 			stmt.setString(2, _channel_type);
@@ -1063,6 +1063,27 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertChannel_Conf Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLInsertChannel_ConfURLCensoring(long _channel_id, long _guild_id, boolean _url_censoring) {
+		logger.debug("SQLInsertChannel_ConfURLCensoring launched. Passed params {}, {}, {}, {}", _channel_id, _guild_id, _url_censoring);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_guild_id, url_censoring) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE url_censoring = VALUES(url_censoring)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _channel_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setBoolean(3, _url_censoring);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertChannel_ConfURLCensoring Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1089,7 +1110,7 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<Channels> SQLgetChannels(long _guild_id){
+	public static ArrayList<Channels> SQLgetChannels(long _guild_id) {
 		logger.debug("SQLgetChannels launched. Passed params {}", _guild_id);
 		ArrayList<Channels> channels = new ArrayList<Channels>();
 		if(Hashes.getChannels(_guild_id) == null) {
@@ -1102,7 +1123,7 @@ public class Azrael {
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					Channels channelProperties = new Channels();
 					channelProperties.setChannel_ID(rs.getLong(1));
 					channelProperties.setChannel_Name(rs.getString(2));
@@ -1111,6 +1132,7 @@ public class Azrael {
 					channelProperties.setGuild_ID(rs.getLong(5));
 					channelProperties.setGuild_Name(rs.getString(6));
 					channelProperties.setLang_Filter(rs.getString(7));
+					channelProperties.setURLCensoring(rs.getBoolean(8));
 					channels.add(channelProperties);
 				}
 				Hashes.addChannels(_guild_id, channels);
@@ -1127,7 +1149,7 @@ public class Azrael {
 		return Hashes.getChannels(_guild_id);
 	}
 	
-	public static ArrayList<Channels> SQLgetChannelTypes(){
+	public static ArrayList<Channels> SQLgetChannelTypes() {
 		logger.debug("SQLgetChannelTypes launched. No params");
 		ArrayList<Channels> channels = new ArrayList<Channels>();
 		Connection myConn = null;
@@ -1138,7 +1160,7 @@ public class Azrael {
 			String sql = ("SELECT * FROM channeltypes");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				Channels channelProperties = new Channels();
 				channelProperties.setChannel_Type(rs.getString(1));
 				channelProperties.setChannel_Type_Name(rs.getString(2));
@@ -1155,7 +1177,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLgetExecutionID(long _guild_id){
+	public static int SQLgetExecutionID(long _guild_id) {
 		logger.debug("SQLgetExecutionID launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1166,7 +1188,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getInt(1);
 			}
 			return 0;
@@ -1191,7 +1213,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getBoolean(1);
 			}
 			return false;
@@ -1205,7 +1227,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertCommand(long _guild_id, int _execution_id){
+	public static int SQLInsertCommand(long _guild_id, int _execution_id) {
 		logger.debug("SQLInsertCommand launched. Passed params {}, {}", _guild_id, _execution_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1225,7 +1247,7 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertCommand(long _guild_id, int _execution_id, boolean _reactions){
+	public static int SQLInsertCommand(long _guild_id, int _execution_id, boolean _reactions) {
 		logger.debug("SQLInsertCommand launched. Passed params {}, {}, {}", _guild_id, _execution_id, _reactions);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1279,7 +1301,7 @@ public class Azrael {
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _channel_id);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					filter_lang.add(rs.getString(2));
 				}
 				Hashes.addFilterLang(_channel_id, filter_lang);
@@ -1296,7 +1318,7 @@ public class Azrael {
 		return Hashes.getFilterLang(_channel_id);
 	}
 	
-	public synchronized static ArrayList<String> SQLgetFilter(String _filter_lang, long _guild_id){
+	public synchronized static ArrayList<String> SQLgetFilter(String _filter_lang, long _guild_id) {
 		logger.debug("SQLgetFilter launched. Passed params {}, {}", _filter_lang, _guild_id);
 		if(Hashes.getQuerryResult(_filter_lang+"_"+_guild_id) == null) {
 			Connection myConn = null;
@@ -1306,7 +1328,7 @@ public class Azrael {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
 				ArrayList<String> filter_words = new ArrayList<String>();
 				String sql;
-				if(_filter_lang.equals("all")){
+				if(_filter_lang.equals("all")) {
 					sql = ("SELECT word FROM filter WHERE fk_guild_id = ?");
 					stmt = myConn.prepareStatement(sql);
 					stmt.setLong(1, _guild_id);
@@ -1318,7 +1340,7 @@ public class Azrael {
 					stmt.setLong(2, _guild_id);
 				}
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					filter_words.add(rs.getString(1));
 				}
 				Hashes.addQuerryResult(_filter_lang+"_"+_guild_id, filter_words);
@@ -1431,7 +1453,7 @@ public class Azrael {
 		}
 	}
 	
-	public synchronized static ArrayList<String> SQLgetStaffNames(long _guild_id){
+	public synchronized static ArrayList<String> SQLgetStaffNames(long _guild_id) {
 		if(Hashes.getQuerryResult("staff-names_"+_guild_id) == null) {
 			logger.debug("SQLgetStaffNames launched. Passed params {}", _guild_id);
 			ArrayList<String> staff_names = new ArrayList<String>();
@@ -1444,7 +1466,7 @@ public class Azrael {
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					staff_names.add(rs.getString(1));
 				}
 				Hashes.addQuerryResult("staff-names_"+_guild_id, staff_names);
@@ -1518,7 +1540,7 @@ public class Azrael {
 			
 			String sql2 = ("INSERT INTO staff_name_filter (name_id, name, fk_guild_id) VALUES(NULL, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);
-			for(String word : _words){
+			for(String word : _words) {
 				stmt.setString(1, word.toLowerCase());
 				stmt.setLong(2, _guild_id);
 				stmt.addBatch();
@@ -1541,7 +1563,7 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLInsertChannel_Filter(long _channel_id, String _filter_lang){
+	public static void SQLInsertChannel_Filter(long _channel_id, String _filter_lang) {
 		logger.debug("SQLInsertChannel_Filter launched. Passed params {}, {}", _channel_id, _filter_lang);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1560,7 +1582,7 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLDeleteChannel_Filter(long _channel_id){
+	public static void SQLDeleteChannel_Filter(long _channel_id) {
 		logger.debug("SQLDeleteChannel_Filter launched. Passed params {}", _channel_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1591,7 +1613,7 @@ public class Azrael {
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					names.add(rs.getString(1));
 				}
 				Hashes.addQuerryResult("funny-names_"+_guild_id, names);
@@ -1660,7 +1682,7 @@ public class Azrael {
 				String sql = ("SELECT word, kick FROM name_filter");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					names.add(new NameFilter(rs.getString(1), rs.getBoolean(2)));
 				}
 				Hashes.addNameFilter(_guild_id, names);
@@ -1730,7 +1752,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()){
+			if(rs.next()) {
 				return rs.getString(1);
 			}
 			return "Nickname";
@@ -1747,7 +1769,7 @@ public class Azrael {
 	public static ArrayList<String> SQLgetFilterLanguages() {
 		logger.debug("SQLgetFilterLanguages launched. No params passed");
 		ArrayList<String> filter_lang = new ArrayList<String>();
-		if(Hashes.getFilterLang(0) == null){
+		if(Hashes.getFilterLang(0) == null) {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -1756,7 +1778,7 @@ public class Azrael {
 				String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv NOT LIKE \"all\"");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					filter_lang.add(rs.getString(1));
 				}
 				Hashes.addFilterLang(0, filter_lang);
@@ -1793,7 +1815,7 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<RSS> SQLgetRSSFeeds(long _guild_id){
+	public static ArrayList<RSS> SQLgetRSSFeeds(long _guild_id) {
 		logger.debug("SQLgetRSSFeeds launched. Params passed {}", _guild_id);
 		ArrayList<RSS> feeds = new ArrayList<RSS>();
 		Connection myConn = null;
@@ -1805,7 +1827,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			while(rs.next()) {
 				feeds.add(new RSS(rs.getString(1), rs.getString(2)));
 			}
 			Hashes.addFeeds(_guild_id, feeds);
@@ -1861,49 +1883,6 @@ public class Azrael {
 		}
 	}
 	
-	public static synchronized void SQLgetGlobalURLBlacklist() {
-		if(!Hashes.globalURLBlacklistEmpty()) {
-			logger.debug("SQLgetGlobalURLBlacklist launched. No params passed");
-			Connection myConn = null;
-			PreparedStatement stmt = null;
-			ResultSet rs = null;
-			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT url FROM global_url_blacklist");
-				stmt = myConn.prepareStatement(sql);
-				rs = stmt.executeQuery();
-				while(rs.next()){
-					Hashes.addGlobalURLBlacklist(rs.getString(1));
-				}
-			} catch (SQLException e) {
-				logger.error("SQLgetGlobalURLBlacklist Exception", e);
-			} finally {
-				try { rs.close(); } catch (Exception e) { /* ignored */ }
-			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-			}
-		}
-	}
-	
-	public static synchronized int SQLInsertGlobalURLBlacklist(String _url) {
-		logger.debug("SQLInsertGlobalURLBlacklist launched. Params passed {}", _url);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO global_url_blacklist (url) VALUES(?)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _url);
-			return stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLInsertGlobalURLBlacklist Exception", e);
-			return 0;
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static synchronized ArrayList<String> SQLgetURLBlacklist(long _guild_id) {
 		if(Hashes.getURLBlacklist(_guild_id) == null) {
 			logger.debug("SQLgetURLBlacklist launched. Passed params {}", _guild_id);
@@ -1917,7 +1896,7 @@ public class Azrael {
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					urls.add(rs.getString(1));
 				}
 				Hashes.addURLBlacklist(_guild_id, urls);
@@ -1974,7 +1953,7 @@ public class Azrael {
 	}
 	
 	public static synchronized ArrayList<String> SQLgetURLWhitelist(long _guild_id) {
-		if(Hashes.getURLBlacklist(_guild_id) == null) {
+		if(Hashes.getURLWhitelist(_guild_id) == null) {
 			logger.debug("SQLgetURLWhitelist launched. Passed params {}", _guild_id);
 			ArrayList<String> urls = new ArrayList<String>();
 			Connection myConn = null;
@@ -1986,7 +1965,7 @@ public class Azrael {
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
-				while(rs.next()){
+				while(rs.next()) {
 					urls.add(rs.getString(1));
 				}
 				Hashes.addURLWhitelist(_guild_id, urls);
@@ -2044,7 +2023,7 @@ public class Azrael {
 	
 	//Transactions
 	@SuppressWarnings("resource")
-	public static int SQLLowerTotalWarning(long _guild_id, int _warning_id){
+	public static int SQLLowerTotalWarning(long _guild_id, int _warning_id) {
 		logger.debug("SQLLowerTotalWarning launched. Passed params {}, {}", _guild_id, _warning_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2079,7 +2058,7 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceWordFilter(String _lang, String [] _words, long _guild_id, boolean delete){
+	public static int SQLReplaceWordFilter(String _lang, String [] _words, long _guild_id, boolean delete) {
 		logger.debug("SQLReplaceWordFilter launched. Passed params {}, array, {}, {}", _lang, _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2122,7 +2101,7 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceNameFilter(String [] _words, boolean _kick, long _guild_id, boolean delete){
+	public static int SQLReplaceNameFilter(String [] _words, boolean _kick, long _guild_id, boolean delete) {
 		logger.debug("SQLReplaceNameFilter launched. Passed params array, {}, {}, {}", _kick, _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2165,7 +2144,7 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceFunnyNames(String [] _words, long _guild_id, boolean delete){
+	public static int SQLReplaceFunnyNames(String [] _words, long _guild_id, boolean delete) {
 		logger.debug("SQLReplaceFunnyNames launched. Passed params array, {}, {}", _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
