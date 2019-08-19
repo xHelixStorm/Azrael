@@ -27,7 +27,7 @@ public class GuildLeaveListener extends ListenerAdapter{
 		EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User kicked!");
 		EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User banned!");
 		
-		String trigger_user_name = "";
+		//String trigger_user_name = "";
 		boolean kickOccurred = false;
 		//String kick_reason = "";
 		//String ban_reason = "";
@@ -69,7 +69,7 @@ public class GuildLeaveListener extends ListenerAdapter{
 			var kick_reason = (cache != null ? cache.getAdditionalInfo2() : "No reason has been provided!");
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			if(warnedUser.getBanID() == 2){
-				System.out.println("["+timestamp.toString()+"] "+user_name+" with the id number "+e.getMember().getUser().getId()+" has been banned!");
+				logger.debug("{} with the id number {} has been banned!", user_name, e.getMember().getUser().getId());
 			}
 			else if(warnedUser.getMuted() && warnedUser.getBanID() == 1) {
 				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+"** has left from "+guild_name+" while being muted!").build()).queue();
@@ -87,20 +87,20 @@ public class GuildLeaveListener extends ListenerAdapter{
 			var ban_reason = (cache != null ? cache.getAdditionalInfo2() : "No reason has been provided!");
 			
 			if(warning_id == 0 && warnedUser.getBanID() == 2) {
-				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + user_name + "** with the ID Number **" + user_id + "** has been banned without any protocolled warnings!\nBanned by: "+ban_issuer+"\nReason"+ban_reason).build()).queue();
+				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + user_name + "** with the ID Number **" + user_id + "** has been banned without any protocolled warnings!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
 			}
 			else if(warning_id < max_warning_id && warnedUser.getBanID() == 2) {
-				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + user_name + "** with the ID Number **" + user_id + "** has been banned without enough protocolled warnings! Warnings: "+warning_id+"\nBanned by: "+ban_issuer+"\nReason"+ban_reason).build()).queue();
+				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + user_name + "** with the ID Number **" + user_id + "** has been banned without enough protocolled warnings! Warnings: "+warning_id+"\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
 			}
 			else if(warning_id == max_warning_id && warnedUser.getBanID() == 2) {
-				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + user_name + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: "+ban_issuer+"\nReason"+ban_reason).build()).queue();
+				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + user_name + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
 			}
 		}
 		
 		Hashes.clearTempCache("kick_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 		Hashes.clearTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 		
-		if(trigger_user_name.length() > 0 && warnedUser.getBanID() == 1) {
+		if(kickOccurred && warnedUser.getBanID() == 1) {
 			Azrael.SQLInsertActionLog("MEMBER_KICK", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
 		}
 	}
