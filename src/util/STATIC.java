@@ -16,7 +16,7 @@ import sql.DiscordRoles;
 
 public class STATIC {
 	
-	private static final String VERSION = "6.2.299";
+	private static final String VERSION = "6.2.300";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	

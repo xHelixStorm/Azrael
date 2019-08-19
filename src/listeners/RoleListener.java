@@ -41,7 +41,7 @@ public class RoleListener extends ListenerAdapter{
 		boolean customTimeMute = false;
 		
 		if(UserPrivs.isUserMuted(e.getMember().getUser(), e.getGuild().getIdLong())) {
-			var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+			var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 			Bancollect warnedUser = Azrael.SQLgetData(user_id, guild_id);
 			var permMute = false;
 			long unmute_time = 0;
@@ -106,7 +106,10 @@ public class RoleListener extends ListenerAdapter{
 					}
 					
 					if(warnedUser.getCustomTime()) {
-						mute_time = Long.parseLong(Hashes.getTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()).getAdditionalInfo());
+						var cache = Hashes.getTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
+						mute_time = Long.parseLong(cache.getAdditionalInfo());
+						var issuer = cache.getAdditionalInfo2();
+						var reason = cache.getAdditionalInfo3();
 						Hashes.clearTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 						long hours = (mute_time/1000/60/60);
 						long minutes = (mute_time/1000/60%60);
@@ -115,13 +118,17 @@ public class RoleListener extends ListenerAdapter{
 						String and_add = minutes != 0 && hours != 0 ? " and " : "";
 						
 						PrivateChannel pc = e.getUser().openPrivateChannel().complete();
-						pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+hour_add+and_add+minute_add+"** . Except for the first mute, your warning counter won't increase.\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
-								+ "On an important note, this is an automated reply. You'll receive no reply in any way.").queue();
+						pc.sendMessage("You have been muted on "+e.getGuild().getName()+". Your current mute will last for **"+hour_add+and_add+minute_add+"** . Except for the first mute, your warning counter won't increase.\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
+								+ "On an important note, this is an automated reply. You'll receive no reply in any way.\n"
+								+ (GuildIni.getMuteSendReason(guild_id) ? "Provided reason: **"+reason+"**" : "")).queue();
 						pc.close();
-						new Thread(new RoleTimer(e, mute_time, log_channel, mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0)).start();
+						new Thread(new RoleTimer(e, mute_time, log_channel, mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0, issuer, reason)).start();
 						logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getName());
 					}
 					else {
+						var cache = Hashes.getTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
+						var issuer = (cache != null ? cache.getAdditionalInfo() : "NaN");
+						var reason = (cache != null ? cache.getAdditionalInfo2() : "No reason has been provided!");
 						Warning warn = Azrael.SQLgetWarning(e.getGuild().getIdLong(), (warning_id+1));
 						mute_time = (long) warn.getTimer();
 						unmute = warn.getTimer();
@@ -140,17 +147,19 @@ public class RoleListener extends ListenerAdapter{
 								if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
 							}
 							PrivateChannel pc = e.getUser().openPrivateChannel().complete();
-							pc.sendMessage("You have been muted on "+e.getGuild().getName()+" due to bad behaviour. Your current mute will last for **"+hour_add+and_add+minute_add+"** for being your "+warn.getDescription()+". Warning **"+(warning_id+1)+"**/**"+max_warning+"**\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
-									+ "On an important note, this is an automated reply. You'll receive no reply in any way.").queue();
+							pc.sendMessage("You have been muted on "+e.getGuild().getName()+". Your current mute will last for **"+hour_add+and_add+minute_add+"** for being your "+warn.getDescription()+". Warning **"+(warning_id+1)+"**/**"+max_warning+"**\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
+									+ "On an important note, this is an automated reply. You'll receive no reply in any way.\n"
+									+ (GuildIni.getMuteSendReason(guild_id) ? "Provided reason: **"+reason+"**" : "")).queue();
 							pc.close();
-							new Thread(new RoleTimer(e, mute_time, log_channel, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning)).start();
+							new Thread(new RoleTimer(e, mute_time, log_channel, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning, issuer, reason)).start();
 							logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getName());
 						}
 						else if((warning_id+1) > max_warning) {
 							if(!GuildIni.getOverrideBan(guild_id)) {
 								PrivateChannel pc = e.getUser().openPrivateChannel().complete();
 								pc.sendMessage("You have been banned from "+e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
-										+ "On an important note, this is an automated reply. You'll receive no reply in any way.").complete();
+										+ "On an important note, this is an automated reply. You'll receive no reply in any way.\n"
+										+ (GuildIni.getBanSendReason(guild_id) ? "Provided reason: **"+reason+"**" : "")).complete();
 								pc.close();
 								logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 								e.getJDA().getGuildById(guild_id).ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").complete();
@@ -161,8 +170,9 @@ public class RoleListener extends ListenerAdapter{
 									if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
 								}
 								e.getUser().openPrivateChannel().complete().sendMessage("You have been muted without expiration from "+e.getGuild().getName()+". Rejoining the server will reapply the mute.\n"
-											+ "On an important note, this is an automated reply. You'll receive no reply in any way.").queue();
-								new Thread(new RoleTimer(e, log_channel, mute_id)).start();
+											+ "On an important note, this is an automated reply. You'll receive no reply in any way.\n"
+											+ (GuildIni.getMuteSendReason(guild_id) ? "Provided reason: **"+reason+"**" : "")).queue();
+								new Thread(new RoleTimer(e, log_channel, mute_id, issuer, reason)).start();
 							}
 						}
 					}

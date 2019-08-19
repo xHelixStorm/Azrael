@@ -36,6 +36,11 @@ public class RegisterChannel {
 		_e.getTextChannel().sendMessage(messageBuild.setDescription(parseMessage+strB.toString()).build()).queue();
 	}
 	
+	public static void RegisterChannelHelperURL(MessageReceivedEvent _e) {
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register text channels to enable or disable the url censoring!");
+		_e.getTextChannel().sendMessage(messageBuild.setDescription("Enable or disable the url censoring for one text-channel. By default, the url censoring is disabled on every channel. Please write the command in this format:\n**"+GuildIni.getCommandPrefix(_e.getGuild().getIdLong())+"register -text-channel-url #<text-channel-name> enable/disable**").build()).queue();
+	}
+	
 	@SuppressWarnings("preview")
 	public static void runCommand(MessageReceivedEvent _e, long _guild_id, String [] _args, boolean adminPermission) {
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
@@ -89,6 +94,41 @@ public class RegisterChannel {
 			}
 		}
 		else {
+			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild())).build()).queue();
+		}
+	}
+	
+	public static void runCommandURL(MessageReceivedEvent _e, long _guild_id, String [] args, boolean adminPermission) {
+		final var commandLevel = GuildIni.getRegisterTextChannelURLLevel(_e.getGuild().getIdLong());
+		if(UserPrivs.comparePrivilege(_e.getMember(), commandLevel) || adminPermission) {
+			try {
+				var channel_id = Long.parseLong(args[1].replaceAll("[<>#]", ""));
+				if(args.length > 2 && _e.getGuild().getTextChannelById(channel_id) != null) {
+					if(args[2].equalsIgnoreCase("enable") || args[2].equalsIgnoreCase("disable")) {
+						var url_censoring = (args[2].equalsIgnoreCase("enable") ? true : false);
+						if(Azrael.SQLInsertChannel_ConfURLCensoring(channel_id, _guild_id, url_censoring) > 0) {
+							Hashes.removeChannels(_guild_id);
+							logger.debug("{} has registered the channel {} for url censoring in the guild {}", _e.getMember().getUser().getId(), channel_id, _e.getGuild().getName());
+							_e.getTextChannel().sendMessage("**The channel has been registered!**").queue();
+						}
+						else {
+							logger.error("Azrael.url_censoring couldn't be updated for channel {} and guild {}", channel_id, _e.getGuild().getName());
+							_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Internal error!").setDescription("An internal error occurred! Azrael.url_censoring couldn't be updated!").build()).queue();
+						}
+					}
+					else {
+						_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Syntax error!").setDescription("Please use either enable or disable!").build()).queue();
+					}
+				}
+				else {
+					_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Syntax error!").setDescription("Please insert a valid text channel!").build()).queue();
+				}
+			} catch(NumberFormatException | NullPointerException exc) {
+				_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Syntax error!").setDescription("Please insert a valid text channel!").build()).queue();
+			}
+		}
+		else {
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 			_e.getTextChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild())).build()).queue();
 		}
 	}

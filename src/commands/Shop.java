@@ -34,7 +34,7 @@ public class Shop implements Command{
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 				if(guild_settings.getRankingState() == true) {
-					var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+					var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 					if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null) {
 						e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Welcome, step in!").setThumbnail(IniFileReader.getShopThumbnail())
 								.setDescription("Welcome to my shop! Have a look around! Write out the section that you wish to take a closer look into and type 'exit' when you wish to leave!\n\n"

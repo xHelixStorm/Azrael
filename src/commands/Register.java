@@ -71,6 +71,8 @@ public class Register implements Command{
 								+ "**"+prefix+"register -role**\n\n"
 							+ "Description to register a channel:\n"
 								+ "**"+prefix+"register -text-channel**\n\n"
+							+ "Description to enable the url censoring in a channel:\n"
+								+ "**"+prefix+"register -text-channel-url**\n\n"
 							+ "Syntax to register all channels:\n"
 								+ "**"+prefix+"register -text-channels**\n\n"
 							+ "Description to register a ranking role:\n"
@@ -99,11 +101,23 @@ public class Register implements Command{
 						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild())).build()).queue();
 					}
 				}
-				else if(args[0].equalsIgnoreCase("-text-channels")) {
-					RegisterChannel.runChannelsRegistration(e, guild_id, adminPermission);
-				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-text-channel")) {
 					RegisterChannel.runCommand(e, guild_id, args, adminPermission);
+				}
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-text-channel-url")) {
+					final var commandLevel = GuildIni.getRegisterTextChannelURLLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+						RegisterChannel.RegisterChannelHelperURL(e);
+					}
+					else {
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild())).build()).queue();
+					}
+				}
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-text-channel-url")) {
+					RegisterChannel.runCommandURL(e, guild_id, args, adminPermission);
+				}
+				else if(args[0].equalsIgnoreCase("-text-channels")) {
+					RegisterChannel.runChannelsRegistration(e, guild_id, adminPermission);
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase("-ranking-role")) {
 					final var commandLevel = GuildIni.getRegisterRankingRoleLevel(e.getGuild().getIdLong());

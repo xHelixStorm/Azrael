@@ -30,16 +30,19 @@ public class GuildIni {
 			ini.add("Mute", "MessageDeleteEnabled", "false");
 			ini.add("Mute", "ForceMessageDeletion", "false");
 			ini.add("Mute", "AutoDeleteMessages", "0");
+			ini.add("Mute", "SendReason", "false");
 			
 			//Kick
 			ini.add("Kick", "MessageDeleteEnabled", "false");
 			ini.add("Kick", "ForceMessageDeletion", "false");
 			ini.add("Kick", "AutoDeleteMessages", "0");
+			ini.add("Kick", "SendReason", "false");
 			
 			//Ban
 			ini.add("Ban", "MessageDeleteEnabled", "false");
 			ini.add("Ban", "ForceMessageDeletion", "false");
 			ini.add("Ban", "AutoDeleteMessages", "0");
+			ini.add("Ban", "SendReason", "false");
 			
 			//Pastebin
 			ini.add("Pastebin", "Username", "");
@@ -91,6 +94,7 @@ public class GuildIni {
 			ini.add("Commands", "RegisterLevel", "20");
 			ini.add("Commands", "RegisterRoleLevel", "20");
 			ini.add("Commands", "RegisterTextChannelLevel", "20");
+			ini.add("Commands", "RegisterTextChannelURLLevel", "20");
 			ini.add("Commands", "RegisterRankingRoleLevel", "20");
 			ini.add("Commands", "RegisterTextChannelsLevel", "20");
 			ini.add("Commands", "RegisterUsersLevel", "20");
@@ -218,7 +222,7 @@ public class GuildIni {
 			ini.add("Level", "generalTextFontSize", "12");
 			ini.add("Level", "nameTextFontSize", "12");
 			
-			ini.store(new File("./ini/"+guild_id+".ini"));
+			ini.store(new File("ini/"+guild_id+".ini"));
 		} catch (IOException e) {
 			logger.error("Error while creating guild ini file {}.ini", guild_id, e);
 		}
@@ -308,6 +312,11 @@ public class GuildIni {
 		return ini.get("Mute", "AutoDeleteMessages", int.class);
 	}
 	
+	public static boolean getMuteSendReason(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Mute", "SendReason", boolean.class);
+	}
+	
 	public static boolean getKickMessageDeleteEnabled(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Kick", "MessageDeleteEnabled", boolean.class);
@@ -323,6 +332,11 @@ public class GuildIni {
 		return ini.get("Kick", "AutoDeleteMessages", int.class);
 	}
 	
+	public static boolean getKickSendReason(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Kick", "SendReason", boolean.class);
+	}
+	
 	public static boolean getBanMessageDeleteEnabled(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Ban", "MessageDeleteEnabled", boolean.class);
@@ -336,6 +350,11 @@ public class GuildIni {
 	public static int getBanAutoDeleteMessages(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Ban", "AutoDeleteMessages", int.class);
+	}
+	
+	public static boolean getBanSendReason(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Ban", "SendReason", boolean.class);
 	}
 	
 	public static String[] getPastebinCredentials(long guild_id) {
@@ -499,6 +518,10 @@ public class GuildIni {
 	public static int getRegisterTextChannelLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "RegisterTextChannelLevel", int.class);
+	}
+	public static int getRegisterTextChannelURLLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "RegisterTextChannelURLLevel", int.class);
 	}
 	public static int getRegisterRankingRoleLevel(long guild_id) {
 		Ini ini = readIni(guild_id);

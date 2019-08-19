@@ -31,7 +31,7 @@ public class UnbanListener extends ListenerAdapter{
 			break first_entry;
 		}
 		
-		var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+		var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 		long user_id = e.getUser().getIdLong();
 		long guild_id = e.getGuild().getIdLong();
 		String user_name = e.getUser().getName()+"#"+e.getUser().getDiscriminator();

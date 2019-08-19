@@ -123,7 +123,7 @@ public class Display implements Command{
 					if(UserPrivs.comparePrivilege(e.getMember(), registeredChannelsLevel) || adminPermission) {
 						for(Channels ch : Azrael.SQLgetChannels(guild_id)) {
 							if(!out.contains(""+ch.getChannel_ID())) {
-								out += "\n\n"+ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \nChannel type: "+ch.getChannel_Type_Name()+" Channel\nFilter(s) in use: "+ch.getLang_Filter();
+								out += "\n\n"+ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \nChannel type: "+(ch.getChannel_Type_Name() != null ? ch.getChannel_Type_Name() : "none")+" Channel\nFilter(s) in use: "+ch.getLang_Filter()+"\nURL censoring: "+(ch.getURLCensoring() ? "enabled" : "disabled");
 							}
 							else if(out.contains(""+ch.getChannel_ID())) {
 								out += ", "+ch.getLang_Filter();
@@ -172,6 +172,7 @@ public class Display implements Command{
 						out += "Register command: "+GuildIni.getRegisterLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register role subcommand: "+GuildIni.getRegisterRoleLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register text channel subcommand: "+GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong())+"\n";
+						out += "Register text channel url subcommand: "+GuildIni.getRegisterTextChannelURLLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register text channels subcommand: "+GuildIni.getRegisterTextChannelsLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register ranking role subcommand: "+GuildIni.getRegisterRankingRoleLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register users subcommand: "+GuildIni.getRegisterUsersLevel(e.getGuild().getIdLong())+"\n";

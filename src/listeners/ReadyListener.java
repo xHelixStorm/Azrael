@@ -75,7 +75,7 @@ public class ReadyListener extends ListenerAdapter {
 			logger.error("Themes couldn't be retried from RankingSystem.themes");
 		}
 		for(Guild guild : e.getJDA().getGuilds()) {
-			if(!new File("./ini/"+guild.getId()+".ini").exists()) {
+			if(!new File("ini/"+guild.getId()+".ini").exists()) {
 				GuildIni.createIni(guild.getIdLong());
 			}
 			if(Azrael.SQLgetGuild(guild.getIdLong()) == 0) {
@@ -101,12 +101,12 @@ public class ReadyListener extends ListenerAdapter {
 			Channels log_channel = null;
 			Channels bot_channel = null;
 			var channels = Azrael.SQLgetChannels(guild.getIdLong());
-			if(channels == null) {
+			if(channels == null || channels.size() == 0) {
 				logger.error("Channel information from Azrael.channels couldn't be retrieved and cached");
 			}
 			else {
-				log_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
-				bot_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals("bot")).findAny().orElse(null);
+				log_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+				bot_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null);
 			}
 			if(DiscordRoles.SQLgetRoles(guild.getIdLong()).size() == 0) {
 				var result = DiscordRoles.SQLInsertRoles(guild.getIdLong(), guild.getRoles());

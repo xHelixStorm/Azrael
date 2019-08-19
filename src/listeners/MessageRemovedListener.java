@@ -67,7 +67,7 @@ public class MessageRemovedListener extends ListenerAdapter{
 				if(removed_message != null && removed_message.getMessage().length() > 0 && trigger_user_id > 0) {
 					message.setTitle(trigger_user_name+" has removed a message from #"+e.getTextChannel().getName()+"!");
 					if(removed_message.getMessage().length() > 0) {
-						var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("tra")).findAny().orElse(null);
+						var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 						if(tra_channel != null){e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("["+removed_message.getTime().toString()+" - "+removed_message.getUserName()+"]: "+removed_message.getMessage()).build()).queue();}
 					}
 				}

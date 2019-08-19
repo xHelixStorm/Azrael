@@ -37,7 +37,7 @@ public class Pug implements Command{
 					long guild_id = e.getGuild().getIdLong();
 					String path = "./files/Pug/";
 					
-					var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+					var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 					var this_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null);
 					
 					var execution_id = Azrael.SQLgetExecutionID(guild_id);

@@ -15,7 +15,7 @@ public class IniFileReader {
 	
 	private static void readConfig(){
 		try {
-			ini = new Ini(new File("./config.ini"));
+			ini = new Ini(new File("config.ini"));
 		} catch (IOException e) {
 			Logger logger = LoggerFactory.getLogger(IniFileReader.class);
 			logger.error("Config file couldn't be found or couldn't be opened", e);

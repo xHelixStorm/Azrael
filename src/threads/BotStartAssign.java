@@ -86,7 +86,7 @@ public class BotStartAssign implements Runnable{
 				}
 			}
 			logger.debug("Start up user registration complete in {}", g.getName());
-			var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+			var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 			if(i != 0 && log_channel != null){
 				g.getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(i+" User(s) received the earned ranking role on bot start up").build()).queue();
 			}

@@ -44,7 +44,7 @@ public class DoubleExperience implements Command{
 						if(args[0].equalsIgnoreCase("on")) {
 							Hashes.addTempCache("doubleExp_gu"+e.getGuild().getId(), new Cache("on"));
 							File doubleEvent = new File("./files/RankingSystem/doubleweekend.jpg");
-							var bot_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).findAny().orElse(null);
+							var bot_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null);
 							if(bot_channel != null) {
 								e.getGuild().getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg").complete();
 								e.getGuild().getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\nThe double EXP weekend is here\nUse the chance to gain more experience points than usual to reach new heights. See you at the top!\nThe event has been activated manually. Use this chance while you can!```").queue();

@@ -35,7 +35,7 @@ public class Use implements Command{
 				Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 				constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
 				if(guild_settings.getRankingState()){
-					var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+					var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 					if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null) {
 						String input = e.getMessage().getContentRaw();
 						final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());

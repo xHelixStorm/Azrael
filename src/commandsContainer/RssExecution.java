@@ -75,7 +75,7 @@ public class RssExecution {
 	
 	public static boolean runTest(MessageReceivedEvent e, int feed) {
 		EmbedBuilder message = new EmbedBuilder();
-		var rss_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("rss")).findAny().orElse(null);
+		var rss_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rss")).findAny().orElse(null);
 		if(rss_channel != null) {
 			ArrayList<RSS> rss = Hashes.getFeed(e.getGuild().getIdLong());
 			if(rss.size() >= feed+1) {

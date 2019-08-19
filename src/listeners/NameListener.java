@@ -35,7 +35,7 @@ public class NameListener extends ListenerAdapter{
 			check: for(String name : Azrael.SQLgetStaffNames(guild.getIdLong())){
 				if(nameCheck.matches(name+"#[0-9]{4}")){
 					Member member = e.getJDA().getGuildById(guild.getIdLong()).getMemberById(user_id);
-					var log_channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+					var log_channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 					try {
 						String nickname = Azrael.SQLgetRandomName(guild.getIdLong());
 						e.getJDA().getGuildById(guild.getIdLong()).modifyNickname(member, nickname).queue();
@@ -60,7 +60,7 @@ public class NameListener extends ListenerAdapter{
 						Member member = e.getJDA().getGuildById(guild_id).getMemberById(user_id);
 						
 						if(member.getUser().getIdLong() != 0){
-							var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+							var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 							try {
 								if(!word.getKick()) {
 									String nickname = Azrael.SQLgetRandomName(guild_id);

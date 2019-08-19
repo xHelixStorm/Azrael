@@ -149,7 +149,7 @@ public class URLFilter implements Runnable{
 			e.getMessage().delete().reason("Not allowed URL found!").complete();
 			if(defaultBlacklist) {e.getTextChannel().sendMessage(e.getMember().getAsMention()+output[2]).queue();}
 			else {STATIC.handleRemovedMessages(e, e2, output);}
-			tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("tra")).findAny().orElse(null);
+			tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 			if(tra_channel != null) {
 				e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder()
 					.setDescription(e.getMessage().getContentRaw())
@@ -169,7 +169,7 @@ public class URLFilter implements Runnable{
 			e2.getMessage().delete().reason("Not allowed URL found!").complete();
 			if(defaultBlacklist) {e2.getTextChannel().sendMessage(e2.getMember().getAsMention()+output[2]).queue();}
 			else {STATIC.handleRemovedMessages(e, e2, output);}
-			tra_channel = Azrael.SQLgetChannels(e2.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("tra")).findAny().orElse(null);
+			tra_channel = Azrael.SQLgetChannels(e2.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 			if(tra_channel != null) {
 				e2.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder()
 					.setDescription(e2.getMessage().getContentRaw())

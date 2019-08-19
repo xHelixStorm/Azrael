@@ -37,7 +37,7 @@ public class Inventory implements Command{
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 				if(guild_settings.getRankingState()){
-					var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+					var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 					if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getTextChannel().getIdLong()).findAny().orElse(null) != null) {
 						final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 						if(args.length > 0 && args[0].equalsIgnoreCase("-help")) {

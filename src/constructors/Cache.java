@@ -39,6 +39,22 @@ public class Cache {
 		this.expire = false;
 	}
 	
+	public Cache(String _additionalInfo, String _additionalInfo2) {
+		this.expiration = System.currentTimeMillis();
+		this.additionalInfo = _additionalInfo;
+		this.additionalInfo2 = _additionalInfo2;
+		this.additionalInfo3 = "";
+		this.expire = false;
+	}
+	
+	public Cache(String _additionalInfo, String _additionalInfo2, String _additionalInfo3) {
+		this.expiration = System.currentTimeMillis();
+		this.additionalInfo = _additionalInfo;
+		this.additionalInfo2 = _additionalInfo2;
+		this.additionalInfo3 = _additionalInfo3;
+		this.expire = false;
+	}
+	
 	public long getExpiration() {
 		return expiration;
 	}

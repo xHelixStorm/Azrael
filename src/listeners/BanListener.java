@@ -19,7 +19,7 @@ public class BanListener extends ListenerAdapter{
 		long guild_id = e.getGuild().getIdLong();
 		
 		var user = Azrael.SQLgetData(user_id, guild_id);
-		var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+		var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 		
 		if(user.getBanID() == 1 && user.getWarningID() > 0) {
 			if(Azrael.SQLUpdateBan(user_id, guild_id, 2) == 0) {
@@ -36,9 +36,5 @@ public class BanListener extends ListenerAdapter{
 		}
 		logger.debug("{} has been banned from {}", e.getUser().getId(), e.getGuild().getName());
 		Azrael.SQLInsertActionLog("MEMBER_BAN_ADD", user_id, guild_id, "User Banned");
-		
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e1) {}
 	}
 }

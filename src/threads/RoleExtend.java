@@ -33,7 +33,7 @@ public class RoleExtend implements Runnable{
 			EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle("Warned users can't run away even after a reboot!");
 			boolean banHammerFound = false;
 			ArrayList<Member> users = new ArrayList<Member>();
-			var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+			var log_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 			int i = 0;
 			
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);

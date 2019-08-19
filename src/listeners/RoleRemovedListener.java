@@ -45,7 +45,7 @@ public class RoleRemovedListener extends ListenerAdapter{
 		try{
 			Logger logger = LoggerFactory.getLogger(RoleRemovedListener.class);
 			if(!UserPrivs.isUserMuted(e.getUser(), guild_id) && (warnedUser.getUnmute() == null || (warnedUser.getUnmute().getTime() - System.currentTimeMillis()) > 0)  && warnedUser.getMuted()) {
-				var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
+				var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 				if(warnedUser.getUserID() != 0) {
 					if(Azrael.SQLUpdateMuted(user_id, guild_id, false) == 0) {
 						logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getName());
