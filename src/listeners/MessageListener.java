@@ -2,6 +2,7 @@ package listeners;
 
 import java.awt.Color;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -387,8 +388,9 @@ public class MessageListener extends ListenerAdapter{
 				executor.execute(new URLFilter(e, null, filter_lang));
 			}
 			else {
-				filter_lang.add("eng");
-				executor.execute(new URLFilter(e, null, filter_lang));
+				ArrayList<String> lang = new ArrayList<String>();
+				lang.add("eng");
+				executor.execute(new URLFilter(e, null, lang));
 			}
 			executor.shutdown();
 		}

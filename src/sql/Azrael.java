@@ -2182,4 +2182,84 @@ public class Azrael {
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
+	
+	@SuppressWarnings("resource")
+	public static int SQLReplaceURLBlacklist(String [] _url, long _guild_id, boolean delete) {
+		logger.debug("SQLReplaceURLBlacklist launched. Passed params array, {}, {}", _guild_id, delete);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false);
+			if(delete) {
+				String sql = ("DELETE FROM url_blacklist WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				stmt.executeUpdate();
+			}
+			
+			String sql2 = ("INSERT INTO url_blacklist (url, fk_guild_id) VALUES(?, ?)");
+			stmt = myConn.prepareStatement(sql2);
+			for(String url : _url) {
+				stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
+				stmt.setLong(2, _guild_id);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			myConn.commit();
+			return 0;
+		} catch (SQLException e) {
+			try {
+				logger.error("SQLReplaceURLBlacklist Exception", e);
+				myConn.rollback();
+				return 1;
+			} catch (SQLException e1) {
+				logger.error("SQLReplaceURLBlacklist roll back Exception", e1);
+				return 2;
+			}
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	@SuppressWarnings("resource")
+	public static int SQLReplaceURLWhitelist(String [] _url, long _guild_id, boolean delete) {
+		logger.debug("SQLReplaceURLWhitelist launched. Passed params array, {}, {}", _guild_id, delete);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false);
+			if(delete) {
+				String sql = ("DELETE FROM url_whitelist WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				stmt.executeUpdate();
+			}
+			
+			String sql2 = ("INSERT INTO url_whitelist (url, fk_guild_id) VALUES(?, ?)");
+			stmt = myConn.prepareStatement(sql2);
+			for(String url : _url) {
+				stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
+				stmt.setLong(2, _guild_id);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			myConn.commit();
+			return 0;
+		} catch (SQLException e) {
+			try {
+				logger.error("SQLReplaceURLWhitelist Exception", e);
+				myConn.rollback();
+				return 1;
+			} catch (SQLException e1) {
+				logger.error("SQLReplaceURLWhitelist roll back Exception", e1);
+				return 2;
+			}
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
 }

@@ -857,7 +857,61 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 				}
 				case "add-load-url-blacklist", "load-url-blacklist" -> {
-					
+					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
+						try {
+							String [] url = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
+							List<String> checkedURLs = new ArrayList<String>();
+							for(var link : url) {
+								if(link.matches("^(http:\\/\\/|https:\\/\\/)[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}$")) {
+									checkedURLs.add(link);
+								}
+								else {
+									checkedURLs.clear();
+									break;
+								}
+							}
+							if(checkedURLs.size() > 0 ) {
+								var querryResult = Azrael.SQLReplaceURLBlacklist(url, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+								if(querryResult == 0) {
+									message.setTitle("Success!");
+									_e.getTextChannel().sendMessage(message.setDescription("URLs have been inserted!").build()).queue();
+									Hashes.removeURLBlacklist(_e.getGuild().getIdLong());
+									logger.debug("{} has inserted urls out of pastebin into url-blacklist", _e.getMember().getUser().getIdLong());
+								}
+								else if(querryResult == 1) {
+									//throw error for failing the db replacement
+									message.setColor(Color.RED).setTitle("Execution failed");
+									var duplicates = checkDuplicates(url);
+									if(duplicates == null || duplicates.size() == 0) {
+										_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current url-blacklist with the names from inside the pastebin link! Please verify that the urls aren't already registered!").build()).queue();
+										logger.warn("url-blacklist couldn't be updated in guild {}", _e.getGuild().getId());
+									}
+									else {
+										StringBuilder out = new StringBuilder();
+										for(var word : duplicates) {
+											out.append("**"+word+"**\n");
+										}
+										_e.getTextChannel().sendMessage(message.setDescription("URLs couldn't be loaded from the pastebin link because duplicates have been found. Please remove these duplicates and then try again!\n\n").build()).queue();
+									}
+								}
+								else {
+									//thow error for failing the rollback
+									message.setColor(Color.RED).setTitle("Execution failed");
+									_e.getTextChannel().sendMessage(message.setDescription("A critical error occurred. The url-blacklist table has been altered but couldn't be reverted on error. Current url data could have been lost!").build()).queue();
+									logger.error("Update on url-blacklist table couldn't be rolled back on error. Affected guild {}", _e.getGuild().getId());
+								}
+							}
+							else {
+								message.setColor(Color.RED).setTitle("Execution failed");
+								_e.getTextChannel().sendMessage(message.setDescription("Please send a pastebin link with valid pastebin urls!").build()).queue();
+							}
+						} catch (MalformedURLException | RuntimeException e) {
+							logger.error("Reading paste failed!", e);
+							message.setColor(Color.RED).setTitle("Invalid pastebin link!");
+							_e.getTextChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
+						}
+						Hashes.clearTempCache(key);
+					}
 				}
 				case "insert-url-whitelist" -> {
 					if((_message.startsWith("http://") || _message.startsWith("https://")) && !_message.matches("[\\s]")) {
@@ -896,7 +950,61 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 				}
 				case "add-load-url-whitelist", "load-url-whitelist" -> {
-					
+					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
+						try {
+							String [] url = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
+							List<String> checkedURLs = new ArrayList<String>();
+							for(var link : url) {
+								if(link.matches("^(http:\\/\\/|https:\\/\\/)[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}$")) {
+									checkedURLs.add(link);
+								}
+								else {
+									checkedURLs.clear();
+									break;
+								}
+							}
+							if(checkedURLs.size() > 0) {
+								var querryResult = Azrael.SQLReplaceURLWhitelist(url, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+								if(querryResult == 0) {
+									message.setTitle("Success!");
+									_e.getTextChannel().sendMessage(message.setDescription("URLs have been inserted!").build()).queue();
+									Hashes.removeURLWhitelist(_e.getGuild().getIdLong());
+									logger.debug("{} has inserted urls out of pastebin into url-whitelist", _e.getMember().getUser().getIdLong());
+								}
+								else if(querryResult == 1) {
+									//throw error for failing the db replacement
+									message.setColor(Color.RED).setTitle("Execution failed");
+									var duplicates = checkDuplicates(url);
+									if(duplicates == null || duplicates.size() == 0) {
+										_e.getTextChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current url-whitelist with the names from inside the pastebin link! Please verify that the urls aren't already registered!").build()).queue();
+										logger.warn("url-whitelist couldn't be updated in guild {}", _e.getGuild().getId());
+									}
+									else {
+										StringBuilder out = new StringBuilder();
+										for(var word : duplicates) {
+											out.append("**"+word+"**\n");
+										}
+										_e.getTextChannel().sendMessage(message.setDescription("URLs couldn't be loaded from the pastebin link because duplicates have been found. Please remove these duplicates and then try again!\n\n").build()).queue();
+									}
+								}
+								else {
+									//thow error for failing the rollback
+									message.setColor(Color.RED).setTitle("Execution failed");
+									_e.getTextChannel().sendMessage(message.setDescription("A critical error occurred. The url-whitelist table has been altered but couldn't be reverted on error. Current url data could have been lost!").build()).queue();
+									logger.error("Update on url-whitelist table couldn't be rolled back on error. Affected guild {}", _e.getGuild().getId());
+								}
+							}
+							else {
+								message.setColor(Color.RED).setTitle("Execution failed");
+								_e.getTextChannel().sendMessage(message.setDescription("Please send a pastebin link with valid pastebin urls!").build()).queue();
+							}
+						} catch (MalformedURLException | RuntimeException e) {
+							logger.error("Reading paste failed!", e);
+							message.setColor(Color.RED).setTitle("Invalid pastebin link!");
+							_e.getTextChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
+						}
+						Hashes.clearTempCache(key);
+					}
 				}
 			}
 		}
