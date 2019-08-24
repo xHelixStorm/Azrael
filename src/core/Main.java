@@ -41,6 +41,7 @@ import commands.User;
 import fileManagement.IniFileReader;
 import listeners.AvatarUpdateListener;
 import listeners.BanListener;
+import listeners.BoostCountListener;
 import listeners.GuildJoinListener;
 import listeners.GuildLeaveListener;
 import listeners.GuildListener;
@@ -160,7 +161,8 @@ public class Main {
 				new StatusListener(),
 				new ReconnectedListener(),
 				new ResumedListener(),
-				new RoleCreateListener()
+				new RoleCreateListener(),
+				new BoostCountListener()
 		);
 	}
 }

@@ -1076,7 +1076,7 @@ public class FilterExecution {
 			logger.debug("{} has removed the word {} from the english word filter", _e.getMember().getUser().getIdLong(), word);
 		}
 		else {
-			message.setColor(Color.RED).setTitle("Word couldn't be inserted!");
+			message.setColor(Color.RED).setTitle("Word couldn't be removed!");
 			_e.getTextChannel().sendMessage(message.setDescription("An internal error occurred. Word couldn't be removed from the word-filter. Either the word wasn't inside the filter or an internal error occurred!").build()).queue();
 			logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
 		}

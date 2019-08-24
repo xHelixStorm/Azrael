@@ -1366,7 +1366,7 @@ public class Azrael {
 			if(!_lang.equals("all"))
 				sql = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv, fk_guild_id) VALUES(NULL, ?, ?, ?)");
 			else {
-				sql = ("INSERT INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES"
+				sql = ("INSERT IGNORE INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES"
 						+ "(?, \"eng\", ?),"
 						+ "(?, \"ger\", ?),"
 						+ "(?, \"fre\", ?),"
@@ -1438,11 +1438,15 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("DELETE FROM filter WHERE word LIKE ? && fk_lang_abbrv LIKE ? && fk_guild_id = ?");
+			String sql = ("DELETE FROM filter WHERE word LIKE ? "+(!_lang.equals("all") ? "&& fk_lang_abbrv LIKE ? " : "")+"&& fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
-			stmt.setString(2, _lang);
-			stmt.setLong(3, _guild_id);
+			if(!_lang.equals("all")) {
+				stmt.setString(2, _lang);
+				stmt.setLong(3, _guild_id);
+			}
+			else
+				stmt.setLong(2, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteWordFilter Exception", e);
@@ -2184,7 +2188,7 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceURLBlacklist(String [] _url, long _guild_id, boolean delete) {
+	public static int SQLReplaceURLBlacklist(String [] _urls, long _guild_id, boolean delete) {
 		logger.debug("SQLReplaceURLBlacklist launched. Passed params array, {}, {}", _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2200,7 +2204,7 @@ public class Azrael {
 			
 			String sql2 = ("INSERT INTO url_blacklist (url, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql2);
-			for(String url : _url) {
+			for(String url : _urls) {
 				stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 				stmt.setLong(2, _guild_id);
 				stmt.addBatch();
@@ -2224,7 +2228,7 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceURLWhitelist(String [] _url, long _guild_id, boolean delete) {
+	public static int SQLReplaceURLWhitelist(String [] _urls, long _guild_id, boolean delete) {
 		logger.debug("SQLReplaceURLWhitelist launched. Passed params array, {}, {}", _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2240,7 +2244,7 @@ public class Azrael {
 			
 			String sql2 = ("INSERT INTO url_whitelist (url, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql2);
-			for(String url : _url) {
+			for(String url : _urls) {
 				stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 				stmt.setLong(2, _guild_id);
 				stmt.addBatch();
