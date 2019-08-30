@@ -1110,7 +1110,7 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<Channels> SQLgetChannels(long _guild_id) {
+	public static synchronized ArrayList<Channels> SQLgetChannels(long _guild_id) {
 		logger.debug("SQLgetChannels launched. Passed params {}", _guild_id);
 		ArrayList<Channels> channels = new ArrayList<Channels>();
 		if(Hashes.getChannels(_guild_id) == null) {
@@ -1133,6 +1133,7 @@ public class Azrael {
 					channelProperties.setGuild_Name(rs.getString(6));
 					channelProperties.setLang_Filter(rs.getString(7));
 					channelProperties.setURLCensoring(rs.getBoolean(8));
+					channelProperties.setTextRemoval(rs.getBoolean(9));
 					channels.add(channelProperties);
 				}
 				Hashes.addChannels(_guild_id, channels);

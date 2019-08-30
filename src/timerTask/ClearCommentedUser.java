@@ -20,7 +20,7 @@ public class ClearCommentedUser extends TimerTask{
 		logger.debug("Commented user list cleared!");
 	}
 	
-	public static void runTask(long timeout){
+	public static void runTask(long timeout) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);

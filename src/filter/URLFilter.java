@@ -29,17 +29,19 @@ public class URLFilter implements Runnable{
 	MessageReceivedEvent e;
 	MessageUpdateEvent e2;
 	List<String> lang;
+	List<Channels> allChannels;
 	
-	public URLFilter(MessageReceivedEvent _e, MessageUpdateEvent _e2, List<String> _lang) {
+	public URLFilter(MessageReceivedEvent _e, MessageUpdateEvent _e2, List<String> _lang, List<Channels> _allChannels) {
 		this.e = _e;
 		this.e2 = _e2;
 		this.lang = _lang;
+		this.allChannels = _allChannels;
 	}
 	
 	@Override
 	public void run() {
 		var guild_id = (e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong());
-		if(verifyChannel((e != null ? e.getTextChannel().getIdLong() : e2.getTextChannel().getIdLong()), guild_id)) {
+		if(verifyChannel((e != null ? e.getTextChannel().getIdLong() : e2.getTextChannel().getIdLong()), guild_id, allChannels)) {
 			Pattern urlPattern = Pattern.compile("[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b");
 			Matcher matcher = urlPattern.matcher((e != null ? e.getMessage().getContentRaw() : e2.getMessage().getContentRaw()));
 			if(matcher.find()) {
@@ -50,7 +52,7 @@ public class URLFilter implements Runnable{
 						//Whitelist check, if this url should be ignored
 						var whitelist = Azrael.SQLgetURLWhitelist(guild_id);
 						if(whitelist == null || whitelist.parallelStream().filter(f -> foundURL.contains(f)).findAny().orElse(null) == null)
-							printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang));
+							printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang), allChannels);
 					}
 					else {
 						//Do a web check and confirm that the url is valid or not and then insert into global blacklist
@@ -60,7 +62,7 @@ public class URLFilter implements Runnable{
 								//check the url with the whitelist and don't delete message if found
 								var whitelist = Azrael.SQLgetURLWhitelist(guild_id);
 								if(whitelist == null || whitelist.parallelStream().filter(f -> foundURL.contains(foundURL)).findAny().orElse(null) == null)
-									printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang));
+									printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang), allChannels);
 							}
 						} catch (MalformedURLException e1) {
 							logger.error("URL malformed error", e1);
@@ -73,15 +75,14 @@ public class URLFilter implements Runnable{
 					//confront link with the blacklist table and delete if found
 					var blacklist = Azrael.SQLgetURLBlacklist(guild_id);
 					if(blacklist != null && blacklist.size() > 0 && blacklist.parallelStream().filter(f -> foundURL.contains(f)).findAny().orElse(null) != null)
-						printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang));
+						printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang), allChannels);
 				}
 			}
 		}
 	}
 	
-	private static boolean verifyChannel(long channel_id, long guild_id) {
-		var channels = Azrael.SQLgetChannels(guild_id);
-		var channel = channels.parallelStream().filter(f -> f.getURLCensoring() && f.getChannel_ID() == channel_id).findAny().orElse(null);
+	private static boolean verifyChannel(long channel_id, long guild_id, List<Channels> allChannels) {
+		var channel = allChannels.parallelStream().filter(f -> f.getURLCensoring() && f.getChannel_ID() == channel_id).findAny().orElse(null);
 		if(channel != null)
 			return true;
 		else
@@ -143,13 +144,13 @@ public class URLFilter implements Runnable{
 		return output;
 	}
 	
-	private static void printMessage(MessageReceivedEvent e, MessageUpdateEvent e2, String foundURL, boolean defaultBlacklist, String [] output) {
+	private static void printMessage(MessageReceivedEvent e, MessageUpdateEvent e2, String foundURL, boolean defaultBlacklist, String [] output, List<Channels> allChannels) {
 		Channels tra_channel;
 		if(e != null) {
 			e.getMessage().delete().reason("Not allowed URL found!").complete();
 			if(defaultBlacklist) {e.getTextChannel().sendMessage(e.getMember().getAsMention()+output[2]).queue();}
 			else {STATIC.handleRemovedMessages(e, e2, output);}
-			tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
+			tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 			if(tra_channel != null) {
 				e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder()
 					.setDescription(e.getMessage().getContentRaw())
@@ -169,7 +170,7 @@ public class URLFilter implements Runnable{
 			e2.getMessage().delete().reason("Not allowed URL found!").complete();
 			if(defaultBlacklist) {e2.getTextChannel().sendMessage(e2.getMember().getAsMention()+output[2]).queue();}
 			else {STATIC.handleRemovedMessages(e, e2, output);}
-			tra_channel = Azrael.SQLgetChannels(e2.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
+			tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 			if(tra_channel != null) {
 				e2.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder()
 					.setDescription(e2.getMessage().getContentRaw())

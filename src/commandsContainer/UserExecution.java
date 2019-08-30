@@ -2,8 +2,9 @@ package commandsContainer;
 
 import java.awt.Color;
 import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.jpaste.exceptions.PasteException;
 import org.jpaste.pastebin.exceptions.LoginException;
@@ -1111,13 +1112,7 @@ public class UserExecution {
 				_e.getTextChannel().sendMessage("Please choose a number between 1 and 100!").queue();
 			}
 			else{
-				ArrayList<Messages> messages = new ArrayList<Messages>();
-				for(Messages collectedMessage : Hashes.getWholeMessagePool().values()) {
-					if(collectedMessage.getUserID() == user_id && collectedMessage.getGuildID() == _e.getGuild().getIdLong()) {
-						messages.add(collectedMessage);
-					}
-				}
-				
+				List<Messages> messages = Hashes.getWholeMessagePool().values().parallelStream().filter(f -> f.getUserID() == user_id && f.getGuildID() == _e.getGuild().getIdLong()).collect(Collectors.toList());
 				int hash_counter = 0;
 				StringBuilder collected_messages = new StringBuilder();
 				for(int i = messages.size()-1; i >= 0; i--) {

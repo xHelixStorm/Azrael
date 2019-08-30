@@ -25,6 +25,7 @@ public class GuildIni {
 			ini.add("General", "ForceReason", "true");
 			ini.add("General", "OverrideBan", "false");
 			ini.add("General", "URLBlacklist", "false");
+			ini.add("General", "SelfDeletedMessage", "false");
 			
 			//Mute
 			ini.add("Mute", "MessageDeleteEnabled", "false");
@@ -257,14 +258,12 @@ public class GuildIni {
 		return ini.get("General", "LeaveMessage", boolean.class);
 	}
 	
-	public static boolean getChannelLog(long guild_id) {
+	public static boolean [] getChannelAndCacheLog(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("General", "ChannelLog", boolean.class);
-	}
-	
-	public static boolean getCacheLog(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("General", "CacheLog", boolean.class);
+		boolean [] log = new boolean[2];
+		log[0] = ini.get("General", "ChannelLog", boolean.class);
+		log[1] = ini.get("General", "CacheLog", boolean.class);
+		return log;
 	}
 	
 	public static boolean getURLBlacklist(long guild_id) {
@@ -295,6 +294,10 @@ public class GuildIni {
 	public static boolean getOverrideBan(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "OverrideBan", boolean.class);
+	}
+	public static boolean getSelfDeletedMessage(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "SelfDeletedMessage", boolean.class);
 	}
 	
 	public static boolean getMuteMessageDeleteEnabled(long guild_id) {

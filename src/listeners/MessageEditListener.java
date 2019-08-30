@@ -17,12 +17,14 @@ public class MessageEditListener extends ListenerAdapter{
 		var filter_lang = Azrael.SQLgetChannel_Filter(channel_id);
 		
 		ExecutorService executor = Executors.newSingleThreadExecutor();
-		if(filter_lang.size() > 0){
-			executor.execute(new LanguageEditFilter(e, filter_lang));
-			executor.execute(new URLFilter(null, e, filter_lang));
+		if(filter_lang.size() > 0) {
+			var allChannels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
+			executor.execute(new LanguageEditFilter(e, filter_lang, allChannels));
+			executor.execute(new URLFilter(null, e, filter_lang, allChannels));
 		}
 		else {
-			executor.execute(new URLFilter(null, e, filter_lang));
+			var allChannels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
+			executor.execute(new URLFilter(null, e, filter_lang, allChannels));
 		}
 		executor.shutdown();
 	}

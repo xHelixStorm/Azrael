@@ -34,6 +34,7 @@ import threads.RoleExtend;
 import timerTask.ClearCommentedUser;
 import timerTask.ClearHashes;
 import timerTask.ParseRSS;
+import timerTask.VerifyMutedMembers;
 import util.STATIC;
 
 public class ReadyListener extends ListenerAdapter {
@@ -211,6 +212,7 @@ public class ReadyListener extends ListenerAdapter {
 			DoubleExperienceOff.runTask();
 		}
 		ClearHashes.runTask();
+		VerifyMutedMembers.delayFirstStart(e);
 		
 		var timeout = IniFileReader.getMessageTimeout();
 		if(timeout != 0)

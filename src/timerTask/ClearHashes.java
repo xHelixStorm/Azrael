@@ -9,9 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
+import util.STATIC;
 
 public class ClearHashes extends TimerTask{
-	//this class is meant to clear the cache of ranks, shop and dailies every 12h
+	//this class is meant to clear temporary caches every 4 hours
 
 	@Override
 	public void run() {
@@ -38,6 +39,7 @@ public class ClearHashes extends TimerTask{
 		calendar.set(Calendar.MILLISECOND, 0);
 		
 		Timer time = new Timer("ClearHashes");
+		STATIC.addTimer(time);
 		time.schedule(new ClearHashes(), calendar.getTime(), TimeUnit.HOURS.toMillis(4));
 	}
 }
