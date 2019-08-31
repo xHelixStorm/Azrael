@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import constructors.Cache;
 import constructors.Channels;
 import core.Hashes;
 import core.UserPrivs;
@@ -80,6 +81,7 @@ public class LanguageEditFilter implements Runnable {
 							.findAny();
 						if(option.isPresent()) {
 							e.getMessage().delete().reason("Message removed due to bad manner!").complete();
+							Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
 							var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 							if(tra_channel != null) {e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();}
 							wordFound = true;
