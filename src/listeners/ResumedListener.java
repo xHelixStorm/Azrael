@@ -19,6 +19,6 @@ public class ResumedListener extends ListenerAdapter{
 			DoubleExperienceOff.runTask();
 		}
 		ClearHashes.runTask();
-		VerifyMutedMembers.runTask(null, null, e);
+		VerifyMutedMembers.runTask(null, null, e, false);
 	}
 }

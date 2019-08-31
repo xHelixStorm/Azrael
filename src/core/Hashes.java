@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +52,7 @@ public class Hashes {
     private static final ConcurrentMap<String, ArrayList<String>> querry_result = new ConcurrentHashMap<String, ArrayList<String>>();
     private static final ConcurrentMap<Long, ArrayList<NameFilter>> name_filter = new ConcurrentHashMap<Long, ArrayList<NameFilter>>();
     private static final Map<Long, ArrayList<String>> filter_lang = new HashMap<Long, ArrayList<String>>();
-    private static final Map<Long, Integer> message_removed = new HashMap<Long, Integer>();
+    private static final Set<String> actionlog = new LinkedHashSet<String>();
     private static final ConcurrentHashMap<Long, Guilds> status = new ConcurrentHashMap<Long, Guilds>();
     private static final Map<Long, ArrayList<Rank>> ranking_roles = new HashMap<Long, ArrayList<Rank>>();
     private static final LinkedHashMap<String, Ranks> ranking_levels = new LinkedHashMap<String, Ranks>();
@@ -90,8 +91,8 @@ public class Hashes {
 	public static void addNameFilter(Long _key, ArrayList<NameFilter> _names) {
 		name_filter.putIfAbsent(_key, _names);
 	}
-	public static void addMessageRemoved(Long _key, Integer _count){
-		message_removed.put(_key, _count);
+	public static void addActionlog(String _key) {
+		actionlog.add(_key);
 	}
 	public static void addStatus(Long _key, Guilds _status){
 		status.put(_key, _status);
@@ -188,8 +189,11 @@ public class Hashes {
 	public static ArrayList<NameFilter> getNameFilter(Long _key) {
 		return name_filter.get(_key);
 	}
-	public static Integer getMessageRemoved(long _key){
-		return message_removed.get(_key);
+	public static boolean containsActionlog(String _key) {
+		return actionlog.contains(_key);
+	}
+	public static boolean actionlogIsEmpty() {
+		return actionlog.isEmpty();
 	}
 	public static Guilds getStatus(long _key){
 		return status.get(_key);
@@ -288,9 +292,6 @@ public class Hashes {
 	public static void removeNameFilter(Long _key) {
 		name_filter.remove(_key);
 	}
-	public static void removeMessageRemoved(long _key){
-		message_removed.remove(_key);
-	}
 	public static void removeRanking(String _key){
 		ranking.remove(_key);
 	}
@@ -385,5 +386,8 @@ public class Hashes {
 	}
 	public static void clearURLWhitelist() {
 		urlWhitelist.clear();
+	}
+	public static void clearActionlog() {
+		actionlog.clear();
 	}
 }

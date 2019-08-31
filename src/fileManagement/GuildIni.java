@@ -96,6 +96,7 @@ public class GuildIni {
 			ini.add("Commands", "RegisterRoleLevel", "20");
 			ini.add("Commands", "RegisterTextChannelLevel", "20");
 			ini.add("Commands", "RegisterTextChannelURLLevel", "20");
+			ini.add("Commands", "RegisterTextChannelTXTLevel", "20");
 			ini.add("Commands", "RegisterRankingRoleLevel", "20");
 			ini.add("Commands", "RegisterTextChannelsLevel", "20");
 			ini.add("Commands", "RegisterUsersLevel", "20");
@@ -525,6 +526,10 @@ public class GuildIni {
 	public static int getRegisterTextChannelURLLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "RegisterTextChannelURLLevel", int.class);
+	}
+	public static int getRegisterTextChannelTXTLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "RegisterTextChannelTXTLevel", int.class);
 	}
 	public static int getRegisterRankingRoleLevel(long guild_id) {
 		Ini ini = readIni(guild_id);

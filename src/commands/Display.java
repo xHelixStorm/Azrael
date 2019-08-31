@@ -173,6 +173,7 @@ public class Display implements Command{
 						out += "Register role subcommand: "+GuildIni.getRegisterRoleLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register text channel subcommand: "+GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register text channel url subcommand: "+GuildIni.getRegisterTextChannelURLLevel(e.getGuild().getIdLong())+"\n";
+						out += "Register text channel txt subcommand: "+GuildIni.getRegisterTextChannelTXTLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register text channels subcommand: "+GuildIni.getRegisterTextChannelsLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register ranking role subcommand: "+GuildIni.getRegisterRankingRoleLevel(e.getGuild().getIdLong())+"\n";
 						out += "Register users subcommand: "+GuildIni.getRegisterUsersLevel(e.getGuild().getIdLong())+"\n";

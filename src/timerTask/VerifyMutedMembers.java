@@ -20,15 +20,23 @@ public class VerifyMutedMembers extends TimerTask {
 	private ReadyEvent event;
 	private ReconnectedEvent event2;
 	private ResumedEvent event3;
+	private boolean delay;
 	
-	public VerifyMutedMembers(ReadyEvent _e, ReconnectedEvent _e2, ResumedEvent _e3) {
+	public VerifyMutedMembers(ReadyEvent _e, ReconnectedEvent _e2, ResumedEvent _e3, boolean _delay) {
 		this.event = _e;
 		this.event2 = _e2;
 		this.event3 = _e3;
+		this.delay = _delay;
 	}
 	
 	@Override
 	public void run() {
+		try {
+			if(delay)
+				Thread.sleep(600000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		var e = (event != null ? event : (event2 != null ? event2 : event3));
 		for(var guild : e.getJDA().getGuilds()) {
 			var mute_role = DiscordRoles.SQLgetRole(guild.getIdLong(), "mut");
@@ -54,22 +62,13 @@ public class VerifyMutedMembers extends TimerTask {
 		}
 	}
 	
-	public static void delayFirstStart(ReadyEvent e) {
-		try {
-			Thread.sleep(3600000);
-			runTask(e, null, null);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-	}
-	
-	public static void runTask(ReadyEvent e, ReconnectedEvent e2, ResumedEvent e3) {
+	public static void runTask(ReadyEvent e, ReconnectedEvent e2, ResumedEvent e3, boolean delay) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 		
 		Timer time = new Timer("VerifyMutedMembers");
 		STATIC.addTimer(time);
-		time.schedule(new VerifyMutedMembers(e, e2, e3), calendar.getTime(), TimeUnit.HOURS.toMillis(1));
+		time.schedule(new VerifyMutedMembers(e, e2, e3, delay), calendar.getTime(), TimeUnit.HOURS.toMillis(1));
 	}
 }

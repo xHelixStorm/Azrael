@@ -1055,7 +1055,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_channel_type, fk_guild_id, url_censoring) VALUES (?, ?, ?, 0) ON DUPLICATE KEY UPDATE fk_channel_type = VALUES(fk_channel_type)");
+			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_channel_type, fk_guild_id, url_censoring, txt_removal) VALUES (?, ?, ?, 0, 0) ON DUPLICATE KEY UPDATE fk_channel_type = VALUES(fk_channel_type)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
 			stmt.setString(2, _channel_type);
@@ -1076,7 +1076,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_guild_id, url_censoring) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE url_censoring = VALUES(url_censoring)");
+			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_guild_id, url_censoring, txt_removal) VALUES (?, ?, ?, 0) ON DUPLICATE KEY UPDATE url_censoring = VALUES(url_censoring)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
 			stmt.setLong(2, _guild_id);
@@ -1084,6 +1084,27 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertChannel_ConfURLCensoring Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLInsertChannel_ConfTXTCensoring(long _channel_id, long _guild_id, boolean _txt_removal) {
+		logger.debug("SQLInsertChannel_ConfTXTCensoring launched. Passed params {}, {}, {}, {}", _channel_id, _guild_id, _txt_removal);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_guild_id, url_censoring, txt_removal) VALUES (?, ?, 0, ?) ON DUPLICATE KEY UPDATE txt_removal = VALUES(txt_removal)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _channel_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setBoolean(3, _txt_removal);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertChannel_ConfTXTCensoring Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

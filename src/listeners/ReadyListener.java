@@ -212,7 +212,7 @@ public class ReadyListener extends ListenerAdapter {
 			DoubleExperienceOff.runTask();
 		}
 		ClearHashes.runTask();
-		VerifyMutedMembers.delayFirstStart(e);
+		VerifyMutedMembers.runTask(e, null, null, true);
 		
 		var timeout = IniFileReader.getMessageTimeout();
 		if(timeout != 0)

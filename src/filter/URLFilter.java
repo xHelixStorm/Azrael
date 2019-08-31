@@ -16,8 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Channels;
 import core.Hashes;
+import core.UserPrivs;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import sql.Azrael;
@@ -41,7 +43,8 @@ public class URLFilter implements Runnable{
 	@Override
 	public void run() {
 		var guild_id = (e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong());
-		if(verifyChannel((e != null ? e.getTextChannel().getIdLong() : e2.getTextChannel().getIdLong()), guild_id, allChannels)) {
+		User user = (e != null ? e.getMember().getUser() : e2.getMember().getUser());
+		if(!UserPrivs.isUserAdmin(user, guild_id) && !UserPrivs.isUserMod(user, guild_id) && GuildIni.getAdmin(guild_id) != user.getIdLong()) {
 			Pattern urlPattern = Pattern.compile("[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b");
 			Matcher matcher = urlPattern.matcher((e != null ? e.getMessage().getContentRaw() : e2.getMessage().getContentRaw()));
 			if(matcher.find()) {
@@ -79,14 +82,6 @@ public class URLFilter implements Runnable{
 				}
 			}
 		}
-	}
-	
-	private static boolean verifyChannel(long channel_id, long guild_id, List<Channels> allChannels) {
-		var channel = allChannels.parallelStream().filter(f -> f.getURLCensoring() && f.getChannel_ID() == channel_id).findAny().orElse(null);
-		if(channel != null)
-			return true;
-		else
-			return false;
 	}
 	
 	private static boolean pingHost(String foundURL) throws MalformedURLException, IOException {

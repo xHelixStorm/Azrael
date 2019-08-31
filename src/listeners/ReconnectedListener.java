@@ -19,6 +19,6 @@ public class ReconnectedListener extends ListenerAdapter{
 			DoubleExperienceOff.runTask();
 		}
 		ClearHashes.runTask();
-		VerifyMutedMembers.runTask(null, e, null);
+		VerifyMutedMembers.runTask(null, e, null, false);
 	}
 }

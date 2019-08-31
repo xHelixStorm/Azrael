@@ -100,9 +100,12 @@ public class MessageListener extends ListenerAdapter{
 			}
 			
 			var allChannels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
+			var currentChannel = allChannels.parallelStream().filter(f -> f.getChannel_ID() == channel_id).findAny().orElse(null);
+			
 			//If the channel doesn't allow any text input but only screenshots, then delete
-			if(allChannels.parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getTxtRemoval()).findAny().orElse(null) != null && e.getMessage().getAttachments().size() == 0) {
-				e.getMessage().delete().queue();
+			if(currentChannel != null && currentChannel.getTxtRemoval() && e.getMessage().getAttachments().size() == 0) {
+				Hashes.addTempCache("message-removed_gu"+guild_id+"ch"+channel_id+"us"+user_id, new Cache(10000));
+				e.getMessage().delete().reason("Messages not allowed!").queue();
 			}
 			
 			if(warning != null) {
@@ -390,9 +393,10 @@ public class MessageListener extends ListenerAdapter{
 			var filter_lang = Azrael.SQLgetChannel_Filter(channel_id);
 			if(filter_lang.size() > 0) {
 				executor.execute(new LanguageFilter(e, filter_lang, allChannels));
-				executor.execute(new URLFilter(e, null, filter_lang, allChannels));
+				if(currentChannel != null && currentChannel.getURLCensoring())
+					executor.execute(new URLFilter(e, null, filter_lang, allChannels));
 			}
-			else {
+			else if(currentChannel != null && currentChannel.getURLCensoring()) {
 				ArrayList<String> lang = new ArrayList<String>();
 				lang.add("eng");
 				executor.execute(new URLFilter(e, null, lang, allChannels));

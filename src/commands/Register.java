@@ -73,6 +73,8 @@ public class Register implements Command{
 								+ "**"+prefix+"register -text-channel**\n\n"
 							+ "Description to enable the url censoring in a channel:\n"
 								+ "**"+prefix+"register -text-channel-url**\n\n"
+							+ "Description to enable the text removal in a channel:\n"
+								+ "**"+prefix+"register -text-channel-txt**\n\n"
 							+ "Syntax to register all channels:\n"
 								+ "**"+prefix+"register -text-channels**\n\n"
 							+ "Description to register a ranking role:\n"
@@ -115,6 +117,18 @@ public class Register implements Command{
 				}
 				else if(args.length > 1 && args[0].equalsIgnoreCase("-text-channel-url")) {
 					RegisterChannel.runCommandURL(e, guild_id, args, adminPermission);
+				}
+				else if(args.length == 1 && args[0].equalsIgnoreCase("-text-channel-txt")) {
+					final var commandLevel = GuildIni.getRegisterTextChannelTXTLevel(e.getGuild().getIdLong());
+					if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+						RegisterChannel.RegisterChannelHelperTxt(e);
+					}
+					else {
+						e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild())).build()).queue();
+					}
+				}
+				else if(args.length > 1 && args[0].equalsIgnoreCase("-text-channel-txt")) {
+					RegisterChannel.runCommandTxt(e, guild_id, args, adminPermission);
 				}
 				else if(args[0].equalsIgnoreCase("-text-channels")) {
 					RegisterChannel.runChannelsRegistration(e, guild_id, adminPermission);
