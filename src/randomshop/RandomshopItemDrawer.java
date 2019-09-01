@@ -16,11 +16,11 @@ import org.slf4j.LoggerFactory;
 import constructors.Weapons;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
 public class RandomshopItemDrawer {
-	public static void drawItems(MessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<Weapons> weapons, int current_page, int last_page, int theme_id) {
+	public static void drawItems(GuildMessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<Weapons> weapons, int current_page, int last_page, int theme_id) {
 		try {
 			BufferedImage randomshop = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/randomshop_blank.png"));
 			
@@ -66,7 +66,7 @@ public class RandomshopItemDrawer {
 			
 			File file1 = new File(IniFileReader.getTempDirectory()+"randomshop_items_gu"+(e != null ? e.getGuild().getId() : e2.getGuild().getId())+"us"+(e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId())+".png");
 			if(e != null)
-				e.getTextChannel().sendFile(file1, "randomshop.png").complete();
+				e.getChannel().sendFile(file1, "randomshop.png").complete();
 			else
 				e2.getChannel().sendFile(file1, "randomshop.png").complete();
 			file1.delete();

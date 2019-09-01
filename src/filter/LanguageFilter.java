@@ -10,18 +10,18 @@ import constructors.Channels;
 import core.Hashes;
 import core.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 import util.STATIC;
 import util.CharacterReplacer;
 
 public class LanguageFilter implements Runnable {
 	
-	private MessageReceivedEvent e;
+	private GuildMessageReceivedEvent e;
 	private ArrayList<String> filter_lang;
 	private List<Channels> allChannels;
 	
-	public LanguageFilter(MessageReceivedEvent event, ArrayList<String> _filter_lang, List<Channels> _allChannels) {
+	public LanguageFilter(GuildMessageReceivedEvent event, ArrayList<String> _filter_lang, List<Channels> _allChannels) {
 		this.e = event;
 		this.filter_lang = _filter_lang;
 		this.allChannels = _allChannels;
@@ -58,7 +58,7 @@ public class LanguageFilter implements Runnable {
 		
 		if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong())) {
 			String getMessage = e.getMessage().getContentRaw();
-			String channel = e.getTextChannel().getName();
+			String channel = e.getChannel().getName();
 			String thisMessage;
 			String name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
 			
@@ -81,7 +81,7 @@ public class LanguageFilter implements Runnable {
 							.findAny();
 						if(option.isPresent()) {
 							e.getMessage().delete().reason("Message removed due to bad manner!").complete();
-							Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
+							Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
 							var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 							if(tra_channel != null) {e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();}
 							wordFound = true;

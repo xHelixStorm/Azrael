@@ -16,64 +16,64 @@ import constructors.Cache;
 import constructors.RSS;
 import core.Hashes;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 
 public class RssExecution {
 	private static final Logger logger = LoggerFactory.getLogger(RssExecution.class);
 	
-	public static boolean removeFeed(MessageReceivedEvent e, int feed) {
+	public static boolean removeFeed(GuildMessageReceivedEvent e, int feed) {
 		EmbedBuilder message = new EmbedBuilder();
 		ArrayList<RSS> rss = Hashes.getFeed(e.getGuild().getIdLong());
 		if(rss.size() >= feed+1) {
 			String url = rss.get(feed).getURL();
 			if(Azrael.SQLDeleteRSSFeed(url, e.getGuild().getIdLong()) > 0) {
 				Hashes.clearFeeds();
-				e.getTextChannel().sendMessage(message.setColor(Color.BLUE).setDescription("Feed has been succesfully removed").build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription("Feed has been succesfully removed").build()).queue();
 				logger.debug("{} rss feed has been deleted from guild {}", url, e.getGuild().getId());
 				return true;
 			}
 			else {
-				e.getTextChannel().sendMessage(message.setColor(Color.RED).setDescription("An internal error occurred. The rss feed couldn't be removed. Please confirm if the feed isn't already removed").build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.RED).setDescription("An internal error occurred. The rss feed couldn't be removed. Please confirm if the feed isn't already removed").build()).queue();
 				logger.error("{} rss feed couldn't be removed from guild {}", url, e.getGuild().getId());
 				return false;
 			}
 		}
 		else {
-			e.getTextChannel().sendMessage(message.setColor(Color.RED).setDescription("Please select an available digit").build()).queue();
+			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription("Please select an available digit").build()).queue();
 			return false;
 		}
 	}
 	
-	public static void currentFormat(MessageReceivedEvent e, int feed, String key) {
+	public static void currentFormat(GuildMessageReceivedEvent e, int feed, String key) {
 		EmbedBuilder message = new EmbedBuilder();
 		ArrayList<RSS> rss = Hashes.getFeed(e.getGuild().getIdLong());
 		if(rss.size() >= feed+1) {
-			e.getTextChannel().sendMessage("This is the curring setting for this feed. Type your desired template for this feed or type exit to interrupt. Key values are `{pubDate}`, `{title}`, `{description}`, `{link}`\n```"+rss.get(feed).getFormat()+"```").queue();
+			e.getChannel().sendMessage("This is the curring setting for this feed. Type your desired template for this feed or type exit to interrupt. Key values are `{pubDate}`, `{title}`, `{description}`, `{link}`\n```"+rss.get(feed).getFormat()+"```").queue();
 			Hashes.addTempCache(key, new Cache(180000, "updateformat"+feed));
 		}
 		else {
-			e.getTextChannel().sendMessage(message.setColor(Color.RED).setDescription("Please select an available digit").build()).queue();
+			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription("Please select an available digit").build()).queue();
 		}
 	}
 	
-	public static boolean updateFormat(MessageReceivedEvent e, int feed, String format) {
+	public static boolean updateFormat(GuildMessageReceivedEvent e, int feed, String format) {
 		EmbedBuilder message = new EmbedBuilder();
 		ArrayList<RSS> rss = Hashes.getFeed(e.getGuild().getIdLong());
 		if(Azrael.SQLUpdateRSSFormat(rss.get(feed).getURL(), e.getGuild().getIdLong(), EmojiParser.parseToAliases(format)) > 0) {
 			Hashes.clearFeeds();
-			e.getTextChannel().sendMessage(message.setColor(Color.BLUE).setDescription("The format has been updated").build()).queue();
+			e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription("The format has been updated").build()).queue();
 			logger.debug("{} has updated the format of an rss feed in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			return true;
 		}
 		else {
-			e.getTextChannel().sendMessage(message.setColor(Color.RED).setDescription("An internal error occurred. Format couldn't be updated").build()).queue();
+			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription("An internal error occurred. Format couldn't be updated").build()).queue();
 			logger.error("Format couldn't be updated for the url {} in guild {}", rss.get(feed).getURL(), e.getGuild().getId());
 			return false;
 		}
 	}
 	
-	public static boolean runTest(MessageReceivedEvent e, int feed) {
+	public static boolean runTest(GuildMessageReceivedEvent e, int feed) {
 		EmbedBuilder message = new EmbedBuilder();
 		var rss_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rss")).findAny().orElse(null);
 		if(rss_channel != null) {
@@ -129,7 +129,7 @@ public class RssExecution {
 						e.getGuild().getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
 					}
 					else {
-						e.getTextChannel().sendMessage("No feed could be found").queue();
+						e.getChannel().sendMessage("No feed could be found").queue();
 					}
 					in.close();
 					return true;
@@ -139,12 +139,12 @@ public class RssExecution {
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage(message.setColor(Color.RED).setDescription("Please select an available digit").build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.RED).setDescription("Please select an available digit").build()).queue();
 				return false;
 			}
 		}
 		else {
-			e.getTextChannel().sendMessage(message.setColor(Color.RED).setDescription("No rss channel has been registered. Please register a rss channel before testing").build()).queue();
+			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription("No rss channel has been registered. Please register a rss channel before testing").build()).queue();
 			return true;
 		}
 	}

@@ -24,7 +24,6 @@ import commands.Meow;
 import commands.Patchnotes;
 import commands.Profile;
 import commands.Pug;
-import commands.Purchase;
 import commands.Quiz;
 import commands.Randomshop;
 import commands.Rank;
@@ -47,9 +46,9 @@ import listeners.GuildLeaveListener;
 import listeners.GuildListener;
 import listeners.GuildMessageReactionAddListener;
 import listeners.GuildMessageReactionRemoveListener;
-import listeners.MessageEditListener;
-import listeners.MessageListener;
-import listeners.MessageRemovedListener;
+import listeners.GuildMessageEditListener;
+import listeners.GuildMessageListener;
+import listeners.GuildMessageRemovedListener;
 import listeners.NameListener;
 import listeners.NicknameListener;
 import listeners.ReadyListener;
@@ -97,7 +96,8 @@ public class Main {
 		builder.setAutoReconnect(true);
 		builder.setStatus(OnlineStatus.ONLINE);	
 	
-		addCommands();
+		addPublicCommands();
+		addPrivateCommands();
 		addListeners();
 		
 		try {
@@ -108,61 +108,64 @@ public class Main {
 		}
 	}
 	
-	public static void addCommands(){
+	public static void addPublicCommands() {
 		
-		CommandHandler.commands.put("shutdown", new ShutDown());
-		CommandHandler.commands.put("help", new Help());
-		CommandHandler.commands.put("about", new About());
-		CommandHandler.commands.put("reboot", new Reboot());
-		CommandHandler.commands.put("commands", new Commands());
-		CommandHandler.commands.put("pug", new Pug());
-		CommandHandler.commands.put("meow", new Meow());
-		CommandHandler.commands.put("rank", new Rank());
-		CommandHandler.commands.put("profile", new Profile());
-		CommandHandler.commands.put("display", new Display());
-		CommandHandler.commands.put("top", new Top());
-		CommandHandler.commands.put("register", new Register());
-		CommandHandler.commands.put("set", new Set());
-		CommandHandler.commands.put("shop", new Shop());
-		CommandHandler.commands.put("purchase", new Purchase());
-		CommandHandler.commands.put("use", new Use());
-		CommandHandler.commands.put("inventory", new Inventory());
-		CommandHandler.commands.put("daily", new Daily());
-		CommandHandler.commands.put("user", new User());
-		CommandHandler.commands.put("filter", new Filter());
-		CommandHandler.commands.put("quiz", new Quiz());
-		CommandHandler.commands.put("rolereaction", new RoleReaction());
-		CommandHandler.commands.put("rss", new Rss());
-		CommandHandler.commands.put("randomshop", new Randomshop());
-		CommandHandler.commands.put("patchnotes", new Patchnotes());
-		CommandHandler.commands.put("doubleexperience", new DoubleExperience());
-		CommandHandler.commands.put("equip", new Equip());
+		CommandHandler.commandsPublic.put("shutdown", new ShutDown());
+		CommandHandler.commandsPublic.put("help", new Help());
+		CommandHandler.commandsPublic.put("about", new About());
+		CommandHandler.commandsPublic.put("reboot", new Reboot());
+		CommandHandler.commandsPublic.put("commands", new Commands());
+		CommandHandler.commandsPublic.put("pug", new Pug());
+		CommandHandler.commandsPublic.put("meow", new Meow());
+		CommandHandler.commandsPublic.put("rank", new Rank());
+		CommandHandler.commandsPublic.put("profile", new Profile());
+		CommandHandler.commandsPublic.put("display", new Display());
+		CommandHandler.commandsPublic.put("top", new Top());
+		CommandHandler.commandsPublic.put("register", new Register());
+		CommandHandler.commandsPublic.put("set", new Set());
+		CommandHandler.commandsPublic.put("shop", new Shop());
+		CommandHandler.commandsPublic.put("use", new Use());
+		CommandHandler.commandsPublic.put("inventory", new Inventory());
+		CommandHandler.commandsPublic.put("daily", new Daily());
+		CommandHandler.commandsPublic.put("user", new User());
+		CommandHandler.commandsPublic.put("filter", new Filter());
+		CommandHandler.commandsPublic.put("quiz", new Quiz());
+		CommandHandler.commandsPublic.put("rolereaction", new RoleReaction());
+		CommandHandler.commandsPublic.put("rss", new Rss());
+		CommandHandler.commandsPublic.put("randomshop", new Randomshop());
+		CommandHandler.commandsPublic.put("patchnotes", new Patchnotes());
+		CommandHandler.commandsPublic.put("doubleexperience", new DoubleExperience());
+		CommandHandler.commandsPublic.put("equip", new Equip());
+	}
+	
+	public static void addPrivateCommands() {
+		CommandHandler.commandsPrivate.put("!equip", new Equip());
 	}
 	
 	public static void addListeners() {
 		builder.addEventListeners(
-				new ReadyListener(),
-				new GuildListener(),
-				new RoleListener(),
-				new BanListener(),
-				new UnbanListener(),
-				new MessageListener(),
-				new GuildLeaveListener(),
-				new MessageEditListener(),
-				new NameListener(),
-				new GuildJoinListener(),
-				new ShutdownListener(),
-				new RoleRemovedListener(),
-				new NicknameListener(),
-				new MessageRemovedListener(),
-				new AvatarUpdateListener(),
-				new GuildMessageReactionAddListener(),
-				new GuildMessageReactionRemoveListener(),
-				new StatusListener(),
-				new ReconnectedListener(),
-				new ResumedListener(),
-				new RoleCreateListener(),
-				new BoostCountListener()
+			new ReadyListener(),
+			new GuildListener(),
+			new RoleListener(),
+			new BanListener(),
+			new UnbanListener(),
+			new GuildMessageListener(),
+			new GuildLeaveListener(),
+			new GuildMessageEditListener(),
+			new NameListener(),
+			new GuildJoinListener(),
+			new ShutdownListener(),
+			new RoleRemovedListener(),
+			new NicknameListener(),
+			new GuildMessageRemovedListener(),
+			new AvatarUpdateListener(),
+			new GuildMessageReactionAddListener(),
+			new GuildMessageReactionRemoveListener(),
+			new StatusListener(),
+			new ReconnectedListener(),
+			new ResumedListener(),
+			new RoleCreateListener(),
+			new BoostCountListener()
 		);
 	}
 }

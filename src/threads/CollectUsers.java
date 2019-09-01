@@ -6,14 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 
 public class CollectUsers implements Runnable{
 	private static EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("Collection complete!");
-	MessageReceivedEvent e;
+	GuildMessageReceivedEvent e;
 	
-	public CollectUsers(MessageReceivedEvent _e){
+	public CollectUsers(GuildMessageReceivedEvent _e){
 		e = _e;
 	}
 
@@ -23,6 +23,6 @@ public class CollectUsers implements Runnable{
 		Azrael.SQLBulkInsertUsers(e.getJDA().getGuildById(guild_id).getMembers());
 		Logger logger = LoggerFactory.getLogger(CollectUsers.class);
 		logger.debug("{} has registered all users from the guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
-		e.getTextChannel().sendMessage(message.setDescription("User registration is complete!").build()).queue();
+		e.getChannel().sendMessage(message.setDescription("User registration is complete!").build()).queue();
 	}
 }

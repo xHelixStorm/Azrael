@@ -11,13 +11,13 @@ import constructors.Weapons;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
 
 public class ShopExecution {
 	
-	public static void displayShop(MessageReceivedEvent _e, String _type, String _description){
+	public static void displayShop(GuildMessageReceivedEvent _e, String _type, String _description){
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail());
 		Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 		List<Skins> filteredContent = RankingSystem.SQLgetSkinshopContentAndType(_e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(e -> e.getSkinType().equals(_type)).collect(Collectors.toList());
@@ -40,11 +40,11 @@ public class ShopExecution {
 		message.addField("Description", builder.toString(), true);
 		message.addField("Price", priceBuilder.toString(), true);
 		
-		_e.getTextChannel().sendMessage(message.build()).queue();
-		Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, _type, items));
+		_e.getChannel().sendMessage(message.build()).queue();
+		Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, _type, items));
 	}
 	
-	public static void displaySingleItem(MessageReceivedEvent _e, String _type, String [] _items, Guilds guild_settings, final int selection) {
+	public static void displaySingleItem(GuildMessageReceivedEvent _e, String _type, String [] _items, Guilds guild_settings, final int selection) {
 		if(selection >= 0 && selection < _items.length) {
 			final var item = Integer.parseInt(_items[selection]);
 			var shopItem = RankingSystem.SQLgetSkinshopContentAndType(_e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(f -> f.getItemID() == item).findAny().orElse(null);
@@ -77,29 +77,29 @@ public class ShopExecution {
 				embed.addField("Purchase", shopItem.getPrice()+" "+guild_settings.getCurrency(), true);
 				embed.addField("Return", "Skin selection page", true);
 			}
-			_e.getTextChannel().sendMessage(embed.build()).queue();
-			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, _type, shopItem.getItemID()+terminator));
+			_e.getChannel().sendMessage(embed.build()).queue();
+			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, _type, shopItem.getItemID()+terminator));
 		}
 		else {
-			_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select a digit between 1 and "+_items.length+" to closely inspect an item and then purchase!").build()).queue();
-			var cache = Hashes.getTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()).setExpiration(180000);
-			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), cache);
+			_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select a digit between 1 and "+_items.length+" to closely inspect an item and then purchase!").build()).queue();
+			var cache = Hashes.getTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId()).setExpiration(180000);
+			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId(), cache);
 		}
 	}
 	
-	public static void displayWeaponCategories(MessageReceivedEvent _e, final int theme_id) {
+	public static void displayWeaponCategories(GuildMessageReceivedEvent _e, final int theme_id) {
 		StringBuilder builder = new StringBuilder();
 		var categories = "";
 		for(String category : RankingSystemItems.SQLgetWeaponCategories(_e.getGuild().getIdLong(), theme_id, false)) {
 			categories += (categories.length() == 0 ? "" : "-")+category;
 			builder.append(category+", ");
 		}
-		_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail())
+		_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail())
 				.setDescription("My weapons interest you? Alright! Which category do you wish to take a look into?\n\n**"+builder.toString()+"**").build()).queue();
-		Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, "wea", categories));
+		Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, "wea", categories));
 	}
 	
-	public static void displayShopWeapons(MessageReceivedEvent _e, String _type) {
+	public static void displayShopWeapons(GuildMessageReceivedEvent _e, String _type) {
 		Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 		List<Weapons> filteredContent = RankingSystemItems.SQLgetWholeWeaponShop(_e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(f -> f.getCategoryDescription().equalsIgnoreCase(_type) && f.getEnabled()).collect(Collectors.toList());
 		if(filteredContent.size() > 0) {
@@ -119,12 +119,12 @@ public class ShopExecution {
 			message.addField("Description", builder.toString(), true);
 			message.addField("Price", priceBuilder.toString(), true);
 			
-			_e.getTextChannel().sendMessage(message.build()).queue();
-			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, "wea-"+_type, weapons));
+			_e.getChannel().sendMessage(message.build()).queue();
+			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, "wea-"+_type, weapons));
 		}
 	}
 	
-	public static void displaySingleWeapon(MessageReceivedEvent _e, String _type, String [] weapons, Guilds guild_settings, final int selection) {
+	public static void displaySingleWeapon(GuildMessageReceivedEvent _e, String _type, String [] weapons, Guilds guild_settings, final int selection) {
 		if(selection >= 0 && selection < weapons.length) {
 			final var weapon_id = Integer.parseInt(weapons[selection]);
 			var shopItem = RankingSystemItems.SQLgetWholeWeaponShop(_e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == weapon_id && f.getEnabled()).findAny().orElse(null);
@@ -135,17 +135,17 @@ public class ShopExecution {
 			embed.setColor(Color.BLUE);
 			embed.addField("Purchase", shopItem.getPrice()+" "+guild_settings.getCurrency(), true);
 			embed.addField("Return", "Return to weapon selection", true);
-			_e.getTextChannel().sendMessage(embed.build()).queue();
-			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, _type, shopItem.getWeaponID()+"%"));
+			_e.getChannel().sendMessage(embed.build()).queue();
+			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, _type, shopItem.getWeaponID()+"%"));
 		}
 		else {
-			_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select a digit between 1 and "+weapons.length+" to closely inspect a weapon and then purchase!").build()).queue();
-			var cache = Hashes.getTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()).setExpiration(180000);
-			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), cache);
+			_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select a digit between 1 and "+weapons.length+" to closely inspect a weapon and then purchase!").build()).queue();
+			var cache = Hashes.getTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId()).setExpiration(180000);
+			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId(), cache);
 		}
 	}
 	
-	public static void displaySkills(MessageReceivedEvent _e, Guilds guild_settings) {
+	public static void displaySkills(GuildMessageReceivedEvent _e, Guilds guild_settings) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail());
 		var skills = RankingSystemItems.SQLgetSkills(_e.getGuild().getIdLong(), guild_settings.getThemeID());
 		StringBuilder builder = new StringBuilder();
@@ -162,11 +162,11 @@ public class ShopExecution {
 		message.addField("Description", builder.toString(), true);
 		message.addField("Price", priceBuilder.toString(), true);
 		
-		_e.getTextChannel().sendMessage(message.build()).queue();
-		Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, "ski", skill));
+		_e.getChannel().sendMessage(message.build()).queue();
+		Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, "ski", skill));
 	}
 	
-	public static void displaySingleSkill(MessageReceivedEvent _e, Guilds guild_settings, String [] skills, final int selection) {
+	public static void displaySingleSkill(GuildMessageReceivedEvent _e, Guilds guild_settings, String [] skills, final int selection) {
 		if(selection >= 0 && selection < skills.length) {
 			final var skill_id = Integer.parseInt(skills[selection]);
 			var shopItem = RankingSystemItems.SQLgetSkills(_e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(f -> f.getSkillId() == skill_id && f.getEnabled()).findAny().orElse(null);
@@ -177,13 +177,13 @@ public class ShopExecution {
 			embed.setColor(Color.BLUE);
 			embed.addField("Purchase", shopItem.getPrice()+" "+guild_settings.getCurrency(), true);
 			embed.addField("Return", "", true);
-			_e.getTextChannel().sendMessage(embed.build()).queue();
-			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, "ski", shopItem.getSkillId()+"%"));
+			_e.getChannel().sendMessage(embed.build()).queue();
+			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, "ski", shopItem.getSkillId()+"%"));
 		}
 		else {
-			_e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select a digit between 1 and "+skills.length+" to closely inspect an item and then purchase!").build()).queue();
-			var cache = Hashes.getTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId()).setExpiration(180000);
-			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getTextChannel().getId()+"us"+_e.getMember().getUser().getId(), cache);
+			_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select a digit between 1 and "+skills.length+" to closely inspect an item and then purchase!").build()).queue();
+			var cache = Hashes.getTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId()).setExpiration(180000);
+			Hashes.addTempCache("shop_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId(), cache);
 		}
 	}
 }

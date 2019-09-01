@@ -20,20 +20,20 @@ import core.UserPrivs;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import sql.Azrael;
 import util.STATIC;
 
 public class URLFilter implements Runnable{
 	private final static Logger logger = LoggerFactory.getLogger(URLFilter.class);
 
-	MessageReceivedEvent e;
-	MessageUpdateEvent e2;
+	GuildMessageReceivedEvent e;
+	GuildMessageUpdateEvent e2;
 	List<String> lang;
 	List<Channels> allChannels;
 	
-	public URLFilter(MessageReceivedEvent _e, MessageUpdateEvent _e2, List<String> _lang, List<Channels> _allChannels) {
+	public URLFilter(GuildMessageReceivedEvent _e, GuildMessageUpdateEvent _e2, List<String> _lang, List<Channels> _allChannels) {
 		this.e = _e;
 		this.e2 = _e2;
 		this.lang = _lang;
@@ -139,11 +139,11 @@ public class URLFilter implements Runnable{
 		return output;
 	}
 	
-	private static void printMessage(MessageReceivedEvent e, MessageUpdateEvent e2, String foundURL, boolean defaultBlacklist, String [] output, List<Channels> allChannels) {
+	private static void printMessage(GuildMessageReceivedEvent e, GuildMessageUpdateEvent e2, String foundURL, boolean defaultBlacklist, String [] output, List<Channels> allChannels) {
 		Channels tra_channel;
 		if(e != null) {
 			e.getMessage().delete().reason("Not allowed URL found!").complete();
-			if(defaultBlacklist) {e.getTextChannel().sendMessage(e.getMember().getAsMention()+output[2]).queue();}
+			if(defaultBlacklist) {e.getChannel().sendMessage(e.getMember().getAsMention()+output[2]).queue();}
 			else {STATIC.handleRemovedMessages(e, e2, output);}
 			tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 			if(tra_channel != null) {
@@ -153,7 +153,7 @@ public class URLFilter implements Runnable{
 					.setTitle("Message removed!")
 					.addField("NAME", e.getMember().getUser().getAsMention(), true)
 					.addField("USER ID", e.getMember().getUser().getId(), true)
-					.addField("CHANNEL", e.getTextChannel().getAsMention(), true)
+					.addField("CHANNEL", e.getChannel().getAsMention(), true)
 					.addField("TYPE", "URL", true)
 					.addField("FQDN", foundURL, true)
 					.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl())
@@ -163,7 +163,7 @@ public class URLFilter implements Runnable{
 		}
 		else {
 			e2.getMessage().delete().reason("Not allowed URL found!").complete();
-			if(defaultBlacklist) {e2.getTextChannel().sendMessage(e2.getMember().getAsMention()+output[2]).queue();}
+			if(defaultBlacklist) {e2.getChannel().sendMessage(e2.getMember().getAsMention()+output[2]).queue();}
 			else {STATIC.handleRemovedMessages(e, e2, output);}
 			tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 			if(tra_channel != null) {
@@ -173,7 +173,7 @@ public class URLFilter implements Runnable{
 					.setTitle("Message removed!")
 					.addField("NAME", e2.getMember().getUser().getAsMention(), true)
 					.addField("USER ID", e2.getMember().getUser().getId(), true)
-					.addField("CHANNEL", e2.getTextChannel().getAsMention(), true)
+					.addField("CHANNEL", e2.getChannel().getAsMention(), true)
 					.addField("TYPE", "URL", true)
 					.addField("FQDN", foundURL, true)
 					.setThumbnail(e2.getMember().getUser().getEffectiveAvatarUrl())

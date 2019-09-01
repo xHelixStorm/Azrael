@@ -12,12 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 import util.Pastebin;
 
 public class SetGiveawayItems {
-	public static void runTask(MessageReceivedEvent e, String _link) {
+	public static void runTask(GuildMessageReceivedEvent e, String _link) {
 		Logger logger = LoggerFactory.getLogger(SetGiveawayItems.class);
 		
 		//verify pastebin link and save the content into array
@@ -36,22 +36,22 @@ public class SetGiveawayItems {
 				
 				if(err == false) {
 					logger.debug("{} has inserted giveaway items for the daily command", e.getMember().getUser().getId());
-					e.getTextChannel().sendMessage("Rewards from pastebin link have been inserted succesfully!").queue();
+					e.getChannel().sendMessage("Rewards from pastebin link have been inserted succesfully!").queue();
 				}
 				else {
 					EmbedBuilder error = new EmbedBuilder().setTitle("Invalid format!").setColor(Color.RED);
 					logger.error("Rewards couldn't be uploaded into the RankingSystem.giveaway table");
-					e.getTextChannel().sendMessage(error.setDescription("Rewards couldn't be set to table. Please verify the content of the link!").build()).queue();
+					e.getChannel().sendMessage(error.setDescription("Rewards couldn't be set to table. Please verify the content of the link!").build()).queue();
 				}
 			} catch (MalformedURLException | RuntimeException e1) {
 				logger.error("Reading paste failed!", e1);
 				EmbedBuilder error = new EmbedBuilder().setTitle("Reading paste failed!").setColor(Color.RED);
-				e.getTextChannel().sendMessage(error.setDescription("Rewards couldn't be retrieved from the Pastebin link. Please verify that the right link has been provided!").build()).queue();
+				e.getChannel().sendMessage(error.setDescription("Rewards couldn't be retrieved from the Pastebin link. Please verify that the right link has been provided!").build()).queue();
 			}
 		}
 		else {
 			EmbedBuilder error = new EmbedBuilder().setTitle("Invalid url!").setColor(Color.RED);
-			e.getTextChannel().sendMessage(error.setDescription("An invalid url has been inserted. Please insert a Pastebin link").build()).queue();
+			e.getChannel().sendMessage(error.setDescription("An invalid url has been inserted. Please insert a Pastebin link").build()).queue();
 			logger.warn("Invalid pastebin link has been inserted for the giveaway rewards");
 		}
 	}

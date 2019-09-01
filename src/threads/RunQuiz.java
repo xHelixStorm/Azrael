@@ -13,16 +13,16 @@ import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class RunQuiz implements Runnable{
 	private final Logger logger = LoggerFactory.getLogger(RunQuiz.class);
-	private MessageReceivedEvent e;
+	private GuildMessageReceivedEvent e;
 	private long channel_id;
 	private long log_channel_id;
 	private int mode;
 	
-	public RunQuiz(MessageReceivedEvent _e, long _channel_id, long _log_channel_id, int _mode) {
+	public RunQuiz(GuildMessageReceivedEvent _e, long _channel_id, long _log_channel_id, int _mode) {
 		this.e = _e;
 		this.channel_id = _channel_id;
 		this.log_channel_id = _log_channel_id;

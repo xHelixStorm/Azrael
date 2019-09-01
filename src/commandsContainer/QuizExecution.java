@@ -13,13 +13,13 @@ import constructors.Quizes;
 import core.Hashes;
 import fileManagement.FileSetting;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import util.Pastebin;
 
 public class QuizExecution {
 	private static final Logger logger = LoggerFactory.getLogger(QuizExecution.class);
 	
-	public static void registerRewards(MessageReceivedEvent e, String _link) {
+	public static void registerRewards(GuildMessageReceivedEvent e, String _link) {
 		//check if it is a link that was inserted and if yes call readPublicPasteLink and then
 		//split the returned String in an array
 		if(_link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _link.startsWith("http")) {
@@ -58,40 +58,40 @@ public class QuizExecution {
 				if(interrupted == false) {
 					String integrity = IntegrityCheck();
 					if(integrity.equals("0")) {
-						e.getTextChannel().sendMessage("All rewards have been registered successfully!").queue();
+						e.getChannel().sendMessage("All rewards have been registered successfully!").queue();
 						logger.debug("Quiz rewards have been registered");
 					}
 					else {
 						try {
-							e.getTextChannel().sendMessage("An error occured while registering the rewards. All inserted rewards have been cleared. Please check the error log:\n"
+							e.getChannel().sendMessage("An error occured while registering the rewards. All inserted rewards have been cleared. Please check the error log:\n"
 									+ ""+Pastebin.unlistedPaste("Error on registering rewards", integrity, e.getGuild().getIdLong())).queue();
 							logger.error("Quiz rewards couldn't be registered");
 						} catch (IllegalStateException | LoginException | PasteException e1) {
 							logger.warn("Error on creating paste!", e1);
-							e.getTextChannel().sendMessage("An error occurred while registering the rewards. All inserted rewards have been cleared. Error log couldn't be pasted on Pastebin!").queue();
+							e.getChannel().sendMessage("An error occurred while registering the rewards. All inserted rewards have been cleared. Error log couldn't be pasted on Pastebin!").queue();
 						}
 						clearRewards(1);
 					}
 				}
 				else {
-					e.getTextChannel().sendMessage("Please don't try to register questions with this parameter! Please register only rewards!").queue();
+					e.getChannel().sendMessage("Please don't try to register questions with this parameter! Please register only rewards!").queue();
 					clearRewards(1);
 				}
 			} catch (MalformedURLException | RuntimeException e2) {
 				logger.error("Reading paste failed!", e2);
 				EmbedBuilder error = new EmbedBuilder().setTitle("Reading paste failed!").setColor(Color.RED);
-				e.getTextChannel().sendMessage(error.setDescription("Please ensure that a valid Pastebin link has been inserted and that the API key inside the config.ini file is correct").build()).queue();
+				e.getChannel().sendMessage(error.setDescription("Please ensure that a valid Pastebin link has been inserted and that the API key inside the config.ini file is correct").build()).queue();
 			}
 		}
 		else {
 			EmbedBuilder error = new EmbedBuilder().setTitle("Invalid url!").setColor(Color.RED);
-			e.getTextChannel().sendMessage(error.setDescription("An invalid url has been inserted. Please insert a Pastebin link").build()).queue();
+			e.getChannel().sendMessage(error.setDescription("An invalid url has been inserted. Please insert a Pastebin link").build()).queue();
 			logger.warn("Wrong pastebin link has been inserted for the reward registration");
 		}
 	}
 	
 	@SuppressWarnings("preview")
-	public static void registerQuestions(MessageReceivedEvent e, String _link, boolean _readFile) {
+	public static void registerQuestions(GuildMessageReceivedEvent e, String _link, boolean _readFile) {
 		//check if it is a link that was inserted and if yes call readPublicPasteLink and then
 		//split the returned String in an array. Or if it's being registered from a file, the file should be checked
 		if((_link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _link.startsWith("http") && _readFile == false)
@@ -103,7 +103,7 @@ public class QuizExecution {
 				} catch (MalformedURLException | RuntimeException e1) {
 					logger.error("Reading paste failed!", e1);
 					EmbedBuilder error = new EmbedBuilder().setTitle(content[0]).setColor(Color.RED);
-					e.getTextChannel().sendMessage(error.setDescription("Please ensure that a valid Pastebin link has been inserted and that the API key inside the config.ini file is correct").build()).queue();
+					e.getChannel().sendMessage(error.setDescription("Please ensure that a valid Pastebin link has been inserted and that the API key inside the config.ini file is correct").build()).queue();
 				}
 			}
 			else {
@@ -167,42 +167,42 @@ public class QuizExecution {
 				
 				String integrity = IntegrityCheck();
 				if(integrity.equals("0")) {
-					e.getTextChannel().sendMessage("All questions have been registered successfully!").queue();
+					e.getChannel().sendMessage("All questions have been registered successfully!").queue();
 					logger.debug("Quiz questions have been registered");
 				}
 				else {
 					try {
-						e.getTextChannel().sendMessage("An error occured while registering the questions. Inserted questions have been cleared. Please check the error log:\n"
+						e.getChannel().sendMessage("An error occured while registering the questions. Inserted questions have been cleared. Please check the error log:\n"
 								+ ""+Pastebin.unlistedPaste("Error on registering rewards", integrity, e.getGuild().getIdLong())).queue();
 						logger.error("Internal pastebin error in registering questions for the quiz");
 					} catch (IllegalStateException | LoginException | PasteException e1) {
 						logger.warn("Error on creating paste!", e1);
-						e.getTextChannel().sendMessage("An error occured while registering the questions. Inserted questions have been cleared. Error log couldn't be pasted on Pastebin!").queue();
+						e.getChannel().sendMessage("An error occured while registering the questions. Inserted questions have been cleared. Error log couldn't be pasted on Pastebin!").queue();
 					}
 					clearQuestions(1);
 				}
 			}
 			else if(_readFile) {
 				EmbedBuilder error = new EmbedBuilder().setTitle("An error occurred while reading file!").setColor(Color.RED);
-				e.getTextChannel().sendMessage(error.setDescription("An unexpected error occurred while reading the file. Please check the content or create a new save file.").build()).queue();
+				e.getChannel().sendMessage(error.setDescription("An unexpected error occurred while reading the file. Please check the content or create a new save file.").build()).queue();
 				logger.error("Settings from the quiz backup file couldn't be loaded");
 			}
 		}
 		else {
 			if(_readFile == false) {
 				EmbedBuilder error = new EmbedBuilder().setTitle("Invalid url!").setColor(Color.RED);
-				e.getTextChannel().sendMessage(error.setDescription("An invalid url has been inserted. Please insert a Pastebin link").build()).queue();
+				e.getChannel().sendMessage(error.setDescription("An invalid url has been inserted. Please insert a Pastebin link").build()).queue();
 				logger.warn("Wrong pastebin link has been inserted for the question registration");
 			}
 			else {
 				EmbedBuilder error = new EmbedBuilder().setTitle("File doesn't exist!").setColor(Color.RED);
-				e.getTextChannel().sendMessage(error.setDescription("Please confirm that the settings file exists before continuing .").build()).queue();
+				e.getChannel().sendMessage(error.setDescription("Please confirm that the settings file exists before continuing .").build()).queue();
 				logger.warn("Quiz backup file doesn't exist");
 			}
 		}
 	}
 	
-	public static void saveQuestions(MessageReceivedEvent e) {
+	public static void saveQuestions(GuildMessageReceivedEvent e) {
 		//Iterate through the HashMap values and write all information into a file
 		StringBuilder sb = new StringBuilder();
 		for(Quizes quiz : Hashes.getWholeQuiz().values()) {
@@ -247,17 +247,17 @@ public class QuizExecution {
 		if(!sb.toString().equals("No questions!") && !sb.toString().equals("No rewards!")) {
 			new File("./files/QuizBackup").mkdirs();
 			FileSetting.createFile("./files/QuizBackup/quizsettings"+e.getGuild().getId()+".azr", sb.toString());
-			e.getTextChannel().sendMessage("Quiz settings have been saved successfully!").queue();
+			e.getChannel().sendMessage("Quiz settings have been saved successfully!").queue();
 			logger.debug("The settings for the quiz have been registered");
 		}
 		else if(sb.toString().equals("No questions!")){
 			EmbedBuilder error = new EmbedBuilder().setTitle("Questions missing!").setColor(Color.RED);
-			e.getTextChannel().sendMessage(error.setDescription("A backup from the settings couldn't be created because the questions are missing. Please register them first").build()).queue();
+			e.getChannel().sendMessage(error.setDescription("A backup from the settings couldn't be created because the questions are missing. Please register them first").build()).queue();
 			logger.warn("Quiz backup file couldn't be created due to the missing questions");
 		}
 		else if(sb.toString().equals("No rewards!")) {
 			EmbedBuilder error = new EmbedBuilder().setTitle("Rewards missing!").setColor(Color.RED);
-			e.getTextChannel().sendMessage(error.setDescription("A backup from the settings couldn't be created because the rewards are missing. Please register them first").build()).queue();
+			e.getChannel().sendMessage(error.setDescription("A backup from the settings couldn't be created because the rewards are missing. Please register them first").build()).queue();
 			logger.warn("Quiz backup file couldn't be created due to the missing rewards");
 		}
 	}

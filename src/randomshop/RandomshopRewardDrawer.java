@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
 import constructors.Weapons;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class RandomshopRewardDrawer {
-	public static void drawReward(MessageReceivedEvent e, Weapons weapon, long currency, int theme_id) {
+	public static void drawReward(GuildMessageReceivedEvent e, Weapons weapon, long currency, int theme_id) {
 		try {
 			BufferedImage rewardOverlay = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/"+weapon.getOverlayName()+".png"));
 			BufferedImage drawWeapon = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/weapons/"+weapon.getDescription()+".png"));
@@ -37,10 +37,10 @@ public class RandomshopRewardDrawer {
 			g.dispose();
 			
 			File file1 = new File(IniFileReader.getTempDirectory()+"randomshop_reward_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
-			e.getTextChannel().sendFile(file1, "reward.png").complete();
+			e.getChannel().sendFile(file1, "reward.png").complete();
 			file1.delete();
 			
-			e.getTextChannel().sendMessage("Congratulations "+e.getMember().getEffectiveName()+", you have received **"+weapon.getDescription()+" "+weapon.getStatDescription()+"**. Remaining balance: **"+currency+"**").queue();
+			e.getChannel().sendMessage("Congratulations "+e.getMember().getEffectiveName()+", you have received **"+weapon.getDescription()+" "+weapon.getStatDescription()+"**. Remaining balance: **"+currency+"**").queue();
 		} catch(IOException e1) {
 			Logger logger = LoggerFactory.getLogger(RandomshopRewardDrawer.class);
 			logger.error("An error occurred while printing the random shop price", e1);

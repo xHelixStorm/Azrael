@@ -259,6 +259,11 @@ public class GuildIni {
 		return ini.get("General", "LeaveMessage", boolean.class);
 	}
 	
+	public static boolean getCacheLog(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "CacheLog", boolean.class);
+	}
+	
 	public static boolean [] getChannelAndCacheLog(long guild_id) {
 		Ini ini = readIni(guild_id);
 		boolean [] log = new boolean[2];

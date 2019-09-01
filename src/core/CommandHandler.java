@@ -2,24 +2,27 @@ package core;
 
 import java.util.HashMap;
 
-import commands.Command;
+import interfaces.CommandPrivate;
+import interfaces.CommandPublic;
 
 public class CommandHandler {
 
-		public static CommandParser parse = new CommandParser();
-		public static HashMap<String, Command> commands = new HashMap<>();
+	public static CommandParser parse = new CommandParser();
+	public static HashMap<String, CommandPublic> commandsPublic = new HashMap<>();
+	public static HashMap<String, CommandPrivate> commandsPrivate = new HashMap<>();
+	
+	public static boolean handleCommand(CommandParser.CommandContainer cmd) {
 		
-		public static boolean handleCommand(CommandParser.CommandContainer cmd){
-			
-			if(commands.containsKey(cmd.invoke)){
-				boolean safe = commands.get(cmd.invoke).called(cmd.args, cmd.e);
+		if(cmd.e != null) {
+			if(commandsPublic.containsKey(cmd.invoke)) {
+				boolean safe = commandsPublic.get(cmd.invoke).called(cmd.args, cmd.e);
 				
-				if(!safe){
-					commands.get(cmd.invoke).action(cmd.args, cmd.e);
-					commands.get(cmd.invoke).executed(safe, cmd.e);
+				if(safe){
+					commandsPublic.get(cmd.invoke).action(cmd.args, cmd.e);
+					commandsPublic.get(cmd.invoke).executed(safe, cmd.e);
 				}
 				else{
-					commands.get(cmd.invoke).executed(safe, cmd.e);
+					commandsPublic.get(cmd.invoke).executed(safe, cmd.e);
 				}
 				return true;
 			}
@@ -27,4 +30,21 @@ public class CommandHandler {
 				return false;
 			}
 		}
+		else {
+			if(commandsPrivate.containsKey(cmd.invoke)) {
+				boolean safe = commandsPrivate.get(cmd.invoke).called(cmd.args, cmd.e2);
+				if(safe) {
+					commandsPrivate.get(cmd.invoke).action(cmd.args, cmd.e2);
+					commandsPrivate.get(cmd.invoke).executed(safe, cmd.e2);
+				}
+				else {
+					commandsPrivate.get(cmd.invoke).executed(safe, cmd.e2);
+				}
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
 }

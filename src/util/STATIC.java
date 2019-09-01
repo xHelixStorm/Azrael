@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import constructors.Cache;
 import constructors.Channels;
 import core.Hashes;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import sql.DiscordRoles;
 
 public class STATIC {
@@ -87,25 +87,25 @@ public class STATIC {
 	}
 	
 	@SuppressWarnings("unused")
-	public static void handleRemovedMessages(MessageReceivedEvent e, MessageUpdateEvent e2, String [] output) {
+	public static void handleRemovedMessages(GuildMessageReceivedEvent e, GuildMessageUpdateEvent e2, String [] output) {
 		Logger logger = LoggerFactory.getLogger(STATIC.class);
 		logger.debug("Message removed from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 		var muteRole = DiscordRoles.SQLgetRole((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()), "mut");
 		if(muteRole == 0) {
-			if(e != null)e.getTextChannel().sendMessage(e.getMember().getAsMention()+" "+output[0]).queue();
-			else 		 e2.getTextChannel().sendMessage(e2.getMember().getAsMention()+" "+output[0]).queue();
+			if(e != null)e.getChannel().sendMessage(e.getMember().getAsMention()+" "+output[0]).queue();
+			else 		 e2.getChannel().sendMessage(e2.getMember().getAsMention()+" "+output[0]).queue();
 		}
 		else {
 			var cache = Hashes.getTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 			if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
-				if(e != null)e.getTextChannel().sendMessage(e.getMember().getAsMention()+" "+output[0]).queue();
-				else 		 e2.getTextChannel().sendMessage(e2.getMember().getAsMention()+" "+output[0]).queue();
+				if(e != null)e.getChannel().sendMessage(e.getMember().getAsMention()+" "+output[0]).queue();
+				else 		 e2.getChannel().sendMessage(e2.getMember().getAsMention()+" "+output[0]).queue();
 				Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "1"));
 			}
 			else if(cache != null) {
 				if(cache.getAdditionalInfo().equals("1")) {
-					if(e != null)e.getTextChannel().sendMessage(e.getMember().getAsMention()+" "+output[1]).queue();
-					else 		 e2.getTextChannel().sendMessage(e2.getMember().getAsMention()+" "+output[1]).queue();
+					if(e != null)e.getChannel().sendMessage(e.getMember().getAsMention()+" "+output[1]).queue();
+					else 		 e2.getChannel().sendMessage(e2.getMember().getAsMention()+" "+output[1]).queue();
 					Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "2"));
 				}
 				else if(cache.getAdditionalInfo().equals("2")) {

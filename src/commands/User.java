@@ -11,18 +11,19 @@ import commandsContainer.UserExecution;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
+import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class User implements Command{
+public class User implements CommandPublic{
 
 	@Override
-	public boolean called(String[] args, MessageReceivedEvent e) {
+	public boolean called(String[] args, GuildMessageReceivedEvent e) {
 		return false;
 	}
 
 	@Override
-	public void action(String[] args, MessageReceivedEvent e) {
+	public void action(String[] args, GuildMessageReceivedEvent e) {
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 		if(GuildIni.getUserCommand(e.getGuild().getIdLong())) {
 			ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -38,7 +39,7 @@ public class User implements Command{
 					}
 				}
 				else {
-					e.getTextChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild())).build()).queue();
+					e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild())).build()).queue();
 				}
 			});
 			executor.shutdown();
@@ -46,7 +47,7 @@ public class User implements Command{
 	}
 
 	@Override
-	public void executed(boolean success, MessageReceivedEvent e) {
+	public void executed(boolean success, GuildMessageReceivedEvent e) {
 		Logger logger = LoggerFactory.getLogger(User.class);
 		logger.debug("{} has used User command", e.getMember().getUser().getId());
 	}

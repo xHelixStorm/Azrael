@@ -18,11 +18,11 @@ import org.slf4j.LoggerFactory;
 import constructors.InventoryContent;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
 public class InventoryBuilder{
-	public static void DrawInventory(MessageReceivedEvent _e, GuildMessageReactionAddEvent _e2, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, int theme_id){
+	public static void DrawInventory(GuildMessageReceivedEvent _e, GuildMessageReactionAddEvent _e2, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, int theme_id){
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.execute(() -> {
 			try{
@@ -104,7 +104,7 @@ public class InventoryBuilder{
 			
 			if(_e != null) {
 				File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png");
-				_e.getTextChannel().sendFile(upload, "inventory.png").complete();
+				_e.getChannel().sendFile(upload, "inventory.png").complete();
 				upload.delete();
 			}
 			else {

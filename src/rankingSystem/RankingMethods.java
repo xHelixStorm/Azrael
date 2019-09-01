@@ -23,13 +23,13 @@ import org.slf4j.LoggerFactory;
 
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class RankingMethods extends ListenerAdapter{
 	private final static Logger logger = LoggerFactory.getLogger(RankingMethods.class);
 	
-	public static void getRankUp(MessageReceivedEvent e , int _level, int _level_skin, int _icon_skin, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id){		
+	public static void getRankUp(GuildMessageReceivedEvent e , int _level, int _level_skin, int _icon_skin, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id){		
 		try {
 			BufferedImage rankUp = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/levelup"+_level_skin+"_blank.png"));
 			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+_icon_skin+"_"+_level+".png"));
@@ -83,14 +83,14 @@ public class RankingMethods extends ListenerAdapter{
 			g.dispose();
 			
 			File file1 = new File(IniFileReader.getTempDirectory()+"lvup_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
-			e.getTextChannel().sendFile(file1, "level_up.png").complete();
+			e.getChannel().sendFile(file1, "level_up.png").complete();
 			file1.delete();
 		} catch (IOException e1) {
 			logger.error("RankUp couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	
-	public static void getRank(MessageReceivedEvent e, String _name, String _avatar, int _experience, int _level, int _rank, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_exp_text, boolean _additional_percent_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id){		
+	public static void getRank(GuildMessageReceivedEvent e, String _name, String _avatar, int _experience, int _level, int _rank, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_exp_text, boolean _additional_percent_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id){		
 		try{
 			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/rank"+_rank_skin+"_blank.png"));
 			BufferedImage experienceBar;
@@ -151,14 +151,14 @@ public class RankingMethods extends ListenerAdapter{
 			g.dispose();
 			
 			File file2 = new File(IniFileReader.getTempDirectory()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
-			e.getTextChannel().sendFile(file2, "rank.png").complete();
+			e.getChannel().sendFile(file2, "rank.png").complete();
 			file2.delete();
 		} catch (IOException e1) {
 			logger.error("Rank couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	
-	public static void getProfile(MessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _level, float _currentExperience, float _rankUpExperience, long _experience, long _currency, int _rank, int _profile_skin, int _icon_skin, int _bar_color, boolean _additional_exp_text, boolean _additional_percent_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id) {		
+	public static void getProfile(GuildMessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _level, float _currentExperience, float _rankUpExperience, long _experience, long _currency, int _rank, int _profile_skin, int _icon_skin, int _bar_color, boolean _additional_exp_text, boolean _additional_percent_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id) {		
 		try{
 			BufferedImage profile = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/profile"+_profile_skin+"_blank.png"));
 			BufferedImage experienceBar;
@@ -259,7 +259,7 @@ public class RankingMethods extends ListenerAdapter{
 			g.dispose();
 			
 			File file3 = new File(IniFileReader.getTempDirectory()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
-			e.getTextChannel().sendFile(file3, "profile.png").complete();
+			e.getChannel().sendFile(file3, "profile.png").complete();
 			file3.delete();
 		} catch (IOException e1) {
 			logger.error("Profile couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);

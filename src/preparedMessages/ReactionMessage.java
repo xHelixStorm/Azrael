@@ -11,11 +11,11 @@ import core.Hashes;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.DiscordRoles;
 
 public class ReactionMessage {
-	public static int print(MessageReceivedEvent e, long channel_id) {
+	public static int print(GuildMessageReceivedEvent e, long channel_id) {
 		Logger logger = LoggerFactory.getLogger(ReactionMessage.class);
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		if(DiscordRoles.SQLgetRolesByCategory(e.getGuild().getIdLong(), "rea")) {

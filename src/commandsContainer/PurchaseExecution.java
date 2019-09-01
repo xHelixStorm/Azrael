@@ -11,12 +11,12 @@ import constructors.InventoryContent;
 import constructors.Weapons;
 import core.Hashes;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
 
 public class PurchaseExecution {
-	public static void purchase(MessageReceivedEvent e, final String type, final String item_number, Guilds guild_settings) {
+	public static void purchase(GuildMessageReceivedEvent e, final String type, final String item_number, Guilds guild_settings) {
 		Logger logger = LoggerFactory.getLogger(PurchaseExecution.class);
 		final var item_id = Integer.parseInt(item_number);
 		var user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
@@ -35,17 +35,17 @@ public class PurchaseExecution {
 					user_details.setCurrency(new_currency);
 					Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 					logger.debug("{} has purchased {}", e.getMember().getUser().getId(), skin.getShopDescription());
-					e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("You have successfully purchased **"+skin.getShopDescription()+"**").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("You have successfully purchased **"+skin.getShopDescription()+"**").build()).queue();
 					returnSkinMenu(e, guild_settings, type);
 				}
 				else {
-					e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("An internal error occurred and purchase has been interrupted. Please contact an administrator!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("An internal error occurred and purchase has been interrupted. Please contact an administrator!").build()).queue();
 					RankingSystem.SQLInsertActionLog("critical", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "purchase interrupted", "An error occurred while purchasing "+skin.getShopDescription());
-					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId());
+					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" you currently don't have enough money to purchase this item/skin!").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" you currently don't have enough money to purchase this item/skin!").build()).queue();
 				returnSkinMenu(e, guild_settings, type);
 			}
 		}
@@ -64,17 +64,17 @@ public class PurchaseExecution {
 					user_details.setCurrency(new_currency);
 					Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 					logger.debug("{} has purchased {}", e.getMember().getUser().getId(), weapon.getDescription()+" "+weapon.getStatDescription());
-					e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("You have successfully purchased **"+weapon.getDescription()+" "+weapon.getStatDescription()+"**").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("You have successfully purchased **"+weapon.getDescription()+" "+weapon.getStatDescription()+"**").build()).queue();
 					ShopExecution.displayShopWeapons(e, weapon.getCategoryDescription());
 				}
 				else {
-					e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("An internal error occurred and purchase has been interrupted. Please contact an administrator!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("An internal error occurred and purchase has been interrupted. Please contact an administrator!").build()).queue();
 					RankingSystem.SQLInsertActionLog("critical", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "purchase interrupted", "An error occurred while purchasing "+weapon.getDescription()+" "+weapon.getStatDescription());
-					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId());
+					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" you don't have enough money to purchase this weapon!").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" you don't have enough money to purchase this weapon!").build()).queue();
 				ShopExecution.displayShopWeapons(e, weapon.getCategoryDescription());
 			}
 		}
@@ -93,23 +93,23 @@ public class PurchaseExecution {
 					user_details.setCurrency(new_currency);
 					Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 					logger.debug("{} has purchased {}", e.getMember().getUser().getId(), skill.getDescription());
-					e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("You have successfully purchased **"+skill.getDescription()+"**").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("You have successfully purchased **"+skill.getDescription()+"**").build()).queue();
 					ShopExecution.displaySkills(e, guild_settings);
 				}
 				else {
-					e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("An internal error occurred and purchase has been interrupted. Please contact an administrator!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("An internal error occurred and purchase has been interrupted. Please contact an administrator!").build()).queue();
 					RankingSystem.SQLInsertActionLog("critical", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "purchase interrupted", "An error occurred while purchasing "+skill.getDescription());
-					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getTextChannel().getId()+"us"+e.getMember().getUser().getId());
+					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 			else {
-				e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" you don't have enough money to purchase this skill!").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" you don't have enough money to purchase this skill!").build()).queue();
 				ShopExecution.displaySkills(e, guild_settings);
 			}
 		}
 	}
 	
-	public static void sell(MessageReceivedEvent e, final String type, final String item_number, Guilds guild_settings) {
+	public static void sell(GuildMessageReceivedEvent e, final String type, final String item_number, Guilds guild_settings) {
 		Logger logger = LoggerFactory.getLogger(PurchaseExecution.class);
 		final var item_id = Integer.parseInt(item_number);
 		var user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
@@ -121,33 +121,33 @@ public class PurchaseExecution {
 				if(user_details.getLevelDescription().equals(skin.getShopDescription())) {
 					user_details.setLevelDescription(guild_settings.getLevelDescription());
 					if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID()) == 0) {
-						e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized level up skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized level up skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
 						logger.error("The RankingSystem.users table couldn't be updated with the default level up skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				if(user_details.getRankDescription().equals(skin.getShopDescription())) {
 					user_details.setRankDescription(guild_settings.getRankDescription());
 					if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getRankID()) == 0) {
-						e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized rank skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized rank skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
 						logger.error("The RankingSystem.users table couldn't be updated with the default rank skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				if(user_details.getProfileDescription().equals(skin.getShopDescription())) {
 					user_details.setProfileDescription(guild_settings.getProfileDescription());
 					if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getProfileID()) == 0) {
-						e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized profile skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized profile skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
 						logger.error("The RankingSystem.users table couldn't be updated with the default profile skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				if(user_details.getIconDescription().equals(skin.getShopDescription())) {
 					user_details.setIconDescription(guild_settings.getIconDescription());
 					if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getIconID()) == 0) {
-						e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized icon skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized icon skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
 						logger.error("The RankingSystem.users table couldn't be updated with the default icon skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
-				e.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Item has been sold succesfully").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Item has been sold succesfully").build()).queue();
 				returnSkinMenu(e, guild_settings, type);
 			}
 			else {
@@ -157,7 +157,7 @@ public class PurchaseExecution {
 	}
 	
 	@SuppressWarnings("preview")
-	private static void returnSkinMenu(MessageReceivedEvent e, Guilds guild_settings, final String type) {
+	private static void returnSkinMenu(GuildMessageReceivedEvent e, Guilds guild_settings, final String type) {
 		switch(type) {
 			case "lev" -> ShopExecution.displayShop(e, "lev", guild_settings.getLevelDescription());
 			case "ran" -> ShopExecution.displayShop(e, "ran", guild_settings.getRankDescription());

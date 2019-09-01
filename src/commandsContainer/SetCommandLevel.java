@@ -3,13 +3,13 @@ package commandsContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 
 public class SetCommandLevel {
 	
 	@SuppressWarnings("preview")
-	public static void runTask(MessageReceivedEvent _e, String _input){
+	public static void runTask(GuildMessageReceivedEvent _e, String _input){
 		int level = 0;
 		boolean wrongInput = false;
 		String message;
@@ -37,15 +37,15 @@ public class SetCommandLevel {
 			Logger logger = LoggerFactory.getLogger(SetCommandLevel.class);
 			if(Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), level) > 0) {
 				logger.debug("{} has changed the command level to {} in guild {}", _e.getMember().getUser().getId(), level, _e.getGuild().getName());
-				_e.getTextChannel().sendMessage(message).queue();
+				_e.getChannel().sendMessage(message).queue();
 			}
 			else {
 				logger.error("The execution id for guild {} couldn't be updated on table Azrael.commands", _e.getGuild().getName());
-				_e.getTextChannel().sendMessage("An internal error occurred.The execution id couldn't be set or updated in Azrael.commands").queue();
+				_e.getChannel().sendMessage("An internal error occurred.The execution id couldn't be set or updated in Azrael.commands").queue();
 			}
 		}
 		else{
-			_e.getTextChannel().sendMessage(message).queue();
+			_e.getChannel().sendMessage(message).queue();
 		}
 	}
 }

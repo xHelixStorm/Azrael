@@ -5,13 +5,13 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
 import core.Hashes;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 import threads.CollectUsers;
 
 public class SetRankingSystem {
 	@SuppressWarnings("preview")
-	public static void runTask(MessageReceivedEvent _e, String _input){
+	public static void runTask(GuildMessageReceivedEvent _e, String _input){
 		boolean ranking_state = false;
 		boolean wrongInput = false;
 		String message;
@@ -38,27 +38,27 @@ public class SetRankingSystem {
 				guild.setRankingState(ranking_state);
 				Hashes.addStatus(_e.getGuild().getIdLong(), guild);
 				logger.debug("{} has set the ranking system to {} in guild {}", _e.getMember().getUser().getId(), _input, _e.getGuild().getName());
-				_e.getTextChannel().sendMessage(message).queue();
+				_e.getChannel().sendMessage(message).queue();
 				
 				if(ranking_state == true) {
 					if(RankingSystem.SQLgetRoles(_e.getGuild().getIdLong()) == null) {
 						logger.error("Roles from RankingSystem.roles couldn't be called and cached");
-						_e.getTextChannel().sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
+						_e.getChannel().sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
 					}
 					if(RankingSystem.SQLgetLevels(_e.getGuild().getIdLong(), guild.getThemeID()) == 0) {
 						logger.error("Levels from RankingSystem.level_list couldn't be called and cached");
-						_e.getTextChannel().sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
+						_e.getChannel().sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
 					}
 					new Thread(new CollectUsers(_e)).start();
 				}
 			}
 			else {
 				logger.error("An internal error occurred on editing the RankingSystem.guilds table to alter the ranking state for guild {}", _e.getGuild().getName());
-				_e.getTextChannel().sendMessage("An internal error occurred. The ranking state couldn't be altered in the table RankingSystem.guilds").queue();
+				_e.getChannel().sendMessage("An internal error occurred. The ranking state couldn't be altered in the table RankingSystem.guilds").queue();
 			}
 		}
 		else{
-			_e.getTextChannel().sendMessage(message).queue();
+			_e.getChannel().sendMessage(message).queue();
 		}
 	}
 }

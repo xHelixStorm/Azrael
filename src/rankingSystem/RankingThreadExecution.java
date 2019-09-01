@@ -17,12 +17,12 @@ import fileManagement.FileSetting;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 
 public class RankingThreadExecution {
 	private final static Logger logger = LoggerFactory.getLogger(RankingThreadExecution.class);
-	public static void setProgress(MessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, int percent_multiplier, Rank user_details, Guilds guild_settings){
+	public static void setProgress(GuildMessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, int percent_multiplier, Rank user_details, Guilds guild_settings){
 		RankingSystem.SQLDeleteInventory();
 		int multiplier = 1;
 		
@@ -95,7 +95,7 @@ public class RankingThreadExecution {
 		}
 	}
 	
-	private static void ExperienceGain(MessageReceivedEvent e, Rank user_details, Guilds guild_settings, int currentExperience, long experience, int daily_experience, int roleAssignLevel, boolean max_experience_enabled, Timestamp reset){
+	private static void ExperienceGain(GuildMessageReceivedEvent e, Rank user_details, Guilds guild_settings, int currentExperience, long experience, int daily_experience, int roleAssignLevel, boolean max_experience_enabled, Timestamp reset){
 		int rankUpExperience = user_details.getRankUpExperience();
 		int max_level = guild_settings.getMaxLevel();
 		int level = user_details.getLevel();
@@ -153,7 +153,7 @@ public class RankingThreadExecution {
 				}
 				else {
 					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
-					e.getTextChannel().sendMessage(error.setDescription("Default skins aren't defined. Please contact an administrator!").build()).queue();
+					e.getChannel().sendMessage(error.setDescription("Default skins aren't defined. Please contact an administrator!").build()).queue();
 					logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 				}
 			}

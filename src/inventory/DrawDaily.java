@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class DrawDaily {
-	public static void draw(MessageReceivedEvent _e, String _reward, int theme_id) {
+	public static void draw(GuildMessageReceivedEvent _e, String _reward, int theme_id) {
 		try {
 			BufferedImage daily = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/daily_blank.png"));
 			BufferedImage reward = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/"+_reward+".png"));
@@ -56,7 +56,7 @@ public class DrawDaily {
 			logger.error("Error on daily reward drawing", ioe);
 		}
 		File file1 = new File(IniFileReader.getTempDirectory()+"daily_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png");
-		_e.getTextChannel().sendFile(file1, "daily.png").complete();
+		_e.getChannel().sendFile(file1, "daily.png").complete();
 		file1.delete();
 	}
 	
