@@ -21,7 +21,7 @@ public class NicknameListener extends ListenerAdapter{
 				logger.error("Nickname from {} couldn't be deleted from Azrael.nickname", e.getUser().getId());
 			}
 			else {
-				logger.debug("{} received the nickname {} in guild {}", e.getUser().getId(), nickname, e.getGuild().getName());
+				logger.debug("{} received the nickname {} in guild {}", e.getUser().getId(), nickname, e.getGuild().getId());
 				Azrael.SQLInsertActionLog("MEMBER_NICKNAME_CLEAR", user_id, guild_id, "<cleared name>");
 			}
 		}

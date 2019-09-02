@@ -58,16 +58,6 @@ public class GuildMessageListener extends ListenerAdapter{
 		}
 		
 		Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-		var warning = Hashes.getTempCache("warnings_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-		var user = Hashes.getTempCache("user_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-		var filter = Hashes.getTempCache("filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-		var shop = Hashes.getTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-		var inventory_bot = Hashes.getTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-		var randomshop_bot = Hashes.getTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-		var reaction = Hashes.getTempCache("reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-		var rss = Hashes.getTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-		var quiz = Hashes.getTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-		var runquiz = Hashes.getTempCache("quiztime"+e.getGuild().getId());
 		
 		long user_id = e.getMember().getUser().getIdLong();
 		long guild_id = e.getGuild().getIdLong();
@@ -83,7 +73,7 @@ public class GuildMessageListener extends ListenerAdapter{
 			}
 			Messages collectedMessage = new Messages();
 			collectedMessage.setUserID(user_id);
-			collectedMessage.setUsername(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
+			collectedMessage.setUsername(e.getMember().getAsMention());
 			collectedMessage.setGuildID(guild_id);
 			collectedMessage.setChannelID(channel_id);
 			collectedMessage.setChannelName(e.getChannel().getName());
@@ -104,14 +94,17 @@ public class GuildMessageListener extends ListenerAdapter{
 			e.getMessage().delete().reason("Messages not allowed!").queue();
 		}
 		
+		final var warning = Hashes.getTempCache("warnings_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		if(warning != null) {
 			SetWarning.performUpdate(e, message, warning, "warnings_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 		
+		final var filter = Hashes.getTempCache("filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		if(filter != null) {
 			FilterExecution.performAction(e, message, filter);
 		}
 		
+		final var shop = Hashes.getTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		if(shop != null && shop.getExpiration() - System.currentTimeMillis() > 0) {
 			if(message.equalsIgnoreCase("exit")) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Thanks for the visit! See you again!").build()).queue();
@@ -203,10 +196,12 @@ public class GuildMessageListener extends ListenerAdapter{
 			}
 		}
 		
-		if(user != null){
-			UserExecution.performAction(e, message, user);
+		final var user = Hashes.getTempCache("user_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+		if(user != null) {
+			UserExecution.performAction(e, message, user, allChannels);
 		}
 		
+		final var inventory_bot = Hashes.getTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 		if(inventory_bot != null && UserPrivs.isUserBot(e.getMember().getUser(), guild_id) && inventory_bot.getExpiration() - System.currentTimeMillis() > 0) {
 			String cache_content = inventory_bot.getAdditionalInfo();
 			String [] array = cache_content.split("_");
@@ -231,6 +226,7 @@ public class GuildMessageListener extends ListenerAdapter{
 			Hashes.clearTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 		}
 		
+		final var randomshop_bot = Hashes.getTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 		if(randomshop_bot != null && UserPrivs.isUserBot(e.getMember().getUser(), guild_id) && randomshop_bot.getExpiration() - System.currentTimeMillis() > 0) {
 			String cache_content = randomshop_bot.getAdditionalInfo();
 			String [] array = cache_content.split("_");
@@ -254,6 +250,7 @@ public class GuildMessageListener extends ListenerAdapter{
 			Hashes.clearTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 		}
 		
+		final var reaction = Hashes.getTempCache("reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 		if(reaction != null && UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
 			int counter = Integer.parseInt(reaction.getAdditionalInfo());
 			Message m = e.getMessage();
@@ -279,6 +276,7 @@ public class GuildMessageListener extends ListenerAdapter{
 			Hashes.clearTempCache("reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 		}
 		
+		final var rss = Hashes.getTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 		if(rss != null && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id) && rss.getExpiration() - System.currentTimeMillis() > 0) {
 			var key = "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId();
 			String task = rss.getAdditionalInfo();
@@ -305,6 +303,7 @@ public class GuildMessageListener extends ListenerAdapter{
 			}
 		}
 		
+		final var quiz = Hashes.getTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 		if(quiz != null && quiz.getExpiration() - System.currentTimeMillis() > 0) {
 			String content = quiz.getAdditionalInfo();
 			if(e.getMember().getUser().getId().equals(content) && (message.equals("1") || message.equals("2") || message.equals("3"))) {
@@ -324,6 +323,7 @@ public class GuildMessageListener extends ListenerAdapter{
 			}
 		}
 		
+		final var runquiz = Hashes.getTempCache("quiztime"+e.getGuild().getId());
 		if(runquiz != null) {
 			String content = runquiz.getAdditionalInfo();
 			if(!content.equals("skip-question") || !content.equals("interrupt-questions")) {

@@ -52,10 +52,10 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter{
 								e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(emote+"_"+e.getGuild().getId()).getRole_ID())).queue();
 							}
 						}
-						logger.debug("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getName());
+						logger.debug("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
 					}
 					else
-						logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getName());
+						logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());
 				}
 			}
 		}

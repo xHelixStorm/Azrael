@@ -127,7 +127,7 @@ public class RandomshopExecution {
 								}
 								else {
 									e.getChannel().sendMessage("Weapons for this weapon type have not been configured. Please contact an administrator!").queue();
-									logger.warn("Table weapon_shop_content is not configured for the weapon abbreviation {} in guild {}", abbv, e.getGuild().getName());
+									logger.warn("Table weapon_shop_content is not configured for the weapon abbreviation {} in guild {}", abbv, e.getGuild().getId());
 								}
 							}
 							else {
@@ -138,7 +138,7 @@ public class RandomshopExecution {
 								}
 								else {
 									e.getChannel().sendMessage("Weapons for this weapon category have not been configured. Please contact an administrator!").queue();
-									logger.warn("Table weapon_shop_content is not configured for the weapon category {} in guild {}", category, e.getGuild().getName());
+									logger.warn("Table weapon_shop_content is not configured for the weapon category {} in guild {}", category, e.getGuild().getId());
 								}
 							}
 							
@@ -151,7 +151,7 @@ public class RandomshopExecution {
 							else if(weapon_id > 0){
 								EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle("Randomshop failed");
 								e.getChannel().sendMessage(message.setDescription("An internal error occurred while receiving a weapon from the Randomshop. Please contact an administrator").build()).queue();
-								logger.error("The user {} couldn't receive the weapon with the weapon_id {} in guild {}", e.getMember().getUser().getId(), weapon_id, e.getGuild().getName());
+								logger.error("The user {} couldn't receive the weapon with the weapon_id {} in guild {}", e.getMember().getUser().getId(), weapon_id, e.getGuild().getId());
 							}
 						}
 						else {
@@ -230,7 +230,7 @@ public class RandomshopExecution {
 							e.getChannel().sendMessage("No items to display could be retrieved!").queue();
 						else
 							e2.getChannel().sendMessage("No items to display could be retrieved!").queue();
-						logger.warn("Randomshop content couldn't be displayed in guild {}", e.getGuild().getName());
+						logger.warn("Randomshop content couldn't be displayed in guild {}", e.getGuild().getId());
 					}
 				}
 				else {

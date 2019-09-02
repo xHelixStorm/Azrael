@@ -106,7 +106,7 @@ public class NameListener extends ListenerAdapter{
 		else if(Azrael.SQLInsertNickname(user_id, guild.getIdLong(), nickname) == 0) {
 			logger.error("User nickname of {} couldn't be inserted into Azrael.nickname", user_id);
 		}
-		logger.debug("{} received the nickname {} in guild {}", member.getUser().getId(), nickname, guild.getName());
+		logger.debug("{} received the nickname {} in guild {}", member.getUser().getId(), nickname, guild.getId());
 		Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild.getIdLong(), nickname);
 	}
 }

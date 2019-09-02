@@ -15,12 +15,12 @@ public class SetLevelDefaultSkin {
 			Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 			guild_settings.setLevelID(_default_skin);
 			if(RankingSystem.SQLUpdateLevelDefaultSkin(_e.getGuild().getIdLong(), _e.getGuild().getName(), guild_settings.getLevelID()) > 0) {
-				logger.debug("{} has set the default level skin id to {} in guild {}", _e.getMember().getUser().getId(), guild_settings.getLevelID(), _e.getGuild().getName());
+				logger.debug("{} has set the default level skin id to {} in guild {}", _e.getMember().getUser().getId(), guild_settings.getLevelID(), _e.getGuild().getId());
 				Hashes.addStatus(_e.getGuild().getIdLong(), guild_settings);
 				_e.getChannel().sendMessage("**The default skin is now the theme number "+guild_settings.getLevelID()+"!**").queue();
 			}
 			else {
-				logger.error("RankingSystem.guilds couldn't be updated with the default level skin in guild {}", _e.getGuild().getName());
+				logger.error("RankingSystem.guilds couldn't be updated with the default level skin in guild {}", _e.getGuild().getId());
 				_e.getChannel().sendMessage("An internal error occurred! The table RankingSystem.guilds couldn't be updated with the default level skin").queue();
 			}
 		}

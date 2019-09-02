@@ -16,7 +16,6 @@ import sql.Azrael;
 import util.STATIC;
 
 public class Commands implements CommandPublic {
-	
 	private final static Logger logger = LoggerFactory.getLogger(Commands.class);
 
 	@Override
@@ -49,12 +48,7 @@ public class Commands implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used Commands command", e.getMember().getUser().getId());
-	}
-
-	@Override
-	public String help() {
-		return null;
+		logger.debug("{} has used Commands command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 
 }

@@ -24,6 +24,7 @@ import constructors.RejoinTask;
 import constructors.Roles;
 import constructors.Skills;
 import constructors.Skins;
+import constructors.Watchlist;
 import constructors.WeaponAbbvs;
 import constructors.WeaponStats;
 import constructors.Weapons;
@@ -78,6 +79,7 @@ public class Hashes {
     private static final Set<String> globalURLBlacklist = new HashSet<String>();
     private static final ConcurrentHashMap<Long, ArrayList<String>> urlBlacklist = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final ConcurrentHashMap<Long, ArrayList<String>> urlWhitelist = new ConcurrentHashMap<Long, ArrayList<String>>();
+    private static final Map<String, Watchlist> watchlist = new HashMap<String, Watchlist>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);
@@ -171,6 +173,9 @@ public class Hashes {
 	}
 	public static void addURLWhitelist(Long _key, ArrayList<String> _value) {
 		urlWhitelist.put(_key, _value);
+	}
+	public static void addWatchlist(String _key, Watchlist _value) {
+		watchlist.put(_key, _value);
 	}
 	
 	
@@ -282,6 +287,9 @@ public class Hashes {
 	public static ArrayList<String> getURLWhitelist(Long _key) {
 		return urlWhitelist.get(_key);
 	}
+	public static Watchlist getWatchlist(String _key) {
+		return watchlist.get(_key);
+	}
 	
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
@@ -389,5 +397,8 @@ public class Hashes {
 	}
 	public static void clearActionlog() {
 		actionlog.clear();
+	}
+	public static void removeWatchlist(String _key) {
+		watchlist.remove(_key);
 	}
 }

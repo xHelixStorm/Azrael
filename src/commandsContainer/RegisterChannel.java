@@ -55,7 +55,7 @@ public class RegisterChannel {
 		
 		final var commandLevel = GuildIni.getRegisterTextChannelLevel(_e.getGuild().getIdLong());
 		if(UserPrivs.comparePrivilege(_e.getMember(), commandLevel) || adminPermission) {
-			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss)");
+			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss|wat)");
 			Matcher matcher = pattern.matcher(_args[1]);
 			if(_args.length > 2 && matcher.find()) {
 				channel_type = matcher.group();
@@ -73,16 +73,16 @@ public class RegisterChannel {
 							Azrael.SQLDeleteChannel_Filter(channel_id);
 							Azrael.SQLInsertChannel_Filter(channel_id, "all");
 						}
-						case "log", "tra", "rea", "qui", "rss" -> {
+						case "log", "tra", "rea", "qui", "rss", "wat" -> {
 							Azrael.SQLDeleteChannelType(channel_type, _guild_id);
 							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
 						}
 					}
 					Hashes.removeChannels(_guild_id);
-					logger.debug("{} has registered the channel {} as {} channel in the guild {}", _e.getMember().getUser().getId(), channel_type, channel_type, _e.getGuild().getName());
+					logger.debug("{} has registered the channel {} as {} channel in guild {}", _e.getMember().getUser().getId(), channel_type, channel_type, _e.getGuild().getId());
 					_e.getChannel().sendMessage("**The channel has been registered!**").queue();
 					if(channel_type.equals("rea")) {
-						//create message in the channel and create an auto-delete-file so that the MessageListener can create the needed reactions
+						//use the temp cache to append reactions after the bot sends a message
 						if(Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), 0, true) > 0) {
 							String count = ""+ReactionMessage.print(_e, channel_id);
 							Hashes.addTempCache("reaction_gu"+_e.getGuild().getId()+"ch"+channel, new Cache(0, count));

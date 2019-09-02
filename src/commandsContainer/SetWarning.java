@@ -39,14 +39,14 @@ public class SetWarning {
 			}
 			
 			if(editedRows > 0) {
-				logger.debug("{} has edited the warning level in guild {}", _e.getMember().getUser().getId(), _e.getGuild().getName());
+				logger.debug("{} has edited the warning level in guild {}", _e.getMember().getUser().getId(), _e.getGuild().getId());
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 				_e.getChannel().sendMessage(message.setDescription("The system has been set to warn "+warning_value+" time(s) before banning").build()).queue();
 				Hashes.addTempCache("warnings_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, "1"));
 				_e.getChannel().sendMessage(message.setDescription("To complete the warning setup, you'll be asked to enter the time in minutes for every single warning. You have a total time of 10 minutes for the final setup.\n\nPlease insert the time in minutes for warning 1.").build()).queueAfter(3, TimeUnit.SECONDS);
 			}
 			else {
-				logger.error("The warning level for the guild {} couldn't be edited on Azrael.warnings", _e.getGuild().getName());
+				logger.error("The warning level for the guild {} couldn't be edited on Azrael.warnings", _e.getGuild().getId());
 				_e.getChannel().sendMessage("An internal error occurred. The warning level couldn't be updated on Azrael.warnings").queue();
 			}
 		}
@@ -70,7 +70,7 @@ public class SetWarning {
 						Hashes.addTempCache(key, cache);
 					}
 					else {
-						logger.error("warning timer couldn't be updated in guild {}", _e.getGuild().getName());
+						logger.error("warning timer couldn't be updated in guild {}", _e.getGuild().getId());
 						_e.getChannel().sendMessage("An internal error occurred. The timer couldn't be inserted into Azrael.warnings. Please insert the time again").queue();
 					}
 				}
@@ -81,7 +81,7 @@ public class SetWarning {
 						Hashes.clearTempCache("warnings_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId());
 					}
 					else {
-						logger.error("warning timer couldn't be updated in guild {}", _e.getGuild().getName());
+						logger.error("warning timer couldn't be updated in guild {}", _e.getGuild().getId());
 						_e.getChannel().sendMessage("An internal error occurred. The timer couldn't be inserted into Azrael.warnings. Please insert the time again").queue();
 					}
 				}

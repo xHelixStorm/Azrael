@@ -32,18 +32,12 @@ public class Equip implements CommandPublic, CommandPrivate {
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
-		if(GuildIni.getEquipCommand(e.getGuild().getIdLong()))
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" My apologies young padawan, please try to use this command in a private message to me by just writing equip without prefix!").build()).queue();
+		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" My apologies young padawan, please try to use this command in a private message to me by just writing equip without prefix!").build()).queue();
 	}
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used Equip command", e.getMember().getUser().getId());
-	}
-
-	@Override
-	public String help() {
-		return null;
+		logger.debug("{} has used Equip command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 
 	@Override
@@ -106,7 +100,7 @@ public class Equip implements CommandPublic, CommandPrivate {
 
 	@Override
 	public void executed(boolean success, PrivateMessageReceivedEvent e) {
-		logger.debug("{} has used Equip command", e.getAuthor().getId());
+		logger.debug("{} has used Equip command in private message", e.getAuthor().getId());
 	}
 
 }

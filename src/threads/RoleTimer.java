@@ -90,7 +90,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable{
 				}
 			} catch (InterruptedException e1) {
 				Logger logger = LoggerFactory.getLogger(RoleTimer.class);
-				logger.info("The mute of {} in guild {} has been interrupted!", e.getMember().getUser().getId(), e.getGuild().getName());
+				logger.info("The mute of {} in guild {} has been interrupted!", e.getMember().getUser().getId(), e.getGuild().getId());
 				if(!Azrael.SQLisBanned(user_id, guild_id)) {
 					if(channel != null && (Azrael.SQLgetMuted(user_id, guild_id) == true || Azrael.SQLgetData(user_id, guild_id).getUserID() == 0)) {
 						timestamp = new Timestamp(System.currentTimeMillis());

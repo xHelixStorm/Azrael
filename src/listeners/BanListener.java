@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
@@ -45,41 +46,43 @@ public class BanListener extends ListenerAdapter{
 		Azrael.SQLInsertActionLog("MEMBER_BAN_ADD", user_id, guild_id, "User Banned");
 		
 		if(log_channel != null) {
-			AuditLogPaginationAction banLog = e.getGuild().retrieveAuditLogs().cache(false);
-			banLog.limit(1);
-			banLog.queue((entries) -> {
-				if(entries.get(0).getType() == ActionType.BAN) {
-					var cache = Hashes.getTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
-					var ban_issuer = "";
-					var ban_reason = "";
-					if(!entries.isEmpty() && entries.get(0).getTargetIdLong() == user_id) {
-						AuditLogEntry entry = entries.get(0);
-						ban_issuer = (cache != null ? cache.getAdditionalInfo() : entry.getUser().getAsMention());
-						ban_reason = (cache != null ? cache.getAdditionalInfo2() : (entry.getReason() != null && entry.getReason().length() > 0 ? entry.getReason() : "No reason has been provided!"));
+			if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
+				AuditLogPaginationAction banLog = e.getGuild().retrieveAuditLogs().cache(false);
+				banLog.limit(1);
+				banLog.queue((entries) -> {
+					if(entries.get(0).getType() == ActionType.BAN) {
+						var cache = Hashes.getTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
+						var ban_issuer = "";
+						var ban_reason = "";
+						if(!entries.isEmpty() && entries.get(0).getTargetIdLong() == user_id) {
+							AuditLogEntry entry = entries.get(0);
+							ban_issuer = (cache != null ? cache.getAdditionalInfo() : entry.getUser().getAsMention());
+							ban_reason = (cache != null ? cache.getAdditionalInfo2() : (entry.getReason() != null && entry.getReason().length() > 0 ? entry.getReason() : "No reason has been provided!"));
+						}
+						else {
+							ban_issuer = (cache != null ? cache.getAdditionalInfo() : "NaN");
+							ban_reason = (cache != null ? cache.getAdditionalInfo2() : "No reason has been provided!");
+						}
+						
+						EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User banned!");
+						int max_warning_id = Azrael.SQLgetMaxWarning(guild_id);
+						if(user.getWarningID() == 0) {
+							e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without any protocolled warnings!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						}
+						else if(user.getWarningID() < max_warning_id) {
+							e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without enough protocolled warnings! Warnings: "+user.getWarningID()+"\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						}
+						else if(user.getWarningID() == max_warning_id) {
+							e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						}
+						Hashes.clearTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 					}
 					else {
-						ban_issuer = (cache != null ? cache.getAdditionalInfo() : "NaN");
-						ban_reason = (cache != null ? cache.getAdditionalInfo2() : "No reason has been provided!");
+						EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User banned!");
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getAsMention() + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: NaN\nReason: No reason has been provided!").build()).queue();
 					}
-					
-					EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User banned!");
-					int max_warning_id = Azrael.SQLgetMaxWarning(guild_id);
-					if(user.getWarningID() == 0) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getAsMention() + "** with the ID Number **" + user_id + "** has been banned without any protocolled warnings!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
-					}
-					else if(user.getWarningID() < max_warning_id) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getAsMention() + "** with the ID Number **" + user_id + "** has been banned without enough protocolled warnings! Warnings: "+user.getWarningID()+"\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
-					}
-					else if(user.getWarningID() == max_warning_id) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getAsMention() + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
-					}
-					Hashes.clearTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
-				}
-				else {
-					EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User banned!");
-					e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getAsMention() + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: NaN\nReason: No reason has been provided!").build()).queue();
-				}
-			});
+				});
+			}
 		}
 	}
 }

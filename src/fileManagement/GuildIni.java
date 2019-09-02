@@ -131,6 +131,8 @@ public class GuildIni {
 			ini.add("Commands", "UserBanLevel", "20");
 			ini.add("Commands", "UserKickLevel", "20");
 			ini.add("Commands", "UserHistoryLevel", "20");
+			ini.add("Commands", "UserWatchLevel", "20");
+			ini.add("Commands", "UserUseWatchChannel", "20");
 			ini.add("Commands", "UserGiftExperienceLevel", "20");
 			ini.add("Commands", "UserSetExperienceLevel", "20");
 			ini.add("Commands", "UserSetLevelLevel", "20");
@@ -671,6 +673,14 @@ public class GuildIni {
 	public static int getUserHistoryLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "UserHistoryLevel", int.class);
+	}
+	public static int getUserWatchLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserWatchLevel", int.class);
+	}
+	public static int getUserUseWatchChannelLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserUseWatchChannelLevel", int.class);
 	}
 	public static int getUserGiftExperienceLevel(long guild_id) {
 		Ini ini = readIni(guild_id);

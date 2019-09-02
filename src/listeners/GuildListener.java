@@ -127,7 +127,7 @@ public class GuildListener extends ListenerAdapter {
 					nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
 					e.getGuild().modifyNickname(e.getMember(), nickname).queue();
 					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server and tried to impersonate a staff member. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
-					logger.info("Impersonation attempt found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+					logger.info("Impersonation attempt found from {} in guild {}", user_id, guild_id);
 					badName = true;
 					break check;
 				}
@@ -140,7 +140,7 @@ public class GuildListener extends ListenerAdapter {
 							nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
 							e.getGuild().modifyNickname(e.getMember(), nickname).queue();
 							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
-							logger.info("Improper name found from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+							logger.info("Improper name found from {} in guild {}", user_id, guild_id);
 							badName = true;
 						}
 						else {
@@ -167,7 +167,7 @@ public class GuildListener extends ListenerAdapter {
 						logger.error("User nickname of {} couldn't be inserted into Azrael.nickname", user_id);
 					}
 				}
-				logger.debug("{} received the nickname {} in guild {}", e.getUser().getId(), nickname, e.getGuild().getName());
+				logger.debug("{} received the nickname {} in guild {}", user_id, nickname, guild_id);
 				Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild_id, nickname);
 			}
 		}

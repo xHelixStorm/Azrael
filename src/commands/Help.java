@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.UserPrivs;
+import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -25,17 +26,12 @@ public class Help implements CommandPublic {
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
-		e.getChannel().sendMessage("Here all listed issues about S4. If you got something to add or to ask about a specific point, poke a GM\nhttps://s4league.aeriagames.com/forum/index.php?thread/52-guide-general-technical-issues/").queue();
+		var fileInput = FileSetting.readFile("files/Guilds/"+e.getGuild().getId()+"/helpmessage.txt");
+		e.getChannel().sendMessage((fileInput != null && fileInput.length() > 0 ? fileInput : "The help command message has not been configured!")).queue();
 	}
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used Help command", e.getMember().getUser().getId());
+		logger.debug("{} has used Help command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
-
-	@Override
-	public String help() {
-		return null;
-	}
-
 }

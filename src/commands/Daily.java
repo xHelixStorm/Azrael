@@ -31,7 +31,6 @@ import sql.Azrael;
 import util.STATIC;
 
 public class Daily implements CommandPublic {
-	
 	private final static Logger logger = LoggerFactory.getLogger(Daily.class);
 
 	@Override
@@ -178,12 +177,7 @@ public class Daily implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used Daily command", e.getMember().getUser().getId());
-	}
-
-	@Override
-	public String help() {
-		return null;
+		logger.debug("{} has used Daily command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 
 }

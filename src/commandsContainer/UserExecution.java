@@ -2,6 +2,7 @@ package commandsContainer;
 
 import java.awt.Color;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -13,12 +14,14 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Bancollect;
 import constructors.Cache;
+import constructors.Channels;
 import constructors.Guilds;
 import constructors.Messages;
 import constructors.Rank;
 import constructors.Ranks;
 import constructors.RejoinTask;
 import constructors.User;
+import constructors.Watchlist;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
@@ -80,6 +83,7 @@ public class UserExecution {
 						+ "**ban**: To ban the user\n"
 						+ "**kick**: To kick the user\n"
 						+ "**history**: To display the whole kick/ban/mute history with reasons\n"
+						+ "**watch**: To either log all messages or only deleted messages from this user\n"
 						+ "**gift-experience**: To gift experience points\n"
 						+ "**set-experience**: To set an experience value\n"
 						+ "**set-level**: To assign a level\n"
@@ -97,14 +101,14 @@ public class UserExecution {
 	}
 	
 	@SuppressWarnings("preview")
-	public static void performAction(GuildMessageReceivedEvent _e, String _message, Cache cache) {
+	public static void performAction(GuildMessageReceivedEvent _e, String _message, Cache cache, ArrayList<Channels> _allChannels) {
 		var key = "user_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId();
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Session Expired!");
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
 			Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 			var comment = _message.toLowerCase();
-			if(comment.equals("information") || comment.equals("delete-messages") || comment.equals("warning") || comment.equals("mute") || comment.equals("unmute") || comment.equals("ban") || comment.equals("kick") || comment.equals("history") || comment.equals("gift-experience") || comment.equals("set-experience") || comment.equals("set-level") || comment.equals("gift-currency") || comment.equals("set-currency")) {
+			if(comment.equals("information") || comment.equals("delete-messages") || comment.equals("warning") || comment.equals("mute") || comment.equals("unmute") || comment.equals("ban") || comment.equals("kick") || comment.equals("history") || comment.equals("watch") || comment.equals("gift-experience") || comment.equals("set-experience") || comment.equals("set-level") || comment.equals("gift-currency") || comment.equals("set-currency")) {
 				var user_id = Long.parseLong(cache.getAdditionalInfo());
 				switch(comment) {
 					case "information" -> {
@@ -399,6 +403,16 @@ public class UserExecution {
 							Hashes.clearTempCache(key);
 						}
 					}
+					case "watch" -> {
+						final var watchLevel = GuildIni.getUserWatchLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), watchLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							message.setTitle("You chose to watch this user!");
+							message.setDescription("Now please select a log level.\n1: Log only deleted messages from this user\n2: log all written messages from a user!");
+							_e.getChannel().sendMessage(message.build()).queue();
+							cache.updateDescription("watch"+cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
+							Hashes.addTempCache(key, cache);
+						}
+					}
 					case "gift-experience" -> {
 						final var giftExperienceLevel = GuildIni.getUserGiftExperienceLevel(_e.getGuild().getIdLong());
 						if(UserPrivs.comparePrivilege(_e.getMember(), giftExperienceLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
@@ -533,31 +547,31 @@ public class UserExecution {
 							if(warning_id == 0) {
 								if(Azrael.SQLDeleteData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong()) > 0) {
 									_e.getChannel().sendMessage("The warnings of this user has been cleared!").queue();
-									logger.debug("{} has cleared the warnings from {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+									logger.debug("{} has cleared the warnings from {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 								}
 								else {
 									_e.getChannel().sendMessage("An internal error occurred. The warnings of this user couldn't be cleared from Azrael.bancollect").queue();
-									logger.error("The warnings of the user {} in guild {} couldn't be cleared", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+									logger.error("The warnings of the user {} in guild {} couldn't be cleared", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 								}
 							}
 							else if(warning_id <= max_warning_id) {
 								if(Azrael.SQLUpdateWarning(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]", "")), _e.getGuild().getIdLong(), warning_id) > 0) {
 									_e.getChannel().sendMessage("Warning value "+warning_id+" has been set!").queue();
-									logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+									logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 								}
 								else {
 									_e.getChannel().sendMessage("An internal error occurred. The warning level of the selected user couldn't be updated on Azrael.bancollect").queue();
-									logger.error("Warning on user {} couldn't be updated on Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+									logger.error("Warning on user {} couldn't be updated on Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 								}
 							}
 							else {
 								if(Azrael.SQLUpdateWarning(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]", "")), _e.getGuild().getIdLong(), max_warning_id) > 0) {
 									_e.getChannel().sendMessage("The max possible value "+max_warning_id+" has been set because your input exceeded the max possible warning!").queue();
-									logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), max_warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+									logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), max_warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 								}
 								else {
 									_e.getChannel().sendMessage("An internal error occurred. The warning level of the selected user couldn't be updated on Azrael.bancollect").queue();
-									logger.error("Warning on user {} couldn't be updated on Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+									logger.error("Warning on user {} couldn't be updated on Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 								}
 							}
 						}
@@ -568,21 +582,21 @@ public class UserExecution {
 								if(warning_id <= max_warning_id) {
 									if(Azrael.SQLInsertData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong(), warning_id, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false) > 0) {
 										_e.getChannel().sendMessage("Warning value "+warning_id+" has been set!").queue();
-										logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+										logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 									}
 									else {
 										_e.getChannel().sendMessage("An internal error occurred. The warning level of the selected user couldn't be inserted in Azrael.bancollect").queue();
-										logger.error("Warning on user {} couldn't be inserted in Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+										logger.error("Warning on user {} couldn't be inserted in Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 									}
 								}
 								else {
 									if(Azrael.SQLInsertData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong(), max_warning_id, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false) > 0) {
 										_e.getChannel().sendMessage("The max possible value "+max_warning_id+" has been set because your input exceeded the max possible warning!").queue();
-										logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), max_warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+										logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), max_warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 									}
 									else {
 										_e.getChannel().sendMessage("An internal error occurred. The warning level of the selected user couldn't be inserted in Azrael.bancollect").queue();
-										logger.error("Warning on user {} couldn't be inserted in Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+										logger.error("Warning on user {} couldn't be inserted in Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 									}
 								}
 							}
@@ -683,7 +697,7 @@ public class UserExecution {
 							}
 							if(Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID() != 0) {
 								if(Azrael.SQLUpdateUnmute(user_id, _e.getGuild().getIdLong(), timestamp, unmute_timestamp, true, true) == 0) {
-									logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, _e.getGuild().getName());
+									logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, _e.getGuild().getId());
 									_e.getChannel().sendMessage("An internal error occurred. The unmute time couldn't be updated on Azrael.bancollect").queue();
 								}
 							}
@@ -694,7 +708,7 @@ public class UserExecution {
 								}
 							}
 							_e.getChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
-							logger.debug("{} has muted {} in guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getName());
+							logger.debug("{} has muted {} in guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getId());
 							checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(""+mute_time, _e.getMember().getAsMention(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
 						} catch(IllegalArgumentException iae) {
@@ -786,7 +800,7 @@ public class UserExecution {
 					_e.getChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
 					_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
 					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", _message);
-					logger.debug("{} has banned {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+					logger.debug("{} has banned {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 					checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 					Hashes.addTempCache("ban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
 				} catch(IllegalArgumentException | NullPointerException iae) {
@@ -854,6 +868,77 @@ public class UserExecution {
 					Hashes.clearTempCache(key);
 				}
 			}
+			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("watch")) {
+				long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
+				if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserUseWatchChannelLevel(_e.getGuild().getIdLong())) || _e.getMember().getUser().getIdLong() == GuildIni.getAdmin(_e.getGuild().getIdLong())) {
+					var trash_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
+					var watch_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("wat")).findAny().orElse(null);
+					if(trash_channel != null || watch_channel != null) {
+						var useWatchChannel = (watch_channel != null ? true : false);
+						switch(_message) {
+							case "1" -> {
+								if(Azrael.SQLInsertWatchlist(user_id, _e.getGuild().getIdLong(), 1, useWatchChannel) == 0) {
+									_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred. User couldn't be inserted into Azrael.watchlist table!").build()).queue();
+									logger.error("{} couldn't be inserted into Azrael.watchlist for guild {}", user_id, _e.getGuild().getId());
+									return;
+								}
+								else
+									Hashes.addWatchlist(_e.getGuild().getId()+"-"+user_id, new Watchlist(1, useWatchChannel));
+							}
+							case "2" -> {
+								if(Azrael.SQLInsertWatchlist(user_id, _e.getGuild().getIdLong(), 2, useWatchChannel) == 0) {
+									_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred. User couldn't be inserted into Azrael.watchlist table!").build()).queue();
+									logger.error("{} couldn't be inserted into Azrael.watchlist for guild {}", user_id, _e.getGuild().getId());
+									return;
+								}
+								else
+									Hashes.addWatchlist(_e.getGuild().getId()+"-"+user_id, new Watchlist(2, useWatchChannel));
+							}
+							default  -> { return; }
+						}
+						_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Success!").setDescription("This user is now being watched with level "+_message).build()).queue();
+						Hashes.clearTempCache(key);
+					}
+					else {
+						//throw error if no trash or watch channel has been registered
+						_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Trash channel not found!").setDescription("Before watching a discord user, please register a trash channel!").build()).queue();
+						Hashes.clearTempCache(key);
+					}
+				}
+				else {
+					var trash_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
+					if(trash_channel != null) {
+						switch(_message) {
+							case "1" -> {
+								if(Azrael.SQLInsertWatchlist(user_id, _e.getGuild().getIdLong(), 1, false) == 0) {
+									_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred. User couldn't be inserted into Azrael.watchlist table!").build()).queue();
+									logger.error("{} couldn't be inserted into Azrael.watchlist for guild {}", user_id, _e.getGuild().getId());
+									return;
+								}
+								else
+									Hashes.addWatchlist(_e.getGuild().getId()+"-"+user_id, new Watchlist(1, false));
+							}
+							case "2" -> {
+								if(Azrael.SQLInsertWatchlist(user_id, _e.getGuild().getIdLong(), 2, false) == 0) {
+									_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred. User couldn't be inserted into Azrael.watchlist table!").build()).queue();
+									logger.error("{} couldn't be inserted into Azrael.watchlist for guild {}", user_id, _e.getGuild().getId());
+									return;
+								}
+								else
+									Hashes.addWatchlist(_e.getGuild().getId()+"-"+user_id, new Watchlist(2, false));
+							}
+							default  -> { return; }
+						}
+						_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Success!").setDescription("This user is now being watched with level "+_message).build()).queue();
+						Hashes.clearTempCache(key);
+					}
+					else {
+						//throw error if no trash channel has been registered
+						_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Trash channel not found!").setDescription("Before watching a discord user, please register a trash channel!").build()).queue();
+						Hashes.clearTempCache(key);
+					}
+				}
+			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*",	"").equals("gift-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), guild_settings.getThemeID());
@@ -905,7 +990,7 @@ public class UserExecution {
 							_e.getChannel().sendMessage("Roles won't be updated because user isn't present in this guild!").queue();
 						}
 						_e.getChannel().sendMessage("Experience points have been updated!").queue();
-						logger.debug("{} has gifted {} experience points to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+						logger.debug("{} has gifted {} experience points to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {
@@ -965,7 +1050,7 @@ public class UserExecution {
 							_e.getChannel().sendMessage("Roles won't be updated because user isn't present in this guild!").queue();
 						}
 						_e.getChannel().sendMessage("Experience points have been updated!").queue();
-						logger.debug("{} has set {} experience points to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+						logger.debug("{} has set {} experience points to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {
@@ -1019,7 +1104,7 @@ public class UserExecution {
 								_e.getChannel().sendMessage("Roles won't be updated because user isn't present in this guild!").queue();
 							}
 							_e.getChannel().sendMessage("The level has been updated!").queue();
-							logger.debug("{} has set the level {} to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+							logger.debug("{} has set the level {} to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 							Hashes.clearTempCache(key);
 						}
 						else {
@@ -1041,7 +1126,7 @@ public class UserExecution {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money gifted", "User received money in value of "+currency+" "+guild_settings.getCurrency());
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						_e.getChannel().sendMessage("Currency has been updated!").queue();
-						logger.debug("{} has gifted {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+						logger.debug("{} has gifted {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {
@@ -1059,7 +1144,7 @@ public class UserExecution {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money set", "Currency value for the user has been changed to "+currency+" "+guild_settings.getCurrency());
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						_e.getChannel().sendMessage("Currency has been updated!").queue();
-						logger.debug("{} has set {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getName());
+						logger.debug("{} has set {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {

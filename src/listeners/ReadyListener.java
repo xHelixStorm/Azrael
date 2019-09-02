@@ -79,6 +79,7 @@ public class ReadyListener extends ListenerAdapter {
 			if(!new File("ini/"+guild.getId()+".ini").exists()) {
 				GuildIni.createIni(guild.getIdLong());
 			}
+			FileSetting.createGuildDirectory(guild);
 			if(Azrael.SQLgetGuild(guild.getIdLong()) == 0) {
 				if(Azrael.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
 					logger.error("Azrael.guild is empty and couldn't be filled!");

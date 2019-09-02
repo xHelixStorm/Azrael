@@ -124,12 +124,6 @@ public class Inventory implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used Inventory command", e.getMember().getUser().getId());
+		logger.debug("{} has used Inventory command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
-
-	@Override
-	public String help() {
-		return null;
-	}
-
 }

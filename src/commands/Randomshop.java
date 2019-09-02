@@ -75,11 +75,6 @@ public class Randomshop implements CommandPublic {
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
 		logger.debug("The user {} has executed the Randomshop command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
-
-	@Override
-	public String help() {
-		return null;
-	}
 	
 	private String bundleArguments(String [] args, int start) {
 		var weapon = "";

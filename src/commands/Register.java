@@ -22,7 +22,6 @@ import threads.CollectUsers;
 public class Register implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Register.class);
 	private EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register various stuff from your server to enable all features!");
-	private long guild_id;
 	
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
@@ -35,7 +34,7 @@ public class Register implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		ExecutorService executor = Executors.newSingleThreadExecutor();
-		guild_id = e.getGuild().getIdLong();
+		var guild_id = e.getGuild().getIdLong();
 		var adminPermission = (GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong());
 		final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 		if(DiscordRoles.SQLgetRole(guild_id, "adm") == 0) {
@@ -69,20 +68,13 @@ public class Register implements CommandPublic {
 		else if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getRegisterLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 			if(args.length == 0) {
 				e.getChannel().sendMessage(messageBuild.setDescription("Use this command to register either a channel, a role, a ranking role or all users in a guild. Use the following commands to get more details:\n\n"
-						+ "Description to register a role:\n"
-							+ "**"+prefix+"register -role**\n\n"
-						+ "Description to register a channel:\n"
-							+ "**"+prefix+"register -text-channel**\n\n"
-						+ "Description to enable the url censoring in a channel:\n"
-							+ "**"+prefix+"register -text-channel-url**\n\n"
-						+ "Description to enable the text removal in a channel:\n"
-							+ "**"+prefix+"register -text-channel-txt**\n\n"
-						+ "Syntax to register all channels:\n"
-							+ "**"+prefix+"register -text-channels**\n\n"
-						+ "Description to register a ranking role:\n"
-							+ "**"+prefix+"register -ranking-role**\n\n"
-						+ "How to register all users into the database:\n"
-							+ "**"+prefix+"register -users**").build()).queue();
+						+ "Description to register a role:\n**"+prefix+"register -role**\n\n"
+						+ "Description to register a channel:\n**"+prefix+"register -text-channel**\n\n"
+						+ "Description to enable the url censoring in a channel:\n**"+prefix+"register -text-channel-url**\n\n"
+						+ "Description to enable the text removal in a channel:\n**"+prefix+"register -text-channel-txt**\n\n"
+						+ "Command to register all channels:\n**"+prefix+"register -text-channels**\n\n"
+						+ "Description to register a ranking role:\n**"+prefix+"register -ranking-role**\n\n"
+						+ "Command to register all users into the database:\n**"+prefix+"register -users**").build()).queue();
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase("-role")) {
 				final var commandLevel = GuildIni.getRegisterRoleLevel(e.getGuild().getIdLong());
@@ -169,12 +161,6 @@ public class Register implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used Register command", e.getMember().getUser().getId());
+		logger.debug("{} has used Register command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
-
-	@Override
-	public String help() {
-		return null;
-	}
-
 }

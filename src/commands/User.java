@@ -1,6 +1,5 @@
 package commands;
 
-import java.awt.Color;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -10,51 +9,41 @@ import org.slf4j.LoggerFactory;
 import commandsContainer.UserExecution;
 import core.UserPrivs;
 import fileManagement.GuildIni;
-import fileManagement.IniFileReader;
 import interfaces.CommandPublic;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class User implements CommandPublic{
+public class User implements CommandPublic {
+	private final static Logger logger = LoggerFactory.getLogger(User.class);
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+		if(GuildIni.getUserCommand(e.getGuild().getIdLong())) {
+			final var commandLevel = GuildIni.getUserLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
+				return true;
+			else
+				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
+		}
 		return false;
 	}
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
-		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-		if(GuildIni.getUserCommand(e.getGuild().getIdLong())) {
-			ExecutorService executor = Executors.newSingleThreadExecutor();
-			executor.execute(() -> {
-				final var commandLevel = GuildIni.getUserLevel(e.getGuild().getIdLong());
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-					final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-					if(args.length == 0) {
-						UserExecution.getHelp(e);
-					}
-					else if(args.length > 0) {
-						UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]", ""), e.getMessage().getContentDisplay().substring(prefix.length()+5));
-					}
-				}
-				else {
-					e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, e.getGuild())).build()).queue();
-				}
-			});
-			executor.shutdown();
-		}
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		executor.execute(() -> {
+			final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+			if(args.length == 0) {
+				UserExecution.getHelp(e);
+			}
+			else if(args.length > 0) {
+				UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]", ""), e.getMessage().getContentDisplay().substring(prefix.length()+5));
+			}
+		});
+		executor.shutdown();
 	}
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		Logger logger = LoggerFactory.getLogger(User.class);
-		logger.debug("{} has used User command", e.getMember().getUser().getId());
+		logger.debug("{} has used User command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
-
-	@Override
-	public String help() {
-		return null;
-	}
-	
 }

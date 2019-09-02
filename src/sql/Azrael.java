@@ -2047,6 +2047,28 @@ public class Azrael {
 		}
 	}
 	
+	public static int SQLInsertWatchlist(long _user_id, long _guild_id, int _level, boolean _watchChannel) {
+		logger.debug("SQLInsertWatchlist launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _level, _watchChannel);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO watchlist (fk_user_id, fk_guild_id, level, watch_channel) VALUES(?, ?, ?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setInt(3, _level);
+			stmt.setBoolean(4, _watchChannel);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertWatchlist Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	//Transactions
 	@SuppressWarnings("resource")
 	public static int SQLLowerTotalWarning(long _guild_id, int _warning_id) {

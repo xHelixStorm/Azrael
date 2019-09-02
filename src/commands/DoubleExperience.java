@@ -79,12 +79,6 @@ public class DoubleExperience implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used DoubleExperience command", e.getMember().getUser().getIdLong());
+		logger.debug("{} has used DoubleExperience command in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
 	}
-
-	@Override
-	public String help() {
-		return null;
-	}
-
 }

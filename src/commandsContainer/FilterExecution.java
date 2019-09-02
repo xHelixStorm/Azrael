@@ -1078,7 +1078,7 @@ public class FilterExecution {
 		else {
 			message.setColor(Color.RED).setTitle("Word couldn't be removed!");
 			_e.getChannel().sendMessage(message.setDescription("An internal error occurred. Word couldn't be removed from the word-filter. Either the word wasn't inside the filter or an internal error occurred!").build()).queue();
-			logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getName());
+			logger.error("Word couldn't be removed from Azrael.filter in guild {}", _e.getGuild().getId());
 		}
 		Hashes.clearTempCache(key);
 	}

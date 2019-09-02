@@ -7,5 +7,4 @@ public interface CommandPublic {
 	boolean called(String[] args, GuildMessageReceivedEvent e);
 	void action(String[] args, GuildMessageReceivedEvent e);
 	void executed(boolean success, GuildMessageReceivedEvent e);
-	String help();
 }

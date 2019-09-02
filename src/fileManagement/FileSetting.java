@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.ReadyEvent;
 
 public class FileSetting {
@@ -141,5 +142,15 @@ public class FileSetting {
 	
 	public static void createTemp(ReadyEvent e) {
 		(new File(IniFileReader.getTempDirectory())).mkdirs();
+	}
+	
+	public static void createGuildDirectory(Guild guild) {
+		(new File("files/Guilds")).mkdir();
+		if(new File("files/Guilds/"+guild.getId()).mkdir()) {
+			if(!new File("files/Guilds/"+guild.getId()+"/reactionmessage.txt").exists())
+				createFile("files/Guilds/"+guild.getId()+"/reactionmessage.txt", "");
+			if(!new File("files/Guilds/"+guild.getId()+"/helpmessage.txt").exists())
+				createFile("files/Guilds/"+guild.getId()+"/helpmessage.txt", "");
+		}
 	}
 }

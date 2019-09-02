@@ -44,7 +44,7 @@ public class ReactionMessage {
 					counter ++;
 				}
 			}
-			String reactionMessage = FileSetting.readFile("./files/reactionmessage.txt");
+			String reactionMessage = FileSetting.readFile("./files/Guilds/"+e.getGuild().getId()+"/reactionmessage.txt");
 			if(reactionMessage.length() > 0)
 				e.getGuild().getTextChannelById(channel_id).sendMessage(reactionMessage+"\n\n"
 						+ ""+sb.toString()).complete();
@@ -58,7 +58,7 @@ public class ReactionMessage {
 			return counter;
 		}
 		else {
-			logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getName());
+			logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());
 			return 0;
 		}
 	}

@@ -37,7 +37,7 @@ public class SetRankingSystem {
 				Guilds guild = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 				guild.setRankingState(ranking_state);
 				Hashes.addStatus(_e.getGuild().getIdLong(), guild);
-				logger.debug("{} has set the ranking system to {} in guild {}", _e.getMember().getUser().getId(), _input, _e.getGuild().getName());
+				logger.debug("{} has set the ranking system to {} in guild {}", _e.getMember().getUser().getId(), _input, _e.getGuild().getId());
 				_e.getChannel().sendMessage(message).queue();
 				
 				if(ranking_state == true) {

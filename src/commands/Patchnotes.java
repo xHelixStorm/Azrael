@@ -211,14 +211,9 @@ public class Patchnotes implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used Patchnotes command", e.getMember().getUser().getId());
+		logger.debug("{} has used Patchnotes command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 
-	@Override
-	public String help() {
-		return null;
-	}
-	
 	private void collectPatchNotes(GuildMessageReceivedEvent e, ArrayList<Patchnote> display_notes, EmbedBuilder message) {
 		StringBuilder out = new StringBuilder();
 		for(Patchnote note : display_notes) {

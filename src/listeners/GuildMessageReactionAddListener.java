@@ -59,11 +59,11 @@ public class GuildMessageReactionAddListener extends ListenerAdapter{
 								int emote = returnEmote(reactionName);
 								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(Hashes.getRoles(emote+"_"+e.getGuild().getId()).getRole_ID())).queue();
 							}
-							logger.debug("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getName());
+							logger.debug("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
 						}
 					}
 					else
-						logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getName());
+						logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());
 				}
 			}
 			

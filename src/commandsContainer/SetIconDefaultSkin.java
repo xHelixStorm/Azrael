@@ -15,7 +15,7 @@ public class SetIconDefaultSkin {
 			Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 			guild_settings.setIconID(_default_skin);
 			if(RankingSystem.SQLUpdateIconDefaultSkin(_e.getGuild().getIdLong(), _e.getGuild().getName(), guild_settings.getIconID()) > 0) {
-				logger.debug("{} has set the default icon skin id to {} in guild {}", _e.getMember().getUser().getId(), guild_settings.getIconID(), _e.getGuild().getName());
+				logger.debug("{} has set the default icon skin id to {} in guild {}", _e.getMember().getUser().getId(), guild_settings.getIconID(), _e.getGuild().getId());
 				Hashes.addStatus(_e.getGuild().getIdLong(), guild_settings);
 				_e.getChannel().sendMessage("**The default skin is now the theme number "+guild_settings.getIconID()+"!**").queue();
 			}

@@ -36,7 +36,7 @@ public class SetMaxExperience {
 					_e.getChannel().sendMessage("An internal error occurred. Max experience couldn't be set to disable in table RankingSystem.max_exp").queue();
 			}
 			if(editedRows > 0) {
-				logger.debug("{} has set the max experience limitation to {} in guild {}", _e.getMember().getUser().getId(), matcher.group(), _e.getGuild().getName());
+				logger.debug("{} has set the max experience limitation to {} in guild {}", _e.getMember().getUser().getId(), matcher.group(), _e.getGuild().getId());
 				Hashes.addStatus(_e.getGuild().getIdLong(), guild_settings);
 			}
 			else {
@@ -48,7 +48,7 @@ public class SetMaxExperience {
 				guild_settings.setMaxExperience(Long.parseLong(_input.replaceAll("[^0-9]", "")));
 				guild_settings.setMaxExpEnabled(true);
 				if(RankingSystem.SQLInsertMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), _e.getGuild().getIdLong()) > 0) {
-					logger.debug("{} has set the max experience limitation to {} exp in guild {}", _e.getMember().getUser().getId(), guild_settings.getMaxExperience(), _e.getGuild().getName());
+					logger.debug("{} has set the max experience limitation to {} exp in guild {}", _e.getMember().getUser().getId(), guild_settings.getMaxExperience(), _e.getGuild().getId());
 					Hashes.addStatus(_e.getGuild().getIdLong(), guild_settings);
 					_e.getChannel().sendMessage("**The max experience per day is now "+guild_settings.getMaxExperience()+" and has been automatically enabled!**").queue();
 				}
