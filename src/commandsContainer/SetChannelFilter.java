@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 
 public class SetChannelFilter {
+	private final static Logger logger = LoggerFactory.getLogger(SetChannelFilter.class);
+	
 	@SuppressWarnings("preview")
 	public static void runTask(GuildMessageReceivedEvent _e, String [] _input){
 		int i = 0;
@@ -38,7 +40,6 @@ public class SetChannelFilter {
 					i++;
 				}
 				if(languageError ==  false){
-					Logger logger = LoggerFactory.getLogger(SetChannelFilter.class);
 					for(String language : filter_lang){
 						Azrael.SQLInsertChannel_Filter(channel_id, language);
 						logger.debug("{} has set the channel filter {} for channel {} in guild {}", _e.getMember().getUser().getId(), language, channel_id, _e.getGuild().getId());

@@ -38,6 +38,7 @@ import timerTask.VerifyMutedMembers;
 import util.STATIC;
 
 public class ReadyListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(ReadyListener.class);
 	
 	@Override
 	public void onReady(ReadyEvent e) {
@@ -49,7 +50,6 @@ public class ReadyListener extends ListenerAdapter {
 		}
 		FileSetting.createFile(IniFileReader.getTempDirectory()+"running.azr", "1");
 		
-		Logger logger = LoggerFactory.getLogger(ReadyListener.class);
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the latest patch notes!");
 		System.out.println();
 		System.out.println("Azrael Version: "+STATIC.getVersion()+"\nAll credits to xHelixStorm");
@@ -189,8 +189,9 @@ public class ReadyListener extends ListenerAdapter {
 		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		
 		ExecutorService executor = Executors.newFixedThreadPool(1);
+		executor.execute(() -> { Azrael.SQLgetWholeWatchlist(); });
 		executor.execute(new BotStartAssign(e, null));
-		for(Guild g : e.getJDA().getGuilds()){
+		for(Guild g : e.getJDA().getGuilds()) {
 			executor.execute(new RoleExtend(e, g.getIdLong()));
 			for(TextChannel tc : g.getTextChannels()){
 				if(Azrael.SQLInsertChannels(tc.getIdLong(), tc.getName()) == 0) {

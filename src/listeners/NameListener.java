@@ -16,12 +16,12 @@ import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 
-public class NameListener extends ListenerAdapter{
+public class NameListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(NameListener.class);
 	
 	@Override
 	public void onUserUpdateName(UserUpdateNameEvent e){
 		EmbedBuilder message = new EmbedBuilder();
-		Logger logger = LoggerFactory.getLogger(NameListener.class);
 		String oldname = e.getOldName()+"#"+e.getUser().getDiscriminator();
 		String newname = e.getUser().getName()+"#"+e.getUser().getDiscriminator();
 		long user_id = e.getUser().getIdLong();
@@ -41,7 +41,7 @@ public class NameListener extends ListenerAdapter{
 						e.getJDA().getGuildById(guild.getIdLong()).modifyNickname(member, nickname).queue();
 						message.setColor(Color.RED).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle("Impersonation attempt found!");
 						if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**\nPlease review in case of impersonation!").build()).queue();
-						updateNickname(member, guild, nickname, logger);
+						updateNickname(member, guild, nickname);
 						staff_name = true;
 						break check;
 					} catch(HierarchyException hye){
@@ -67,7 +67,7 @@ public class NameListener extends ListenerAdapter{
 									e.getJDA().getGuildById(guild_id).modifyNickname(member, nickname).queue();
 									message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
 									if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
-									updateNickname(member, guild, nickname, logger);
+									updateNickname(member, guild, nickname);
 								}
 								else {
 									if(!UserPrivs.isUserAdmin(member.getUser(), guild_id) && !UserPrivs.isUserMod(member.getUser(), guild_id)) {
@@ -96,7 +96,7 @@ public class NameListener extends ListenerAdapter{
 		Azrael.SQLInsertActionLog("MEMBER_NAME_UPDATE", e.getUser().getIdLong(), 0, e.getUser().getName()+"#"+e.getUser().getDiscriminator());
 	}
 	
-	private void updateNickname(Member member, Guild guild, String nickname, Logger logger) {
+	private void updateNickname(Member member, Guild guild, String nickname) {
 		var user_id = member.getUser().getIdLong();
 		if(Azrael.SQLgetNickname(user_id, guild.getIdLong()).length() > 0){
 			if(Azrael.SQLUpdateNickname(user_id, guild.getIdLong(), nickname) == 0) {

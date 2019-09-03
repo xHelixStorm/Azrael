@@ -19,6 +19,8 @@ import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class DrawDaily {
+	private final static Logger logger = LoggerFactory.getLogger(DrawDaily.class);
+	
 	public static void draw(GuildMessageReceivedEvent _e, String _reward, int theme_id) {
 		try {
 			BufferedImage daily = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/daily_blank.png"));
@@ -52,7 +54,6 @@ public class DrawDaily {
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"daily_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png"));
 			g.dispose();
 		} catch(IOException ioe){
-			Logger logger = LoggerFactory.getLogger(DrawDaily.class);
 			logger.error("Error on daily reward drawing", ioe);
 		}
 		File file1 = new File(IniFileReader.getTempDirectory()+"daily_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png");

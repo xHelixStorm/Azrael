@@ -10,14 +10,13 @@ import org.slf4j.LoggerFactory;
 import enums.Weekday;
 
 public class IniFileReader {
-	
+	private final static Logger logger = LoggerFactory.getLogger(IniFileReader.class);
 	private static Ini ini;
 	
 	private static void readConfig(){
 		try {
 			ini = new Ini(new File("config.ini"));
 		} catch (IOException e) {
-			Logger logger = LoggerFactory.getLogger(IniFileReader.class);
 			logger.error("Config file couldn't be found or couldn't be opened", e);
 		}
 	}

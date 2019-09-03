@@ -7,11 +7,11 @@ import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameE
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 
-public class NicknameListener extends ListenerAdapter{
+public class NicknameListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(NameListener.class);
 	
 	@Override
 	public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent e) {
-		Logger logger = LoggerFactory.getLogger(NameListener.class);
 		long user_id = e.getMember().getUser().getIdLong();
 		long guild_id = e.getGuild().getIdLong();
 		String nickname = e.getNewNickname();

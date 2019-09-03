@@ -20,6 +20,7 @@ import constructors.NameFilter;
 import constructors.RSS;
 import constructors.User;
 import constructors.Warning;
+import constructors.Watchlist;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.entities.Member;
@@ -63,19 +64,21 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLInsertHistory(long _user_id, long _guild_id, String _type, String _reason) {
-		logger.debug("SQLInsertHistory launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _type, _reason);
+	public static void SQLInsertHistory(long _user_id, long _guild_id, String _type, String _reason, long _penalty) {
+		logger.debug("SQLInsertHistory launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _type, _reason, _penalty);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO history (fk_user_id, fk_guild_id, type, reason, time) VALUES(?, ?, ?, ?, ?)");
+			String sql = ("INSERT INTO history (fk_user_id, fk_guild_id, type, reason, time, penalty) VALUES(?, ?, ?, ?, ?, "+(_penalty != 0 ? "?" : "NULL")+")");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			stmt.setString(3, _type);
 			stmt.setString(4, _reason);
 			stmt.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+			if(_penalty != 0)
+				stmt.setLong(6, _penalty);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertActionLog Exception", e);
@@ -93,7 +96,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT type, reason, time FROM history WHERE fk_user_id = ? && fk_guild_id = ?");
+			String sql = ("SELECT type, reason, time, penalty FROM history WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -103,7 +106,8 @@ public class Azrael {
 					new History(
 						rs.getString(1),
 						rs.getString(2),
-						rs.getTimestamp(3)
+						rs.getTimestamp(3),
+						rs.getLong(4)
 					)	
 				);
 			}
@@ -2047,21 +2051,91 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertWatchlist(long _user_id, long _guild_id, int _level, boolean _watchChannel) {
-		logger.debug("SQLInsertWatchlist launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _level, _watchChannel);
+	public static synchronized void SQLgetWholeWatchlist() {
+		logger.debug("SQLgetWholeWatchlist launched. No params have been passed!");
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT * FROM watchlist");
+			stmt = myConn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				Hashes.addWatchlist(rs.getString(2)+"-"+rs.getString(1), new Watchlist(rs.getInt(3), rs.getLong(4), rs.getBoolean(5)));
+			}
+		} catch (SQLException e) {
+			logger.error("SQLgetWholeWatchlist Exception", e);
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<String> SQLgetWholeWatchlist(long _guild_id, boolean _highPrivileges) {
+		logger.debug("SQLgetWholeWatchlist launched. Params passed {}, {}", _guild_id, _highPrivileges);
+		ArrayList<String> watchlist = new ArrayList<String>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("SELECT name, fk_user_id, level FROM watchlist INNER JOIN users ON fk_user_id = user_id WHERE fk_guild_id = ? && higher_privileges = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setBoolean(2, _highPrivileges);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				watchlist.add(rs.getString(1)+" ("+rs.getString(2)+") Watch Level "+rs.getString(3));
+			}
+			return watchlist;
+		} catch (SQLException e) {
+			logger.error("SQLgetWholeWatchlist Exception", e);
+			return watchlist;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLInsertWatchlist(long _user_id, long _guild_id, int _level, long _watchChannel, boolean _higherPrivileges) {
+		logger.debug("SQLInsertWatchlist launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _level, _watchChannel, _higherPrivileges);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO watchlist (fk_user_id, fk_guild_id, level, watch_channel) VALUES(?, ?, ?, ?)");
+			String sql = ("INSERT INTO watchlist (fk_user_id, fk_guild_id, level, watch_channel, higher_privileges) VALUES(?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE level=VALUES(level), watch_channel=VALUES(watch_channel), higher_privileges=VALUES(higher_privileges)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			stmt.setInt(3, _level);
-			stmt.setBoolean(4, _watchChannel);
+			stmt.setLong(4, _watchChannel);
+			stmt.setBoolean(5, _higherPrivileges);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertWatchlist Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteWatchlist(long _user_id, long _guild_id) {
+		logger.debug("SQLDeleteWatchlist launched. Passed params {}, {}, {}, {}", _user_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE watchlist WHERE fk_user_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteWatchlist Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

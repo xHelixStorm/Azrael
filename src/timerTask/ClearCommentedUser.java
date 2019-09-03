@@ -10,13 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 
-public class ClearCommentedUser extends TimerTask{
+public class ClearCommentedUser extends TimerTask {
+	private final static Logger logger = LoggerFactory.getLogger(ClearHashes.class);
 	//clear the records of users that has commented during a certain interval, to allow the user to gain experience points again
 	
 	@Override
 	public void run() {
 		Hashes.clearCommentedUsers();
-		Logger logger = LoggerFactory.getLogger(ClearHashes.class);
 		logger.debug("Commented user list cleared!");
 	}
 	

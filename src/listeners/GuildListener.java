@@ -22,10 +22,10 @@ import sql.DiscordRoles;
 import sql.Azrael;
 
 public class GuildListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(GuildListener.class);
 	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent e) {
-		Logger logger = LoggerFactory.getLogger(GuildListener.class);
 		logger.debug("{} has joined the guild {}", e.getUser().getId(), e.getGuild().getName());
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
 		EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name found!");
@@ -83,7 +83,8 @@ public class GuildListener extends ListenerAdapter {
 			if(rejoinAction.getType().equals("mute")) {
 				if(rejoinAction.getInfo().length() == 0) {
 					e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
-					Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"));
+					var mute_time = (long)Azrael.SQLgetWarning(guild_id, Azrael.SQLgetData(user_id, guild_id).getWarningID()+1).getTimer();
+					Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
 					Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
 				}
 				else {
@@ -91,7 +92,7 @@ public class GuildListener extends ListenerAdapter {
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
 					e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
-					Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"));
+					Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
 					if(Azrael.SQLgetData(user_id, guild_id).getWarningID() != 0) {
 						if(Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp, unmute_timestamp, true, true) == 0) {
 							logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, guild_id);
@@ -113,7 +114,7 @@ public class GuildListener extends ListenerAdapter {
 						+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
 						+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? "Provided reason: "+rejoinAction.getReason() : "")).queue();
 				e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
-				Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason());
+				Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0);
 				Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
 				Hashes.removeRejoinTask(e.getGuild().getId()+"_"+e.getMember().getUser().getId());
 			}

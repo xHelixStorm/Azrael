@@ -84,6 +84,7 @@ public class UserExecution {
 						+ "**kick**: To kick the user\n"
 						+ "**history**: To display the whole kick/ban/mute history with reasons\n"
 						+ "**watch**: To either log all messages or only deleted messages from this user\n"
+						+ "**unwatch**: To remove this user from the watchlist\n"
 						+ "**gift-experience**: To gift experience points\n"
 						+ "**set-experience**: To set an experience value\n"
 						+ "**set-level**: To assign a level\n"
@@ -108,7 +109,7 @@ public class UserExecution {
 		if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
 			Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 			var comment = _message.toLowerCase();
-			if(comment.equals("information") || comment.equals("delete-messages") || comment.equals("warning") || comment.equals("mute") || comment.equals("unmute") || comment.equals("ban") || comment.equals("kick") || comment.equals("history") || comment.equals("watch") || comment.equals("gift-experience") || comment.equals("set-experience") || comment.equals("set-level") || comment.equals("gift-currency") || comment.equals("set-currency")) {
+			if(comment.equals("information") || comment.equals("delete-messages") || comment.equals("warning") || comment.equals("mute") || comment.equals("unmute") || comment.equals("ban") || comment.equals("kick") || comment.equals("history") || comment.equals("watch") || comment.equals("unwatch") || comment.equals("gift-experience") || comment.equals("set-experience") || comment.equals("set-level") || comment.equals("gift-currency") || comment.equals("set-currency")) {
 				var user_id = Long.parseLong(cache.getAdditionalInfo());
 				switch(comment) {
 					case "information" -> {
@@ -128,6 +129,11 @@ public class UserExecution {
 							message.addField("BANNED", warnedUser.getBanID() == 2 ? "**YES**" : "**NO**", true);
 							message.addField("JOIN DATE", "**"+user.getJoinDate()+"**", true);
 							message.addField("USER ID", "**"+cache.getAdditionalInfo()+"**", true);
+							var watchedUser = Hashes.getWatchlist(_e.getGuild().getId()+"-"+user_id);
+							if(watchedUser == null || (watchedUser.hasHigherPrivileges() && !UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserUseWatchChannelLevel(_e.getGuild().getIdLong()))))
+								message.addField("WATCH LEVEL", "**0**", true);
+							else
+								message.addField("WATCH LEVEL", "**"+watchedUser.getLevel()+"**", true);
 							message.addBlankField(false);
 							Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong(), guild_settings.getThemeID());
 							if(guild_settings.getRankingState() == true) {
@@ -216,8 +222,7 @@ public class UserExecution {
 							logger.debug("{} has displayed information of the user {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo());
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(informationLevel, _e.getGuild())).build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, informationLevel);
 						}
 						Hashes.clearTempCache(key);
 					}
@@ -230,8 +235,7 @@ public class UserExecution {
 							Hashes.addTempCache(key, cache);
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(deleteMessagesLevel, _e.getGuild())).build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, deleteMessagesLevel);
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -244,8 +248,7 @@ public class UserExecution {
 							Hashes.addTempCache(key, cache);
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(warningLevel, _e.getGuild())).build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, warningLevel);
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -267,8 +270,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(muteLevel, _e.getGuild())).build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, muteLevel);
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -332,8 +334,7 @@ public class UserExecution {
 							logger.debug("{} has used the unmute action on {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo());
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(unmuteLevel, _e.getGuild())).build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, unmuteLevel);
 						}
 						Hashes.clearTempCache(key);
 					}
@@ -355,8 +356,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(banLevel, _e.getGuild())).build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, banLevel);
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -378,8 +378,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(kickLevel, _e.getGuild())).build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, kickLevel);
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -389,7 +388,7 @@ public class UserExecution {
 							message.setTitle("You chose to display the history!");
 							StringBuilder out = new StringBuilder();
 							for(var history : Azrael.SQLgetHistory(user_id, _e.getGuild().getIdLong())) {
-								out.append(history.getTime()+": **"+history.getType()+"**\nReason: **"+history.getReason()+"**\n\n");
+								out.append(history.getTime()+": **"+history.getType()+(history.getPenalty() != 0 ? " for "+history.getPenalty()+" minutes" : "")+"**\nReason: **"+history.getReason()+"**\n\n");
 							}
 							if(out.length() > 0)
 								_e.getChannel().sendMessage(message.setDescription("Here the requested history of this user\n\n"+out.toString()).build()).queue();
@@ -398,8 +397,7 @@ public class UserExecution {
 							Hashes.clearTempCache(key);
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(historyLevel, _e.getGuild())).build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, historyLevel);
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -412,6 +410,64 @@ public class UserExecution {
 							cache.updateDescription("watch"+cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 							Hashes.addTempCache(key, cache);
 						}
+						else {
+							UserPrivs.throwNotEnoughPrivilegeError(_e, watchLevel);
+							Hashes.clearTempCache(key);
+						}
+					}
+					case "unwatch" -> {
+						final var unwatchLevel = GuildIni.getUserUnwatchLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), unwatchLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							var watchedMember = Hashes.getWatchlist(_e.getGuild().getId()+"-"+user_id);
+							if(watchedMember != null) {
+								if(!watchedMember.hasHigherPrivileges()) {
+									//No higher privileges required, if it's set to log in the trash channel
+									if(Azrael.SQLDeleteWatchlist(user_id, _e.getGuild().getIdLong()) > 0) {
+										//Successful unwatch operation
+										Hashes.removeWatchlist(_e.getGuild().getId()+"-"+user_id);
+										message.setTitle("Success!");
+										_e.getChannel().sendMessage(message.setDescription("This user is not being watched anymore!").build()).queue();
+										logger.debug("The user {} has been removed from the watchlist for the guild {}", user_id, _e.getGuild().getId());
+									}
+									else {
+										//Error DB update
+										message.setTitle("Error!").setColor(Color.RED);
+										_e.getChannel().sendMessage("An internal error occurred! The Azrael.watchlist table couldn't be updated!");
+										logger.error("An internal error occurred! User {} in guild {} couldn't be inserted into Azrael.watchlist", user_id, _e.getGuild().getId());
+									}
+								}
+								else if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserUseWatchChannelLevel(_e.getGuild().getIdLong()))) {
+									//Higher privileges required to unwatch a member that is assigned to a separate watchlist channel
+									if(Azrael.SQLDeleteWatchlist(user_id, _e.getGuild().getIdLong()) > 0) {
+										//Successful unwatch operation
+										Hashes.removeWatchlist(_e.getGuild().getId()+"-"+user_id);
+										message.setTitle("Success!");
+										_e.getChannel().sendMessage(message.setDescription("This user is not being watched anymore!").build()).queue();
+										logger.debug("The user {} has been removed from the watchlist for the guild {}", user_id, _e.getGuild().getId());
+									}
+									else {
+										//Error DB update
+										message.setTitle("Error!").setColor(Color.RED);
+										_e.getChannel().sendMessage("An internal error occurred! The Azrael.watchlist table couldn't be updated!");
+										logger.error("An internal error occurred! User {} in guild {} couldn't be inserted into Azrael.watchlist", user_id, _e.getGuild().getId());
+									}
+								}
+								else {
+									//error: the user isn't being watched
+									message.setTitle("User is not being watched!").setColor(Color.RED);
+									_e.getChannel().sendMessage(message.setDescription("The user is currently not being watched! Not actions required!").build()).queue();
+								}
+							}
+							else {
+								//error: the user isn't being watched
+								message.setTitle("User is not being watched!").setColor(Color.RED);
+								_e.getChannel().sendMessage(message.setDescription("The user is currently not being watched! Not actions required!").build()).queue();
+							}
+						}
+						else {
+							UserPrivs.throwNotEnoughPrivilegeError(_e, unwatchLevel);
+						}
+						Hashes.clearTempCache(key);
 					}
 					case "gift-experience" -> {
 						final var giftExperienceLevel = GuildIni.getUserGiftExperienceLevel(_e.getGuild().getIdLong());
@@ -428,8 +484,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(giftExperienceLevel, _e.getGuild())).build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, giftExperienceLevel);
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -448,8 +503,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(setExperienceLevel, _e.getGuild())).build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, setExperienceLevel);
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -468,8 +522,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(setLevelLevel, _e.getGuild())).build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, setLevelLevel);
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -488,8 +541,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(giftCurrencyLevel, _e.getGuild())).build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, giftCurrencyLevel);
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -508,8 +560,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder();
-							_e.getChannel().sendMessage(error.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+							UserPrivs.throwNotEnoughPrivilegeError(_e, setCurrencyLevel);
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -652,7 +703,8 @@ public class UserExecution {
 						try {
 							var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id)).queue();
-							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "mute", (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!"));
+							var mute_time = (long)Azrael.SQLgetWarning(_e.getGuild().getIdLong(), Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID()+1).getTimer();
+							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "mute", (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!"), (mute_time/1000/60));
 							_e.getChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
 							checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
@@ -689,11 +741,11 @@ public class UserExecution {
 							long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 							if(cache.getAdditionalInfo2().length() > 0) {
 								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id)).reason(cache.getAdditionalInfo2()).queue();
-								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2());
+								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), (mute_time/1000/60));
 							}
 							else {
 								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id)).reason("No reason has been provided!").queue();
-								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", "No reason has been provided!");
+								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", "No reason has been provided!", (mute_time/1000/60));
 							}
 							if(Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID() != 0) {
 								if(Azrael.SQLUpdateUnmute(user_id, _e.getGuild().getIdLong(), timestamp, unmute_timestamp, true, true) == 0) {
@@ -765,8 +817,8 @@ public class UserExecution {
 						}
 						_e.getChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
 						_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason("User has been banned with the bot command!").queue();
-						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", "No reason has been provided!");
-						logger.debug("{} has banned {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getName());
+						Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "ban", "No reason has been provided!", 0);
+						logger.debug("{} has banned {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getId());
 						checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 						Hashes.addTempCache("ban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), "No reason has been provided!"));
 					} catch(IllegalArgumentException | NullPointerException iae) {
@@ -799,7 +851,7 @@ public class UserExecution {
 					}
 					_e.getChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
 					_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
-					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", _message);
+					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", _message, 0);
 					logger.debug("{} has banned {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 					checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 					Hashes.addTempCache("ban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
@@ -840,7 +892,7 @@ public class UserExecution {
 								+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
 								+ (GuildIni.getKickSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).complete();
 						_e.getGuild().kick(_e.getGuild().getMemberById(user_id)).reason("No reason has been provided!").queue();
-						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", "No reason has been provided!");
+						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", "No reason has been provided!", 0);
 						logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getName());
 						checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 						Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), "No reason has been provided!"));
@@ -859,7 +911,7 @@ public class UserExecution {
 							+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
 							+ (GuildIni.getKickSendReason(_e.getGuild().getIdLong()) ? "Provided reason: "+_message : "")).complete();
 					_e.getGuild().kick(_e.getGuild().getMemberById(user_id)).reason(_message).queue();
-					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", _message);
+					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", _message, 0);
 					logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getName());
 					checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 					Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
@@ -874,25 +926,38 @@ public class UserExecution {
 					var trash_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 					var watch_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("wat")).findAny().orElse(null);
 					if(trash_channel != null || watch_channel != null) {
-						var useWatchChannel = (watch_channel != null ? true : false);
+						long watchChannel = 0;
+						var higherPrivileges = false;
+						if(watch_channel != null) {
+							watchChannel = watch_channel.getChannel_ID();
+							higherPrivileges = true;
+						}
+						else {
+							watchChannel = trash_channel.getChannel_ID();
+							higherPrivileges = false;
+						}
 						switch(_message) {
 							case "1" -> {
-								if(Azrael.SQLInsertWatchlist(user_id, _e.getGuild().getIdLong(), 1, useWatchChannel) == 0) {
+								if(Azrael.SQLInsertWatchlist(user_id, _e.getGuild().getIdLong(), 1, watchChannel, higherPrivileges) == 0) {
 									_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred. User couldn't be inserted into Azrael.watchlist table!").build()).queue();
 									logger.error("{} couldn't be inserted into Azrael.watchlist for guild {}", user_id, _e.getGuild().getId());
 									return;
 								}
-								else
-									Hashes.addWatchlist(_e.getGuild().getId()+"-"+user_id, new Watchlist(1, useWatchChannel));
+								else {
+									Hashes.addWatchlist(_e.getGuild().getId()+"-"+user_id, new Watchlist(1, watchChannel, higherPrivileges));
+									logger.debug("User {} has been added to the watchlist for guild {}", user_id, _e.getGuild().getId());
+								}
 							}
 							case "2" -> {
-								if(Azrael.SQLInsertWatchlist(user_id, _e.getGuild().getIdLong(), 2, useWatchChannel) == 0) {
+								if(Azrael.SQLInsertWatchlist(user_id, _e.getGuild().getIdLong(), 2, watchChannel, higherPrivileges) == 0) {
 									_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred. User couldn't be inserted into Azrael.watchlist table!").build()).queue();
 									logger.error("{} couldn't be inserted into Azrael.watchlist for guild {}", user_id, _e.getGuild().getId());
 									return;
 								}
-								else
-									Hashes.addWatchlist(_e.getGuild().getId()+"-"+user_id, new Watchlist(2, useWatchChannel));
+								else {
+									Hashes.addWatchlist(_e.getGuild().getId()+"-"+user_id, new Watchlist(2, watchChannel, higherPrivileges));
+									logger.debug("User {} has been added to the watchlist for guild {}", user_id, _e.getGuild().getId());
+								}
 							}
 							default  -> { return; }
 						}
@@ -910,22 +975,26 @@ public class UserExecution {
 					if(trash_channel != null) {
 						switch(_message) {
 							case "1" -> {
-								if(Azrael.SQLInsertWatchlist(user_id, _e.getGuild().getIdLong(), 1, false) == 0) {
+								if(Azrael.SQLInsertWatchlist(user_id, _e.getGuild().getIdLong(), 1, trash_channel.getChannel_ID(), false) == 0) {
 									_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred. User couldn't be inserted into Azrael.watchlist table!").build()).queue();
 									logger.error("{} couldn't be inserted into Azrael.watchlist for guild {}", user_id, _e.getGuild().getId());
 									return;
 								}
-								else
-									Hashes.addWatchlist(_e.getGuild().getId()+"-"+user_id, new Watchlist(1, false));
+								else {
+									Hashes.addWatchlist(_e.getGuild().getId()+"-"+user_id, new Watchlist(1, trash_channel.getChannel_ID(), false));
+									logger.debug("User {} has been added to the watchlist for guild {}", user_id, _e.getGuild().getId());
+								}
 							}
 							case "2" -> {
-								if(Azrael.SQLInsertWatchlist(user_id, _e.getGuild().getIdLong(), 2, false) == 0) {
+								if(Azrael.SQLInsertWatchlist(user_id, _e.getGuild().getIdLong(), 2, trash_channel.getChannel_ID(), false) == 0) {
 									_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred. User couldn't be inserted into Azrael.watchlist table!").build()).queue();
 									logger.error("{} couldn't be inserted into Azrael.watchlist for guild {}", user_id, _e.getGuild().getId());
 									return;
 								}
-								else
-									Hashes.addWatchlist(_e.getGuild().getId()+"-"+user_id, new Watchlist(2, false));
+								else {
+									Hashes.addWatchlist(_e.getGuild().getId()+"-"+user_id, new Watchlist(2, trash_channel.getChannel_ID(), false));
+									logger.debug("User {} has been added to the watchlist for guild {}", user_id, _e.getGuild().getId());
+								}
 							}
 							default  -> { return; }
 						}

@@ -79,7 +79,7 @@ public class Hashes {
     private static final Set<String> globalURLBlacklist = new HashSet<String>();
     private static final ConcurrentHashMap<Long, ArrayList<String>> urlBlacklist = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final ConcurrentHashMap<Long, ArrayList<String>> urlWhitelist = new ConcurrentHashMap<Long, ArrayList<String>>();
-    private static final Map<String, Watchlist> watchlist = new HashMap<String, Watchlist>();
+    private static final ConcurrentHashMap<String, Watchlist> watchlist = new ConcurrentHashMap<String, Watchlist>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
 		message_pool.put(_message_id, _message);

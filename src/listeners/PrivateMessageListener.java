@@ -14,7 +14,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class PrivateMessageListener extends ListenerAdapter{
+public class PrivateMessageListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(PrivateMessageListener.class);
 	
 	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent e) {
@@ -23,7 +24,6 @@ public class PrivateMessageListener extends ListenerAdapter{
 		if(message.equalsIgnoreCase("equip")) {
 			if(e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
 				if(!CommandHandler.handleCommand(CommandParser.parser(message, null, e))) {
-					Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
 					logger.warn("Private message command {} doesn't exist!", e.getMessage().getContentRaw());
 				}
 			}

@@ -12,9 +12,9 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 
 public class SetMaxExperience {
+	private final static Logger logger = LoggerFactory.getLogger(SetMaxExperience.class);
+	
 	public static void runTask(GuildMessageReceivedEvent _e, String _input, Guilds guild_settings){
-		Logger logger = LoggerFactory.getLogger(SetMaxExperience.class);
-		
 		Pattern pattern = Pattern.compile("(enable|disable)");
 		Matcher matcher = pattern.matcher(_input);
 		if(matcher.find()){

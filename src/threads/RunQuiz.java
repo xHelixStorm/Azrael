@@ -16,7 +16,8 @@ import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class RunQuiz implements Runnable{
-	private final Logger logger = LoggerFactory.getLogger(RunQuiz.class);
+	private final static Logger logger = LoggerFactory.getLogger(RunQuiz.class);
+	
 	private GuildMessageReceivedEvent e;
 	private long channel_id;
 	private long log_channel_id;

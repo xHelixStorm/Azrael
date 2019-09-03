@@ -21,7 +21,9 @@ import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
-public class InventoryBuilder{
+public class InventoryBuilder {
+	private final static Logger logger = LoggerFactory.getLogger(InventoryBuilder.class);
+	
 	public static void DrawInventory(GuildMessageReceivedEvent _e, GuildMessageReactionAddEvent _e2, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, int theme_id){
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.execute(() -> {
@@ -98,7 +100,6 @@ public class InventoryBuilder{
 				else
 					ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+_e2.getGuild().getId()+"us"+_e2.getMember().getUser().getId()+".png"));
 			} catch(IOException ioe){
-				Logger logger = LoggerFactory.getLogger(InventoryBuilder.class);
 				logger.warn("Inventory tab not found", ioe);
 			}
 			

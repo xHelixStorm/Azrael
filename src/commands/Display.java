@@ -1,6 +1,7 @@
 package commands;
 
 import java.awt.Color;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,11 +43,11 @@ public class Display implements CommandPublic{
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		var adminPermission = e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong());
 		long guild_id = e.getGuild().getIdLong();
-		String out = "";
+		StringBuilder out = new StringBuilder();
 		
 		final String prefix = GuildIni.getCommandPrefix(guild_id);
 		if(args.length == 0) {
-			out = "Use these parameters after the display command like **"+prefix+"display -roles** for further information on what to display:\n\n"
+			out.append("Use these parameters after the display command like **"+prefix+"display -roles** for further information on what to display:\n\n"
 					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong())) || adminPermission 				? "**-roles**: Display all roles from this guild.\n" : "")
 					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRegisteredRolesLevel(e.getGuild().getIdLong())) || adminPermission 		? "**-registered-roles**: Display all registered roles with their privileges.\n" : "")
 					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong())) || adminPermission 		? "**-ranking-roles**: Display all roles that can be unlocked with which level.\n" : "")
@@ -54,31 +55,32 @@ public class Display implements CommandPublic{
 					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayVoiceChannelsLevel(e.getGuild().getIdLong())) || adminPermission 		? "**-voicechannels**: Display all voicechannels from this guild.\n" : "")
 					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRegisteredChannelsLevel(e.getGuild().getIdLong())) || adminPermission 	? "**-registered-channels**: Display all registered textchannels with configured filter options.\n" : "")
 					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong())) || adminPermission 				? "**-dailies**: Display all items that the "+prefix+"daily command contains.\n" : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong())) || adminPermission 		? "**-command-levels**: Display the privilege level of each command and subcommand." : "");
-			e.getChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
+					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayWatchedUsersLevel(e.getGuild().getIdLong())) || adminPermission 		? "**-watched-users**: Display all users that are currently being watched with their watch level.\n" : "")
+					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong())) || adminPermission 		? "**-command-levels**: Display the privilege level of each command and subcommand." : ""));
+			e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue();
 		}
 		else if(args[0].equalsIgnoreCase("-roles")) {
 			final var rolesLevel = GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), rolesLevel) || adminPermission) {
 				for(Role r : e.getGuild().getRoles()) {
-					out += r.getName() + " (" + r.getId() + ") \n";
+					out.append(r.getName() + " (" + r.getId() + ") \n");
 				}
-				e.getChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
+				e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue();
 			}
 			else {
-				e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(rolesLevel, e.getGuild())).build()).queue();
+				UserPrivs.throwNotEnoughPrivilegeError(e, rolesLevel);
 			}
 		}
 		else if(args[0].equalsIgnoreCase("-registered-roles")) {
 			final var registeredRolesLevel = GuildIni.getDisplayRegisteredRolesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredRolesLevel) || adminPermission) {
 				for(Roles r : DiscordRoles.SQLgetRoles(guild_id)) {
-					out += r.getRole_Name() + " (" + r.getRole_ID() + ") \nrole type: "+r.getCategory_Name()+"\nPrivilege level: "+r.getLevel()+"\n\n";
+					out.append(r.getRole_Name() + " (" + r.getRole_ID() + ") \nrole type: "+r.getCategory_Name()+"\nPrivilege level: "+r.getLevel()+"\n\n");
 				}
-				e.getChannel().sendMessage(messageBuild.setDescription(out).build()).queue();
+				e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue();
 			}
 			else {
-				e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(registeredRolesLevel, e.getGuild())).build()).queue();
+				UserPrivs.throwNotEnoughPrivilegeError(e, registeredRolesLevel);
 			}
 		}
 		else if(args[0].equalsIgnoreCase("-ranking-roles")) {
@@ -87,153 +89,178 @@ public class Display implements CommandPublic{
 				if(RankingSystem.SQLgetGuild(guild_id).getRankingState()) {
 					for(constructors.Rank r : RankingSystem.SQLgetRoles(guild_id)) {
 						if(r.getGuildID() == guild_id) {
-							out += r.getRole_Name() + " (" + r.getRoleID() + ") \nlevel to unlock: " + r.getLevel_Requirement() + "\n";
+							out.append(r.getRole_Name() + " (" + r.getRoleID() + ") \nlevel to unlock: " + r.getLevel_Requirement() + "\n");
 						}
 					}
 				}
 				else {
-					out = "The ranking system isn't enabled and hence no role can be displayed!";
+					out.append("The ranking system isn't enabled and hence no role can be displayed!");
 				}
-				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No ranking role has been registered!").build()).queue();
+				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out.toString() : "No ranking role has been registered!").build()).queue();
 			}
 			else {
-				e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(rankingRolesLevel, e.getGuild())).build()).queue();
+				UserPrivs.throwNotEnoughPrivilegeError(e, rankingRolesLevel);
 			}
 		}
 		else if(args[0].equalsIgnoreCase("-textchannels")) {
 			final var textChannelsLevel = GuildIni.getDisplayTextChannelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), textChannelsLevel) || adminPermission) {
 				for(TextChannel tc : e.getGuild().getTextChannels()) {
-					out += tc.getName() + " (" + tc.getId() + ") \n";
+					out.append(tc.getName() + " (" + tc.getId() + ") \n");
 				}
-				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "Textchannels don't exist in this server!").build()).queue();
+				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out.toString() : "Textchannels don't exist in this server!").build()).queue();
 			}
 			else {
-				e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(textChannelsLevel, e.getGuild())).build()).queue();
+				UserPrivs.throwNotEnoughPrivilegeError(e, textChannelsLevel);
 			}
 		}
 		else if(args[0].equalsIgnoreCase("-voicechannels")) {
 			final var voiceChannelsLevel = GuildIni.getDisplayVoiceChannelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), voiceChannelsLevel) || adminPermission) {
 				for(VoiceChannel vc : e.getGuild().getVoiceChannels()) {
-					out += vc.getName() + " (" + vc.getId() + ") \n";
+					out.append(vc.getName() + " (" + vc.getId() + ") \n");
 				}
-				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "Voicechannels don't exist in this server!").build()).queue();
+				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out.toString() : "Voicechannels don't exist in this server!").build()).queue();
 			}
 			else {
-				e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(voiceChannelsLevel, e.getGuild())).build()).queue();
+				UserPrivs.throwNotEnoughPrivilegeError(e, voiceChannelsLevel);
 			}
 		}
 		else if(args[0].equalsIgnoreCase("-registered-channels")) {
 			final var registeredChannelsLevel = GuildIni.getDisplayRegisteredChannelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredChannelsLevel) || adminPermission) {
 				for(Channels ch : Azrael.SQLgetChannels(guild_id)) {
-					if(!out.contains(""+ch.getChannel_ID())) {
-						out += "\n\n"+ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \nChannel type: "+(ch.getChannel_Type_Name() != null ? ch.getChannel_Type_Name() : "none")+" Channel\nFilter(s) in use: "+ch.getLang_Filter()+"\nURL censoring: "+(ch.getURLCensoring() ? "enabled" : "disabled");
+					if(!out.toString().contains(""+ch.getChannel_ID())) {
+						out.append("\n\n"+ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \nChannel type: "+(ch.getChannel_Type_Name() != null ? ch.getChannel_Type_Name() : "none")+" Channel\nFilter(s) in use: "+ch.getLang_Filter()+"\nURL censoring: "+(ch.getURLCensoring() ? "enabled" : "disabled")) ;
 					}
-					else if(out.contains(""+ch.getChannel_ID())) {
-						out += ", "+ch.getLang_Filter();
+					else if(out.toString().contains(""+ch.getChannel_ID())) {
+						out.append(", "+ch.getLang_Filter());
 					}
 				}
-				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out : "No channel has been registered!").build()).queue();
+				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out.toString() : "No channel has been registered!").build()).queue();
 			}
 			else{
-				e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(registeredChannelsLevel, e.getGuild())).build()).queue();
+				UserPrivs.throwNotEnoughPrivilegeError(e, registeredChannelsLevel);
 			}
 		}
 		else if(args[0].equalsIgnoreCase("-dailies")) {
 			final var dailiesLevel = GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), dailiesLevel) || adminPermission) {
 				for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID())) {
-					out+= daily.getDescription()+"\nWeight: "+daily.getWeight()+"\n\n";
+					out.append(daily.getDescription()+"\nWeight: "+daily.getWeight()+"\n\n");
 				}
-				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? "You can receive the following items through dailies:\n\n"+out : "No daily item has been registered!").build()).queue();
+				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? "You can receive the following items through dailies:\n\n"+out.toString() : "No daily item has been registered!").build()).queue();
 			}
 			else{
-				e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+				UserPrivs.throwNotEnoughPrivilegeError(e, dailiesLevel);
+			}
+		}
+		else if(args[0].equalsIgnoreCase("-watched-users")) {
+			final var watchedUsersLevel = GuildIni.getDisplayWatchedUsersLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), watchedUsersLevel) || adminPermission) {
+				List<String> watchedUsers = null;
+				if(!UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUserUseWatchChannelLevel(e.getGuild().getIdLong()))) {
+					watchedUsers = Azrael.SQLgetWholeWatchlist(e.getGuild().getIdLong(), false);
+				}
+				else {
+					watchedUsers = Azrael.SQLgetWholeWatchlist(e.getGuild().getIdLong(), true);
+				}
+				for(final var watchedUser : watchedUsers) {
+					out.append(watchedUser+"\n");
+				}
+				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0 ? "Here all users that are being watched:\n\n"+out.toString() : "Currently no user is being watched!")).build()).queue();
+			}
+			else {
+				UserPrivs.throwNotEnoughPrivilegeError(e, watchedUsersLevel);
 			}
 		}
 		else if(args[0].equalsIgnoreCase("-command-levels")) {
 			var commandsLevel = GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandsLevel) || adminPermission) {
-				out += "About command: "+GuildIni.getAboutLevel(e.getGuild().getIdLong())+"\n";
-				out += "Commands command: "+GuildIni.getCommandsLevel(e.getGuild().getIdLong())+"\n";
-				out += "Hidden commands: "+GuildIni.getCommandsAdminLevel(e.getGuild().getIdLong())+"\n";
-				out += "Daily command: "+GuildIni.getDailyLevel(e.getGuild().getIdLong())+"\n";
-				out += "Display command: "+GuildIni.getDisplayLevel(e.getGuild().getIdLong())+"\n";
-				out += "Display roles subcommand: "+GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong())+"\n";
-				out += "Display registered roles subcommand: "+GuildIni.getDisplayRegisteredRolesLevel(e.getGuild().getIdLong())+"\n";
-				out += "Display ranking roles subcommand: "+GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong())+"\n";
-				out += "Display text channels subcommand: "+GuildIni.getDisplayTextChannelsLevel(e.getGuild().getIdLong())+"\n";
-				out += "Display voice channels subcommand: "+GuildIni.getDisplayVoiceChannelsLevel(e.getGuild().getIdLong())+"\n";
-				out += "Display registered text channel subcommand: "+GuildIni.getDisplayRegisteredChannelsLevel(e.getGuild().getIdLong())+"\n";
-				out += "Display dailies subcommand: "+GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong())+"\n";
-				out += "Display command levels subcommand: "+GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong())+"\n";
-				out += "Help command: "+GuildIni.getHelpLevel(e.getGuild().getIdLong())+"\n";
-				out += "Inventory command: "+GuildIni.getInventoryLevel(e.getGuild().getIdLong())+"\n";
-				out += "Meow command: "+GuildIni.getMeowLevel(e.getGuild().getIdLong())+"\n";
-				out += "Pug command: "+GuildIni.getPugLevel(e.getGuild().getIdLong())+"\n";
-				out += "Profile command: "+GuildIni.getProfileLevel(e.getGuild().getIdLong())+"\n";
-				out += "Rank command: "+GuildIni.getRankLevel(e.getGuild().getIdLong())+"\n";
-				out += "Register command: "+GuildIni.getRegisterLevel(e.getGuild().getIdLong())+"\n";
-				out += "Register role subcommand: "+GuildIni.getRegisterRoleLevel(e.getGuild().getIdLong())+"\n";
-				out += "Register text channel subcommand: "+GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong())+"\n";
-				out += "Register text channel url subcommand: "+GuildIni.getRegisterTextChannelURLLevel(e.getGuild().getIdLong())+"\n";
-				out += "Register text channel txt subcommand: "+GuildIni.getRegisterTextChannelTXTLevel(e.getGuild().getIdLong())+"\n";
-				out += "Register text channels subcommand: "+GuildIni.getRegisterTextChannelsLevel(e.getGuild().getIdLong())+"\n";
-				out += "Register ranking role subcommand: "+GuildIni.getRegisterRankingRoleLevel(e.getGuild().getIdLong())+"\n";
-				out += "Register users subcommand: "+GuildIni.getRegisterUsersLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set command: "+GuildIni.getSetLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set privilege level subcommand: "+GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set channel filter subcommand: "+GuildIni.getSetChannelFilterLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set warnings subcommand: "+GuildIni.getSetWarningsLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set commands subcommand: "+GuildIni.getSetCommandsLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set ranking sucommand: "+GuildIni.getSetRankingLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set max experience subcommand: "+GuildIni.getSetMaxExperienceLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set default level skin subcommand: "+GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set default rank skin subcommand: "+GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set default profile skin subcommand: "+GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set default icon skin subcommand: "+GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set daily item sucommand: "+GuildIni.getSetDailyItemLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set giveaway items sucommand: "+GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong())+"\n";
-				out += "Set privilege level sucommand: "+GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong())+"\n";
-				out += "Shop command: "+GuildIni.getShopLevel(e.getGuild().getIdLong())+"\n";
-				out += "Top command: "+GuildIni.getTopLevel(e.getGuild().getIdLong())+"\n";
-				out += "Use command: "+GuildIni.getUseLevel(e.getGuild().getIdLong())+"\n";
-				out += "User command: "+GuildIni.getUserLevel(e.getGuild().getIdLong())+"\n";
-				out += "User information subcommand: "+GuildIni.getUserInformationLevel(e.getGuild().getIdLong())+"\n";
-				out += "User delete messages subcommand: "+GuildIni.getUserDeleteMessagesLevel(e.getGuild().getIdLong())+"\n";
-				out += "User warning subcommand: "+GuildIni.getUserWarningLevel(e.getGuild().getIdLong())+"\n";
-				out += "User forced warning subcommand: "+GuildIni.getUserWarningForceLevel(e.getGuild().getIdLong())+"\n";
-				out += "User mute subcommand: "+GuildIni.getUserMuteLevel(e.getGuild().getIdLong())+"\n";
-				out += "User unmute subcommand: "+GuildIni.getUserUnmuteLevel(e.getGuild().getIdLong())+"\n";
-				out += "User ban subcommand: "+GuildIni.getUserBanLevel(e.getGuild().getIdLong())+"\n";
-				out += "User kick subcommand: "+GuildIni.getUserKickLevel(e.getGuild().getIdLong())+"\n";
-				out += "User history subcommand: "+GuildIni.getUserHistoryLevel(e.getGuild().getIdLong())+"\n";
-				out += "User gift experience subcommand: "+GuildIni.getUserGiftExperienceLevel(e.getGuild().getIdLong())+"\n";
-				out += "User set experience subcommand: "+GuildIni.getUserSetExperienceLevel(e.getGuild().getIdLong())+"\n";
-				out += "User gift currency subcommand: "+GuildIni.getUserGiftCurrencyLevel(e.getGuild().getIdLong())+"\n";
-				out += "User set currency subcommand: "+GuildIni.getUserSetCurrencyLevel(e.getGuild().getIdLong())+"\n";
-				out += "Filter command: "+GuildIni.getFilterLevel(e.getGuild().getIdLong())+"\n";
-				out += "Filter word filter subcommand: "+GuildIni.getFilterWordFilterLevel(e.getGuild().getIdLong())+"\n";
-				out += "Filter name filter subcommand: "+GuildIni.getFilterNameFilterLevel(e.getGuild().getIdLong())+"\n";
-				out += "Filter name kick subcommand: "+GuildIni.getFilterNameKickLevel(e.getGuild().getIdLong())+"\n";
-				out += "Filter funny names subcommand: "+GuildIni.getFilterFunnyNamesLevel(e.getGuild().getIdLong())+"\n";
-				out += "Filter staff names subcommand: "+GuildIni.getFilterStaffNamesLevel(e.getGuild().getIdLong())+"\n";
-				out += "Filter url blacklist subcommand: "+GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong())+"\n";
-				out += "Filter url whitelist subcommand: "+GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong())+"\n";
-				out += "Quiz command: "+GuildIni.getQuizLevel(e.getGuild().getIdLong())+"\n";
-				out += "Rolereaction command: "+GuildIni.getRoleReactionLevel(e.getGuild().getIdLong())+"\n";
-				out += "Rss command: "+GuildIni.getRssLevel(e.getGuild().getIdLong())+"\n";
-				out += "Randomshop command: "+GuildIni.getRandomshopLevel(e.getGuild().getIdLong())+"\n";
-				out += "Patchnotes command: "+GuildIni.getPatchnotesLevel(e.getGuild().getIdLong())+"\n";
-				out += "Doubleexperience command: "+GuildIni.getDoubleExperienceLevel(e.getGuild().getIdLong())+"\n";
-				out += "Equip command: "+GuildIni.getEquipLevel(e.getGuild().getIdLong());
+				out.append("About command: "+GuildIni.getAboutLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Commands command: "+GuildIni.getCommandsLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Hidden commands: "+GuildIni.getCommandsAdminLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Daily command: "+GuildIni.getDailyLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Display command: "+GuildIni.getDisplayLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Display roles subcommand: "+GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Display registered roles subcommand: "+GuildIni.getDisplayRegisteredRolesLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Display ranking roles subcommand: "+GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Display text channels subcommand: "+GuildIni.getDisplayTextChannelsLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Display voice channels subcommand: "+GuildIni.getDisplayVoiceChannelsLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Display registered text channel subcommand: "+GuildIni.getDisplayRegisteredChannelsLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Display dailies subcommand: "+GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Display watched users subcommand: "+GuildIni.getDisplayWatchedUsersLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Display command levels subcommand: "+GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Help command: "+GuildIni.getHelpLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Inventory command: "+GuildIni.getInventoryLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Meow command: "+GuildIni.getMeowLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Pug command: "+GuildIni.getPugLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Profile command: "+GuildIni.getProfileLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Rank command: "+GuildIni.getRankLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Register command: "+GuildIni.getRegisterLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Register role subcommand: "+GuildIni.getRegisterRoleLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Register text channel subcommand: "+GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Register text channel url subcommand: "+GuildIni.getRegisterTextChannelURLLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Register text channel txt subcommand: "+GuildIni.getRegisterTextChannelTXTLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Register text channels subcommand: "+GuildIni.getRegisterTextChannelsLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Register ranking role subcommand: "+GuildIni.getRegisterRankingRoleLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Register users subcommand: "+GuildIni.getRegisterUsersLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set command: "+GuildIni.getSetLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set privilege level subcommand: "+GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set channel filter subcommand: "+GuildIni.getSetChannelFilterLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set warnings subcommand: "+GuildIni.getSetWarningsLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set commands subcommand: "+GuildIni.getSetCommandsLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set ranking sucommand: "+GuildIni.getSetRankingLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set max experience subcommand: "+GuildIni.getSetMaxExperienceLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set default level skin subcommand: "+GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set default rank skin subcommand: "+GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set default profile skin subcommand: "+GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set default icon skin subcommand: "+GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set daily item sucommand: "+GuildIni.getSetDailyItemLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set giveaway items sucommand: "+GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set privilege level sucommand: "+GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Shop command: "+GuildIni.getShopLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Top command: "+GuildIni.getTopLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Use command: "+GuildIni.getUseLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User command: "+GuildIni.getUserLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User information subcommand: "+GuildIni.getUserInformationLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User delete messages subcommand: "+GuildIni.getUserDeleteMessagesLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User warning subcommand: "+GuildIni.getUserWarningLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User forced warning subcommand: "+GuildIni.getUserWarningForceLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User mute subcommand: "+GuildIni.getUserMuteLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User unmute subcommand: "+GuildIni.getUserUnmuteLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User ban subcommand: "+GuildIni.getUserBanLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User kick subcommand: "+GuildIni.getUserKickLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User history subcommand: "+GuildIni.getUserHistoryLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User watch subcommand: "+GuildIni.getUserWatchLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User unwatch subcommand: "+GuildIni.getUserUnwatchLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User use watch channel subcommand: "+GuildIni.getUserUseWatchChannelLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User gift experience subcommand: "+GuildIni.getUserGiftExperienceLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User set experience subcommand: "+GuildIni.getUserSetExperienceLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User gift currency subcommand: "+GuildIni.getUserGiftCurrencyLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User set currency subcommand: "+GuildIni.getUserSetCurrencyLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Filter command: "+GuildIni.getFilterLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Filter word filter subcommand: "+GuildIni.getFilterWordFilterLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Filter name filter subcommand: "+GuildIni.getFilterNameFilterLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Filter name kick subcommand: "+GuildIni.getFilterNameKickLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Filter funny names subcommand: "+GuildIni.getFilterFunnyNamesLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Filter staff names subcommand: "+GuildIni.getFilterStaffNamesLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Filter url blacklist subcommand: "+GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Filter url whitelist subcommand: "+GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Quiz command: "+GuildIni.getQuizLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Rolereaction command: "+GuildIni.getRoleReactionLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Rss command: "+GuildIni.getRssLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Randomshop command: "+GuildIni.getRandomshopLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Patchnotes command: "+GuildIni.getPatchnotesLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Doubleexperience command: "+GuildIni.getDoubleExperienceLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Equip command: "+GuildIni.getEquipLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Watch command: "+GuildIni.getWatchLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Unwatch command: "+GuildIni.getUnwatchLevel(e.getGuild().getIdLong())+"\n");
 				
-				e.getChannel().sendMessage("`"+out+"`").queue();
+				e.getChannel().sendMessage("`"+out.toString()+"`").queue();
 			}
 			else{
-				e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandsLevel, e.getGuild())).build()).queue();
+				UserPrivs.throwNotEnoughPrivilegeError(e, commandsLevel);
 			}
 		}
 		else {

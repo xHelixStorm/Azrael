@@ -21,14 +21,14 @@ import sql.RankingSystem;
 import sql.RankingSystemItems;
 import sql.Azrael;
 
-public class GuildMessageReactionAddListener extends ListenerAdapter{
+public class GuildMessageReactionAddListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(GuildMessageReactionAddListener.class);
 	
 	@Override
 	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent e) {
 		if(!UserPrivs.isUserBot(e.getUser(), e.getGuild().getIdLong())) {
 			if(!UserPrivs.isUserMuted(e.getUser(), e.getGuild().getIdLong())) {
 				if(Azrael.SQLgetCommandExecutionReaction(e.getGuild().getIdLong())) {
-					Logger logger = LoggerFactory.getLogger(GuildMessageReactionAddListener.class);
 					if(DiscordRoles.SQLgetRolesByCategory(e.getGuild().getIdLong(), "rea")) {
 						var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rea")).findAny().orElse(null);
 						String reactionName = "";

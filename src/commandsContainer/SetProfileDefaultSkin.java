@@ -9,8 +9,9 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 
 public class SetProfileDefaultSkin {
-	public static void runTask(GuildMessageReceivedEvent _e, int _default_skin, int _last_theme){
-		Logger logger = LoggerFactory.getLogger(SetProfileDefaultSkin.class);
+	private final static Logger logger = LoggerFactory.getLogger(SetProfileDefaultSkin.class);
+	
+	public static void runTask(GuildMessageReceivedEvent _e, int _default_skin, int _last_theme) {
 		if(_default_skin <= _last_theme){
 			Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 			guild_settings.setProfileID(_default_skin);

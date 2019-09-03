@@ -13,14 +13,14 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.DiscordRoles;
 import sql.Azrael;
 
-public class GuildMessageReactionRemoveListener extends ListenerAdapter{
+public class GuildMessageReactionRemoveListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(GuildMessageReactionRemoveListener.class);
 	
 	@Override
 	public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent e) {
 		if(!UserPrivs.isUserBot(e.getUser(), e.getGuild().getIdLong())) {
 			if(!UserPrivs.isUserMuted(e.getUser(), e.getGuild().getIdLong())) {
 				if(Azrael.SQLgetCommandExecutionReaction(e.getGuild().getIdLong())) {
-					Logger logger = LoggerFactory.getLogger(GuildMessageReactionRemoveListener.class);
 					if(DiscordRoles.SQLgetRolesByCategory(e.getGuild().getIdLong(), "rea")) {
 						var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rea")).findAny().orElse(null);
 						String reactionName = "";

@@ -55,7 +55,7 @@ public class BoostCountListener extends ListenerAdapter{
 		if(channels != null && channels.size() > 0) {
 			var log_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 			if(log_channel != null) {
-				EmbedBuilder message = new EmbedBuilder().setColor(Color.getHSBColor(293, 87, 63)).setTitle((increased ? "Server has been boosted!" : "Tier level decreased!"));
+				EmbedBuilder message = new EmbedBuilder().setColor(Color.MAGENTA).setTitle((increased ? "Server has been boosted!" : "Tier level decreased!"));
 				if(affectedMember != null)message.addField((increased ? "Booster" : "Traitor"), affectedMember.getAsMention(), true);
 				message.addField("Current Boost Count", "**"+e.getNewBoostCount()+"**", true);
 				message.setThumbnail(affectedMember.getUser().getEffectiveAvatarUrl());

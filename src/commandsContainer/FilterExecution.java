@@ -21,6 +21,8 @@ import sql.Azrael;
 import util.Pastebin;
 
 public class FilterExecution {
+	private final static Logger logger = LoggerFactory.getLogger(FilterExecution.class);
+	
 	public static void runHelp(GuildMessageReceivedEvent _e) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle("Actions for the filter command!");
 		_e.getChannel().sendMessage(message.setDescription("Type one of the following word types right after the command to choose a respective action! These types are available:\n\n**word-filter\nname-filter\nname-kick\nfunny-names\nstaff-names\nurl-blacklist\nurl-whitelist**").build()).queue();
@@ -117,7 +119,6 @@ public class FilterExecution {
 	@SuppressWarnings("preview")
 	public static void performAction(GuildMessageReceivedEvent _e, String _message, Cache cache) {
 		String key = "filter_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId();
-		Logger logger = LoggerFactory.getLogger(FilterExecution.class);
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		if(cache.getExpiration() - System.currentTimeMillis() > 0) {
 			switch(cache.getAdditionalInfo()) {
@@ -469,7 +470,7 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache);
 					}
 				}
-				case "display-word-filter" -> callFilterLangContent(_e, message, logger, key, _message.toLowerCase());
+				case "display-word-filter" -> callFilterLangContent(_e, message, key, _message.toLowerCase());
 				case "insert-word-filter" -> {
 					var langInsert = _message.toLowerCase();
 					if(langInsert.equalsIgnoreCase("english") || langInsert.equalsIgnoreCase("german") || langInsert.equalsIgnoreCase("french") || langInsert.equalsIgnoreCase("turkish") || langInsert.equalsIgnoreCase("russian") || 
@@ -480,15 +481,15 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache);
 					}
 				}
-				case "english-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "german-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "french-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "turkish-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "russian-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "spanish-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "portuguese-insert-word-filter" 	-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "italian-insert-word-filter" 		-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "all-insert-word-filter" 			-> insertLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "english-insert-word-filter" 		-> insertLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "german-insert-word-filter" 		-> insertLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "french-insert-word-filter" 		-> insertLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "turkish-insert-word-filter" 		-> insertLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "russian-insert-word-filter" 		-> insertLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "spanish-insert-word-filter" 		-> insertLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "portuguese-insert-word-filter" 	-> insertLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "italian-insert-word-filter" 		-> insertLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "all-insert-word-filter" 			-> insertLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
 				case "remove-word-filter" -> {
 					var langRemove = _message.toLowerCase();
 					if(langRemove.equalsIgnoreCase("english") || langRemove.equalsIgnoreCase("german") || langRemove.equalsIgnoreCase("french") || langRemove.equalsIgnoreCase("turkish") || langRemove.equalsIgnoreCase("russian") || 
@@ -499,15 +500,15 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache);
 					}
 				}
-				case "english-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "german-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "french-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "turkish-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "russian-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "spanish-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "portuguese-remove-word-filter" 	-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "italian-remove-word-filter" 		-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "all-remove-word-filter" 			-> removeLangWord(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "english-remove-word-filter" 		-> removeLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "german-remove-word-filter" 		-> removeLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "french-remove-word-filter" 		-> removeLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "turkish-remove-word-filter" 		-> removeLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "russian-remove-word-filter" 		-> removeLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "spanish-remove-word-filter" 		-> removeLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "portuguese-remove-word-filter" 	-> removeLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "italian-remove-word-filter" 		-> removeLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "all-remove-word-filter" 			-> removeLangWord(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
 				case "add-load-word-filter" -> {
 					var addLangLoad = _message.toLowerCase();
 					if(addLangLoad.equalsIgnoreCase("english") || addLangLoad.equalsIgnoreCase("german") || addLangLoad.equalsIgnoreCase("french") || addLangLoad.equalsIgnoreCase("turkish") || addLangLoad.equalsIgnoreCase("russian") || 
@@ -518,14 +519,14 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache);
 					}
 				}
-				case "english-add-load-word-filter" 	-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "german-add-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "french-add-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "turkish-add-load-word-filter" 	-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "russian-add-load-word-filter" 	-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "spanish-add-load-word-filter" 	-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "portuguese-add-load-word-filter" 	-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "italian-add-load-word-filter" 	-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "english-add-load-word-filter" 	-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "german-add-load-word-filter" 		-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "french-add-load-word-filter" 		-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "turkish-add-load-word-filter" 	-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "russian-add-load-word-filter" 	-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "spanish-add-load-word-filter" 	-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "portuguese-add-load-word-filter" 	-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "italian-add-load-word-filter" 	-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
 				case "load-word-filter" -> {
 					var langLoad = _message.toLowerCase();
 					if(langLoad.equalsIgnoreCase("english") || langLoad.equalsIgnoreCase("german") || langLoad.equalsIgnoreCase("french") || langLoad.equalsIgnoreCase("turkish") || langLoad.equalsIgnoreCase("russian") || 
@@ -536,14 +537,14 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache);
 					}
 				}
-				case "english-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "german-load-word-filter" 			-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "french-load-word-filter" 			-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "turkish-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "russian-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "spanish-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "portuguese-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "italian-load-word-filter" 		-> loadLangWords(_e, message, logger, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "english-load-word-filter" 		-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "german-load-word-filter" 			-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "french-load-word-filter" 			-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "turkish-load-word-filter" 		-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "russian-load-word-filter" 		-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "spanish-load-word-filter" 		-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "portuguese-load-word-filter" 		-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "italian-load-word-filter" 		-> loadLangWords(_e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
 				case "insert-name-filter" -> {
 					if(Azrael.SQLInsertNameFilter(_message, false, _e.getGuild().getIdLong()) > 0) {
 						message.setTitle("Success!");
@@ -1014,7 +1015,7 @@ public class FilterExecution {
 	}
 	
 	@SuppressWarnings("preview")
-	private static void callFilterLangContent(GuildMessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String key, final String lang) {
+	private static void callFilterLangContent(GuildMessageReceivedEvent _e, EmbedBuilder message, final String key, final String lang) {
 		var langAbbreviation = "";
 		var definitiveLang = "";
 		switch(lang) {
@@ -1051,7 +1052,7 @@ public class FilterExecution {
 		Hashes.clearTempCache(key);
 	}
 	
-	private static void insertLangWord(GuildMessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String key, final String lang, String word) {
+	private static void insertLangWord(GuildMessageReceivedEvent _e, EmbedBuilder message, final String key, final String lang, String word) {
 		if(Azrael.SQLInsertWordFilter(lang.substring(0, 3), word, _e.getGuild().getIdLong()) > 0) {
 			message.setTitle("Success!");
 			_e.getChannel().sendMessage(message.setDescription("The word has been inserted into the "+lang+" word filter!").build()).queue();
@@ -1067,7 +1068,7 @@ public class FilterExecution {
 		Hashes.clearTempCache(key);
 	}
 	
-	private static void removeLangWord(GuildMessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String key, final String lang, String word) {
+	private static void removeLangWord(GuildMessageReceivedEvent _e, EmbedBuilder message, final String key, final String lang, String word) {
 		if(Azrael.SQLDeleteWordFilter(lang.substring(0, 3), word, _e.getGuild().getIdLong()) > 0) {
 			message.setTitle("Success!");
 			_e.getChannel().sendMessage(message.setDescription("The word has been removed from the "+lang+" word filter!").build()).queue();
@@ -1083,7 +1084,7 @@ public class FilterExecution {
 		Hashes.clearTempCache(key);
 	}
 	
-	private static void loadLangWords(GuildMessageReceivedEvent _e, EmbedBuilder message, Logger logger, final String key, final String lang, String _message, boolean replace) {
+	private static void loadLangWords(GuildMessageReceivedEvent _e, EmbedBuilder message, final String key, final String lang, String _message, boolean replace) {
 		if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 			var langAbbreviation = lang.substring(0, 3);
 			String[] words;

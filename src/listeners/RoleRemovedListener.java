@@ -18,7 +18,8 @@ import sql.DiscordRoles;
 import sql.RankingSystem;
 import sql.Azrael;
 
-public class RoleRemovedListener extends ListenerAdapter{
+public class RoleRemovedListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(RoleRemovedListener.class);
 	
 	@Override
 	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent e) {
@@ -43,7 +44,6 @@ public class RoleRemovedListener extends ListenerAdapter{
 		Bancollect warnedUser = Azrael.SQLgetData(user_id, guild_id);
 		
 		try{
-			Logger logger = LoggerFactory.getLogger(RoleRemovedListener.class);
 			if(!UserPrivs.isUserMuted(e.getUser(), guild_id) && (warnedUser.getUnmute() == null || (warnedUser.getUnmute().getTime() - System.currentTimeMillis()) > 0)  && warnedUser.getMuted()) {
 				var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 				if(warnedUser.getUserID() != 0) {

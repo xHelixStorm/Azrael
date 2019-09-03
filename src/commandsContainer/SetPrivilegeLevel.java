@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.DiscordRoles;
 
 public class SetPrivilegeLevel {
+	private final static Logger logger = LoggerFactory.getLogger(SetPrivilegeLevel.class);
+	
 	public static void runTask(GuildMessageReceivedEvent e, String [] args) {
 		if(args.length > 2) {
 			var role = args[1];
@@ -15,7 +17,6 @@ public class SetPrivilegeLevel {
 					var role_id = Long.parseLong(role);
 					var level = Integer.parseInt(args[2]);
 					if(level <= 100 && level >= 0) {
-						Logger logger = LoggerFactory.getLogger(SetPrivilegeLevel.class);
 						if(DiscordRoles.SQLUpdateLevel(e.getGuild().getIdLong(), role_id, level) > 0) {
 							logger.debug("role id {} has been updated with privilege level {}", role_id, level);
 							e.getChannel().sendMessage("**The role privilege has been updated successfully!**").queue();

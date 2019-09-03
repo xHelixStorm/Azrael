@@ -16,13 +16,13 @@ import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import sql.Azrael;
+import util.STATIC;
 
-public class BanListener extends ListenerAdapter{
+public class BanListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(BanListener.class);
 	
 	@Override
 	public void onGuildBan(GuildBanEvent e){
-		Logger logger = LoggerFactory.getLogger(BanListener.class);
-		
 		long user_id = e.getUser().getIdLong();
 		long guild_id = e.getGuild().getIdLong();
 		
@@ -42,6 +42,10 @@ public class BanListener extends ListenerAdapter{
 				if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
 			}
 		}
+		
+		//Unwatch the banned user, if he's being watched
+		STATIC.handleUnwatch(e, null, (short)1);
+		
 		logger.debug("{} has been banned from {}", e.getUser().getId(), e.getGuild().getName());
 		Azrael.SQLInsertActionLog("MEMBER_BAN_ADD", user_id, guild_id, "User Banned");
 		

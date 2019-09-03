@@ -87,6 +87,13 @@ public class GuildMessageRemovedListener extends ListenerAdapter{
 					Hashes.clearTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+(removed_message != null ? removed_message.getUserID() : "0"));
 				}
 			}
+			
+			//Log additional removed messages from users that are being watched with watch level 1
+			var watchedUser = Hashes.getWatchlist(e.getGuild().getId()+"-"+removed_message.getUserID());
+			if(watchedUser != null && watchedUser.getLevel() == 1) {
+				message.setTitle("Logged message from "+removed_message.getUserName()+" due to watching!");
+				e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(message.setDescription("["+removed_message.getTime().toString()+"] - "+removed_message.getMessage()).build()).queue();
+			}
 		}
 	}
 }

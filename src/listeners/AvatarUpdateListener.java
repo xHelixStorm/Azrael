@@ -7,11 +7,11 @@ import net.dv8tion.jda.api.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 
-public class AvatarUpdateListener extends ListenerAdapter{
+public class AvatarUpdateListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(AvatarUpdateListener.class);
 	
 	@Override
 	public void onUserUpdateAvatar(UserUpdateAvatarEvent e){
-		Logger logger = LoggerFactory.getLogger(AvatarUpdateListener.class);
 		if(Azrael.SQLUpdateAvatar(e.getUser().getIdLong(), e.getUser().getEffectiveAvatarUrl()) > 0) {
 			logger.debug("{} has updated his/her avatar: {}", e.getUser().getId(), e.getUser().getEffectiveAvatarUrl());
 		}

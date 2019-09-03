@@ -16,8 +16,9 @@ import sql.RankingSystem;
 import sql.RankingSystemItems;
 
 public class PurchaseExecution {
+	private final static Logger logger = LoggerFactory.getLogger(PurchaseExecution.class);
+	
 	public static void purchase(GuildMessageReceivedEvent e, final String type, final String item_number, Guilds guild_settings) {
-		Logger logger = LoggerFactory.getLogger(PurchaseExecution.class);
 		final var item_id = Integer.parseInt(item_number);
 		var user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
 		if(!type.equals("wep") && !type.equals("ski")) {
@@ -110,7 +111,6 @@ public class PurchaseExecution {
 	}
 	
 	public static void sell(GuildMessageReceivedEvent e, final String type, final String item_number, Guilds guild_settings) {
-		Logger logger = LoggerFactory.getLogger(PurchaseExecution.class);
 		final var item_id = Integer.parseInt(item_number);
 		var user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
 		if(!type.equals("wep") && !type.equals("ski")) {

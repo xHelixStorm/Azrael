@@ -22,6 +22,7 @@ import sql.RankingSystem;
 
 public class RankingThreadExecution {
 	private final static Logger logger = LoggerFactory.getLogger(RankingThreadExecution.class);
+	
 	public static void setProgress(GuildMessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, int percent_multiplier, Rank user_details, Guilds guild_settings){
 		RankingSystem.SQLDeleteInventory();
 		int multiplier = 1;

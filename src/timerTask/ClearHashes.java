@@ -11,7 +11,8 @@ import org.slf4j.LoggerFactory;
 import core.Hashes;
 import util.STATIC;
 
-public class ClearHashes extends TimerTask{
+public class ClearHashes extends TimerTask {
+	private final static Logger logger = LoggerFactory.getLogger(ClearHashes.class);
 	//this class is meant to clear temporary caches every 4 hours
 
 	@Override
@@ -30,7 +31,6 @@ public class ClearHashes extends TimerTask{
 		Hashes.clearRankList();
 		Hashes.clearThemes();
 		
-		Logger logger = LoggerFactory.getLogger(ClearHashes.class);
 		logger.debug("Temporary Hashes have been cleared!");
 	}
 	

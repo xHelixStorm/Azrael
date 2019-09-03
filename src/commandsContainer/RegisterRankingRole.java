@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 
 public class RegisterRankingRole {
+	private final static Logger logger = LoggerFactory.getLogger(RegisterRankingRole.class);
 	
 	public static void RegisterRankingRoleHelper(GuildMessageReceivedEvent _e) {
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register roles for the ranking system!");
@@ -23,7 +24,6 @@ public class RegisterRankingRole {
 	}
 	
 	public static void runCommand(GuildMessageReceivedEvent _e, long _guild_id, String [] _args, boolean adminPermission) {
-		Logger logger = LoggerFactory.getLogger(RegisterRankingRole.class);
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied");
 		long guild_id = _e.getGuild().getIdLong();
 		long role_id = 0;

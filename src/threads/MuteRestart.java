@@ -15,7 +15,8 @@ import net.dv8tion.jda.api.events.ReadyEvent;
 import sql.Azrael;
 import util.STATIC;
 
-public class MuteRestart implements Runnable{
+public class MuteRestart implements Runnable {
+	private final static Logger logger = LoggerFactory.getLogger(MuteRestart.class);
 	private EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setThumbnail(IniFileReader.getUnmuteThumbnail()).setTitle("User unmuted!");
 	
 	private ReadyEvent e;
@@ -54,7 +55,6 @@ public class MuteRestart implements Runnable{
 		} catch (InterruptedException e2) {
 			//launch when the sleep has been interrupted
 			if(!Azrael.SQLisBanned(member.getUser().getIdLong(), guild_id)) {
-				Logger logger = LoggerFactory.getLogger(MuteRestart.class);
 				logger.info("The mute of {} ing guild {} has been interrupted!", member.getUser().getId(), e.getJDA().getGuildById(guild_id).getName());
 				if(channel != null && (Azrael.SQLgetMuted(member.getUser().getIdLong(), guild_id) == true || Azrael.SQLgetData(member.getUser().getIdLong(), guild_id).getUserID() == 0)) {
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());

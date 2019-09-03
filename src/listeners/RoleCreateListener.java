@@ -7,11 +7,11 @@ import net.dv8tion.jda.api.events.role.RoleCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.DiscordRoles;
 
-public class RoleCreateListener extends ListenerAdapter{
+public class RoleCreateListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(RoleCreateListener.class);
 	
 	@Override
 	public void onRoleCreate(RoleCreateEvent e) {
-		Logger logger = LoggerFactory.getLogger(RoleCreateListener.class);
 		//When a new role gets created, insert it into table as default role
 		var inserted = DiscordRoles.SQLInsertRole(e.getGuild().getIdLong(), e.getRole().getIdLong(), 1, e.getRole().getName(), "def");
 		if(inserted > 0) {

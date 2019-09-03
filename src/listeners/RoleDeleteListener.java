@@ -14,10 +14,10 @@ import sql.DiscordRoles;
 import sql.RankingSystem;
 
 public class RoleDeleteListener extends ListenerAdapter {
-
+	private final static Logger logger = LoggerFactory.getLogger(RoleDeleteListener.class);
+	
 	@Override
 	public void onRoleDelete(RoleDeleteEvent e) {
-		Logger logger = LoggerFactory.getLogger(RoleDeleteListener.class);
 		//When a role gets deleted from a guild, delete it from table
 		var deleted = DiscordRoles.SQLDeleteRole(e.getRole().getIdLong(), e.getGuild().getIdLong());
 		if(deleted > 0) {

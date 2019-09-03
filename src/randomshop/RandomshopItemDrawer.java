@@ -20,6 +20,8 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
 public class RandomshopItemDrawer {
+	private final static Logger logger = LoggerFactory.getLogger(RandomshopItemDrawer.class);
+	
 	public static void drawItems(GuildMessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<Weapons> weapons, int current_page, int last_page, int theme_id) {
 		try {
 			BufferedImage randomshop = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/randomshop_blank.png"));
@@ -71,7 +73,6 @@ public class RandomshopItemDrawer {
 				e2.getChannel().sendFile(file1, "randomshop.png").complete();
 			file1.delete();
 		} catch (IOException e1) {
-			Logger logger = LoggerFactory.getLogger(RandomshopItemDrawer.class);
 			logger.error("Randomshop Items couldn't be drawn", e1);
 		}
 	}

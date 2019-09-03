@@ -15,8 +15,9 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.DiscordRoles;
 
 public class ReactionMessage {
+	private final static Logger logger = LoggerFactory.getLogger(ReactionMessage.class);
+	
 	public static int print(GuildMessageReceivedEvent e, long channel_id) {
-		Logger logger = LoggerFactory.getLogger(ReactionMessage.class);
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		if(DiscordRoles.SQLgetRolesByCategory(e.getGuild().getIdLong(), "rea")) {
 			String [] reactions = GuildIni.getReactions(e.getGuild().getIdLong());

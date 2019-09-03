@@ -1,5 +1,6 @@
 package util;
 
+import java.awt.Color;
 import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -10,13 +11,18 @@ import org.slf4j.LoggerFactory;
 import constructors.Cache;
 import constructors.Channels;
 import core.Hashes;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.guild.GuildBanEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
+import sql.Azrael;
 import sql.DiscordRoles;
 
 public class STATIC {
+	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.3.308";
+	private static final String VERSION = "6.4.309";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	
@@ -113,6 +119,26 @@ public class STATIC {
 					else		 e.getGuild().addRoleToMember(e2.getMember(), e2.getGuild().getRoleById(DiscordRoles.SQLgetRole(e2.getGuild().getIdLong(), "mut"))).queue();
 					Hashes.clearTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 				}
+			}
+		}
+	}
+	
+	public static void handleUnwatch(GuildBanEvent e, GuildMemberLeaveEvent e2, short type) {
+		var user_id = (e != null ? e.getUser().getIdLong() : e2.getMember().getUser().getIdLong());
+		var guild_id = (e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong());
+		var unwatchReason = (type == 1 ? "ban" : "kick");
+		var watchedUser = Hashes.getWatchlist(guild_id+"-"+user_id);
+		if(watchedUser != null) {
+			if(Azrael.SQLDeleteWatchlist(user_id, guild_id) > 0) {
+				e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(new EmbedBuilder().setColor(Color.YELLOW).setTitle("Watch lifted due to "+unwatchReason+"!")
+					.setDescription("The watch for the user "+e.getUser().getName()+"#"+e.getUser().getDiscriminator()+" has been removed due to a "+unwatchReason+"!").build()).queue();
+				Hashes.removeWatchlist(guild_id+"-"+user_id);
+				logger.debug("The user {} has been removed from the watchlist in guild {}", user_id, guild_id);
+			}
+			else {
+				e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!")
+					.setDescription("An internal error occurred. The user "+e.getUser().getName()+"#"+e.getUser().getDiscriminator()+" couldn't be removed from Azrael.watchlist!").build()).queue();
+				logger.error("An internal error occurred. The user {} couldn't be removed from the Azrael.watchlist table for guild {}", user_id, guild_id);
 			}
 		}
 	}

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 
 public class SetCommandLevel {
+	private final static Logger logger = LoggerFactory.getLogger(SetCommandLevel.class);
 	
 	@SuppressWarnings("preview")
 	public static void runTask(GuildMessageReceivedEvent _e, String _input){
@@ -34,7 +35,6 @@ public class SetCommandLevel {
 		}
 		
 		if(wrongInput == false){
-			Logger logger = LoggerFactory.getLogger(SetCommandLevel.class);
 			if(Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), level) > 0) {
 				logger.debug("{} has changed the command level to {} in guild {}", _e.getMember().getUser().getId(), level, _e.getGuild().getId());
 				_e.getChannel().sendMessage(message).queue();

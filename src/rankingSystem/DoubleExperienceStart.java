@@ -23,7 +23,8 @@ import sql.Azrael;
 import sql.RankingSystem;
 import util.STATIC;
 
-public class DoubleExperienceStart extends TimerTask{
+public class DoubleExperienceStart extends TimerTask {
+	private final static Logger logger = LoggerFactory.getLogger(DoubleExperienceStart.class);
 
 	private ReadyEvent e;
 	private ReconnectedEvent e2;
@@ -55,7 +56,6 @@ public class DoubleExperienceStart extends TimerTask{
 				}
 			}
 		}
-		Logger logger = LoggerFactory.getLogger(DoubleExperienceStart.class);
 		logger.debug("Double experience is running");
 	}
 	

@@ -18,14 +18,15 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import sql.Azrael;
+import util.STATIC;
 
-public class GuildLeaveListener extends ListenerAdapter{
+public class GuildLeaveListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(GuildLeaveListener.class);
 	
 	@Override
 	public void onGuildMemberLeave(GuildMemberLeaveEvent e){
 		var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 		if(log_channel != null) {
-			Logger logger = LoggerFactory.getLogger(GuildLeaveListener.class);
 			logger.debug("{} has left the guild {}", e.getUser().getId(), e.getGuild().getName());
 			EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getLeaveThumbnail()).setTitle("User left!");
 			EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User kicked!");
@@ -49,6 +50,9 @@ public class GuildLeaveListener extends ListenerAdapter{
 						Hashes.clearTempCache("kick_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(kick.setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+user_name+"** with the id number **"+e.getUser().getId()+"** got kicked from **"+guild_name+"**!\n Kicked by: "+kick_issuer+"\nReason: "+kick_reason).build()).queue();
 						Azrael.SQLInsertActionLog("MEMBER_KICK", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
+						
+						//Unwatch the kicked user, if he's being watched
+						STATIC.handleUnwatch(null, e, (short)2);
 					}
 					else if(warnedUser.getMuted() && warnedUser.getBanID() == 1) {
 						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+user_name+"** has left from "+guild_name+" while being muted!").build()).queue();

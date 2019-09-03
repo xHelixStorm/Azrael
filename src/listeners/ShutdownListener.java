@@ -14,16 +14,16 @@ import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 
-public class ShutdownListener extends ListenerAdapter{
+public class ShutdownListener extends ListenerAdapter {
+	private static final Logger logger = LoggerFactory.getLogger(ShutdownListener.class);
 	
 	@Override
 	public void onShutdown(ShutdownEvent e){
-		final Logger logger = LoggerFactory.getLogger(ShutdownListener.class);
 		String filecontent = FileSetting.readFile(IniFileReader.getTempDirectory()+"running.azr");
 		
 		if(SystemUtils.IS_OS_LINUX) {
 			if(filecontent.contains("1")) {
-				deleteTemp(logger);
+				deleteTemp();
 				try {
 					Process proc;
 					proc = Runtime.getRuntime().exec("./scripts/restart.sh");
@@ -35,7 +35,7 @@ public class ShutdownListener extends ListenerAdapter{
 		}
 		else if(SystemUtils.IS_OS_WINDOWS) {			
 			if(filecontent.contains("1")) {
-				deleteTemp(logger);
+				deleteTemp();
 				try {
 					Process proc;
 					proc = Runtime.getRuntime().exec("./scripts/restart.bat");
@@ -57,7 +57,7 @@ public class ShutdownListener extends ListenerAdapter{
 		System.exit(0);
 	}
 	
-	private static void deleteTemp(Logger logger) {
+	private static void deleteTemp() {
 		try {
 			FileUtils.forceDelete(new File(IniFileReader.getTempDirectory()));
 		} catch (IOException e2) {

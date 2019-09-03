@@ -78,6 +78,7 @@ public class GuildIni {
 			ini.add("Commands", "DisplayVoiceChannelsLevel", "1");
 			ini.add("Commands", "DisplayRegisteredChannelsLevel", "1");
 			ini.add("Commands", "DisplayDailiesLevel", "1");
+			ini.add("Commands", "DisplayWatchedUsersLevel", "1");
 			ini.add("Commands", "DisplayCommandLevelsLevel", "1");
 			ini.add("Commands", "Help", "false");
 			ini.add("Commands", "HelpLevel", "1");
@@ -132,7 +133,8 @@ public class GuildIni {
 			ini.add("Commands", "UserKickLevel", "20");
 			ini.add("Commands", "UserHistoryLevel", "20");
 			ini.add("Commands", "UserWatchLevel", "20");
-			ini.add("Commands", "UserUseWatchChannel", "20");
+			ini.add("Commands", "UserUnwatchLevel", "20");
+			ini.add("Commands", "UserUseWatchChannelLevel", "20");
 			ini.add("Commands", "UserGiftExperienceLevel", "20");
 			ini.add("Commands", "UserSetExperienceLevel", "20");
 			ini.add("Commands", "UserSetLevelLevel", "20");
@@ -161,6 +163,10 @@ public class GuildIni {
 			ini.add("Commands", "DoubleExperienceLevel", "20");
 			ini.add("Commands", "Equip", "false");
 			ini.add("Commands", "EquipLevel", "1");
+			ini.add("Commands", "Watch", "false");
+			ini.add("Commands", "WatchLevel", "20");
+			ini.add("Commands", "Unwatch", "false");
+			ini.add("Commands", "UnwatchLevel", "20");
 			
 			//Inventory
 			ini.add("Inventory", "startX", "0");
@@ -462,6 +468,10 @@ public class GuildIni {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "DisplayDailiesLevel", int.class);
 	}
+	public static int getDisplayWatchedUsersLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "DisplayWatchedUsersLevel", int.class);
+	}
 	public static int getDisplayCommandLevelsLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "DisplayCommandLevelsLevel", int.class);
@@ -678,6 +688,10 @@ public class GuildIni {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "UserWatchLevel", int.class);
 	}
+	public static int getUserUnwatchLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UserUnwatchLevel", int.class);
+	}
 	public static int getUserUseWatchChannelLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "UserUseWatchChannelLevel", int.class);
@@ -793,6 +807,22 @@ public class GuildIni {
 	public static int getEquipLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "EquipLevel", int.class);
+	}
+	public static boolean getWatchCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Watch", boolean.class);
+	}
+	public static int getWatchLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "WatchLevel", int.class);
+	}
+	public static boolean getUnwatchCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Unwatch", boolean.class);
+	}
+	public static int getUnwatchLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "UnwatchLevel", int.class);
 	}
 	
 	public static int[] getWholeInventory(long guild_id) {

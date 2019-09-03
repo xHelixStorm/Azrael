@@ -17,7 +17,9 @@ import sql.RankingSystem;
 import sql.DiscordRoles;
 import sql.Azrael;
 
-public class RoleExtend implements Runnable{
+public class RoleExtend implements Runnable {
+	private final static Logger logger = LoggerFactory.getLogger(RoleExtend.class);
+	
 	private ReadyEvent e;
 	private long guild_id;
 	
@@ -61,7 +63,6 @@ public class RoleExtend implements Runnable{
 				}
 			}
 			if(banHammerFound == true && log_channel != null) {
-				Logger logger = LoggerFactory.getLogger(RoleExtend.class);
 				logger.debug("Found muted users on start up in {}", e.getJDA().getGuildById(guild_id).getName());
 				e.getJDA().getGuildById(guild_id).getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(i+" users were found muted on start up. The mute timer is restarting from where it stopped!"+(GuildIni.getOverrideBan(guild_id) ? "\nExcluded are users that have been muted permanently on this server!" : "")).build()).queue();
 			}

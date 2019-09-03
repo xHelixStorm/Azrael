@@ -2,17 +2,22 @@ package constructors;
 
 public class Watchlist {
 	private int level;
-	private boolean useWatchChannel;
+	private long watchChannel;
+	private boolean higherPrivileges;
 	
-	public Watchlist(int _level, boolean _useWatchChannel) {
+	public Watchlist(int _level, long _watchChannel, boolean _higherPrivileges) {
 		this.level = _level;
-		this.useWatchChannel = _useWatchChannel;
+		this.watchChannel = _watchChannel;
+		this.higherPrivileges = _higherPrivileges;
 	}
 	
 	public int getLevel() {
 		return this.level;
 	}
-	public boolean getUseWatchChannel() {
-		return this.useWatchChannel;
+	public long getWatchChannel() {
+		return this.watchChannel;
+	}
+	public boolean hasHigherPrivileges() {
+		return this.higherPrivileges;
 	}
 }

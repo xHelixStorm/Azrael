@@ -16,6 +16,8 @@ import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class RandomshopRewardDrawer {
+	private final static Logger logger = LoggerFactory.getLogger(RandomshopRewardDrawer.class);
+	
 	public static void drawReward(GuildMessageReceivedEvent e, Weapons weapon, long currency, int theme_id) {
 		try {
 			BufferedImage rewardOverlay = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/"+weapon.getOverlayName()+".png"));
@@ -42,7 +44,6 @@ public class RandomshopRewardDrawer {
 			
 			e.getChannel().sendMessage("Congratulations "+e.getMember().getEffectiveName()+", you have received **"+weapon.getDescription()+" "+weapon.getStatDescription()+"**. Remaining balance: **"+currency+"**").queue();
 		} catch(IOException e1) {
-			Logger logger = LoggerFactory.getLogger(RandomshopRewardDrawer.class);
 			logger.error("An error occurred while printing the random shop price", e1);
 		}
 	}

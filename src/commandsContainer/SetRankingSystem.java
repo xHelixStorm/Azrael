@@ -10,6 +10,8 @@ import sql.RankingSystem;
 import threads.CollectUsers;
 
 public class SetRankingSystem {
+	private final static Logger logger = LoggerFactory.getLogger(SetRankingSystem.class);
+	
 	@SuppressWarnings("preview")
 	public static void runTask(GuildMessageReceivedEvent _e, String _input){
 		boolean ranking_state = false;
@@ -32,7 +34,6 @@ public class SetRankingSystem {
 		}
 		
 		if(wrongInput == false){
-			Logger logger = LoggerFactory.getLogger(SetRankingSystem.class);
 			if(RankingSystem.SQLUpdateRankingSystem(_e.getGuild().getIdLong(), _e.getGuild().getName(), ranking_state) > 0) {
 				Guilds guild = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 				guild.setRankingState(ranking_state);

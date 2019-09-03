@@ -16,11 +16,11 @@ import sql.DiscordRoles;
 import sql.Patchnotes;
 import sql.Azrael;
 
-public class GuildJoinListener extends ListenerAdapter{
+public class GuildJoinListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(GuildJoinListener.class);
 	
 	@Override
 	public void onGuildJoin(GuildJoinEvent e){
-		Logger logger = LoggerFactory.getLogger(GuildJoinListener.class);
 		logger.debug("Bot joined a new guild: {}", e.getGuild().getName());
 		
 		long guild_id = e.getGuild().getIdLong();

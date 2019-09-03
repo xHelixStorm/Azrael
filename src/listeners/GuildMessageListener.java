@@ -41,7 +41,8 @@ import sql.RankingSystem;
 import sql.Azrael;
 import threads.RunQuiz;
 
-public class GuildMessageListener extends ListenerAdapter{
+public class GuildMessageListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
 	
 	@SuppressWarnings({ "preview", "null" })
 	@Override
@@ -52,7 +53,6 @@ public class GuildMessageListener extends ListenerAdapter{
 		if(e.getMessage().getContentRaw().startsWith(GuildIni.getCommandPrefix(e.getGuild().getIdLong())) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
 			var prefixLength = GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length();
 			if(!CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength).toLowerCase(), e, null))) {
-				Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
 				logger.warn("Command {} doesn't exist!", e.getMessage().getContentRaw());
 			}
 		}
@@ -397,6 +397,15 @@ public class GuildMessageListener extends ListenerAdapter{
 			lang.add("eng");
 			executor.execute(new URLFilter(e, null, lang, allChannels));
 		}
+		executor.execute(() -> {
+			var watchedMember = Hashes.getWatchlist(guild_id+"-"+user_id);
+			var sentMessage = Hashes.getMessagePool(e.getMessageIdLong());
+			if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
+				e.getGuild().getTextChannelById(watchedMember.getWatchChannel()).sendMessage(new EmbedBuilder()
+					.setTitle("Logged message from "+sentMessage.getUserName()+" due to watching!").setColor(Color.YELLOW)
+					.setDescription("["+sentMessage.getTime().toString()+"] - "+sentMessage.getMessage()).build()).queue();
+			}
+		});
 		executor.shutdown();
 	}
 }

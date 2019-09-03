@@ -25,12 +25,11 @@ import sql.DiscordRoles;
 import sql.Azrael;
 import threads.RoleTimer;
 
-public class RoleListener extends ListenerAdapter{
+public class RoleListener extends ListenerAdapter {
+	private static final Logger logger = LoggerFactory.getLogger(RoleListener.class);
 	
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent e) {
-		final Logger logger = LoggerFactory.getLogger(RoleListener.class);
-		
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setTitle("A user has been muted!");
 		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN).setTitle("Mute Retracted!");
 		

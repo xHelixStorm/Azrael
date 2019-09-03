@@ -15,13 +15,12 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import sql.Azrael;
 
-public class UnbanListener extends ListenerAdapter{
+public class UnbanListener extends ListenerAdapter {
+	private final static Logger logger = LoggerFactory.getLogger(UnbanListener.class);
+	private final static EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getUnbanThumbnail()).setTitle("User unbanned!");
 	
 	@Override
-	public void onGuildUnban(GuildUnbanEvent e){
-		Logger logger = LoggerFactory.getLogger(UnbanListener.class);
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getUnbanThumbnail()).setTitle("User unbanned!");
-		
+	public void onGuildUnban(GuildUnbanEvent e) {
 		String trigger_user_name = "NaN";
 		AuditLogPaginationAction logs = e.getGuild().retrieveAuditLogs();
 		for (AuditLogEntry entry : logs)
