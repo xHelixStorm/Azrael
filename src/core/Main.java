@@ -53,6 +53,7 @@ import listeners.GuildMessageListener;
 import listeners.GuildMessageRemovedListener;
 import listeners.NameListener;
 import listeners.NicknameListener;
+import listeners.PrivateMessageListener;
 import listeners.ReadyListener;
 import listeners.ReconnectedListener;
 import listeners.ResumedListener;
@@ -156,6 +157,7 @@ public class Main {
 			new GuildMessageListener(),
 			new GuildLeaveListener(),
 			new GuildMessageEditListener(),
+			new PrivateMessageListener(),
 			new NameListener(),
 			new GuildJoinListener(),
 			new ShutdownListener(),

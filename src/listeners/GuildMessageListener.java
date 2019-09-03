@@ -402,8 +402,8 @@ public class GuildMessageListener extends ListenerAdapter {
 			var sentMessage = Hashes.getMessagePool(e.getMessageIdLong());
 			if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
 				e.getGuild().getTextChannelById(watchedMember.getWatchChannel()).sendMessage(new EmbedBuilder()
-					.setTitle("Logged message from "+sentMessage.getUserName()+" due to watching!").setColor(Color.YELLOW)
-					.setDescription("["+sentMessage.getTime().toString()+"] - "+sentMessage.getMessage()).build()).queue();
+					.setTitle("Logged written message due to watching!").setColor(Color.YELLOW)
+					.setDescription("["+sentMessage.getTime().toString()+" - "+sentMessage.getUserName()+"]: "+sentMessage.getMessage()).build()).queue();
 			}
 		});
 		executor.shutdown();

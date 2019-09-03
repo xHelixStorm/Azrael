@@ -89,10 +89,10 @@ public class GuildMessageRemovedListener extends ListenerAdapter{
 			}
 			
 			//Log additional removed messages from users that are being watched with watch level 1
-			var watchedUser = Hashes.getWatchlist(e.getGuild().getId()+"-"+removed_message.getUserID());
+			var watchedUser = Hashes.getWatchlist(e.getGuild().getId()+"-"+(removed_message != null ? removed_message.getUserID() : "BOT"));
 			if(watchedUser != null && watchedUser.getLevel() == 1) {
-				message.setTitle("Logged message from "+removed_message.getUserName()+" due to watching!");
-				e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(message.setDescription("["+removed_message.getTime().toString()+"] - "+removed_message.getMessage()).build()).queue();
+				message.setTitle("Logged deleted message due to watching!");
+				e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(message.setDescription("["+removed_message.getTime().toString()+" - "+removed_message.getUserName()+"]: "+removed_message.getMessage()).build()).queue();
 			}
 		}
 	}

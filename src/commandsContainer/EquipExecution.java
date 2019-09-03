@@ -365,7 +365,7 @@ public class EquipExecution {
 						var weapon3 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon3()).findAny().orElse(null);
 						var selectedWeapon = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == weapon_id).findAny().orElse(null);
 						if(!selectedWeapon.getWeaponAbbv().equals((weapon1 != null ? weapon1.getWeaponAbbv() : "")) && !selectedWeapon.getWeaponAbbv().equals((weapon2 != null ? weapon2.getWeaponAbbv() : "")) && !selectedWeapon.getWeaponAbbv().equals((weapon3 != null ? weapon3.getWeaponAbbv() : ""))) {
-							if(RankingSystemItems.SQLEquipWeapon(e.getAuthor().getIdLong(), guild, weapon_id, selection+1) > 0) {
+							if(RankingSystemItems.SQLEquipWeapon(e.getAuthor().getIdLong(), guild, weapon_id, slot) > 0) {
 								switch(selection) {
 									case 0 -> user_details.setWeapon1(weapon_id);
 									case 1 -> user_details.setWeapon2(weapon_id);
