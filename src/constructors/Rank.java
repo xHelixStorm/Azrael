@@ -34,6 +34,16 @@ public class Rank {
 	private boolean additional_exp_text_profile;
 	private boolean additional_percent_text_profile;
 	
+	private int exp_textx_rank;
+	private int exp_textx_profile;
+	private int exp_texty_rank;
+	private int exp_texty_profile;
+	
+	private int percent_textx_rank;
+	private int percent_textx_profile;
+	private int percent_texty_rank;
+	private int percent_texty_profile;
+	
 	private int color_r_level;
 	private int color_r_rank;
 	private int color_r_profile;
@@ -79,6 +89,20 @@ public class Rank {
 	private int avatar_width_profile;
 	private int avatar_height_rank;
 	private int avatar_height_profile;
+	
+	private int placementx_rank;
+	private int placementx_profile;
+	private int placementy_rank;
+	private int placementy_profile;
+	
+	private int experiencex_profile;
+	private int experiencey_profile;
+	
+	private int currencyx_profile;
+	private int currencyy_profile;
+	
+	private int exp_reachx_profile;
+	private int exp_reachy_profile;
 	
 	private int daily_experience;
 	private Timestamp daily_reset;
@@ -175,6 +199,30 @@ public class Rank {
 	}
 	public void setAdditionalPercentTextProfile(boolean _additional_percent_text_profile) {
 		this.additional_percent_text_profile = _additional_percent_text_profile;
+	}
+	public void setExpTextXRank(int _exp_textx_rank) {
+		this.exp_textx_rank = _exp_textx_rank;
+	}
+	public void setExpTextXProfile(int _exp_textx_profile) {
+		this.exp_textx_profile = _exp_textx_profile;
+	}
+	public void setExpTextYRank(int _exp_texty_rank) {
+		this.exp_texty_rank = _exp_texty_rank;
+	}
+	public void setExpTextYProfile(int _exp_texty_profile) {
+		this.exp_texty_profile= _exp_texty_profile;
+	}
+	public void setPercentTextXRank(int _percent_textx_rank) {
+		this.percent_textx_rank = _percent_textx_rank;
+	}
+	public void setPercentTextXProfile(int _percent_textx_profile) {
+		this.percent_textx_profile = _percent_textx_profile;
+	}
+	public void setPercentTextYRank(int _percent_texty_rank) {
+		this.percent_texty_rank = _percent_texty_rank;
+	}
+	public void setPercentTextYProfile(int _percent_texty_profile) {
+		this.percent_texty_profile= _percent_texty_profile;
 	}
 	public void setColorRLevel(int _color_r_level) {
 		this.color_r_level = _color_r_level;
@@ -293,6 +341,36 @@ public class Rank {
 	public void setAvatarHeightProfile(int _avatar_height_profile) {
 		this.avatar_height_profile = _avatar_height_profile;
 	}
+	public void setPlacementXRank(int _placementx_rank) {
+		this.placementx_rank = _placementx_rank;
+	}
+	public void setPlacementXProfile(int _placementx_profile) {
+		this.placementx_profile = _placementx_profile;
+	}
+	public void setPlacementYRank(int _placementy_rank) {
+		this.placementy_rank = _placementy_rank;
+	}
+	public void setPlacementYProfile(int _placementy_profile) {
+		this.placementy_profile = _placementy_profile;
+	}
+	public void setExperienceXProfile(int _experiencex_profile) {
+		this.experiencex_profile = _experiencex_profile;
+	}
+	public void setExperienceYProfile(int _experiencey_profile) {
+		this.experiencey_profile = _experiencey_profile;
+	}
+	public void setCurrencyXProfile(int _currencyx_profile) {
+		this.currencyx_profile = _currencyx_profile;
+	}
+	public void setCurrencyYProfile(int _currencyy_profile) {
+		this.currencyy_profile = _currencyy_profile;
+	}
+	public void setExpReachXProfile(int _exp_reachx_profile) {
+		this.exp_reachx_profile = _exp_reachx_profile;
+	}
+	public void setExpReachYProfile(int _exp_reachy_profile) {
+		this.exp_reachy_profile = _exp_reachy_profile;
+	}
 	public void setDailyExperience(int _daily_experience) {
 		this.daily_experience = _daily_experience;
 	}
@@ -407,6 +485,30 @@ public class Rank {
 	}
 	public boolean getAdditionalPercentTextProfile() {
 		return this.additional_percent_text_profile;
+	}
+	public int getExpTextXRank() {
+		return this.exp_textx_rank;
+	}
+	public int getExpTextXProfile() {
+		return this.exp_textx_profile;
+	}
+	public int getExpTextYRank() {
+		return this.exp_texty_rank;
+	}
+	public int getExpTextYProfile() {
+		return this.exp_texty_profile;
+	}
+	public int getPercentTextXRank() {
+		return this.percent_textx_rank;
+	}
+	public int getPercentTextXProfile() {
+		return this.percent_textx_profile;
+	}
+	public int getPercentTextYRank() {
+		return this.percent_texty_rank;
+	}
+	public int getPercentTextYProfile() {
+		return this.percent_texty_profile;
 	}
 	public int getColorRLevel() {
 		return this.color_r_level;
@@ -524,6 +626,36 @@ public class Rank {
 	}
 	public int getAvatarHeightProfile() {
 		return this.avatar_height_profile;
+	}
+	public int getPlacementXRank() {
+		return this.placementx_rank;
+	}
+	public int getPlacementXProfile() {
+		return this.placementx_profile;
+	}
+	public int getPlacementYRank() {
+		return this.placementy_rank;
+	}
+	public int getPlacementYProfile() {
+		return this.placementy_profile;
+	}
+	public int getExperienceXProfile() {
+		return this.experiencex_profile;
+	}
+	public int getExperienceYProfile() {
+		return this.experiencey_profile;
+	}
+	public int getCurrencyXProfile() {
+		return this.currencyx_profile;
+	}
+	public int getCurrencyYProfile() {
+		return this.currencyy_profile;
+	}
+	public int getExpReachXProfile() {
+		return this.exp_reachx_profile;
+	}
+	public int getExpReachYProfile() {
+		return this.exp_reachy_profile;
 	}
 	public int getDailyExperience() {
 		return this.daily_experience;

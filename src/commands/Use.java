@@ -100,6 +100,13 @@ public class Use implements CommandPublic {
 					user_details.setAvatarYRank(rank.getAvatarYRank());
 					user_details.setAvatarWidthRank(rank.getAvatarWidthRank());
 					user_details.setAvatarHeightRank(rank.getAvatarHeightRank());
+					user_details.setExpTextXRank(rank.getExpTextXRank());
+					user_details.setExpTextYRank(rank.getExpTextYRank());
+					user_details.setPercentTextXRank(rank.getPercentTextXRank());
+					user_details.setPercentTextYRank(rank.getPercentTextYRank());
+					user_details.setPlacementXRank(rank.getPlacementXRank());
+					user_details.setPlacementYRank(rank.getPlacementYRank());
+					
 					if(user_details.getRankingRank() != 0) {
 						if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank()) > 0) {
 							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
@@ -142,6 +149,16 @@ public class Use implements CommandPublic {
 					user_details.setAvatarYProfile(rank.getAvatarYProfile());
 					user_details.setAvatarWidthProfile(rank.getAvatarWidthProfile());
 					user_details.setAvatarHeightProfile(rank.getAvatarHeightProfile());
+					user_details.setExpTextXProfile(rank.getExpTextXProfile());
+					user_details.setExpTextYProfile(rank.getExpTextYProfile());
+					user_details.setPercentTextXProfile(rank.getPercentTextXProfile());
+					user_details.setPercentTextYProfile(rank.getPercentTextYProfile());
+					user_details.setPlacementXProfile(rank.getPlacementXProfile());
+					user_details.setPlacementYProfile(rank.getPlacementYProfile());
+					user_details.setExperienceXProfile(rank.getExperienceXProfile());
+					user_details.setExperienceYProfile(rank.getExperienceYProfile());
+					user_details.setCurrencyXProfile(rank.getCurrencyXProfile());
+					user_details.setCurrencyYProfile(rank.getCurrencyYProfile());
 					if(user_details.getRankingProfile() != 0) {
 						if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile()) > 0) {
 							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
@@ -235,6 +252,12 @@ public class Use implements CommandPublic {
 							user_details.setAvatarYRank(rank.getAvatarYRank());
 							user_details.setAvatarWidthRank(rank.getAvatarWidthRank());
 							user_details.setAvatarHeightRank(rank.getAvatarHeightRank());
+							user_details.setExpTextXRank(rank.getExpTextXRank());
+							user_details.setExpTextYRank(rank.getExpTextYRank());
+							user_details.setPercentTextXRank(rank.getPercentTextXRank());
+							user_details.setPercentTextYRank(rank.getPercentTextYRank());
+							user_details.setPlacementXRank(rank.getPlacementXRank());
+							user_details.setPlacementYRank(rank.getPlacementYRank());
 							if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank()) > 0) {
 								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 								e.getChannel().sendMessage("**"+input+"** will be used from now on!").queue();
@@ -270,6 +293,18 @@ public class Use implements CommandPublic {
 							user_details.setAvatarYProfile(rank.getAvatarYProfile());
 							user_details.setAvatarWidthProfile(rank.getAvatarWidthProfile());
 							user_details.setAvatarHeightProfile(rank.getAvatarHeightProfile());
+							user_details.setExpTextXProfile(rank.getExpTextXProfile());
+							user_details.setExpTextYProfile(rank.getExpTextYProfile());
+							user_details.setPercentTextXProfile(rank.getPercentTextXProfile());
+							user_details.setPercentTextYProfile(rank.getPercentTextYProfile());
+							user_details.setPlacementXProfile(rank.getPlacementXProfile());
+							user_details.setPlacementYProfile(rank.getPlacementYProfile());
+							user_details.setExperienceXProfile(rank.getExperienceXProfile());
+							user_details.setExperienceYProfile(rank.getExperienceYProfile());
+							user_details.setCurrencyXProfile(rank.getCurrencyXProfile());
+							user_details.setCurrencyYProfile(rank.getCurrencyYProfile());
+							user_details.setExpReachXProfile(rank.getExpReachXProfile());
+							user_details.setExpReachYProfile(rank.getExpReachYProfile());
 							if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile()) > 0) {
 								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 								e.getChannel().sendMessage("**"+input+"** will be used from now on!").queue();

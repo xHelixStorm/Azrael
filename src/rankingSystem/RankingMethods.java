@@ -138,13 +138,13 @@ public class RankingMethods extends ListenerAdapter{
 			g.setFont(new Font("Nexa Bold", Font.PLAIN, generalTextFontSize));
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			if(user_details.getAdditionalExpTextRank() == true) {
-				g.drawString("Exp:", 14, 73);
+				g.drawString("Exp:", user_details.getExpTextXRank(), user_details.getExpTextYRank());
 			}
 			if(user_details.getAdditionalPercentTextRank() == true) {
-				g.drawString(levelT+"%", 246, 73);
+				g.drawString(levelT+"%", user_details.getPercentTextXRank(), user_details.getPercentTextYRank());
 			}
 			var rankString = insertDots(_rank);
-			g.drawString("Rank:  #"+rankString, 118, 57);
+			g.drawString("Rank:  #"+rankString, user_details.getPlacementXRank(), user_details.getPlacementYRank());
 			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
 			g.drawString(name, user_details.getNameXRank(), user_details.getNameYRank());
 			
@@ -209,45 +209,42 @@ public class RankingMethods extends ListenerAdapter{
 			g.setColor(color);
 			g.setFont(new Font("Nexa Bold", Font.PLAIN, generalTextFontSize));
 			if(user_details.getAdditionalExpTextProfile() == true) {
-				g.drawString("Exp:", 15, 109);
+				g.drawString("Exp:", user_details.getExpTextXProfile(), user_details.getExpTextYProfile());
 			}
 			if(user_details.getAdditionalPercentTextProfile() == true) {
-				g.drawString(levelT+"%", 243, 109);
+				g.drawString(levelT+"%", user_details.getPercentTextXProfile(), user_details.getPercentTextYProfile());
 			}
 			
 			if(descriptionMode == 0) {
-				g.drawString(""+user_details.getLevel(), 136, 176);
+				g.drawString(""+user_details.getLevel(), user_details.getLevelXProfile(), user_details.getLevelYProfile());
 				var experienceString = insertDots(user_details.getExperience());
-				g.drawString(""+experienceString, 136, 153);
-				var currentExperienceString = insertDots(user_details.getCurrentExperience());
-				var rankUpExperienceString = insertDots(user_details.getRankUpExperience());
-				g.drawString(currentExperienceString+"/"+rankUpExperienceString, 142, 123);
+				g.drawString(""+experienceString, user_details.getExperienceXProfile(), user_details.getExperienceYProfile());
 				var currencyString = insertDots(user_details.getCurrency());
-				g.drawString(currencyString, 263, 153);
+				g.drawString(currencyString, user_details.getCurrencyXProfile(), user_details.getCurrencyYProfile());
 				var rankString = insertDots(rank);
-				g.drawString(rankString, 263, 176);
+				g.drawString(rankString, user_details.getPlacementXProfile(), user_details.getPlacementYProfile());
 			}
 			else if(descriptionMode == 1) {
-				g.drawString(""+user_details.getLevel(), getCenteredString(""+user_details.getLevel(), 136, g), 176);
+				g.drawString(""+user_details.getLevel(), getCenteredString(""+user_details.getLevel(), user_details.getLevelXProfile(), g), user_details.getLevelYProfile());
 				var experienceString = insertDots(user_details.getExperience());
-				g.drawString(""+experienceString, getCenteredString(""+experienceString, 136, g), 153);
+				g.drawString(""+experienceString, getCenteredString(""+experienceString, user_details.getExperienceXProfile(), g), user_details.getExperienceYProfile());
 				var currencyString = insertDots(user_details.getCurrency());
-				g.drawString(currencyString, getCenteredString(currencyString, 263, g), 153);
+				g.drawString(currencyString, getCenteredString(currencyString, user_details.getCurrencyXProfile(), g), user_details.getCurrencyYProfile());
 				var rankString = insertDots(rank);
-				g.drawString(rankString, getCenteredString(rankString, 263, g), 176);
+				g.drawString(rankString, getCenteredString(rankString, user_details.getPlacementXProfile(), g), user_details.getPlacementYProfile());
 			}
 			else if(descriptionMode == 2) {
-				g.drawString(""+user_details.getLevel(), getRightString(""+user_details.getLevel(), 136, g), 176);
+				g.drawString(""+user_details.getLevel(), getRightString(""+user_details.getLevel(), user_details.getLevelXProfile(), g), user_details.getLevelYProfile());
 				var experienceString = insertDots(user_details.getExperience());
-				g.drawString(""+experienceString, getRightString(""+experienceString, 136, g), 153);
+				g.drawString(""+experienceString, getRightString(""+experienceString, user_details.getExperienceXProfile(), g), user_details.getExperienceYProfile());
 				var currencyString = insertDots(user_details.getCurrency());
-				g.drawString(currencyString, getRightString(currencyString, 263, g), 153);
+				g.drawString(currencyString, getRightString(currencyString, user_details.getCurrencyXProfile(), g), user_details.getCurrencyYProfile());
 				var rankString = insertDots(rank);
-				g.drawString(rankString, getRightString(rankString, 263, g), 176);
+				g.drawString(rankString, getRightString(rankString, user_details.getPlacementXProfile(), g), user_details.getPlacementYProfile());
 			}
 			var currentExperienceString = insertDots(currentExperience);
 			var rankUpExperienceString = insertDots(rankUpExperience);
-			g.drawString(currentExperienceString+"/"+rankUpExperienceString, getRightString(""+currentExperienceString, 142, g), 123);
+			g.drawString(currentExperienceString+"/"+rankUpExperienceString, getRightString(""+currentExperienceString, user_details.getExpReachXProfile(), g), user_details.getExpReachYProfile());
 
 			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
 			g.drawString(name, 126, 56);
