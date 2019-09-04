@@ -455,7 +455,7 @@ public class UserExecution {
 								else {
 									//error: the user isn't being watched
 									message.setTitle("User is not being watched!").setColor(Color.RED);
-									_e.getChannel().sendMessage(message.setDescription("The user is currently not being watched! Not actions required!").build()).queue();
+									_e.getChannel().sendMessage(message.setDescription("The user is currently not being watched! No actions required!").build()).queue();
 								}
 							}
 							else {

@@ -10,7 +10,7 @@ public class CommandList {
 		boolean entertainment = false;
 		boolean other = false;
 		
-		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getRssCommand(guild_id))){
+		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getRssCommand(guild_id)) || GuildIni.getWatchCommand(guild_id) || GuildIni.getUnwatchCommand(guild_id)) {
 			administration = true;
 		}
 		
@@ -32,6 +32,8 @@ public class CommandList {
 			if(GuildIni.getRoleReactionCommand(guild_id))textCollector.append("**-"+prefix+"roleReaction**\nenable / disable the role reaction and remove roles on disable\n\n");
 			if(GuildIni.getRssCommand(guild_id))textCollector.append("**-"+prefix+"rss**\ninsert rss feeds \n\n");
 			if(GuildIni.getDoubleExperienceCommand(guild_id))textCollector.append("**-"+prefix+"doubleExperience**\nenable, disable or set the double experience mode to auto \n\n");
+			if(GuildIni.getWatchCommand(guild_id))textCollector.append("**-"+prefix+"watch**\nlog messages from one or multiple users\n\n");
+			if(GuildIni.getUnwatchCommand(guild_id))textCollector.append("**-"+prefix+"unwatch**\nremove the messages logging from one or multiple users\n\n");
 		}
 		if(entertainment == true) {
 			textCollector.append("**_Entertainment:_**\n");

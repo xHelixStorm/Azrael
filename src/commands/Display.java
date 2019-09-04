@@ -210,14 +210,18 @@ public class Display implements CommandPublic{
 				out.append("Set channel filter subcommand: "+GuildIni.getSetChannelFilterLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Set warnings subcommand: "+GuildIni.getSetWarningsLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Set commands subcommand: "+GuildIni.getSetCommandsLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set ranking sucommand: "+GuildIni.getSetRankingLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set ranking subcommand: "+GuildIni.getSetRankingLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Set max experience subcommand: "+GuildIni.getSetMaxExperienceLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Set default level skin subcommand: "+GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Set default rank skin subcommand: "+GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Set default profile skin subcommand: "+GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Set default icon skin subcommand: "+GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Set daily item sucommand: "+GuildIni.getSetDailyItemLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set giveaway items sucommand: "+GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set giveaway items subcommand: "+GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong())+"\n");
+				
+				e.getChannel().sendMessage("`"+out.toString()+"`").queue();
+				out.setLength(0);
+				
 				out.append("Set privilege level sucommand: "+GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Shop command: "+GuildIni.getShopLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Top command: "+GuildIni.getTopLevel(e.getGuild().getIdLong())+"\n");

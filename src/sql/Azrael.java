@@ -2129,7 +2129,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("DELETE watchlist WHERE fk_user_id = ? && fk_guild_id = ?");
+			String sql = ("DELETE FROM watchlist WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
