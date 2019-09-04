@@ -1,5 +1,7 @@
 package commands;
 
+import java.awt.Color;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,6 +9,7 @@ import core.UserPrivs;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class Help implements CommandPublic {
@@ -27,7 +30,7 @@ public class Help implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		var fileInput = FileSetting.readFile("files/Guilds/"+e.getGuild().getId()+"/helpmessage.txt");
-		e.getChannel().sendMessage((fileInput != null && fileInput.length() > 0 ? fileInput : "The help command message has not been configured!")).queue();
+		e.getChannel().sendMessage(new EmbedBuilder().setTitle("Coming to the rescue!").setColor(Color.BLUE).setDescription((fileInput != null && fileInput.length() > 0 ? fileInput : "The help command message has not been configured!")).build()).queue();
 	}
 
 	@Override

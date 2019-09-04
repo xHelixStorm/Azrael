@@ -147,10 +147,10 @@ public class RankingThreadExecution {
 			
 			if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole()) > 0) {
 				FileSetting.appendFile("./log/rankingdetails.txt", "["+new Timestamp(System.currentTimeMillis())+"] "+user_details.getUser_ID()+" reached level "+user_details.getLevel()+", has "+user_details.getExperience()+" experience and "+user_details.getDailyExperience()+" daily experience from guild "+e.getGuild().getIdLong()+"\n");
-				RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Level Up", "User reached level "+level);
+				RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Level Up", "User reached level "+user_details.getLevel());
 				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
 				if(user_details.getRankingLevel() != 0 && user_details.getRankingIcon() != 0) {
-					RankingMethods.getRankUp(e, level, user_details.getRankingLevel(), user_details.getRankingIcon(), user_details.getColorRLevel(), user_details.getColorGLevel(), user_details.getColorBLevel(), user_details.getRankXLevel(), user_details.getRankYLevel(), user_details.getRankWidthLevel(), user_details.getRankHeightLevel(), guild_settings.getThemeID());
+					RankingMethods.getRankUp(e, guild_settings.getThemeID(), user_details);
 				}
 				else {
 					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");

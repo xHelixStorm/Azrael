@@ -43,7 +43,7 @@ public class FileSetting {
 		}
 	}
 
-	public static String readFile(String name){
+	public static String readFile(String name) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(name));
 			try {
@@ -51,7 +51,7 @@ public class FileSetting {
 				String line = br.readLine();
 				
 				while(line != null){
-					sb.append(line);
+					sb.append(line+"\n");
 					line = br.readLine();
 				}
 				String content = sb.toString();
@@ -72,7 +72,7 @@ public class FileSetting {
 		return null;
 	}
 	
-	public static ArrayList<String> readFileIntoArray(String _name){
+	public static ArrayList<String> readFileIntoArray(String _name) {
 		ArrayList<String> content = new ArrayList<String>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(_name));
@@ -101,7 +101,7 @@ public class FileSetting {
 		return null;
 	}
 	
-	public static String [] readFileIntoFixedArray(String _name){
+	public static String [] readFileIntoFixedArray(String _name) {
 		ArrayList<String> content = new ArrayList<String>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(_name));

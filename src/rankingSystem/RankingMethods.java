@@ -21,6 +21,7 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.Rank;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -29,13 +30,13 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class RankingMethods extends ListenerAdapter{
 	private final static Logger logger = LoggerFactory.getLogger(RankingMethods.class);
 	
-	public static void getRankUp(GuildMessageReceivedEvent e , int _level, int _level_skin, int _icon_skin, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id){		
+	public static void getRankUp(GuildMessageReceivedEvent e , int theme_id, Rank user_details) {		
 		try {
-			BufferedImage rankUp = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/levelup"+_level_skin+"_blank.png"));
-			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+_icon_skin+"_"+_level+".png"));
+			BufferedImage rankUp = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/levelup"+user_details.getRankingLevel()+"_blank.png"));
+			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+user_details.getLevel()+".png"));
 			String name = e.getMember().getEffectiveName();
 			int characterCounter = name.length();
-			int level = _level;
+			int level = user_details.getLevel();
 			int level1;
 			int level2;
 			String levelS1 = null;
@@ -48,7 +49,7 @@ public class RankingMethods extends ListenerAdapter{
 			final var generalTextFontSize = lev[1];
 			final var nameTextFontSize = lev[2];
 			
-			if(level > 9){
+			if(level > 9) {
 				level1 = level / 10;
 				level2 = level % 10;
 				sb.append(level1);
@@ -56,7 +57,7 @@ public class RankingMethods extends ListenerAdapter{
 				sb2.append(level2);
 				levelS2 = sb2.toString();
 			}
-			else{
+			else {
 				levelS1 = "0";
 				sb.append(level);
 				levelS2 = sb.toString();
@@ -71,14 +72,14 @@ public class RankingMethods extends ListenerAdapter{
 			Graphics2D g = overlay.createGraphics();
 			g.drawImage(rankUp, 0, 0, null);
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-			g.drawImage(rank, _rankx, _ranky, _rank_width, _rank_height, null);
-			Color color = new Color(_color_r, _color_g, _color_b);
+			g.drawImage(rank, user_details.getRankXLevel(), user_details.getRankYLevel(), user_details.getRankWidthLevel(), user_details.getRankHeightLevel(), null);
+			Color color = new Color(user_details.getColorRLevel(), user_details.getColorGLevel(), user_details.getColorBLevel());
 			g.setColor(color);
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setFont(new Font("Nexa Bold", Font.BOLD, generalTextFontSize));
-			g.drawString(levelS1+""+levelS2, getCenteredString(levelS1+""+levelS2, 205, g), 69);
+			g.drawString(levelS1+""+levelS2, getCenteredString(levelS1+""+levelS2, user_details.getLevelXLevel(), g), user_details.getLevelYLevel());
 			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
-			g.drawString(name, 137, 68);
+			g.drawString(name, user_details.getNameXLevel(), user_details.getNameYLevel());
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"lvup_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 			g.dispose();
 			
@@ -90,18 +91,18 @@ public class RankingMethods extends ListenerAdapter{
 		}
 	}
 	
-	public static void getRank(GuildMessageReceivedEvent e, String _name, String _avatar, int _experience, int _level, int _rank, int _rank_skin, int _icon_skin, int _bar_color, boolean _additional_exp_text, boolean _additional_percent_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id){		
+	public static void getRank(GuildMessageReceivedEvent e, String _name, String _avatar, int _experience, int _rank, int theme_id, Rank user_details) {		
 		try{
-			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/rank"+_rank_skin+"_blank.png"));
+			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/rank"+user_details.getRankingRank()+"_blank.png"));
 			BufferedImage experienceBar;
 			if(_experience != 0) {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+_bar_color+"_"+100+".png"));
+				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+user_details.getBarColorRank()+"_"+100+".png"));
 				experienceBar = experienceBar.getSubimage(0, 0, 2*_experience, experienceBar.getHeight());
 			}
 			else {
 				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+0+"_"+0+".png"));
 			}
-			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+_icon_skin+"_"+_level+".png"));
+			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+user_details.getLevel()+".png"));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -128,24 +129,24 @@ public class RankingMethods extends ListenerAdapter{
 			Graphics2D g = overlay.createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			g.drawImage(rank, 0, 0, null);
-			g.drawImage(experienceBar, 38, 64, null);
+			g.drawImage(experienceBar, user_details.getBarXRank(), user_details.getBarYRank(), null);
 			level = blurImage(level);
-			g.drawImage(level, _rankx, _ranky, _rank_width, _rank_height, null);
-			g.drawImage(avatarPicture, 19, 19, 40, 40, null);
-			Color color = new Color(_color_r, _color_g, _color_b);
+			g.drawImage(level, user_details.getRankXRank(), user_details.getRankYRank(), user_details.getRankWidthRank(), user_details.getRankHeightRank(), null);
+			g.drawImage(avatarPicture, user_details.getAvatarXRank(), user_details.getAvatarYRank(), user_details.getAvatarWidthRank(), user_details.getAvatarHeightRank(), null);
+			Color color = new Color(user_details.getColorRRank(), user_details.getColorGRank(), user_details.getColorBRank());
 			g.setColor(color);
 			g.setFont(new Font("Nexa Bold", Font.PLAIN, generalTextFontSize));
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			if(_additional_exp_text == true) {
+			if(user_details.getAdditionalExpTextRank() == true) {
 				g.drawString("Exp:", 14, 73);
 			}
-			if(_additional_percent_text == true) {
+			if(user_details.getAdditionalPercentTextRank() == true) {
 				g.drawString(levelT+"%", 246, 73);
 			}
 			var rankString = insertDots(_rank);
 			g.drawString("Rank:  #"+rankString, 118, 57);
 			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
-			g.drawString(name, 117, 38);
+			g.drawString(name, user_details.getNameXRank(), user_details.getNameYRank());
 			
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 			g.dispose();
@@ -158,18 +159,18 @@ public class RankingMethods extends ListenerAdapter{
 		}
 	}
 	
-	public static void getProfile(GuildMessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _level, float _currentExperience, float _rankUpExperience, long _experience, long _currency, int _rank, int _profile_skin, int _icon_skin, int _bar_color, boolean _additional_exp_text, boolean _additional_percent_text, int _color_r, int _color_g, int _color_b, int _rankx, int _ranky, int _rank_width, int _rank_height, int theme_id) {		
+	public static void getProfile(GuildMessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _rank, int currentExperience, int rankUpExperience, int theme_id, Rank user_details) {		
 		try{
-			BufferedImage profile = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/profile"+_profile_skin+"_blank.png"));
+			BufferedImage profile = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/profile"+user_details.getRankingProfile()+"_blank.png"));
 			BufferedImage experienceBar;
 			if(_experiencePercentage != 0) {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+_bar_color+"_"+100+".png"));
+				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+user_details.getBarColorProfile()+"_"+100+".png"));
 				experienceBar = experienceBar.getSubimage(0, 0, 2*_experiencePercentage, experienceBar.getHeight());
 			}
 			else {
 				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+0+"_"+0+".png"));
 			}
-			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+_icon_skin+"_"+_level+".png"));
+			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+user_details.getLevel()+".png"));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -181,10 +182,6 @@ public class RankingMethods extends ListenerAdapter{
 			String name = _name;
 			int characterCounter = name.length();
 			int levelT = _experiencePercentage;
-			int currentExperience = (int) _currentExperience;
-			int rankUpExperience = (int) _rankUpExperience;
-			long experience = _experience;
-			long currency = _currency;
 			int rank = _rank;
 			
 			int[] prof = GuildIni.getWholeProfile(e.getGuild().getIdLong());
@@ -204,46 +201,46 @@ public class RankingMethods extends ListenerAdapter{
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g.drawImage(experienceBar, 42, 100, null);
+			g.drawImage(experienceBar, user_details.getBarXProfile(), user_details.getBarYProfile(), null);
 			level = blurImage(level);
-			g.drawImage(level, _rankx, _ranky, _rank_width, _rank_height, null);
-			g.drawImage(avatarPicture, 20, 20, 55, 55, null);
-			Color color = new Color(_color_r, _color_g, _color_b);
+			g.drawImage(level, user_details.getRankXProfile(), user_details.getRankYProfile(), user_details.getRankWidthProfile(), user_details.getRankHeightProfile(), null);
+			g.drawImage(avatarPicture, user_details.getAvatarXProfile(), user_details.getAvatarYProfile(), user_details.getAvatarWidthProfile(), user_details.getAvatarHeightProfile(), null);
+			Color color = new Color(user_details.getColorRProfile(), user_details.getColorGProfile(), user_details.getColorBProfile());
 			g.setColor(color);
 			g.setFont(new Font("Nexa Bold", Font.PLAIN, generalTextFontSize));
-			if(_additional_exp_text == true) {
+			if(user_details.getAdditionalExpTextProfile() == true) {
 				g.drawString("Exp:", 15, 109);
 			}
-			if(_additional_percent_text == true) {
+			if(user_details.getAdditionalPercentTextProfile() == true) {
 				g.drawString(levelT+"%", 243, 109);
 			}
 			
 			if(descriptionMode == 0) {
-				g.drawString(""+_level, 136, 176);
-				var experienceString = insertDots(experience);
+				g.drawString(""+user_details.getLevel(), 136, 176);
+				var experienceString = insertDots(user_details.getExperience());
 				g.drawString(""+experienceString, 136, 153);
-				var currentExperienceString = insertDots(currentExperience);
-				var rankUpExperienceString = insertDots(rankUpExperience);
+				var currentExperienceString = insertDots(user_details.getCurrentExperience());
+				var rankUpExperienceString = insertDots(user_details.getRankUpExperience());
 				g.drawString(currentExperienceString+"/"+rankUpExperienceString, 142, 123);
-				var currencyString = insertDots(currency);
+				var currencyString = insertDots(user_details.getCurrency());
 				g.drawString(currencyString, 263, 153);
 				var rankString = insertDots(rank);
 				g.drawString(rankString, 263, 176);
 			}
 			else if(descriptionMode == 1) {
-				g.drawString(""+_level, getCenteredString(""+_level, 136, g), 176);
-				var experienceString = insertDots(experience);
+				g.drawString(""+user_details.getLevel(), getCenteredString(""+user_details.getLevel(), 136, g), 176);
+				var experienceString = insertDots(user_details.getExperience());
 				g.drawString(""+experienceString, getCenteredString(""+experienceString, 136, g), 153);
-				var currencyString = insertDots(currency);
+				var currencyString = insertDots(user_details.getCurrency());
 				g.drawString(currencyString, getCenteredString(currencyString, 263, g), 153);
 				var rankString = insertDots(rank);
 				g.drawString(rankString, getCenteredString(rankString, 263, g), 176);
 			}
 			else if(descriptionMode == 2) {
-				g.drawString(""+_level, getRightString(""+_level, 136, g), 176);
-				var experienceString = insertDots(experience);
+				g.drawString(""+user_details.getLevel(), getRightString(""+user_details.getLevel(), 136, g), 176);
+				var experienceString = insertDots(user_details.getExperience());
 				g.drawString(""+experienceString, getRightString(""+experienceString, 136, g), 153);
-				var currencyString = insertDots(currency);
+				var currencyString = insertDots(user_details.getCurrency());
 				g.drawString(currencyString, getRightString(currencyString, 263, g), 153);
 				var rankString = insertDots(rank);
 				g.drawString(rankString, getRightString(rankString, 263, g), 176);

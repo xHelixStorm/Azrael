@@ -694,7 +694,11 @@ public class RankingSystem {
 					rankingSystem.setRankYLevel(rs.getInt(7));
 					rankingSystem.setRankWidthLevel(rs.getInt(8));
 					rankingSystem.setRankHeightLevel(rs.getInt(9));
-					rankingSystem.setThemeID(rs.getInt(10));
+					rankingSystem.setLevelXLevel(rs.getInt(10));
+					rankingSystem.setLevelYLevel(rs.getInt(11));
+					rankingSystem.setNameXLevel(rs.getInt(12));
+					rankingSystem.setNameYLevel(rs.getInt(13));
+					rankingSystem.setThemeID(rs.getInt(14));
 					rankList.add(rankingSystem);
 				}
 				Hashes.addRankList("ranking-level", rankList);
@@ -738,7 +742,15 @@ public class RankingSystem {
 					rankingSystem.setRankYRank(rs.getInt(10));
 					rankingSystem.setRankWidthRank(rs.getInt(11));
 					rankingSystem.setRankHeightRank(rs.getInt(12));
-					rankingSystem.setThemeID(rs.getInt(13));
+					rankingSystem.setNameXRank(rs.getInt(13));
+					rankingSystem.setNameYRank(rs.getInt(14));
+					rankingSystem.setBarXRank(rs.getInt(15));
+					rankingSystem.setBarYRank(rs.getInt(16));
+					rankingSystem.setAvatarXRank(rs.getInt(17));
+					rankingSystem.setAvatarYRank(rs.getInt(18));
+					rankingSystem.setAvatarWidthRank(rs.getInt(19));
+					rankingSystem.setAvatarHeightRank(rs.getInt(20));
+					rankingSystem.setThemeID(rs.getInt(21));
 					rankList.add(rankingSystem);
 				}
 				Hashes.addRankList("ranking-rank", rankList);
@@ -782,7 +794,17 @@ public class RankingSystem {
 					rankingSystem.setRankYProfile(rs.getInt(10));
 					rankingSystem.setRankWidthProfile(rs.getInt(11));
 					rankingSystem.setRankHeightProfile(rs.getInt(12));
-					rankingSystem.setThemeID(rs.getInt(13));
+					rankingSystem.setLevelXProfile(rs.getInt(13));
+					rankingSystem.setLevelYProfile(rs.getInt(14));
+					rankingSystem.setNameXProfile(rs.getInt(15));
+					rankingSystem.setNameYProfile(rs.getInt(16));
+					rankingSystem.setBarXProfile(rs.getInt(17));
+					rankingSystem.setBarYProfile(rs.getInt(18));
+					rankingSystem.setAvatarXProfile(rs.getInt(19));
+					rankingSystem.setAvatarYProfile(rs.getInt(20));
+					rankingSystem.setAvatarWidthProfile(rs.getInt(21));
+					rankingSystem.setAvatarHeightProfile(rs.getInt(22));
+					rankingSystem.setThemeID(rs.getInt(23));
 					rankList.add(rankingSystem);
 				}
 				Hashes.addRankList("ranking-profile", rankList);
@@ -1281,7 +1303,7 @@ public class RankingSystem {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT user_details.fk_user_id, user_details.level, (SELECT (user_details.experience - level_list.experience) FROM level_list WHERE level_list.level = user_details.level AND level_list.fk_theme_id = ?) AS `current_experience`, (SELECT (level_list.experience - (SELECT level_list.experience FROM level_list WHERE level_list.level = user_details.level)) FROM level_list WHERE level_list.level = (user_details.level+1) AND level_list.fk_theme_id = ?) AS `rank_up_experience`, user_details.experience, user_details.currency, user_details.current_role, users.level_skin, ranking_level.description, users.rank_skin, ranking_rank.description, users.profile_skin, ranking_profile.description, users.icon_skin, ranking_icons.description, ranking_profile.fk_bar_id, ranking_rank.fk_bar_id, ranking_profile.exp_txt, ranking_profile.percent_txt, ranking_rank.exp_txt, ranking_rank.percent_txt, ranking_profile.tcolor_r, ranking_rank.tcolor_r, ranking_level.tcolor_r, ranking_profile.tcolor_g, ranking_rank.tcolor_g, ranking_level.tcolor_g, ranking_profile.tcolor_b, ranking_rank.tcolor_b, ranking_level.tcolor_b, ranking_level.rankx, ranking_level.ranky, ranking_level.rank_width, ranking_level.rank_height, ranking_rank.rankx, ranking_rank.ranky, ranking_rank.rank_width, ranking_rank.rank_height, ranking_profile.rankx, ranking_profile.ranky, ranking_profile.rank_width, ranking_profile.rank_height, daily_experience.experience, daily_experience.reset, users.weapon1, users.weapon2, users.weapon3, users.skill FROM user_details INNER JOIN users ON user_details.fk_user_id = users.user_id && user_details.fk_guild_id = users.fk_guild_id LEFT JOIN ranking_level ON level_skin = level_id LEFT JOIN ranking_rank ON rank_skin = rank_id LEFT JOIN ranking_profile ON profile_skin = profile_id LEFT JOIN ranking_icons ON icon_skin = icon_id INNER JOIN guilds ON user_details.fk_guild_id = guilds.guild_id LEFT JOIN daily_experience ON guilds.guild_id = daily_experience.fk_guild_id WHERE user_details.fk_user_id = ? && user_details.fk_guild_id = ?");
+				String sql = ("SELECT user_details.fk_user_id, user_details.level, (SELECT (user_details.experience - level_list.experience) FROM level_list WHERE level_list.level = user_details.level AND level_list.fk_theme_id = ?) AS `current_experience`, (SELECT (level_list.experience - (SELECT level_list.experience FROM level_list WHERE level_list.level = user_details.level)) FROM level_list WHERE level_list.level = (user_details.level+1) AND level_list.fk_theme_id = ?) AS `rank_up_experience`, user_details.experience, user_details.currency, user_details.current_role, users.level_skin, ranking_level.description, users.rank_skin, ranking_rank.description, users.profile_skin, ranking_profile.description, users.icon_skin, ranking_icons.description, ranking_profile.fk_bar_id, ranking_rank.fk_bar_id, ranking_profile.exp_txt, ranking_profile.percent_txt, ranking_rank.exp_txt, ranking_rank.percent_txt, ranking_profile.tcolor_r, ranking_rank.tcolor_r, ranking_level.tcolor_r, ranking_profile.tcolor_g, ranking_rank.tcolor_g, ranking_level.tcolor_g, ranking_profile.tcolor_b, ranking_rank.tcolor_b, ranking_level.tcolor_b, ranking_level.rankx, ranking_level.ranky, ranking_level.rank_width, ranking_level.rank_height, ranking_rank.rankx, ranking_rank.ranky, ranking_rank.rank_width, ranking_rank.rank_height, ranking_profile.rankx, ranking_profile.ranky, ranking_profile.rank_width, ranking_profile.rank_height, ranking_level.levelx, ranking_level.levely, ranking_profile.levelx, ranking_profile.levely, ranking_level.namex, ranking_level.namey, ranking_rank.namex, ranking_rank.namey, ranking_profile.namex, ranking_profile.namey, ranking_rank.barx, ranking_rank.bary, ranking_profile.barx, ranking_profile.bary, ranking_rank.avatarx, ranking_rank.avatary, ranking_profile.avatarx, ranking_profile.avatary, ranking_rank.avatar_width, ranking_rank.avatar_height, ranking_profile.avatar_width, ranking_profile.avatar_height, daily_experience.experience, daily_experience.reset, users.weapon1, users.weapon2, users.weapon3, users.skill FROM user_details INNER JOIN users ON user_details.fk_user_id = users.user_id && user_details.fk_guild_id = users.fk_guild_id LEFT JOIN ranking_level ON level_skin = level_id LEFT JOIN ranking_rank ON rank_skin = rank_id LEFT JOIN ranking_profile ON profile_skin = profile_id LEFT JOIN ranking_icons ON icon_skin = icon_id INNER JOIN guilds ON user_details.fk_guild_id = guilds.guild_id LEFT JOIN daily_experience ON guilds.guild_id = daily_experience.fk_guild_id WHERE user_details.fk_user_id = ? && user_details.fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _theme_id);
 				stmt.setInt(2, _theme_id);
@@ -1332,12 +1354,34 @@ public class RankingSystem {
 					rank.setRankYProfile(rs.getInt(40));
 					rank.setRankWidthProfile(rs.getInt(41));
 					rank.setRankHeightProfile(rs.getInt(42));
-					rank.setDailyExperience(rs.getInt(43));
-					rank.setDailyReset(rs.getTimestamp(44));
-					rank.setWeapon1(rs.getInt(45));
-					rank.setWeapon2(rs.getInt(46));
-					rank.setWeapon3(rs.getInt(47));
-					rank.setSkill(rs.getInt(48));
+					rank.setLevelXLevel(rs.getInt(43));
+					rank.setLevelYLevel(rs.getInt(44));
+					rank.setLevelXProfile(rs.getInt(45));
+					rank.setLevelYProfile(rs.getInt(46));
+					rank.setNameXLevel(rs.getInt(47));
+					rank.setNameYLevel(rs.getInt(48));
+					rank.setNameXRank(rs.getInt(49));
+					rank.setNameYRank(rs.getInt(50));
+					rank.setNameXProfile(rs.getInt(52));
+					rank.setNameYProfile(rs.getInt(53));
+					rank.setBarXRank(rs.getInt(54));
+					rank.setBarYRank(rs.getInt(55));
+					rank.setBarXProfile(rs.getInt(56));
+					rank.setBarYProfile(rs.getInt(57));
+					rank.setAvatarXRank(rs.getInt(58));
+					rank.setAvatarYRank(rs.getInt(59));
+					rank.setAvatarXProfile(rs.getInt(60));
+					rank.setAvatarYProfile(rs.getInt(61));
+					rank.setAvatarWidthRank(rs.getInt(62));
+					rank.setAvatarHeightRank(rs.getInt(63));
+					rank.setAvatarWidthProfile(rs.getInt(64));
+					rank.setAvatarHeightProfile(rs.getInt(65));
+					rank.setDailyExperience(rs.getInt(66));
+					rank.setDailyReset(rs.getTimestamp(67));
+					rank.setWeapon1(rs.getInt(68));
+					rank.setWeapon2(rs.getInt(69));
+					rank.setWeapon3(rs.getInt(70));
+					rank.setSkill(rs.getInt(71));
 					Hashes.addRanking(_guild_id+"_"+_user_id, rank);
 					return rank;
 				}
