@@ -94,8 +94,6 @@ public class EquipExecution {
 	
 	public static void equipmentItemScreen(PrivateMessageReceivedEvent e, final String guild_id, String action) {
 		final long guild = guild_id.transform(v -> Long.valueOf(v));
-		var guild_settings = RankingSystem.SQLgetGuild(guild);
-		var theme_id = (guild_settings != null ? guild_settings.getThemeID() : 0);
 		Rank user_details = null;
 		RankingSystem.SQLDeleteInventory();
 		//retrieve weapon descriptions for already equipped items or find out, if they're expired from the inventory and then remove
@@ -108,7 +106,7 @@ public class EquipExecution {
 			if(RankingSystemItems.SQLRemoveEquippedWeapon(e.getAuthor().getIdLong(), guild, 1) == 0) {
 				//To do: log error
 			}
-			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild, theme_id);
+			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 			if(user_details != null) {
 				user_details.setWeapon1(0);
 				Hashes.addRanking(guild+"_"+e.getAuthor().getId(), user_details);
@@ -119,7 +117,7 @@ public class EquipExecution {
 			if(RankingSystemItems.SQLRemoveEquippedWeapon(e.getAuthor().getIdLong(), guild, 2) == 0) {
 				//To do: log error
 			}
-			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild, theme_id);
+			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 			if(user_details != null) {
 				user_details.setWeapon2(0);
 				Hashes.addRanking(guild+"_"+e.getAuthor().getId(), user_details);
@@ -130,7 +128,7 @@ public class EquipExecution {
 			if(RankingSystemItems.SQLRemoveEquippedWeapon(e.getAuthor().getIdLong(), guild, 3) == 0) {
 				//To do: log error
 			}
-			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild, theme_id);
+			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 			if(user_details != null) {
 				user_details.setWeapon3(0);
 				Hashes.addRanking(guild+"_"+e.getAuthor().getId(), user_details);
@@ -141,7 +139,7 @@ public class EquipExecution {
 			if(RankingSystemItems.SQLRemoveEquippedSkill(e.getAuthor().getIdLong(), guild) == 0) {
 				//To do: log error
 			}
-			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild, theme_id);
+			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 			if(user_details != null) {
 				user_details.setSkill(0);
 				Hashes.addRanking(guild+"_"+e.getAuthor().getId(), user_details);
@@ -158,7 +156,7 @@ public class EquipExecution {
 	}
 	
 	public static void removeWholeEquipment(PrivateMessageReceivedEvent e, final long guild_id) {
-		var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID());
+		var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild_id);
 		if(user_details.getWeapon1() != 0 || user_details.getWeapon2() != 0 || user_details.getWeapon3() != 0 || user_details.getSkill() != 0) {
 			if(RankingSystemItems.SQLUnequipWholeEquipment(e.getAuthor().getIdLong(), guild_id) > 0) {
 				user_details.setWeapon1(0);
@@ -193,7 +191,7 @@ public class EquipExecution {
 			else if(action.equals("remove")) {
 				int itemID = 0;
 				long guild = Long.parseLong(guild_id);
-				var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild, RankingSystem.SQLgetGuild(guild).getThemeID());
+				var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 				switch(selection) {
 					case 1 -> itemID = user_details.getWeapon1();
 					case 2 -> itemID = user_details.getWeapon2();
@@ -245,7 +243,7 @@ public class EquipExecution {
 			//weapons
 			var weapons = RankingSystemItems.SQLfilterInventoryWeapons(e.getAuthor().getIdLong(), guild, item);
 			if(weapons.size() == 1) {
-				var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild, RankingSystem.SQLgetGuild(guild).getThemeID());
+				var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 				var weapon = weapons.get(0);
 				if(weapon.getItemId() != user_details.getWeapon1() && weapon.getItemId() != user_details.getWeapon2() && weapon.getItemId() != user_details.getWeapon3()) {
 					var guild_settings = RankingSystem.SQLgetGuild(guild);
@@ -306,7 +304,7 @@ public class EquipExecution {
 			//skill
 			var skills = RankingSystemItems.SQLfilterInventorySkills(e.getAuthor().getIdLong(), guild, item);
 			if(skills.size() == 1) {
-				var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild, RankingSystem.SQLgetGuild(guild).getThemeID());
+				var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 				var skill = skills.get(0);
 				if(skill.getItemId() != user_details.getSkill()) {
 					if(RankingSystemItems.SQLEquipSkill(e.getAuthor().getIdLong(), guild, skill.getItemId()) > 0) {
@@ -357,7 +355,7 @@ public class EquipExecution {
 			switch(slot) {
 				case 1, 2, 3 -> {
 					var weapon_id = Integer.parseInt(items[selection]);
-					var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild, RankingSystem.SQLgetGuild(guild).getThemeID());
+					var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 					if(weapon_id != user_details.getWeapon1() && weapon_id != user_details.getWeapon2() && weapon_id != user_details.getWeapon3()) {
 						var guild_settings = RankingSystem.SQLgetGuild(guild);
 						var weapon1 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon1()).findAny().orElse(null);
@@ -395,7 +393,7 @@ public class EquipExecution {
 				}
 				case 4 -> {
 					var skill_id = Integer.parseInt(items[selection]);
-					var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild, RankingSystem.SQLgetGuild(guild).getThemeID());
+					var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 					if(user_details.getSkill() != skill_id) {
 						if(RankingSystemItems.SQLEquipSkill(e.getAuthor().getIdLong(), guild, skill_id) > 0) {
 							user_details.setSkill(skill_id);

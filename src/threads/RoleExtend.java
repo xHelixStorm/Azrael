@@ -51,7 +51,7 @@ public class RoleExtend implements Runnable {
 					if(unmute < 0){unmute = 0;}
 					long assignedRole = 0;
 					boolean rankingState = false;
-					Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), guild_id, guild_settings.getThemeID());
+					Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), guild_id);
 					if(user_details != null){
 						assignedRole = user_details.getCurrentRole();
 						rankingState = guild_settings.getRankingState();

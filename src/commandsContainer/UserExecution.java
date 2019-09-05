@@ -73,7 +73,7 @@ public class UserExecution {
 		
 		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17)) {
 			if(user_name != null && user_name.length() > 0) {
-				RankingSystem.SQLgetWholeRankView(Long.parseLong(raw_input), _e.getGuild().getIdLong(), RankingSystem.SQLgetGuild(_e.getGuild().getIdLong()).getThemeID());
+				RankingSystem.SQLgetWholeRankView(Long.parseLong(raw_input), _e.getGuild().getIdLong());
 				_e.getChannel().sendMessage(message.setDescription("User **"+user_name+"** has been found in this guild! Now type one of the following words within 3 minutes to execute an action!\n\n"
 						+ "**information**: To display all details of the selected user\n"
 						+ "**delete-messages**: To remove up to 100 messages from the selected user\n"
@@ -135,7 +135,7 @@ public class UserExecution {
 							else
 								message.addField("WATCH LEVEL", "**"+watchedUser.getLevel()+"**", true);
 							message.addBlankField(false);
-							Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong(), guild_settings.getThemeID());
+							Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
 							if(guild_settings.getRankingState() == true) {
 								message.addField("LEVEL", "**"+user_details.getLevel()+"**/**"+guild_settings.getMaxLevel()+"**", true);
 								message.addField("EXPERIENCE", "**"+user_details.getCurrentExperience()+"**/**"+user_details.getRankUpExperience()+"**", true);
@@ -310,7 +310,7 @@ public class UserExecution {
 										Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
 										_e.getGuild().removeRoleFromMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut"))).complete();
 										long assignedRole = 0;
-										Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong(), RankingSystem.SQLgetGuild(_e.getGuild().getIdLong()).getThemeID());
+										Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
 										if(user_details != null) {
 											assignedRole = user_details.getCurrentRole();
 										}
@@ -1010,7 +1010,7 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*",	"").equals("gift-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), guild_settings.getThemeID());
+					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
 					long experience = Integer.parseInt(_message);
 					long totExperience = 0;
 					long currentExperience = 0;
@@ -1070,7 +1070,7 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("set-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), guild_settings.getThemeID());
+					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
 					long experience = Long.parseLong(_message);
 					long totExperience = 0;
 					long currentExperience = 0;
@@ -1132,7 +1132,7 @@ public class UserExecution {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					int level = Integer.parseInt(_message);
 					if(level <= guild_settings.getMaxLevel()) {
-						Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), guild_settings.getThemeID());
+						Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
 						long experience = 0;
 						long rankUpExperience = 0;
 						long assign_role = 0;
@@ -1188,7 +1188,7 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("gift-currency")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), guild_settings.getThemeID());
+					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(user_details.getCurrency()+currency);
 					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getCurrency()) > 0) {
@@ -1206,7 +1206,7 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("set-currency")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong(), guild_settings.getThemeID());
+					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(currency);
 					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getCurrency()) > 0) {

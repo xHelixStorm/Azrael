@@ -97,10 +97,10 @@ public class UserPrivs {
 	}
 	
 	public static String retrieveRequiredRoles(int requiredLevel, Guild guild) {
-		var out = "";
+		StringBuilder out = new StringBuilder();
 		for(final var role : guild.getRoles()) {
 			try {
-				out += (!role.getName().equals("@everyone") && Hashes.getDiscordRole(role.getIdLong()).getLevel() >= requiredLevel ? "`"+role.getName()+"` " : "");
+				out.append((!role.getName().equals("@everyone") && Hashes.getDiscordRole(role.getIdLong()).getLevel() >= requiredLevel ? "`"+role.getName()+"` " : ""));
 			} catch(NullPointerException npe) {
 				if(DiscordRoles.SQLInsertRole(guild.getIdLong(), role.getIdLong(), 0, role.getName(), "def") > 0) {
 					Hashes.addDiscordRole(role.getIdLong(), new Roles(role.getIdLong(), role.getName(), 0, "def", "Default"));
@@ -110,7 +110,7 @@ public class UserPrivs {
 				}
 			}
 		}
-		return out;
+		return (out.length() > 0 ? out.toString() : "No available role!");
 	}
 	
 	public static void throwNotEnoughPrivilegeError(GuildMessageReceivedEvent e, int requiredLevel) {

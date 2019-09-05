@@ -42,7 +42,7 @@ public class BotStartAssign implements Runnable{
 				rankingIncluded = true;
 				for(Member member : g.getMembers()) {
 					if(!UserPrivs.isUserBot(member.getUser(), guild_id) && !UserPrivs.isUserMuted(member.getUser(), guild_id)) {
-						Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), guild_id, guild_settings.getThemeID());
+						Rank user_details = RankingSystem.SQLgetWholeRankView(member.getUser().getIdLong(), guild_id);
 						if(user_details != null) {
 							if(user_details.getCurrentRole() != 0 && member.getRoles().parallelStream().filter(f -> f.getIdLong() == user_details.getCurrentRole()).findAny().orElse(null) == null) {
 								g.addRoleToMember(member, g.getRoleById(user_details.getCurrentRole())).queue();

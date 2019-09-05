@@ -20,7 +20,7 @@ public class PurchaseExecution {
 	
 	public static void purchase(GuildMessageReceivedEvent e, final String type, final String item_number, Guilds guild_settings) {
 		final var item_id = Integer.parseInt(item_number);
-		var user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
+		var user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		if(!type.equals("wep") && !type.equals("ski")) {
 			var skin = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(s -> s.getItemID() == item_id).findAny().orElse(null);
 			if(user_details.getCurrency() >= skin.getPrice()) {
@@ -112,7 +112,7 @@ public class PurchaseExecution {
 	
 	public static void sell(GuildMessageReceivedEvent e, final String type, final String item_number, Guilds guild_settings) {
 		final var item_id = Integer.parseInt(item_number);
-		var user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
+		var user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		if(!type.equals("wep") && !type.equals("ski")) {
 			var skin = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(s -> s.getItemID() == item_id).findAny().orElse(null);
 			var newCurrency = user_details.getCurrency()+(skin.getPrice()/10);

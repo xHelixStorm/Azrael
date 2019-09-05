@@ -102,7 +102,7 @@ public class Daily implements CommandPublic {
 						Timestamp timestamp2 = Timestamp.valueOf(tomorrowMidnight);
 						var editedRows = 0;
 						if(list.get(random).getType().equals("cur")){
-							constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
+							constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 							user_details.setCurrency(user_details.getCurrency()+Long.parseLong(list.get(random).getDescription().replaceAll("[^0-9]*", "")));
 							editedRows = RankingSystem.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency());
 							if(editedRows > 0)

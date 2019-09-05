@@ -29,11 +29,6 @@ public class Rank {
 	private int bary_rank;
 	private int bary_profile;
 	
-	private boolean additional_exp_text_rank;
-	private boolean additional_percent_text_rank;
-	private boolean additional_exp_text_profile;
-	private boolean additional_percent_text_profile;
-	
 	private int exp_textx_rank;
 	private int exp_textx_profile;
 	private int exp_texty_rank;
@@ -187,18 +182,6 @@ public class Rank {
 	}
 	public void setBarYProfile(int _bary_profile) {
 		this.bary_profile = _bary_profile;
-	}
-	public void setAdditionalExpTextRank(boolean _additional_exp_text_rank) {
-		this.additional_exp_text_rank = _additional_exp_text_rank;
-	}
-	public void setAdditionalPercentTextRank(boolean _additional_percent_text_rank) {
-		this.additional_percent_text_rank = _additional_percent_text_rank;
-	}
-	public void setAdditionalExpTextProfile(boolean _additional_exp_text_profile) {
-		this.additional_exp_text_profile = _additional_exp_text_profile;
-	}
-	public void setAdditionalPercentTextProfile(boolean _additional_percent_text_profile) {
-		this.additional_percent_text_profile = _additional_percent_text_profile;
 	}
 	public void setExpTextXRank(int _exp_textx_rank) {
 		this.exp_textx_rank = _exp_textx_rank;
@@ -473,18 +456,6 @@ public class Rank {
 	}
 	public int getBarYProfile() {
 		return this.bary_profile;
-	}
-	public boolean getAdditionalExpTextRank() {
-		return this.additional_exp_text_rank;
-	}
-	public boolean getAdditionalPercentTextRank() {
-		return this.additional_percent_text_rank;
-	}
-	public boolean getAdditionalExpTextProfile() {
-		return this.additional_exp_text_profile;
-	}
-	public boolean getAdditionalPercentTextProfile() {
-		return this.additional_percent_text_profile;
 	}
 	public int getExpTextXRank() {
 		return this.exp_textx_rank;

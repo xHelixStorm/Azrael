@@ -36,7 +36,7 @@ public class Use implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-		constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID());
+		constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		if(guild_settings.getRankingState()){
 			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
@@ -83,8 +83,6 @@ public class Use implements CommandPublic {
 					user_details.setRankingRank(rank.getRankingRank());
 					user_details.setRankDescription(rank.getRankDescription());
 					user_details.setBarColorRank(rank.getBarColorRank());
-					user_details.setAdditionalExpTextRank(rank.getAdditionalExpTextRank());
-					user_details.setAdditionalPercentTextRank(rank.getAdditionalPercentTextRank());
 					user_details.setColorRRank(rank.getColorRRank());
 					user_details.setColorGRank(rank.getColorGRank());
 					user_details.setColorBRank(rank.getColorBRank());
@@ -130,8 +128,6 @@ public class Use implements CommandPublic {
 					user_details.setRankingProfile(rank.getRankingProfile());
 					user_details.setProfileDescription(rank.getProfileDescription());
 					user_details.setBarColorProfile(rank.getBarColorProfile());
-					user_details.setAdditionalExpTextProfile(rank.getAdditionalExpTextProfile());
-					user_details.setAdditionalPercentTextProfile(rank.getAdditionalPercentTextProfile());
 					user_details.setColorRProfile(rank.getColorRProfile());
 					user_details.setColorGProfile(rank.getColorGProfile());
 					user_details.setColorBProfile(rank.getColorBProfile());
@@ -235,8 +231,6 @@ public class Use implements CommandPublic {
 							user_details.setRankingRank(rank.getRankingRank());
 							user_details.setRankDescription(rank.getRankDescription());
 							user_details.setBarColorRank(rank.getBarColorRank());
-							user_details.setAdditionalExpTextRank(rank.getAdditionalExpTextRank());
-							user_details.setAdditionalPercentTextRank(rank.getAdditionalPercentTextRank());
 							user_details.setColorRRank(rank.getColorRRank());
 							user_details.setColorGRank(rank.getColorGRank());
 							user_details.setColorBRank(rank.getColorBRank());
@@ -274,8 +268,6 @@ public class Use implements CommandPublic {
 							user_details.setRankingProfile(rank.getRankingProfile());
 							user_details.setProfileDescription(rank.getProfileDescription());
 							user_details.setBarColorProfile(rank.getBarColorProfile());
-							user_details.setAdditionalExpTextProfile(rank.getAdditionalExpTextProfile());
-							user_details.setAdditionalPercentTextProfile(rank.getAdditionalPercentTextProfile());
 							user_details.setColorRProfile(rank.getColorRProfile());
 							user_details.setColorGProfile(rank.getColorGProfile());
 							user_details.setColorBProfile(rank.getColorBProfile());

@@ -67,7 +67,7 @@ public class Profile implements CommandPublic {
 				int rank = 0;
 				
 				Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
-				constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
+				constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
 				
 				if(guild_settings.getRankingState()){				
 					var cache = Hashes.getTempCache("profileDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());

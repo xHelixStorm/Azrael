@@ -27,7 +27,8 @@ import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class RankingMethods extends ListenerAdapter{
+public class RankingMethods extends ListenerAdapter {
+	//Class for drawing level ups, ranks and profiles basing on the user settings
 	private final static Logger logger = LoggerFactory.getLogger(RankingMethods.class);
 	
 	public static void getRankUp(GuildMessageReceivedEvent e , int theme_id, Rank user_details) {		
@@ -71,15 +72,21 @@ public class RankingMethods extends ListenerAdapter{
 			BufferedImage overlay = new BufferedImage(rankUpW, rankUpH, BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics2D g = overlay.createGraphics();
 			g.drawImage(rankUp, 0, 0, null);
-			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-			g.drawImage(rank, user_details.getRankXLevel(), user_details.getRankYLevel(), user_details.getRankWidthLevel(), user_details.getRankHeightLevel(), null);
+			if(user_details.getRankXLevel() > 0 || user_details.getRankYLevel() > 0) {
+				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+				g.drawImage(rank, user_details.getRankXLevel(), user_details.getRankYLevel(), user_details.getRankWidthLevel(), user_details.getRankHeightLevel(), null);
+			}
 			Color color = new Color(user_details.getColorRLevel(), user_details.getColorGLevel(), user_details.getColorBLevel());
 			g.setColor(color);
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g.setFont(new Font("Nexa Bold", Font.BOLD, generalTextFontSize));
-			g.drawString(levelS1+""+levelS2, getCenteredString(levelS1+""+levelS2, user_details.getLevelXLevel(), g), user_details.getLevelYLevel());
-			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
-			g.drawString(name, user_details.getNameXLevel(), user_details.getNameYLevel());
+			if(user_details.getLevelXLevel() > 0 || user_details.getLevelYLevel() > 0) {
+				g.setFont(new Font("Nexa Bold", Font.BOLD, generalTextFontSize));
+				g.drawString(levelS1+""+levelS2, getCenteredString(levelS1+""+levelS2, user_details.getLevelXLevel(), g), user_details.getLevelYLevel());
+			}
+			if(user_details.getNameXLevel() > 0 || user_details.getNameYLevel() > 0) {
+				g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
+				g.drawString(name, user_details.getNameXLevel(), user_details.getNameYLevel());
+			}
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"lvup_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 			g.dispose();
 			
@@ -129,24 +136,27 @@ public class RankingMethods extends ListenerAdapter{
 			Graphics2D g = overlay.createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			g.drawImage(rank, 0, 0, null);
-			g.drawImage(experienceBar, user_details.getBarXRank(), user_details.getBarYRank(), null);
-			level = blurImage(level);
-			g.drawImage(level, user_details.getRankXRank(), user_details.getRankYRank(), user_details.getRankWidthRank(), user_details.getRankHeightRank(), null);
-			g.drawImage(avatarPicture, user_details.getAvatarXRank(), user_details.getAvatarYRank(), user_details.getAvatarWidthRank(), user_details.getAvatarHeightRank(), null);
+			if(user_details.getBarXRank() > 0 || user_details.getBarYRank() > 0)
+				g.drawImage(experienceBar, user_details.getBarXRank(), user_details.getBarYRank(), null);
+			if(user_details.getRankXRank() > 0 || user_details.getRankYRank() > 0)
+				g.drawImage(blurImage(level), user_details.getRankXRank(), user_details.getRankYRank(), user_details.getRankWidthRank(), user_details.getRankHeightRank(), null);
+			if(user_details.getAvatarXRank() > 0 || user_details.getAvatarYRank() > 0)
+				g.drawImage(avatarPicture, user_details.getAvatarXRank(), user_details.getAvatarYRank(), user_details.getAvatarWidthRank(), user_details.getAvatarHeightRank(), null);
 			Color color = new Color(user_details.getColorRRank(), user_details.getColorGRank(), user_details.getColorBRank());
 			g.setColor(color);
 			g.setFont(new Font("Nexa Bold", Font.PLAIN, generalTextFontSize));
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			if(user_details.getAdditionalExpTextRank() == true) {
+			if(user_details.getExpTextXRank() > 0 || user_details.getExpTextYProfile() > 0)
 				g.drawString("Exp:", user_details.getExpTextXRank(), user_details.getExpTextYRank());
-			}
-			if(user_details.getAdditionalPercentTextRank() == true) {
+			if(user_details.getPercentTextXRank() > 0 || user_details.getPercentTextYRank() > 0)
 				g.drawString(levelT+"%", user_details.getPercentTextXRank(), user_details.getPercentTextYRank());
-			}
 			var rankString = insertDots(_rank);
-			g.drawString("Rank:  #"+rankString, user_details.getPlacementXRank(), user_details.getPlacementYRank());
-			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
-			g.drawString(name, user_details.getNameXRank(), user_details.getNameYRank());
+			if(user_details.getPlacementXRank() > 0 || user_details.getPlacementYRank() > 0)
+				g.drawString("Rank:  #"+rankString, user_details.getPlacementXRank(), user_details.getPlacementYRank());
+			if(user_details.getNameXRank() > 0 || user_details.getNameYRank() > 0) {
+				g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
+				g.drawString(name, user_details.getNameXRank(), user_details.getNameYRank());
+			}
 			
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 			g.dispose();
@@ -201,53 +211,72 @@ public class RankingMethods extends ListenerAdapter{
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g.drawImage(experienceBar, user_details.getBarXProfile(), user_details.getBarYProfile(), null);
-			level = blurImage(level);
-			g.drawImage(level, user_details.getRankXProfile(), user_details.getRankYProfile(), user_details.getRankWidthProfile(), user_details.getRankHeightProfile(), null);
-			g.drawImage(avatarPicture, user_details.getAvatarXProfile(), user_details.getAvatarYProfile(), user_details.getAvatarWidthProfile(), user_details.getAvatarHeightProfile(), null);
+			if(user_details.getBarXProfile() > 0 || user_details.getBarYProfile() > 0)
+				g.drawImage(experienceBar, user_details.getBarXProfile(), user_details.getBarYProfile(), null);
+			if(user_details.getRankXProfile() > 0 || user_details.getRankYProfile() > 0)
+				g.drawImage(blurImage(level), user_details.getRankXProfile(), user_details.getRankYProfile(), user_details.getRankWidthProfile(), user_details.getRankHeightProfile(), null);
+			if(user_details.getAvatarXProfile() > 0 || user_details.getAvatarYProfile() > 0)
+				g.drawImage(avatarPicture, user_details.getAvatarXProfile(), user_details.getAvatarYProfile(), user_details.getAvatarWidthProfile(), user_details.getAvatarHeightProfile(), null);
 			Color color = new Color(user_details.getColorRProfile(), user_details.getColorGProfile(), user_details.getColorBProfile());
 			g.setColor(color);
 			g.setFont(new Font("Nexa Bold", Font.PLAIN, generalTextFontSize));
-			if(user_details.getAdditionalExpTextProfile() == true) {
+			if(user_details.getExpTextXProfile() > 0 || user_details.getExpTextYProfile() > 0) {
 				g.drawString("Exp:", user_details.getExpTextXProfile(), user_details.getExpTextYProfile());
 			}
-			if(user_details.getAdditionalPercentTextProfile() == true) {
+			if(user_details.getPercentTextXProfile() > 0 || user_details.getPercentTextYProfile() > 0) {
 				g.drawString(levelT+"%", user_details.getPercentTextXProfile(), user_details.getPercentTextYProfile());
 			}
 			
 			if(descriptionMode == 0) {
-				g.drawString(""+user_details.getLevel(), user_details.getLevelXProfile(), user_details.getLevelYProfile());
-				var experienceString = insertDots(user_details.getExperience());
-				g.drawString(""+experienceString, user_details.getExperienceXProfile(), user_details.getExperienceYProfile());
-				var currencyString = insertDots(user_details.getCurrency());
-				g.drawString(currencyString, user_details.getCurrencyXProfile(), user_details.getCurrencyYProfile());
-				var rankString = insertDots(rank);
-				g.drawString(rankString, user_details.getPlacementXProfile(), user_details.getPlacementYProfile());
+				if(user_details.getLevelXProfile() > 0 || user_details.getLevelYProfile() > 0)
+					g.drawString(""+user_details.getLevel(), user_details.getLevelXProfile(), user_details.getLevelYProfile());
+				if(user_details.getExperienceXProfile() > 0 || user_details.getExperienceYProfile() > 0)
+					g.drawString(insertDots(user_details.getExperience()), user_details.getExperienceXProfile(), user_details.getExperienceYProfile());
+				if(user_details.getCurrencyXProfile() > 0 || user_details.getCurrencyYProfile() > 0)
+					g.drawString(insertDots(user_details.getCurrency()), user_details.getCurrencyXProfile(), user_details.getCurrencyYProfile());
+				if(user_details.getPlacementXProfile() > 0 || user_details.getPlacementYProfile() > 0)
+					g.drawString(insertDots(rank), user_details.getPlacementXProfile(), user_details.getPlacementYProfile());
 			}
 			else if(descriptionMode == 1) {
-				g.drawString(""+user_details.getLevel(), getCenteredString(""+user_details.getLevel(), user_details.getLevelXProfile(), g), user_details.getLevelYProfile());
-				var experienceString = insertDots(user_details.getExperience());
-				g.drawString(""+experienceString, getCenteredString(""+experienceString, user_details.getExperienceXProfile(), g), user_details.getExperienceYProfile());
-				var currencyString = insertDots(user_details.getCurrency());
-				g.drawString(currencyString, getCenteredString(currencyString, user_details.getCurrencyXProfile(), g), user_details.getCurrencyYProfile());
-				var rankString = insertDots(rank);
-				g.drawString(rankString, getCenteredString(rankString, user_details.getPlacementXProfile(), g), user_details.getPlacementYProfile());
+				if(user_details.getLevelXProfile() > 0 || user_details.getLevelYProfile() > 0)
+					g.drawString(""+user_details.getLevel(), getCenteredString(""+user_details.getLevel(), user_details.getLevelXProfile(), g), user_details.getLevelYProfile());
+				if(user_details.getExperienceXProfile() > 0 || user_details.getExperienceYProfile() > 0) {
+					var experienceString = insertDots(user_details.getExperience());
+					g.drawString(experienceString, getCenteredString(experienceString, user_details.getExperienceXProfile(), g), user_details.getExperienceYProfile());
+				}
+				if(user_details.getCurrencyXProfile() > 0 || user_details.getCurrencyYProfile() > 0) {
+					var currencyString = insertDots(user_details.getCurrency());
+					g.drawString(currencyString, getCenteredString(currencyString, user_details.getCurrencyXProfile(), g), user_details.getCurrencyYProfile());
+				}
+				if(user_details.getPlacementXProfile() > 0 || user_details.getPlacementYProfile() > 0) {
+					var rankString = insertDots(rank);
+					g.drawString(rankString, getCenteredString(rankString, user_details.getPlacementXProfile(), g), user_details.getPlacementYProfile());
+				}
 			}
 			else if(descriptionMode == 2) {
-				g.drawString(""+user_details.getLevel(), getRightString(""+user_details.getLevel(), user_details.getLevelXProfile(), g), user_details.getLevelYProfile());
-				var experienceString = insertDots(user_details.getExperience());
-				g.drawString(""+experienceString, getRightString(""+experienceString, user_details.getExperienceXProfile(), g), user_details.getExperienceYProfile());
-				var currencyString = insertDots(user_details.getCurrency());
-				g.drawString(currencyString, getRightString(currencyString, user_details.getCurrencyXProfile(), g), user_details.getCurrencyYProfile());
-				var rankString = insertDots(rank);
-				g.drawString(rankString, getRightString(rankString, user_details.getPlacementXProfile(), g), user_details.getPlacementYProfile());
+				if(user_details.getLevelXProfile() > 0 || user_details.getLevelYProfile() > 0)
+					g.drawString(""+user_details.getLevel(), getRightString(""+user_details.getLevel(), user_details.getLevelXProfile(), g), user_details.getLevelYProfile());
+				if(user_details.getExperienceXProfile() > 0 || user_details.getExperienceYProfile() > 0) {
+					var experienceString = insertDots(user_details.getExperience());
+					g.drawString(""+experienceString, getRightString(""+experienceString, user_details.getExperienceXProfile(), g), user_details.getExperienceYProfile());
+				}
+				if(user_details.getCurrencyXProfile() > 0 || user_details.getCurrencyYProfile() > 0) {
+					var currencyString = insertDots(user_details.getCurrency());
+					g.drawString(currencyString, getRightString(currencyString, user_details.getCurrencyXProfile(), g), user_details.getCurrencyYProfile());
+				}
+				if(user_details.getPlacementXProfile() > 0 || user_details.getPlacementYProfile() > 0) {
+					var rankString = insertDots(rank);
+					g.drawString(rankString, getRightString(rankString, user_details.getPlacementXProfile(), g), user_details.getPlacementYProfile());
+				}
 			}
-			var currentExperienceString = insertDots(currentExperience);
-			var rankUpExperienceString = insertDots(rankUpExperience);
-			g.drawString(currentExperienceString+"/"+rankUpExperienceString, getRightString(""+currentExperienceString, user_details.getExpReachXProfile(), g), user_details.getExpReachYProfile());
-
-			g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
-			g.drawString(name, 126, 56);
+			if(user_details.getExpReachXProfile() > 0 || user_details.getExpReachYProfile() > 0) {
+				var currentExperienceString = insertDots(currentExperience);
+				g.drawString(currentExperienceString+"/"+insertDots(rankUpExperience), getRightString(""+currentExperienceString, user_details.getExpReachXProfile(), g), user_details.getExpReachYProfile());
+			}
+			if(user_details.getNameXProfile() > 0 || user_details.getNameYProfile() > 0) {
+				g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
+				g.drawString(name, user_details.getNameXProfile(), user_details.getNameYProfile());
+			}
 			
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 			g.dispose();

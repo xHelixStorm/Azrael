@@ -73,7 +73,7 @@ public class GuildListener extends ListenerAdapter {
 		}
 		else {
 			if(guild_settings.getRankingState()) {
-				Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id, guild_settings.getThemeID());
+				Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
 				if(user_details.getCurrentRole() != 0) {e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(user_details.getCurrentRole())).queue();}
 			}
 		}
