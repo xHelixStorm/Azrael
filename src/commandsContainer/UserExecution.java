@@ -590,39 +590,40 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("warning")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					if(!Azrael.SQLisBanned(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong()) && !UserPrivs.isUserMuted(_e.getGuild().getMemberById(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).getUser(), _e.getGuild().getIdLong())) {
-						int db_warning = Azrael.SQLgetData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong()).getWarningID();
+					var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
+					if(!Azrael.SQLisBanned(user_id, _e.getGuild().getIdLong()) && ( _e.getGuild().getMemberById(user_id) == null || !UserPrivs.isUserMuted(_e.getGuild().getMemberById(user_id).getUser(), _e.getGuild().getIdLong()))) {
+						int db_warning = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID();
 						if(db_warning != 0) {
 							int warning_id = Integer.parseInt(_message.replaceAll("[^0-9]*", ""));
 							int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
 							if(warning_id == 0) {
-								if(Azrael.SQLDeleteData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong()) > 0) {
+								if(Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong()) > 0) {
 									_e.getChannel().sendMessage("The warnings of this user has been cleared!").queue();
-									logger.debug("{} has cleared the warnings from {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+									logger.debug("{} has cleared the warnings from {} in guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getId());
 								}
 								else {
 									_e.getChannel().sendMessage("An internal error occurred. The warnings of this user couldn't be cleared from Azrael.bancollect").queue();
-									logger.error("The warnings of the user {} in guild {} couldn't be cleared", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+									logger.error("The warnings of the user {} in guild {} couldn't be cleared", user_id, _e.getGuild().getId());
 								}
 							}
 							else if(warning_id <= max_warning_id) {
-								if(Azrael.SQLUpdateWarning(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]", "")), _e.getGuild().getIdLong(), warning_id) > 0) {
+								if(Azrael.SQLUpdateWarning(user_id, _e.getGuild().getIdLong(), warning_id) > 0) {
 									_e.getChannel().sendMessage("Warning value "+warning_id+" has been set!").queue();
-									logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+									logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), warning_id, user_id, _e.getGuild().getId());
 								}
 								else {
 									_e.getChannel().sendMessage("An internal error occurred. The warning level of the selected user couldn't be updated on Azrael.bancollect").queue();
-									logger.error("Warning on user {} couldn't be updated on Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+									logger.error("Warning on user {} couldn't be updated on Azrael.bancollect in guild {}", user_id, _e.getGuild().getId());
 								}
 							}
 							else {
-								if(Azrael.SQLUpdateWarning(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]", "")), _e.getGuild().getIdLong(), max_warning_id) > 0) {
+								if(Azrael.SQLUpdateWarning(user_id, _e.getGuild().getIdLong(), max_warning_id) > 0) {
 									_e.getChannel().sendMessage("The max possible value "+max_warning_id+" has been set because your input exceeded the max possible warning!").queue();
-									logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), max_warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+									logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), max_warning_id, user_id, _e.getGuild().getId());
 								}
 								else {
 									_e.getChannel().sendMessage("An internal error occurred. The warning level of the selected user couldn't be updated on Azrael.bancollect").queue();
-									logger.error("Warning on user {} couldn't be updated on Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+									logger.error("Warning on user {} couldn't be updated on Azrael.bancollect in guild {}", user_id, _e.getGuild().getId());
 								}
 							}
 						}
@@ -631,29 +632,29 @@ public class UserExecution {
 								int warning_id = Integer.parseInt(_message.replaceAll("[^0-9]*", ""));
 								int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
 								if(warning_id <= max_warning_id) {
-									if(Azrael.SQLInsertData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong(), warning_id, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false) > 0) {
+									if(Azrael.SQLInsertData(user_id, _e.getGuild().getIdLong(), warning_id, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false) > 0) {
 										_e.getChannel().sendMessage("Warning value "+warning_id+" has been set!").queue();
-										logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+										logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), warning_id, user_id, _e.getGuild().getId());
 									}
 									else {
 										_e.getChannel().sendMessage("An internal error occurred. The warning level of the selected user couldn't be inserted in Azrael.bancollect").queue();
-										logger.error("Warning on user {} couldn't be inserted in Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+										logger.error("Warning on user {} couldn't be inserted in Azrael.bancollect in guild {}", user_id, _e.getGuild().getId());
 									}
 								}
 								else {
-									if(Azrael.SQLInsertData(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]",  "")), _e.getGuild().getIdLong(), max_warning_id, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false) > 0) {
+									if(Azrael.SQLInsertData(user_id, _e.getGuild().getIdLong(), max_warning_id, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false) > 0) {
 										_e.getChannel().sendMessage("The max possible value "+max_warning_id+" has been set because your input exceeded the max possible warning!").queue();
-										logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), max_warning_id, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+										logger.debug("{} has set the warning level to {} from {} in guild {}", _e.getMember().getUser().getId(), max_warning_id, user_id, _e.getGuild().getId());
 									}
 									else {
 										_e.getChannel().sendMessage("An internal error occurred. The warning level of the selected user couldn't be inserted in Azrael.bancollect").queue();
-										logger.error("Warning on user {} couldn't be inserted in Azrael.bancollect in guild {}", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+										logger.error("Warning on user {} couldn't be inserted in Azrael.bancollect in guild {}", user_id, _e.getGuild().getId());
 									}
 								}
 							}
 							else {
 								_e.getChannel().sendMessage("A custom warning can't be set because the player was never muted or was freshly unbanned!").queue();
-								logger.warn("{} got no available warnings to be edit", cache.getAdditionalInfo().replaceAll("[^0-9]",  ""));
+								logger.warn("{} got no available warnings to be edit", user_id);
 							}
 						}
 					}
