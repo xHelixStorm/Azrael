@@ -33,7 +33,7 @@ public class RankingMethods extends ListenerAdapter {
 	
 	public static void getRankUp(GuildMessageReceivedEvent e , int theme_id, Rank user_details) {		
 		try {
-			BufferedImage rankUp = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/levelup"+user_details.getRankingLevel()+"_blank.png"));
+			BufferedImage rankUp = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/"+user_details.getLevelDescription()+".png"));
 			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+user_details.getLevel()+".png"));
 			String name = e.getMember().getEffectiveName();
 			int characterCounter = name.length();
@@ -100,7 +100,7 @@ public class RankingMethods extends ListenerAdapter {
 	
 	public static void getRank(GuildMessageReceivedEvent e, String _name, String _avatar, int _experience, int _rank, int theme_id, Rank user_details) {		
 		try{
-			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/rank"+user_details.getRankingRank()+"_blank.png"));
+			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/"+user_details.getRankDescription()+".png"));
 			BufferedImage experienceBar;
 			if(_experience != 0) {
 				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+user_details.getBarColorRank()+"_"+100+".png"));
@@ -136,8 +136,7 @@ public class RankingMethods extends ListenerAdapter {
 			Graphics2D g = overlay.createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			g.drawImage(rank, 0, 0, null);
-			if(user_details.getBarXRank() > 0 || user_details.getBarYRank() > 0)
-				g.drawImage(experienceBar, user_details.getBarXRank(), user_details.getBarYRank(), null);
+			g.drawImage(experienceBar, user_details.getBarXRank(), user_details.getBarYRank(), null);
 			if(user_details.getRankXRank() > 0 || user_details.getRankYRank() > 0)
 				g.drawImage(blurImage(level), user_details.getRankXRank(), user_details.getRankYRank(), user_details.getRankWidthRank(), user_details.getRankHeightRank(), null);
 			if(user_details.getAvatarXRank() > 0 || user_details.getAvatarYRank() > 0)
@@ -171,7 +170,7 @@ public class RankingMethods extends ListenerAdapter {
 	
 	public static void getProfile(GuildMessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _rank, int currentExperience, int rankUpExperience, int theme_id, Rank user_details) {		
 		try{
-			BufferedImage profile = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/profile"+user_details.getRankingProfile()+"_blank.png"));
+			BufferedImage profile = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/"+user_details.getProfileDescription()+".png"));
 			BufferedImage experienceBar;
 			if(_experiencePercentage != 0) {
 				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+user_details.getBarColorProfile()+"_"+100+".png"));
@@ -211,8 +210,7 @@ public class RankingMethods extends ListenerAdapter {
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			if(user_details.getBarXProfile() > 0 || user_details.getBarYProfile() > 0)
-				g.drawImage(experienceBar, user_details.getBarXProfile(), user_details.getBarYProfile(), null);
+			g.drawImage(experienceBar, user_details.getBarXProfile(), user_details.getBarYProfile(), null);
 			if(user_details.getRankXProfile() > 0 || user_details.getRankYProfile() > 0)
 				g.drawImage(blurImage(level), user_details.getRankXProfile(), user_details.getRankYProfile(), user_details.getRankWidthProfile(), user_details.getRankHeightProfile(), null);
 			if(user_details.getAvatarXProfile() > 0 || user_details.getAvatarYProfile() > 0)

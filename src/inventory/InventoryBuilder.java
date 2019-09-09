@@ -66,12 +66,14 @@ public class InventoryBuilder {
 				for(InventoryContent inventory : _items){
 					i++;
 					BufferedImage item;
-					if(inventory.getType() != null)
-						item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/items/"+inventory.getDescription()+".png"));
+					if(inventory.getType().equals("ite"))
+						item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Items/"+inventory.getDescription()+".png"));
+					else if(inventory.getType() != null)
+						item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/"+inventory.getDescription()+".png"));
 					else if(inventory.getSkillDescription() == null)
-						item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/weapons/"+inventory.getWeaponDescription()+".png"));
+						item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Weapons/"+inventory.getWeaponDescription()+".png"));
 					else
-						item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/skills/"+inventory.getSkillDescription()+".png"));
+						item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skills/"+inventory.getSkillDescription()+".png"));
 					g.drawImage(item, currentX+(boxSizeX/2)-(item.getWidth()/2), currentY+boxSizeY-(item.getHeight()/2), (itemSizeX != 0 ? itemSizeX : item.getWidth()), (itemSizeY != 0 ? itemSizeY : item.getHeight()), null);
 					g.drawString((inventory.getDescription() != null ? inventory.getDescription() : (inventory.getWeaponDescription() != null ? inventory.getWeaponDescription()+" "+inventory.getStat() : inventory.getSkillDescription())), currentX+getCenteredString(inventory.getDescription() != null ? inventory.getDescription() : (inventory.getWeaponDescription() != null ? inventory.getWeaponDescription()+ " "+inventory.getStat() : inventory.getSkillDescription()), boxSizeX, g), currentY+boxSizeY+descriptionY);
 					if(inventory.getType() == null || inventory.getType().equals("ite")){

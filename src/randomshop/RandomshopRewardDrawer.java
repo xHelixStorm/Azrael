@@ -20,8 +20,8 @@ public class RandomshopRewardDrawer {
 	
 	public static void drawReward(GuildMessageReceivedEvent e, Weapons weapon, long currency, int theme_id) {
 		try {
-			BufferedImage rewardOverlay = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/"+weapon.getOverlayName()+".png"));
-			BufferedImage drawWeapon = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/weapons/"+weapon.getDescription()+".png"));
+			BufferedImage rewardOverlay = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Randomshop/"+weapon.getOverlayName()+".png"));
+			BufferedImage drawWeapon = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Weapons/"+weapon.getDescription()+".png"));
 			
 			int[] rand = GuildIni.getWholeRandomshopReward(e.getGuild().getIdLong());
 			final int overlayW = rewardOverlay.getWidth();

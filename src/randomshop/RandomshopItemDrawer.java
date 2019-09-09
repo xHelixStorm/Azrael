@@ -24,7 +24,7 @@ public class RandomshopItemDrawer {
 	
 	public static void drawItems(GuildMessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<Weapons> weapons, int current_page, int last_page, int theme_id) {
 		try {
-			BufferedImage randomshop = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/randomshop_blank.png"));
+			BufferedImage randomshop = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Randomshop/randomshop_blank.png"));
 			
 			int [] rand = GuildIni.getWholeRandomshopItems((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()));
 			final var startX = rand[0];
@@ -51,7 +51,7 @@ public class RandomshopItemDrawer {
 			var currentY = startY;
 			for(var weapon : weapons) {
 				counter++;
-				BufferedImage currentWeapon = ImageIO.read(new File("./files/RankingSystem/Inventory/weapons/"+weapon.getDescription()+".png"));
+				BufferedImage currentWeapon = ImageIO.read(new File("./files/RankingSystem/Weapons/"+weapon.getDescription()+".png"));
 				g.drawImage(currentWeapon, currentX+(sizeX/2)-(itemSizeX/2), currentY+(sizeY/2)-(itemSizeY/2), (itemSizeX != 0 ? itemSizeX : currentWeapon.getWidth()), (itemSizeY != 0 ? itemSizeY : currentWeapon.getHeight()), null);
 				if(counter % rowLimit != 0) {
 					currentX += moveX;
