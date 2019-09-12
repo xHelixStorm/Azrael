@@ -1513,7 +1513,7 @@ public class RankingSystem {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT all_enabled_skins WHERE fk_theme_id = ?");
+				String sql = ("SELECT * FROM all_enabled_skins WHERE fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _theme_id);
 				rs = stmt.executeQuery();
