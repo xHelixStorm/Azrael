@@ -1,8 +1,6 @@
 package commands;
 
 import java.awt.Color;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +31,6 @@ public class Register implements CommandPublic {
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
-		ExecutorService executor = Executors.newSingleThreadExecutor();
 		var guild_id = e.getGuild().getIdLong();
 		var adminPermission = (GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong());
 		final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
@@ -142,9 +139,8 @@ public class Register implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase("-users")) {
 				final var commandLevel = GuildIni.getRegisterUsersLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					executor.execute(new CollectUsers(e));
+					new Thread(new CollectUsers(e)).start();
 					e.getChannel().sendMessage("All users in this server are being registered. Please wait...").queue();
-					executor.shutdown();
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);

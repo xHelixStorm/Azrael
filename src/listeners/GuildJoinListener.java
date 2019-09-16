@@ -1,8 +1,6 @@
 package listeners;
 
 import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +40,7 @@ public class GuildJoinListener extends ListenerAdapter {
 		}
 		if(!new File("./ini/"+guild_id+".ini").exists())
 			GuildIni.createIni(e.getGuild().getIdLong());
-		ExecutorService executor = Executors.newSingleThreadExecutor();
-		executor.execute(new BotStartAssign(null, e));
-		executor.shutdown();
+		new Thread(new BotStartAssign(null, e)).start();
 		Azrael.SQLInsertActionLog("GUILD_JOIN", e.getGuild().getIdLong(), e.getGuild().getIdLong(), guild_name);
 	}
 }

@@ -1549,7 +1549,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT item_id FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_user_id = ? AND item_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? AND enabled = 1");
+			String sql = ("SELECT item_id FROM inventory_items WHERE user_id = ? AND item_id = ? AND guild_id = ? AND theme_id = ? AND enabled = 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
@@ -1577,7 +1577,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT item_id, fk_skin, fk_status FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_user_id = ? AND shop_content.description LIKE ? AND fk_status LIKE \"perm\" AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? AND shop_content.enabled = 1");
+			String sql = ("SELECT item_id, skin, status FROM inventory_items WHERE user_id = ? AND description LIKE ? AND status LIKE \"perm\" AND guild_id = ? AND theme_id = ? AND enabled = 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _description);
@@ -1605,7 +1605,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT number FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_user_id = ? AND description LIKE ? AND fk_status LIKE ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ?");
+			String sql = ("SELECT number FROM inventory_items WHERE user_id = ? AND description LIKE ? AND status LIKE ? AND guild_id = ? AND theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _description);
@@ -1635,7 +1635,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name, skill_shop_content.description FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id LEFT JOIN skill_shop_content ON inventory.fk_skill_id = skill_shop_content.skill_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? ORDER BY position desc LIMIT ?, ?");
+			String sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? ORDER BY position desc LIMIT ?, ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -1678,7 +1678,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? AND shop_content.fk_skin = \"ite\" ORDER BY position desc LIMIT ?, ?");
+			String sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? AND skin = \"ite\" ORDER BY position desc LIMIT ?, ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -1721,7 +1721,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name, skill_shop_content.description FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id LEFT JOIN skill_shop_content ON inventory.fk_skill_id = skill_shop_content.skill_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? AND (inventory.fk_weapon_id IS NOT NULL OR inventory.fk_skill_id IS NOT NULL) ORDER BY position desc LIMIT ?, ?");
+			String sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? AND (weapon_id IS NOT NULL OR skill_id IS NOT NULL) ORDER BY position desc LIMIT ?, ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -1766,14 +1766,14 @@ public class RankingSystem {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
 			String sql = "";
 			if(!_category.equalsIgnoreCase("skill")) {
-				sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name, skill_shop_content.description FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id LEFT JOIN skill_shop_content ON inventory.fk_skill_id = skill_shop_content.skill_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? AND inventory.fk_weapon_id IS NOT NULL AND weapon_category.name LIKE ? ORDER BY position desc LIMIT ?, ?");
+				sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? AND weapon_id IS NOT NULL AND name LIKE ? ORDER BY position desc LIMIT ?, ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setString(4, _category);
 				stmt.setInt(5, _limit);
 				stmt.setInt(6, _maxItems);
 			}
 			else {
-				sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin, weapon_shop_content.description, weapon_stats.stat, weapon_category.category_id, weapon_category.name, skill_shop_content.description FROM inventory LEFT JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id LEFT JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id LEFT JOIN weapon_stats ON weapon_stat = stat_id LEFT JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id LEFT JOIN skill_shop_content ON inventory.fk_skill_id = skill_shop_content.skill_id WHERE fk_user_id = ? AND inventory.fk_guild_id = ? AND inventory.fk_theme_id = ? AND inventory.fk_skill_id IS NOT NULL ORDER BY position desc LIMIT ?, ?");
+				sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? AND skill_id IS NOT NULL ORDER BY position desc LIMIT ?, ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(4, _limit);
 				stmt.setInt(5, _maxItems);
@@ -1817,7 +1817,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, number, fk_status, expires, shop_content.description, shop_content.fk_skin FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_user_id = ? AND fk_guild_id = ? AND inventory.fk_theme_id = ? AND shop_content.fk_skin != 'ite' ORDER BY position desc LIMIT ?, ?");
+			String sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? AND skin != 'ite' ORDER BY position desc LIMIT ?, ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -1855,7 +1855,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT fk_user_id, position, description FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_user_id = ? AND fk_guild_id = ? AND inventory.fk_theme_id = ? ORDER BY position desc");
+			String sql = ("SELECT user_id, position, description FROM inventory_items WHERE user_id = ? AND guild_id = ? AND theme_id = ? ORDER BY position desc");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);

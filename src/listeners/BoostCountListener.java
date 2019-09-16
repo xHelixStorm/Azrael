@@ -3,6 +3,9 @@ package listeners;
 import java.awt.Color;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateBoostCountEvent;
@@ -10,10 +13,12 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 import sql.DiscordRoles;
 
-public class BoostCountListener extends ListenerAdapter{
+public class BoostCountListener extends ListenerAdapter {
+	Logger logger = LoggerFactory.getLogger(BoostCountListener.class);
 	
 	@Override
 	public void onGuildUpdateBoostCount(GuildUpdateBoostCountEvent e) {
+		logger.debug("Server boos value changed to {} for guild {}", e.getNewValue(), e.getGuild().getIdLong());
 		var boostRole = DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "boo");
 		if(boostRole != 0) {
 			List<Member> passedBoosters = e.getGuild().getMembersWithRoles(e.getGuild().getRoleById(boostRole));

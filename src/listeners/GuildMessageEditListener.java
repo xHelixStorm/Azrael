@@ -1,8 +1,5 @@
 package listeners;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import filter.LanguageEditFilter;
 import filter.URLFilter;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
@@ -17,15 +14,12 @@ public class GuildMessageEditListener extends ListenerAdapter{
 		var filter_lang = Azrael.SQLgetChannel_Filter(channel_id);
 		
 		var allChannels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
-		ExecutorService executor = Executors.newSingleThreadExecutor();
 		if(filter_lang.size() > 0) {
-			executor.execute(new LanguageEditFilter(e, filter_lang, allChannels));
+			new Thread(new LanguageEditFilter(e, filter_lang, allChannels)).start();
 			if(allChannels.parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getURLCensoring()).findAny().orElse(null) != null)
-				executor.execute(new URLFilter(null, e, filter_lang, allChannels));
+				new Thread(new URLFilter(null, e, filter_lang, allChannels)).start();
 		}
 		else if(allChannels.parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getURLCensoring()).findAny().orElse(null) != null)
-			executor.execute(new URLFilter(null, e, filter_lang, allChannels));
-		
-		executor.shutdown();
+			new Thread(new URLFilter(null, e, filter_lang, allChannels)).start();
 	}
 }

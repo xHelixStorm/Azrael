@@ -83,7 +83,7 @@ public class DiscordRoles {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT roles.role_id, roles.name, roles.level, role_category.category_abv, role_category.rank FROM guilds INNER JOIN roles ON guilds.guild_id = roles.fk_guild_id INNER JOIN role_category ON roles.fk_category_abv = role_category.category_abv WHERE guild_id = ? && roles.role_id = ?");
+				String sql = ("SELECT * FROM all_roles WHERE guild_id = ? && role_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				stmt.setLong(2, _role_id);
@@ -222,7 +222,7 @@ public class DiscordRoles {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT roles.role_id, roles.name, roles.level, role_category.category_abv, role_category.rank FROM guilds INNER JOIN roles ON guilds.guild_id = roles.fk_guild_id INNER JOIN role_category ON roles.fk_category_abv = role_category.category_abv WHERE guild_id = ?");
+			String sql = ("SELECT * FROM all_roles WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
@@ -256,7 +256,7 @@ public class DiscordRoles {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT roles.role_id, roles.name, roles.level, role_category.category_abv, role_category.rank FROM guilds INNER JOIN roles ON guilds.guild_id = roles.fk_guild_id INNER JOIN role_category ON roles.fk_category_abv = role_category.category_abv WHERE guild_id = ? AND role_category.category_abv LIKE ?");
+				String sql = ("SELECT * FROM all_roles WHERE guild_id = ? AND category_abv LIKE ?");
 				boolean success = false;
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);

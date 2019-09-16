@@ -1,8 +1,5 @@
 package commands;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,17 +26,13 @@ public class User implements CommandPublic {
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
-		ExecutorService executor = Executors.newSingleThreadExecutor();
-		executor.execute(() -> {
-			final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-			if(args.length == 0) {
-				UserExecution.getHelp(e);
-			}
-			else if(args.length > 0) {
-				UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]", ""), e.getMessage().getContentDisplay().substring(prefix.length()+5));
-			}
-		});
-		executor.shutdown();
+		final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+		if(args.length == 0) {
+			UserExecution.getHelp(e);
+		}
+		else if(args.length > 0) {
+			UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]", ""), e.getMessage().getContentDisplay().substring(prefix.length()+5));
+		}
 	}
 
 	@Override

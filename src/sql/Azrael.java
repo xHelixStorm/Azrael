@@ -2081,7 +2081,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT name, fk_user_id, level FROM watchlist INNER JOIN users ON fk_user_id = user_id WHERE fk_guild_id = ? && higher_privileges = ?");
+			String sql = ("SELECT * FROM whole_watchlist WHERE guild_id = ? && higher_privileges = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setBoolean(2, _highPrivileges);

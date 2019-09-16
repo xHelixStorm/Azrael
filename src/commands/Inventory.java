@@ -47,14 +47,16 @@ public class Inventory implements CommandPublic {
 					EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 					e.getChannel().sendMessage(message.setDescription("- Type **-list** after the command to display the whole inventory as a list\n"
 							+ "- Type **-page** and then the page together with the command to directly select the page you wish to view\n"
-							+ "- Type the tab name to filter your inventory item by type. Available types are **items** and **weapons**\n"
+							+ "- Type the tab name to filter your inventory item by type. Available types are **items**, **weapons** and **skins**\n"
 							+ "- Type the sub tab after the tab name together with the command to further filter your inventory selection").build()).queue();
 				}
 				else if(args.length > 0 && args[0].equalsIgnoreCase("-list")){
-					String out = "";
+					StringBuilder out = new StringBuilder();
 					for(InventoryContent inventory : RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID())){
-						out+= (inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+" "+inventory.getStat())+"\n";
+						out.append((inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+" "+inventory.getStat())+"\n");
 					}
+					if(out.length() == 0)
+						out.append("Inventory is empty!");
 					e.getChannel().sendMessage("```"+out+"```").queue();
 				}
 				else{

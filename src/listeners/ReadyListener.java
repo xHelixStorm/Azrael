@@ -188,7 +188,7 @@ public class ReadyListener extends ListenerAdapter {
 		}
 		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		
-		ExecutorService executor = Executors.newFixedThreadPool(1);
+		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.execute(() -> { Azrael.SQLgetWholeWatchlist(); });
 		executor.execute(new BotStartAssign(e, null));
 		for(Guild g : e.getJDA().getGuilds()) {
