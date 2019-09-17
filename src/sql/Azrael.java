@@ -1853,12 +1853,12 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT url, format FROM rss WHERE fk_guild_id = ? ORDER BY timestamp asc");
+			String sql = ("SELECT url, format, type FROM rss WHERE fk_guild_id = ? ORDER BY timestamp asc");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				feeds.add(new RSS(rs.getString(1), rs.getString(2)));
+				feeds.add(new RSS(rs.getString(1), rs.getString(2), rs.getInt(3)));
 			}
 			Hashes.addFeeds(_guild_id, feeds);
 			return feeds;

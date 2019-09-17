@@ -701,15 +701,16 @@ public class UserExecution {
 				else if(comment.equals("no")) {
 					var mute_role_id = DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut");
 					if(mute_role_id != 0) {
-						try {
-							var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
+						var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
+						if(_e.getGuild().getMemberById(user_id) != null) {
+							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
 							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id)).queue();
 							var mute_time = (long)Azrael.SQLgetWarning(_e.getGuild().getIdLong(), Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID()+1).getTimer();
 							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "mute", (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!"), (mute_time/1000/60));
 							_e.getChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
 							checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
-							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
-						} catch(IllegalArgumentException iae) {
+						}
+						else {
 							_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the mute role after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
 							cache.updateDescription("mute-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
 							Hashes.addTempCache(key, cache);
@@ -738,8 +739,9 @@ public class UserExecution {
 					var mute_role_id = DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut");
 					
 					if(mute_role_id != 0) {
-						try {
-							long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
+						long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
+						if(_e.getGuild().getMemberById(user_id) != null) {
+							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(""+mute_time, _e.getMember().getAsMention(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
 							if(cache.getAdditionalInfo2().length() > 0) {
 								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id)).reason(cache.getAdditionalInfo2()).queue();
 								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), (mute_time/1000/60));
@@ -763,8 +765,8 @@ public class UserExecution {
 							_e.getChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
 							logger.debug("{} has muted {} in guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getId());
 							checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
-							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(""+mute_time, _e.getMember().getAsMention(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
-						} catch(IllegalArgumentException iae) {
+						}
+						else {
 							_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the mute role after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
 							cache.updateDescription("mute-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000).updateDescription3(""+mute_time);
 							Hashes.addTempCache(key, cache);
@@ -803,29 +805,32 @@ public class UserExecution {
 					int warning_id = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID();
 					int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
 					try {
-						PrivateChannel pc = _e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete();
-						if(warning_id == max_warning_id) {
-							pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
-									+ "On a important note, this is an automatic reply. You'll receive no reply in any way.\n"
-									+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).queue();
-							pc.close();
+						if(_e.getGuild().getMemberById(user_id) != null) {
+							Hashes.addTempCache("ban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), "No reason has been provided!"));
+							PrivateChannel pc = _e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete();
+							if(warning_id == max_warning_id) {
+								pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
+										+ "On a important note, this is an automatic reply. You'll receive no reply in any way.\n"
+										+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).queue();
+								pc.close();
+							}
+							else {
+								pc.sendMessage("You have been banned from "+_e.getGuild().getName()+". Thank you for your understanding.\n"
+										+ "On a important note, this is an automatic reply. You'll receive no reply in any way.\n"
+										+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).queue();
+								pc.close();
+							}
+							_e.getChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
+							_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason("User has been banned with the bot command!").queue();
+							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "ban", "No reason has been provided!", 0);
+							logger.debug("{} has banned {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getId());
+							checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 						}
 						else {
-							pc.sendMessage("You have been banned from "+_e.getGuild().getName()+". Thank you for your understanding.\n"
-									+ "On a important note, this is an automatic reply. You'll receive no reply in any way.\n"
-									+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).queue();
-							pc.close();
+							_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the ban after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
+							cache.updateDescription("ban-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).updateDescription2("No reason has been provided!").setExpiration(180000);
+							Hashes.addTempCache(key, cache);
 						}
-						_e.getChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
-						_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason("User has been banned with the bot command!").queue();
-						Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "ban", "No reason has been provided!", 0);
-						logger.debug("{} has banned {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getId());
-						checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
-						Hashes.addTempCache("ban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), "No reason has been provided!"));
-					} catch(IllegalArgumentException | NullPointerException iae) {
-						_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the ban after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
-						cache.updateDescription("ban-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).updateDescription2("No reason has been provided!").setExpiration(180000);
-						Hashes.addTempCache(key, cache);
 					} catch(HierarchyException hye) {
 						_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The user you tried to ban has higher privileges than the bot. Action aborted!").build()).queue();
 						Hashes.clearTempCache(key);
@@ -837,29 +842,32 @@ public class UserExecution {
 				int warning_id = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID();
 				int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
 				try {
-					PrivateChannel pc = _e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete();
-					if(warning_id == max_warning_id) {
-						pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
-								+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
-								+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: "+_message : "")).queue();
-						pc.close();
+					if(_e.getGuild().getMemberById(user_id) != null) {
+						Hashes.addTempCache("ban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
+						PrivateChannel pc = _e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete();
+						if(warning_id == max_warning_id) {
+							pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
+									+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
+									+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: "+_message : "")).queue();
+							pc.close();
+						}
+						else {
+							pc.sendMessage("You have been banned from "+_e.getGuild().getName()+". Thank you for your understanding.\n"
+									+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
+									+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: "+_message : "")).queue();
+							pc.close();
+						}
+						_e.getChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
+						_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
+						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", _message, 0);
+						logger.debug("{} has banned {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+						checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 					}
 					else {
-						pc.sendMessage("You have been banned from "+_e.getGuild().getName()+". Thank you for your understanding.\n"
-								+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
-								+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: "+_message : "")).queue();
-						pc.close();
+						_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the ban after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
+						cache.updateDescription("ban-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000).updateDescription2(_message);
+						Hashes.addTempCache(key, cache);
 					}
-					_e.getChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
-					_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
-					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", _message, 0);
-					logger.debug("{} has banned {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
-					checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
-					Hashes.addTempCache("ban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
-				} catch(IllegalArgumentException | NullPointerException iae) {
-					_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the ban after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
-					cache.updateDescription("ban-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000).updateDescription2(_message);
-					Hashes.addTempCache(key, cache);
 				} catch(HierarchyException hye) {
 					_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The user you tried to ban has higher privileges than the bot. Action aborted!").build()).queue();
 					Hashes.clearTempCache(key);
@@ -887,7 +895,8 @@ public class UserExecution {
 				else if(comment.equals("no")) {
 					long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 					_e.getChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
-					try {
+					if(_e.getGuild().getMemberById(user_id) != null) {
+						Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), "No reason has been provided!"));
 						_e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete()
 						.sendMessage("You have been kicked from **"+_e.getGuild().getName()+"**.Thank you for your understanding.\n" 
 								+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
@@ -896,8 +905,8 @@ public class UserExecution {
 						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", "No reason has been provided!", 0);
 						logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getName());
 						checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
-						Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), "No reason has been provided!"));
-					} catch(IllegalArgumentException iae) {
+					}
+					else {
 						_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed because the user can't be found on the server!").build()).queue();
 						Hashes.clearTempCache(key);
 					}
@@ -906,7 +915,8 @@ public class UserExecution {
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("kick-reason")) {
 				long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 				_e.getChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
-				try {
+				if(_e.getGuild().getMemberById(user_id) != null) {
+					Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
 					_e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete()
 					.sendMessage("You have been kicked from **"+_e.getGuild().getName()+"**.Thank you for your understanding.\n" 
 							+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
@@ -915,10 +925,14 @@ public class UserExecution {
 					Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", _message, 0);
 					logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getName());
 					checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
-					Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
-				} catch(IllegalArgumentException iae) {
+				}
+				else {
 					_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed because the user can't be found on the server!").build()).queue();
 					Hashes.clearTempCache(key);
+				}
+				try {
+				} catch(IllegalArgumentException iae) {
+					
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("watch")) {

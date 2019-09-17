@@ -258,8 +258,6 @@ public class Display implements CommandPublic{
 				out.append("Patchnotes command: "+GuildIni.getPatchnotesLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Doubleexperience command: "+GuildIni.getDoubleExperienceLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Equip command: "+GuildIni.getEquipLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Watch command: "+GuildIni.getWatchLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Unwatch command: "+GuildIni.getUnwatchLevel(e.getGuild().getIdLong())+"\n");
 				
 				e.getChannel().sendMessage("`"+out.toString()+"`").queue();
 			}

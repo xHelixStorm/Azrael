@@ -35,10 +35,8 @@ import commands.Set;
 import commands.Shop;
 import commands.ShutDown;
 import commands.Top;
-import commands.Unwatch;
 import commands.Use;
 import commands.User;
-import commands.Watch;
 import fileManagement.IniFileReader;
 import listeners.AvatarUpdateListener;
 import listeners.BanListener;
@@ -139,8 +137,6 @@ public class Main {
 		CommandHandler.commandsPublic.put("patchnotes", new Patchnotes());
 		CommandHandler.commandsPublic.put("doubleexperience", new DoubleExperience());
 		CommandHandler.commandsPublic.put("equip", new Equip());
-		CommandHandler.commandsPublic.put("watch", new Watch());
-		CommandHandler.commandsPublic.put("unwatch", new Unwatch());
 	}
 	
 	public static void addPrivateCommands() {

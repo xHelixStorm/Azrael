@@ -163,10 +163,6 @@ public class GuildIni {
 			ini.add("Commands", "DoubleExperienceLevel", "20");
 			ini.add("Commands", "Equip", "false");
 			ini.add("Commands", "EquipLevel", "1");
-			ini.add("Commands", "Watch", "false");
-			ini.add("Commands", "WatchLevel", "20");
-			ini.add("Commands", "Unwatch", "false");
-			ini.add("Commands", "UnwatchLevel", "20");
 			
 			//Inventory
 			ini.add("Inventory", "startX", "0");
@@ -807,22 +803,6 @@ public class GuildIni {
 	public static int getEquipLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "EquipLevel", int.class);
-	}
-	public static boolean getWatchCommand(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("Commands", "Watch", boolean.class);
-	}
-	public static int getWatchLevel(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("Commands", "WatchLevel", int.class);
-	}
-	public static boolean getUnwatchCommand(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("Commands", "Unwatch", boolean.class);
-	}
-	public static int getUnwatchLevel(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("Commands", "UnwatchLevel", int.class);
 	}
 	
 	public static int[] getWholeInventory(long guild_id) {

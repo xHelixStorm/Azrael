@@ -23,15 +23,14 @@ import sql.Azrael;
 
 public class GuildListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildListener.class);
+	private final static EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
+	private final static EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name found!");
+	private final static EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle("An error occurred!");
 	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent e) {
 		new Thread(() -> {
 			logger.debug("{} has joined the guild {}", e.getUser().getId(), e.getGuild().getId());
-			EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
-			EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name found!");
-			EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle("An error occurred!");
-			
 			long user_id = e.getMember().getUser().getIdLong();
 			String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
 			long guild_id = e.getGuild().getIdLong();
@@ -83,21 +82,24 @@ public class GuildListener extends ListenerAdapter {
 			if(rejoinAction != null) {
 				if(rejoinAction.getType().equals("mute")) {
 					if(rejoinAction.getInfo().length() == 0) {
+						Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
 						e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
 						var mute_time = (long)Azrael.SQLgetWarning(guild_id, Azrael.SQLgetData(user_id, guild_id).getWarningID()+1).getTimer();
 						Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
-						Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
 					}
 					else {
 						var mute_time = Long.parseLong(rejoinAction.getInfo());
 						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 						Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
-						e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
 						Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
 						if(Azrael.SQLgetData(user_id, guild_id).getWarningID() != 0) {
 							if(Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp, unmute_timestamp, true, true) == 0) {
 								logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, guild_id);
 								if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The unmute time couldn't be updated on Azrael.bancollect").queue();
+							}
+							else {
+								Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
+								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
 							}
 						}
 						else {
@@ -105,8 +107,11 @@ public class GuildListener extends ListenerAdapter {
 								logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", user_id, guild_id);
 								if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
 							}
+							else {
+								Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
+								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
+							}
 						}
-						Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
 					}
 					Hashes.removeRejoinTask(e.getGuild().getId()+"_"+e.getMember().getUser().getId());
 				}
@@ -114,9 +119,9 @@ public class GuildListener extends ListenerAdapter {
 					e.getUser().openPrivateChannel().complete().sendMessage("You have been banned from "+e.getGuild().getName()+". Thank you for your understanding.\n"
 							+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
 							+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? "Provided reason: "+rejoinAction.getReason() : "")).queue();
+					Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
 					e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
 					Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0);
-					Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
 					Hashes.removeRejoinTask(e.getGuild().getId()+"_"+e.getMember().getUser().getId());
 				}
 			}
