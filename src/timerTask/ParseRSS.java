@@ -1,9 +1,4 @@
 package timerTask;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -19,6 +14,7 @@ import fileManagement.GuildIni;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import rss.ParseModel;
 import sql.Azrael;
+import util.STATIC;
 
 public class ParseRSS extends TimerTask{
 	private static final Logger logger = LoggerFactory.getLogger(ParseRSS.class);
@@ -39,23 +35,17 @@ public class ParseRSS extends TimerTask{
 				var rss_channel = Hashes.getChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rss")).findAny().orElse(null);
 				if(rss_channel != null) {
 					for(RSS rss : Hashes.getFeed(guild_id)) {
-						try {
-							logger.debug("Retrieving rss feed for {} in guild {}", rss.getURL(), e.getJDA().getGuildById(guild_id).getName());
-							URL rssUrl = new URL(rss.getURL());
-							URLConnection con = rssUrl.openConnection();
-							con.setConnectTimeout(5000);
-							con.setReadTimeout(10000);
-							BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-							
-							if(rss.getType() == 1)
-								ParseModel.BasicModelParse(in, e, rss, guild_id, rss_channel);
-							else if(rss.getType() == 2)
-								ParseModel.TwitterModelParse(in, e, rss, guild_id, rss_channel);
-							
-							in.close();
-						} catch (Exception e1) {
-							logger.error("Error on retrieving feed", e1);
-						}
+						new Thread(() -> {
+							try {
+								logger.debug("Retrieving rss feed for {} in guild {}", rss.getURL(), e.getJDA().getGuildById(guild_id).getName());
+								if(rss.getType() == 1)
+									ParseModel.BasicModelParse(STATIC.retrieveWebPageCode(rss.getURL()), e, rss, guild_id, rss_channel);
+								else if(rss.getType() == 2)
+									ParseModel.TwitterModelParse(STATIC.retrieveWebPageCode(rss.getURL()), e, rss, guild_id, rss_channel);
+							} catch (Exception e1) {
+								logger.error("Error on retrieving feed", e1);
+							}
+						}).start();
 					}
 				}
 				else {

@@ -1,6 +1,11 @@
 package util;
 
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -22,7 +27,7 @@ import sql.DiscordRoles;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.4.314";
+	private static final String VERSION = "6.5.315";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	
@@ -141,5 +146,13 @@ public class STATIC {
 				logger.error("An internal error occurred. The user {} couldn't be removed from the Azrael.watchlist table for guild {}", user_id, guild_id);
 			}
 		}
+	}
+	
+	public static BufferedReader retrieveWebPageCode(String link) throws IOException {
+		URL url = new URL(link);
+		URLConnection con = url.openConnection();
+		con.setConnectTimeout(5000);
+		con.setReadTimeout(10000);
+		return new BufferedReader(new InputStreamReader(con.getInputStream()));
 	}
 }
