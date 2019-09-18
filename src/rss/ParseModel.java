@@ -3,6 +3,7 @@ package rss;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,6 +14,7 @@ import constructors.RSS;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import sql.Azrael;
 import util.STATIC;
 
 public class ParseModel {
@@ -182,103 +184,33 @@ public class ParseModel {
 								description.replaceAll("https:\\/\\/t.co\\/[\\w\\d]*", (url2 != null ? url2 : url1));
 						}
 						if(description.length() > 0 || pubDate.length() > 0 || link.length() > 0) {
-							String out = /*format.replace("{title}", title);
-							out = out*/format.replace("{description}", description);
+							String out = format.replace("{description}", description);
 							out = out.replace("{pubDate}", pubDate);
 							out = out.replace("{link}", "<"+link+">");
 							out = out.replace("{author}", author);
 							out = out.replaceAll("&#039;", "'");
 							final String outMessage = EmojiParser.parseToUnicode(out);
-							MessageHistory history = new MessageHistory(e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()));
-							List<Message> msg = history.retrievePast(100).complete();
-							Message historyMessage = msg.parallelStream().filter(f -> f.getContentRaw().equals(outMessage)).findAny().orElse(null);
-							if(historyMessage == null)
-								e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
+							boolean wordFound = false;
+							find: for(var filter : Azrael.SQLgetChannel_Filter(rss_channel.getChannel_ID())) {
+								if(wordFound == false) {
+									Optional<String> option = Azrael.SQLgetFilter(filter, guild_id).parallelStream()
+										.filter(word -> outMessage.equals(word) || outMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || outMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || outMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || outMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || outMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || outMessage.contains(" "+word+" "))
+										.findAny();
+									if(option.isPresent()) {
+										wordFound = true;
+										break find;
+									}
+								}
+							}
+							if(!wordFound) {
+								MessageHistory history = new MessageHistory(e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()));
+								List<Message> msg = history.retrievePast(100).complete();
+								Message historyMessage = msg.parallelStream().filter(f -> f.getContentRaw().equals(outMessage)).findAny().orElse(null);
+								if(historyMessage == null)
+									e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
+							}
 						}
 					}
-					/*if(message.contains("<link>") && message.contains("</link>")) {
-						int firstPos = message.indexOf("<link>");
-						int lastPos = message.indexOf("</link>");
-						link = message.substring(firstPos, lastPos).replaceAll("(<link>|</link>)", "");
-						BufferedReader stream = STATIC.retrieveWebPageCode(link);
-						Pattern patternURL = Pattern.compile("https:\\/\\/twitter.com[\\w\\d\\/]*");
-						Matcher matcher = null;
-						String currentLine;
-						while((currentLine = stream.readLine()) != null) {
-							matcher = patternURL.matcher(currentLine);
-							if(matcher.find()) {
-								link = matcher.group();
-							}
-						}
-						stream.close();
-					}*/
-					/*if(message.contains("<description>") && message.contains("</description>")) {
-						Pattern patternURL = Pattern.compile("&mdash; .+\\(@[\\w\\d_]*\\)");
-						Matcher matcher = null;
-						int firstPos = message.indexOf("<description>");
-						int lastPos = message.indexOf("</description>");
-						description = message.substring(firstPos, lastPos).replaceAll("(<description>|</description>)", "");
-						//description = description.substring(9, description.length()-3);
-						matcher = patternURL.matcher(description);
-						if(matcher.find())
-							author = matcher.group().replaceAll("&mdash; ", "");
-						title = title.replaceAll("(<a[\\s\\w\\d=\"\\/?:.-]*>|<s[\\s\\w\\s=\"]*>|<\\/s>|<b[\\s\\w\\d=\"]*>|<\\/span>|<span[\\s\\w\\d=\"-]*>|<\\/strong>|<\\/b>|<\\/a>)", "");
-						title = title.replaceAll("(<br>|</p>)", "\n");
-						//description = description.replaceAll("\\b(January|February|March|April|May|June|July|August|September|October|November|December) [\\d]{2}, [\\d]{4}.?$", "");
-						//description = description.replace(author, "");
-						if(description.contains("pic.twitter.com/")) {
-							
-							BufferedReader stream = STATIC.retrieveWebPageCode(link);
-							patternURL = Pattern.compile("https:\\/\\/t.co/[\\w\\d]*");
-							boolean url1Found = false;
-							String url1 = null;
-							String url2 = null;
-							String streamLine;
-							while((streamLine = stream.readLine()) != null) {
-								if(!url1Found) {
-									matcher = patternURL.matcher(streamLine);
-									if(matcher.find()) {
-										url1 = matcher.group();
-										url1Found = true;
-									}
-								}
-								if(url1Found) {
-									if(line.contains("https://pbs.twimg.com/media")) {
-										Pattern pattern = Pattern.compile("https:\\/\\/pbs.twimg.com\\/media\\/[\\w\\d-.]*");
-										matcher = pattern.matcher(streamLine);
-										if(matcher.find()) {
-											url2 = matcher.group();
-											break;
-										}
-									}
-									else if(line.contains("https://pbs.twimg.com/ext")){
-										break;
-									}
-								}
-							}
-							stream.close();
-							description = description.replaceAll("pic.twitter.com\\/[\\w\\d]*", (url2 != null ? url2 : url1));
-						}
-					}*/
-					/*if(message.contains("<pubDate>") && message.contains("</pubDate>")) {
-						int firstPos = message.indexOf("<pubDate>");
-						int lastPos = message.indexOf("</pubDate>");
-						pubDate = message.substring(firstPos, lastPos).replaceAll("(<pubDate>|</pubDate>)", "");
-					}*/
-					/*if(title.length() > 0 || description.length() > 0 || pubDate.length() > 0 || link.length() > 0) {
-						String out = format.replace("{title}", title);
-						out = out.replace("{description}", description);
-						out = out.replace("{pubDate}", pubDate);
-						out = out.replace("{link}", "<"+link+">");
-						out = out.replace("{author}", author);
-						out = out.replaceAll("&#039;", "'");
-						final String outMessage = EmojiParser.parseToUnicode(out);
-						MessageHistory history = new MessageHistory(e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()));
-						List<Message> msg = history.retrievePast(30).complete();
-						Message historyMessage = msg.parallelStream().filter(f -> f.getContentRaw().equals(outMessage)).findAny().orElse(null);
-						if(historyMessage == null)
-							e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
-					}*/
 					message = "";
 					itemTagFound = false;
 					title = "";
