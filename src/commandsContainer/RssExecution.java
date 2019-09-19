@@ -21,9 +21,23 @@ import sql.Azrael;
 
 public class RssExecution {
 	private static final Logger logger = LoggerFactory.getLogger(RssExecution.class);
+	private static final EmbedBuilder message = new EmbedBuilder();
+	
+	public static void registerFeed(GuildMessageReceivedEvent e, String feed, int type) {
+		if(Azrael.SQLInsertRSS(feed, e.getGuild().getIdLong(), type) > 0) {
+			message.setColor(Color.BLUE);
+			e.getChannel().sendMessage(message.setDescription("RSS has been registered").build()).queue();
+			Hashes.clearFeeds();
+			logger.debug("{} RSS link has been registered for guild {}", feed, e.getGuild().getId());
+		}
+		else {
+			message.setColor(Color.RED);
+			e.getChannel().sendMessage(message.setDescription("RSS link couldn't be registered. Either the link has been already registered or an internal error occurred").build()).queue();
+			logger.error("{} RSS link couldn't be registered for guild {}", feed, e.getGuild().getId());
+		}
+	}
 	
 	public static boolean removeFeed(GuildMessageReceivedEvent e, int feed) {
-		EmbedBuilder message = new EmbedBuilder();
 		ArrayList<RSS> rss = Hashes.getFeed(e.getGuild().getIdLong());
 		if(rss.size() >= feed+1) {
 			String url = rss.get(feed).getURL();
@@ -46,11 +60,16 @@ public class RssExecution {
 	}
 	
 	public static void currentFormat(GuildMessageReceivedEvent e, int feed, String key) {
-		EmbedBuilder message = new EmbedBuilder();
 		ArrayList<RSS> rss = Hashes.getFeed(e.getGuild().getIdLong());
 		if(rss.size() >= feed+1) {
-			e.getChannel().sendMessage("This is the curring setting for this feed. Type your desired template for this feed or type exit to interrupt. Key values are `{pubDate}`, `{title}`, `{description}`, `{link}`\n```"+rss.get(feed).getFormat()+"```").queue();
-			Hashes.addTempCache(key, new Cache(180000, "updateformat"+feed));
+			if(rss.get(feed).getType() == 1) {
+				e.getChannel().sendMessage("This is the curring setting for this feed. Type your desired template for this feed or type exit to interrupt. Key values are `{pubDate}`, `{title}`, `{description}`, `{link}`\n```"+rss.get(feed).getFormat()+"```").queue();
+				Hashes.addTempCache(key, new Cache(180000, "updateformat"+feed));
+			}
+			else if(rss.get(feed).getType() == 2) {
+				e.getChannel().sendMessage("Different formats for Twitter feeds are not available for the moment! Please choose a different feed!").queue();
+				
+			}
 		}
 		else {
 			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription("Please select an available digit").build()).queue();
@@ -58,7 +77,6 @@ public class RssExecution {
 	}
 	
 	public static boolean updateFormat(GuildMessageReceivedEvent e, int feed, String format) {
-		EmbedBuilder message = new EmbedBuilder();
 		ArrayList<RSS> rss = Hashes.getFeed(e.getGuild().getIdLong());
 		if(Azrael.SQLUpdateRSSFormat(rss.get(feed).getURL(), e.getGuild().getIdLong(), EmojiParser.parseToAliases(format)) > 0) {
 			Hashes.clearFeeds();
@@ -74,7 +92,6 @@ public class RssExecution {
 	}
 	
 	public static boolean runTest(GuildMessageReceivedEvent e, int feed) {
-		EmbedBuilder message = new EmbedBuilder();
 		var rss_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rss")).findAny().orElse(null);
 		if(rss_channel != null) {
 			ArrayList<RSS> rss = Hashes.getFeed(e.getGuild().getIdLong());

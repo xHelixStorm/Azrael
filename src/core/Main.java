@@ -60,6 +60,7 @@ import listeners.RoleListener;
 import listeners.RoleRemovedListener;
 import listeners.ShutdownListener;
 import listeners.StatusListener;
+import listeners.TextChannelListener;
 import listeners.UnbanListener;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
@@ -167,7 +168,8 @@ public class Main {
 			new ReconnectedListener(),
 			new ResumedListener(),
 			new RoleCreateListener(),
-			new BoostCountListener()
+			new BoostCountListener(),
+			new TextChannelListener()
 		);
 	}
 }

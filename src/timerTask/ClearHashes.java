@@ -29,6 +29,7 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearSkillShop();
 		Hashes.clearActionlog();
 		Hashes.clearRankList();
+		Hashes.clearChannels();
 		Hashes.clearThemes();
 		
 		logger.debug("Temporary Hashes have been cleared!");

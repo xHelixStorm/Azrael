@@ -45,20 +45,21 @@ public class Rss implements CommandPublic {
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase("-register")) {
 			message.setColor(Color.BLUE);
-			e.getChannel().sendMessage(message.setDescription("Please insert an URL to register the rss page").build()).queue();
+			e.getChannel().sendMessage(message.setDescription("Do you wish to add a basic RSS url or add a Twitter RSS feed created with politepol.com?\n"
+					+ "Write either 1 for the Basic RSS or 2 for the Twitter RSS together with the full command to select one option!").build()).queue();
 		}
-		else if(args.length > 1 && args[0].equalsIgnoreCase("-register")) {
-			//register a link
-			String input = args[1];
-			if(Azrael.SQLInsertRSS(input, e.getGuild().getIdLong()) > 0) {
+		else if(args.length > 1 && args[0].equalsIgnoreCase("-register") && !args[1].matches("[^\\d]")) {
+			//select a rss model
+			var type = Integer.parseInt(args[1]);
+			if(type >= 1 && type <= 2) {
 				message.setColor(Color.BLUE);
-				e.getChannel().sendMessage(message.setDescription("RSS has been registered").build()).queue();
-				logger.debug("{} RSS link has been registered for guild {}", input, e.getGuild().getId());
+				e.getChannel().sendMessage(message.setDescription("Now please apply a regular RSS url, if you chose Basic or a RSS url for twitter generated with politepol!\n"
+						+ "Note that for the rss creation on politepol the title tag should be used upon the whole body tweet. The description tag is not required!").build()).queue();
+				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "register", ""+type));
 			}
 			else {
 				message.setColor(Color.RED);
-				e.getChannel().sendMessage(message.setDescription("RSS link couldn't be registered. Either the link has been already registered or an internal error occurred").build()).queue();
-				logger.error("{} RSS link couldn't be registered for guild {}", input, e.getGuild().getId());
+				e.getChannel().sendMessage(message.setDescription("Please type either 1 or 2 to register a rss link!").build()).queue();
 			}
 		}
 		else if(args[0].equalsIgnoreCase("-remove")) {

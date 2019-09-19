@@ -359,6 +359,9 @@ public class Hashes {
 	public static void clearThemes() {
 		themes.clear();
 	}
+	public static void clearChannels() {
+		channels.clear();
+	}
 	public static void removeChannels(Long _key) {
 		channels.remove(_key);
 	}

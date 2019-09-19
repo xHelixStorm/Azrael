@@ -1053,6 +1053,25 @@ public class Azrael {
 		}
 	}
 	
+	public static int SQLDeleteChannels(long _channel_id) {
+		logger.debug("SQLDeleteChannels launched. Passed params {}", _channel_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM channels WHERE channel_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _channel_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteChannels Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLInsertChannel_Conf(long _channel_id, long _guild_id, String _channel_type) {
 		logger.debug("SQLInsertChannel launched. Passed params {}, {}, {}, {}", _channel_id, _guild_id, _channel_type);
 		Connection myConn = null;
@@ -1067,6 +1086,26 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertChannel_Conf Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteChannelConf(long _channel_id, long _guild_id) {
+		logger.debug("SQLDeleteChannelConf launched. Passed params {}, {}", _channel_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM channel_conf WHERE fk_channel_id = ? and fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _channel_id);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteChannelConf Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1824,17 +1863,21 @@ public class Azrael {
 		return Hashes.getFilterLang(0);
 	}
 	
-	public static int SQLInsertRSS(String _url, long _guild_id) {
-		logger.debug("SQLInsertRSS launched. Params passed {}, {}", _url, _guild_id);
+	public static int SQLInsertRSS(String _url, long _guild_id, int _type) {
+		logger.debug("SQLInsertRSS launched. Params passed {}, {}, {}", _url, _guild_id, _type);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO rss (url, fk_guild_id, format) VALUES (?, ?, ?)");
+			String sql = ("INSERT INTO rss (url, fk_guild_id, format, type) VALUES (?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _url);
 			stmt.setLong(2, _guild_id);
-			stmt.setString(3, "{pubDate} | {title}\n{description}\n{link}");
+			if(_type == 1)
+				stmt.setString(3, "{pubDate} | {title}\n{description}\n{link}");
+			else if(_type == 2)
+				stmt.setString(3, "From: **{author}**\n{description}");
+			stmt.setInt(4, _type);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInserRSS Exception", e);
