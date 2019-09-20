@@ -63,12 +63,6 @@ public class ReadyListener extends ListenerAdapter {
 		else{System.out.println("private patch notes: disabled");}
 		if(allowPublicPatchNotes){System.out.println("public patch notes:  enabled");}
 		else{System.out.println("public patch notes:  disabled");}
-		
-		String out = "\nThis Bot is running on following servers: \n";
-		for(Guild g : e.getJDA().getGuilds()){
-			out += g.getName() + " (" + g.getId() + ") \n";
-		}
-		System.out.println(out);
 
 		var themesRetrieved = true;
 		if(RankingSystem.SQLgetThemes() == false) {

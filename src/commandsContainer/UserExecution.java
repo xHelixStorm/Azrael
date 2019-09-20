@@ -404,6 +404,9 @@ public class UserExecution {
 					case "watch" -> {
 						final var watchLevel = GuildIni.getUserWatchLevel(_e.getGuild().getIdLong());
 						if(UserPrivs.comparePrivilege(_e.getMember(), watchLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							if(!GuildIni.getCacheLog(_e.getGuild().getIdLong())) {
+								_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.YELLOW).setTitle("Warning!").setDescription("The CacheLog is disabled. Please ensure to have it enabled or logged messages won't get displayed!").build()).queue();
+							}
 							message.setTitle("You chose to watch this user!");
 							message.setDescription("Now please select a log level.\n1: Log only deleted messages from this user\n2: log all written messages from a user!");
 							_e.getChannel().sendMessage(message.build()).queue();

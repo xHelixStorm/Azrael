@@ -27,7 +27,7 @@ import sql.DiscordRoles;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.5.317";
+	private static final String VERSION = "6.5.318";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	
@@ -120,8 +120,15 @@ public class STATIC {
 					Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "2"));
 				}
 				else if(cache.getAdditionalInfo().equals("2")) {
-					if(e != null)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
-					else		 e.getGuild().addRoleToMember(e2.getMember(), e2.getGuild().getRoleById(DiscordRoles.SQLgetRole(e2.getGuild().getIdLong(), "mut"))).queue();
+					var mute_role = DiscordRoles.SQLgetRole((e != null ? e : e2).getGuild().getIdLong(), "mut");
+					if(mute_role != 0) {
+						if(e != null)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
+						else		 e.getGuild().addRoleToMember(e2.getMember(), e2.getGuild().getRoleById(DiscordRoles.SQLgetRole(e2.getGuild().getIdLong(), "mut"))).queue();
+					}
+					else {
+						var log_channel = Azrael.SQLgetChannels((e != null ? e : e2).getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+						if(log_channel != null) (e != null ? e : e2).getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("User couldn't get muted!").setDescription("The user "+(e != null ? e.getMember().getAsMention() : e2.getMember().getAsMention())+" wasn't muted because no mute role is registered!").build()).queue();
+					}
 					Hashes.clearTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}

@@ -153,6 +153,7 @@ public class GuildListener extends ListenerAdapter {
 							else {
 								e.getMember().getUser().openPrivateChannel().complete().sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").complete();
 								e.getGuild().kick(e.getMember()).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
+								Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", "Kicked for having an invalid word inside his name!", 0);
 								nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("User kicked for having a not allowed name!");
 								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. The user has been kicked automatically from the server due to this word: **"+word.getName().toUpperCase()+"**").build()).queue();
 							}

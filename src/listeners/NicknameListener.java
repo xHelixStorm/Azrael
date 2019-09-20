@@ -12,18 +12,20 @@ public class NicknameListener extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent e) {
-		long user_id = e.getMember().getUser().getIdLong();
-		long guild_id = e.getGuild().getIdLong();
-		String nickname = e.getNewNickname();
-		
-		if(nickname == null) {
-			if(Azrael.SQLDeleteNickname(user_id, guild_id) == 0) {
-				logger.error("Nickname from {} couldn't be deleted from Azrael.nickname", e.getUser().getId());
+		new Thread(() -> {
+			long user_id = e.getMember().getUser().getIdLong();
+			long guild_id = e.getGuild().getIdLong();
+			String nickname = e.getNewNickname();
+			
+			if(nickname == null) {
+				if(Azrael.SQLDeleteNickname(user_id, guild_id) == 0) {
+					logger.error("Nickname from {} couldn't be deleted from Azrael.nickname", e.getUser().getId());
+				}
+				else {
+					logger.debug("{} received the nickname {} in guild {}", e.getUser().getId(), nickname, e.getGuild().getId());
+					Azrael.SQLInsertActionLog("MEMBER_NICKNAME_CLEAR", user_id, guild_id, "<cleared name>");
+				}
 			}
-			else {
-				logger.debug("{} received the nickname {} in guild {}", e.getUser().getId(), nickname, e.getGuild().getId());
-				Azrael.SQLInsertActionLog("MEMBER_NICKNAME_CLEAR", user_id, guild_id, "<cleared name>");
-			}
-		}
+		}).start();
 	}
 }

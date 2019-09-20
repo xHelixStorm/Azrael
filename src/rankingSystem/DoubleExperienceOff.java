@@ -5,17 +5,22 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import constructors.Cache;
 import core.Hashes;
 import enums.Weekday;
 import fileManagement.IniFileReader;
 import util.STATIC;
 
-public class DoubleExperienceOff extends TimerTask{
+public class DoubleExperienceOff extends TimerTask {
+	private static final Logger logger = LoggerFactory.getLogger(DoubleExperienceOff.class);
 
 	@Override
 	public void run() {
 		Hashes.addTempCache("doubleExp", new Cache(0, "off"));
+		logger.debug("Double experience has been turned off globaly!");
 	}
 	
 	public static void runTask(){

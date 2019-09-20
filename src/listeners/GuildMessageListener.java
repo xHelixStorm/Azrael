@@ -382,20 +382,11 @@ public class GuildMessageListener extends ListenerAdapter {
 				lang.add("eng");
 				new Thread(new URLFilter(e, null, filter_lang, allChannels)).start();
 			}
-			var watchedMember = Hashes.getWatchlist(guild_id+"-"+user_id);
-			var sentMessage = Hashes.getMessagePool(e.getMessageIdLong());
-			if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
-				e.getGuild().getTextChannelById(watchedMember.getWatchChannel()).sendMessage(new EmbedBuilder()
-					.setTitle("Logged written message due to watching!").setColor(Color.YELLOW)
-					.setDescription("["+sentMessage.getTime().toString()+" - "+sentMessage.getUserName()+"]: "+sentMessage.getMessage()).build()).queue();
-			}
-			
 			var log = GuildIni.getChannelAndCacheLog(guild_id);
 			if((log[0] || log[1]) && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
-				LocalDateTime time = LocalDateTime.now();
-				String image_url = "";
+				StringBuilder image_url = new StringBuilder();
 				for(Attachment attch : e.getMessage().getAttachments()){
-					image_url = (e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? image_url+"("+attch.getProxyUrl()+")" : image_url+"\n("+attch.getProxyUrl()+")";
+					image_url.append((e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? "("+attch.getProxyUrl()+")" : "\n("+attch.getProxyUrl()+")");
 				}
 				Messages collectedMessage = new Messages();
 				collectedMessage.setUserID(user_id);
@@ -403,12 +394,24 @@ public class GuildMessageListener extends ListenerAdapter {
 				collectedMessage.setGuildID(guild_id);
 				collectedMessage.setChannelID(channel_id);
 				collectedMessage.setChannelName(e.getChannel().getName());
-				collectedMessage.setMessage(message+image_url+"\n");
+				collectedMessage.setMessage(message+image_url.toString()+"\n");
 				collectedMessage.setMessageID(e.getMessageIdLong());
-				collectedMessage.setTime(time);
+				collectedMessage.setTime(LocalDateTime.now());
 				
-				if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "["+collectedMessage.getTime().toString()+" - "+collectedMessage.getUserName()+"]: "+collectedMessage.getMessage());
+				if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"]: "+collectedMessage.getMessage());
 				if(log[1]) 	Hashes.addMessagePool(e.getMessageIdLong(), collectedMessage);
+			}
+			var watchedMember = Hashes.getWatchlist(guild_id+"-"+user_id);
+			var sentMessage = Hashes.getMessagePool(e.getMessageIdLong());
+			if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
+				e.getGuild().getTextChannelById(watchedMember.getWatchChannel()).sendMessage(new EmbedBuilder()
+					.setTitle("Logged written message due to watching!").setColor(Color.YELLOW)
+					.setDescription("["+sentMessage.getTime().toString()+" - "+sentMessage.getUserName()+"]: "+sentMessage.getMessage()).build()).queue();
+			}
+			else if(watchedMember != null && watchedMember.getLevel() == 3 && sentMessage == null) {
+				e.getGuild().getTextChannelById(watchedMember.getWatchChannel()).sendMessage(new EmbedBuilder()
+					.setTitle("CacheLog disabled!").setColor(Color.RED)
+					.setDescription("Please enable the CacheLog to display messages! Message from "+e.getMember().getAsMention()+" couldn't be displayed!").build()).queue();
 			}
 		}).start();
 	}

@@ -43,20 +43,20 @@ public class DoubleExperienceStart extends TimerTask {
 		long guild_id;
 		var event = (e != null ? e : (e2 != null ? e2 : (e3 != null ? e3 : e4)));
 		if(Hashes.getTempCache("doubleExp") == null || Hashes.getTempCache("doubleExp").getAdditionalInfo().equals("off")) {
-			Hashes.addTempCache("doubleExp", new Cache(0, "on"));
+			Hashes.addTempCache("doubleExp", new Cache("on"));
 			for(Guild g : event.getJDA().getGuilds()) {
 				guild_id = g.getIdLong();
-				File doubleEvent = new File("./files/RankingSystem/"+RankingSystem.SQLgetGuild(guild_id).getThemeID()+"/doubleweekend.jpg");
 				if(RankingSystem.SQLgetGuild(guild_id).getRankingState() || GuildIni.getDoubleExperienceMode(guild_id).equals("auto")) {
 					var bot_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null);
 					if(bot_channel != null) {
+						File doubleEvent = new File("./files/RankingSystem/"+RankingSystem.SQLgetGuild(guild_id).getThemeID()+"/doubleweekend.jpg");
 						event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg").complete();
 						event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\nThe double EXP weekend is here\nUse the chance to gain more experience points than usual to reach new heights. See you at the top!\nThe event will stay up from Saturday 00:01 cest till Sunday 23:59 cest!```").queue();
+						logger.debug("Double experience started for guild {}!", guild_id);
 					}
 				}
 			}
 		}
-		logger.debug("Double experience is running");
 	}
 	
 	public static void runTask(ReadyEvent _e, ReconnectedEvent _e2, ResumedEvent _e3, MessageReceivedEvent _e4){
