@@ -19,21 +19,27 @@ public class TextChannelListener extends ListenerAdapter {
 	
 	@Override
 	public void onTextChannelCreate(TextChannelCreateEvent e) {
-		insertOrUpdateChannel(e, null);
+		new Thread(() -> {
+			insertOrUpdateChannel(e, null);
+		}).start();
 	}
 	
 	@Override
 	public void onTextChannelUpdateName(TextChannelUpdateNameEvent e) {
-		insertOrUpdateChannel(null, e);
+		new Thread(() -> {
+			insertOrUpdateChannel(null, e);
+		}).start();
 	}
 	
 	@Override
 	public void onTextChannelDelete(TextChannelDeleteEvent e) {
-		Azrael.SQLDeleteChannel_Filter(e.getChannel().getIdLong());
-		Azrael.SQLDeleteChannelConf(e.getChannel().getIdLong(), e.getGuild().getIdLong());
-		Azrael.SQLDeleteChannels(e.getChannel().getIdLong());
-		Hashes.clearChannels();
-		logger.debug("TextChannel {} for guild {} has been deleted from all tables!", e.getChannel().getId(), e.getGuild().getId());
+		new Thread(() -> {
+			Azrael.SQLDeleteChannel_Filter(e.getChannel().getIdLong());
+			Azrael.SQLDeleteChannelConf(e.getChannel().getIdLong(), e.getGuild().getIdLong());
+			Azrael.SQLDeleteChannels(e.getChannel().getIdLong());
+			Hashes.clearChannels();
+			logger.debug("TextChannel {} for guild {} has been deleted from all tables!", e.getChannel().getId(), e.getGuild().getId());
+		}).start();
 	}
 	
 	private static void insertOrUpdateChannel(TextChannelCreateEvent e1, TextChannelUpdateNameEvent e2) {

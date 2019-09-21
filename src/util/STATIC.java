@@ -27,7 +27,7 @@ import sql.DiscordRoles;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.5.318";
+	private static final String VERSION = "6.5.319";
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	
@@ -100,7 +100,7 @@ public class STATIC {
 	@SuppressWarnings("unused")
 	public static void handleRemovedMessages(GuildMessageReceivedEvent e, GuildMessageUpdateEvent e2, String [] output) {
 		Logger logger = LoggerFactory.getLogger(STATIC.class);
-		logger.debug("Message removed from {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+		logger.debug("Message removed from {} in guild {}", (e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId()), e.getGuild().getName());
 		var muteRole = DiscordRoles.SQLgetRole((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()), "mut");
 		if(muteRole == 0) {
 			if(e != null)e.getChannel().sendMessage(e.getMember().getAsMention()+" "+output[0]).queue();

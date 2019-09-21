@@ -149,6 +149,7 @@ public class GuildIni {
 			ini.add("Commands", "FilterStaffNamesLevel", "20");
 			ini.add("Commands", "FilterURLBlacklistLevel", "20");
 			ini.add("Commands", "FilterURLWhitelistLevel", "20");
+			ini.add("Commands", "FilterTweetBlacklistLevel", "20");
 			ini.add("Commands", "Quiz", "false");
 			ini.add("Commands", "QuizLevel", "20");
 			ini.add("Commands", "RoleReaction", "false");
@@ -747,6 +748,10 @@ public class GuildIni {
 	public static int getFilterURLWhitelistLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "FilterURLWhitelistLevel", int.class);
+	}
+	public static int getFilterTweetBlacklistLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "FilterTweetBlacklistLevel", int.class);
 	}
 	public static boolean getQuizCommand(long guild_id) {
 		Ini ini = readIni(guild_id);

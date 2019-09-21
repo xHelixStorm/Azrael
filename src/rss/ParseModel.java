@@ -190,21 +190,27 @@ public class ParseModel {
 							out = out.replace("{author}", author);
 							out = out.replaceAll("&#039;", "'");
 							final String outMessage = EmojiParser.parseToUnicode(out);
+							final String toCheckMessage = outMessage.toLowerCase();
+							final String compareAuthor = author;
 							boolean wordFound = false;
-							find: for(var filter : Azrael.SQLgetChannel_Filter(rss_channel.getChannel_ID())) {
-								if(wordFound == false) {
-									Optional<String> option = Azrael.SQLgetFilter(filter, guild_id).parallelStream()
-										.filter(word -> outMessage.equals(word) || outMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || outMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || outMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || outMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || outMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || outMessage.contains(" "+word+" "))
-										.findAny();
-									if(option.isPresent()) {
-										wordFound = true;
-										break find;
+							if(Azrael.SQLgetTweetBlacklist(guild_id).parallelStream().filter(f -> compareAuthor.contains(f)).findAny().orElse(null) != null)
+								wordFound = true;
+							if(!wordFound) {
+								find: for(var filter : Azrael.SQLgetChannel_Filter(rss_channel.getChannel_ID())) {
+									if(wordFound == false) {
+										Optional<String> option = Azrael.SQLgetFilter(filter, guild_id).parallelStream()
+											.filter(word -> toCheckMessage.equals(word) || toCheckMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || toCheckMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || toCheckMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || toCheckMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || toCheckMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || toCheckMessage.contains(" "+word+" "))
+											.findAny();
+										if(option.isPresent()) {
+											wordFound = true;
+											break find;
+										}
 									}
 								}
 							}
 							if(!wordFound) {
 								MessageHistory history = new MessageHistory(e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()));
-								List<Message> msg = history.retrievePast(100).complete();
+								List<Message> msg = history.retrievePast(20).complete();
 								Message historyMessage = msg.parallelStream().filter(f -> f.getContentRaw().equals(outMessage)).findAny().orElse(null);
 								if(historyMessage == null)
 									e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();

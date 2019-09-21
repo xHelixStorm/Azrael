@@ -25,7 +25,7 @@ public class FilterExecution {
 	
 	public static void runHelp(GuildMessageReceivedEvent _e) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle("Actions for the filter command!");
-		_e.getChannel().sendMessage(message.setDescription("Type one of the following word types right after the command to choose a respective action! These types are available:\n\n**word-filter\nname-filter\nname-kick\nfunny-names\nstaff-names\nurl-blacklist\nurl-whitelist**").build()).queue();
+		_e.getChannel().sendMessage(message.setDescription("Type one of the following word types right after the command to choose a respective action! These types are available:\n\n**word-filter\nname-filter\nname-kick\nfunny-names\nstaff-names\nurl-blacklist\nurl-whitelist\ntweet-blacklist**").build()).queue();
 	}
 	
 	@SuppressWarnings("preview")
@@ -106,10 +106,21 @@ public class FilterExecution {
 				if(UserPrivs.comparePrivilege(_e.getMember(), urlWhitelistLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 					message.setTitle("You chose url-blacklist!");
 					_e.getChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
-					Hashes.addTempCache(key, new Cache(180000, "url-blacklist"));
+					Hashes.addTempCache(key, new Cache(180000, "url-whitelist"));
 				}
 				else {
 					_e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(urlWhitelistLevel, _e.getGuild())).build()).queue();
+				}
+			}
+			case "tweet-blacklist" -> {
+				final var tweetBlacklistLevel = GuildIni.getFilterTweetBlacklistLevel(_e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(_e.getMember(), tweetBlacklistLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+					message.setTitle("You chose url-blacklist!");
+					_e.getChannel().sendMessage(message.setDescription("Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**").build()).queue();
+					Hashes.addTempCache(key, new Cache(180000, "tweet-blacklist"));
+				}
+				else {
+					_e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(tweetBlacklistLevel, _e.getGuild())).build()).queue();
 				}
 			}
 			default -> _e.getChannel().sendMessage("Please choose between word-filter, name-filter, funny-names, staff-names, url-blacklist or url-whitelist").queue();
@@ -467,6 +478,55 @@ public class FilterExecution {
 						message.setTitle("You chose to add the names from a pastebin link into the url-whitelist!");
 						_e.getChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required urls to upload.").build()).queue();
 						cache.updateDescription("load-url-whitelist").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+				}
+				case "tweet-blacklist" -> {
+					if(_message.equalsIgnoreCase("display")) {
+						StringBuilder out = new StringBuilder();
+						for(String word : Azrael.SQLgetTweetBlacklist(_e.getGuild().getIdLong())) {
+							out.append(word+"\n");
+						}
+						if(out.length() > 0) {
+							try {
+								String paste_link = Pastebin.unlistedPaste("Tweet Blacklist", out.toString(), _e.getGuild().getIdLong());
+								message.setTitle("Tweet Blacklist!");
+								out.setLength(0);
+								_e.getChannel().sendMessage(message.setDescription("Here the current present tweet blacklist: "+paste_link).build()).queue();
+							} catch (IllegalStateException | LoginException | PasteException e) {
+								logger.warn("Error on creating paste!", e);
+								message.setColor(Color.RED).setTitle("Creating paste failed!");
+								_e.getChannel().sendMessage(message.setDescription("An error occurred with posting on pastebin. Please verify that the login credentials are set correctly!").build()).queue();
+							}
+						}
+						else {
+							message.setColor(Color.RED).setTitle("No results have been returned!");
+							_e.getChannel().sendMessage("The url-whitelist list is empty! Nothing to display!").queue();
+						}
+						Hashes.clearTempCache(key);
+					}
+					else if(_message.equalsIgnoreCase("insert")) {
+						message.setTitle("You chose to insert a username into the tweet blacklist!");
+						_e.getChannel().sendMessage(message.setDescription("Please insert a username of someone from Twitter.").build()).queue();
+						cache.updateDescription("insert-tweet-blacklist").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("remove")) {
+						message.setTitle("You chose to remove a username out of the tweet blacklist!");
+						_e.getChannel().sendMessage(message.setDescription("Please insert a username of someone from Twitter.").build()).queue();
+						cache.updateDescription("remove-tweet-blacklist").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("add-pastebin")) {
+						message.setTitle("You chose to add the usernames from a pastebin link into the tweet blacklist!");
+						_e.getChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required usernames to upload.").build()).queue();
+						cache.updateDescription("add-load-tweet-blacklist").setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+					else if(_message.equalsIgnoreCase("load-pastebin")) {
+						message.setTitle("You chose to add the usernames from a pastebin link into the tweet blacklist!");
+						_e.getChannel().sendMessage(message.setDescription("Please submit a public pastebin link with all required usernames to upload.").build()).queue();
+						cache.updateDescription("load-tweet-blacklist").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
 				}
@@ -1006,6 +1066,89 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
+				}
+				case "insert-tweet-blacklist" -> {
+					if(Azrael.SQLInsertTweetBlacklist(_message, _e.getGuild().getIdLong()) > 0) {
+						message.setTitle("Success!");
+						_e.getChannel().sendMessage(message.setDescription("The username has been inserted into the tweet-blacklist!").build()).queue();
+						Hashes.removeTweetBlacklist(_e.getGuild().getIdLong());
+						logger.debug("{} has inserted the username {} into the tweet-blacklist", _e.getMember().getUser().getIdLong(), _message);
+					}
+					else {
+						message.setColor(Color.RED).setTitle("Username couldn't be inserted!");
+						_e.getChannel().sendMessage(message.setDescription("Username couldn't be inserted into Azrael.tweet_blacklist. Either the username already exists or an internal error has occurred!").build()).queue();
+						logger.error("Username couldn't be inserted into Azrael.tweet_blacklist for guild {}", _e.getGuild().getName());
+					}
+					Hashes.clearTempCache(key);
+				}
+				case "remove-tweet-blacklist" -> {
+					if(Azrael.SQLDeleteTweetBlacklist(_message, _e.getGuild().getIdLong()) > 0) {
+						message.setTitle("Success!");
+						_e.getChannel().sendMessage(message.setDescription("The username has been removed from the tweet blacklist!").build()).queue();
+						Hashes.removeTweetBlacklist(_e.getGuild().getIdLong());
+						logger.debug("{} has removed the username {} from the tweet blacklist", _e.getMember().getUser().getIdLong(), _message);
+					}
+					else {
+						message.setColor(Color.RED).setTitle("Username couldn't be removed!");
+						_e.getChannel().sendMessage(message.setDescription("Username couldn't be removed from Azrael.tweet_blacklist. Username doesn't exist or an internal error occurred!").build()).queue();
+						logger.error("Username couldn't be removed from Azrael.tweet_blacklist for guild {}", _e.getGuild().getName());
+					}
+					Hashes.clearTempCache(key);
+				}
+				case "add-load-tweet-blacklist", "load-tweet-blacklist" -> {
+					try {
+						String [] usernames = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
+						List<String> checkedUsernames = new ArrayList<String>();
+						for(var username : usernames) {
+							if(username.startsWith("@")) {
+								checkedUsernames.add(username);
+							}
+							else {
+								checkedUsernames.clear();
+								break;
+							}
+						}
+						if(checkedUsernames.size() > 0) {
+							var querryResult = Azrael.SQLReplaceTweetBlacklist(usernames, _e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+							if(querryResult == 0) {
+								message.setTitle("Success!");
+								_e.getChannel().sendMessage(message.setDescription("Usernames have been inserted!").build()).queue();
+								Hashes.removeURLWhitelist(_e.getGuild().getIdLong());
+								logger.debug("{} has inserted urls out of pastebin into url-whitelist", _e.getMember().getUser().getIdLong());
+							}
+							else if(querryResult == 1) {
+								//throw error for failing the db replacement
+								message.setColor(Color.RED).setTitle("Execution failed");
+								var duplicates = checkDuplicates(usernames);
+								if(duplicates == null || duplicates.size() == 0) {
+									_e.getChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current tweet-blacklist with the usernames from inside the pastebin link! Please verify that the usernames aren't already registered!").build()).queue();
+									logger.warn("tweet blacklist couldn't be updated in guild {}", _e.getGuild().getId());
+								}
+								else {
+									StringBuilder out = new StringBuilder();
+									for(var word : duplicates) {
+										out.append("**"+word+"**\n");
+									}
+									_e.getChannel().sendMessage(message.setDescription("Usernames couldn't be loaded from the pastebin link because duplicates have been found. Please remove these duplicates and then try again!\n\n").build()).queue();
+								}
+							}
+							else {
+								//thow error for failing the rollback
+								message.setColor(Color.RED).setTitle("Execution failed");
+								_e.getChannel().sendMessage(message.setDescription("A critical error occurred. The tweet-blacklist table has been altered but couldn't be reverted on error. Current tweet username data could have been lost!").build()).queue();
+								logger.error("Update on url-whitelist table couldn't be rolled back on error. Affected guild {}", _e.getGuild().getId());
+							}
+						}
+						else {
+							message.setColor(Color.RED).setTitle("Execution failed");
+							_e.getChannel().sendMessage(message.setDescription("Please send a pastebin link with valid usernames that start with '@'!").build()).queue();
+						}
+					} catch (MalformedURLException | RuntimeException e) {
+						logger.error("Reading paste failed!", e);
+						message.setColor(Color.RED).setTitle("Invalid pastebin link!");
+						_e.getChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
+					}
+					Hashes.clearTempCache(key);
 				}
 			}
 		}

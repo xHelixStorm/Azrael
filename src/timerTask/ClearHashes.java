@@ -21,6 +21,7 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearWeaponShopContent();
 		Hashes.clearWeaponCategories();
 		Hashes.clearExpiredTempCache();
+		Hashes.clearTweetBlacklist();
 		Hashes.clearURLBlacklist();
 		Hashes.clearURLWhitelist();
 		Hashes.clearWeaponStats();

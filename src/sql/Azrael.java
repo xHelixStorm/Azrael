@@ -2094,6 +2094,75 @@ public class Azrael {
 		}
 	}
 	
+	public static synchronized ArrayList<String> SQLgetTweetBlacklist(long _guild_id) {
+		if(Hashes.getTweetBlacklist(_guild_id) == null) {
+			logger.debug("SQLgetTweetBlacklist launched. Passed params {}", _guild_id);
+			ArrayList<String> urls = new ArrayList<String>();
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT username FROM tweet_blacklist WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()) {
+					urls.add(rs.getString(1));
+				}
+				Hashes.addTweetBlacklist(_guild_id, urls);
+				return urls;
+			} catch (SQLException e) {
+				logger.error("SQLgetTweetBlacklist Exception", e);
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		return Hashes.getTweetBlacklist(_guild_id);
+	}
+	
+	public static int SQLInsertTweetBlacklist(String _username, long _guild_id) {
+		logger.debug("SQLInsertTweetBlacklist launched. Passed params {}, {}", _username, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("INSERT INTO tweet_blacklist (username, fk_guild_id) VALUES(?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, (_username.startsWith("@") ? _username : "@"+_username));
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertTweetBlacklist Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteTweetBlacklist(String _username, long _guild_id) {
+		logger.debug("SQLDeleteTweetBlacklist launched. Passed params {}, {}", _username, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM tweet_blacklist WHERE username LIKE ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, (_username.startsWith("@") ? _username : "@"+_username));
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteTweetBlacklist Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static synchronized void SQLgetWholeWatchlist() {
 		logger.debug("SQLgetWholeWatchlist launched. No params have been passed!");
 		Connection myConn = null;
@@ -2124,7 +2193,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM whole_watchlist WHERE guild_id = ? && higher_privileges = ?");
+			String sql = ("SELECT * FROM watchlist WHERE guild_id = ? && higher_privileges = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setBoolean(2, _highPrivileges);
@@ -2420,6 +2489,46 @@ public class Azrael {
 				return 1;
 			} catch (SQLException e1) {
 				logger.error("SQLReplaceURLWhitelist roll back Exception", e1);
+				return 2;
+			}
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	@SuppressWarnings("resource")
+	public static int SQLReplaceTweetBlacklist(String [] _usernames, long _guild_id, boolean delete) {
+		logger.debug("SQLReplaceTweetBlacklist launched. Passed params array, {}, {}", _guild_id, delete);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn.setAutoCommit(false);
+			if(delete) {
+				String sql = ("DELETE FROM tweet_blacklist WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				stmt.executeUpdate();
+			}
+			
+			String sql2 = ("INSERT INTO tweet_blacklist (username, fk_guild_id) VALUES(?, ?)");
+			stmt = myConn.prepareStatement(sql2);
+			for(String username : _usernames) {
+				stmt.setString(1, username);
+				stmt.setLong(2, _guild_id);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			myConn.commit();
+			return 0;
+		} catch (SQLException e) {
+			try {
+				logger.error("SQLReplaceTweetBlacklist Exception", e);
+				myConn.rollback();
+				return 1;
+			} catch (SQLException e1) {
+				logger.error("SQLReplaceTweetBlacklist roll back Exception", e1);
 				return 2;
 			}
 		} finally {

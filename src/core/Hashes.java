@@ -78,6 +78,7 @@ public class Hashes {
     private static final Set<String> globalURLBlacklist = new HashSet<String>();
     private static final ConcurrentHashMap<Long, ArrayList<String>> urlBlacklist = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final ConcurrentHashMap<Long, ArrayList<String>> urlWhitelist = new ConcurrentHashMap<Long, ArrayList<String>>();
+    private static final ConcurrentHashMap<Long, ArrayList<String>> tweetBlacklist = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final ConcurrentHashMap<String, Watchlist> watchlist = new ConcurrentHashMap<String, Watchlist>();
 	
 	public static void addMessagePool(long _message_id, Messages _message) {
@@ -172,6 +173,9 @@ public class Hashes {
 	}
 	public static void addURLWhitelist(Long _key, ArrayList<String> _value) {
 		urlWhitelist.put(_key, _value);
+	}
+	public static void addTweetBlacklist(Long _key, ArrayList<String> _value) {
+		tweetBlacklist.put(_key, _value);
 	}
 	public static void addWatchlist(String _key, Watchlist _value) {
 		watchlist.put(_key, _value);
@@ -286,6 +290,9 @@ public class Hashes {
 	public static ArrayList<String> getURLWhitelist(Long _key) {
 		return urlWhitelist.get(_key);
 	}
+	public static ArrayList<String> getTweetBlacklist(Long _key){
+		return tweetBlacklist.get(_key);
+	}
 	public static Watchlist getWatchlist(String _key) {
 		return watchlist.get(_key);
 	}
@@ -396,6 +403,12 @@ public class Hashes {
 	}
 	public static void clearURLWhitelist() {
 		urlWhitelist.clear();
+	}
+	public static void removeTweetBlacklist(Long _key) {
+		tweetBlacklist.remove(_key);
+	}
+	public static void clearTweetBlacklist() {
+		tweetBlacklist.clear();
 	}
 	public static void clearActionlog() {
 		actionlog.clear();

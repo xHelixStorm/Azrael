@@ -251,6 +251,7 @@ public class Display implements CommandPublic{
 				out.append("Filter staff names subcommand: "+GuildIni.getFilterStaffNamesLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Filter url blacklist subcommand: "+GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Filter url whitelist subcommand: "+GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Filter tweet blacklist subcommand: "+GuildIni.getFilterTweetBlacklistLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Quiz command: "+GuildIni.getQuizLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Rolereaction command: "+GuildIni.getRoleReactionLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Rss command: "+GuildIni.getRssLevel(e.getGuild().getIdLong())+"\n");
