@@ -18,22 +18,29 @@ import core.Hashes;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
+import util.STATIC;
 
 public class RssExecution {
 	private static final Logger logger = LoggerFactory.getLogger(RssExecution.class);
 	private static final EmbedBuilder message = new EmbedBuilder();
 	
 	public static void registerFeed(GuildMessageReceivedEvent e, String feed, int type) {
-		if(Azrael.SQLInsertRSS(feed, e.getGuild().getIdLong(), type) > 0) {
-			message.setColor(Color.BLUE);
-			e.getChannel().sendMessage(message.setDescription("RSS has been registered").build()).queue();
-			Hashes.clearFeeds();
-			logger.debug("{} RSS link has been registered for guild {}", feed, e.getGuild().getId());
+		if(STATIC.getTwitterFactory() != null) {
+			if(Azrael.SQLInsertRSS(feed, e.getGuild().getIdLong(), type) > 0) {
+				message.setColor(Color.BLUE);
+				e.getChannel().sendMessage(message.setDescription("RSS has been registered").build()).queue();
+				Hashes.clearFeeds();
+				logger.debug("{} RSS link has been registered for guild {}", feed, e.getGuild().getId());
+			}
+			else {
+				message.setColor(Color.RED);
+				e.getChannel().sendMessage(message.setDescription("RSS link couldn't be registered. Either the link has been already registered or an internal error occurred").build()).queue();
+				logger.error("{} RSS link couldn't be registered for guild {}", feed, e.getGuild().getId());
+			}
 		}
 		else {
 			message.setColor(Color.RED);
-			e.getChannel().sendMessage(message.setDescription("RSS link couldn't be registered. Either the link has been already registered or an internal error occurred").build()).queue();
-			logger.error("{} RSS link couldn't be registered for guild {}", feed, e.getGuild().getId());
+			e.getChannel().sendMessage(message.setDescription("A tweet RSS can't be registered as long a Twitter Bot hasn't been created and configured from within the config.ini file!").build()).queue();
 		}
 	}
 	

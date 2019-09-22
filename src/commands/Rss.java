@@ -37,7 +37,7 @@ public class Rss implements CommandPublic {
 			//throw default message with instructions
 			message.setColor(Color.BLUE);
 			e.getChannel().sendMessage(message.setDescription("Use this command to set up RSS pages that will be displayed in a dedicated channel:\n\n"
-					+ "**-register**: register an rss url for this server\n"
+					+ "**-register**: register an rss url or twitter hashtag for this server\n"
 					+ "**-format**: change the format of how rss feeds should be displayed\n"
 					+ "**-remove**: remove an rss url for this server\n"
 					+ "**-test**: picks the first rss feeed to test the settings\n"
@@ -45,16 +45,15 @@ public class Rss implements CommandPublic {
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase("-register")) {
 			message.setColor(Color.BLUE);
-			e.getChannel().sendMessage(message.setDescription("Do you wish to add a basic RSS url or add a Twitter RSS feed created with politepol.com?\n"
-					+ "Write either 1 for the Basic RSS or 2 for the Twitter RSS together with the full command to select one option!").build()).queue();
+			e.getChannel().sendMessage(message.setDescription("Do you wish to add a basic RSS url or add a Twitter RSS feed?\n"
+					+ "Write either 1 for the Basic RSS or 2 for the Twitter RSS together with the full command to select an option!").build()).queue();
 		}
 		else if(args.length > 1 && args[0].equalsIgnoreCase("-register") && !args[1].matches("[^\\d]")) {
 			//select a rss model
 			var type = Integer.parseInt(args[1]);
 			if(type >= 1 && type <= 2) {
 				message.setColor(Color.BLUE);
-				e.getChannel().sendMessage(message.setDescription("Now please apply a regular RSS url, if you chose Basic or a RSS url for twitter generated with politepol!\n"
-						+ "Note that for the rss creation on politepol the title tag should be used upon the whole body tweet. The description tag is not required!").build()).queue();
+				e.getChannel().sendMessage(message.setDescription("Now please apply a regular RSS url, if you chose Basic or a hashtag if you chose twitter!").build()).queue();
 				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "register", ""+type));
 			}
 			else {

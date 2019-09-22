@@ -82,7 +82,7 @@ public class ParseModel {
 		TwitterFactory tf = STATIC.getTwitterFactory();
 		if(tf != null) {
 			Twitter twitter = tf.getInstance();
-			Query query = new Query("#CelebrateArcheAge");
+			Query query = new Query(rss.getURL());
 			QueryResult result;
 			result = twitter.search(query);
 	        List<Status> tweets = result.getTweets();
