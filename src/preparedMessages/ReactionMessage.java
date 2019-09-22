@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiManager;
 
+import constructors.Cache;
 import core.Hashes;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
@@ -17,7 +18,7 @@ import sql.DiscordRoles;
 public class ReactionMessage {
 	private final static Logger logger = LoggerFactory.getLogger(ReactionMessage.class);
 	
-	public static int print(GuildMessageReceivedEvent e, long channel_id) {
+	public static void print(GuildMessageReceivedEvent e, long channel_id) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		if(DiscordRoles.SQLgetRolesByCategory(e.getGuild().getIdLong(), "rea")) {
 			String [] reactions = GuildIni.getReactions(e.getGuild().getIdLong());
@@ -45,6 +46,7 @@ public class ReactionMessage {
 					counter ++;
 				}
 			}
+			Hashes.addTempCache("reaction_gu"+e.getGuild().getId()+"ch"+channel_id, new Cache(0, ""+counter));
 			String reactionMessage = FileSetting.readFile("./files/Guilds/"+e.getGuild().getId()+"/reactionmessage.txt");
 			if(reactionMessage.length() > 0)
 				e.getGuild().getTextChannelById(channel_id).sendMessage(reactionMessage+"\n\n"
@@ -55,12 +57,9 @@ public class ReactionMessage {
 						+ "To assign yourself a role, react with one or more of the available emojis that are below this message. "
 						+ "It can be used to remove the same role as well. These are the currently available emojis to react to with their unique role:\n\n"
 						+ ""+sb.toString()).build()).complete();
-			
-			return counter;
 		}
 		else {
 			logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());
-			return 0;
 		}
 	}
 	

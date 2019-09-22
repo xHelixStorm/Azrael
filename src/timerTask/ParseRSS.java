@@ -41,7 +41,7 @@ public class ParseRSS extends TimerTask{
 								if(rss.getType() == 1)
 									ParseModel.BasicModelParse(STATIC.retrieveWebPageCode(rss.getURL()), e, rss, guild_id, rss_channel);
 								else if(rss.getType() == 2)
-									ParseModel.TwitterModelParse(STATIC.retrieveWebPageCode(rss.getURL()), e, rss, guild_id, rss_channel);
+									ParseModel.TwitterModelParse(/*STATIC.retrieveWebPageCode(rss.getURL()),*/ e, rss, guild_id, rss_channel);
 							} catch (Exception e1) {
 								logger.error("Error on retrieving feed", e1);
 							}

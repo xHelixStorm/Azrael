@@ -27,5 +27,6 @@
 	<classpathentry kind="lib" path="lib/jackson-databind-2.9.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-core-2.9.9.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-annotations-2.9.9.jar"/>
+	<classpathentry kind="lib" path="lib/twitter4j-core-4.0.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Cache;
 import constructors.Channels;
 import core.Hashes;
+import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
@@ -23,11 +24,14 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import sql.Azrael;
 import sql.DiscordRoles;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
 
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
 	private static final String VERSION = "6.5.319";
+	private static TwitterFactory twitterFactory = null;
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	
@@ -161,5 +165,19 @@ public class STATIC {
 		con.setConnectTimeout(5000);
 		con.setReadTimeout(10000);
 		return new BufferedReader(new InputStreamReader(con.getInputStream()));
+	}
+	
+	public static void loginTwitter() {
+		final var tokens = IniFileReader.getTwitterKeys();
+		ConfigurationBuilder cb = new ConfigurationBuilder()
+				.setOAuthConsumerKey(tokens[0])
+				.setOAuthConsumerSecret(tokens[1])
+				.setOAuthAccessToken(tokens[2])
+				.setOAuthAccessTokenSecret(tokens[3]);
+		twitterFactory = new TwitterFactory(cb.build());
+	}
+	
+	public static TwitterFactory getTwitterFactory() {
+		return twitterFactory;
 	}
 }

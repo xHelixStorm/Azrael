@@ -63,6 +63,8 @@ public class ReadyListener extends ListenerAdapter {
 		else{System.out.println("private patch notes: disabled");}
 		if(allowPublicPatchNotes){System.out.println("public patch notes:  enabled");}
 		else{System.out.println("public patch notes:  disabled");}
+		
+		STATIC.loginTwitter();
 
 		var themesRetrieved = true;
 		if(RankingSystem.SQLgetThemes() == false) {

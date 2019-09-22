@@ -55,6 +55,17 @@ public class IniFileReader {
 		return ini.get("Pastebin", "DeveloperKey");
 	}
 	
+	public static String[] getTwitterKeys() {
+		readConfig();
+		Ini.Section tokens = ini.get("Twitter");
+		String []twitter = new String[4];
+		twitter[0] = tokens.get("ConsumerKey");
+		twitter[1] = tokens.get("ConsumerKeySecret");
+		twitter[2] = tokens.get("AccessToken");
+		twitter[3] = tokens.get("AccessTokenSecret");
+		return twitter;
+	}
+	
 	public static boolean getDoubleExpEnabled() {
 		readConfig();
 		return ini.get("DoubleExperience", "Enabled", boolean.class);

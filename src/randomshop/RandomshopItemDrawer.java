@@ -51,7 +51,7 @@ public class RandomshopItemDrawer {
 			var currentY = startY;
 			for(var weapon : weapons) {
 				counter++;
-				BufferedImage currentWeapon = ImageIO.read(new File("./files/RankingSystem/Weapons/"+weapon.getDescription()+".png"));
+				BufferedImage currentWeapon = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Weapons/"+weapon.getDescription()+".png"));
 				g.drawImage(currentWeapon, currentX+(sizeX/2)-(itemSizeX/2), currentY+(sizeY/2)-(itemSizeY/2), (itemSizeX != 0 ? itemSizeX : currentWeapon.getWidth()), (itemSizeY != 0 ? itemSizeY : currentWeapon.getHeight()), null);
 				if(counter % rowLimit != 0) {
 					currentX += moveX;

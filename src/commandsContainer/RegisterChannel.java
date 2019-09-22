@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import constructors.Cache;
 import constructors.Channels;
 import core.Hashes;
 import core.UserPrivs;
@@ -84,8 +83,7 @@ public class RegisterChannel {
 					if(channel_type.equals("rea")) {
 						//use the temp cache to append reactions after the bot sends a message
 						if(Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), 0, true) > 0) {
-							String count = ""+ReactionMessage.print(_e, channel_id);
-							Hashes.addTempCache("reaction_gu"+_e.getGuild().getId()+"ch"+channel, new Cache(0, count));
+							ReactionMessage.print(_e, channel_id);
 						}
 						else {
 							logger.error("Role reactions couldn't be set to enable for guild {}", _e.getGuild().getName());

@@ -62,7 +62,7 @@ public class InventoryBuilder {
 			for(InventoryContent inventory : _items){
 				i++;
 				BufferedImage item;
-				if(inventory.getType().equals("ite"))
+				if(inventory.getType() != null && inventory.getType().equals("ite"))
 					item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Items/"+inventory.getDescription()+".png"));
 				else if(inventory.getType() != null)
 					item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/"+inventory.getDescription()+".png"));

@@ -3,7 +3,6 @@ package commands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
@@ -40,8 +39,7 @@ public class RoleReaction implements CommandPublic {
 				if(rea_channel != null) {							
 					if(Azrael.SQLUpdateReaction(e.getGuild().getIdLong(), true) > 0) {
 						e.getChannel().sendMessage("Role Reactions have been enabled!").queue();
-						String count = ""+ReactionMessage.print(e, rea_channel.getChannel_ID());
-						Hashes.addTempCache("reaction_gu"+e.getGuild().getId()+"ch"+rea_channel.getChannel_ID(), new Cache(0, count));
+						ReactionMessage.print(e, rea_channel.getChannel_ID());
 					}
 					else {
 						e.getChannel().sendMessage("An internal error occurred. Role reactions couldn't be enabled in Azrael.commands").queue();

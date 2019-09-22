@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.vdurmont.emoji.EmojiParser;
 
@@ -15,6 +13,14 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import sql.Azrael;
+import twitter4j.MediaEntity;
+import twitter4j.Query;
+import twitter4j.QueryResult;
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.URLEntity;
 import util.STATIC;
 
 public class ParseModel {
@@ -72,162 +78,67 @@ public class ParseModel {
 		in.close();
 	}
 	
-	public static void TwitterModelParse(BufferedReader in, ReadyEvent e, RSS rss, long guild_id, Channels rss_channel) throws IOException {
-		String format = rss.getFormat();
-		boolean itemTagFound = false;
-		boolean redo = false;
-		int startPosition = 0;
-		int endPosition = 0;
-		String title = "";
-		String description = "";
-		String pubDate = "";
-		String link = "";
-		String author = "";
-		
-		String tempMessage = "";
-		String message = "";
-		String line;
-		while((line = in.readLine()) != null) {
-			do {
-				if(redo)
-					line = line.substring((tempMessage+"</item>").length());
-				redo = false;
-				if(!itemTagFound && line.contains("<item>")) {
-					itemTagFound = true;
-					startPosition = line.indexOf("<item>");
-					message = line.substring(startPosition);
-				}
-				else {
-					message += line;
-				}
-				if(itemTagFound && line.contains("</item>")) {
-					endPosition = line.indexOf("</item>");
-					tempMessage = line.substring(startPosition, endPosition);
-					message += tempMessage;
-					if(message.contains("<title>") && message.contains("</title>")) {
-						int firstPos = message.indexOf("<title>");
-						int lastPos = message.indexOf("</title>");
-						title = message.substring(firstPos, lastPos).replaceAll("(<title>|</title>)", "");
-						Pattern pattern = Pattern.compile("&gt;[\\w\\d@]{1}[\\w\\d\\s]*&lt;");
-						Matcher matcher = pattern.matcher(title);
-						boolean atFound = false;
-						while(matcher.find()) {
-							var letters = matcher.group();
-							if(atFound) {
-								author += "@"+letters;
-								break;
-							}
-							if(letters.contains("@"))
-								atFound = true;
-							if(!atFound)
-								author = matcher.group()+" ";
-						}
-						author = author.replaceAll("(>|&gt;|<|&lt;)", "");
-						pattern = Pattern.compile("href=\"[\\/\\w\\d\"]*status\\/[\\d\"]*");
-						matcher = pattern.matcher(title);
-						if(matcher.find()) {
-							link = matcher.group();
-							link = "https://twitter.com"+link.replaceAll("(href=|\")", "");
-							BufferedReader stream = STATIC.retrieveWebPageCode(link);
-							pattern = Pattern.compile("https:\\/\\/t.co/[\\w\\d]*");
-							boolean url1Found = false;
-							boolean descriptionFound = false;
-							String url1 = null;
-							String url2 = null;
-							String streamLine;
-							while((streamLine = stream.readLine()) != null) {
-								if(!descriptionFound && streamLine.contains("<title>") && streamLine.contains("</title>")) {
-									descriptionFound = true;
-									int descPos = streamLine.indexOf("<title>");
-									int descPosEnd = streamLine.indexOf("</title>");
-									description = streamLine.substring(descPos, descPosEnd);
-									Pattern descriptionPattern = Pattern.compile(";[\\w\\d#].+");
-									matcher = descriptionPattern.matcher(description);
-									if(matcher.find()) {
-										description = matcher.group();
-										description = description.replaceAll("(&quot;|<\\/title>|;)", "");
-										description = description.replaceAll("&#10", "\n");
-										description = description.replaceAll("&#39", "'");
-										description = description.replace("…", "");
-									}
-									
-								}
-								if(!url1Found) {
-									matcher = pattern.matcher(streamLine);
-									if(matcher.find()) {
-										url1 = matcher.group();
-										url1Found = true;
-									}
-								}
-								if(url1Found) {
-									if(streamLine.contains("https://pbs.twimg.com/media")) {
-										pattern = Pattern.compile("https:\\/\\/pbs.twimg.com\\/media\\/[\\w\\d-.]*");
-										matcher = pattern.matcher(streamLine);
-										if(matcher.find()) {
-											url2 = matcher.group();
-											break;
-										}
-									}
-									else if(streamLine.contains("https://pbs.twimg.com/ext")){
-										break;
-									}
-								}
-							}
-							stream.close();
-							if(description.contains("pic.twitter.com/")) {
-								description.replaceAll("pic.twitter.com\\/[\\w\\d]*", (url2 != null ? url2 : url1));
-							}
-							else if(!description.contains("t.co/")) {
-								description += "\n"+(url2 != null ? url2 : url1);
-							}
-							else
-								description.replaceAll("https:\\/\\/t.co\\/[\\w\\d]*", (url2 != null ? url2 : url1));
-						}
-						if(description.length() > 0 || pubDate.length() > 0 || link.length() > 0) {
-							String out = format.replace("{description}", description);
-							out = out.replace("{pubDate}", pubDate);
-							out = out.replace("{link}", "<"+link+">");
-							out = out.replace("{author}", author);
-							out = out.replaceAll("&#039;", "'");
-							final String outMessage = EmojiParser.parseToUnicode(out);
-							final String toCheckMessage = outMessage.toLowerCase();
-							final String compareAuthor = author;
-							boolean wordFound = false;
-							if(Azrael.SQLgetTweetBlacklist(guild_id).parallelStream().filter(f -> compareAuthor.contains(f)).findAny().orElse(null) != null)
-								wordFound = true;
-							if(!wordFound) {
-								find: for(var filter : Azrael.SQLgetChannel_Filter(rss_channel.getChannel_ID())) {
-									if(wordFound == false) {
-										Optional<String> option = Azrael.SQLgetFilter(filter, guild_id).parallelStream()
-											.filter(word -> toCheckMessage.equals(word) || toCheckMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || toCheckMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || toCheckMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || toCheckMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || toCheckMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || toCheckMessage.contains(" "+word+" "))
-											.findAny();
-										if(option.isPresent()) {
-											wordFound = true;
-											break find;
-										}
-									}
-								}
-							}
-							if(!wordFound) {
-								MessageHistory history = new MessageHistory(e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()));
-								List<Message> msg = history.retrievePast(20).complete();
-								Message historyMessage = msg.parallelStream().filter(f -> f.getContentRaw().equals(outMessage)).findAny().orElse(null);
-								if(historyMessage == null)
-									e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
+	public static void TwitterModelParse(ReadyEvent e, RSS rss, long guild_id, Channels rss_channel) throws TwitterException {
+		TwitterFactory tf = STATIC.getTwitterFactory();
+		if(tf != null) {
+			Twitter twitter = tf.getInstance();
+			Query query = new Query("#CelebrateArcheAge");
+			QueryResult result;
+			result = twitter.search(query);
+	        List<Status> tweets = result.getTweets();
+	        final String pattern = "https:\\/\\/t.co\\/[\\w\\d]*";
+	        for (Status tweet : tweets) {
+	        	if(!tweet.isRetweet()) {
+	        		String message = tweet.getText();
+	        		final String fullName = tweet.getUser().getName();
+	        		final String username = "@"+tweet.getUser().getScreenName();
+	        		final String pubDate = tweet.getCreatedAt().toString();
+	        		boolean tweetProhibited = false;
+	        		if(Azrael.SQLgetTweetBlacklist(guild_id).parallelStream().filter(f -> username.equals(f)).findAny().orElse(null) != null)
+	        			tweetProhibited = true;
+	        		if(!tweetProhibited) {
+	        			final String compareMessage = message.toLowerCase();
+	        			find: for(var filter : Azrael.SQLgetChannel_Filter(rss_channel.getChannel_ID())) {
+	        				Optional<String> option = Azrael.SQLgetFilter(filter, guild_id).parallelStream()
+									.filter(word -> compareMessage.equals(word) || compareMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || compareMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || compareMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || compareMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || compareMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || compareMessage.contains(" "+word+" "))
+									.findAny();
+							if(option.isPresent()) {
+								tweetProhibited = true;
+								break find;
 							}
 						}
-					}
-					message = "";
-					itemTagFound = false;
-					title = "";
-					description = "";
-					pubDate = "";
-					link = "";
-					redo = true;
-				}
-				startPosition = 0;
-			} while(redo);
+	        		}
+	        		if(!tweetProhibited) {
+	        			for(MediaEntity media : tweet.getMediaEntities()) {
+	                		if(message.contains("https://t.co"))
+	                			message = message.replaceFirst(pattern, media.getExpandedURL());
+	                		else
+	                			message += "\n"+media.getExpandedURL();
+	                	}
+	                	for(URLEntity url : tweet.getURLEntities()) {
+	                		if(message.contains("https://t.co"))
+	                			message = message.replaceFirst(pattern, url.getExpandedURL());
+	                		else
+	                			message += "\n"+url.getExpandedURL();
+	                	}
+	                	String format = rss.getFormat();
+	                	String out = format.replace("{description}", message);
+						out = out.replace("{pubDate}", pubDate);
+						out = out.replace("{fullName}", fullName);
+						out = out.replace("{username}", username);
+	                	final String outMessage = out;
+	                	MessageHistory history = new MessageHistory(e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()));
+						List<Message> msg = history.retrievePast(30).complete();
+						Message historyMessage = msg.parallelStream().filter(f -> f.getContentRaw().contains(outMessage)).findAny().orElse(null);
+						
+						if(historyMessage == null)
+							e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
+	        		}
+	        	}
+	        }
 		}
-		in.close();
+		else {
+			//throw error in log channel that the authentication to Twitter is missing
+		}
 	}
 }
