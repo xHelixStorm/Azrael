@@ -347,7 +347,7 @@ public class RankingSystemItems {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT s.weapon_id, s.description, s.price, s.weapon_abbv, s.fk_skin, s.weapon_stat, w.stat, s.fk_category_id, c.name, o.overlay, s.enabled, full_description, thumbnail FROM weapon_shop_content s INNER JOIN weapon_stats w ON s.weapon_stat = w.stat_id INNER JOIN weapon_category c ON s.fk_category_id = c.category_id && s.fk_theme_id = c.fk_theme_id INNER JOIN randomshop_reward_overlays o ON s.fk_overlay_id = o.overlay_id  && s.fk_theme_id = o.fk_theme_id WHERE s.fk_theme_id = ?");
+				String sql = ("SELECT s.weapon_id, s.description, s.price, s.weapon_abbv, s.fk_skin, s.weapon_stat, w.stat, s.fk_category_id, c.name, r.overlay, s.enabled, full_description, thumbnail, c.skill, c.close_range, c.long_range, magazine, ammunition, k.fk_attack_type, k.damage_plus, k.damage_plus_percent, k.damage_drop, k.damage_drop_percent, k.hit_chance_close, k.hit_chance_medium, k.hit_chance_distant, k.sp_consumption, k.fk_effect, m.fk_attack_type, m.damage_plus, m.damage_plus_percent, m.damage_drop, m.damage_drop_percent, m.hit_chance_close, m.hit_chance_medium, m.hit_chance_distant, m.sp_consumption, m.fk_effect, n.fk_attack_type, n.damage_plus, n.damage_plus_percent, n.damage_drop, n.damage_drop_percent, n.hit_chance_close, n.hit_chance_medium, n.hit_chance_distant, n.sp_consumption, n.fk_effect, o.fk_attack_type, o.damage_plus, o.damage_plus_percent, o.damage_drop, o.damage_drop_percent, o.hit_chance_close, o.hit_chance_medium, o.hit_chance_distant, o.sp_consumption, o.fk_effect FROM weapon_shop_content s INNER JOIN weapon_stats w ON s.weapon_stat = w.stat_id INNER JOIN weapon_category c ON s.fk_category_id = c.category_id && s.fk_theme_id = c.fk_theme_id INNER JOIN randomshop_reward_overlays r ON s.fk_overlay_id = r.overlay_id  && s.fk_theme_id = r.fk_theme_id INNER JOIN weapon_abbreviation a ON s.weapon_abbv = a.abbv && s.fk_theme_id = a.fk_theme_id LEFT JOIN weapon_attack k ON a.attack1 = k.attack_id LEFT JOIN weapon_attack m ON a.attack2 = m.attack_id LEFT JOIN weapon_attack n ON a.attack3 = n.attack_id LEFT JOIN weapon_attack o ON a.attack4 = o.attack_id WHERE s.fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _theme_id);
 				rs = stmt.executeQuery();
@@ -365,7 +365,12 @@ public class RankingSystemItems {
 						rs.getString(10),
 						rs.getBoolean(11),
 						rs.getString(12),
-						rs.getString(13)
+						rs.getString(13),
+						rs.getBoolean(14),
+						rs.getBoolean(15),
+						rs.getBoolean(16),
+						rs.getInt(17),
+						rs.getInt(18)
 					);
 					weapons.add(weapon);
 				}

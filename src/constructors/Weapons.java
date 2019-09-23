@@ -14,8 +14,13 @@ public class Weapons {
 	private boolean enabled;
 	private String fullDescription;
 	private String thumbnail;
+	private boolean skill;
+	private boolean close_range;
+	private boolean long_range;
+	private int magazine;
+	private int ammunition;
 	
-	public Weapons(int _weapon_id, String _description, long _price, String _weapon_abbv, int _skin, int _stat, String _stat_description, int _category_id, String _category_description, String _overlay_name, boolean _enabled, String _fullDescription, String _thumbnail) {
+	public Weapons(int _weapon_id, String _description, long _price, String _weapon_abbv, int _skin, int _stat, String _stat_description, int _category_id, String _category_description, String _overlay_name, boolean _enabled, String _fullDescription, String _thumbnail, boolean _skill, boolean _close_range, boolean _long_range, int _magazine, int _ammunition) {
 		this.weapon_id = _weapon_id;
 		this.description = _description;
 		this.price = _price;
@@ -29,45 +34,65 @@ public class Weapons {
 		this.enabled = _enabled;
 		this.fullDescription = _fullDescription;
 		this.thumbnail = _thumbnail;
+		this.skill = _skill;
+		this.close_range = _close_range;
+		this.long_range = _close_range;
+		this.magazine = _magazine;
+		this.ammunition = _ammunition;
 	}
 	
 	public int getWeaponID() {
-		return weapon_id;
+		return this.weapon_id;
 	}
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 	public long getPrice() {
-		return price;
+		return this.price;
 	}
 	public String getWeaponAbbv() {
-		return weapon_abbv;
+		return this.weapon_abbv;
 	}
 	public int getSkin() {
-		return skin;
+		return this.skin;
 	}
 	public int getStat() {
-		return stat;
+		return this.stat;
 	}
 	public String getStatDescription() {
-		return stat_description;
+		return this.stat_description;
 	}
 	public int getCategoryID() {
-		return category_id;
+		return this.category_id;
 	}
 	public String getCategoryDescription() {
-		return category_description;
+		return this.category_description;
 	}
 	public String getOverlayName() {
-		return overlay_name;
+		return this.overlay_name;
 	}
 	public boolean getEnabled() {
-		return enabled;
+		return this.enabled;
 	}
 	public String getFullDescription() {
-		return fullDescription;
+		return this.fullDescription;
 	}
 	public String getThumbnail() {
-		return thumbnail;
+		return this.thumbnail;
+	}
+	public boolean getSkill() {
+		return this.skill;
+	}
+	public boolean getCloseRange() {
+		return this.close_range;
+	}
+	public boolean getLongRange() {
+		return this.long_range;
+	}
+	public int getMagazine() {
+		return this.magazine;
+	}
+	public int getAmmunition() {
+		return this.ammunition;
 	}
 }

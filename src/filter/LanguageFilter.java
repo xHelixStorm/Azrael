@@ -16,6 +16,7 @@ import util.STATIC;
 import util.CharacterReplacer;
 
 public class LanguageFilter implements Runnable {
+	private final static EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle("Message removed!");
 	
 	private GuildMessageReceivedEvent e;
 	private ArrayList<String> filter_lang;
@@ -30,33 +31,32 @@ public class LanguageFilter implements Runnable {
 	@SuppressWarnings("preview")
 	@Override
 	public void run() {
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle("Message removed!");
-		boolean wordFound = false;
-		boolean exceptionFound = false;
-		String [] output = new String[2];
-		
-		if(filter_lang.size() == 1) {
-			switch(filter_lang.get(0)) {
-				case "ger" -> {
-					output[0] = " Die Nachricht wurde wegen schlechten Benehmens entfernt!";
-					output[1] = " Dies ist deine zweite Warnung. Eine weitere entfernte Nachricht und du wirst auf diesem Server **stumm geschaltet**!";
-				}
-				case "fre" -> {
-					output[0] = " Votre message à été supprimé pour mauvais comportement !";
-					output[1] = " C'est votre deuxième avertissement. Encore une fois et vous serez **mis sous silence** sur le serveur !";
-				}
-				default -> {
-					output[0] = " Message has been removed due to bad behaviour!";
-					output[1] = " This has been the second warning. One more and you'll be **muted** from the server!";
+		if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && !UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) && !UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong())) {
+			boolean wordFound = false;
+			boolean exceptionFound = false;
+			String [] output = new String[2];
+			
+			if(filter_lang.size() == 1) {
+				switch(filter_lang.get(0)) {
+					case "ger" -> {
+						output[0] = " Die Nachricht wurde wegen schlechten Benehmens entfernt!";
+						output[1] = " Dies ist deine zweite Warnung. Eine weitere entfernte Nachricht und du wirst auf diesem Server **stumm geschaltet**!";
+					}
+					case "fre" -> {
+						output[0] = " Votre message à été supprimé pour mauvais comportement !";
+						output[1] = " C'est votre deuxième avertissement. Encore une fois et vous serez **mis sous silence** sur le serveur !";
+					}
+					default -> {
+						output[0] = " Message has been removed due to bad behaviour!";
+						output[1] = " This has been the second warning. One more and you'll be **muted** from the server!";
+					}
 				}
 			}
-		}
-		else{
-			output[0] = " Message has been removed due to bad behaviour!";
-			output[1] = " This has been the second warning. One more and you'll be **muted** from the server!";
-		}
-		
-		if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong())) {
+			else{
+				output[0] = " Message has been removed due to bad behaviour!";
+				output[1] = " This has been the second warning. One more and you'll be **muted** from the server!";
+			}
+			
 			String getMessage = e.getMessage().getContentRaw();
 			String channel = e.getChannel().getName();
 			String thisMessage;
