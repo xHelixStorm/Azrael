@@ -261,6 +261,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(!message.equalsIgnoreCase("exit")) {
 						if(task.equals("register") && message.startsWith("http")) {
 							RssExecution.registerFeed(e, message, Integer.parseInt(rss.getAdditionalInfo2()));
+							Hashes.clearTempCache(key);
 						}
 						if(task.equals("remove") && message.replaceAll("[0-9]", "").length() == 0) {
 							if(RssExecution.removeFeed(e, Integer.parseInt(message)-1))

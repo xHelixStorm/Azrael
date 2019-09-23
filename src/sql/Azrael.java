@@ -1876,11 +1876,11 @@ public class Azrael {
 			if(_type == 1)
 				stmt.setString(3, "{pubDate} | {title}\n{description}\n{link}");
 			else if(_type == 2)
-				stmt.setString(3, "From: **{author}**\n{description}");
+				stmt.setString(3, "From: **{fullName} {username}**\n{description}");
 			stmt.setInt(4, _type);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLInserRSS Exception", e);
+			logger.error("SQLInsertRSS Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
