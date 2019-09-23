@@ -30,7 +30,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.5.320";
+	private static final String VERSION = "6.5.321";
 	private static TwitterFactory twitterFactory = null;
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
@@ -168,13 +168,17 @@ public class STATIC {
 	}
 	
 	public static void loginTwitter() {
-		final var tokens = IniFileReader.getTwitterKeys();
-		ConfigurationBuilder cb = new ConfigurationBuilder()
-				.setOAuthConsumerKey(tokens[0])
-				.setOAuthConsumerSecret(tokens[1])
-				.setOAuthAccessToken(tokens[2])
-				.setOAuthAccessTokenSecret(tokens[3]);
-		twitterFactory = new TwitterFactory(cb.build());
+		if(twitterFactory == null) {
+			final var tokens = IniFileReader.getTwitterKeys();
+			if(tokens[0] != null && tokens[1] != null && tokens[2] != null && tokens[3] != null) {
+				ConfigurationBuilder cb = new ConfigurationBuilder()
+						.setOAuthConsumerKey(tokens[0])
+						.setOAuthConsumerSecret(tokens[1])
+						.setOAuthAccessToken(tokens[2])
+						.setOAuthAccessTokenSecret(tokens[3]);
+				twitterFactory = new TwitterFactory(cb.build());
+			}
+		}
 	}
 	
 	public static TwitterFactory getTwitterFactory() {

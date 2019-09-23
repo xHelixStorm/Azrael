@@ -12,7 +12,8 @@ import constructors.RSS;
 import core.Hashes;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.events.ReadyEvent;
-import rss.ParseModel;
+import rss.BasicModel;
+import rss.TwitterModel;
 import sql.Azrael;
 import util.STATIC;
 
@@ -39,9 +40,9 @@ public class ParseRSS extends TimerTask{
 							try {
 								logger.debug("Retrieving rss feed for {} in guild {}", rss.getURL(), e.getJDA().getGuildById(guild_id).getName());
 								if(rss.getType() == 1)
-									ParseModel.BasicModelParse(STATIC.retrieveWebPageCode(rss.getURL()), e, rss, guild_id, rss_channel);
+									BasicModel.ModelParse(STATIC.retrieveWebPageCode(rss.getURL()), e, rss, guild_id, rss_channel);
 								else if(rss.getType() == 2)
-									ParseModel.TwitterModelParse(/*STATIC.retrieveWebPageCode(rss.getURL()),*/ e, rss, guild_id, rss_channel);
+									TwitterModel.ModelParse(e, rss, guild_id, rss_channel);
 							} catch (Exception e1) {
 								logger.error("Error on retrieving feed", e1);
 							}

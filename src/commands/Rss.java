@@ -14,6 +14,7 @@ import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
+import util.STATIC;
 
 public class Rss implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Rss.class);
@@ -36,29 +37,43 @@ public class Rss implements CommandPublic {
 		if(args.length == 0) {
 			//throw default message with instructions
 			message.setColor(Color.BLUE);
-			e.getChannel().sendMessage(message.setDescription("Use this command to set up RSS pages that will be displayed in a dedicated channel:\n\n"
+			e.getChannel().sendMessage(message.setDescription("Use this command to set up RSS pages or Twitter hashtags that will be displayed in a dedicated channel:\n\n"
 					+ "**-register**: register an rss url or twitter hashtag for this server\n"
-					+ "**-format**: change the format of how rss feeds should be displayed\n"
-					+ "**-remove**: remove an rss url for this server\n"
-					+ "**-test**: picks the first rss feeed to test the settings\n"
-					+ "**-display**: display the current registered feeds for this server").build()).queue();
+					+ "**-format**: change the format of how rss feeds and hashtags should be displayed\n"
+					+ "**-remove**: remove an rss or hashtag from this server\n"
+					+ "**-test**: picks the first rss feed or hashtag to test the settings\n"
+					+ "**-display**: display the current registered feeds and hashtags for this server").build()).queue();
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase("-register")) {
 			message.setColor(Color.BLUE);
-			e.getChannel().sendMessage(message.setDescription("Do you wish to add a basic RSS url or add a Twitter RSS feed?\n"
-					+ "Write either 1 for the Basic RSS or 2 for the Twitter RSS together with the full command to select an option!").build()).queue();
+			e.getChannel().sendMessage(message.setDescription("Do you wish to add a basic RSS url or add a Twitter hashtag?\n"
+					+ "Write either 1 for the Basic RSS or 2 for the Twitter hashtag together with the full command to select an option!").build()).queue();
 		}
 		else if(args.length > 1 && args[0].equalsIgnoreCase("-register") && !args[1].matches("[^\\d]")) {
 			//select a rss model
 			var type = Integer.parseInt(args[1]);
 			if(type >= 1 && type <= 2) {
-				message.setColor(Color.BLUE);
-				e.getChannel().sendMessage(message.setDescription("Now please apply a regular RSS url, if you chose Basic or a hashtag if you chose twitter!").build()).queue();
-				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "register", ""+type));
+				if(type == 1) {
+					message.setColor(Color.BLUE);
+					e.getChannel().sendMessage(message.setDescription("Now please apply a regular RSS url!").build()).queue();
+					Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "register", ""+type));
+				}
+				else if(type == 2) {
+					STATIC.loginTwitter();
+					if(STATIC.getTwitterFactory() != null) {
+						message.setColor(Color.BLUE);
+						e.getChannel().sendMessage(message.setDescription("Now please apply a Twitter hashtag!").build()).queue();
+						Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "register", ""+type));
+					}
+					else {
+						message.setColor(Color.RED);
+						e.getChannel().sendMessage(message.setDescription("Please set up the config.ini file after creating a Twitter Bot on https://apps.twitter.com before using this command!").build()).queue();
+					}
+				}
 			}
 			else {
 				message.setColor(Color.RED);
-				e.getChannel().sendMessage(message.setDescription("Please type either 1 or 2 to register a rss link!").build()).queue();
+				e.getChannel().sendMessage(message.setDescription("Please type 1 to register an rss url or 2 to register a Twitter hashtag!").build()).queue();
 			}
 		}
 		else if(args[0].equalsIgnoreCase("-remove")) {
@@ -69,7 +84,7 @@ public class Rss implements CommandPublic {
 				counter++;
 			}
 			message.setColor(Color.BLUE);
-			e.getChannel().sendMessage(message.setDescription("Please select a digit for the RSS feed to be removed:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
+			e.getChannel().sendMessage(message.setDescription("Please select a digit for the RSS feed or hashtag to be removed:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
 			logger.debug("{} chose to remove a feed", e.getMember().getUser().getId());
 			if(out.length() > 0)
 				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "remove"));
@@ -82,7 +97,7 @@ public class Rss implements CommandPublic {
 				counter++;
 			}
 			message.setColor(Color.BLUE);
-			e.getChannel().sendMessage(message.setDescription("Please select a digit for the RSS feed to be personalized:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
+			e.getChannel().sendMessage(message.setDescription("Please select a digit for the RSS feed or hashtag to be personalized:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
 			logger.debug("{} chose to change the format of a feed", e.getMember().getUser().getId());
 			if(out.length() > 0)
 				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "format"));
@@ -96,7 +111,7 @@ public class Rss implements CommandPublic {
 				counter++;
 			}
 			message.setColor(Color.BLUE);
-			e.getChannel().sendMessage(message.setDescription("Please select a digit for the RSS that needs to be tested:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
+			e.getChannel().sendMessage(message.setDescription("Please select a digit for the RSS or hashtag that needs to be tested:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
 			logger.debug("{} chose to change the format of a feed", e.getMember().getUser().getId());
 			if(out.length() > 0)
 				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "test"));
@@ -110,7 +125,7 @@ public class Rss implements CommandPublic {
 				counter++;
 			}
 			message.setColor(Color.BLUE);
-			e.getChannel().sendMessage(message.setDescription("These are the registered rss feeds:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
+			e.getChannel().sendMessage(message.setDescription("These are the registered rss feeds and hashtags:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
 		}
 		else {
 			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription("Parameter not accepted. Please review the available parameters for this command").build()).queue();
