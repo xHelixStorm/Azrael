@@ -37,13 +37,13 @@ public class RoleListener extends ListenerAdapter {
 			long user_id = e.getMember().getUser().getIdLong();
 			long guild_id = e.getMember().getGuild().getIdLong();
 			String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
-			long mute_id;
 			long mute_time;
 			double unmute;
 			boolean customTimeMute = false;
 			
 			if(UserPrivs.isUserMuted(e.getMember().getUser(), e.getGuild().getIdLong())) {
 				var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+				var mute_id = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null).getRole_ID();
 				Bancollect warnedUser = Azrael.SQLgetData(user_id, guild_id);
 				var permMute = false;
 				long unmute_time = 0;
@@ -68,7 +68,7 @@ public class RoleListener extends ListenerAdapter {
 						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned and reactivated the unlimited mute. Reason may be due to manually reassigning the mute role or rejoining the server!").build()).queue();
 					}
-					removeRoles(e);
+					removeRoles(e, mute_id);
 				}
 				else if(unmute_time - System.currentTimeMillis() > 0 && !warnedUser.getMuted()) {
 					if(Azrael.SQLUpdateMuted(user_id, guild_id, true) == 0) {
@@ -79,7 +79,7 @@ public class RoleListener extends ListenerAdapter {
 						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned before the mute time elapsed! Reason may be due to manually reassigning the mute role!").build()).queue();
 					}
-					mute_id = removeRoles(e);
+					removeRoles(e, mute_id);
 				}
 				else if(unmute_time - System.currentTimeMillis() > 0 && warnedUser.getMuted() && warnedUser.getGuildLeft()) {
 					Azrael.SQLUpdateGuildLeft(user_id, guild_id, false);
@@ -102,7 +102,6 @@ public class RoleListener extends ListenerAdapter {
 					
 					if(warnedUser.getCustomTime())
 						customTimeMute = true;
-					mute_id = DiscordRoles.SQLgetRole(guild_id, "mut");
 					try {
 						for(Role r : e.getMember().getRoles()) {
 							if(r.getIdLong() != mute_id) {
@@ -205,14 +204,12 @@ public class RoleListener extends ListenerAdapter {
 		}).start();
 	}
 	
-	private long removeRoles(GuildMemberRoleAddEvent e) {
+	private void removeRoles(GuildMemberRoleAddEvent e, long mute_id) {
 		//remove all roles on mute role reassign
-		var mute_id = DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut");
 		for(Role role : e.getMember().getRoles()) {
 			if(role.getIdLong() != mute_id) {
 				e.getGuild().removeRoleFromMember(e.getMember(), role).queue();
 			}
 		}
-		return mute_id;
 	}
 }

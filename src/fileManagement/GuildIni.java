@@ -164,6 +164,8 @@ public class GuildIni {
 			ini.add("Commands", "DoubleExperienceLevel", "20");
 			ini.add("Commands", "Equip", "false");
 			ini.add("Commands", "EquipLevel", "1");
+			ini.add("Commands", "Remove", "false");
+			ini.add("Commands", "RemoveLevel", "20");
 			
 			//Inventory
 			ini.add("Inventory", "startX", "0");
@@ -808,6 +810,14 @@ public class GuildIni {
 	public static int getEquipLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "EquipLevel", int.class);
+	}
+	public static boolean getRemoveCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Remove", boolean.class);
+	}
+	public static int getRemoveLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "RemoveLevel", int.class);
 	}
 	
 	public static int[] getWholeInventory(long guild_id) {

@@ -353,6 +353,26 @@ public class RankingSystem {
 		}
 	}
 	
+	public static int SQLDeleteRole(long _role_id, long _guild_id) {
+		logger.debug("SQLDeleteRole launched. Passed params {}, {}", _role_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM roles WHERE role_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _role_id);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteRole Exception", e);
+			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLclearRoles(long _guild_id) {
 		logger.debug("SQLclearRoles launched. Passed params {}", _guild_id);
 		Connection myConn = null;

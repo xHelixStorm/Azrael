@@ -34,7 +34,7 @@ public class Register implements CommandPublic {
 		var guild_id = e.getGuild().getIdLong();
 		var adminPermission = (GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong());
 		final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-		if(DiscordRoles.SQLgetRole(guild_id, "adm") == 0) {
+		if(DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("adm")).findAny().orElse(null) == null) {
 			if(args.length == 0) {
 				if(adminPermission) {
 					e.getChannel().sendMessage(messageBuild.setDescription("Use this command to register either a channel, a role, a ranking role or all users in a guild. For the first time, an administrator role needs to be registered and afterwards all the other features for this command will be unlocked.\n\n"

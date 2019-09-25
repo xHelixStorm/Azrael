@@ -1113,6 +1113,25 @@ public class Azrael {
 		}
 	}
 	
+	public static int SQLDeleteAllChannelConfs(long _guild_id) {
+		logger.debug("SQLDeleteAllChannelConfs launched. Passed params {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM channel_conf WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteAllChannelConfs Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLInsertChannel_ConfURLCensoring(long _channel_id, long _guild_id, boolean _url_censoring) {
 		logger.debug("SQLInsertChannel_ConfURLCensoring launched. Passed params {}, {}, {}, {}", _channel_id, _guild_id, _url_censoring);
 		Connection myConn = null;
@@ -1651,7 +1670,7 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLDeleteChannel_Filter(long _channel_id) {
+	public static int SQLDeleteChannel_Filter(long _channel_id) {
 		logger.debug("SQLDeleteChannel_Filter launched. Passed params {}", _channel_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1660,9 +1679,10 @@ public class Azrael {
 			String sql = ("DELETE FROM channel_filter WHERE fk_channel_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteChannel_Filter Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }

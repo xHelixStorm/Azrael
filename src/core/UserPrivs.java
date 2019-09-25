@@ -20,7 +20,7 @@ public class UserPrivs {
 	
 	public static boolean isUserAdmin(User user, long _guild_id) {
 		for(Role r : user.getJDA().getGuildById(_guild_id).getMember(user).getRoles()) {
-			Roles category = Hashes.getDiscordRole(r.getIdLong());
+			Roles category = DiscordRoles.SQLgetRoles(_guild_id).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
 			if(category != null && category.getCategory_Name().length() > 0) {
 				if(category.getCategory_Name().equals("Administrator")) {
 					return true;
@@ -32,7 +32,7 @@ public class UserPrivs {
 	
 	public static boolean isUserMod(User user, long _guild_id) {
 		for(Role r : user.getJDA().getGuildById(_guild_id).getMember(user).getRoles()) {
-			Roles category = Hashes.getDiscordRole(r.getIdLong());
+			Roles category = DiscordRoles.SQLgetRoles(_guild_id).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
 			if(category != null && category.getCategory_Name().length() > 0) {
 				if(category.getCategory_Name().equals("Moderator")) {
 					return true;
@@ -44,7 +44,7 @@ public class UserPrivs {
 	
 	public static boolean isUserBot(User user, long _guild_id) {
 		for(Role r : user.getJDA().getGuildById(_guild_id).getMember(user).getRoles()) {
-			Roles category = Hashes.getDiscordRole(r.getIdLong());
+			Roles category = DiscordRoles.SQLgetRoles(_guild_id).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
 			if(category != null && category.getCategory_Name().length() > 0) {
 				if(category.getCategory_Name().equals("Bot")) {
 					return true;
@@ -56,7 +56,7 @@ public class UserPrivs {
 	
 	public static boolean isUserMuted(User user, long _guild_id) {
 		for(Role r : user.getJDA().getGuildById(_guild_id).getMember(user).getRoles()) {
-			Roles category = Hashes.getDiscordRole(r.getIdLong());
+			Roles category = DiscordRoles.SQLgetRoles(_guild_id).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
 			if(category != null && category.getCategory_Name().length() > 0) {
 				if(category.getCategory_Name().equals("Mute")) {
 					return true;
@@ -68,7 +68,7 @@ public class UserPrivs {
 	
 	public static boolean isUserCommunity(User user, long _guild_id) {
 		for(Role r : user.getJDA().getGuildById(_guild_id).getMember(user).getRoles()) {
-			Roles category = Hashes.getDiscordRole(r.getIdLong());
+			Roles category = DiscordRoles.SQLgetRoles(_guild_id).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
 			if(category != null && category.getCategory_ABV().length() > 0) {
 				if(category.getCategory_Name().equals("Community")) {
 					return true;
@@ -81,7 +81,7 @@ public class UserPrivs {
 	public static boolean comparePrivilege(Member member, int requiredLevel) {
 		var highestLevel = 0;
 		for(final var role : member.getRoles()) {
-			var level = DiscordRoles.SQLgetRole(member.getGuild().getIdLong(), role.getIdLong());
+			var level = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == role.getIdLong()).findAny().orElse(null);
 			if(level != null) {
 				if(level.getLevel() > highestLevel) {
 					highestLevel = level.getLevel();
@@ -99,11 +99,13 @@ public class UserPrivs {
 	public static String retrieveRequiredRoles(int requiredLevel, Guild guild) {
 		StringBuilder out = new StringBuilder();
 		for(final var role : guild.getRoles()) {
-			try {
-				out.append((!role.getName().equals("@everyone") && Hashes.getDiscordRole(role.getIdLong()).getLevel() >= requiredLevel ? "`"+role.getName()+"` " : ""));
-			} catch(NullPointerException npe) {
+			var currentRole = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getRole_ID() == role.getIdLong()).findAny().orElse(null);
+			if(currentRole != null) {
+				out.append((!role.getName().equals("@everyone") && currentRole.getLevel() >= requiredLevel ? "`"+role.getName()+"` " : ""));
+			}
+			else {
 				if(DiscordRoles.SQLInsertRole(guild.getIdLong(), role.getIdLong(), 0, role.getName(), "def") > 0) {
-					Hashes.addDiscordRole(role.getIdLong(), new Roles(role.getIdLong(), role.getName(), 0, "def", "Default"));
+					Hashes.removeDiscordRoles(guild.getIdLong());
 				}
 				else {
 					logger.error("The role id {} couldn't be inserted into DiscordRoles.roles table", role.getId());

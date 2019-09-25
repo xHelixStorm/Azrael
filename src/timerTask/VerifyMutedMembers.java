@@ -39,14 +39,14 @@ public class VerifyMutedMembers extends TimerTask {
 		}
 		var e = (event != null ? event : (event2 != null ? event2 : event3));
 		for(var guild : e.getJDA().getGuilds()) {
-			var mute_role = DiscordRoles.SQLgetRole(guild.getIdLong(), "mut");
-			if(mute_role != 0) {
-				List<Member> mutedMembers = guild.getMembersWithRoles(guild.getRoleById(mute_role));
+			var mute_role = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mute")).findAny().orElse(null);
+			if(mute_role != null) {
+				List<Member> mutedMembers = guild.getMembersWithRoles(guild.getRoleById(mute_role.getRole_ID()));
 				var count = 0;
 				for(var member : mutedMembers) {
 					var data = Azrael.SQLgetData(member.getUser().getIdLong(), guild.getIdLong());
 					if(data.getUnmute() != null && System.currentTimeMillis() > data.getUnmute().getTime()) {
-						guild.removeRoleFromMember(member, guild.getRoleById(mute_role)).queue();
+						guild.removeRoleFromMember(member, guild.getRoleById(mute_role.getRole_ID())).queue();
 						count++;
 					}
 				}

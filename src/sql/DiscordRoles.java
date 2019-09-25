@@ -75,69 +75,6 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static Roles SQLgetRole(long _guild_id, long _role_id) {
-		if(Hashes.getDiscordRole(_role_id) == null) {
-			logger.debug("SQLgetRole launched. Passed params {}, {}", _guild_id, _role_id);
-			Connection myConn = null;
-			PreparedStatement stmt = null;
-			ResultSet rs = null;
-			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT * FROM all_roles WHERE guild_id = ? && role_id = ?");
-				stmt = myConn.prepareStatement(sql);
-				stmt.setLong(1, _guild_id);
-				stmt.setLong(2, _role_id);
-				rs = stmt.executeQuery();
-				if(rs.next()) {
-					var role = new Roles(
-						rs.getLong(1),
-						rs.getString(2),
-						rs.getInt(3),
-						rs.getString(4),
-						rs.getString(5)
-					);
-					Hashes.addDiscordRole(role.getRole_ID(), role);
-					return role;
-				}
-				return null;
-			} catch (SQLException e) {
-				logger.error("SQLgetRole Exception", e);
-				return null;
-			} finally {
-				try { rs.close(); } catch (Exception e) { /* ignored */ }
-			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-			}
-		}
-		return Hashes.getDiscordRole(_role_id);
-	}
-	
-	public static synchronized long SQLgetRole(long _guild_id, String _category_abv) {
-		logger.debug("SQLgetRole launched. Passed params {}, {}", _guild_id, _category_abv);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT role_id FROM roles WHERE fk_guild_id = ? && fk_category_abv LIKE ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setString(2, _category_abv);
-			rs = stmt.executeQuery();
-			if(rs.next()) {
-				return rs.getLong(1);
-			}
-			return 0;
-		} catch (SQLException e) {
-			logger.error("SQLgetRole Exception", e);
-			return 0;
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static int SQLInsertRole(long _guild_id, long _role_id, int _level, String _role_name, String _category_abv) {
 		logger.debug("SQLInsertRole launched. Passed params {}, {}, {}, {}, {}", _guild_id, _role_id, _level, _role_name, _category_abv);
 		Connection myConn = null;
@@ -192,6 +129,25 @@ public class DiscordRoles {
 		}
 	}
 	
+	public static int SQLDeleteAllRoles(long _guild_id) {
+		logger.debug("SQLDeleteAllRoles launched. Passed params {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			String sql = ("DELETE FROM roles WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteAllRoles Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLUpdateLevel(long _guild_id, long _role_id, int _level) {
 		logger.debug("SQLInsertRole launched. Passed params {}, {}, {}", _guild_id, _role_id, _level);
 		Connection myConn = null;
@@ -216,36 +172,39 @@ public class DiscordRoles {
 	
 	public static ArrayList<Roles> SQLgetRoles(long _guild_id) {
 		logger.debug("SQLgetRoles launched. Passed params {}", _guild_id);
-		ArrayList<Roles> roles = new ArrayList<Roles>();
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT * FROM all_roles WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			rs = stmt.executeQuery();
-			while(rs.next()) {
-				Roles roleDetails = new Roles(
-					rs.getLong(1),
-					rs.getString(2),
-					rs.getInt(3),
-					rs.getString(4),
-					rs.getString(5)
-				);
-				roles.add(roleDetails);
-				Hashes.addDiscordRole(roleDetails.getRole_ID(), roleDetails);
+		if(Hashes.getDiscordRole(_guild_id) == null) {
+			ArrayList<Roles> roles = new ArrayList<Roles>();
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+				String sql = ("SELECT * FROM all_roles WHERE guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()) {
+					Roles roleDetails = new Roles(
+						rs.getLong(1),
+						rs.getString(2),
+						rs.getInt(3),
+						rs.getString(4),
+						rs.getString(5)
+					);
+					roles.add(roleDetails);
+				}
+				Hashes.addDiscordRole(_guild_id, roles);
+				return roles;
+			} catch (SQLException e) {
+				logger.error("SQLgetRoles Exception", e);
+				return roles;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
-			return roles;
-		} catch (SQLException e) {
-			logger.error("SQLgetRoles Exception", e);
-			return roles;
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
+		return Hashes.getDiscordRole(_guild_id);
 	}
 	
 	public static boolean SQLgetRolesByCategory(long _guild_id, String _role_type) {

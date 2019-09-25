@@ -10,7 +10,7 @@ public class CommandList {
 		boolean entertainment = false;
 		boolean other = false;
 		
-		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getRssCommand(guild_id))) {
+		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getRssCommand(guild_id)) || GuildIni.getRemoveCommand(guild_id)) {
 			administration = true;
 		}
 		
@@ -27,6 +27,7 @@ public class CommandList {
 			textCollector.append("**_Administration:_**\n");
 			if(GuildIni.getRegisterCommand(guild_id))textCollector.append("**-"+prefix+"register**\nregister channel, role, ranking role or users with the database\n\n");
 			if(GuildIni.getSetCommand(guild_id))textCollector.append("**-"+prefix+"set**\nset set specific paramater to configure your bot and server\n\n");
+			if(GuildIni.getRemoveCommand(guild_id)) textCollector.append("**-"+prefix+"remove**\n remove a registered text channel, filter, role or ranking role from the database\n\n");
 			if(GuildIni.getUserCommand(guild_id))textCollector.append("**-"+prefix+"user**\nchoose between various actions that you can take against a user\n\n");
 			if(GuildIni.getFilterCommand(guild_id))textCollector.append("**-"+prefix+"filter**\ndecide to view, append or remove words/names from various filters or funky names\n\n");
 			if(GuildIni.getRoleReactionCommand(guild_id))textCollector.append("**-"+prefix+"roleReaction**\nenable / disable the role reaction and remove roles on disable\n\n");

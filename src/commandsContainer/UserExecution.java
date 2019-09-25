@@ -307,14 +307,20 @@ public class UserExecution {
 									}
 									else if(GuildIni.getOverrideBan(_e.getGuild().getIdLong()) && Azrael.SQLgetWarning(user_id, _e.getGuild().getIdLong()) == Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong()) && Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getUnmute() == null) {
 										Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
-										_e.getGuild().removeRoleFromMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut"))).complete();
-										long assignedRole = 0;
-										Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
-										if(user_details != null) {
-											assignedRole = user_details.getCurrentRole();
+										var mute_role = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+										if(mute_role != null) {
+											_e.getGuild().removeRoleFromMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role.getRole_ID())).complete();
+											long assignedRole = 0;
+											Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
+											if(user_details != null) {
+												assignedRole = user_details.getCurrentRole();
+											}
+											_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(assignedRole)).complete();
+											_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle("User unmuted!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+_e.getGuild().getMemberById(user_id).getUser().getName()+"#"+_e.getGuild().getMemberById(user_id).getUser().getDiscriminator() + "** with the ID Number **" +user_id+ "** has been unmuted from his/her infinite mute!").build()).queue();
 										}
-										_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(assignedRole)).complete();
-										_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle("User unmuted!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+_e.getGuild().getMemberById(user_id).getUser().getName()+"#"+_e.getGuild().getMemberById(user_id).getUser().getDiscriminator() + "** with the ID Number **" +user_id+ "** has been unmuted from his/her infinite mute!").build()).queue();
+										else {
+											_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("Mute role doesn't exist! Please verify that the mute role is still registered! Action aborted!").build()).queue();
+										}
 									}
 									else {
 										notice.setColor(Color.RED).setTitle("Member is not muted!");
@@ -701,12 +707,12 @@ public class UserExecution {
 					Hashes.addTempCache(key, cache);
 				}
 				else if(comment.equals("no")) {
-					var mute_role_id = DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut");
-					if(mute_role_id != 0) {
+					var mute_role_id = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+					if(mute_role_id != null) {
 						var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 						if(_e.getGuild().getMemberById(user_id) != null) {
 							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
-							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id)).queue();
+							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id.getRole_ID())).queue();
 							var mute_time = (long)Azrael.SQLgetWarning(_e.getGuild().getIdLong(), Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID()+1).getTimer();
 							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "mute", (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!"), (mute_time/1000/60));
 							_e.getChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
@@ -738,18 +744,17 @@ public class UserExecution {
 					}
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
-					var mute_role_id = DiscordRoles.SQLgetRole(_e.getGuild().getIdLong(), "mut");
-					
-					if(mute_role_id != 0) {
+					var mute_role_id = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+					if(mute_role_id != null) {
 						long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 						if(_e.getGuild().getMemberById(user_id) != null) {
 							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(""+mute_time, _e.getMember().getAsMention(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
 							if(cache.getAdditionalInfo2().length() > 0) {
-								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id)).reason(cache.getAdditionalInfo2()).queue();
+								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id.getRole_ID())).reason(cache.getAdditionalInfo2()).queue();
 								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), (mute_time/1000/60));
 							}
 							else {
-								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id)).reason("No reason has been provided!").queue();
+								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id.getRole_ID())).reason("No reason has been provided!").queue();
 								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", "No reason has been provided!", (mute_time/1000/60));
 							}
 							if(Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID() != 0) {

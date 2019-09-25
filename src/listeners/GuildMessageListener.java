@@ -256,27 +256,24 @@ public class GuildMessageListener extends ListenerAdapter {
 				
 				final var rss = Hashes.getTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 				if(rss != null && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id) && rss.getExpiration() - System.currentTimeMillis() > 0) {
-					var key = "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId();
 					String task = rss.getAdditionalInfo();
 					if(!message.equalsIgnoreCase("exit")) {
 						if(task.equals("register") && message.startsWith("http")) {
+							Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 							RssExecution.registerFeed(e, message, Integer.parseInt(rss.getAdditionalInfo2()));
-							Hashes.clearTempCache(key);
 						}
 						if(task.equals("remove") && message.replaceAll("[0-9]", "").length() == 0) {
-							if(RssExecution.removeFeed(e, Integer.parseInt(message)-1))
-								Hashes.clearTempCache(key);
+							RssExecution.removeFeed(e, Integer.parseInt(message)-1);
 						}
 						else if(task.equals("format") && message.replaceAll("[0-9]", "").length() == 0) {
-							RssExecution.currentFormat(e, Integer.parseInt(message)-1, key);
+							RssExecution.currentFormat(e, Integer.parseInt(message)-1, "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 						}
 						else if(task.contains("updateformat")) {
-							if(RssExecution.updateFormat(e, Integer.parseInt(task.replaceAll("[^0-9]", "")), message))
-								Hashes.clearTempCache(key);
+							Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+							RssExecution.updateFormat(e, Integer.parseInt(task.replaceAll("[^0-9]", "")), message);
 						}
 						else if(task.equals("test") && message.replaceAll("[0-9]", "").length() == 0) {
-							if(RssExecution.runTest(e, Integer.parseInt(message)-1))
-								Hashes.clearTempCache(key);
+							RssExecution.runTest(e, Integer.parseInt(message)-1);
 						}
 					}
 					else {
@@ -399,7 +396,7 @@ public class GuildMessageListener extends ListenerAdapter {
 				collectedMessage.setMessageID(e.getMessageIdLong());
 				collectedMessage.setTime(LocalDateTime.now());
 				
-				if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"]: "+collectedMessage.getMessage());
+				if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
 				if(log[1]) 	Hashes.addMessagePool(e.getMessageIdLong(), collectedMessage);
 			}
 			var watchedMember = Hashes.getWatchlist(guild_id+"-"+user_id);

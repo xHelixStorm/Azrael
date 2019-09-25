@@ -69,7 +69,11 @@ public class GuildListener extends ListenerAdapter {
 			}
 			
 			if((unmute - currentTime) > 0 && muted) {
-				e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
+				var mute_role = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+				if(mute_role != null)
+					e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
+				else if(log_channel != null)
+					e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("Muted user couldn't receive the mute role on server join! Is a mute role registered?").build()).queue();
 			}
 			else {
 				if(guild_settings.getRankingState()) {
@@ -81,37 +85,43 @@ public class GuildListener extends ListenerAdapter {
 			var rejoinAction = Hashes.getRejoinTask(e.getGuild().getId()+"_"+e.getMember().getUser().getId());
 			if(rejoinAction != null) {
 				if(rejoinAction.getType().equals("mute")) {
-					if(rejoinAction.getInfo().length() == 0) {
-						Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
-						e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
-						var mute_time = (long)Azrael.SQLgetWarning(guild_id, Azrael.SQLgetData(user_id, guild_id).getWarningID()+1).getTimer();
-						Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
-					}
-					else {
-						var mute_time = Long.parseLong(rejoinAction.getInfo());
-						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-						Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
-						Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
-						if(Azrael.SQLgetData(user_id, guild_id).getWarningID() != 0) {
-							if(Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp, unmute_timestamp, true, true) == 0) {
-								logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, guild_id);
-								if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The unmute time couldn't be updated on Azrael.bancollect").queue();
-							}
-							else {
-								Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
-								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
-							}
+					var mute_role = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+					if(mute_role != null) {
+						if(rejoinAction.getInfo().length() == 0) {
+							Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
+							e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
+							var mute_time = (long)Azrael.SQLgetWarning(guild_id, Azrael.SQLgetData(user_id, guild_id).getWarningID()+1).getTimer();
+							Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
 						}
 						else {
-							if(Azrael.SQLInsertData(user_id, guild_id, 1, 1, timestamp, unmute_timestamp, true, true) == 0) {
-								logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", user_id, guild_id);
-								if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
+							var mute_time = Long.parseLong(rejoinAction.getInfo());
+							Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+							Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
+							Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
+							if(Azrael.SQLgetData(user_id, guild_id).getWarningID() != 0) {
+								if(Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp, unmute_timestamp, true, true) == 0) {
+									logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, guild_id);
+									if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The unmute time couldn't be updated on Azrael.bancollect").queue();
+								}
+								else {
+									Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
+									e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
+								}
 							}
 							else {
-								Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
-								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
+								if(Azrael.SQLInsertData(user_id, guild_id, 1, 1, timestamp, unmute_timestamp, true, true) == 0) {
+									logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", user_id, guild_id);
+									if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
+								}
+								else {
+									Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
+									e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
+								}
 							}
 						}
+					}
+					else if(log_channel != null) {
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("Mute reminder couldn't be applied on server join! Is a mute role registered?").build()).queue();
 					}
 					Hashes.removeRejoinTask(e.getGuild().getId()+"_"+e.getMember().getUser().getId());
 				}

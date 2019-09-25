@@ -63,7 +63,7 @@ public class Hashes {
     private static final ConcurrentMap<String, ArrayList<Rank>> rankList = new ConcurrentHashMap<String, ArrayList<Rank>>();
     private static final ConcurrentMap<Long, ArrayList<Skins>> shopContent = new ConcurrentHashMap<Long, ArrayList<Skins>>();
     private static final ConcurrentMap<String, ArrayList<Dailies>> daily_items = new ConcurrentHashMap<String, ArrayList<Dailies>>();
-    private static final ConcurrentMap<Long, Roles> discordRoles = new ConcurrentHashMap<Long, Roles>();
+    private static final ConcurrentMap<Long, ArrayList<Roles>> discordRoles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
     private static final ConcurrentMap<Long, ArrayList<RSS>> feeds = new ConcurrentHashMap<Long, ArrayList<RSS>>();
     private static final ConcurrentMap<Long, ArrayList<Weapons>> weaponShopContent = new ConcurrentHashMap<Long, ArrayList<Weapons>>();
     private static final ConcurrentMap<Long, ArrayList<String>> weaponCategories = new ConcurrentHashMap<Long, ArrayList<String>>();
@@ -129,8 +129,8 @@ public class Hashes {
 	public static void addDailyItems(String _key, ArrayList<Dailies> _daily_items) {
 		daily_items.put(_key, _daily_items);
 	}
-	public static void addDiscordRole(Long _key, Roles _role) {
-		discordRoles.put(_key, _role);
+	public static void addDiscordRole(Long _key, ArrayList<Roles> _roles) {
+		discordRoles.put(_key, _roles);
 	}
 	public static void addFeeds(Long _key, ArrayList<RSS> _feeds) {
 		feeds.put(_key, _feeds);
@@ -242,7 +242,7 @@ public class Hashes {
 	public static ArrayList<Dailies> getDailyItems(String _key){
 		return daily_items.get(_key);
 	}
-	public static Roles getDiscordRole(Long _key) {
+	public static ArrayList<Roles> getDiscordRole(Long _key) {
 		return discordRoles.get(_key);
 	}
 	public static ArrayList<RSS> getFeed(Long _key) {
@@ -300,6 +300,9 @@ public class Hashes {
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
 	}
+	public static void removeFilterLang(long _key) {
+		filter_lang.remove(_key);
+	}
 	public static void removeQuerryResult(String _key) {
 		querry_result.remove(_key);
 	}
@@ -344,6 +347,9 @@ public class Hashes {
 	}
 	public static void clearDailyItems() {
 		daily_items.clear();
+	}
+	public static void removeDiscordRoles(long _key) {
+		discordRoles.remove(_key);
 	}
 	public static void clearDiscordRoles() {
 		discordRoles.clear();

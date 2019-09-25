@@ -74,7 +74,7 @@ public class BasicModel {
 		in.close();
 	}
 	
-	public static boolean ModelTest(GuildMessageReceivedEvent e, RSS rss) {
+	public static void ModelTest(GuildMessageReceivedEvent e, RSS rss) {
 		try {
 			String format = rss.getFormat();
 			URL rssUrl = new URL(rss.getURL());
@@ -128,10 +128,8 @@ public class BasicModel {
 				e.getChannel().sendMessage("No feed could be found").queue();
 			}
 			in.close();
-			return true;
 		} catch (IOException e1) {
 			logger.error("Error on retrieving feed!", e1);
-			return false;
 		}
 	}
 }

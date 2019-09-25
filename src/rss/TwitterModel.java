@@ -92,7 +92,7 @@ public class TwitterModel {
 		}
 	}
 	
-	public static boolean ModelTest(GuildMessageReceivedEvent e, RSS rss) {
+	public static void ModelTest(GuildMessageReceivedEvent e, RSS rss) {
 		STATIC.loginTwitter();
 		TwitterFactory tf = STATIC.getTwitterFactory();
 		if(tf != null) {
@@ -136,15 +136,12 @@ public class TwitterModel {
 				else {
 					e.getChannel().sendMessage("No tweet could be found").queue();
 				}
-				return true;
 			} catch (TwitterException e1) {
 				logger.error("Error on retrieving feed!", e1);
-				return false;
 			}
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error on Twitter login!").setDescription("Please set up the config.ini file after creating a Twitter Bot on https://apps.twitter.com before using this command!").build()).queue();
 		}
-		return false;
 	}
 }

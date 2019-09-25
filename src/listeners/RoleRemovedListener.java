@@ -30,7 +30,8 @@ public class RoleRemovedListener extends ListenerAdapter {
 			first_entry: for (AuditLogEntry entry : logs)
 			{
 				if(entry.getChangeByKey(AuditLogKey.MEMBER_ROLES_REMOVE) != null) {
-					if(entry.getChangeByKey(AuditLogKey.MEMBER_ROLES_REMOVE).toString().contains(""+DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut")) && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getMember().getUser().getIdLong()) {
+					var mute_role = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+					if(entry.getChangeByKey(AuditLogKey.MEMBER_ROLES_REMOVE).toString().contains(""+(mute_role != null ? mute_role.getRole_ID() : 0)) && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getMember().getUser().getIdLong()) {
 						trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 					}
 				}

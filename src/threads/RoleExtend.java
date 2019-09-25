@@ -30,8 +30,9 @@ public class RoleExtend implements Runnable {
 	
 	@Override
 	public void run() {
-		Role mute_role = e.getJDA().getGuildById(guild_id).getRoleById(DiscordRoles.SQLgetRole(guild_id, "mut"));
-		if(mute_role != null) {
+		var mute_role_object = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);//e.getJDA().getGuildById(guild_id).getRoleById(DiscordRoles.SQLgetRole(guild_id, "mut"));
+		if(mute_role_object != null) {
+			Role mute_role = e.getJDA().getGuildById(guild_id).getRoleById(mute_role_object.getRole_ID());
 			EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle("Warned users can't run away even after a reboot!");
 			boolean banHammerFound = false;
 			ArrayList<Member> users = new ArrayList<Member>();

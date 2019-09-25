@@ -105,8 +105,8 @@ public class STATIC {
 	public static void handleRemovedMessages(GuildMessageReceivedEvent e, GuildMessageUpdateEvent e2, String [] output) {
 		Logger logger = LoggerFactory.getLogger(STATIC.class);
 		logger.debug("Message removed from {} in guild {}", (e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId()), e.getGuild().getName());
-		var muteRole = DiscordRoles.SQLgetRole((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()), "mut");
-		if(muteRole == 0) {
+		var muteRole = DiscordRoles.SQLgetRoles((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong())).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+		if(muteRole == null) {
 			if(e != null)e.getChannel().sendMessage(e.getMember().getAsMention()+" "+output[0]).queue();
 			else 		 e2.getChannel().sendMessage(e2.getMember().getAsMention()+" "+output[0]).queue();
 		}
@@ -124,15 +124,8 @@ public class STATIC {
 					Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "2"));
 				}
 				else if(cache.getAdditionalInfo().equals("2")) {
-					var mute_role = DiscordRoles.SQLgetRole((e != null ? e : e2).getGuild().getIdLong(), "mut");
-					if(mute_role != 0) {
-						if(e != null)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(DiscordRoles.SQLgetRole(e.getGuild().getIdLong(), "mut"))).queue();
-						else		 e.getGuild().addRoleToMember(e2.getMember(), e2.getGuild().getRoleById(DiscordRoles.SQLgetRole(e2.getGuild().getIdLong(), "mut"))).queue();
-					}
-					else {
-						var log_channel = Azrael.SQLgetChannels((e != null ? e : e2).getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-						if(log_channel != null) (e != null ? e : e2).getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("User couldn't get muted!").setDescription("The user "+(e != null ? e.getMember().getAsMention() : e2.getMember().getAsMention())+" wasn't muted because no mute role is registered!").build()).queue();
-					}
+					if(e != null)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(muteRole.getRole_ID())).queue();
+					else		 e.getGuild().addRoleToMember(e2.getMember(), e2.getGuild().getRoleById(muteRole.getRole_ID())).queue();
 					Hashes.clearTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}

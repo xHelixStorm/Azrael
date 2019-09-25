@@ -29,6 +29,7 @@ import commands.Randomshop;
 import commands.Rank;
 import commands.Reboot;
 import commands.Register;
+import commands.Remove;
 import commands.RoleReaction;
 import commands.Rss;
 import commands.Set;
@@ -137,6 +138,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("patchnotes", new Patchnotes());
 		CommandHandler.commandsPublic.put("doubleexperience", new DoubleExperience());
 		CommandHandler.commandsPublic.put("equip", new Equip());
+		CommandHandler.commandsPublic.put("remove", new Remove());
 	}
 	
 	public static void addPrivateCommands() {
