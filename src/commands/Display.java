@@ -75,7 +75,8 @@ public class Display implements CommandPublic{
 			final var registeredRolesLevel = GuildIni.getDisplayRegisteredRolesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredRolesLevel) || adminPermission) {
 				for(Roles r : DiscordRoles.SQLgetRoles(guild_id)) {
-					out.append(r.getRole_Name() + " (" + r.getRole_ID() + ") \nrole type: "+r.getCategory_Name()+"\nPrivilege level: "+r.getLevel()+"\n\n");
+					if(!r.getCategory_ABV().equals("def"))
+						out.append(r.getRole_Name() + " (" + r.getRole_ID() + ") \nrole type: "+r.getCategory_Name()+"\nPrivilege level: "+r.getLevel()+"\n\n");
 				}
 				e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue();
 			}

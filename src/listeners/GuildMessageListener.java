@@ -233,8 +233,8 @@ public class GuildMessageListener extends ListenerAdapter {
 					int counter = Integer.parseInt(reaction.getAdditionalInfo());
 					Message m = e.getMessage();
 					String [] reactions = GuildIni.getReactions(guild_id);
-					for(int i = 1; i <= counter; i++) {
-						if(!reactions[0].equals("true")) {
+					for(int i = 0; i < counter; i++) {
+						if(!GuildIni.getReactionEnabled(e.getGuild().getIdLong())) {
 							m.addReaction(EmojiManager.getForAlias(ReactionMessage.getReaction(i)).getUnicode()).complete();
 						}
 						else {

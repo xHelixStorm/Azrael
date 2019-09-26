@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import preparedMessages.ReactionMessage;
 import sql.Azrael;
+import sql.DiscordRoles;
 
 public class RoleReaction implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(RoleReaction.class);
@@ -61,12 +62,14 @@ public class RoleReaction implements CommandPublic {
 					if(rea_channel != null && Hashes.getReactionMessage(e.getGuild().getIdLong()) != null) {
 						e.getGuild().getTextChannelById(rea_channel.getChannel_ID()).deleteMessageById(Hashes.getReactionMessage(e.getGuild().getIdLong())).queue();
 					}
-					for(int i = 1; i < 10; i++) {
-						if(Hashes.getRoles(i+"_"+e.getGuild().getId()) != null) {
-							long role_id = Hashes.getRoles(i+"_"+e.getGuild().getId()).getRole_ID();
+					var reactionRoles = DiscordRoles.SQLgetReactionRoles(e.getGuild().getIdLong());
+					if(reactionRoles != null && reactionRoles.size() > 0) {
+						for(int i = 0; i < reactionRoles.size(); i++) {
+							long role_id = reactionRoles.get(i).getRole_ID();
 							for(Member m : e.getGuild().getMembersWithRoles(e.getGuild().getRoleById(role_id))) {
 								e.getGuild().removeRoleFromMember(m, e.getGuild().getRoleById(role_id)).queue();
 							}
+							if(i == 8) break;
 						}
 					}
 					e.getChannel().sendMessage("Role reactions have been disabled and the assigned roles have been removed!").queue();

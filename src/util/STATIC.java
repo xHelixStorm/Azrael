@@ -30,7 +30,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.5.322";
+	private static final String VERSION = "6.5.323";
 	private static TwitterFactory twitterFactory = null;
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
@@ -176,5 +176,21 @@ public class STATIC {
 	
 	public static TwitterFactory getTwitterFactory() {
 		return twitterFactory;
+	}
+	
+	@SuppressWarnings("preview")
+	public static int returnEmote(String reactionName) {
+		return switch(reactionName) {
+			case "one" 	 -> 0;
+			case "two"   -> 1;
+			case "three" -> 2;
+			case "four"  -> 3;
+			case "five"  -> 4;
+			case "six" 	 -> 5;
+			case "seven" -> 6;
+			case "eight" -> 7;
+			case "nine"  -> 8;
+			default 	 -> 9;
+		};
 	}
 }

@@ -49,6 +49,7 @@ public class Remove implements CommandPublic {
 				if(DiscordRoles.SQLDeleteAllRoles(e.getGuild().getIdLong()) > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.WHITE).setDescription("All regular registered roles have been removed from the database!").build()).queue();
 					Hashes.removeDiscordRoles(e.getGuild().getIdLong());
+					Hashes.removeReactionRoles(e.getGuild().getIdLong());
 					logger.debug("User {} has removed all registered roles from guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 				}
 				else {
@@ -63,6 +64,7 @@ public class Remove implements CommandPublic {
 						if(DiscordRoles.SQLDeleteRole(role, e.getGuild().getIdLong()) > 0) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.WHITE).setDescription("Role has been successfully removed from the database!").build()).queue();
 							Hashes.removeDiscordRoles(e.getGuild().getIdLong());
+							Hashes.removeReactionRoles(e.getGuild().getIdLong());
 							logger.debug("User {} has removed the registered role {} from guild {}", e.getMember().getUser().getId(), role, e.getGuild().getId());
 						}
 						else {

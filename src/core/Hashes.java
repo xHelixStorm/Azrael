@@ -56,7 +56,7 @@ public class Hashes {
     private static final ConcurrentHashMap<Long, Guilds> status = new ConcurrentHashMap<Long, Guilds>();
     private static final ConcurrentMap<Long, ArrayList<Rank>> ranking_roles = new ConcurrentHashMap<Long, ArrayList<Rank>>();
     private static final LinkedHashMap<String, Ranks> ranking_levels = new LinkedHashMap<String, Ranks>();
-    private static final ConcurrentMap<String, Roles> roles = new ConcurrentHashMap<String, Roles>();
+    private static final ConcurrentMap<Long, ArrayList<Roles>> reaction_roles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
     private static final ConcurrentMap<Long, Long> reaction_message = new ConcurrentHashMap<Long, Long>();
     private static final ConcurrentMap<Integer, Quizes> quiz = new ConcurrentHashMap<Integer, Quizes>();
     private static final ConcurrentMap<Member, Integer> quiz_winners = new ConcurrentHashMap<Member, Integer>();
@@ -108,8 +108,8 @@ public class Hashes {
 	public static void addRankingLevels(String _key, Ranks _levels){
 		ranking_levels.put(_key, _levels);
 	}
-	public static void addRoles(String _key, Roles _roles) {
-		roles.put(_key, _roles);
+	public static void addReactionRoles(Long _key, ArrayList<Roles> _roles) {
+		reaction_roles.put(_key, _roles);
 	}
 	public static void addReactionMessage(Long _key, Long _message_id) {
 		reaction_message.put(_key, _message_id);
@@ -218,8 +218,8 @@ public class Hashes {
 	public static Ranks getRankingLevels(String _key){
 		return ranking_levels.get(_key);
 	}
-	public static Roles getRoles(String _key) {
-		return roles.get(_key);
+	public static ArrayList<Roles> getReactionRoles(Long _key) {
+		return reaction_roles.get(_key);
 	}
 	public static Long getReactionMessage(Long _key) {
 		return reaction_message.get(_key);
@@ -312,8 +312,8 @@ public class Hashes {
 	public static void removeRanking(String _key){
 		ranking.remove(_key);
 	}
-	public static void removeRoles() {
-		roles.clear();
+	public static void removeReactionRoles(Long _key) {
+		reaction_roles.remove(_key);
 	}
 	public static void removeRankingRoles(long _key) {
 		ranking_roles.remove(_key);

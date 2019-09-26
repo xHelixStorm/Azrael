@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.util.stream.Collectors;
 
 import constructors.Messages;
 import core.Hashes;
@@ -71,8 +72,12 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 							else if(GuildIni.getSelfDeletedMessage(e.getGuild().getIdLong()) && !suppress_deleted && removed_message != null && !UserPrivs.isUserBot(e.getGuild().getMemberById(removed_message.getUserID()).getUser(), e.getGuild().getIdLong())) {
 								if(removed_message != null && removed_message.getMessage().length() > 0) {
 									message.setTitle("User has removed his own message from #"+e.getChannel().getName()+"!");
-									var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
-									if(tra_channel != null) {e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("["+removed_message.getTime().toString()+" - "+removed_message.getUserName()+"]: "+removed_message.getMessage()).build()).queue();}
+									var traAndDel_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("tra") || f.getChannel_Type().equals("del"))).collect(Collectors.toList());
+									var tra_channel = traAndDel_channel.parallelStream().filter(f -> f.getChannel_Type().equals("tra")).findAny().orElse(null);
+									var del_channel = traAndDel_channel.parallelStream().filter(f -> f.getChannel_Type().equals("del")).findAny().orElse(null);
+									if(tra_channel != null || del_channel != null) {
+										e.getGuild().getTextChannelById((del_channel != null ? del_channel.getChannel_ID() : tra_channel.getChannel_ID())).sendMessage(message.setDescription("["+removed_message.getTime().toString()+" - "+removed_message.getUserName()+"]: "+removed_message.getMessage()).build()).queue();
+									}
 								}
 							}
 						}

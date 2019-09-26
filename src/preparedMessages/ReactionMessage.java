@@ -20,31 +20,32 @@ public class ReactionMessage {
 	
 	public static void print(GuildMessageReceivedEvent e, long channel_id) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
-		if(DiscordRoles.SQLgetRolesByCategory(e.getGuild().getIdLong(), "rea")) {
+		var reactionRoles = DiscordRoles.SQLgetReactionRoles(e.getGuild().getIdLong());
+		if(reactionRoles != null && reactionRoles.size() > 0) {
 			String [] reactions = GuildIni.getReactions(e.getGuild().getIdLong());
 			StringBuilder sb = new StringBuilder();
 			int counter = 0;
-			for(int i = 1; i < 10; i++) {
-				if(Hashes.getRoles(i+"_"+e.getGuild().getIdLong()) != null) {
-					String reaction;
-					if(!reactions[0].equals("true")) {
-						reaction = getReaction(i);
+			var reactionEnabled = GuildIni.getReactionEnabled(e.getGuild().getIdLong());
+			for(int i = 0; i < reactionRoles.size(); i++) {
+				String reaction;
+				if(!reactionEnabled) {
+					reaction = getReaction(i);
+				}
+				else {
+					if(reactions[i].length() > 0) {
+						try {
+							reaction = e.getGuild().getEmotesByName(reactions[i], false).get(0).getAsMention();
+						} catch(Exception exc) {
+							reaction = EmojiManager.getForAlias(":"+reactions[i]+":").getUnicode();
+						}
 					}
 					else {
-						if(reactions[i].length() > 0) {
-							try {
-								reaction = e.getGuild().getEmotesByName(reactions[i], false).get(0).getAsMention();
-							} catch(Exception exc) {
-								reaction = EmojiManager.getForAlias(":"+reactions[i]+":").getUnicode();
-							}
-						}
-						else {
-							reaction = getReaction(i);
-						}
+						reaction = getReaction(i);
 					}
-					sb.append(reaction+" **"+Hashes.getRoles(i+"_"+e.getGuild().getIdLong()).getRole_Name()+"**\n");
-					counter ++;
 				}
+				sb.append(reaction+" **"+reactionRoles.get(i).getRole_Name()+"**\n");
+				counter ++;
+				if(i == 8) break;
 			}
 			Hashes.addTempCache("reaction_gu"+e.getGuild().getId()+"ch"+channel_id, new Cache(0, ""+counter));
 			String reactionMessage = FileSetting.readFile("./files/Guilds/"+e.getGuild().getId()+"/reactionmessage.txt");
@@ -66,15 +67,15 @@ public class ReactionMessage {
 	@SuppressWarnings("preview")
 	public static String getReaction(int counter) {
 		return switch(counter) {
-			case 1  -> ":one:";
-			case 2  -> ":two:";
-			case 3  -> ":three:";
-			case 4  -> ":four:";
-			case 5  -> ":five:";
-			case 6  -> ":six:";
-			case 7  -> ":seven:";
-			case 8  ->":eight:";
-			case 9  -> ":nine:";
+			case 0  -> ":one:";
+			case 1  -> ":two:";
+			case 2  -> ":three:";
+			case 3  -> ":four:";
+			case 4  -> ":five:";
+			case 5  -> ":six:";
+			case 6  -> ":seven:";
+			case 7  ->":eight:";
+			case 8  -> ":nine:";
 			default -> "empty";
 		};
 	}

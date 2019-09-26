@@ -207,43 +207,40 @@ public class DiscordRoles {
 		return Hashes.getDiscordRole(_guild_id);
 	}
 	
-	public static boolean SQLgetRolesByCategory(long _guild_id, String _role_type) {
-		logger.debug("SQLgetRolesByCategory launched. Passed params {}, {}", _guild_id, _role_type);
-		if(Hashes.getRoles(1+"_"+_guild_id) == null) {
+	public static ArrayList<Roles> SQLgetReactionRoles(long _guild_id) {
+		logger.debug("SQLgetReactionRoles launched. Passed params {}", _guild_id);
+		if(Hashes.getReactionRoles(_guild_id) == null) {
+			ArrayList<Roles> reactionRoles = new ArrayList<Roles>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("SELECT * FROM all_roles WHERE guild_id = ? AND category_abv LIKE ?");
-				boolean success = false;
+				String sql = ("SELECT * FROM all_roles WHERE guild_id = ? AND category_abv LIKE \"rea\"");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
-				stmt.setString(2, _role_type);
 				rs = stmt.executeQuery();
-				int i = 1;
 				while(rs.next()) {
-					Hashes.addRoles(i+"_"+_guild_id, new Roles(
-							rs.getLong(1),
-							rs.getString(2),
-							rs.getInt(3),
-							rs.getString(4),
-							rs.getString(5)
+					reactionRoles.add(new Roles(
+						rs.getLong(1),
+						rs.getString(2),
+						rs.getInt(3),
+						rs.getString(4),
+						rs.getString(5)
 					));
-					success = true;
-					i++;
 				}
-				return success;
+				Hashes.addReactionRoles(_guild_id, reactionRoles);
+				return reactionRoles;
 			} catch (SQLException e) {
-				logger.error("SQLgetRolesByCategory Exception", e);
-				return false;
+				logger.error("SQLgetReactionRoles Exception", e);
+				return reactionRoles;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return true;
+		return Hashes.getReactionRoles(_guild_id);
 	}
 	
 	public static ArrayList<Roles> SQLgetCategories() {
@@ -280,7 +277,7 @@ public class DiscordRoles {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("DELETE roles WHERE role_id = ? && fk_guild_id = ?");
+			String sql = ("DELETE FROM roles WHERE role_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_id);
 			stmt.setLong(2, _guild_id);
