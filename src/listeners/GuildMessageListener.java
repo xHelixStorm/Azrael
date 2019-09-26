@@ -31,11 +31,9 @@ import fileManagement.GuildIni;
 import filter.LanguageFilter;
 import filter.URLFilter;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import preparedMessages.ReactionMessage;
 import rankingSystem.RankingThreadExecution;
 import sql.RankingSystem;
 import sql.Azrael;
@@ -226,32 +224,6 @@ public class GuildMessageListener extends ListenerAdapter {
 						Hashes.addTempCache("randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id, new Cache(0, current_page+"_"+last_page+"_"+input));
 					}
 					Hashes.clearTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-				}
-				
-				final var reaction = Hashes.getTempCache("reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-				if(reaction != null && UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
-					int counter = Integer.parseInt(reaction.getAdditionalInfo());
-					Message m = e.getMessage();
-					String [] reactions = GuildIni.getReactions(guild_id);
-					for(int i = 0; i < counter; i++) {
-						if(!GuildIni.getReactionEnabled(e.getGuild().getIdLong())) {
-							m.addReaction(EmojiManager.getForAlias(ReactionMessage.getReaction(i)).getUnicode()).complete();
-						}
-						else {
-							if(reactions[i].length() > 0) {
-								try {
-									m.addReaction(e.getGuild().getEmotesByName(reactions[i], false).get(0)).complete();
-								} catch(Exception exc) {
-									m.addReaction(EmojiManager.getForAlias(":"+reactions[i]+":").getUnicode()).complete();
-								}
-							}
-							else {
-								m.addReaction(EmojiManager.getForAlias(ReactionMessage.getReaction(i)).getUnicode()).complete();
-							}
-						}
-					}
-					Hashes.addReactionMessage(e.getGuild().getIdLong(), e.getMessage().getIdLong());
-					Hashes.clearTempCache("reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 				}
 				
 				final var rss = Hashes.getTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
