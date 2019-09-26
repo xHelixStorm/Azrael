@@ -40,6 +40,6 @@ Create and bind roles with the ranking system and combine it with levels to unlo
 Use the dedicated commands to bring up pictures of pugs or cats into the chat.
 
 ### Requirements
-- Java Runtime Environment 12 required
+- Java Runtime Environment 13 required
 - At least 2gb free ram recommended for long up times and busy servers (minimum 1gb)
 - Runnin MySQL Database
