@@ -26,6 +26,7 @@ public class GuildIni {
 			ini.add("General", "OverrideBan", "false");
 			ini.add("General", "URLBlacklist", "false");
 			ini.add("General", "SelfDeletedMessage", "false");
+			ini.add("General", "EditedMessage" , "false");
 			
 			//Mute
 			ini.add("Mute", "MessageDeleteEnabled", "false");
@@ -311,6 +312,10 @@ public class GuildIni {
 	public static boolean getSelfDeletedMessage(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "SelfDeletedMessage", boolean.class);
+	}
+	public static boolean getEditedMessage(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "EditedMessage", boolean.class);
 	}
 	
 	public static boolean getMuteMessageDeleteEnabled(long guild_id) {

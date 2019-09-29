@@ -3,7 +3,6 @@ package listeners;
 import java.awt.Color;
 import java.util.stream.Collectors;
 
-import constructors.Messages;
 import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
@@ -24,13 +23,13 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 		new Thread(() ->{
 			if(GuildIni.getCacheLog(e.getGuild().getIdLong())) {
 				long message_id = e.getMessageIdLong();
-				Messages removed_message = Hashes.getMessagePool(message_id);
+				var removed_messages = Hashes.getMessagePool(message_id);
 				Hashes.removeMessagePool(message_id);
 				
 				if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
-					var cache = Hashes.getTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+(removed_message != null ? removed_message.getUserID() : "0"));
+					var cache = Hashes.getTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+(removed_messages != null ? removed_messages.get(0).getUserID() : "0"));
 					if(cache == null) {
-						cache = Hashes.getTempCache("message-removed_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+(removed_message != null ? removed_message.getUserID() : "0"));
+						cache = Hashes.getTempCache("message-removed_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+(removed_messages != null ? removed_messages.get(0).getUserID() : "0"));
 						if(cache == null) {
 							long trigger_user_id = 0;
 							String trigger_user_name = "";
@@ -41,7 +40,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 							AuditLogPaginationAction logs = e.getGuild().retrieveAuditLogs().type(ActionType.MESSAGE_DELETE);
 							for (AuditLogEntry entry : logs)
 							{
-								if(!Hashes.containsActionlog(entry.getId()+entry.getOptionByName("count")) && removed_message != null && removed_message.getUserID() == entry.getTargetIdLong()) {
+								if(!Hashes.containsActionlog(entry.getId()+entry.getOptionByName("count")) && removed_messages != null && removed_messages.get(0).getUserID() == entry.getTargetIdLong()) {
 									Hashes.addActionlog(entry.getId()+entry.getOptionByName("count"));
 									send_message = true;
 									if(e.getChannel().getId().equals(entry.getOptionByName("channel_id").toString()) && (UserPrivs.isUserAdmin(e.getGuild().getMemberById(entry.getUser().getId()).getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getGuild().getMemberById(entry.getUser().getId()).getUser(), e.getGuild().getIdLong()))) {
@@ -63,41 +62,53 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 							}
 							
 							if(send_message == true && removed_from != 0 && trigger_user_id != removed_from) {
-								if(removed_message != null && removed_message.getMessage().length() > 0 && trigger_user_id > 0) {
-									message.setTitle(trigger_user_name+" has removed a message from #"+e.getChannel().getName()+"!");
+								if(removed_messages != null && removed_messages.get(0).getMessage().length() > 0 && trigger_user_id > 0) {
 									var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
-									if(tra_channel != null) {e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("["+removed_message.getTime().toString()+" - "+removed_message.getUserName()+"]: "+removed_message.getMessage()).build()).queue();}
+									if(tra_channel != null) {
+										for(final var cachedMessage : removed_messages) {
+											message.setTitle(trigger_user_name+" has removed "+(cachedMessage.isEdit() ? "an **edited message**" : "a **message**")+" from #"+e.getChannel().getName()+"!");
+											e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage()).build()).queue();
+										}
+									}
 								}
 							}
-							else if(GuildIni.getSelfDeletedMessage(e.getGuild().getIdLong()) && !suppress_deleted && removed_message != null && !UserPrivs.isUserBot(e.getGuild().getMemberById(removed_message.getUserID()).getUser(), e.getGuild().getIdLong())) {
-								if(removed_message != null && removed_message.getMessage().length() > 0) {
-									message.setTitle("User has removed his own message from #"+e.getChannel().getName()+"!");
+							else if(GuildIni.getSelfDeletedMessage(e.getGuild().getIdLong()) && !suppress_deleted && removed_messages != null && !UserPrivs.isUserBot(e.getGuild().getMemberById(removed_messages.get(0).getUserID()).getUser(), e.getGuild().getIdLong())) {
+								if(removed_messages != null && removed_messages.get(0).getMessage().length() > 0) {
 									var traAndDel_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("tra") || f.getChannel_Type().equals("del"))).collect(Collectors.toList());
 									var tra_channel = traAndDel_channel.parallelStream().filter(f -> f.getChannel_Type().equals("tra")).findAny().orElse(null);
 									var del_channel = traAndDel_channel.parallelStream().filter(f -> f.getChannel_Type().equals("del")).findAny().orElse(null);
 									if(tra_channel != null || del_channel != null) {
-										e.getGuild().getTextChannelById((del_channel != null ? del_channel.getChannel_ID() : tra_channel.getChannel_ID())).sendMessage(message.setDescription("["+removed_message.getTime().toString()+" - "+removed_message.getUserName()+"]: "+removed_message.getMessage()).build()).queue();
+										for(final var cachedMessage : removed_messages) {
+											message.setTitle("User has removed his own "+(cachedMessage.isEdit() ? "**edited message**" : "**message**")+" from #"+e.getChannel().getName()+"!");
+											e.getGuild().getTextChannelById((del_channel != null ? del_channel.getChannel_ID() : tra_channel.getChannel_ID())).sendMessage(message.setDescription("["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage()).build()).queue();
+										}
 									}
 								}
 							}
 						}
-						else if(removed_message != null && removed_message.getMessage().length() > 0) {
-							message.setTitle("Message removed from #"+e.getChannel().getName()+"!");
+						else if(removed_messages != null && removed_messages.get(0).getMessage().length() > 0) {
 							var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
-							if(tra_channel != null) {e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("["+removed_message.getTime().toString()+" - "+removed_message.getUserName()+"]: "+removed_message.getMessage()).build()).queue();}
-							Hashes.clearTempCache("message-removed_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+(removed_message != null ? removed_message.getUserID() : "0"));
+							if(tra_channel != null) {
+								for(final var cachedMessage : removed_messages) {
+									message.setTitle((cachedMessage.isEdit() ? "**Edited message**" : "**Message**")+" removed from #"+e.getChannel().getName()+"!");
+									e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage()).build()).queue();
+								}
+							}
+							Hashes.clearTempCache("message-removed_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+(removed_messages != null ? removed_messages.get(0).getUserID() : "0"));
 						}
 					}
 					else {
-						Hashes.clearTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+(removed_message != null ? removed_message.getUserID() : "0"));
+						Hashes.clearTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+(removed_messages != null ? removed_messages.get(0).getUserID() : "0"));
 					}
 				}
 				
 				//Log additional removed messages from users that are being watched with watch level 1
-				var watchedUser = Hashes.getWatchlist(e.getGuild().getId()+"-"+(removed_message != null ? removed_message.getUserID() : "BOT"));
+				var watchedUser = Hashes.getWatchlist(e.getGuild().getId()+"-"+(removed_messages != null ? removed_messages.get(0).getUserID() : "BOT"));
 				if(watchedUser != null && watchedUser.getLevel() == 1) {
-					message.setTitle("Logged deleted message due to watching!");
-					e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(message.setDescription("["+removed_message.getTime().toString()+" - "+removed_message.getUserName()+"]: "+removed_message.getMessage()).build()).queue();
+					for(final var cachedMessage : removed_messages) {
+						message.setTitle("Logged deleted "+(cachedMessage.isEdit() ? "**edited message**" : "**message**")+" due to watching!");
+						e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(message.setDescription("["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage()).build()).queue();
+					}
 				}
 			}
 		}).start();

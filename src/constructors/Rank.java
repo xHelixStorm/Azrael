@@ -3,6 +3,20 @@ package constructors;
 import java.sql.Timestamp;
 
 public class Rank {
+	private int nameLengthLimit_level;
+	private int nameLengthLimit_rank;
+	private int nameLengthLimit_profile;
+	
+	private int textFontSize_level;
+	private int textFontSize_rank;
+	private int textFontSize_profile;
+	
+	private int nameFontSize_level;
+	private int nameFontSize_rank;
+	private int nameFontSize_profile;
+	
+	private int descriptionMode_Profile;
+	
 	private long user_id;
 	private int level;
 	private int currentExperience;
@@ -114,6 +128,36 @@ public class Rank {
 	private int weapon3;
 	private int skill;
 	
+	public void setNameLengthLimit_Level(int _nameLengthLimit_level) {
+		this.nameLengthLimit_level = _nameLengthLimit_level;
+	}
+	public void setNameLengthLimit_Rank(int _nameLengthLimit_rank) {
+		this.nameLengthLimit_rank = _nameLengthLimit_rank;
+	}
+	public void setNameLengthLimit_Profile(int _nameLengthLimit_profile) {
+		this.nameLengthLimit_profile = _nameLengthLimit_profile;
+	}
+	public void setTextFontSize_Level(int _textFontSize_level) {
+		this.textFontSize_level = _textFontSize_level;
+	}
+	public void setTextFontSize_Rank(int _textFontSize_rank) {
+		this.textFontSize_rank = _textFontSize_rank;
+	}
+	public void setTextFontSize_Profile(int _textFontSize_profile) {
+		this.textFontSize_profile = _textFontSize_profile;
+	}
+	public void setNameFontSize_Level(int _nameFontSize_level) {
+		this.nameFontSize_level = _nameFontSize_level;
+	}
+	public void setNameFontSize_Rank(int _nameFontSize_rank) {
+		this.nameFontSize_rank = _nameFontSize_rank;
+	}
+	public void setNameFontSize_Profile(int _nameFontSize_profile) {
+		this.nameFontSize_profile = _nameFontSize_profile;
+	}
+	public void setDescriptionMode_Profile(int _descriptionMode_profile) {
+		this.descriptionMode_Profile = _descriptionMode_profile;
+	}
 	public void setUser_ID(long _user_id) {
 		this.user_id = _user_id;
 	}
@@ -388,6 +432,36 @@ public class Rank {
 		this.skill = _skill;
 	}
 	
+	public int getNameLengthLimit_Level() {
+		return this.nameLengthLimit_level;
+	}
+	public int getNameLengthLimit_Rank() {
+		return this.nameLengthLimit_rank;
+	}
+	public int getNameLengthLimit_Profile() {
+		return this.nameLengthLimit_profile;
+	}
+	public int getTextFontSize_Level() {
+		return this.textFontSize_level;
+	}
+	public int getTextFontSize_Rank() {
+		return this.textFontSize_rank;
+	}
+	public int getTextFontSize_Profile() {
+		return this.textFontSize_profile;
+	}
+	public int getNameFontSize_Level() {
+		return this.nameFontSize_level;
+	}
+	public int getNameFontSize_Rank() {
+		return this.nameFontSize_rank;
+	}
+	public int getNameFontSize_Profile() {
+		return this.nameFontSize_profile;
+	}
+	public int getDescriptionMode_Profile() {
+		return this.descriptionMode_Profile;
+	}
 	public long getUser_ID() {
 		return this.user_id;
 	}

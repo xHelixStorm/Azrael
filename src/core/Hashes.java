@@ -31,7 +31,7 @@ import net.dv8tion.jda.api.entities.Member;
 
 public class Hashes {
 	private static final int max_message_pool_size = 100000;
-	private static final LinkedHashMap<Long, Messages> message_pool = new LinkedHashMap<Long, Messages>(){
+	private static final LinkedHashMap<Long, ArrayList<Messages>> message_pool = new LinkedHashMap<Long, ArrayList<Messages>>() {
 		private static final long serialVersionUID = 7505333508062985903L;
 		@Override
 		@SuppressWarnings("rawtypes")
@@ -40,7 +40,7 @@ public class Hashes {
         }
     };
     private static final int max_ranking_pool_size = 500;
-    private static final LinkedHashMap<String, Rank> ranking = new LinkedHashMap<String, Rank>(){
+    private static final LinkedHashMap<String, Rank> ranking = new LinkedHashMap<String, Rank>() {
 		private static final long serialVersionUID = 7054847678737381845L;
 		@Override
 		@SuppressWarnings("rawtypes")
@@ -81,10 +81,10 @@ public class Hashes {
     private static final ConcurrentHashMap<Long, ArrayList<String>> tweetBlacklist = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final ConcurrentHashMap<String, Watchlist> watchlist = new ConcurrentHashMap<String, Watchlist>();
 	
-	public static void addMessagePool(long _message_id, Messages _message) {
-		message_pool.put(_message_id, _message);
+	public static void addMessagePool(long _message_id, ArrayList<Messages> _messages) {
+		message_pool.put(_message_id, _messages);
 	}
-	public static void addFilterLang(long _channel_id, ArrayList<String> _filter_lang){
+	public static void addFilterLang(long _channel_id, ArrayList<String> _filter_lang) {
 		filter_lang.put(_channel_id, _filter_lang);
 	}
 	public static void addQuerryResult(String _key, ArrayList<String> _result) {
@@ -96,16 +96,16 @@ public class Hashes {
 	public static void addActionlog(String _key) {
 		actionlog.add(_key);
 	}
-	public static void addStatus(Long _key, Guilds _status){
+	public static void addStatus(Long _key, Guilds _status) {
 		status.put(_key, _status);
 	}
-	public static void addRanking(String _key, Rank _details){
+	public static void addRanking(String _key, Rank _details) {
 		ranking.put(_key, _details);
 	}
-	public static void addRankingRoles(Long _key, ArrayList<Rank> _details){
+	public static void addRankingRoles(Long _key, ArrayList<Rank> _details) {
 		ranking_roles.put(_key, _details);
 	}
-	public static void addRankingLevels(String _key, Ranks _levels){
+	public static void addRankingLevels(String _key, Ranks _levels) {
 		ranking_levels.put(_key, _levels);
 	}
 	public static void addReactionRoles(Long _key, ArrayList<Roles> _roles) {
@@ -182,13 +182,13 @@ public class Hashes {
 	}
 	
 	
-	public static Messages getMessagePool(long _message_id) {
+	public static ArrayList<Messages> getMessagePool(long _message_id) {
 		return message_pool.get(_message_id);
 	}
-	public static ArrayList<String> getFilterLang(long _channel_id){
+	public static ArrayList<String> getFilterLang(long _channel_id) {
 		return filter_lang.get(_channel_id);
 	}
-	public static LinkedHashMap<Long, Messages> getWholeMessagePool(){
+	public static LinkedHashMap<Long, ArrayList<Messages>> getWholeMessagePool() {
 		return message_pool;
 	}
 	public static ArrayList<String> getQuerryResult(String _key) {
@@ -203,19 +203,19 @@ public class Hashes {
 	public static boolean actionlogIsEmpty() {
 		return actionlog.isEmpty();
 	}
-	public static Guilds getStatus(long _key){
+	public static Guilds getStatus(long _key) {
 		return status.get(_key);
 	}
-	public static Rank getRanking(String _key){
+	public static Rank getRanking(String _key) {
 		return ranking.get(_key);
 	}
-	public static ArrayList<Rank> getRankingRoles(Long _key){
+	public static ArrayList<Rank> getRankingRoles(Long _key) {
 		return ranking_roles.get(_key);
 	}
-	public static Map<String, Ranks> getMapOfRankingLevels(){
+	public static Map<String, Ranks> getMapOfRankingLevels() {
 		return ranking_levels;
 	}
-	public static Ranks getRankingLevels(String _key){
+	public static Ranks getRankingLevels(String _key) {
 		return ranking_levels.get(_key);
 	}
 	public static ArrayList<Roles> getReactionRoles(Long _key) {
@@ -227,19 +227,19 @@ public class Hashes {
 	public static Quizes getQuiz(int _key) {
 		return quiz.get(_key);
 	}
-	public static Map<Integer, Quizes> getWholeQuiz(){
+	public static Map<Integer, Quizes> getWholeQuiz() {
 		return quiz;
 	}
 	public static Integer getQuizWinners(Member _key) {
 		return quiz_winners.get(_key);
 	}
-	public static ArrayList<Rank> getRankList(String _key){
+	public static ArrayList<Rank> getRankList(String _key) {
 		return rankList.get(_key);
 	}
-	public static ArrayList<Skins> getShopContent(Long _key){
+	public static ArrayList<Skins> getShopContent(Long _key) {
 		return shopContent.get(_key);
 	}
-	public static ArrayList<Dailies> getDailyItems(String _key){
+	public static ArrayList<Dailies> getDailyItems(String _key) {
 		return daily_items.get(_key);
 	}
 	public static ArrayList<Roles> getDiscordRole(Long _key) {
@@ -290,7 +290,7 @@ public class Hashes {
 	public static ArrayList<String> getURLWhitelist(Long _key) {
 		return urlWhitelist.get(_key);
 	}
-	public static ArrayList<String> getTweetBlacklist(Long _key){
+	public static ArrayList<String> getTweetBlacklist(Long _key) {
 		return tweetBlacklist.get(_key);
 	}
 	public static Watchlist getWatchlist(String _key) {
@@ -309,7 +309,7 @@ public class Hashes {
 	public static void removeNameFilter(Long _key) {
 		name_filter.remove(_key);
 	}
-	public static void removeRanking(String _key){
+	public static void removeRanking(String _key) {
 		ranking.remove(_key);
 	}
 	public static void removeReactionRoles(Long _key) {

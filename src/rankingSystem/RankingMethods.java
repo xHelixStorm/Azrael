@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Rank;
-import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -45,11 +44,6 @@ public class RankingMethods extends ListenerAdapter {
 			StringBuilder sb = new StringBuilder();
 			StringBuilder sb2 = new StringBuilder();
 			
-			int[] lev = GuildIni.getWholeLevel(e.getGuild().getIdLong());
-			final var nameLengthLimit = lev[0];
-			final var generalTextFontSize = lev[1];
-			final var nameTextFontSize = lev[2];
-			
 			if(level > 9) {
 				level1 = level / 10;
 				level2 = level % 10;
@@ -64,8 +58,8 @@ public class RankingMethods extends ListenerAdapter {
 				levelS2 = sb.toString();
 			}
 			
-			if(characterCounter > nameLengthLimit && nameLengthLimit != 0)
-				name = name.substring(0, nameLengthLimit);
+			if(characterCounter > user_details.getNameLengthLimit_Level() && user_details.getNameLengthLimit_Level() != 0)
+				name = name.substring(0, user_details.getNameLengthLimit_Level());
 			
 			int rankUpW = rankUp.getWidth();
 			int rankUpH = rankUp.getHeight();
@@ -80,11 +74,11 @@ public class RankingMethods extends ListenerAdapter {
 			g.setColor(color);
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			if(user_details.getLevelXLevel() > 0 || user_details.getLevelYLevel() > 0) {
-				g.setFont(new Font("Nexa Bold", Font.BOLD, generalTextFontSize));
+				g.setFont(new Font("Nexa Bold", Font.BOLD, user_details.getTextFontSize_Level()));
 				g.drawString(levelS1+""+levelS2, getCenteredString(levelS1+""+levelS2, user_details.getLevelXLevel(), g), user_details.getLevelYLevel());
 			}
 			if(user_details.getNameXLevel() > 0 || user_details.getNameYLevel() > 0) {
-				g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
+				g.setFont(new Font("Nexa Bold", Font.BOLD, user_details.getNameFontSize_Level()));
 				g.drawString(name, user_details.getNameXLevel(), user_details.getNameYLevel());
 			}
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"lvup_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
@@ -122,13 +116,8 @@ public class RankingMethods extends ListenerAdapter {
 			int characterCounter = name.length();
 			int levelT = _experience;
 			
-			int[] ran = GuildIni.getWholeProfile(e.getGuild().getIdLong());
-			final var nameLengthLimit = ran[0];
-			final var generalTextFontSize = ran[1];
-			final var nameTextFontSize = ran[2];
-			
-			if(characterCounter > nameLengthLimit && nameLengthLimit != 0)
-				name = name.substring(0, nameLengthLimit);
+			if(characterCounter > user_details.getNameLengthLimit_Rank() && user_details.getNameLengthLimit_Rank() != 0)
+				name = name.substring(0, user_details.getNameLengthLimit_Rank());
 			
 			int rankW = rank.getWidth();
 			int rankH = rank.getHeight();
@@ -143,7 +132,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.drawImage(avatarPicture, user_details.getAvatarXRank(), user_details.getAvatarYRank(), user_details.getAvatarWidthRank(), user_details.getAvatarHeightRank(), null);
 			Color color = new Color(user_details.getColorRRank(), user_details.getColorGRank(), user_details.getColorBRank());
 			g.setColor(color);
-			g.setFont(new Font("Nexa Bold", Font.PLAIN, generalTextFontSize));
+			g.setFont(new Font("Nexa Bold", Font.PLAIN, user_details.getTextFontSize_Rank()));
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			if(user_details.getExpTextXRank() > 0 || user_details.getExpTextYProfile() > 0)
 				g.drawString("Exp:", user_details.getExpTextXRank(), user_details.getExpTextYRank());
@@ -153,7 +142,7 @@ public class RankingMethods extends ListenerAdapter {
 			if(user_details.getPlacementXRank() > 0 || user_details.getPlacementYRank() > 0)
 				g.drawString("Rank:  #"+rankString, user_details.getPlacementXRank(), user_details.getPlacementYRank());
 			if(user_details.getNameXRank() > 0 || user_details.getNameYRank() > 0) {
-				g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
+				g.setFont(new Font("Nexa Bold", Font.BOLD, user_details.getNameFontSize_Rank()));
 				g.drawString(name, user_details.getNameXRank(), user_details.getNameYRank());
 			}
 			
@@ -174,7 +163,7 @@ public class RankingMethods extends ListenerAdapter {
 			BufferedImage experienceBar;
 			if(_experiencePercentage != 0) {
 				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+user_details.getBarColorProfile()+"_"+100+".png"));
-				experienceBar = experienceBar.getSubimage(0, 0, 2*_experiencePercentage, experienceBar.getHeight());
+				experienceBar = experienceBar.getSubimage(0, 0, (experienceBar.getWidth()*_experiencePercentage)/100, experienceBar.getHeight());
 			}
 			else {
 				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+0+"_"+0+".png"));
@@ -193,14 +182,8 @@ public class RankingMethods extends ListenerAdapter {
 			int levelT = _experiencePercentage;
 			int rank = _rank;
 			
-			int[] prof = GuildIni.getWholeProfile(e.getGuild().getIdLong());
-			final var nameLengthLimit = prof[0];
-			final var generalTextFontSize = prof[1];
-			final var nameTextFontSize = prof[2];
-			final var descriptionMode = prof[3];
-			
-			if(characterCounter > nameLengthLimit && nameLengthLimit != 0)
-				name = name.substring(0, nameLengthLimit);
+			if(characterCounter > user_details.getNameLengthLimit_Profile() && user_details.getNameLengthLimit_Profile() != 0)
+				name = name.substring(0, user_details.getNameLengthLimit_Profile());
 			
 			int profileW = profile.getWidth();
 			int profileH = profile.getHeight();
@@ -217,7 +200,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.drawImage(avatarPicture, user_details.getAvatarXProfile(), user_details.getAvatarYProfile(), user_details.getAvatarWidthProfile(), user_details.getAvatarHeightProfile(), null);
 			Color color = new Color(user_details.getColorRProfile(), user_details.getColorGProfile(), user_details.getColorBProfile());
 			g.setColor(color);
-			g.setFont(new Font("Nexa Bold", Font.PLAIN, generalTextFontSize));
+			g.setFont(new Font("Nexa Bold", Font.PLAIN, user_details.getTextFontSize_Profile()));
 			if(user_details.getExpTextXProfile() > 0 || user_details.getExpTextYProfile() > 0) {
 				g.drawString("Exp:", user_details.getExpTextXProfile(), user_details.getExpTextYProfile());
 			}
@@ -225,7 +208,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.drawString(levelT+"%", user_details.getPercentTextXProfile(), user_details.getPercentTextYProfile());
 			}
 			
-			if(descriptionMode == 0) {
+			if(user_details.getDescriptionMode_Profile() == 0) {
 				if(user_details.getLevelXProfile() > 0 || user_details.getLevelYProfile() > 0)
 					g.drawString(""+user_details.getLevel(), user_details.getLevelXProfile(), user_details.getLevelYProfile());
 				if(user_details.getExperienceXProfile() > 0 || user_details.getExperienceYProfile() > 0)
@@ -235,7 +218,7 @@ public class RankingMethods extends ListenerAdapter {
 				if(user_details.getPlacementXProfile() > 0 || user_details.getPlacementYProfile() > 0)
 					g.drawString(insertDots(rank), user_details.getPlacementXProfile(), user_details.getPlacementYProfile());
 			}
-			else if(descriptionMode == 1) {
+			else if(user_details.getDescriptionMode_Profile() == 1) {
 				if(user_details.getLevelXProfile() > 0 || user_details.getLevelYProfile() > 0)
 					g.drawString(""+user_details.getLevel(), getCenteredString(""+user_details.getLevel(), user_details.getLevelXProfile(), g), user_details.getLevelYProfile());
 				if(user_details.getExperienceXProfile() > 0 || user_details.getExperienceYProfile() > 0) {
@@ -251,7 +234,7 @@ public class RankingMethods extends ListenerAdapter {
 					g.drawString(rankString, getCenteredString(rankString, user_details.getPlacementXProfile(), g), user_details.getPlacementYProfile());
 				}
 			}
-			else if(descriptionMode == 2) {
+			else if(user_details.getDescriptionMode_Profile() == 2) {
 				if(user_details.getLevelXProfile() > 0 || user_details.getLevelYProfile() > 0)
 					g.drawString(""+user_details.getLevel(), getRightString(""+user_details.getLevel(), user_details.getLevelXProfile(), g), user_details.getLevelYProfile());
 				if(user_details.getExperienceXProfile() > 0 || user_details.getExperienceYProfile() > 0) {
@@ -272,7 +255,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.drawString(currentExperienceString+"/"+insertDots(rankUpExperience), getRightString(""+currentExperienceString, user_details.getExpReachXProfile(), g), user_details.getExpReachYProfile());
 			}
 			if(user_details.getNameXProfile() > 0 || user_details.getNameYProfile() > 0) {
-				g.setFont(new Font("Nexa Bold", Font.BOLD, nameTextFontSize));
+				g.setFont(new Font("Nexa Bold", Font.BOLD, user_details.getNameFontSize_Profile()));
 				g.drawString(name, user_details.getNameXProfile(), user_details.getNameYProfile());
 			}
 			

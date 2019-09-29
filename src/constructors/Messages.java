@@ -11,54 +11,61 @@ public class Messages {
 	private String message;
 	private long message_id;
 	private LocalDateTime time;
+	private boolean edit;
 	
 	public void setUserID(long _user_id) {
-		user_id = _user_id;
+		this.user_id = _user_id;
 	}
 	public void setUsername(String _user_name) {
-		user_name = _user_name;
+		this.user_name = _user_name;
 	}
 	public void setGuildID(long _guild_id) {
-		guild_id = _guild_id;
+		this.guild_id = _guild_id;
 	}
 	public void setChannelID(long _channel_id) {
-		channel_id = _channel_id;
+		this.channel_id = _channel_id;
 	}
 	public void setChannelName(String _channel_name) {
-		channel_name = _channel_name;
+		this.channel_name = _channel_name;
 	}
 	public void setMessage(String _message) {
-		message = _message;
+		this.message = _message;
 	}
 	public void setMessageID(long _message_id) {
-		message_id = _message_id;
+		this.message_id = _message_id;
 	}
 	public void setTime(LocalDateTime _time) {
-		time = _time;
+		this.time = _time;
+	}
+	public void setIsEdit(boolean _edit) {
+		this.edit = _edit;
 	}
 	
 	public long getUserID() {
-		return user_id;
+		return this.user_id;
 	}
 	public String getUserName() {
-		return user_name;
+		return this.user_name;
 	}
 	public long getGuildID() {
-		return guild_id;
+		return this.guild_id;
 	}
 	public long getChannelID() {
-		return channel_id;
+		return this.channel_id;
 	}
 	public String getChannelName() {
-		return channel_name;
+		return this.channel_name;
 	}
 	public String getMessage() {
-		return message;
+		return this.message;
 	}
 	public long getMessageID() {
-		return message_id;
+		return this.message_id;
 	}
 	public LocalDateTime getTime() {
-		return time;
+		return this.time;
+	}
+	public boolean isEdit() {
+		return this.edit;
 	}
 }

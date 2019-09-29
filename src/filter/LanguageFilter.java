@@ -60,7 +60,7 @@ public class LanguageFilter implements Runnable {
 			String getMessage = e.getMessage().getContentRaw();
 			String channel = e.getChannel().getName();
 			String thisMessage;
-			String name = e.getMember().getAsMention();
+			String name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")";
 			
 			thisMessage = CharacterReplacer.replace(getMessage);
 			final var parseMessage = thisMessage.toLowerCase();

@@ -1288,32 +1288,34 @@ public class UserExecution {
 				_e.getChannel().sendMessage("Please choose a number between 1 and 100!").queue();
 			}
 			else{
-				List<Messages> messages = Hashes.getWholeMessagePool().values().parallelStream().filter(f -> f.getUserID() == user_id && f.getGuildID() == _e.getGuild().getIdLong()).collect(Collectors.toList());
+				List<ArrayList<Messages>> messages = Hashes.getWholeMessagePool().values().parallelStream().filter(f -> f.get(0).getUserID() == user_id && f.get(0).getGuildID() == _e.getGuild().getIdLong()).collect(Collectors.toList());
 				int hash_counter = 0;
 				StringBuilder collected_messages = new StringBuilder();
 				for(int i = messages.size()-1; i >= 0; i--) {
 					hash_counter++;
 					try {
-						Message m = _e.getGuild().getTextChannelById(messages.get(i).getChannelID()).retrieveMessageById(messages.get(i).getMessageID()).complete();
-						collected_messages.append("["+messages.get(i).getTime().toString()+"]: "+messages.get(i).getMessage());
-						Hashes.removeMessagePool(messages.get(i).getMessageID());
+						Message m = _e.getGuild().getTextChannelById(messages.get(i).get(0).getChannelID()).retrieveMessageById(messages.get(i).get(0).getMessageID()).complete();
+						for(final var cachedMessage: messages.get(i)) {
+							collected_messages.append((cachedMessage.isEdit() ? "EDIT" : "MESSAGE")+" ["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]: "+cachedMessage.getMessage());
+						}
+						Hashes.removeMessagePool(messages.get(i).get(0).getMessageID());
 						m.delete().queue();
 						if(i == 0 || hash_counter == value) {
 							break;
 						}
 					}catch(InsufficientPermissionException ipe) {
 						error.setTitle("Message couldn't be removed");
-						_e.getChannel().sendMessage(error.setDescription("Message couldn't be removed from <#"+messages.get(i).getChannelID()+"> due to lack of permissions: **"+ipe.getPermission().getName()+"**").build()).queue();
+						_e.getChannel().sendMessage(error.setDescription("Message couldn't be removed from <#"+messages.get(i).get(0).getChannelID()+"> due to lack of permissions: **"+ipe.getPermission().getName()+"**").build()).queue();
 						hash_counter--;
 					}
 				}
 				
 				if(messages.size() > 0) {
 					try {
-						String paste_link = Pastebin.unlistedPermanentPaste("Messages from "+messages.get(0).getUserName()+" in guild"+_e.getGuild().getId(), hash_counter+" messages from "+messages.get(0).getUserName()+" have been removed:\n\n"+collected_messages.toString(), _e.getGuild().getIdLong());
+						String paste_link = Pastebin.unlistedPermanentPaste("Messages from "+messages.get(0).get(0).getUserName()+" ("+messages.get(0).get(0).getUserID()+") in guild"+_e.getGuild().getId(), hash_counter+" messages from "+messages.get(0).get(0).getUserName()+" ("+messages.get(0).get(0).getUserID()+") have been removed:\n\n"+collected_messages.toString(), _e.getGuild().getIdLong());
 						_e.getChannel().sendMessage(message.setDescription("The comments of the selected user have been succesfully removed: "+paste_link).build()).queue();
 						Azrael.SQLInsertActionLog("MESSAGES_DELETED", user_id, _e.getGuild().getIdLong(), paste_link);
-						logger.debug("{} has bulk deleted messages from {}", _e.getMember().getUser().getId(), messages.get(0).getUserID());
+						logger.debug("{} has bulk deleted messages from {}", _e.getMember().getUser().getId(), messages.get(0).get(0).getUserID());
 					} catch (IllegalStateException | LoginException | PasteException e) {
 						logger.warn("Error on creating paste", e);
 						error.setTitle("New Paste couldn't be created!");

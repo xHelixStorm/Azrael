@@ -58,7 +58,7 @@ public class ShopExecution {
 				alreadyPurchased = true;
 			}
 			EmbedBuilder embed = new EmbedBuilder();
-			if(shopItem.getThumbnail().contains("http"))
+			if(shopItem.getThumbnail() != null && shopItem.getThumbnail().contains("http"))
 				embed.setThumbnail(shopItem.getThumbnail());
 			embed.setDescription("**"+shopItem.getShopDescription()+"**\n"+(shopItem.getSkinFullDescription() != null && shopItem.getSkinFullDescription().length() > 0 ? shopItem.getSkinFullDescription() : ""));
 			if(defaultSkin) {
