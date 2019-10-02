@@ -132,7 +132,7 @@ public class Display implements CommandPublic{
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredChannelsLevel) || adminPermission) {
 				for(Channels ch : Azrael.SQLgetChannels(guild_id)) {
 					if(!out.toString().contains(""+ch.getChannel_ID())) {
-						out.append("\n\n"+ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \nChannel type: "+(ch.getChannel_Type_Name() != null ? ch.getChannel_Type_Name() : "none")+" Channel\nFilter(s) in use: "+ch.getLang_Filter()+"\nURL censoring: "+(ch.getURLCensoring() ? "enabled" : "disabled")) ;
+						out.append("\n\n"+ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \nChannel type: "+(ch.getChannel_Type_Name() != null ? ch.getChannel_Type_Name() : "none")+" Channel\nURL censoring: "+(ch.getURLCensoring() ? "enabled" : "disabled")+"\nFilter(s) in use: "+ch.getLang_Filter());
 					}
 					else if(out.toString().contains(""+ch.getChannel_ID())) {
 						out.append(", "+ch.getLang_Filter());

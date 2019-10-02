@@ -1196,17 +1196,23 @@ public class FilterExecution {
 	}
 	
 	private static void insertLangWord(GuildMessageReceivedEvent _e, EmbedBuilder message, final String key, final String lang, String word) {
-		if(Azrael.SQLInsertWordFilter(lang.substring(0, 3), word, _e.getGuild().getIdLong()) > 0) {
-			message.setTitle("Success!");
-			_e.getChannel().sendMessage(message.setDescription("The word has been inserted into the "+lang+" word filter!").build()).queue();
-			clearHash(_e, lang, true);
-			Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-			logger.debug("{} has inserted the word {} into the "+lang+" word filter", _e.getMember().getUser().getIdLong(), word);
+		if(!word.matches("[\\w\\d\\s\\@-]*[^\\w\\d\\s\\@\\-]{1,}[\\w\\d\\s\\@-]*")) {
+			if(Azrael.SQLInsertWordFilter(lang.substring(0, 3), word, _e.getGuild().getIdLong()) > 0) {
+				message.setTitle("Success!");
+				_e.getChannel().sendMessage(message.setDescription("The word has been inserted into the "+lang+" word filter!").build()).queue();
+				clearHash(_e, lang, true);
+				Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
+				logger.debug("{} has inserted the word {} into the "+lang+" word filter", _e.getMember().getUser().getIdLong(), word);
+			}
+			else {
+				message.setColor(Color.RED).setTitle("Word couldn't be inserted!");
+				_e.getChannel().sendMessage(message.setDescription("Word couldn't be inserted into the word-filter table. Either the word already exists or an internal error has occurred!").build()).queue();
+				logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
+			}
 		}
 		else {
-			message.setColor(Color.RED).setTitle("Word couldn't be inserted!");
-			_e.getChannel().sendMessage(message.setDescription("Word couldn't be inserted into the word-filter table. Either the word already exists or an internal error has occurred!").build()).queue();
-			logger.error("Word couldn't be inserted into Azrael.filter for guild {}", _e.getGuild().getName());
+			message.setColor(Color.RED).setTitle("Invalid character found!");
+			_e.getChannel().sendMessage(message.setDescription("A not allowed character has been used. Please try again!").build()).queue();
 		}
 		Hashes.clearTempCache(key);
 	}
@@ -1233,35 +1239,48 @@ public class FilterExecution {
 			String[] words;
 			try {
 				words = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
-				var querryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, _e.getGuild().getIdLong(), replace);
-				if(querryResult == 0) {
-					message.setTitle("Success!");
-					_e.getChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
-					clearHash(_e, lang, false);
-					Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
-					logger.debug("{} has inserted words from a file into the "+lang+" word filter", _e.getMember().getUser().getIdLong());
+				var interrupt = false;
+				for(final var word : words) {
+					if(word.toLowerCase().matches("[\\w\\d\\s\\@-]*[^\\w\\d\\s\\@\\-]{1,}[\\w\\d\\s\\@-]*")) {
+						interrupt = true;
+					}
+					break;
 				}
-				else if(querryResult == 1) {
-					//throw error for failing the db replacement
-					message.setColor(Color.RED).setTitle("Execution failed");
-					var duplicates = checkDuplicates(words);
-					if(duplicates == null || duplicates.size() == 0) {
-						_e.getChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current lang filter with the words from inside the pastebin link! Please verify that the words you try to insert aren't already registered!").build()).queue();
-						logger.warn("The {} filter couldn't be updated in guild {}", lang, _e.getGuild().getId());
+				if(!interrupt) {
+					var querryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, _e.getGuild().getIdLong(), replace);
+					if(querryResult == 0) {
+						message.setTitle("Success!");
+						_e.getChannel().sendMessage(message.setDescription("Words have been inserted!").build()).queue();
+						clearHash(_e, lang, false);
+						Hashes.removeQuerryResult("all_"+_e.getGuild().getId());
+						logger.debug("{} has inserted words from a file into the "+lang+" word filter", _e.getMember().getUser().getIdLong());
+					}
+					else if(querryResult == 1) {
+						//throw error for failing the db replacement
+						message.setColor(Color.RED).setTitle("Execution failed");
+						var duplicates = checkDuplicates(words);
+						if(duplicates == null || duplicates.size() == 0) {
+							_e.getChannel().sendMessage(message.setDescription("An unexpected error occurred while replacing the current lang filter with the words from inside the pastebin link! Please verify that the words you try to insert aren't already registered!").build()).queue();
+							logger.warn("The {} filter couldn't be updated in guild {}", lang, _e.getGuild().getId());
+						}
+						else {
+							StringBuilder out = new StringBuilder();
+							for(var word : duplicates) {
+								out.append("**"+word+"**\n");
+							}
+							_e.getChannel().sendMessage(message.setDescription("Words couldn't be loaded from the pastebin link because duplicates have been found. Please remove these duplicates and then try again!\n\n"+out.toString()).build()).queue();
+						}
 					}
 					else {
-						StringBuilder out = new StringBuilder();
-						for(var word : duplicates) {
-							out.append("**"+word+"**\n");
-						}
-						_e.getChannel().sendMessage(message.setDescription("Words couldn't be loaded from the pastebin link because duplicates have been found. Please remove these duplicates and then try again!\n\n"+out.toString()).build()).queue();
+						//throw error for failing the rollback
+						message.setColor(Color.RED).setTitle("Execution failed");
+						_e.getChannel().sendMessage(message.setDescription("A critical error occurred. The filter table has been altered but couldn't be reverted on error. Current filter data could have been lost!").build()).queue();
+						logger.error("Update on filter table couldn't be rolled back on error. Affected language is {} for guild {}", lang, _e.getGuild().getId());
 					}
 				}
 				else {
-					//throw error for failing the rollback
-					message.setColor(Color.RED).setTitle("Execution failed");
-					_e.getChannel().sendMessage(message.setDescription("A critical error occurred. The filter table has been altered but couldn't be reverted on error. Current filter data could have been lost!").build()).queue();
-					logger.error("Update on filter table couldn't be rolled back on error. Affected language is {} for guild {}", lang, _e.getGuild().getId());
+					message.setColor(Color.RED).setTitle("Invalid character found!");
+					_e.getChannel().sendMessage(message.setDescription("A not allowed character has been used. Please edit the list and then try again!").build()).queue();
 				}
 			} catch (MalformedURLException | RuntimeException e) {
 				logger.error("Reading paste failed!", e);

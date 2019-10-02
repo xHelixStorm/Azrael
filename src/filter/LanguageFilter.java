@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import constructors.Cache;
 import constructors.Channels;
@@ -16,7 +18,7 @@ import util.STATIC;
 import util.CharacterReplacer;
 
 public class LanguageFilter implements Runnable {
-	private final static EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle("Message removed!");
+	private final static EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE);
 	
 	private GuildMessageReceivedEvent e;
 	private ArrayList<String> filter_lang;
@@ -32,7 +34,6 @@ public class LanguageFilter implements Runnable {
 	@Override
 	public void run() {
 		if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && !UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) && !UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong())) {
-			boolean wordFound = false;
 			boolean exceptionFound = false;
 			String [] output = new String[2];
 			
@@ -59,40 +60,42 @@ public class LanguageFilter implements Runnable {
 			
 			String getMessage = e.getMessage().getContentRaw();
 			String channel = e.getChannel().getName();
-			String thisMessage;
+			String thisMessage = CharacterReplacer.replace(getMessage).trim();
 			String name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")";
 			
-			thisMessage = CharacterReplacer.replace(getMessage);
 			final var parseMessage = thisMessage.toLowerCase();
-			int letterCounter = parseMessage.length();
 			
-			for(String exceptions : CharacterReplacer.getExceptions()) {
-				if(parseMessage.equals(exceptions) || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+exceptions+"(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + exceptions + "(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + exceptions + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || parseMessage.matches(exceptions+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+exceptions+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.contains(" "+exceptions+" ")) {
+			for(String exception : CharacterReplacer.getExceptions()) {
+				if(parseMessage.matches("(.|\\s){0,}\\b"+exception+"\\b(.|\\s){0,}")) {
 					exceptionFound = true;
 				}
 			}
 			
 			if(exceptionFound == false) {
-				find: for(String filter : filter_lang) {
-					Azrael.SQLgetFilter(filter, e.getGuild().getIdLong());
-					if(wordFound == false && letterCounter > 1) {
-						Optional<String> option = Hashes.getQuerryResult(filter+"_"+e.getGuild().getIdLong()).parallelStream()
-							.filter(word -> parseMessage.equals(word) || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || parseMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || parseMessage.contains(" "+word+" "))
-							.findAny();
-						if(option.isPresent()) {
-							e.getMessage().delete().reason("Message removed due to bad manner!").complete();
-							Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
-							var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
-							if(tra_channel != null) {e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();}
-							wordFound = true;
-							break find;
+				for(String filter : filter_lang) {
+					Optional<String> option = Azrael.SQLgetFilter(filter, e.getGuild().getIdLong()).parallelStream()
+						.filter(word -> parseMessage.matches("(.|\\s){0,}\\b"+word+"\\b(.|\\s){0,}")).findAny();
+					if(option.isPresent()) {
+						Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
+						e.getMessage().delete().reason("Message removed due to bad manner!").complete();
+						STATIC.handleRemovedMessages(e, null, output);
+						var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
+						if(tra_channel != null) {
+							Matcher matcher = Pattern.compile("[\\w\\d]*").matcher(getMessage);
+							while(matcher.find()) {
+								var word = matcher.group();
+								var convertedWord = CharacterReplacer.replace(word);
+								if(convertedWord.equalsIgnoreCase(option.get())) {
+									getMessage = getMessage.replace(word, "**__"+word+"__**");
+									break;
+								}
+							}
+							message.setTitle("Message removed! The word **"+option.get()+"** from filter **"+filter+"** has been detected!");
+							e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();
 						}
+						break;
 					}
 				}
-			}
-			
-			if(wordFound == true) {
-				STATIC.handleRemovedMessages(e, null, output);
 			}
 		}
 	}
