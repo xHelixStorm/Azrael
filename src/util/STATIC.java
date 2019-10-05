@@ -40,13 +40,37 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.6.328";
+	private static final String VERSION = "6.7.329";
+	private static String TOKEN = "";
+	private static String SESSION_NAME = "";
+	private static long ADMIN = 0;
 	private static TwitterFactory twitterFactory = null;
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	
 	public static String getVersion() {
 		return VERSION;
+	}
+	
+	public static void setToken(String _token) {
+		TOKEN = _token;
+	}
+	public static String getToken() {
+		return TOKEN;
+	}
+	
+	public static void setSessionName(String _name) {
+		SESSION_NAME = _name;
+	}
+	public static String getSessionName() {
+		return SESSION_NAME;
+	}
+	
+	public static void setAdmin(long _admin) {
+		ADMIN = _admin;
+	}
+	public static long getAdmin() {
+		return ADMIN;
 	}
 	
 	public static void addThread(Thread thread, final String name) {

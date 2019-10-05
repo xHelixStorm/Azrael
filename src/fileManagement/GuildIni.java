@@ -28,6 +28,10 @@ public class GuildIni {
 			ini.add("General", "SelfDeletedMessage", "false");
 			ini.add("General", "EditedMessage" , "false");
 			
+			//Patch
+			ini.add("Patch", "PrivatePatchNotes", "true");
+			ini.add("Patch", "PublicPatchNotes", "true");
+			
 			//Mute
 			ini.add("Mute", "MessageDeleteEnabled", "false");
 			ini.add("Mute", "ForceMessageDeletion", "false");
@@ -318,6 +322,15 @@ public class GuildIni {
 	public static boolean getEditedMessage(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "EditedMessage", boolean.class);
+	}
+	
+	public static boolean getPrivatePatchNotes(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Patch", "PrivatePatchNotes", boolean.class);
+	}
+	public static boolean getPublicPatchNotes(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Patch", "PublicPatchNotes", boolean.class);
 	}
 	
 	public static boolean getMuteMessageDeleteEnabled(long guild_id) {

@@ -8,55 +8,61 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import enums.Weekday;
+import util.STATIC;
 
 public class IniFileReader {
 	private final static Logger logger = LoggerFactory.getLogger(IniFileReader.class);
-	private static Ini ini;
 	
-	private static void readConfig(){
+	private static Ini readConfig() {
 		try {
-			ini = new Ini(new File("config.ini"));
+			return new Ini(new File("config.ini"));
 		} catch (IOException e) {
 			logger.error("Config file couldn't be found or couldn't be opened", e);
+			return null;
 		}
 	}
 	
-	public static String getToken(){
-		readConfig();
+	public static String getToken() {
+		Ini ini = readConfig();
 		return ini.get("Bot", "Token");
 	}
 	public static long getAdmin(){
-		readConfig();
-		return ini.get("Bot", "Admin", long.class);
+		if(STATIC.getAdmin() != 0) {
+			return STATIC.getAdmin();
+		}
+		else {
+			Ini ini = readConfig();
+			return ini.get("Bot", "Admin", long.class);
+		}
 	}
 	public static boolean getCountMembers() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Bot", "CountMembers", boolean.class);
 	}
 	public static String getGameMessage(){
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Bot", "GameMessage");
 	}
 	public static boolean getActionLog(){
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Bot", "ActionLog", boolean.class);
 	}
 	public static boolean getFileLogger() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Bot", "FileLogger", boolean.class);
 	}
-	public static String getTempDirectory(){
-		readConfig();
+	public static String getTempDirectory() {
+		Ini ini = readConfig();
 		return ini.get("Bot", "TempDirectory");
 	}
 	
 	public static String getPastebinDeveloperKey() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Pastebin", "DeveloperKey");
 	}
 	
 	public static String[] getTwitterKeys() {
-		readConfig();
+		Ini ini = readConfig();
 		Ini.Section tokens = ini.get("Twitter");
 		String []twitter = new String[4];
 		twitter[0] = tokens.get("ConsumerKey");
@@ -67,109 +73,101 @@ public class IniFileReader {
 	}
 	
 	public static boolean getDoubleExpEnabled() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("DoubleExperience", "Enabled", boolean.class);
 	}
 	
 	public static Weekday getDoubleExpStart() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("DoubleExperience", "Start", Weekday.class);
 	}
 	
 	public static Weekday getDoubleExpEnd() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("DoubleExperience", "End", Weekday.class);
 	}
-	public static boolean getAllowPatchNotes(){
-		readConfig();
-		return ini.get("Patch", "PrivatePatchNotes", boolean.class);
-	}
-	public static boolean getAllowPublicPatchNotes(){
-		readConfig();
-		return ini.get("Patch", "PublicPatchNotes", boolean.class);
-	}
-	public static String getSQLUsername(){
-		readConfig();
+	public static String getSQLUsername() {
+		Ini ini = readConfig();
 		return ini.get("Azrael", "Username");
 	}
-	public static String getSQLPassword(){
-		readConfig();
+	public static String getSQLPassword() {
+		Ini ini = readConfig();
 		return ini.get("Azrael", "Password");
 	}
-	public static long getMessageTimeout(){
-		readConfig();
+	public static long getMessageTimeout() {
+		Ini ini = readConfig();
 		return ini.get("RankingSystem", "MessageTimeout", long.class);
 	}
-	public static String getSQLUsername2(){
-		readConfig();
+	public static String getSQLUsername2() {
+		Ini ini = readConfig();
 		return ini.get("RankingSystem", "Username");
 	}
-	public static String getSQLPassword2(){
-		readConfig();
+	public static String getSQLPassword2() {
+		Ini ini = readConfig();
 		return ini.get("RankingSystem", "Password");
 	}
-	public static String getSQLUsername3(){
-		readConfig();
+	public static String getSQLUsername3() {
+		Ini ini = readConfig();
 		return ini.get("DiscordRoles", "Username");
 	}
-	public static String getSQLPassword3(){
-		readConfig();
+	public static String getSQLPassword3() {
+		Ini ini = readConfig();
 		return ini.get("DiscordRoles", "Password");
 	}
-	public static String getSQLUsername4(){
-		readConfig();
+	public static String getSQLUsername4() {
+		Ini ini = readConfig();
 		return ini.get("Patchnotes", "Username");
 	}
-	public static String getSQLPassword4(){
-		readConfig();
+	public static String getSQLPassword4() {
+		Ini ini = readConfig();
 		return ini.get("Patchnotes", "Password");
 	}
 	public static String getPugThumbnail() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Pug");
 	}
 	public static String getMeowThumbnail() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Meow");
 	}
 	public static String getBanThumbnail() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Ban");
 	}
 	public static String getSettingsThumbnail() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Settings");
 	}
 	public static String getShopThumbnail() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Shop");
 	}
 	public static String getDeniedThumbnail() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Denied");
 	}
 	public static String getLeaveThumbnail() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Leave");
 	}
 	public static String getUnbanThumbnail() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Unban");
 	}
 	public static String getUnmuteThumbnail() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Unmute");
 	}
 	public static String getKickThumbnail() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Kick");
 	}
 	public static String getCatchedThumbnail() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Catched");
 	}
 	public static String getFalseAlarmThumbnail() {
-		readConfig();
+		Ini ini = readConfig();
 		return ini.get("Thumbnails", "FalseAlarm");
 	}
 }

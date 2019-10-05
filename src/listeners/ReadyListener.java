@@ -43,26 +43,17 @@ public class ReadyListener extends ListenerAdapter {
 	@Override
 	public void onReady(ReadyEvent e) {
 		FileSetting.createTemp(e);
-		if(new File(IniFileReader.getTempDirectory()+"running.azr").exists() && FileSetting.readFile(IniFileReader.getTempDirectory()+"running.azr").contains("1")) {
-			FileSetting.createFile(IniFileReader.getTempDirectory()+"running.azr", "2");
+		if(new File(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr").exists() && FileSetting.readFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr").contains("1")) {
+			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "2");
 			e.getJDA().shutdownNow();
 			return;
 		}
-		FileSetting.createFile(IniFileReader.getTempDirectory()+"running.azr", "1");
+		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "1");
 		
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the latest patch notes!");
 		System.out.println();
 		System.out.println("Azrael Version: "+STATIC.getVersion()+"\nAll credits to xHelixStorm");
-		
-		boolean allowPatchNotes = IniFileReader.getAllowPatchNotes();
-		boolean allowPublicPatchNotes = IniFileReader.getAllowPublicPatchNotes();
-		
 		System.out.println();
-		
-		if(allowPatchNotes){System.out.println("private patch notes: enabled");}
-		else{System.out.println("private patch notes: disabled");}
-		if(allowPublicPatchNotes){System.out.println("public patch notes:  enabled");}
-		else{System.out.println("public patch notes:  disabled");}
 		
 		STATIC.loginTwitter();
 
@@ -147,7 +138,7 @@ public class ReadyListener extends ListenerAdapter {
 			}
 			
 			var published = false;
-			if(priv_notes != null && allowPatchNotes) {
+			if(priv_notes != null && GuildIni.getPrivatePatchNotes(guild.getIdLong())) {
 				if(log_channel != null) {
 					e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
 							messageBuild.setDescription("Bot patch notes version **"+STATIC.getVersion()+"** "+priv_notes.getDate()+"\n"+priv_notes.getMessage1())
@@ -160,7 +151,7 @@ public class ReadyListener extends ListenerAdapter {
 					published = true;
 				}
 			}
-			if(publ_notes != null && allowPublicPatchNotes) {
+			if(publ_notes != null && GuildIni.getPublicPatchNotes(guild.getIdLong())) {
 				if(bot_channel != null) {
 					e.getJDA().getGuildById(guild.getId()).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
 							messageBuild.setDescription("Bot patch notes version **"+STATIC.getVersion()+"** "+publ_notes.getDate()+"\n"+publ_notes.getMessage1())

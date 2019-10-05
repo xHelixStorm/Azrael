@@ -13,40 +13,29 @@ import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
+import util.STATIC;
 
 public class ShutdownListener extends ListenerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(ShutdownListener.class);
 	
 	@Override
-	public void onShutdown(ShutdownEvent e){
-		String filecontent = FileSetting.readFile(IniFileReader.getTempDirectory()+"running.azr");
+	public void onShutdown(ShutdownEvent e) {
+		String filecontent = FileSetting.readFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr");
 		
 		if(SystemUtils.IS_OS_LINUX) {
 			if(filecontent.contains("1")) {
 				deleteTemp();
 				try {
 					Process proc;
-					proc = Runtime.getRuntime().exec("./scripts/restart.sh");
+					proc = Runtime.getRuntime().exec("screen "+(STATIC.getSessionName().length() > 0 ? "-S "+STATIC.getSessionName()+" " : "")+"java -jar --enable-preview Azrael.jar "+STATIC.getToken()+" "+STATIC.getSessionName()+" "+(STATIC.getAdmin() != 0 ? STATIC.getAdmin() : ""));
 					proc.waitFor();
 				} catch (IOException | InterruptedException e1) {
-					logger.error("restart.sh script couldn't be started");
-				}
-			}
-		}
-		else if(SystemUtils.IS_OS_WINDOWS) {			
-			if(filecontent.contains("1")) {
-				deleteTemp();
-				try {
-					Process proc;
-					proc = Runtime.getRuntime().exec("./scripts/restart.bat");
-					proc.waitFor();
-				} catch (IOException | InterruptedException e1) {
-					logger.error("restart.bat script couldn't be started");
+					logger.error("Bot couldn't be restarted!");
 				}
 			}
 		}
 		if(filecontent.contains("2")) {
-			FileSetting.createFile(IniFileReader.getTempDirectory()+"running.azr", "1");
+			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "1");
 			logger.warn("Duplicate running session shut down!");
 			Azrael.SQLInsertActionLog("DUPLICATE_SESSION", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
 		}

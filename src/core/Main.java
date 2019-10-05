@@ -67,6 +67,7 @@ import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import util.STATIC;
 
 public class Main {
 	static {System.setProperty("logback.configurationFile", "./logback.xml");}
@@ -79,13 +80,20 @@ public class Main {
 		dir[1] = (new File("./message_log")).mkdirs();
 		dir[2] = (new File("./ini")).mkdirs();
 		
+		if(args.length > 0) {
+			STATIC.setToken(args[0]);
+			if(args.length > 1)
+				STATIC.setSessionName(args[1]);
+			if(args.length > 2)
+				STATIC.setAdmin(Long.parseLong(args[2]));
+		}
+		
 		if(IniFileReader.getFileLogger()) {
-			
 			PrintStream out;
 			PrintStream err;
 			try {
-				out = new PrintStream(new FileOutputStream("log/log"+new Timestamp(System.currentTimeMillis()).toString().replaceAll(":", "-")+".txt"));
-				err = new PrintStream(new FileOutputStream("log/err"+new Timestamp(System.currentTimeMillis()).toString().replaceAll(":", "-")+".txt"));
+				out = new PrintStream(new FileOutputStream("log/"+STATIC.getSessionName()+"log"+new Timestamp(System.currentTimeMillis()).toString().replaceAll(":", "-")+".txt"));
+				err = new PrintStream(new FileOutputStream("log/"+STATIC.getSessionName()+"err"+new Timestamp(System.currentTimeMillis()).toString().replaceAll(":", "-")+".txt"));
 				System.setOut(out);
 				System.setErr(err);
 			} catch (FileNotFoundException e1) {
@@ -93,7 +101,7 @@ public class Main {
 			}
 		}
 		
-		String token = IniFileReader.getToken();
+		String token = (STATIC.getToken().length() > 0 ? STATIC.getToken() : IniFileReader.getToken());
 		builder = new JDABuilder(AccountType.BOT);
 		builder.setToken(token);
 		builder.setAutoReconnect(true);
