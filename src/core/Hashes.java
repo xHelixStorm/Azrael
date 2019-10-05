@@ -80,6 +80,8 @@ public class Hashes {
     private static final ConcurrentHashMap<Long, ArrayList<String>> urlWhitelist = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final ConcurrentHashMap<Long, ArrayList<String>> tweetBlacklist = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final ConcurrentHashMap<String, Watchlist> watchlist = new ConcurrentHashMap<String, Watchlist>();
+    private static final ConcurrentHashMap<Long, Boolean> heavyCensoring = new ConcurrentHashMap<Long, Boolean>();
+    private static final ConcurrentHashMap<Long, ArrayList<String>> censorMessage = new ConcurrentHashMap<Long, ArrayList<String>>();
 	
 	public static void addMessagePool(long _message_id, ArrayList<Messages> _messages) {
 		message_pool.put(_message_id, _messages);
@@ -179,6 +181,12 @@ public class Hashes {
 	}
 	public static void addWatchlist(String _key, Watchlist _value) {
 		watchlist.put(_key, _value);
+	}
+	public static void addHeavyCensoring(Long _key, Boolean _value) {
+		heavyCensoring.put(_key, _value);
+	}
+	public static void addCensorMessage(Long _key, ArrayList<String> _value) {
+		censorMessage.put(_key, _value);
 	}
 	
 	
@@ -295,6 +303,12 @@ public class Hashes {
 	}
 	public static Watchlist getWatchlist(String _key) {
 		return watchlist.get(_key);
+	}
+	public static Boolean getHeavyCensoring(Long _key) {
+		return heavyCensoring.get(_key);
+	}
+	public static ArrayList<String> getCensorMessage(Long _key) {
+		return censorMessage.get(_key);
 	}
 	
 	public static void removeMessagePool(long _message_id) {

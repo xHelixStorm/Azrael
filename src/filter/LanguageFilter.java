@@ -72,6 +72,7 @@ public class LanguageFilter implements Runnable {
 			}
 			
 			if(exceptionFound == false) {
+				var blockHeavyCensor = false;
 				for(String filter : filter_lang) {
 					Optional<String> option = Azrael.SQLgetFilter(filter, e.getGuild().getIdLong()).parallelStream()
 						.filter(word -> parseMessage.matches("(.|\\s){0,}\\b"+word+"\\b(.|\\s){0,}")).findAny();
@@ -94,6 +95,34 @@ public class LanguageFilter implements Runnable {
 							e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();
 						}
 						break;
+					}
+					else if(!blockHeavyCensor) {
+						blockHeavyCensor = true;
+						var heavyCensoring = Hashes.getHeavyCensoring(e.getGuild().getIdLong());
+						if(heavyCensoring != null && heavyCensoring) {
+							var censorMessage = Hashes.getCensorMessage(e.getGuild().getIdLong());
+							if(parseMessage.length() == 1 || !parseMessage.matches("(.|\\s){0,}[\\w\\d](.|\\s){0,}") || (censorMessage != null && censorMessage.contains(parseMessage))) {
+								Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
+								e.getMessage().delete().reason("Message removed due to heavy censoring!").complete();
+								var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
+								if(tra_channel != null) {
+									message.setTitle("Message removed due to **heavy censoring**!");
+									e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();
+								}
+								if(censorMessage == null) {
+									ArrayList<String> saveMessage = new ArrayList<String>();
+									saveMessage.add(parseMessage);
+									Hashes.addCensorMessage(e.getGuild().getIdLong(), saveMessage);
+								}
+								else {
+									censorMessage.add(parseMessage);
+									if(censorMessage.size() > 10)
+										censorMessage.remove(0);
+									Hashes.addCensorMessage(e.getGuild().getIdLong(), censorMessage);
+								}
+								break;
+							}
+						}
 					}
 				}
 			}

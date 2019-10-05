@@ -18,6 +18,7 @@ import commands.Display;
 import commands.DoubleExperience;
 import commands.Equip;
 import commands.Filter;
+import commands.HeavyCensoring;
 import commands.Help;
 import commands.Inventory;
 import commands.Meow;
@@ -139,6 +140,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("doubleexperience", new DoubleExperience());
 		CommandHandler.commandsPublic.put("equip", new Equip());
 		CommandHandler.commandsPublic.put("remove", new Remove());
+		CommandHandler.commandsPublic.put("heavycensoring", new HeavyCensoring());
 	}
 	
 	public static void addPrivateCommands() {
