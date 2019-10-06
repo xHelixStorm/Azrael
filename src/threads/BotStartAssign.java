@@ -38,7 +38,7 @@ public class BotStartAssign implements Runnable{
 		for(Guild g : (e != null ? e.getJDA().getGuilds() : e2.getJDA().getGuilds())) {
 			long guild_id = g.getIdLong();
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
-			if(guild_settings.getRankingState() == true){
+			if(guild_settings != null && guild_settings.getRankingState()) {
 				rankingIncluded = true;
 				for(Member member : g.getMembers()) {
 					if(!UserPrivs.isUserBot(member.getUser(), guild_id) && !UserPrivs.isUserMuted(member.getUser(), guild_id)) {

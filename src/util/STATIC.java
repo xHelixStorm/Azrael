@@ -40,10 +40,14 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.7.329";
+	private static final String VERSION = "6.7.330";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
+	private static String ACTIONLOG = "";
+	private static String DOUBLEEXPERIENCE = "";
+	private static String COUNTMEMBERS = "";
+	private static String GAMEMESSAGE = "";
 	private static TwitterFactory twitterFactory = null;
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
@@ -71,6 +75,34 @@ public class STATIC {
 	}
 	public static long getAdmin() {
 		return ADMIN;
+	}
+	
+	public static void setActionLog(String _actionLog) {
+		ACTIONLOG = _actionLog;
+	}
+	public static String getActionLog() {
+		return ACTIONLOG;
+	}
+	
+	public static void setDoubleExperience(String _doubleExperience) {
+		DOUBLEEXPERIENCE = _doubleExperience;
+	}
+	public static String getDoubleExperience() {
+		return DOUBLEEXPERIENCE;
+	}
+	
+	public static void setCountMembers(String _countMembers) {
+		COUNTMEMBERS = _countMembers;
+	}
+	public static String getCountMembers() {
+		return COUNTMEMBERS;
+	}
+	
+	public static void setGameMessage(String _gameMessage) {
+		GAMEMESSAGE = _gameMessage;
+	}
+	public static String getGameMessage() {
+		return GAMEMESSAGE;
 	}
 	
 	public static void addThread(Thread thread, final String name) {

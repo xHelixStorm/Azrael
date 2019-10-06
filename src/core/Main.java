@@ -81,11 +81,24 @@ public class Main {
 		dir[2] = (new File("./ini")).mkdirs();
 		
 		if(args.length > 0) {
-			STATIC.setToken(args[0]);
+			STATIC.setToken(args[0].trim());
 			if(args.length > 1)
-				STATIC.setSessionName(args[1]);
+				STATIC.setSessionName(args[1].trim());
 			if(args.length > 2)
-				STATIC.setAdmin(Long.parseLong(args[2]));
+				STATIC.setAdmin(Long.parseLong(args[2].trim()));
+			if(args.length > 3)
+				STATIC.setActionLog(args[3].trim());
+			if(args.length > 4)
+				STATIC.setDoubleExperience(args[4].trim());
+			if(args.length > 5)
+				STATIC.setCountMembers(args[5].trim());
+			if(args.length > 6) {
+				var splitMessage = args[6].split("-");
+				StringBuilder message = new StringBuilder();
+				for(final var split : splitMessage)
+					message.append(split+" ");
+				STATIC.setGameMessage(message.toString().trim());
+			}
 		}
 		
 		if(IniFileReader.getFileLogger()) {

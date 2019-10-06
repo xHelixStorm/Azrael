@@ -26,7 +26,7 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("Bot", "Token");
 	}
-	public static long getAdmin(){
+	public static long getAdmin() {
 		if(STATIC.getAdmin() != 0) {
 			return STATIC.getAdmin();
 		}
@@ -36,16 +36,37 @@ public class IniFileReader {
 		}
 	}
 	public static boolean getCountMembers() {
-		Ini ini = readConfig();
-		return ini.get("Bot", "CountMembers", boolean.class);
+		var countMembers = STATIC.getCountMembers();
+		if(countMembers.equals("true"))
+			return true;
+		else if(countMembers.equals("false"))
+			return false;
+		else {
+			Ini ini = readConfig();
+			return ini.get("Bot", "CountMembers", boolean.class);
+		}
 	}
-	public static String getGameMessage(){
-		Ini ini = readConfig();
-		return ini.get("Bot", "GameMessage");
+	public static String getGameMessage() {
+		var gameMessage = STATIC.getGameMessage();
+		if(gameMessage.length() == 1 && gameMessage.equals("%"))
+			return "";
+		else if(gameMessage.length() > 0)
+			return gameMessage;
+		else {
+			Ini ini = readConfig();
+			return ini.get("Bot", "GameMessage");
+		}
 	}
-	public static boolean getActionLog(){
-		Ini ini = readConfig();
-		return ini.get("Bot", "ActionLog", boolean.class);
+	public static boolean getActionLog() {
+		var actionLog = STATIC.getActionLog();
+		if(actionLog.equals("true"))
+			return true;
+		else if(actionLog.equals("false"))
+			return false;
+		else {
+			Ini ini = readConfig();
+			return ini.get("Bot", "ActionLog", boolean.class);
+		}
 	}
 	public static boolean getFileLogger() {
 		Ini ini = readConfig();
@@ -73,8 +94,15 @@ public class IniFileReader {
 	}
 	
 	public static boolean getDoubleExpEnabled() {
-		Ini ini = readConfig();
-		return ini.get("DoubleExperience", "Enabled", boolean.class);
+		var doubleExperience = STATIC.getDoubleExperience();
+		if(doubleExperience.equals("true"))
+			return true;
+		else if(doubleExperience.equals("false"))
+			return false;
+		else {
+			Ini ini = readConfig();
+			return ini.get("DoubleExperience", "Enabled", boolean.class);
+		}
 	}
 	
 	public static Weekday getDoubleExpStart() {

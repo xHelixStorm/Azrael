@@ -10,6 +10,7 @@ import fileManagement.IniFileReader;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import util.STATIC;
 
 public class ShutDown implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(ShutDown.class);
@@ -22,7 +23,7 @@ public class ShutDown implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
-			FileSetting.createFile(IniFileReader.getTempDirectory()+"running.azr", "0");
+			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
 			e.getChannel().sendMessage("**shutting down now. Cya later!**").queue();
 			e.getJDA().shutdown();
 		}
