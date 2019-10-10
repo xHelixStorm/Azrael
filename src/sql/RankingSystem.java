@@ -21,10 +21,12 @@ import constructors.Ranks;
 import constructors.Skins;
 import core.Hashes;
 import fileManagement.IniFileReader;
+import util.STATIC;
 
 public class RankingSystem {
 	private static final Logger logger = LoggerFactory.getLogger(RankingSystem.class);
 	
+	private static String ip = IniFileReader.getSQLIP2();
 	private static String username = IniFileReader.getSQLUsername2();
 	private static String password = IniFileReader.getSQLPassword2();
 		
@@ -42,7 +44,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("INSERT INTO action_log (warning_level, affected_entity, affected_server, event, notes) VALUES (?, ?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _warning_level);
@@ -65,7 +67,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql;
 			if(_level_skin != 0 && _rank_skin != 0 && _profile_skin != 0 && _icon_skin != 0) {
 				sql = ("INSERT INTO users (user_id, name, level_skin, rank_skin, profile_skin, icon_skin, fk_guild_id) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
@@ -100,7 +102,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE users SET level_skin = ?, name = ? WHERE user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _skin_id);
@@ -122,7 +124,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE users SET rank_skin = ?, name = ? WHERE user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _skin_id);
@@ -144,7 +146,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE users SET profile_skin = ?, name = ? WHERE user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _skin_id);
@@ -166,7 +168,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE users SET icon_skin = ?, name = ? WHERE user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _skin_id);
@@ -189,7 +191,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("INSERT INTO guilds (guild_id, name, ranking_state) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), ranking_state=VALUES(ranking_state)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -210,7 +212,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE guilds SET name = ?, ranking_state = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
@@ -231,7 +233,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE guilds SET name = ?, fk_level_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
@@ -252,7 +254,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE guilds SET name = ?, fk_rank_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
@@ -273,7 +275,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE guilds SET name = ?, fk_profile_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
@@ -294,7 +296,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE guilds SET name = ?, fk_icon_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
@@ -316,7 +318,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("INSERT INTO roles (role_id, name, level_requirement, fk_guild_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), level_requirement=VALUES(level_requirement)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_id);
@@ -338,7 +340,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("DELETE FROM roles WHERE role_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_id);
@@ -358,7 +360,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("DELETE FROM roles WHERE role_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_id);
@@ -378,7 +380,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("DELETE FROM roles WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -400,7 +402,7 @@ public class RankingSystem {
 			ResultSet rs = null;
 			ArrayList<Rank> ranks = new ArrayList<Rank>();
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				String sql = ("SELECT * FROM roles WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -433,7 +435,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT * FROM roles WHERE role_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_id);
@@ -459,7 +461,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("INSERT IGNORE INTO user_details (`fk_user_id`, `level`, `experience`, `currency`, `current_role`, `fk_guild_id`) VALUES (?, ?, ?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -484,7 +486,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT `current_role` FROM `user_details` WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -509,7 +511,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE user_details SET `experience` = ? WHERE `fk_user_id` = ? AND `fk_guild_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _experience);
@@ -530,7 +532,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE user_details SET `level` = ?, `experience` = ?, `currency` = ?, `current_role` = ? WHERE `fk_user_id` = ? AND `fk_guild_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _level);
@@ -554,7 +556,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE user_details SET `current_role` = ? WHERE `fk_guild_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_assign);
@@ -574,7 +576,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE user_details SET `currency` = ? WHERE `fk_user_id` = ? AND `fk_guild_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _currency);
@@ -598,7 +600,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				String sql = ("SELECT `fk_user_id`, `Level`, `experience`, @curRank := @curRank + 1 AS Rank FROM `user_details`, (SELECT @curRank := 0) r WHERE fk_guild_id = ? ORDER BY `experience` DESC");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -631,7 +633,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("INSERT INTO max_exp (max_exp_id, experience, enabled, fk_guild_id) VALUES (NULL, ?, ?, ?) ON DUPLICATE KEY UPDATE experience=VALUES(experience), enabled=VALUES(enabled)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _experience);
@@ -653,7 +655,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("INSERT INTO daily_experience (user_id, experience, reset, fk_guild_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE experience=VALUES(experience), reset=VALUES(reset)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -675,7 +677,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("DELETE FROM daily_experience WHERE user_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -699,7 +701,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				String sql = ("SELECT * FROM ranking_level");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
@@ -747,7 +749,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				String sql = ("SELECT * FROM ranking_rank");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
@@ -761,26 +763,26 @@ public class RankingSystem {
 					rankingSystem.setColorBRank(rs.getInt(6));
 					rankingSystem.setRankXRank(rs.getInt(7));
 					rankingSystem.setRankYRank(rs.getInt(8));
-					rankingSystem.setRankWidthRank(rs.getInt(10));
-					rankingSystem.setRankHeightRank(rs.getInt(11));
-					rankingSystem.setNameXRank(rs.getInt(12));
-					rankingSystem.setNameYRank(rs.getInt(13));
-					rankingSystem.setBarXRank(rs.getInt(14));
-					rankingSystem.setBarYRank(rs.getInt(15));
-					rankingSystem.setAvatarXRank(rs.getInt(16));
-					rankingSystem.setAvatarYRank(rs.getInt(17));
-					rankingSystem.setAvatarWidthRank(rs.getInt(18));
-					rankingSystem.setAvatarHeightRank(rs.getInt(19));
-					rankingSystem.setExpTextXRank(rs.getInt(20));
-					rankingSystem.setExpTextYRank(rs.getInt(21));
-					rankingSystem.setPercentTextXRank(rs.getInt(22));
-					rankingSystem.setPercentTextYRank(rs.getInt(23));
-					rankingSystem.setPlacementXRank(rs.getInt(24));
-					rankingSystem.setPlacementYRank(rs.getInt(25));
-					rankingSystem.setNameLengthLimit_Rank(rs.getInt(26));
-					rankingSystem.setTextFontSize_Rank(rs.getInt(27));
-					rankingSystem.setNameFontSize_Rank(rs.getInt(28));
-					rankingSystem.setThemeID(rs.getInt(29));
+					rankingSystem.setRankWidthRank(rs.getInt(9));
+					rankingSystem.setRankHeightRank(rs.getInt(10));
+					rankingSystem.setNameXRank(rs.getInt(11));
+					rankingSystem.setNameYRank(rs.getInt(12));
+					rankingSystem.setBarXRank(rs.getInt(13));
+					rankingSystem.setBarYRank(rs.getInt(14));
+					rankingSystem.setAvatarXRank(rs.getInt(15));
+					rankingSystem.setAvatarYRank(rs.getInt(16));
+					rankingSystem.setAvatarWidthRank(rs.getInt(17));
+					rankingSystem.setAvatarHeightRank(rs.getInt(18));
+					rankingSystem.setExpTextXRank(rs.getInt(19));
+					rankingSystem.setExpTextYRank(rs.getInt(20));
+					rankingSystem.setPercentTextXRank(rs.getInt(21));
+					rankingSystem.setPercentTextYRank(rs.getInt(22));
+					rankingSystem.setPlacementXRank(rs.getInt(23));
+					rankingSystem.setPlacementYRank(rs.getInt(24));
+					rankingSystem.setNameLengthLimit_Rank(rs.getInt(25));
+					rankingSystem.setTextFontSize_Rank(rs.getInt(26));
+					rankingSystem.setNameFontSize_Rank(rs.getInt(27));
+					rankingSystem.setThemeID(rs.getInt(28));
 					rankList.add(rankingSystem);
 				}
 				Hashes.addRankList("ranking-rank", rankList);
@@ -806,7 +808,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				String sql = ("SELECT * FROM ranking_profile");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
@@ -874,7 +876,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				String sql = ("SELECT * FROM ranking_icons");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
@@ -905,7 +907,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("INSERT INTO daily_items (description, weight, fk_type, action, fk_theme_id) VALUES(?, ?, ?, \"use\", ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _description);
@@ -928,7 +930,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status, fk_guild_id, fk_theme_id) VALUES(?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE number=VALUES(number)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -953,7 +955,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status, expires, fk_guild_id, fk_theme_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE number=VALUES(number), expires=VALUES(expires)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -980,7 +982,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT number FROM inventory WHERE fk_user_id = ? AND fk_item_id = ? AND fk_guild_id = ? AND fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1008,7 +1010,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT expires FROM inventory WHERE fk_user_id = ? AND fk_item_id = ? AND fk_guild_id = ? AND fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1035,7 +1037,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("DELETE FROM inventory WHERE fk_status LIKE \"limit\" AND expires-CURRENT_TIMESTAMP <= 0");
 			stmt = myConn.prepareStatement(sql);
 			stmt.executeUpdate();
@@ -1053,7 +1055,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT COUNT(*) FROM inventory WHERE fk_user_id = ? && fk_guild_id = ? && fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1080,7 +1082,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT COUNT(*) FROM inventory INNER JOIN shop_content ON fk_item_id = item_id && inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_user_id = ? && inventory.fk_guild_id = ? && inventory.fk_theme_id = ? && shop_content.fk_skin = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1108,7 +1110,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT COUNT(*) FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_user_id = ? && inventory.fk_guild_id = ? && inventory.fk_theme_id = ? && fk_skin NOT LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1136,7 +1138,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT COUNT(*) FROM inventory INNER JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id WHERE fk_user_id = ? && fk_guild_id = ? && inventory.fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1163,7 +1165,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT COUNT(*) FROM inventory INNER JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_theme_id = weapon_shop_content.fk_theme_id INNER JOIN weapon_category ON fk_category_id = category_id && weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id WHERE fk_user_id = ? && fk_guild_id = ? && weapon_category.name = ? && inventory.fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1192,7 +1194,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT next_daily FROM dailies_usage WHERE fk_user_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1217,7 +1219,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("INSERT INTO dailies_usage (fk_user_id, opened, next_daily, fk_guild_id) VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE opened=VALUES(opened), next_daily=VALUES(next_daily)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1240,7 +1242,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			myConn.setAutoCommit(false); 
 			String sql = ("INSERT INTO giveaway (code, enabled, used, expires, fk_guild_id) VALUES (?, ?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
@@ -1270,7 +1272,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT code FROM giveaway WHERE enabled = 1 && used = 0 && expires >= ? && fk_guild_id = ? LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
@@ -1296,7 +1298,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE giveaway SET used = 1 WHERE code = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _code);
@@ -1318,7 +1320,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT theme, theme_id FROM themes");
 			var success = false;
 			stmt = myConn.prepareStatement(sql);
@@ -1346,7 +1348,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				String sql = ("SELECT * from all_ranking_users WHERE fk_user_id = ? && fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _user_id);
@@ -1471,7 +1473,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				String sql = ("SELECT * FROM guild_settings WHERE guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -1517,7 +1519,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT * FROM level_list_join_roles WHERE fk_theme_id = ? AND (fk_guild_id = ? OR fk_guild_id IS NULL) ORDER BY level");
 			var count = 0;
 			stmt = myConn.prepareStatement(sql);
@@ -1552,7 +1554,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				String sql = ("SELECT * FROM all_enabled_skins WHERE fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _theme_id);
@@ -1588,7 +1590,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT item_id FROM inventory_items WHERE user_id = ? AND item_id = ? AND guild_id = ? AND theme_id = ? AND enabled = 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1616,7 +1618,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT item_id, skin, status FROM inventory_items WHERE user_id = ? AND description LIKE ? AND status LIKE \"perm\" AND guild_id = ? AND theme_id = ? AND enabled = 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1644,7 +1646,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT number FROM inventory_items WHERE user_id = ? AND description LIKE ? AND status LIKE ? AND guild_id = ? AND theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1674,7 +1676,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? ORDER BY position desc LIMIT ?, ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1717,7 +1719,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? AND skin = \"ite\" ORDER BY position desc LIMIT ?, ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1760,7 +1762,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? AND (weapon_id IS NOT NULL OR skill_id IS NOT NULL) ORDER BY position desc LIMIT ?, ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1803,7 +1805,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = "";
 			if(!_category.equalsIgnoreCase("skill")) {
 				sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? AND weapon_id IS NOT NULL AND name LIKE ? ORDER BY position desc LIMIT ?, ?");
@@ -1856,7 +1858,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? AND skin != 'ite' ORDER BY position desc LIMIT ?, ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1894,7 +1896,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT user_id, position, description FROM inventory_items WHERE user_id = ? AND guild_id = ? AND theme_id = ? ORDER BY position desc");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1925,7 +1927,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT number, expires FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_user_id = ? AND description = ? AND fk_status = ? AND fk_guild_id = ? AND inventory.fk_theme_id = ? AND enabled = 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -1959,7 +1961,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				String sql = ("SELECT item_id, daily_items.description, weight, type, daily_type.description, action FROM daily_items INNER JOIN daily_type ON fk_type = type WHERE fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _theme_id);
@@ -1995,7 +1997,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			myConn.setAutoCommit(false);
 			String sql = ("UPDATE user_details SET currency = ? WHERE fk_user_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
@@ -2035,7 +2037,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			myConn.setAutoCommit(false);
 			String sql = ("UPDATE user_details SET currency = ? WHERE fk_user_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
@@ -2073,7 +2075,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			myConn.setAutoCommit(false);
 			String sql = ("UPDATE inventory SET number = ? WHERE fk_user_id = ? AND fk_status LIKE \"perm\" AND fk_item_id = ? AND fk_guild_id = ? AND fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
@@ -2116,7 +2118,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			myConn.setAutoCommit(false);
 			String sql = ("DELETE FROM inventory WHERE fk_user_id = ? AND fk_status LIKE \"perm\" AND fk_item_id = ? AND fk_guild_id = ? AND fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
@@ -2159,7 +2161,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/RankingSystem?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("SELECT DISTINCT description FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_status LIKE \"limit\" AND EXISTS (SELECT description FROM daily_items WHERE fk_type LIKE \"exp\" AND daily_items.fk_theme_id = ?) AND fk_user_id = ? AND fk_guild_id = ? AND inventory.fk_theme_id = ? AND enabled = 1");
 			var description = "0";
 			stmt = myConn.prepareStatement(sql);

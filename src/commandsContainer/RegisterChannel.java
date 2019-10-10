@@ -82,7 +82,7 @@ public class RegisterChannel {
 					_e.getChannel().sendMessage("**The channel has been registered!**").queue();
 					if(channel_type.equals("rea")) {
 						//use the temp cache to append reactions after the bot sends a message
-						if(Azrael.SQLInsertCommand(_e.getGuild().getIdLong(), 0, true) > 0) {
+						if(Azrael.SQLUpdateReaction(_e.getGuild().getIdLong(), true) > 0) {
 							ReactionMessage.print(_e, channel_id);
 						}
 						else {

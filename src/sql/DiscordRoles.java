@@ -15,10 +15,12 @@ import constructors.Roles;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.entities.Role;
+import util.STATIC;
 
 public class DiscordRoles {
 	private static final Logger logger = LoggerFactory.getLogger(DiscordRoles.class);
 	
+	private static String ip = IniFileReader.getSQLIP3();
 	private static String username = IniFileReader.getSQLUsername3();
 	private static String password = IniFileReader.getSQLPassword3();
 	
@@ -36,7 +38,7 @@ public class DiscordRoles {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("SELECT guild_id FROM guilds WHERE guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -60,7 +62,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("INSERT INTO guilds(guild_id, name) VALUES(?,?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -80,7 +82,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("INSERT INTO roles(role_id, name, level, fk_category_abv, fk_guild_id) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name), level=VALUES(level), fk_category_abv=VALUES(fk_category_abv)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_id);
@@ -103,7 +105,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			myConn.setAutoCommit(false);
 			String sql = ("INSERT INTO roles(role_id, name, level, fk_category_abv, fk_guild_id) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name), level=VALUES(level), fk_category_abv=VALUES(fk_category_abv)");
 			stmt = myConn.prepareStatement(sql);
@@ -134,7 +136,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("DELETE FROM roles WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -153,7 +155,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("UPDATE roles SET level = ? WHERE role_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _level);
@@ -178,7 +180,7 @@ public class DiscordRoles {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 				String sql = ("SELECT * FROM all_roles WHERE guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -215,7 +217,7 @@ public class DiscordRoles {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 				String sql = ("SELECT * FROM all_roles WHERE guild_id = ? AND category_abv LIKE \"rea\"");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -250,7 +252,7 @@ public class DiscordRoles {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("SELECT * FROM role_category");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
@@ -276,7 +278,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/DiscordRoles?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("DELETE FROM roles WHERE role_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_id);

@@ -17,6 +17,7 @@ import util.STATIC;
 public class Patchnotes {
 	private static final Logger logger = LoggerFactory.getLogger(Patchnotes.class);
 	
+	private static String ip = IniFileReader.getSQLIP4();
 	private static String username = IniFileReader.getSQLUsername4();
 	private static String password = IniFileReader.getSQLPassword4();
 		
@@ -34,7 +35,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("SELECT message1, message2, date FROM priv_notes WHERE version_number LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
@@ -63,7 +64,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("SELECT message1, message2, date FROM publ_notes WHERE version_number LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
@@ -91,7 +92,7 @@ public class Patchnotes {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("INSERT INTO published (fk_version_number, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
@@ -111,7 +112,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("SELECT * FROM published WHERE fk_version_number LIKE ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
@@ -137,7 +138,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("SELECT guild_id FROM guilds WHERE guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -161,7 +162,7 @@ public class Patchnotes {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("INSERT INTO guilds (guild_id, name) VALUES(?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -182,7 +183,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("SELECT * FROM published WHERE fk_guild_id = ? LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -208,7 +209,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("SELECT message1, message2, date, version_number FROM priv_notes ORDER BY date desc LIMIT 10");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
@@ -243,7 +244,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("SELECT message1, message2, date, version_number FROM publ_notes ORDER BY date desc LIMIT 10");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
@@ -278,7 +279,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Patchnotes?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("SELECT message1, message2, date, title FROM game_notes WHERE fk_guild_id = ? ORDER BY date desc LIMIT 10");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);

@@ -69,12 +69,24 @@ public class IniFileReader {
 		}
 	}
 	public static boolean getFileLogger() {
-		Ini ini = readConfig();
-		return ini.get("Bot", "FileLogger", boolean.class);
+		var fileLogger = STATIC.getFileLogger();
+		if(fileLogger.equals("true"))
+			return true;
+		else if(fileLogger.equals("false"))
+			return false;
+		else {
+			Ini ini = readConfig();
+			return ini.get("Bot", "FileLogger", boolean.class);
+		}
 	}
 	public static String getTempDirectory() {
-		Ini ini = readConfig();
-		return ini.get("Bot", "TempDirectory");
+		var temp = STATIC.getTemp();
+		if(temp.length() > 0) 
+			return temp;
+		else {
+			Ini ini = readConfig();
+			return ini.get("Bot", "TempDirectory");
+		}
 	}
 	
 	public static String getPastebinDeveloperKey() {
@@ -106,13 +118,25 @@ public class IniFileReader {
 	}
 	
 	public static Weekday getDoubleExpStart() {
-		Ini ini = readConfig();
-		return ini.get("DoubleExperience", "Start", Weekday.class);
+		if(STATIC.getDoubleExperienceStart().length() > 0)
+			return Enum.valueOf(Weekday.class, STATIC.getDoubleExperienceStart());
+		else {
+			Ini ini = readConfig();
+			return ini.get("DoubleExperience", "Start", Weekday.class);
+		}
 	}
 	
 	public static Weekday getDoubleExpEnd() {
+		if(STATIC.getDoubleExperienceEnd().length() > 0)
+			return Enum.valueOf(Weekday.class, STATIC.getDoubleExperienceEnd());
+		else {
+			Ini ini = readConfig();
+			return ini.get("DoubleExperience", "End", Weekday.class);
+		}
+	}
+	public static String getSQLIP() {
 		Ini ini = readConfig();
-		return ini.get("DoubleExperience", "End", Weekday.class);
+		return ini.get("Azrael", "IP");
 	}
 	public static String getSQLUsername() {
 		Ini ini = readConfig();
@@ -126,6 +150,10 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("RankingSystem", "MessageTimeout", long.class);
 	}
+	public static String getSQLIP2() {
+		Ini ini = readConfig();
+		return ini.get("RankingSystem", "IP");
+	}
 	public static String getSQLUsername2() {
 		Ini ini = readConfig();
 		return ini.get("RankingSystem", "Username");
@@ -134,6 +162,10 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("RankingSystem", "Password");
 	}
+	public static String getSQLIP3() {
+		Ini ini = readConfig();
+		return ini.get("DiscordRoles", "IP");
+	}
 	public static String getSQLUsername3() {
 		Ini ini = readConfig();
 		return ini.get("DiscordRoles", "Username");
@@ -141,6 +173,10 @@ public class IniFileReader {
 	public static String getSQLPassword3() {
 		Ini ini = readConfig();
 		return ini.get("DiscordRoles", "Password");
+	}
+	public static String getSQLIP4() {
+		Ini ini = readConfig();
+		return ini.get("Patchnotes", "IP");
 	}
 	public static String getSQLUsername4() {
 		Ini ini = readConfig();

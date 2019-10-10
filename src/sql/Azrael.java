@@ -24,10 +24,12 @@ import constructors.Watchlist;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.entities.Member;
+import util.STATIC;
 
 public class Azrael {
 	private static final Logger logger = LoggerFactory.getLogger(Azrael.class);
 	
+	private static String ip = IniFileReader.getSQLIP();
 	private static String username = IniFileReader.getSQLUsername();
 	private static String password = IniFileReader.getSQLPassword();
 	
@@ -46,8 +48,8 @@ public class Azrael {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-				String sql = ("INSERT INTO action_log (log_id, event, target_id, guild_id, description, timestamp) VALUES(null, ?, ?, ?, ?, ?)");
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				String sql = ("INSERT INTO action_log (event, target_id, guild_id, description, timestamp) VALUES(?, ?, ?, ?, ?)");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setString(1, _event);
 				stmt.setLong(2, _target_id);
@@ -69,7 +71,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO history (fk_user_id, fk_guild_id, type, reason, time, penalty) VALUES(?, ?, ?, ?, ?, "+(_penalty != 0 ? "?" : "NULL")+")");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -95,7 +97,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT type, reason, time, penalty FROM history WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -128,7 +130,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT COUNT(*) FROM action_log WHERE target_id = ? && guild_id = ? && event LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
@@ -156,7 +158,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT description FROM action_log WHERE target_id = ? && (guild_id = ? || guild_id = 0) && (event LIKE ? || event LIKE ?) GROUP BY description");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
@@ -185,7 +187,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT description FROM action_log WHERE target_id = ? && guild_id = ? && event LIKE ? GROUP BY description");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
@@ -212,7 +214,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT description, timestamp FROM action_log WHERE target_id = ? && guild_id = ? && (event LIKE \"MEMBER_KICK\" || event LIKE \"MEMBER_BAN_ADD\" || event LIKE \"MEMBER_BAN_REMOVE\" || event LIKE \"MEMBER_MUTE_ADD\") ORDER BY timestamp desc LIMIT 30");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
@@ -239,7 +241,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT timestamp, description FROM action_log WHERE target_id = ? && guild_id = ? && event LIKE ? ORDER BY timestamp desc LIMIT 30");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
@@ -265,7 +267,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO users (user_id, name, avatar_url, join_date) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -287,7 +289,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false); 
 			String sql = ("INSERT INTO users (user_id, name, avatar_url, join_date) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
 			stmt = myConn.prepareStatement(sql);
@@ -313,7 +315,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE users SET avatar_url = ? WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _avatar);
@@ -334,7 +336,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT user_id, name FROM users WHERE name LIKE ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _name);
@@ -358,7 +360,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT * FROM users WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _user_id);
@@ -381,7 +383,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE users SET name = ? WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _name);
@@ -402,7 +404,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT guild_id FROM guild WHERE guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -426,7 +428,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO guild VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -447,7 +449,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT nickname FROM nickname WHERE fk_user_id= ? && fk_guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -472,7 +474,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO nickname VALUES (?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -493,7 +495,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE nickname SET nickname = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _nickname);
@@ -514,7 +516,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM nickname WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -535,7 +537,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT * FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -561,7 +563,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT muted FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -587,7 +589,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT custom_time FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -613,7 +615,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT fk_ban_id FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -642,7 +644,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT fk_warning_id FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -667,7 +669,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO bancollect VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0) ON DUPLICATE KEY UPDATE fk_warning_id=VALUES(fk_warning_id), fk_ban_id=VALUES(fk_ban_id), timestamp=VALUES(timestamp), unmute=VALUES(unmute), muted=VALUES(muted), custom_time=VALUES(custom_time), guild_left=VALUES(guild_left)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -693,7 +695,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM bancollect WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -713,7 +715,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE bancollect SET muted = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setBoolean(1, _muted);
@@ -734,7 +736,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE bancollect SET muted = ?, custom_time = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setBoolean(1, _muted);
@@ -756,7 +758,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE bancollect SET muted = ?, custom_time = ? WHERE fk_user_id = ? && fk_guild_id = ? && muted = 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setBoolean(1, _muted);
@@ -778,7 +780,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE bancollect SET guild_left = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setBoolean(1, _guildLeft);
@@ -800,7 +802,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT warning_id, mute_time, description FROM warnings WHERE fk_guild_id = ? && warning_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -826,7 +828,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT MAX(warning_id) FROM warnings WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -851,7 +853,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = "";
 			switch(_warning_id) {
 				case 1 -> {
@@ -930,7 +932,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE bancollect SET fk_warning_id = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _warning_id);
@@ -951,7 +953,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE warnings SET mute_time = ? WHERE fk_guild_id = ? && warning_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _mute_time);
@@ -972,7 +974,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE bancollect SET timestamp = ?, unmute = ?, muted = ?, custom_time = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setTimestamp(1, _timestamp);
@@ -996,7 +998,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE bancollect SET unmute = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setTimestamp(1, _unmute);
@@ -1017,7 +1019,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE bancollect SET fk_ban_id = ? WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _ban_id);
@@ -1038,7 +1040,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO channels (channel_id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -1058,7 +1060,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM channels WHERE channel_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -1077,7 +1079,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_channel_type, fk_guild_id, url_censoring, txt_removal) VALUES (?, ?, ?, 0, 0) ON DUPLICATE KEY UPDATE fk_channel_type = VALUES(fk_channel_type)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -1098,7 +1100,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM channel_conf WHERE fk_channel_id = ? and fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -1118,7 +1120,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM channel_conf WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -1137,7 +1139,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_guild_id, url_censoring, txt_removal) VALUES (?, ?, ?, 0) ON DUPLICATE KEY UPDATE url_censoring = VALUES(url_censoring)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -1158,7 +1160,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_guild_id, url_censoring, txt_removal) VALUES (?, ?, 0, ?) ON DUPLICATE KEY UPDATE txt_removal = VALUES(txt_removal)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -1179,7 +1181,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM channel_conf WHERE fk_channel_type = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _channel_type);
@@ -1201,7 +1203,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 				String sql = ("SELECT * FROM all_channels WHERE guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -1240,7 +1242,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT * FROM channeltypes");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
@@ -1267,8 +1269,8 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT execution_id FROM command WHERE guild_id = ?");
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT execution_id FROM guild WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
@@ -1292,8 +1294,8 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("SELECT reactions FROM command WHERE guild_id = ?");
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT reactions FROM guild WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
@@ -1311,40 +1313,19 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertCommand(long _guild_id, int _execution_id) {
-		logger.debug("SQLInsertCommand launched. Passed params {}, {}", _guild_id, _execution_id);
+	public static int SQLUpdateCommand(long _guild_id, int _execution_id) {
+		logger.debug("SQLUpdateCommand launched. Passed params {}, {}", _guild_id, _execution_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO command (guild_id, execution_id, reactions) VALUES (?, ?, 0) ON DUPLICATE KEY UPDATE execution_id=VALUES(execution_id)");
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE guild SET execution_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _execution_id);
+			stmt.setInt(1, _execution_id);
+			stmt.setLong(2, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLInsertCommand Exception", e);
-			return 0;
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static int SQLInsertCommand(long _guild_id, int _execution_id, boolean _reactions) {
-		logger.debug("SQLInsertCommand launched. Passed params {}, {}, {}", _guild_id, _execution_id, _reactions);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO command (guild_id, execution_id, reactions) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE reactions=VALUES(reactions)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _execution_id);
-			stmt.setBoolean(3, _reactions);
-			return stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLInsertCommand Exception", e);
+			logger.error("SQLUpdateCommand Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1357,8 +1338,8 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("UPDATE command SET reactions = ? WHERE guild_id = ?");
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE guild SET reactions = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setBoolean(1, _reactions);
 			stmt.setLong(2, _guild_id);
@@ -1379,7 +1360,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 				String sql = ("SELECT * FROM channel_filter WHERE fk_channel_id = ?");
 				ArrayList<String> filter_lang = new ArrayList<String>();
 				stmt = myConn.prepareStatement(sql);
@@ -1409,7 +1390,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 				ArrayList<String> filter_words = new ArrayList<String>();
 				String sql;
 				if(_filter_lang.equals("all")) {
@@ -1445,10 +1426,10 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			var sql = "";
 			if(!_lang.equals("all"))
-				sql = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv, fk_guild_id) VALUES(NULL, ?, ?, ?)");
+				sql = ("INSERT INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES(?, ?, ?)");
 			else {
 				sql = ("INSERT IGNORE INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES"
 						+ "(?, \"eng\", ?),"
@@ -1500,7 +1481,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM filter WHERE word LIKE ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
@@ -1521,7 +1502,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM filter WHERE word LIKE ? "+(!_lang.equals("all") ? "&& fk_lang_abbrv LIKE ? " : "")+"&& fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
@@ -1549,7 +1530,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 				String sql = ("SELECT name FROM staff_name_filter WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -1576,8 +1557,8 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO staff_name_filter (name_id, name, fk_guild_id) VALUES(NULL, ?, ?)");
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("INSERT INTO staff_name_filter (name, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word.toLowerCase());
 			stmt.setLong(2, _guild_id);
@@ -1596,7 +1577,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM staff_name_filter WHERE name LIKE ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word.toLowerCase());
@@ -1617,7 +1598,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				String sql = ("DELETE FROM staff_name_filter WHERE fk_guild_id = ?");
@@ -1626,7 +1607,7 @@ public class Azrael {
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT INTO staff_name_filter (name_id, name, fk_guild_id) VALUES(NULL, ?, ?)");
+			String sql2 = ("INSERT INTO staff_name_filter (name, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql2);
 			for(String word : _words) {
 				stmt.setString(1, word.toLowerCase());
@@ -1656,7 +1637,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO channel_filter (fk_channel_id, fk_lang_abbrv) VALUES (?,?) ON DUPLICATE KEY UPDATE fk_lang_abbrv = VALUES(fk_lang_abbrv)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -1675,7 +1656,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM channel_filter WHERE fk_channel_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
@@ -1697,7 +1678,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 				String sql = ("SELECT name FROM names WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -1724,8 +1705,8 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO names (name_id, name, fk_guild_id) VALUES(NULL, ?, ?)");
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("INSERT INTO names (name, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
@@ -1744,7 +1725,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM names WHERE name LIKE ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
@@ -1767,7 +1748,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 				String sql = ("SELECT word, kick FROM name_filter");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
@@ -1793,8 +1774,8 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
-			String sql = ("INSERT INTO name_filter (word_id, word, kick, fk_guild_id) VALUES(NULL, ?, ?, ?)");
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("INSERT INTO name_filter (word, kick, fk_guild_id) VALUES(?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setBoolean(2, _kick);
@@ -1814,7 +1795,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM name_filter WHERE word LIKE ? && fk_guild_id = ? && kick = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
@@ -1836,7 +1817,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT name FROM names WHERE fk_guild_id = ? ORDER BY RAND() LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -1863,7 +1844,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 				String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv NOT LIKE \"all\"");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
@@ -1888,7 +1869,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO rss (url, fk_guild_id, format, type) VALUES (?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _url);
@@ -1915,7 +1896,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT url, format, type FROM rss WHERE fk_guild_id = ? ORDER BY timestamp asc");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -1940,7 +1921,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM rss WHERE url = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _url);
@@ -1960,7 +1941,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("UPDATE rss SET format = ? WHERE url = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _format);
@@ -1984,7 +1965,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 				String sql = ("SELECT url FROM url_blacklist WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -2010,7 +1991,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO url_blacklist (url, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
@@ -2030,7 +2011,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM url_blacklist WHERE url LIKE ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
@@ -2053,7 +2034,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 				String sql = ("SELECT url FROM url_whitelist WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -2079,7 +2060,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO url_whitelist (url, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replaceAll("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
@@ -2099,7 +2080,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM url_whitelist WHERE url LIKE ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
@@ -2122,7 +2103,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 				String sql = ("SELECT username FROM tweet_blacklist WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
@@ -2148,7 +2129,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO tweet_blacklist (username, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, (_username.startsWith("@") ? _username : "@"+_username));
@@ -2168,7 +2149,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM tweet_blacklist WHERE username LIKE ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, (_username.startsWith("@") ? _username : "@"+_username));
@@ -2189,7 +2170,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT * FROM watchlist");
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
@@ -2212,7 +2193,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT * FROM watchlist WHERE guild_id = ? && higher_privileges = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
@@ -2237,7 +2218,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO watchlist (fk_user_id, fk_guild_id, level, watch_channel, higher_privileges) VALUES(?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE level=VALUES(level), watch_channel=VALUES(watch_channel), higher_privileges=VALUES(higher_privileges)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -2260,7 +2241,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("DELETE FROM watchlist WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
@@ -2282,7 +2263,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			String sql = ("UPDATE bancollect SET fk_warning_id = ? WHERE fk_guild_id = ? && fk_warning_id > ?");
 			stmt = myConn.prepareStatement(sql);
@@ -2317,7 +2298,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				String sql = ("DELETE FROM filter WHERE fk_lang_abbrv LIKE ? && fk_guild_id = ?");
@@ -2327,7 +2308,7 @@ public class Azrael {
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT INTO filter (filter_id, word, fk_lang_abbrv, fk_guild_id) VALUES(NULL, ?, ?, ?)");
+			String sql2 = ("INSERT INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES(?, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);
 			
 			for(String word : _words) {
@@ -2360,7 +2341,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				String sql = ("DELETE FROM name_filter WHERE fk_guild_id = ? && kick = ?");
@@ -2370,7 +2351,7 @@ public class Azrael {
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT INTO name_filter (word_id, word, kick, fk_guild_id) VALUES(NULL, ?, ?, ?)");
+			String sql2 = ("INSERT INTO name_filter (word, kick, fk_guild_id) VALUES(?, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);
 			
 			for(String word : _words) {
@@ -2403,7 +2384,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				String sql = ("DELETE FROM names WHERE fk_guild_id = ?");
@@ -2411,7 +2392,7 @@ public class Azrael {
 				stmt.setLong(1, _guild_id);
 			}
 			
-			String sql2 = ("INSERT INTO names (name_id, name, fk_guild_id) VALUES(NULL, ?, ?)");
+			String sql2 = ("INSERT INTO names (name, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql2);;
 			
 			for(String word : _words) {
@@ -2443,7 +2424,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				String sql = ("DELETE FROM url_blacklist WHERE fk_guild_id = ?");
@@ -2483,7 +2464,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				String sql = ("DELETE FROM url_whitelist WHERE fk_guild_id = ?");
@@ -2523,7 +2504,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Azrael?autoReconnect=true&useSSL=false", username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				String sql = ("DELETE FROM tweet_blacklist WHERE fk_guild_id = ?");

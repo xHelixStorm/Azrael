@@ -40,7 +40,7 @@ public class GuildMessageEditListener extends ListenerAdapter{
 			
 			executor.execute(() -> {
 				if(GuildIni.getEditedMessage(e.getGuild().getIdLong())) {
-					var traAndEdiChannels = allChannels.parallelStream().filter(f -> f.getChannel_Type().equals("tra") || f.getChannel_Type().equals("edi")).collect(Collectors.toList());
+					var traAndEdiChannels = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("tra") || f.getChannel_Type().equals("edi"))).collect(Collectors.toList());
 					var tra_channel = traAndEdiChannels.parallelStream().filter(f -> f.getChannel_Type().equals("tra")).findAny().orElse(null);
 					var edi_channel = traAndEdiChannels.parallelStream().filter(f -> f.getChannel_Type().equals("edi")).findAny().orElse(null);
 					if(tra_channel != null || edi_channel != null) {

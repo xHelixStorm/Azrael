@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Bancollect;
 import core.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.audit.AuditLogKey;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
@@ -25,19 +26,6 @@ public class RoleRemovedListener extends ListenerAdapter {
 	@Override
 	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent e) {
 		new Thread(() -> {
-			String trigger_user_name = "";
-			AuditLogPaginationAction logs = e.getGuild().retrieveAuditLogs();
-			first_entry: for (AuditLogEntry entry : logs)
-			{
-				if(entry.getChangeByKey(AuditLogKey.MEMBER_ROLES_REMOVE) != null) {
-					var mute_role = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
-					if(entry.getChangeByKey(AuditLogKey.MEMBER_ROLES_REMOVE).toString().contains(""+(mute_role != null ? mute_role.getRole_ID() : 0)) && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getMember().getUser().getIdLong()) {
-						trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
-					}
-				}
-				break first_entry;
-			}
-			
 			String member_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
 			long user_id = e.getMember().getUser().getIdLong();
 			long guild_id = e.getGuild().getIdLong();
@@ -46,6 +34,23 @@ public class RoleRemovedListener extends ListenerAdapter {
 			
 			try{
 				if(!UserPrivs.isUserMuted(e.getUser(), guild_id) && (warnedUser.getUnmute() == null || (warnedUser.getUnmute().getTime() - System.currentTimeMillis()) > 0)  && warnedUser.getMuted()) {
+					String trigger_user_name = "NA";
+					if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
+						AuditLogPaginationAction logs = e.getGuild().retrieveAuditLogs();
+						first_entry: for (AuditLogEntry entry : logs)
+						{
+							if(entry.getChangeByKey(AuditLogKey.MEMBER_ROLES_REMOVE) != null) {
+								var mute_role = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+								if(entry.getChangeByKey(AuditLogKey.MEMBER_ROLES_REMOVE).toString().contains(""+(mute_role != null ? mute_role.getRole_ID() : 0)) && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getMember().getUser().getIdLong()) {
+									trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
+								}
+							}
+							break first_entry;
+						}
+					}
+					else {
+						logger.warn("Audit Log permissions missing for guild {}", e.getGuild().getId());
+					}
 					var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 					if(warnedUser.getUserID() != 0) {
 						if(Azrael.SQLUpdateMuted(user_id, guild_id, false) == 0) {

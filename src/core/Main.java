@@ -80,24 +80,54 @@ public class Main {
 		dir[1] = (new File("./message_log")).mkdirs();
 		dir[2] = (new File("./ini")).mkdirs();
 		
+		//collect parameters, if provided. Token and SessionName have to be the first 2 parameters
 		if(args.length > 0) {
-			STATIC.setToken(args[0].trim());
-			if(args.length > 1)
-				STATIC.setSessionName(args[1].trim());
-			if(args.length > 2)
-				STATIC.setAdmin(Long.parseLong(args[2].trim()));
-			if(args.length > 3)
-				STATIC.setActionLog(args[3].trim());
-			if(args.length > 4)
-				STATIC.setDoubleExperience(args[4].trim());
-			if(args.length > 5)
-				STATIC.setCountMembers(args[5].trim());
-			if(args.length > 6) {
-				var splitMessage = args[6].split("-");
-				StringBuilder message = new StringBuilder();
-				for(final var split : splitMessage)
-					message.append(split+" ");
-				STATIC.setGameMessage(message.toString().trim());
+			//display all available parmeters if program receives 'list' as parameter and terminate with exit 0
+			if(args[0].equals("list")) {
+				System.out.println("These are all available parameters. If nothing has been provided, the values from config.ini will be taken:\n\n"
+						+ "admin:<NUMERIC> (17/18 digit long user id that defines the admin for shutdown and reboot)\n"
+						+ "actionlog:<BOOLEAN> (true/false parameter to log actions related to the ranking system and other updates)\n"
+						+ "doubleexperience:<BOOLEAN> (true/false parameter to either enable or disable double experience events)\n"
+						+ "doubleexperiencestart:<WEEKDAY> (Regular days from Monday to Sunday as parameter to define the start day of double experience events)\n"
+						+ "doubleexperienceend:<WEEKDAY> (Regular days from Monday to Sunday as parameter to define the end day of double experience events)\n"
+						+ "countmembers:<BOOLEAN> (true/false parameter to either enable or disable the count of all active members as playing status)\n"
+						+ "filelogger:<BOOLEAN> (true/false parameter to print all messages to the console if off or to file if on)\n"
+						+ "gamemessage:<STRING> (Message to display as playing status. Separate blank spaces with '-')\n"
+						+ "temp:<STRING> (Path for the temp directory)");
+				System.exit(0);
+			}
+			else {
+				//initialize all static variables
+				STATIC.setToken(args[0].trim());
+				if(args.length > 1)
+					STATIC.setSessionName(args[1].trim());
+				if(args.length > 2) {
+					for(final var argument : args) {
+						if(argument.toLowerCase().startsWith("admin:"))
+							STATIC.setAdmin(Long.parseLong(argument.split(":")[1].trim()));
+						if(argument.toLowerCase().startsWith("actionlog:"))
+							STATIC.setActionLog(argument.split(":")[1].trim());
+						if(argument.toLowerCase().startsWith("doubleexperience:"))
+							STATIC.setDoubleExperience(argument.split(":")[1].trim());
+						if(argument.toLowerCase().startsWith("doubleexperiencestart:"))
+							STATIC.setDoubleExperienceStart(argument.split(":")[1].trim());
+						if(argument.toLowerCase().startsWith("doubleexperienceend:"))
+							STATIC.setDoubleExperienceEnd(argument.split(":")[1].trim());
+						if(argument.toLowerCase().startsWith("countmembers:"))
+							STATIC.setCountMembers(argument.split(":")[1].trim());
+						if(argument.toLowerCase().startsWith("filelogger:"))
+							STATIC.setFileLogger(argument.split(":")[1].trim());
+						if(argument.toLowerCase().startsWith("gamemessage:")) {
+							var splitMessage = argument.split(":")[1].split("-");
+							StringBuilder message = new StringBuilder();
+							for(final var split : splitMessage)
+								message.append(split+" ");
+							STATIC.setGameMessage(message.toString().trim());
+						}
+						if(argument.toLowerCase().startsWith("temp:"))
+							STATIC.setTemp(argument.split(":")[1].trim());
+					}
+				}
 			}
 		}
 		

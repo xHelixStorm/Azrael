@@ -301,7 +301,7 @@ public class GuildMessageListener extends ListenerAdapter {
 			});
 			
 			executor.execute(() -> {
-				if(guild_settings.getRankingState() == true && (Hashes.getCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId()) == null || guild_settings.getMessageTimeout() == 0)){
+				if(guild_settings != null && guild_settings.getRankingState() == true && (Hashes.getCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId()) == null || guild_settings.getMessageTimeout() == 0)){
 					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
 					if(user_details == null){
 						if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
@@ -342,7 +342,7 @@ public class GuildMessageListener extends ListenerAdapter {
 			executor.shutdown();
 			
 			var filter_lang = Azrael.SQLgetChannel_Filter(channel_id);
-			if(filter_lang.size() > 0) {
+			if(filter_lang != null && filter_lang.size() > 0) {
 				new Thread(new LanguageFilter(e, filter_lang, allChannels)).start();
 				if(currentChannel != null && currentChannel.getURLCensoring())
 					new Thread(new URLFilter(e, null, filter_lang, allChannels)).start();

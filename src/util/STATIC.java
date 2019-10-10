@@ -40,20 +40,28 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.7.330";
+	private static final String VERSION = "6.7.331";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
 	private static String ACTIONLOG = "";
 	private static String DOUBLEEXPERIENCE = "";
+	private static String DOUBLEEXPERIENCESTART = "";
+	private static String DOUBLEEXPERIENCEEND = "";
 	private static String COUNTMEMBERS = "";
 	private static String GAMEMESSAGE = "";
+	private static String FILELOGGER = "";
+	private static String TEMP = "";
 	private static TwitterFactory twitterFactory = null;
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
 	
 	public static String getVersion() {
 		return VERSION;
+	}
+	
+	public static String getDatabaseURL(final String _dbName, final String _ip) {
+		return "jdbc:mysql://"+_ip+"/"+_dbName+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin";
 	}
 	
 	public static void setToken(String _token) {
@@ -91,6 +99,20 @@ public class STATIC {
 		return DOUBLEEXPERIENCE;
 	}
 	
+	public static void setDoubleExperienceStart(String _doubleExperienceStart) {
+		DOUBLEEXPERIENCESTART = _doubleExperienceStart;
+	}
+	public static String getDoubleExperienceStart() {
+		return DOUBLEEXPERIENCESTART;
+	}
+	
+	public static void setDoubleExperienceEnd(String _doubleExperienceEnd) {
+		DOUBLEEXPERIENCEEND = _doubleExperienceEnd;
+	}
+	public static String getDoubleExperienceEnd() {
+		return DOUBLEEXPERIENCEEND;
+	}
+	
 	public static void setCountMembers(String _countMembers) {
 		COUNTMEMBERS = _countMembers;
 	}
@@ -103,6 +125,20 @@ public class STATIC {
 	}
 	public static String getGameMessage() {
 		return GAMEMESSAGE;
+	}
+	
+	public static void setFileLogger(String _fileLogger) {
+		FILELOGGER = _fileLogger;
+	}
+	public static String getFileLogger() {
+		return FILELOGGER;
+	}
+	
+	public static void setTemp(String _temp) {
+		TEMP = _temp;
+	}
+	public static String getTemp() {
+		return TEMP;
 	}
 	
 	public static void addThread(Thread thread, final String name) {
