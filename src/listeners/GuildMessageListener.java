@@ -301,9 +301,9 @@ public class GuildMessageListener extends ListenerAdapter {
 			});
 			
 			executor.execute(() -> {
-				if(guild_settings != null && guild_settings.getRankingState() == true && (Hashes.getCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId()) == null || guild_settings.getMessageTimeout() == 0)){
+				if(guild_settings != null && guild_settings.getRankingState() == true && (Hashes.getCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId()) == null || guild_settings.getMessageTimeout() == 0)) {
 					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
-					if(user_details == null){
+					if(user_details == null) {
 						if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
 							if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, 50000, 0) > 0) {
 								var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
@@ -313,24 +313,29 @@ public class GuildMessageListener extends ListenerAdapter {
 								}
 							}
 						}
+						else if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, 50000, 0) > 0) {
+							var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+							if(log_channel != null) {
+								EmbedBuilder success = new EmbedBuilder().setColor(Color.GREEN).setTitle("Table insertion successful!");
+								e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(success.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** has been successfully inserted into all required ranking system table!").build()).queue();
+							}
+						}
 					}
-					else{
+					else {
 						var channels = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("bot") || f.getChannel_Type().equals("qui"))).collect(Collectors.toList());
-						if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) == null){
+						if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) == null) {
 							int roleAssignLevel = 0;
 							long role_id = 0;
-							Rank ranking_levels = RankingSystem.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getLevel_Requirement() == (user_details.getLevel()+1)).findAny().orElse(null);
-							if(ranking_levels != null){
-								if(ranking_levels.getGuildID() == guild_id){
-									roleAssignLevel = ranking_levels.getLevel_Requirement();
-									role_id = ranking_levels.getRoleID();
-								}
+							final var ranking_levels = RankingSystem.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getLevel() == (user_details.getLevel()+1)).findAny().orElse(null);
+							if(ranking_levels != null) {
+								roleAssignLevel = ranking_levels.getLevel();
+								role_id = ranking_levels.getRole_ID();
 							}
 							
 							int percent_multiplier;
 							try {
 								percent_multiplier = Integer.parseInt(RankingSystem.SQLExpBoosterExistsInInventory(user_id, guild_id, guild_settings.getThemeID()).replaceAll("[^0-9]*", ""));
-							} catch(NumberFormatException nfe){
+							} catch(NumberFormatException nfe) {
 								percent_multiplier = 0;
 							}
 							
@@ -355,7 +360,7 @@ public class GuildMessageListener extends ListenerAdapter {
 			var log = GuildIni.getChannelAndCacheLog(guild_id);
 			if((log[0] || log[1]) && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
 				StringBuilder image_url = new StringBuilder();
-				for(Attachment attch : e.getMessage().getAttachments()){
+				for(Attachment attch : e.getMessage().getAttachments()) {
 					image_url.append((e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? "("+attch.getProxyUrl()+")" : "\n("+attch.getProxyUrl()+")");
 				}
 				Messages collectedMessage = new Messages();

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
 import constructors.Rank;
+import constructors.Roles;
 import core.Hashes;
 import fileManagement.FileSetting;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -96,7 +97,23 @@ public class RankingThreadExecution {
 		}
 	}
 	
-	private static void ExperienceGain(GuildMessageReceivedEvent e, Rank user_details, Guilds guild_settings, int currentExperience, long experience, int daily_experience, int roleAssignLevel, boolean max_experience_enabled, Timestamp reset){
+	private static void ExperienceGain(GuildMessageReceivedEvent e, Rank user_details, Guilds guild_settings, int currentExperience, long experience, int daily_experience, int roleAssignLevel, boolean max_experience_enabled, Timestamp reset) {
+		//check if the default skin had been updated, if yes update level skin, description and file type
+		var old_guild_settings = Hashes.getOldGuildSettings(e.getGuild().getIdLong());
+		if(old_guild_settings != null && old_guild_settings.getLevelID() == user_details.getRankingLevel()) {
+			user_details.setRankingLevel(guild_settings.getLevelID());
+			user_details.setLevelDescription(guild_settings.getLevelDescription());
+			user_details.setFileTypeLevel(guild_settings.getFileTypeLevel());
+			Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
+		}
+		//then do the same comparison for level icons
+		if(old_guild_settings != null && old_guild_settings.getIconID() == user_details.getRankingIcon()) {
+			user_details.setRankingIcon(guild_settings.getIconID());
+			user_details.setIconDescription(guild_settings.getIconDescription());
+			user_details.setFileTypeIcon(guild_settings.getFileTypeIcon());
+			Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
+		}
+		
 		int rankUpExperience = user_details.getRankUpExperience();
 		int max_level = guild_settings.getMaxLevel();
 		int level = user_details.getLevel();
@@ -104,28 +121,29 @@ public class RankingThreadExecution {
 		
 		if(currentExperience >= rankUpExperience && level < max_level) {
 			level += 1;
+			final var newLevel = level;
 			currentExperience -= rankUpExperience;
-			currency += Hashes.getRankingLevels(e.getGuild().getId()+"_"+level).getCurrency();
+			var levelDetails = RankingSystem.SQLgetLevels(guild_settings.getThemeID()).parallelStream().filter(f -> f.getLevel() == newLevel).findAny().orElse(null);
+			currency += levelDetails.getCurrency();
 			if(level != max_level) {
-				rankUpExperience = Hashes.getRankingLevels(e.getGuild().getId()+"_"+(level+1)).getExperience() - Hashes.getRankingLevels(e.getGuild().getId()+"_"+level).getExperience();
+				rankUpExperience = RankingSystem.SQLgetLevels(guild_settings.getThemeID()).parallelStream().filter(f -> f.getLevel() == (newLevel+1)).findAny().orElse(null).getExperience() - levelDetails.getExperience();
 			}
 			else{
 				rankUpExperience = 0;
 			}
 			
-			Rank current_role = null;
-			var rankingRoles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
+			Roles current_role = null;
+			final var rankingRoles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
 			if(level == roleAssignLevel){
-				for(Role r : e.getMember().getRoles()){
-					for(Rank role : rankingRoles) {
-						if(r.getIdLong() == role.getRoleID() && role.getGuildID() == e.getGuild().getIdLong()) {
+				for(final Role r : e.getMember().getRoles()){
+					for(final var role : rankingRoles) {
+						if(r.getIdLong() == role.getRole_ID()) {
 							e.getGuild().removeRoleFromMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(r.getIdLong())).queue();
 						}
 					}
 				}
-				final var newLevel = level;
-				current_role = rankingRoles.parallelStream().filter(f -> f.getLevel_Requirement() == newLevel).findAny().orElse(null);
-				if(current_role != null) e.getGuild().addRoleToMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(current_role.getRoleID())).queue();
+				current_role = rankingRoles.parallelStream().filter(f -> f.getLevel() == newLevel).findAny().orElse(null);
+				if(current_role != null) e.getGuild().addRoleToMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(current_role.getRole_ID())).queue();
 			}
 			
 			user_details.setLevel(level);
@@ -135,7 +153,7 @@ public class RankingThreadExecution {
 			user_details.setCurrency(currency);
 			
 			if(current_role != null){
-				user_details.setCurrentRole(current_role.getRoleID());
+				user_details.setCurrentRole(current_role.getRole_ID());
 			}
 			
 			var editedRows = 0;

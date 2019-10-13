@@ -13,12 +13,12 @@ import constructors.Cache;
 import constructors.Channels;
 import constructors.Dailies;
 import constructors.Guilds;
+import constructors.Level;
 import constructors.Messages;
 import constructors.NameFilter;
 import constructors.Quizes;
 import constructors.RSS;
 import constructors.Rank;
-import constructors.Ranks;
 import constructors.RejoinTask;
 import constructors.Roles;
 import constructors.Skills;
@@ -54,13 +54,16 @@ public class Hashes {
     private static final ConcurrentMap<Long, ArrayList<String>> filter_lang = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final Set<String> actionlog = new LinkedHashSet<String>();
     private static final ConcurrentHashMap<Long, Guilds> status = new ConcurrentHashMap<Long, Guilds>();
-    private static final ConcurrentMap<Long, ArrayList<Rank>> ranking_roles = new ConcurrentHashMap<Long, ArrayList<Rank>>();
-    private static final LinkedHashMap<String, Ranks> ranking_levels = new LinkedHashMap<String, Ranks>();
+    private static final ConcurrentMap<Long, ArrayList<Roles>> ranking_roles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
+    private static final LinkedHashMap<Integer, ArrayList<Level>> ranking_levels = new LinkedHashMap<Integer, ArrayList<Level>>();
     private static final ConcurrentMap<Long, ArrayList<Roles>> reaction_roles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
     private static final ConcurrentMap<Long, Long> reaction_message = new ConcurrentHashMap<Long, Long>();
     private static final ConcurrentMap<Integer, Quizes> quiz = new ConcurrentHashMap<Integer, Quizes>();
     private static final ConcurrentMap<Member, Integer> quiz_winners = new ConcurrentHashMap<Member, Integer>();
-    private static final ConcurrentMap<String, ArrayList<Rank>> rankList = new ConcurrentHashMap<String, ArrayList<Rank>>();
+    private static final ConcurrentMap<Long, ArrayList<Rank>> rankListLevel = new ConcurrentHashMap<Long, ArrayList<Rank>>();
+    private static final ConcurrentMap<Long, ArrayList<Rank>> rankListRank = new ConcurrentHashMap<Long, ArrayList<Rank>>();
+    private static final ConcurrentMap<Long, ArrayList<Rank>> rankListProfile = new ConcurrentHashMap<Long, ArrayList<Rank>>();
+    private static final ConcurrentMap<Long, ArrayList<Rank>> rankListIcons = new ConcurrentHashMap<Long, ArrayList<Rank>>();
     private static final ConcurrentMap<Long, ArrayList<Skins>> shopContent = new ConcurrentHashMap<Long, ArrayList<Skins>>();
     private static final ConcurrentMap<String, ArrayList<Dailies>> daily_items = new ConcurrentHashMap<String, ArrayList<Dailies>>();
     private static final ConcurrentMap<Long, ArrayList<Roles>> discordRoles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
@@ -82,6 +85,7 @@ public class Hashes {
     private static final ConcurrentHashMap<String, Watchlist> watchlist = new ConcurrentHashMap<String, Watchlist>();
     private static final ConcurrentHashMap<Long, Boolean> heavyCensoring = new ConcurrentHashMap<Long, Boolean>();
     private static final ConcurrentHashMap<Long, ArrayList<String>> censorMessage = new ConcurrentHashMap<Long, ArrayList<String>>();
+    private static final ConcurrentHashMap<Long, Guilds> old_guild_settings = new ConcurrentHashMap<Long, Guilds>();
 	
 	public static void addMessagePool(long _message_id, ArrayList<Messages> _messages) {
 		message_pool.put(_message_id, _messages);
@@ -104,10 +108,10 @@ public class Hashes {
 	public static void addRanking(String _key, Rank _details) {
 		ranking.put(_key, _details);
 	}
-	public static void addRankingRoles(Long _key, ArrayList<Rank> _details) {
+	public static void addRankingRoles(Long _key, ArrayList<Roles> _details) {
 		ranking_roles.put(_key, _details);
 	}
-	public static void addRankingLevels(String _key, Ranks _levels) {
+	public static void addRankingLevels(Integer _key, ArrayList<Level> _levels) {
 		ranking_levels.put(_key, _levels);
 	}
 	public static void addReactionRoles(Long _key, ArrayList<Roles> _roles) {
@@ -122,8 +126,17 @@ public class Hashes {
 	public static void addQuizWinners(Member _key, Integer _threshold) {
 		quiz_winners.put(_key, _threshold);
 	}
-	public static void addRankList(String _key, ArrayList<Rank> _rankList) {
-		rankList.put(_key, _rankList);
+	public static void addRankListLevel(Long _key, ArrayList<Rank> _rankList) {
+		rankListLevel.put(_key, _rankList);
+	}
+	public static void addRankListRank(Long _key, ArrayList<Rank> _rankList) {
+		rankListRank.put(_key, _rankList);
+	}
+	public static void addRankListProfile(Long _key, ArrayList<Rank> _rankList) {
+		rankListProfile.put(_key, _rankList);
+	}
+	public static void addRankListIcons(Long _key, ArrayList<Rank> _rankList) {
+		rankListIcons.put(_key, _rankList);
 	}
 	public static void addShopContent(Long _key, ArrayList<Skins> _skin_content) {
 		shopContent.put(_key, _skin_content);
@@ -188,6 +201,9 @@ public class Hashes {
 	public static void addCensorMessage(Long _key, ArrayList<String> _value) {
 		censorMessage.put(_key, _value);
 	}
+	public static void addOldGuildSettings(Long _key, Guilds _guild) {
+		old_guild_settings.put(_key, _guild);
+	}
 	
 	
 	public static ArrayList<Messages> getMessagePool(long _message_id) {
@@ -217,13 +233,10 @@ public class Hashes {
 	public static Rank getRanking(String _key) {
 		return ranking.get(_key);
 	}
-	public static ArrayList<Rank> getRankingRoles(Long _key) {
+	public static ArrayList<Roles> getRankingRoles(Long _key) {
 		return ranking_roles.get(_key);
 	}
-	public static Map<String, Ranks> getMapOfRankingLevels() {
-		return ranking_levels;
-	}
-	public static Ranks getRankingLevels(String _key) {
+	public static ArrayList<Level> getRankingLevels(int _key) {
 		return ranking_levels.get(_key);
 	}
 	public static ArrayList<Roles> getReactionRoles(Long _key) {
@@ -241,8 +254,17 @@ public class Hashes {
 	public static Integer getQuizWinners(Member _key) {
 		return quiz_winners.get(_key);
 	}
-	public static ArrayList<Rank> getRankList(String _key) {
-		return rankList.get(_key);
+	public static ArrayList<Rank> getRankListLevel(Long _key) {
+		return rankListLevel.get(_key);
+	}
+	public static ArrayList<Rank> getRankListRank(Long _key) {
+		return rankListRank.get(_key);
+	}
+	public static ArrayList<Rank> getRankListProfile(Long _key) {
+		return rankListProfile.get(_key);
+	}
+	public static ArrayList<Rank> getRankListIcons(Long _key) {
+		return rankListIcons.get(_key);
 	}
 	public static ArrayList<Skins> getShopContent(Long _key) {
 		return shopContent.get(_key);
@@ -310,6 +332,9 @@ public class Hashes {
 	public static ArrayList<String> getCensorMessage(Long _key) {
 		return censorMessage.get(_key);
 	}
+	public static Guilds getOldGuildSettings(Long _key) {
+		return old_guild_settings.get(_key);
+	}
 	
 	public static void removeMessagePool(long _message_id) {
 		message_pool.remove(_message_id);
@@ -352,9 +377,30 @@ public class Hashes {
 	}
 	public static void clearQuizWinners() {
 		quiz_winners.clear();
-	}	
-	public static void clearRankList() {
-		rankList.clear();
+	}
+	public static void removeRankListLevel(long _key) {
+		rankListLevel.remove(_key);
+	}
+	public static void removeRankListRank(long _key) {
+		rankListRank.remove(_key);
+	}
+	public static void removeRankListProfile(long _key) {
+		rankListProfile.remove(_key);
+	}
+	public static void removeRankListIcons(long _key) {
+		rankListIcons.remove(_key);
+	}
+	public static void clearRankListLevel() {
+		rankListLevel.clear();
+	}
+	public static void clearRankListRank() {
+		rankListRank.clear();
+	}
+	public static void clearRankListProfile() {
+		rankListProfile.clear();
+	}
+	public static void clearRankListIcons() {
+		rankListIcons.clear();
 	}
 	public static void clearShopContent() {
 		shopContent.clear();
@@ -435,5 +481,8 @@ public class Hashes {
 	}
 	public static void removeWatchlist(String _key) {
 		watchlist.remove(_key);
+	}
+	public static void removeStatus(long _key) {
+		status.remove(_key);
 	}
 }

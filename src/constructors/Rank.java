@@ -113,6 +113,11 @@ public class Rank {
 	private int exp_reachx_profile;
 	private int exp_reachy_profile;
 	
+	private String file_type_level;
+	private String file_type_rank;
+	private String file_type_profile;
+	private String file_type_icon;
+	
 	private int daily_experience;
 	private Timestamp daily_reset;
 	
@@ -397,6 +402,18 @@ public class Rank {
 	}
 	public void setExpReachYProfile(int _exp_reachy_profile) {
 		this.exp_reachy_profile = _exp_reachy_profile;
+	}
+	public void setFileTypeLevel(String _file_type_level) {
+		this.file_type_level = _file_type_level;
+	}
+	public void setFileTypeRank(String _file_type_rank) {
+		this.file_type_rank = _file_type_rank;
+	}
+	public void setFileTypeProfile(String _file_type_profile) {
+		this.file_type_profile = _file_type_profile;
+	}
+	public void setFileTypeIcon(String _file_type_icon) {
+		this.file_type_icon = _file_type_icon;
 	}
 	public void setDailyExperience(int _daily_experience) {
 		this.daily_experience = _daily_experience;
@@ -701,6 +718,18 @@ public class Rank {
 	}
 	public int getExpReachYProfile() {
 		return this.exp_reachy_profile;
+	}
+	public String getFileTypeLevel() {
+		return this.file_type_level;
+	}
+	public String getFileTypeRank() {
+		return this.file_type_rank;
+	}
+	public String getFileTypeProfile() {
+		return this.file_type_profile;
+	}
+	public String getFileTypeIcon() {
+		return this.file_type_icon;
 	}
 	public int getDailyExperience() {
 		return this.daily_experience;

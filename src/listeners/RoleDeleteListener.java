@@ -29,7 +29,7 @@ public class RoleDeleteListener extends ListenerAdapter {
 			}
 			
 			//check if a ranking role has been deleted
-			if(RankingSystem.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getRoleID() == e.getRole().getIdLong()).findAny().orElse(null) != null) {
+			if(RankingSystem.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == e.getRole().getIdLong()).findAny().orElse(null) != null) {
 				Hashes.removeRankingRoles(e.getGuild().getIdLong());
 				if(RankingSystem.SQLUpdateCurrentRole(e.getGuild().getIdLong(), 0) > 0) {
 					if(RankingSystem.SQLremoveSingleRole(e.getRole().getIdLong(), e.getGuild().getIdLong()) == 0) {

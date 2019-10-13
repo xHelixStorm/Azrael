@@ -63,12 +63,28 @@ public class Profile implements CommandPublic {
 			int rank = 0;
 			
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
-			constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
 			
 			if(guild_settings.getRankingState()){				
 				var cache = Hashes.getTempCache("profileDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 				if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
 					Hashes.addTempCache("profileDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(30000));
+					
+					constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
+					//check if the default skin had been updated, if yes update profile skin, description and file type
+					var old_guild_settings = Hashes.getOldGuildSettings(guild_id);
+					if(old_guild_settings != null && old_guild_settings.getProfileID() == user_details.getRankingProfile()) {
+						user_details.setRankingProfile(guild_settings.getProfileID());
+						user_details.setProfileDescription(guild_settings.getProfileDescription());
+						user_details.setFileTypeProfile(guild_settings.getFileTypeProfile());
+						Hashes.addRanking(guild_id+"_"+user_id, user_details);
+					}
+					//then do the same comparison for level icons
+					if(old_guild_settings != null && old_guild_settings.getIconID() == user_details.getRankingIcon()) {
+						user_details.setRankingIcon(guild_settings.getIconID());
+						user_details.setIconDescription(guild_settings.getIconDescription());
+						user_details.setFileTypeIcon(guild_settings.getFileTypeIcon());
+						Hashes.addRanking(guild_id+"_"+user_id, user_details);
+					}
 					
 					float experienceCounter;
 					int convertedExperience;

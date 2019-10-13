@@ -88,10 +88,8 @@ public class Display implements CommandPublic{
 			final var rankingRolesLevel = GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), rankingRolesLevel) || adminPermission) {
 				if(RankingSystem.SQLgetGuild(guild_id).getRankingState()) {
-					for(constructors.Rank r : RankingSystem.SQLgetRoles(guild_id)) {
-						if(r.getGuildID() == guild_id) {
-							out.append(r.getRole_Name() + " (" + r.getRoleID() + ") \nlevel to unlock: " + r.getLevel_Requirement() + "\n");
-						}
+					for(final var r : RankingSystem.SQLgetRoles(guild_id)) {
+						out.append(r.getRole_Name() + " (" + r.getRole_ID() + ") \nlevel to unlock: " + r.getLevel() + "\n");
 					}
 				}
 				else {

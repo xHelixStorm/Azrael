@@ -429,7 +429,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO guild VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			String sql = ("INSERT INTO guild VALUES (?, ?, 0, 0) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setString(2, _guild_name);
@@ -1749,8 +1749,9 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT word, kick FROM name_filter");
+				String sql = ("SELECT word, kick FROM name_filter WHERE fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
 					names.add(new NameFilter(rs.getString(1), rs.getBoolean(2)));

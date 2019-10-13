@@ -15,6 +15,14 @@ public class Roles {
 		this.category_name = _category_name;
 	}
 	
+	public Roles(long _role_id, String _role_name, int _level) {
+		this.role_id = _role_id;
+		this.role_name = _role_name;
+		this.level = _level;
+		this.category_abv = null;
+		this.category_name = null;
+	}
+	
 	public Roles(long _role_id, String _role_name, int _level, String _category_abv, String _category_name) {
 		this.role_id = _role_id;
 		this.role_name = _role_name;

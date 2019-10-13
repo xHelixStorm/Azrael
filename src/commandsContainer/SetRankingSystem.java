@@ -46,7 +46,7 @@ public class SetRankingSystem {
 						logger.error("Roles from RankingSystem.roles couldn't be called and cached");
 						_e.getChannel().sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
 					}
-					if(RankingSystem.SQLgetLevels(_e.getGuild().getIdLong(), guild.getThemeID()) == 0) {
+					if(RankingSystem.SQLgetLevels(guild.getThemeID()).size() == 0) {
 						logger.error("Levels from RankingSystem.level_list couldn't be called and cached");
 						_e.getChannel().sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
 					}

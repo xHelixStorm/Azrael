@@ -146,12 +146,28 @@ public class Set implements CommandPublic {
 			else if(args.length > 1 && args[0].equalsIgnoreCase("-ranking")) {
 				commandLevel = GuildIni.getSetRankingLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					if(RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getMaxLevel() != 0) {
-						SetRankingSystem.runTask(e, args[1]);
+					var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
+					if(guild_settings.getThemeID() == 0) {
+						e.getChannel().sendMessage(messageBuild.setDescription("Before enabling the ranking system, please set a theme ID!").build()).queue();
+						return;
 					}
-					else {
-						e.getChannel().sendMessage(e.getMember().getAsMention() + " **Before using this command, set the max level for this guild!**").queue();
+					if(guild_settings.getLevelID() == 0) {
+						e.getChannel().sendMessage(messageBuild.setDescription("Before enabling the ranking system, please set a default level skin!").build()).queue();
+						return;
 					}
+					if(guild_settings.getRankID() == 0) {
+						e.getChannel().sendMessage(messageBuild.setDescription("Before enabling the ranking system, please set a default rank skin!").build()).queue();
+						return;
+					}
+					if(guild_settings.getProfileID() == 0) {
+						e.getChannel().sendMessage(messageBuild.setDescription("Before enabling the ranking system, please set a default profile skin!").build()).queue();
+						return;
+					}
+					if(guild_settings.getIconID() == 0) {
+						e.getChannel().sendMessage(messageBuild.setDescription("Before enabling the ranking system, please set a default icon skin!").build()).queue();
+						return;
+					}
+					SetRankingSystem.runTask(e, args[1]);
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
@@ -179,7 +195,7 @@ public class Set implements CommandPublic {
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					String out = "";
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingLevel().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
+					for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingLevel(e.getGuild().getIdLong()).parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
 						out+= "Theme "+rankingSystem.getRankingLevel()+":\t"+rankingSystem.getLevelDescription()+"\n";
 					}
 					if(out.length() > 0)
@@ -195,7 +211,7 @@ public class Set implements CommandPublic {
 				commandLevel = GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					int last_theme = RankingSystem.SQLgetRankingLevel().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
+					int last_theme = RankingSystem.SQLgetRankingLevel(e.getGuild().getIdLong()).parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 					if(last_theme > 0) {
 						if(args[1].replaceAll("[0-9]", "").length() == 0)
 							SetLevelDefaultSkin.runTask(e, Integer.parseInt(args[1]), last_theme);
@@ -215,7 +231,7 @@ public class Set implements CommandPublic {
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					String out = "";
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingRank().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
+					for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingRank(e.getGuild().getIdLong()).parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
 						out+= "Theme "+rankingSystem.getRankingRank()+":\t"+rankingSystem.getRankDescription()+"\n";
 					}
 					if(out.length() > 0)
@@ -231,7 +247,7 @@ public class Set implements CommandPublic {
 				commandLevel = GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					int last_theme = RankingSystem.SQLgetRankingRank().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
+					int last_theme = RankingSystem.SQLgetRankingRank(e.getGuild().getIdLong()).parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 					if(last_theme > 0) {
 						if(args[1].replaceAll("[0-9]", "").length() == 0)
 							SetRankDefaultSkin.runTask(e, Integer.parseInt(args[1]), last_theme);
@@ -251,7 +267,7 @@ public class Set implements CommandPublic {
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					String out = "";
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingProfile().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
+					for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingProfile(e.getGuild().getIdLong()).parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
 						out+= "Theme "+rankingSystem.getRankingProfile()+":\t"+rankingSystem.getProfileDescription()+"\n";
 					}
 					if(out.length() > 0)
@@ -267,7 +283,7 @@ public class Set implements CommandPublic {
 				commandLevel = GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					int last_theme = RankingSystem.SQLgetRankingProfile().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
+					int last_theme = RankingSystem.SQLgetRankingProfile(e.getGuild().getIdLong()).parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 					if(last_theme > 0) {
 						if(args[1].replaceAll("[0-9]", "").length() == 0)
 							SetProfileDefaultSkin.runTask(e, Integer.parseInt(args[1]), last_theme);
@@ -287,7 +303,7 @@ public class Set implements CommandPublic {
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					String out = "";
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingIcons().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
+					for(constructors.Rank rankingSystem : RankingSystem.SQLgetRankingIcons(e.getGuild().getIdLong()).parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList())) {
 						out+= "Theme "+rankingSystem.getRankingIcon()+":\t"+rankingSystem.getIconDescription()+"\n";
 					}
 					if(out.length() > 0)
@@ -303,7 +319,7 @@ public class Set implements CommandPublic {
 				commandLevel = GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					int last_theme = RankingSystem.SQLgetRankingIcons().parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
+					int last_theme = RankingSystem.SQLgetRankingIcons(e.getGuild().getIdLong()).parallelStream().filter(t -> t.getThemeID() == theme).collect(Collectors.toList()).size();
 					if(last_theme > 0) {
 						if(args[1].replaceAll("[0-9]", "").length() == 0)
 							SetIconDefaultSkin.runTask(e, Integer.parseInt(args[1]), last_theme);

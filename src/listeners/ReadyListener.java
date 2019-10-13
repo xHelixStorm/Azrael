@@ -69,29 +69,29 @@ public class ReadyListener extends ListenerAdapter {
 			FileSetting.createGuildDirectory(guild);
 			if(Azrael.SQLgetGuild(guild.getIdLong()) == 0) {
 				if(Azrael.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
-					logger.error("Azrael.guild is empty and couldn't be filled!");
+					logger.error("Azrael.guild is empty and couldn't be filled! for guild {}", guild.getId());
 				}
 			}
 			if(DiscordRoles.SQLgetGuild(guild.getIdLong()) == 0) {
 				if(DiscordRoles.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
-					logger.error("DiscordRoles.guilds is empty and couldn't be filled!");
+					logger.error("DiscordRoles.guilds is empty and couldn't be filled! for guild {}", guild.getId());
 				}
 			}
 			if(RankingSystem.SQLgetGuild(guild.getIdLong()) == null) {
 				if(RankingSystem.SQLInsertGuild(guild.getIdLong(), guild.getName(), false) == 0) {
-					logger.error("RankingSystem.guild is empty and couldn't be filled!");
+					logger.error("RankingSystem.guild is empty and couldn't be filled! for guild {}", guild.getId());
 				}
 			}
 			if(Patchnotes.SQLgetGuild(guild.getIdLong()) == 0) {
 				if(Patchnotes.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
-					logger.error("Patchnotes.guilds is empty and couldn't be filled!");
+					logger.error("Patchnotes.guilds is empty and couldn't be filled! for guild {}", guild.getId());
 				}
 			}
 			Channels log_channel = null;
 			Channels bot_channel = null;
 			var channels = Azrael.SQLgetChannels(guild.getIdLong());
 			if(channels == null || channels.size() == 0) {
-				logger.error("Channel information from Azrael.channels couldn't be retrieved and cached");
+				logger.error("Channel information from Azrael.channels couldn't be retrieved and cached for guild {}", guild.getId());
 			}
 			else {
 				log_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
@@ -117,10 +117,6 @@ public class ReadyListener extends ListenerAdapter {
 			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetRoles(guild.getIdLong()) == null) {
 				logger.error("Roles from RankingSystem.roles couldn't be called and cached");
 				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
-			}
-			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetLevels(guild.getIdLong(), guild_settings.getThemeID()) == 0) {
-				logger.error("Levels from RankingSystem.level_list couldn't be called and cached");
-				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
 			}
 			if(themesRetrieved == false) {
 				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Themes from RankingSystem.themes couldn't be called and cached").queue();

@@ -11,22 +11,32 @@ import sql.RankingSystem;
 public class SetRankDefaultSkin {
 	private final static Logger logger = LoggerFactory.getLogger(SetRankDefaultSkin.class);
 	
-	public static void runTask(GuildMessageReceivedEvent _e, int _default_skin, int _last_theme){
-		if(_default_skin <= _last_theme){
-			Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
-			guild_settings.setRankID(_default_skin);
-			if(RankingSystem.SQLUpdateRankDefaultSkin(_e.getGuild().getIdLong(), _e.getGuild().getName(), guild_settings.getRankID()) > 0) {
-				logger.debug("{} has set the default rank skin id to {} in guild {}", _e.getMember().getUser().getId(), guild_settings.getRankID(), _e.getGuild().getId());
-				Hashes.addStatus(_e.getGuild().getIdLong(), guild_settings);
-				_e.getChannel().sendMessage("**The default skin is now the theme number "+guild_settings.getRankID()+"!**").queue();
+	public static void runTask(GuildMessageReceivedEvent _e, int _default_skin, int _last_theme) {
+		if(_default_skin > 0 && _default_skin <= _last_theme) {
+			if(RankingSystem.SQLUpdateRankDefaultSkin(_e.getGuild().getIdLong(), _e.getGuild().getName(), _default_skin) > 0) {
+				logger.debug("{} has set the default rank skin id to {} in guild {}", _e.getMember().getUser().getId(), _default_skin, _e.getGuild().getId());
+				Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
+				if(RankingSystem.SQLUpdateUsersDefaultRankSkin(guild_settings.getRankID(), _default_skin, _e.getGuild().getIdLong()) > 0) {
+					logger.debug("The default rank skin has been updated for everyone who used the previous rank skin for guild {}", _e.getGuild().getId());
+					_e.getChannel().sendMessage("**The default rank skin is now the theme number "+_default_skin+"!**").queue();
+				}
+				else if(guild_settings.getRankingState()) {
+					logger.warn("default level skin couldn't be updated for all users for guild {}", _e.getGuild().getId());
+					_e.getChannel().sendMessage("**The default rank skin couldn't be updated for all users but the server default skin has been set!**").queue();
+				}
+				else if(!guild_settings.getRankingState()) {
+					_e.getChannel().sendMessage("**The default rank skin is now the theme number "+_default_skin+"!**").queue();
+				}
+				Hashes.removeStatus(_e.getGuild().getIdLong());
+				Hashes.addOldGuildSettings(_e.getGuild().getIdLong(), guild_settings);
 			}
 			else {
-				logger.error("The table RankingSystem.guilds couldn't be updated with the default rank skin for guild {}", _e.getGuild().getName());
-				_e.getChannel().sendMessage("An internal error occurred. The table RankingSystem.guilds couldn't be updated with the default rank skin").queue();
+				logger.error("RankingSystem.guilds couldn't be updated with the default rank skin in guild {}", _e.getGuild().getId());
+				_e.getChannel().sendMessage("An internal error occurred! The table RankingSystem.guilds couldn't be updated with the default rank skin").queue();
 			}
 		}
 		else{
-			_e.getChannel().sendMessage("**"+_e.getMember().getAsMention()+" please choose one available theme out of "+_last_theme+" available themes!**").queue();
+			_e.getChannel().sendMessage("**"+_e.getMember().getAsMention()+" please choose one available skin out of "+_last_theme+" available skins!**").queue();
 		}
 	}
 }

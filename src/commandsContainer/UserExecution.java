@@ -18,7 +18,6 @@ import constructors.Channels;
 import constructors.Guilds;
 import constructors.Messages;
 import constructors.Rank;
-import constructors.Ranks;
 import constructors.RejoinTask;
 import constructors.User;
 import constructors.Watchlist;
@@ -55,7 +54,7 @@ public class UserExecution {
 		String raw_input = _input;
 		String user_name = "";
 		
-		if(raw_input.length() != 18 && raw_input.length() != 17){
+		if(raw_input.length() != 18 && raw_input.length() != 17) {
 			User user = Azrael.SQLgetUser(name);
 			try {
 				if(user.getUserID() != 0) {
@@ -67,7 +66,7 @@ public class UserExecution {
 				return;
 			}
 		}
-		else{
+		else {
 			user_name = Azrael.SQLgetUserThroughID(raw_input).getUserName();
 		}
 		
@@ -138,10 +137,10 @@ public class UserExecution {
 							if(guild_settings.getRankingState() == true) {
 								message.addField("LEVEL", "**"+user_details.getLevel()+"**/**"+guild_settings.getMaxLevel()+"**", true);
 								message.addField("EXPERIENCE", "**"+user_details.getCurrentExperience()+"**/**"+user_details.getRankUpExperience()+"**", true);
-								if(user_details.getCurrentRole() != 0){
+								if(user_details.getCurrentRole() != 0) {
 									message.addField("UNLOCKED ROLE", _e.getGuild().getRoleById(user_details.getCurrentRole()).getAsMention(), true);
 								}
-								else{
+								else {
 									message.addField("UNLOCKED ROLE", "**N/A**", true);
 								}
 								message.addField("TOTAL EXPERIENCE", "**"+user_details.getExperience()+"**", true);
@@ -1040,16 +1039,18 @@ public class UserExecution {
 					int level = 0;
 					long assign_role = 0;
 					boolean toBreak = false;
-					for(Ranks ranks : Hashes.getMapOfRankingLevels().values()){
-						if((user_details.getExperience() + experience) >= ranks.getExperience()){
+					var roles = RankingSystem.SQLgetRoles(_e.getGuild().getIdLong());
+					for(final var ranks : RankingSystem.SQLgetLevels(guild_settings.getThemeID())) {
+						if((user_details.getExperience() + experience) >= ranks.getExperience()) {
 							totExperience = ranks.getExperience();
 							level = ranks.getLevel();
 							currentExperience = (user_details.getExperience() + experience) - ranks.getExperience();
-							if(ranks.getAssignRole() != 0){
-								assign_role = ranks.getAssignRole();
+							var role = roles.parallelStream().filter(f -> f.getLevel() == ranks.getLevel()).findAny().orElse(null);
+							if(role != null) {
+								assign_role = role.getRole_ID();
 							}
 						}
-						else{
+						else {
 							if(toBreak == false) {
 								rankUpExperience = ranks.getExperience() - totExperience;
 								toBreak = true;
@@ -1067,14 +1068,14 @@ public class UserExecution {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Experience points gifted", "User received "+experience+" experience points");
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						try {
-							for(Role r : _e.getMember().getRoles()){
-								for(Rank role : RankingSystem.SQLgetRoles(_e.getGuild().getIdLong())) {
-									if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()){
+							for(final Role r : _e.getMember().getRoles()) {
+								for(final var role : roles) {
+									if(r.getIdLong() == role.getRole_ID()) {
 										_e.getGuild().removeRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
 									}
 								}
 							}
-							if(assign_role != 0){
+							if(assign_role != 0) {
 								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
 							}
 						} catch(IllegalArgumentException iae) {
@@ -1100,16 +1101,18 @@ public class UserExecution {
 					int level = 0;
 					long assign_role = 0;
 					boolean toBreak = false;
-					for(Ranks ranks : Hashes.getMapOfRankingLevels().values()){
-						if(experience >= ranks.getExperience()){
+					var roles = RankingSystem.SQLgetRoles(_e.getGuild().getIdLong());
+					for(final var ranks : RankingSystem.SQLgetLevels(guild_settings.getThemeID())) {
+						if(experience >= ranks.getExperience()) {
 							totExperience = ranks.getExperience();
 							level = ranks.getLevel();
 							currentExperience = experience - ranks.getExperience();
-							if(ranks.getAssignRole() != 0){
-								assign_role = ranks.getAssignRole();
+							var role = roles.parallelStream().filter(f -> f.getLevel() == ranks.getLevel()).findAny().orElse(null);
+							if(role != null) {
+								assign_role = role.getRole_ID();
 							}
 						}
-						else{
+						else {
 							if(toBreak == false) {
 								rankUpExperience = ranks.getExperience() - totExperience;
 								toBreak = true;
@@ -1127,14 +1130,14 @@ public class UserExecution {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Experience points edited", "User has been set to "+experience+" experience points");
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						try {
-							for(Role r : _e.getMember().getRoles()){
-								for(Rank role : RankingSystem.SQLgetRoles(_e.getGuild().getIdLong())) {
-									if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()) {
+							for(final Role r : _e.getMember().getRoles()) {
+								for(final var role : roles) {
+									if(r.getIdLong() == role.getRole_ID()) {
 										_e.getGuild().removeRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
 									}
 								}
 							}
-							if(assign_role != 0){
+							if(assign_role != 0) {
 								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
 							}
 						} catch(IllegalArgumentException iae) {
@@ -1159,15 +1162,17 @@ public class UserExecution {
 						long rankUpExperience = 0;
 						long assign_role = 0;
 						boolean toBreak = false;
-						for(Ranks ranks : Hashes.getMapOfRankingLevels().values()){
-							if(ranks.getAssignRole() != 0 && toBreak == false){
-								assign_role = ranks.getAssignRole();
+						var roles = RankingSystem.SQLgetRoles(_e.getGuild().getIdLong());
+						for(final var ranks : RankingSystem.SQLgetLevels(guild_settings.getThemeID())) {
+							var role = roles.parallelStream().filter(f -> f.getLevel() == ranks.getLevel()).findAny().orElse(null);
+							if(role != null && toBreak == false) {
+								assign_role = role.getRole_ID();
 							}
-							if(level == ranks.getLevel()){
+							if(level == ranks.getLevel()) {
 								experience = ranks.getExperience();
 								toBreak = true;
 							}
-							else if(toBreak == true){
+							else if(toBreak == true) {
 								rankUpExperience = ranks.getExperience() - experience;
 								break;
 							}
@@ -1181,14 +1186,14 @@ public class UserExecution {
 							RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Level changed", "User is now level "+user_details.getLevel());
 							Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 							try {
-								for(Role r : _e.getMember().getRoles()){
-									for(Rank role : RankingSystem.SQLgetRoles(_e.getGuild().getIdLong())){
-										if(r.getIdLong() == role.getRoleID() && role.getGuildID() == _e.getGuild().getIdLong()) {
+								for(final Role r : _e.getMember().getRoles()) {
+									for(final var role : roles) {
+										if(r.getIdLong() == role.getRole_ID()) {
 											_e.getGuild().removeRoleFromMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(r.getIdLong())).queue();
 										}
 									}
 								}
-								if(assign_role != 0){
+								if(assign_role != 0) {
 									_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_details.getUser_ID()), _e.getGuild().getRoleById(assign_role)).queue();
 								}
 							} catch(IllegalArgumentException iae) {
@@ -1281,13 +1286,13 @@ public class UserExecution {
 		if(_message.replaceAll("[0-9]*", "").length() == 0 || passValue) {
 			EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 			int value = (passValue ? messagesCount : Integer.parseInt(_message));
-			if(value == 0){
+			if(value == 0) {
 				_e.getChannel().sendMessage("You chose to not remove any messages at all!").queue();
 			}
-			else if(value > 100){
+			else if(value > 100) {
 				_e.getChannel().sendMessage("Please choose a number between 1 and 100!").queue();
 			}
-			else{
+			else {
 				List<ArrayList<Messages>> messages = Hashes.getWholeMessagePool().values().parallelStream().filter(f -> f.get(0).getUserID() == user_id && f.get(0).getGuildID() == _e.getGuild().getIdLong()).collect(Collectors.toList());
 				int hash_counter = 0;
 				StringBuilder collected_messages = new StringBuilder();
