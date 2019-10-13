@@ -87,7 +87,7 @@ public class RankingMethods extends ListenerAdapter {
 					g.setFont(new Font("Nexa Bold", Font.BOLD, user_details.getNameFontSize_Level()));
 					g.drawString(name, user_details.getNameXLevel(), user_details.getNameYLevel());
 				}
-				ImageIO.write(overlay, user_details.getFileTypeLevel(), new File(IniFileReader.getTempDirectory()+"lvup_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeLevel()));
+				ImageIO.write(overlay, user_details.getFileTypeLevel(), new File(IniFileReader.getTempDirectory()+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeLevel()));
 				g.dispose();
 			}
 			else {
