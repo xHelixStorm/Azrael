@@ -16,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.DataFormatException;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
@@ -28,6 +29,7 @@ import fileManagement.IniFileReader;
 import gif.GifDecoder;
 import gif.GifSequenceWriter;
 import gif.GifDecoder.GifImage;
+import gif.GifOptimizer;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -122,10 +124,20 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			File file1 = new File(IniFileReader.getTempDirectory()+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeLevel());
+			if(file1.getTotalSpace() > 8000000) {
+				String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("level", "level_compressed")};
+				final var output = GifOptimizer.startGifOptimization(args);
+				if(output == null) {
+					file1.delete();
+					file1 = new File(IniFileReader.getTempDirectory()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeProfile());
+				}
+			}
 			e.getChannel().sendFile(file1, "level_up."+user_details.getFileTypeLevel()).complete();
 			file1.delete();
 		} catch (IOException e1) {
 			logger.error("RankUp couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
+		} catch (DataFormatException e1) {
+			e1.printStackTrace();
 		}
 	}
 	
@@ -226,10 +238,20 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			File file2 = new File(IniFileReader.getTempDirectory()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeRank());
+			if(file2.getTotalSpace() > 8000000) {
+				String [] args = {file2.getCanonicalPath(), file2.getCanonicalPath().replace("rank", "rank_compressed")};
+				final var output = GifOptimizer.startGifOptimization(args);
+				if(output == null) {
+					file2.delete();
+					file2 = new File(IniFileReader.getTempDirectory()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeProfile());
+				}
+			}
 			e.getChannel().sendFile(file2, "rank."+user_details.getFileTypeRank()).complete();
 			file2.delete();
 		} catch (IOException e1) {
 			logger.error("Rank couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
+		} catch (DataFormatException e1) {
+			e1.printStackTrace();
 		}
 	}
 	
@@ -425,10 +447,20 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			File file3 = new File(IniFileReader.getTempDirectory()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeProfile());
+			if(file3.getTotalSpace() > 8000000) {
+				String [] args = {file3.getCanonicalPath(), file3.getCanonicalPath().replace("profile", "profile_compressed")};
+				final var output = GifOptimizer.startGifOptimization(args);
+				if(output == null) {
+					file3.delete();
+					file3 = new File(IniFileReader.getTempDirectory()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeProfile());
+				}
+			}
 			e.getChannel().sendFile(file3, "profile."+user_details.getFileTypeProfile()).complete();
 			file3.delete();
 		} catch (IOException e1) {
 			logger.error("Profile couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
+		} catch (DataFormatException e1) {
+			e1.printStackTrace();
 		}
 	}
 	
