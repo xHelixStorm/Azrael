@@ -68,9 +68,9 @@ public class URLFilter implements Runnable{
 									printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang), allChannels);
 							}
 						} catch (MalformedURLException e1) {
-							logger.error("URL malformed error", e1);
+							logger.error("URL malformed error for url {} and guild {}", foundURL, guild_id, e1);
 						} catch (IOException e1) {
-							logger.warn("Invalid URL");
+							logger.warn("Invalid URL {} for guild {}", foundURL, guild_id, e1);
 						}
 					}
 				}

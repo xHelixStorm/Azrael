@@ -125,7 +125,7 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			final File file1 = new File(IniFileReader.getTempDirectory()+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeLevel());
-			if(file1.getTotalSpace() > 8000000) {
+			if(file1.length() > 8000000) {
 				e.getChannel().sendMessage("Request is being processed. Please wait...").queue(message -> {
 					try {
 						String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("level", "level_compressed")};
@@ -134,8 +134,9 @@ public class RankingMethods extends ListenerAdapter {
 							file1.delete();
 							message.delete().queue();
 							final File file2 = new File(IniFileReader.getTempDirectory()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeProfile());
-							e.getChannel().sendFile(file2, "level_up."+user_details.getFileTypeLevel()).complete();
-							file2.delete();
+							e.getChannel().sendFile(file2, "level_up."+user_details.getFileTypeLevel()).queue(complete -> {
+								file2.delete();
+							});;
 						}
 					} catch(IOException | DataFormatException e1) {
 						logger.error("Compression error for file {}", user_details.getLevelDescription()+user_details.getFileTypeLevel(), e1);
@@ -251,7 +252,7 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			final File file1 = new File(IniFileReader.getTempDirectory()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeRank());
-			if(file1.getTotalSpace() > 8000000) {
+			if(file1.length() > 8000000) {
 				e.getChannel().sendMessage("Request is being processed. Please wait...").queue(message -> {
 					try {
 						String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("rank", "rank_compressed")};
@@ -260,8 +261,9 @@ public class RankingMethods extends ListenerAdapter {
 							file1.delete();
 							message.delete().queue();
 							final File file2 = new File(IniFileReader.getTempDirectory()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeProfile());
-							e.getChannel().sendFile(file2, "rank."+user_details.getFileTypeLevel()).complete();
-							file2.delete();
+							e.getChannel().sendFile(file2, "rank."+user_details.getFileTypeLevel()).queue(complete -> {
+								file2.delete();
+							});;
 						}
 					} catch(IOException | DataFormatException e1) {
 						logger.error("Compression error for file {}", user_details.getRankDescription()+user_details.getFileTypeRank(), e1);
@@ -472,7 +474,7 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			final File file1 = new File(IniFileReader.getTempDirectory()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeProfile());
-			if(file1.getTotalSpace() > 8000000) {
+			if(file1.length() > 8000000) {
 				e.getChannel().sendMessage("Request is being processed. Please wait...").queue(message -> {
 					try {
 						String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("profile", "profile_compressed")};
@@ -481,8 +483,9 @@ public class RankingMethods extends ListenerAdapter {
 							file1.delete();
 							message.delete().queue();
 							final File file2 = new File(IniFileReader.getTempDirectory()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeProfile());
-							e.getChannel().sendFile(file2, "profile."+user_details.getFileTypeLevel()).complete();
-							file2.delete();
+							e.getChannel().sendFile(file2, "profile."+user_details.getFileTypeLevel()).queue(complete -> {
+								file2.delete();
+							});;
 						}
 					} catch(IOException | DataFormatException e1) {
 						logger.error("Compression error for file {}", user_details.getProfileDescription()+user_details.getFileTypeProfile(), e1);
