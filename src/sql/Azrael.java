@@ -1778,7 +1778,7 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("INSERT INTO name_filter (word, kick, fk_guild_id) VALUES(?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _word);
+			stmt.setString(1, _word.toLowerCase());
 			stmt.setBoolean(2, _kick);
 			stmt.setLong(3, _guild_id);
 			return stmt.executeUpdate();
