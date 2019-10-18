@@ -150,8 +150,7 @@ public class GuildListener extends ListenerAdapter {
 					}
 				}
 				if(badName == false) {
-					Azrael.SQLgetNameFilter(e.getGuild().getIdLong());
-					check: for(var word : Hashes.getNameFilter(guild_id)) {
+					check: for(var word : Azrael.SQLgetNameFilter(e.getGuild().getIdLong())) {
 						if(lc_user_name.contains(word.getName())) {
 							if(!word.getKick()) {
 								nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());

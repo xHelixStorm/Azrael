@@ -127,7 +127,7 @@ public class UserExecution {
 							message.addField("BANNED", warnedUser.getBanID() == 2 ? "**YES**" : "**NO**", true);
 							message.addField("JOIN DATE", "**"+user.getJoinDate()+"**", true);
 							message.addField("USER ID", "**"+cache.getAdditionalInfo()+"**", true);
-							var watchedUser = Hashes.getWatchlist(_e.getGuild().getId()+"-"+user_id);
+							var watchedUser = Azrael.SQLgetWatchlist(user_id, _e.getGuild().getIdLong());
 							if(watchedUser == null || (watchedUser.hasHigherPrivileges() && !UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserUseWatchChannelLevel(_e.getGuild().getIdLong()))))
 								message.addField("WATCH LEVEL", "**0**", true);
 							else
@@ -425,7 +425,7 @@ public class UserExecution {
 					case "unwatch" -> {
 						final var unwatchLevel = GuildIni.getUserUnwatchLevel(_e.getGuild().getIdLong());
 						if(UserPrivs.comparePrivilege(_e.getMember(), unwatchLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
-							var watchedMember = Hashes.getWatchlist(_e.getGuild().getId()+"-"+user_id);
+							var watchedMember = Azrael.SQLgetWatchlist(user_id, _e.getGuild().getIdLong());
 							if(watchedMember != null) {
 								if(!watchedMember.hasHigherPrivileges()) {
 									//No higher privileges required, if it's set to log in the trash channel

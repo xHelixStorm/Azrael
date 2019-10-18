@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 
 import constructors.RSS;
-import core.Hashes;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import rss.BasicModel;
@@ -30,12 +29,13 @@ public class ParseRSS extends TimerTask{
 
 	@Override
 	public void run() {
+		var feeds = Azrael.SQLgetRSSFeeds(guild_id);
 		try {
-			if(Hashes.getFeed(guild_id) != null) {
+			if(feeds != null) {
 				logger.info("task running for guild {}", e.getJDA().getGuildById(guild_id).getName());
 				var rss_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rss")).findAny().orElse(null);
 				if(rss_channel != null) {
-					for(RSS rss : Hashes.getFeed(guild_id)) {
+					for(RSS rss : feeds) {
 						new Thread(() -> {
 							try {
 								logger.debug("Retrieving rss feed for {} in guild {}", rss.getURL(), e.getJDA().getGuildById(guild_id).getName());

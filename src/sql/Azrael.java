@@ -2165,6 +2165,37 @@ public class Azrael {
 		}
 	}
 	
+	public static synchronized Watchlist SQLgetWatchlist(long _user_id, long _guild_id) {
+		logger.debug("SQLgetWatchlist launched. Params passed {}, {}", _user_id, _guild_id);
+		if(Hashes.getWatchlist(_guild_id+"-"+_user_id) == null) {
+			Watchlist watchlist = null;
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				String sql = ("SELECT * FROM watchlist WHERE fk_user_id = ? AND fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _user_id);
+				stmt.setLong(2, _guild_id);
+				rs = stmt.executeQuery();
+				if(rs.next()) {
+					watchlist = new Watchlist(rs.getInt(3), rs.getLong(4), rs.getBoolean(5));
+					Hashes.addWatchlist(rs.getString(2)+"-"+rs.getString(1), watchlist);
+				}
+				return watchlist;
+			} catch (SQLException e) {
+				logger.error("SQLgetWatchlist Exception", e);
+				return watchlist;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		return Hashes.getWatchlist(_guild_id+"-"+_user_id);
+	}
+	
 	public static synchronized void SQLgetWholeWatchlist() {
 		logger.debug("SQLgetWholeWatchlist launched. No params have been passed!");
 		Connection myConn = null;

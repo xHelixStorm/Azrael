@@ -81,7 +81,7 @@ public class GuildMessageEditListener extends ListenerAdapter{
 						}
 					}
 				}
-				var watchedMember = Hashes.getWatchlist(e.getGuild().getId()+"-"+e.getMember().getUser().getId());
+				var watchedMember = Azrael.SQLgetWatchlist(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 				var sentMessage = Hashes.getMessagePool(e.getMessageIdLong());
 				if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
 					var cachedMessage = sentMessage.get(0);

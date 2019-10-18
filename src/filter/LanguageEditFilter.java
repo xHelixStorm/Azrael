@@ -116,7 +116,7 @@ public class LanguageEditFilter implements Runnable {
 								}
 								else {
 									censorMessage.add(parseMessage);
-									if(censorMessage.size() > 10)
+									if(censorMessage.size() > 30)
 										censorMessage.remove(0);
 									Hashes.addCensorMessage(e.getGuild().getIdLong(), censorMessage);
 								}

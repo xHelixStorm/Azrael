@@ -40,7 +40,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.8.332";
+	private static final String VERSION = "6.8.333";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
@@ -238,7 +238,7 @@ public class STATIC {
 		var user_id = (e != null ? e.getUser().getIdLong() : e2.getMember().getUser().getIdLong());
 		var guild_id = (e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong());
 		var unwatchReason = (type == 1 ? "ban" : "kick");
-		var watchedUser = Hashes.getWatchlist(guild_id+"-"+user_id);
+		var watchedUser = Azrael.SQLgetWatchlist(user_id, guild_id);
 		if(watchedUser != null) {
 			if(Azrael.SQLDeleteWatchlist(user_id, guild_id) > 0) {
 				e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(new EmbedBuilder().setColor(Color.YELLOW).setTitle("Watch lifted due to "+unwatchReason+"!")

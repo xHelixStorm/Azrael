@@ -5,7 +5,6 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.Hashes;
 import core.UserPrivs;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -55,8 +54,7 @@ public class NameListener extends ListenerAdapter {
 			if(staff_name == false){
 				for(Guild guild : e.getJDA().getGuilds()){
 					long guild_id = guild.getIdLong();
-					Azrael.SQLgetNameFilter(guild_id);
-					check: for(var word : Hashes.getNameFilter(guild_id)){
+					check: for(var word : Azrael.SQLgetNameFilter(guild_id)) {
 						if(nameCheck.contains(word.getName())){
 							Member member = e.getJDA().getGuildById(guild_id).getMemberById(user_id);
 							

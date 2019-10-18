@@ -103,11 +103,13 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 				}
 				
 				//Log additional removed messages from users that are being watched with watch level 1
-				var watchedUser = Hashes.getWatchlist(e.getGuild().getId()+"-"+(removed_messages != null ? removed_messages.get(0).getUserID() : "BOT"));
-				if(watchedUser != null && watchedUser.getLevel() == 1) {
-					for(final var cachedMessage : removed_messages) {
-						message.setTitle("Logged deleted "+(cachedMessage.isEdit() ? "**edited message**" : "**message**")+" due to watching!");
-						e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(message.setDescription("["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage()).build()).queue();
+				if(removed_messages != null) {
+					var watchedUser = Azrael.SQLgetWatchlist(removed_messages.get(0).getUserID(), e.getGuild().getIdLong());
+					if(watchedUser != null && watchedUser.getLevel() == 1) {
+						for(final var cachedMessage : removed_messages) {
+							message.setTitle("Logged deleted "+(cachedMessage.isEdit() ? "**edited message**" : "**message**")+" due to watching!");
+							e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(message.setDescription("["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage()).build()).queue();
+						}
 					}
 				}
 			}
