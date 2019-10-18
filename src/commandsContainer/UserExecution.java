@@ -52,47 +52,39 @@ public class UserExecution {
 		
 		String name = _displayed_input.replaceAll("@", "");
 		String raw_input = _input;
-		String user_name = "";
+		String user_name = null;
 		
 		if(raw_input.length() != 18 && raw_input.length() != 17) {
-			User user = Azrael.SQLgetUser(name);
-			try {
-				if(user.getUserID() != 0) {
-					raw_input = ""+user.getUserID();
-					user_name = user.getUserName();
-				}
-			} catch(Exception exc) {
-				_e.getChannel().sendMessage("Error, user doesn't exist. Please try again!").queue();
-				return;
+			final User user = Azrael.SQLgetUser(name);
+			if(user != null) {
+				raw_input = ""+user.getUserID();
+				user_name = user.getUserName();
 			}
 		}
 		else {
-			user_name = Azrael.SQLgetUserThroughID(raw_input).getUserName();
+			final User user = Azrael.SQLgetUserThroughID(raw_input);
+			if(user != null)
+				user_name = user.getUserName();
 		}
 		
-		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17)) {
-			if(user_name != null && user_name.length() > 0) {
-				_e.getChannel().sendMessage(message.setDescription("User **"+user_name+"** has been found in this guild! Now type one of the following words within 3 minutes to execute an action!\n\n"
-						+ "**information**: To display all details of the selected user\n"
-						+ "**delete-messages**: To remove up to 100 messages from the selected user\n"
-						+ "**warning**: To change the current warning value\n"
-						+ "**mute**: To assign the mute role\n"
-						+ "**unmute** To unmute the member and to terminate the running task\n"
-						+ "**ban**: To ban the user\n"
-						+ "**kick**: To kick the user\n"
-						+ "**history**: To display the whole kick/ban/mute history with reasons\n"
-						+ "**watch**: To either log all messages or only deleted messages from this user\n"
-						+ "**unwatch**: To remove this user from the watchlist\n"
-						+ "**gift-experience**: To gift experience points\n"
-						+ "**set-experience**: To set an experience value\n"
-						+ "**set-level**: To assign a level\n"
-						+ "**gift-currency**: To gift money\n"
-						+ "**set-currency**: To se a money value").build()).queue();
-				Hashes.addTempCache(key, new Cache(180000, raw_input));
-			}
-			else {
-				_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Error, user doesn't exist. Please try again!").queue();
-			}
+		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17) && user_name != null && user_name.length() > 0) {
+			_e.getChannel().sendMessage(message.setDescription("User **"+user_name+"** has been found in this guild! Now type one of the following words within 3 minutes to execute an action!\n\n"
+				+ "**information**: To display all details of the selected user\n"
+				+ "**delete-messages**: To remove up to 100 messages from the selected user\n"
+				+ "**warning**: To change the current warning value\n"
+				+ "**mute**: To assign the mute role\n"
+				+ "**unmute** To unmute the member and to terminate the running task\n"
+				+ "**ban**: To ban the user\n"
+				+ "**kick**: To kick the user\n"
+				+ "**history**: To display the whole kick/ban/mute history with reasons\n"
+				+ "**watch**: To either log all messages or only deleted messages from this user\n"
+				+ "**unwatch**: To remove this user from the watchlist\n"
+				+ "**gift-experience**: To gift experience points\n"
+				+ "**set-experience**: To set an experience value\n"
+				+ "**set-level**: To assign a level\n"
+				+ "**gift-currency**: To gift money\n"
+				+ "**set-currency**: To se a money value").build()).queue();
+			Hashes.addTempCache(key, new Cache(180000, raw_input));
 		}
 		else {
 			_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Error, user doesn't exist. Please try again!").queue();
@@ -107,8 +99,8 @@ public class UserExecution {
 		if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
 			Guilds guild_settings = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
 			var comment = _message.toLowerCase();
-			if(comment.equals("information") || comment.equals("delete-messages") || comment.equals("warning") || comment.equals("mute") || comment.equals("unmute") || comment.equals("ban") || comment.equals("kick") || comment.equals("history") || comment.equals("watch") || comment.equals("unwatch") || comment.equals("gift-experience") || comment.equals("set-experience") || comment.equals("set-level") || comment.equals("gift-currency") || comment.equals("set-currency")) {
-				var user_id = Long.parseLong(cache.getAdditionalInfo());
+			var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
+			if(!cache.getAdditionalInfo().matches("[a-zA-Z\\-]{1,}[\\d]*") && (comment.equals("information") || comment.equals("delete-messages") || comment.equals("warning") || comment.equals("mute") || comment.equals("unmute") || comment.equals("ban") || comment.equals("kick") || comment.equals("history") || comment.equals("watch") || comment.equals("unwatch") || comment.equals("gift-experience") || comment.equals("set-experience") || comment.equals("set-level") || comment.equals("gift-currency") || comment.equals("set-currency"))) {
 				switch(comment) {
 					case "information" -> {
 						final var informationLevel = GuildIni.getUserInformationLevel(_e.getGuild().getIdLong());
@@ -414,7 +406,7 @@ public class UserExecution {
 							message.setTitle("You chose to watch this user!");
 							message.setDescription("Now please select a log level.\n1: Log only deleted messages from this user\n2: log all written messages from a user!");
 							_e.getChannel().sendMessage(message.build()).queue();
-							cache.updateDescription("watch"+cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
+							cache.updateDescription("watch"+user_id);
 							Hashes.addTempCache(key, cache);
 						}
 						else {
@@ -578,13 +570,13 @@ public class UserExecution {
 					if(cache.getAdditionalInfo3().length() == 0) {
 						message.setTitle("You chose to delete a number of messages!");
 						_e.getChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
-						cache.updateDescription("delete-messages"+Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""))).setExpiration(180000);
+						cache.updateDescription("delete-messages"+user_id).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
 					else {
 						message.setTitle("Delete Messages!");
 						_e.getChannel().sendMessage(message.setDescription("Messages are being deleted...").build()).queue();
-						deleteMessages(_e, Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _message, Integer.parseInt(cache.getAdditionalInfo3()), message, key, true);
+						deleteMessages(_e, user_id, _message, Integer.parseInt(cache.getAdditionalInfo3()), message, key, true);
 					}
 				}
 				else if(_message.equalsIgnoreCase("no")) {
@@ -593,11 +585,10 @@ public class UserExecution {
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("delete-messages")) {
-				deleteMessages(_e, Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _message, 0, message, key, false);
+				deleteMessages(_e, user_id, _message, 0, message, key, false);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("warning")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 					if(!Azrael.SQLisBanned(user_id, _e.getGuild().getIdLong()) && ( _e.getGuild().getMemberById(user_id) == null || !UserPrivs.isUserMuted(_e.getGuild().getMemberById(user_id).getUser(), _e.getGuild().getIdLong()))) {
 						int db_warning = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID();
 						if(db_warning != 0) {
@@ -675,7 +666,7 @@ public class UserExecution {
 				if(comment.equals("yes")) {
 					message.setTitle("You chose to provide a reason!");
 					_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
-					cache.updateDescription("mute-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+					cache.updateDescription("mute-reason"+user_id).setExpiration(180000);
 					Hashes.addTempCache(key, cache);
 				}
 				else if(comment.equals("no")) {
@@ -683,7 +674,7 @@ public class UserExecution {
 					message.addField("YES", "Provide a mute time", true);
 					message.addField("NO", "Don't provide a mute time", true);
 					_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a self chosen mute timer? By providing a self chosen mute timer, the warning value won't increment unless the user has been never warned before!").build()).queue();
-					cache.updateDescription("mute-action"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+					cache.updateDescription("mute-action"+user_id).setExpiration(180000);
 					Hashes.addTempCache(key, cache);
 				}
 			}
@@ -692,7 +683,7 @@ public class UserExecution {
 				message.addField("YES", "Provide a mute time", true);
 				message.addField("NO", "Don't provide a mute time", true);
 				_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a self chosen mute timer? By providing a self chosen mute timer, the warning value won't increment unless the user has been never warned before!").build()).queue();
-				cache.updateDescription("mute-action"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).updateDescription2(_message).setExpiration(180000);
+				cache.updateDescription("mute-action"+user_id).updateDescription2(_message).setExpiration(180000);
 				Hashes.addTempCache(key, cache);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("mute-action")) {
@@ -702,13 +693,12 @@ public class UserExecution {
 							+ "to set the time in minutes: eg. **1m**\n"
 							+ "to set the time in hours: eg.**1h**\n"
 							+ "to set the time in days: eg. **1d**").build()).queue();
-					cache.updateDescription("mute-time"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+					cache.updateDescription("mute-time"+user_id).setExpiration(180000);
 					Hashes.addTempCache(key, cache);
 				}
 				else if(comment.equals("no")) {
 					var mute_role_id = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 					if(mute_role_id != null) {
-						var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 						if(_e.getGuild().getMemberById(user_id) != null) {
 							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
 							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id.getRole_ID())).queue();
@@ -719,7 +709,7 @@ public class UserExecution {
 						}
 						else {
 							_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the mute role after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
-							cache.updateDescription("mute-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+							cache.updateDescription("mute-delay"+user_id).setExpiration(180000);
 							Hashes.addTempCache(key, cache);
 						}
 					}
@@ -745,7 +735,6 @@ public class UserExecution {
 					Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
 					var mute_role_id = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 					if(mute_role_id != null) {
-						long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 						if(_e.getGuild().getMemberById(user_id) != null) {
 							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(""+mute_time, _e.getMember().getAsMention(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
 							if(cache.getAdditionalInfo2().length() > 0) {
@@ -774,7 +763,7 @@ public class UserExecution {
 						}
 						else {
 							_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the mute role after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
-							cache.updateDescription("mute-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000).updateDescription3(""+mute_time);
+							cache.updateDescription("mute-delay"+user_id).setExpiration(180000).updateDescription3(""+mute_time);
 							Hashes.addTempCache(key, cache);
 						}
 					}
@@ -790,8 +779,7 @@ public class UserExecution {
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("mute-delay")) {
 				if(_message.equalsIgnoreCase("yes")) {
 					_e.getChannel().sendMessage(message.setDescription("Mute reminder has been set!").build()).queue();
-					var user_id = cache.getAdditionalInfo().replaceAll("[^0-9]*", "");
-					Hashes.addRejoinTask(_e.getGuild().getId()+"_"+user_id, new RejoinTask(Long.parseLong(user_id), _e.getGuild().getIdLong(), cache.getAdditionalInfo3(), _e.getMember().getAsMention(), "mute", cache.getAdditionalInfo2()));
+					Hashes.addRejoinTask(_e.getGuild().getId()+"_"+user_id, new RejoinTask(user_id, _e.getGuild().getIdLong(), cache.getAdditionalInfo3(), _e.getMember().getAsMention(), "mute", cache.getAdditionalInfo2()));
 					Hashes.clearTempCache(key);
 				}
 				else if(_message.equalsIgnoreCase("no")) {
@@ -800,7 +788,6 @@ public class UserExecution {
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban")) {
-				long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 				if(comment.equals("yes")) {
 					message.setTitle("You chose to provide a reason!");
 					_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
@@ -834,7 +821,7 @@ public class UserExecution {
 						}
 						else {
 							_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the ban after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
-							cache.updateDescription("ban-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).updateDescription2("No reason has been provided!").setExpiration(180000);
+							cache.updateDescription("ban-delay"+user_id).updateDescription2("No reason has been provided!").setExpiration(180000);
 							Hashes.addTempCache(key, cache);
 						}
 					} catch(HierarchyException hye) {
@@ -844,7 +831,6 @@ public class UserExecution {
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban-reason")) {
-				long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 				int warning_id = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID();
 				int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
 				try {
@@ -871,7 +857,7 @@ public class UserExecution {
 					}
 					else {
 						_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed. Do you wish to apply the ban after the user has rejoined the server?").addField("YES", "", true).addField("NO", "", true).build()).queue();
-						cache.updateDescription("ban-delay"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000).updateDescription2(_message);
+						cache.updateDescription("ban-delay"+user_id).setExpiration(180000).updateDescription2(_message);
 						Hashes.addTempCache(key, cache);
 					}
 				} catch(HierarchyException hye) {
@@ -882,8 +868,7 @@ public class UserExecution {
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban-delay")) {
 				if(_message.equalsIgnoreCase("yes")) {
 					_e.getChannel().sendMessage(message.setDescription("Ban reminder has been set!").build()).queue();
-					var user_id = cache.getAdditionalInfo().replaceAll("[^0-9]*", "");
-					Hashes.addRejoinTask(_e.getGuild().getId()+"_"+user_id, new RejoinTask(Long.parseLong(user_id), _e.getGuild().getIdLong(), "", _e.getMember().getAsMention(), "ban", cache.getAdditionalInfo2()));
+					Hashes.addRejoinTask(_e.getGuild().getId()+"_"+user_id, new RejoinTask(user_id, _e.getGuild().getIdLong(), "", _e.getMember().getAsMention(), "ban", cache.getAdditionalInfo2()));
 					Hashes.clearTempCache(key);
 				}
 				else if(_message.equalsIgnoreCase("no")) {
@@ -895,11 +880,10 @@ public class UserExecution {
 				if(comment.equals("yes")) {
 					message.setTitle("You chose to provide a reason!");
 					_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
-					cache.updateDescription("kick-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+					cache.updateDescription("kick-reason"+user_id).setExpiration(180000);
 					Hashes.addTempCache(key, cache);
 				}
 				else if(comment.equals("no")) {
-					long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 					_e.getChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
 					if(_e.getGuild().getMemberById(user_id) != null) {
 						Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), "No reason has been provided!"));
@@ -919,7 +903,6 @@ public class UserExecution {
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("kick-reason")) {
-				long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 				_e.getChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
 				if(_e.getGuild().getMemberById(user_id) != null) {
 					Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
@@ -936,13 +919,8 @@ public class UserExecution {
 					_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Action cannot be executed because the user can't be found on the server!").build()).queue();
 					Hashes.clearTempCache(key);
 				}
-				try {
-				} catch(IllegalArgumentException iae) {
-					
-				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("watch")) {
-				long user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 				if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserUseWatchChannelLevel(_e.getGuild().getIdLong())) || _e.getMember().getUser().getIdLong() == GuildIni.getAdmin(_e.getGuild().getIdLong())) {
 					var trash_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 					var watch_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("wat")).findAny().orElse(null);
@@ -1031,7 +1009,7 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*",	"").equals("gift-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
+					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
 					long experience = Integer.parseInt(_message);
 					long totExperience = 0;
 					long currentExperience = 0;
@@ -1082,7 +1060,7 @@ public class UserExecution {
 							_e.getChannel().sendMessage("Roles won't be updated because user isn't present in this guild!").queue();
 						}
 						_e.getChannel().sendMessage("Experience points have been updated!").queue();
-						logger.debug("{} has gifted {} experience points to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+						logger.debug("{} has gifted {} experience points to {} in guild {}", _e.getMember().getUser().getId(), _message, user_id, _e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {
@@ -1093,7 +1071,7 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("set-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
+					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
 					long experience = Long.parseLong(_message);
 					long totExperience = 0;
 					long currentExperience = 0;
@@ -1144,7 +1122,7 @@ public class UserExecution {
 							_e.getChannel().sendMessage("Roles won't be updated because user isn't present in this guild!").queue();
 						}
 						_e.getChannel().sendMessage("Experience points have been updated!").queue();
-						logger.debug("{} has set {} experience points to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+						logger.debug("{} has set {} experience points to {} in guild {}", _e.getMember().getUser().getId(), _message, user_id, _e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {
@@ -1157,7 +1135,7 @@ public class UserExecution {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					int level = Integer.parseInt(_message);
 					if(level <= guild_settings.getMaxLevel()) {
-						Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
+						Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
 						long experience = 0;
 						long rankUpExperience = 0;
 						long assign_role = 0;
@@ -1200,7 +1178,7 @@ public class UserExecution {
 								_e.getChannel().sendMessage("Roles won't be updated because user isn't present in this guild!").queue();
 							}
 							_e.getChannel().sendMessage("The level has been updated!").queue();
-							logger.debug("{} has set the level {} to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+							logger.debug("{} has set the level {} to {} in guild {}", _e.getMember().getUser().getId(), _message, user_id, _e.getGuild().getId());
 							Hashes.clearTempCache(key);
 						}
 						else {
@@ -1215,14 +1193,14 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("gift-currency")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
+					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(user_details.getCurrency()+currency);
 					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getCurrency()) > 0) {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money gifted", "User received money in value of "+currency+" "+guild_settings.getCurrency());
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						_e.getChannel().sendMessage("Currency has been updated!").queue();
-						logger.debug("{} has gifted {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+						logger.debug("{} has gifted {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, user_id, _e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {
@@ -1233,14 +1211,14 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("set-currency")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", "")), _e.getGuild().getIdLong());
+					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(currency);
 					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getCurrency()) > 0) {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money set", "Currency value for the user has been changed to "+currency+" "+guild_settings.getCurrency());
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						_e.getChannel().sendMessage("Currency has been updated!").queue();
-						logger.debug("{} has set {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
+						logger.debug("{} has set {} currency value to {} in guild {}", _e.getMember().getUser().getId(), _message, user_id, _e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {
@@ -1287,10 +1265,11 @@ public class UserExecution {
 			EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 			int value = (passValue ? messagesCount : Integer.parseInt(_message));
 			if(value == 0) {
-				_e.getChannel().sendMessage("You chose to not remove any messages at all!").queue();
+				_e.getChannel().sendMessage("You chose to not remove any messages!").queue();
 			}
 			else if(value > 100) {
 				_e.getChannel().sendMessage("Please choose a number between 1 and 100!").queue();
+				return;
 			}
 			else {
 				List<ArrayList<Messages>> messages = Hashes.getWholeMessagePool().values().parallelStream().filter(f -> f.get(0).getUserID() == user_id && f.get(0).getGuildID() == _e.getGuild().getIdLong()).collect(Collectors.toList());
