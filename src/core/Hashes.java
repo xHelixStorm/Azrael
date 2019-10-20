@@ -86,6 +86,8 @@ public class Hashes {
     private static final ConcurrentHashMap<Long, Boolean> heavyCensoring = new ConcurrentHashMap<Long, Boolean>();
     private static final ConcurrentHashMap<Long, ArrayList<String>> censorMessage = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final ConcurrentHashMap<Long, Guilds> old_guild_settings = new ConcurrentHashMap<Long, Guilds>();
+    private static final ConcurrentHashMap<Long, String> filter_threshold = new ConcurrentHashMap<Long, String>();
+    private static final ConcurrentHashMap<Long, Thread> heavyCensoringThread = new ConcurrentHashMap<Long, Thread>();
 	
 	public static void addMessagePool(long _message_id, ArrayList<Messages> _messages) {
 		message_pool.put(_message_id, _messages);
@@ -203,6 +205,12 @@ public class Hashes {
 	}
 	public static void addOldGuildSettings(Long _key, Guilds _guild) {
 		old_guild_settings.put(_key, _guild);
+	}
+	public static void addFilterThreshold(Long _key, String _count) {
+		filter_threshold.put(_key, _count);
+	}
+	public static void addHeavyCensoringThread(Long _key, Thread _thread) {
+		heavyCensoringThread.put(_key, _thread);
 	}
 	
 	
@@ -334,6 +342,12 @@ public class Hashes {
 	}
 	public static Guilds getOldGuildSettings(Long _key) {
 		return old_guild_settings.get(_key);
+	}
+	public static String getFilterThreshold(Long _key) {
+		return filter_threshold.get(_key);
+	}
+	public static Thread getHeavyCensoringThread(Long _key) {
+		return heavyCensoringThread.get(_key);
 	}
 	
 	public static void removeMessagePool(long _message_id) {
@@ -484,5 +498,14 @@ public class Hashes {
 	}
 	public static void removeStatus(long _key) {
 		status.remove(_key);
+	}
+	public static void removeCensoreMessage(long _key) {
+		censorMessage.remove(_key);
+	}
+	public static void removeFilterThreshold(long _key) {
+		filter_threshold.remove(_key);
+	}
+	public static void removeHeavyCensoringThread(long _key) {
+		heavyCensoringThread.remove(_key);
 	}
 }
