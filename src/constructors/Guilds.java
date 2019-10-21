@@ -21,6 +21,51 @@ public class Guilds {
 	private int theme_id;
 	private String currency;
 	private long randomshop_price;
+	
+	private int inventory_startx;
+	private int inventory_starty;
+	private int inventory_tabx;
+	private int inventory_taby;
+	private int inventory_page_font_size;
+	private int inventory_pagex;
+	private int inventory_pagey;
+	private int inventory_text_font_size;
+	private int inventory_box_sizex;
+	private int inventory_box_sizey;
+	private int inventory_descriptiony;
+	private int inventory_item_sizex;
+	private int inventory_item_sizey;
+	private int inventory_next_boxx;
+	private int inventory_next_boxy;
+	private int inventory_expiration_positiony;
+	private int inventory_row_limit;
+	private int inventory_max_items;
+	
+	private int randomshop_startx;
+	private int randomshop_starty;
+	private int randomshop_pagex;
+	private int randomshop_pagey;
+	private int randomshop_text_font_size;
+	private int randomshop_box_sizex;
+	private int randomshop_box_sizey;
+	private int randomshop_item_sizex;
+	private int randomshop_item_sizey;
+	private int randomshop_next_boxx;
+	private int randomshop_next_boxy;
+	private int randomshop_row_limit;
+	private int randomshop_max_items;
+	private int randomshop_reward_item_sizex;
+	private int randomshop_reward_item_sizey;
+	
+	private int daily_rewardx;
+	private int daily_rewardy;
+	private int daily_text_font_size;
+	private int daily_description_mode;
+	private int daily_descriptionx;
+	private int daily_descriptiony;
+	private int daily_description_startx;
+	private int daily_field_sizex;
+	
 	private long messageTimeout;
 	
 	public void setName(String _name) {

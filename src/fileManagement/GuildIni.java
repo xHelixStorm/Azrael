@@ -288,7 +288,9 @@ public class GuildIni {
 	
 	public static void verifyIni(long guild_id) {
 		Ini ini = readIni(guild_id);
+		Set<String> keyFound = new HashSet<String>();
 		ini.forEach((key, values) -> {
+			keyFound.add(key);
 			LinkedHashMap<String, String> currentSection = fileContent.get(key);
 			if(currentSection != null) {
 				Set<String> subKeyFound = new HashSet<String>();
@@ -305,6 +307,14 @@ public class GuildIni {
 			}
 			else {
 				System.out.println("Current placeholder to remove: "+key+" "+values);
+			}
+		});
+		fileContent.forEach((key, values) -> {
+			if(!keyFound.contains(key)) {
+				ini.add(key);
+				values.forEach((subKey, value) -> {
+					ini.add(key, subKey, value);
+				});
 			}
 		});
 		
