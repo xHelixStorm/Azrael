@@ -49,7 +49,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 											emoteFound = true;
 											break;
 										}
-										if(i == 9) break;
+										if(i == 8) break;
 									}
 									if(emoteFound == false) {
 										int emote = STATIC.returnEmote(reactionName);
