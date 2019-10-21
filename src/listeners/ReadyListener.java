@@ -55,6 +55,7 @@ public class ReadyListener extends ListenerAdapter {
 		System.out.println("Azrael Version: "+STATIC.getVersion()+"\nAll credits to xHelixStorm");
 		System.out.println();
 		
+		GuildIni.initialize();
 		STATIC.loginTwitter();
 
 		var themesRetrieved = true;
@@ -63,9 +64,11 @@ public class ReadyListener extends ListenerAdapter {
 			logger.error("Themes couldn't be retried from RankingSystem.themes");
 		}
 		for(Guild guild : e.getJDA().getGuilds()) {
-			if(!new File("ini/"+guild.getId()+".ini").exists()) {
+			if(!new File("ini/"+guild.getId()+".ini").exists())
 				GuildIni.createIni(guild.getIdLong());
-			}
+			else
+				GuildIni.verifyIni(guild.getIdLong());
+			
 			FileSetting.createGuildDirectory(guild);
 			if(Azrael.SQLgetGuild(guild.getIdLong()) == 0) {
 				if(Azrael.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {

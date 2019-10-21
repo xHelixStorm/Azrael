@@ -86,6 +86,7 @@ public class Main {
 			if(args[0].equals("list")) {
 				System.out.println("These are all available parameters. If nothing has been provided, the values from config.ini will be taken:\n\n"
 						+ "admin:<NUMERIC> (17/18 digit long user id that defines the admin for shutdown and reboot)\n"
+						+ "timezone:<String> (timezone location like 'Europe/Berlin' for mysql databases)"
 						+ "actionlog:<BOOLEAN> (true/false parameter to log actions related to the ranking system and other updates)\n"
 						+ "doubleexperience:<BOOLEAN> (true/false parameter to either enable or disable double experience events)\n"
 						+ "doubleexperiencestart:<WEEKDAY> (Regular days from Monday to Sunday as parameter to define the start day of double experience events)\n"
@@ -103,28 +104,31 @@ public class Main {
 					STATIC.setSessionName(args[1].trim());
 				if(args.length > 2) {
 					for(final var argument : args) {
-						if(argument.toLowerCase().startsWith("admin:"))
+						final var currentArgument = argument.toLowerCase();
+						if(currentArgument.startsWith("admin:"))
 							STATIC.setAdmin(Long.parseLong(argument.split(":")[1].trim()));
-						if(argument.toLowerCase().startsWith("actionlog:"))
+						if(currentArgument.startsWith("timezone:"))
+							STATIC.setTimezone(argument.split(":")[1].trim());
+						if(currentArgument.startsWith("actionlog:"))
 							STATIC.setActionLog(argument.split(":")[1].trim());
-						if(argument.toLowerCase().startsWith("doubleexperience:"))
+						if(currentArgument.startsWith("doubleexperience:"))
 							STATIC.setDoubleExperience(argument.split(":")[1].trim());
-						if(argument.toLowerCase().startsWith("doubleexperiencestart:"))
+						if(currentArgument.startsWith("doubleexperiencestart:"))
 							STATIC.setDoubleExperienceStart(argument.split(":")[1].trim());
-						if(argument.toLowerCase().startsWith("doubleexperienceend:"))
+						if(currentArgument.startsWith("doubleexperienceend:"))
 							STATIC.setDoubleExperienceEnd(argument.split(":")[1].trim());
-						if(argument.toLowerCase().startsWith("countmembers:"))
+						if(currentArgument.startsWith("countmembers:"))
 							STATIC.setCountMembers(argument.split(":")[1].trim());
-						if(argument.toLowerCase().startsWith("filelogger:"))
+						if(currentArgument.startsWith("filelogger:"))
 							STATIC.setFileLogger(argument.split(":")[1].trim());
-						if(argument.toLowerCase().startsWith("gamemessage:")) {
+						if(currentArgument.startsWith("gamemessage:")) {
 							var splitMessage = argument.split(":")[1].split("-");
 							StringBuilder message = new StringBuilder();
 							for(final var split : splitMessage)
 								message.append(split+" ");
 							STATIC.setGameMessage(message.toString().trim());
 						}
-						if(argument.toLowerCase().startsWith("temp:"))
+						if(currentArgument.startsWith("temp:"))
 							STATIC.setTemp(argument.split(":")[1].trim());
 					}
 				}

@@ -24,7 +24,7 @@ public class ShutDown implements CommandPublic {
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
-			e.getChannel().sendMessage("**shutting down now. Cya later!**").queue();
+			e.getChannel().sendMessage("**shutting down now. Cya later!**").complete();
 			e.getJDA().shutdown();
 		}
 		else {

@@ -27,12 +27,29 @@ public class IniFileReader {
 		return ini.get("Bot", "Token");
 	}
 	public static long getAdmin() {
-		if(STATIC.getAdmin() != 0) {
-			return STATIC.getAdmin();
+		var admin = STATIC.getAdmin();
+		if(admin > 0) {
+			return admin;
 		}
 		else {
 			Ini ini = readConfig();
-			return ini.get("Bot", "Admin", long.class);
+			admin = ini.get("Bot", "Admin", long.class);
+			STATIC.setAdmin(admin);
+			return admin;
+		}
+	}
+	public static String getTimezone() {
+		var timezone = STATIC.getTimezone();
+		if(timezone.length() > 0) {
+			return timezone;
+		}
+		else {
+			Ini ini = readConfig();
+			timezone = ini.get("Bot", "Timezone");
+			if(timezone.length() == 0)
+				timezone = "UTC";
+			STATIC.setTimezone(timezone);
+			return timezone;
 		}
 	}
 	public static boolean getCountMembers() {
@@ -85,7 +102,9 @@ public class IniFileReader {
 			return temp;
 		else {
 			Ini ini = readConfig();
-			return ini.get("Bot", "TempDirectory");
+			temp = ini.get("Bot", "TempDirectory");
+			STATIC.setTemp(temp);
+			return temp;
 		}
 	}
 	
@@ -226,9 +245,9 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Kick");
 	}
-	public static String getCatchedThumbnail() {
+	public static String getCaughtThumbnail() {
 		Ini ini = readConfig();
-		return ini.get("Thumbnails", "Catched");
+		return ini.get("Thumbnails", "Caught");
 	}
 	public static String getFalseAlarmThumbnail() {
 		Ini ini = readConfig();

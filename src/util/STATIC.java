@@ -40,10 +40,11 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.8.337";
+	private static final String VERSION = "6.8.338";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
+	private static String TIMEZONE = "";
 	private static String ACTIONLOG = "";
 	private static String DOUBLEEXPERIENCE = "";
 	private static String DOUBLEEXPERIENCESTART = "";
@@ -61,7 +62,7 @@ public class STATIC {
 	}
 	
 	public static String getDatabaseURL(final String _dbName, final String _ip) {
-		return "jdbc:mysql://"+_ip+"/"+_dbName+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin";
+		return "jdbc:mysql://"+_ip+"/"+_dbName+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="+IniFileReader.getTimezone();
 	}
 	
 	public static void setToken(String _token) {
@@ -83,6 +84,13 @@ public class STATIC {
 	}
 	public static long getAdmin() {
 		return ADMIN;
+	}
+	
+	public static void setTimezone(String _timezone) {
+		TIMEZONE = _timezone;
+	}
+	public static String getTimezone() {
+		return TIMEZONE;
 	}
 	
 	public static void setActionLog(String _actionLog) {

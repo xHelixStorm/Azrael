@@ -21,7 +21,7 @@ public class Reboot implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
-			e.getChannel().sendMessage("**Now rebooting!**").queue();
+			e.getChannel().sendMessage("**Now rebooting!**").complete();
 			e.getJDA().shutdown();
 		}
 		else {

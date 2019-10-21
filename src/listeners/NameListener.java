@@ -64,7 +64,7 @@ public class NameListener extends ListenerAdapter {
 									if(!word.getKick()) {
 										String nickname = Azrael.SQLgetRandomName(guild_id);
 										e.getJDA().getGuildById(guild_id).modifyNickname(member, nickname).queue();
-										message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("Not allowed name change found!");
+										message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("Not allowed name change found!");
 										if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
 										updateNickname(member, guild, nickname);
 									}
@@ -73,7 +73,7 @@ public class NameListener extends ListenerAdapter {
 											e.getUser().openPrivateChannel().complete().sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").complete();
 											e.getJDA().getGuildById(guild_id).kick(member).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
 											Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", "Kicked for having an invalid word inside his name!", 0);
-											message.setColor(Color.RED).setThumbnail(IniFileReader.getCatchedThumbnail()).setTitle("User kicked for having a not allowed name!");
+											message.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("User kicked for having a not allowed name!");
 											if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** and was kicked for containing the following word in his name: **"+word.getName().toUpperCase()+"**").build()).queue();
 										}
 									}
