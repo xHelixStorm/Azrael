@@ -131,6 +131,129 @@ public class Guilds {
 	public void setMessageTimeout(long _messageTimeout) {
 		this.messageTimeout = _messageTimeout;
 	}
+	public void setInventoryStartX(int _inventory_startx) {
+		this.inventory_startx = _inventory_startx;
+	}
+	public void setInventoryStartY(int _inventory_starty) {
+		this.inventory_starty = _inventory_starty;
+	}
+	public void setInventoryTabX(int _inventory_tabx) {
+		this.inventory_tabx = _inventory_tabx;
+	}
+	public void setInventoryTabY(int _inventory_taby) {
+		this.inventory_taby = _inventory_taby;
+	}
+	public void setInventoryPageFontSize(int _inventory_page_font_size) {
+		this.inventory_page_font_size = _inventory_page_font_size;
+	}
+	public void setInventoryPageX(int _inventory_pagex) {
+		this.inventory_pagex = _inventory_pagex;
+	}
+	public void setInventoryPageY(int _inventory_pagey) {
+		this.inventory_pagey = _inventory_pagey;
+	}
+	public void setInventoryTextFontSize(int _inventory_text_font_size) {
+		this.inventory_text_font_size = _inventory_text_font_size;
+	}
+	public void setInventoryBoxSizeX(int _inventory_box_sizex) {
+		this.inventory_box_sizex = _inventory_box_sizex;
+	}
+	public void setInventoryBoxSizeY(int _inventory_box_sizey) {
+		this.inventory_box_sizey = _inventory_box_sizey;
+	}
+	public void setInventoryDescriptionY(int _inventory_descriptiony) {
+		this.inventory_descriptiony = _inventory_descriptiony;
+	}
+	public void setInventoryItemSizex(int _inventory_item_sizex) {
+		this.inventory_item_sizex = _inventory_item_sizex;
+	}
+	public void setInventoryItemSizey(int _inventory_item_sizey) {
+		this.inventory_item_sizey = _inventory_item_sizey;
+	}
+	public void setInventoryNextBoxX(int _inventory_next_boxx) {
+		this.inventory_next_boxx = _inventory_next_boxx;
+	}
+	public void setInventoryNextBoxY(int _inventory_next_boxy) {
+		this.inventory_next_boxy = _inventory_next_boxy;
+	}
+	public void setInventoryExpirationPositionY(int _inventory_expiration_positiony) {
+		this.inventory_expiration_positiony = _inventory_expiration_positiony;
+	}
+	public void setInventoryRowLimit(int _inventory_row_limit) {
+		this.inventory_row_limit = _inventory_row_limit;
+	}
+	public void setInventoryMaxItems(int _inventory_max_items) {
+		this.inventory_max_items = _inventory_max_items;
+	}
+	public void setRandomshopStartX(int _randomshop_startx) {
+		this.randomshop_startx = _randomshop_startx;
+	}
+	public void setRandomshopStartY(int _randomshop_starty) {
+		this.randomshop_starty = _randomshop_starty;
+	}
+	public void setRandomshopPageX(int _randomshop_pagex) {
+		this.randomshop_pagex = _randomshop_pagex;
+	}
+	public void setRandomshopPageY(int _randomshop_pagey) {
+		this.randomshop_pagey = _randomshop_pagey;
+	}
+	public void setRandomshopTextFontSize(int _randomshop_text_font_size) {
+		this.randomshop_text_font_size = _randomshop_text_font_size;
+	}
+	public void setRandomshopBoxSizeX(int _randomshop_box_sizex) {
+		this.randomshop_box_sizex = _randomshop_box_sizex;
+	}
+	public void setRandomshopBoxSizeY(int _randomshop_box_sizey) {
+		this.randomshop_box_sizey = _randomshop_box_sizey;
+	}
+	public void setRandomshopItemSizeX(int _randomshop_item_sizex) {
+		this.randomshop_item_sizex = _randomshop_item_sizex;
+	}
+	public void setRandomshopItemSizeY(int _randomshop_item_sizey) {
+		this.randomshop_item_sizey = _randomshop_item_sizey;
+	}
+	public void setRandomshopNextBoxX(int _randomshop_next_boxx) {
+		this.randomshop_next_boxx = _randomshop_next_boxx;
+	}
+	public void setRandomshopNextBoxY(int _randomshop_next_boxy) {
+		this.randomshop_next_boxy = _randomshop_next_boxy;
+	}
+	public void setRandomshopRowLimit(int _randomshop_row_limit) {
+		this.randomshop_row_limit = _randomshop_row_limit;
+	}
+	public void setRandomshopMaxItems(int _randomshop_max_items) {
+		this.randomshop_max_items = _randomshop_max_items;
+	}
+	public void setRandomshopRewardItemSizeX(int _randomshop_reward_item_sizex) {
+		this.randomshop_reward_item_sizex = _randomshop_reward_item_sizex;
+	}
+	public void setRandomshopRewardItemSizeY(int _randomshop_reward_item_sizey) {
+		this.randomshop_reward_item_sizey = _randomshop_reward_item_sizey;
+	}
+	public void setDailyRewardX(int _daily_rewardx) {
+		this.daily_rewardx = _daily_rewardx;
+	}
+	public void setDailyRewardY(int _daily_rewardy) {
+		this.daily_rewardy = _daily_rewardy;
+	}
+	public void setDailyTextFontSize(int _daily_text_font_size) {
+		this.daily_text_font_size = _daily_text_font_size;
+	}
+	public void setDailyDescriptionMode(int _daily_description_mode) {
+		this.daily_description_mode = _daily_description_mode;
+	}
+	public void setDailyDescriptionX(int _daily_descriptionx) {
+		this.daily_descriptionx = _daily_descriptionx;
+	}
+	public void setDailyDescriptionY(int _daily_descriptiony) {
+		this.daily_descriptiony = _daily_descriptiony;
+	}
+	public void setDailyDescriptionStartX(int _daily_description_startx) {
+		this.daily_description_startx = _daily_description_startx;
+	}
+	public void setDailyFieldSizeX(int _daily_field_sizex) {
+		this.daily_field_sizex = _daily_field_sizex;
+	}
 	
 	public String getName() {
 		return this.name;
@@ -194,5 +317,128 @@ public class Guilds {
 	}
 	public long getMessageTimeout() {
 		return this.messageTimeout;
+	}
+	public int getInventoryStartX() {
+		return this.inventory_startx;
+	}
+	public int getInventoryStartY() {
+		return this.inventory_starty;
+	}
+	public int getInventoryTabX() {
+		return this.inventory_tabx;
+	}
+	public int getInventoryTabY() {
+		return this.inventory_taby;
+	}
+	public int getInventoryPageFontSize() {
+		return this.inventory_page_font_size;
+	}
+	public int getInventoryPageX() {
+		return this.inventory_pagex;
+	}
+	public int getInventoryPageY() {
+		return this.inventory_pagey;
+	}
+	public int getInventoryTextFontSize() {
+		return this.inventory_text_font_size;
+	}
+	public int getInventoryBoxSizeX() {
+		return this.inventory_box_sizex;
+	}
+	public int getInventoryBoxSizeY() {
+		return this.inventory_box_sizey;
+	}
+	public int getInventoryDescriptionY() {
+		return this.inventory_descriptiony;
+	}
+	public int getInventoryItemSizeX() {
+		return this.inventory_item_sizex;
+	}
+	public int getInventoryItemSizeY() {
+		return this.inventory_item_sizey;
+	}
+	public int getInventoryNextBoxX() {
+		return this.inventory_next_boxx;
+	}
+	public int getInventoryNextBoxY() {
+		return this.inventory_next_boxy;
+	}
+	public int getInventoryExpirationPositionY() {
+		return this.inventory_expiration_positiony;
+	}
+	public int getInventoryRowLimit() {
+		return this.inventory_row_limit;
+	}
+	public int getInventoryMaxItems() {
+		return this.inventory_max_items;
+	}
+	public int getRandomshopStartX() {
+		return this.randomshop_startx;
+	}
+	public int getRandomshopStartY() {
+		return this.randomshop_starty;
+	}
+	public int getRandomshopPageX() {
+		return this.randomshop_pagex;
+	}
+	public int getRandomshopPageY() {
+		return this.randomshop_pagey;
+	}
+	public int getRandomshopTextFontSize() {
+		return this.randomshop_text_font_size;
+	}
+	public int getRandomshopBoxSizeX() {
+		return this.randomshop_box_sizex;
+	}
+	public int getRandomshopBoxSizeY() {
+		return this.randomshop_box_sizey;
+	}
+	public int getRandomshopItemSizeX() {
+		return this.randomshop_item_sizex;
+	}
+	public int getRandomshopItemSizeY() {
+		return this.randomshop_item_sizey;
+	}
+	public int getRandomshopNextBoxX() {
+		return this.randomshop_next_boxx;
+	}
+	public int getRandomshopNextBoxY() {
+		return this.randomshop_next_boxy;
+	}
+	public int getRandomshopRowLimit() {
+		return this.randomshop_row_limit;
+	}
+	public int getRandomshopMaxItems() {
+		return this.randomshop_max_items;
+	}
+	public int getRandomshopRewardItemSizeX() {
+		return this.randomshop_reward_item_sizex;
+	}
+	public int getRandomshopRewardItemSizeY() {
+		return this.randomshop_reward_item_sizey;
+	}
+	public int getDailyRewardX() {
+		return this.daily_rewardx;
+	}
+	public int getDailyRewardY() {
+		return this.daily_rewardy;
+	}
+	public int getDailyTextFontSize() {
+		return this.daily_text_font_size;
+	}
+	public int getDailyDescriptionMode() {
+		return this.daily_description_mode;
+	}
+	public int getDailyDescriptionX() {
+		return this.daily_descriptionx;
+	}
+	public int getDailyDescriptionY() {
+		return this.daily_descriptiony;
+	}
+	public int getDailyDescriptionStartX() {
+		return this.daily_description_startx;
+	}
+	public int getDailyFieldSizeX() {
+		return this.daily_field_sizex;
 	}
 }

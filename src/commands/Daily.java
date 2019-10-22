@@ -88,7 +88,7 @@ public class Daily implements CommandPublic {
 								list.add(this_daily);
 						}
 					}
-					DrawDaily.draw(e, list.get(random).getDescription(), guild_settings.getThemeID());
+					DrawDaily.draw(e, list.get(random).getDescription(), guild_settings);
 					long time = System.currentTimeMillis();
 					Timestamp timestamp = new Timestamp(time);
 					LocalTime midnight = LocalTime.MIDNIGHT;

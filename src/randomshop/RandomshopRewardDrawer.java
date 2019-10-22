@@ -10,24 +10,24 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.Guilds;
 import constructors.Weapons;
-import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class RandomshopRewardDrawer {
 	private final static Logger logger = LoggerFactory.getLogger(RandomshopRewardDrawer.class);
 	
-	public static void drawReward(GuildMessageReceivedEvent e, Weapons weapon, long currency, int theme_id) {
+	public static void drawReward(GuildMessageReceivedEvent e, Weapons weapon, long currency, Guilds guild_settings) {
 		try {
+			var theme_id = guild_settings.getThemeID();
 			BufferedImage rewardOverlay = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Randomshop/"+weapon.getOverlayName()+".png"));
 			BufferedImage drawWeapon = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Weapons/"+weapon.getDescription()+".png"));
 			
-			int[] rand = GuildIni.getWholeRandomshopReward(e.getGuild().getIdLong());
 			final int overlayW = rewardOverlay.getWidth();
 			final int overlayH = rewardOverlay.getHeight();
-			final int itemSizeX = rand[0];
-			final int itemSizeY = rand[1];
+			final int itemSizeX = guild_settings.getRandomshopRewardItemSizeX();
+			final int itemSizeY = guild_settings.getRandomshopRewardItemSizeY();
 			final int rewardX = (overlayW/2)-((itemSizeX != 0 ? itemSizeX : drawWeapon.getWidth())/2);
 			final int rewardY = (overlayH/2)-((itemSizeY != 0 ? itemSizeY : drawWeapon.getHeight())/2);
 			

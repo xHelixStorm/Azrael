@@ -232,54 +232,6 @@ public class GuildIni {
 				ini.add("CommandLevels", key, value);
 			});
 			
-			//Inventory
-			ini.add("Inventory", "startX", "0");
-			ini.add("Inventory", "startY", "0");
-			ini.add("Inventory", "tabX", "0");
-			ini.add("Inventory", "tabY", "0");
-			ini.add("Inventory", "pageFontSize", "12");
-			ini.add("Inventory", "pageX", "0");
-			ini.add("Inventory", "pageY", "0");
-			ini.add("Inventory", "generalTextFontSize", "0");
-			ini.add("Inventory", "boxSizeX", "0");
-			ini.add("Inventory", "boxSizeY", "0");
-			ini.add("Inventory", "itemSizeX", "0");
-			ini.add("Inventory", "itemSizeY", "0");
-			ini.add("Inventory", "nextBoxX", "0");
-			ini.add("Inventory", "nextBoxY", "0");
-			ini.add("Inventory", "expiration-positionY", "0");
-			ini.add("Inventory", "rowLimit", "0");
-			ini.add("Inventory", "maxItems", "0");
-			
-			//RandomshopItems
-			ini.add("RandomshopItems", "startX", "0");
-			ini.add("RandomshopItems", "startY", "0");
-			ini.add("RandomshopItems", "pageX", "0");
-			ini.add("RandomshopItems", "pageY", "0");
-			ini.add("RandomshopItems", "generalFontSize", "12");
-			ini.add("RandomshopItems", "boxSizeX", "0");
-			ini.add("RandomshopItems", "boxSizeY", "0");
-			ini.add("RandomshopItems", "nextBoxX", "0");
-			ini.add("RandomshopItems", "nextBoxY", "0");
-			ini.add("RandomshopItems", "itemSizeX", "0");
-			ini.add("RandomshopItems", "itemSizeY", "0");
-			ini.add("RandomshopItems", "rowLimit", "0");
-			ini.add("RandomshopItems", "maxItems", "0");
-			
-			//RandomshopReward
-			ini.add("RandomshopReward", "itemSizeX", "0");
-			ini.add("RandomshopReward", "itemSizeY", "0");
-			
-			//Daily
-			ini.add("Daily", "rewardX", "0");
-			ini.add("Daily", "rewardY", "0");
-			ini.add("Daily", "generalTextFontSize", "12");
-			ini.add("Daily", "descriptionMode", "0");
-			ini.add("Daily", "descriptionX", "0");
-			ini.add("Daily", "descriptionY", "0");
-			ini.add("Daily", "descriptionStartX", "0");
-			ini.add("Daily", "fieldSizeX", "0");
-			
 			ini.store(new File("ini/"+guild_id+".ini"));
 		} catch (IOException e) {
 			logger.error("Error while creating guild ini file {}.ini", guild_id, e);
@@ -306,7 +258,7 @@ public class GuildIni {
 				});
 			}
 			else {
-				System.out.println("Current placeholder to remove: "+key+" "+values);
+				ini.remove(key);
 			}
 		});
 		fileContent.forEach((key, values) -> {
@@ -931,82 +883,5 @@ public class GuildIni {
 	public static int getHeavyCensoringLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "HeavyCensoring", int.class);
-	}
-	
-	public static int[] getWholeInventory(long guild_id) {
-		Ini ini = readIni(guild_id);
-		Ini.Section inventory = ini.get("Inventory");
-		int[] inven = new int[17];
-		inven[0] = inventory.get("startX", int.class);
-		inven[1] = inventory.get("startY", int.class);
-		inven[2] = inventory.get("tabX", int.class);
-		inven[3] = inventory.get("tabY", int.class);
-		inven[4] = inventory.get("pageFontSize", int.class);
-		inven[5] = inventory.get("pageX", int.class);
-		inven[6] = inventory.get("pageY", int.class);
-		inven[7] = inventory.get("generalTextFontSize", int.class);
-		inven[8] = inventory.get("boxSizeX", int.class);
-		inven[9] = inventory.get("boxSizeY", int.class);
-		inven[10] = inventory.get("descriptionY", int.class);
-		inven[11] = inventory.get("itemSizeX", int.class);
-		inven[12] = inventory.get("itemSizeY", int.class);
-		inven[13] = inventory.get("nextBoxX", int.class);
-		inven[14] = inventory.get("nextBoxY", int.class);
-		inven[15] = inventory.get("expiration-positionY", int.class);
-		inven[16] = inventory.get("rowLimit", int.class);
-		return inven;
-	}
-	
-	public static int getInventoryMaxItems(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("Inventory", "maxItems", int.class);
-	}
-	
-	public static int[] getWholeRandomshopItems(long guild_id) {
-		Ini ini = readIni(guild_id);
-		Ini.Section randomshop = ini.get("RandomshopItems");
-		int[] rand = new int[12];
-		rand[0] = randomshop.get("startX", int.class);
-		rand[1] = randomshop.get("startY", int.class);
-		rand[2] = randomshop.get("pageX", int.class);
-		rand[3] = randomshop.get("pageY", int.class);
-		rand[4] = randomshop.get("generalTextFontSize", int.class);
-		rand[5] = randomshop.get("boxSizeX", int.class);
-		rand[6] = randomshop.get("boxSizeY", int.class);
-		rand[7] = randomshop.get("itemSizeX", int.class);
-		rand[8] = randomshop.get("itemSizeY", int.class);
-		rand[9] = randomshop.get("nextBoxX", int.class);
-		rand[10] = randomshop.get("nextBoxY", int.class);
-		rand[11] = randomshop.get("rowLimit", int.class);
-		return rand;
-	}
-	
-	public static int getRandomshopItemsMaxItems(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("RandomshopItems", "maxItems", int.class);
-	}
-	
-	public static int[] getWholeRandomshopReward(long guild_id) {
-		Ini ini = readIni(guild_id);
-		Ini.Section randomshop = ini.get("RandomshopReward");
-		int[] rand = new int[2];
-		rand[0] = randomshop.get("itemSizeX", int.class);
-		rand[1] = randomshop.get("itemSizeY", int.class);
-		return rand;
-	}
-	
-	public static int[] getWholeDaily(long guild_id) {
-		Ini ini = readIni(guild_id);
-		Ini.Section daily = ini.get("Daily");
-		int [] dail = new int[8];
-		dail[0] = daily.get("rewardX", int.class);
-		dail[1] = daily.get("rewardY", int.class);
-		dail[2] = daily.get("generalTextFontSize", int.class);
-		dail[3] = daily.get("descriptionMode", int.class);
-		dail[4] = daily.get("descriptionX", int.class);
-		dail[5] = daily.get("descriptionY", int.class);
-		dail[6] = daily.get("descriptionStartX", int.class);
-		dail[7] = daily.get("fieldSizeX", int.class);
-		return dail;
 	}
 }

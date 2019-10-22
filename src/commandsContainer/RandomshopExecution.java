@@ -141,7 +141,7 @@ public class RandomshopExecution {
 						if(editedRows > 0) {
 							//draw won item from the Randomshop
 							final int weapon = weapon_id;
-							RandomshopRewardDrawer.drawReward(e, RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(w -> w.getWeaponID() == weapon).findAny().orElse(null), user_details.getCurrency(), guild_settings.getThemeID());
+							RandomshopRewardDrawer.drawReward(e, RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(w -> w.getWeaponID() == weapon).findAny().orElse(null), user_details.getCurrency(), guild_settings);
 							Hashes.addTempCache("randomshop_play_"+e.getMember().getUser().getId(), new Cache(180000, input));
 						}
 						else if(weapon_id > 0){
@@ -194,7 +194,8 @@ public class RandomshopExecution {
 					weapons = RankingSystemItems.SQLgetWholeWeaponShop((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()), RankingSystem.SQLgetGuild((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong())).getThemeID()).parallelStream().filter(w -> w.getCategoryDescription().equalsIgnoreCase(category) && w.getStat() == 1).collect(Collectors.toList());
 				}
 				
-				var maxItems = GuildIni.getRandomshopItemsMaxItems((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()));
+				var guild_settings = RankingSystem.SQLgetGuild((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()));
+				var maxItems = guild_settings.getRandomshopMaxItems();
 				ArrayList<Weapons> filteredWeapons = new ArrayList<Weapons>();
 				final var lastPage = (page*maxItems)-1;
 				for(var i = (page-1)*maxItems; i <= lastPage; i++) {
@@ -209,11 +210,11 @@ public class RandomshopExecution {
 					//draw page
 					if(e != null) {
 						Hashes.addTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, e.getMember().getUser().getId()+"_"+page+"_"+input+"_"+last_page));
-						RandomshopItemDrawer.drawItems(e, null, filteredWeapons, page, last_page, RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID());
+						RandomshopItemDrawer.drawItems(e, null, filteredWeapons, page, last_page, guild_settings);
 					}
 					else {
 						Hashes.addTempCache("randomshop_bot_gu"+e2.getGuild().getId()+"ch"+e2.getChannel().getId(), new Cache(180000, e2.getMember().getUser().getId()+"_"+page+"_"+input+"_"+last_page));
-						RandomshopItemDrawer.drawItems(null, e2, filteredWeapons, page, last_page, RankingSystem.SQLgetGuild(e2.getGuild().getIdLong()).getThemeID());
+						RandomshopItemDrawer.drawItems(null, e2, filteredWeapons, page, last_page, guild_settings);
 					}
 				}
 				else {

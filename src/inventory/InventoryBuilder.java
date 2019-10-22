@@ -13,8 +13,8 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.Guilds;
 import constructors.InventoryContent;
-import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -22,29 +22,29 @@ import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEve
 public class InventoryBuilder {
 	private final static Logger logger = LoggerFactory.getLogger(InventoryBuilder.class);
 	
-	public static void DrawInventory(GuildMessageReceivedEvent _e, GuildMessageReactionAddEvent _e2, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, int theme_id){
-		try{
+	public static void DrawInventory(GuildMessageReceivedEvent _e, GuildMessageReactionAddEvent _e2, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, Guilds guild_settings) {
+		try {
+			int theme_id = guild_settings.getThemeID();
 			BufferedImage blank_inventory = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/inventory_blank.png"));
 			BufferedImage inventory_tab = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/inventory_"+_inventory_tab+"_"+_sub_tab+".png"));
 			
-			int [] inven = GuildIni.getWholeInventory((_e != null ? _e.getGuild().getIdLong() : _e2.getGuild().getIdLong()));
-			final int startX = inven[0];
-			final int startY = inven[1];
-			final int tabX = inven[2];
-			final int tabY = inven[3];
-			final int pageFontSize = inven[4];
-			final int pageX = inven[5];
-			final int pageY = inven[6];
-			final int generalTextFontSize = inven[7];
-			final int boxSizeX = inven[8];
-			final int boxSizeY = inven[9];
-			final int descriptionY = inven[10];
-			final int itemSizeX = inven[11];
-			final int itemSizeY = inven[12];
-			final int nextBoxX = inven[13];
-			final int nextBoxY = inven[14];
-			final int expiration_positionY = inven[15];
-			final int rowLimit = inven[16];
+			final int startX = guild_settings.getInventoryStartX();
+			final int startY = guild_settings.getInventoryStartY();
+			final int tabX = guild_settings.getInventoryTabX();
+			final int tabY = guild_settings.getInventoryTabY();
+			final int pageFontSize = guild_settings.getInventoryPageFontSize();
+			final int pageX = guild_settings.getInventoryPageX();
+			final int pageY = guild_settings.getInventoryPageY();
+			final int generalTextFontSize = guild_settings.getInventoryTextFontSize();
+			final int boxSizeX = guild_settings.getInventoryBoxSizeX();
+			final int boxSizeY = guild_settings.getInventoryBoxSizeY();
+			final int descriptionY = guild_settings.getInventoryDescriptionY();
+			final int itemSizeX = guild_settings.getInventoryItemSizeX();
+			final int itemSizeY = guild_settings.getInventoryItemSizeY();
+			final int nextBoxX = guild_settings.getInventoryNextBoxX();
+			final int nextBoxY = guild_settings.getInventoryNextBoxY();
+			final int expiration_positionY = guild_settings.getInventoryExpirationPositionY();
+			final int rowLimit = guild_settings.getInventoryRowLimit();
 			
 			int inventory_Width = blank_inventory.getWidth();
 			int inventory_Height = blank_inventory.getHeight();

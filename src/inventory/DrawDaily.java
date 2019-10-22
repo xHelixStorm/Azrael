@@ -14,27 +14,27 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fileManagement.GuildIni;
+import constructors.Guilds;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class DrawDaily {
 	private final static Logger logger = LoggerFactory.getLogger(DrawDaily.class);
 	
-	public static void draw(GuildMessageReceivedEvent _e, String _reward, int theme_id) {
+	public static void draw(GuildMessageReceivedEvent _e, String _reward, Guilds guild_settings) {
 		try {
+			var theme_id = guild_settings.getThemeID();
 			BufferedImage daily = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/daily_blank.png"));
 			BufferedImage reward = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/"+_reward+".png"));
 			
-			int [] dail = GuildIni.getWholeDaily(_e.getGuild().getIdLong());
-			final int rewardX = dail[0];
-			final int rewardY = dail[1];
-			final int generalTextFontSize = dail[2];
-			final int descriptionMode = dail[3];
-			final int descriptionX = dail[4];
-			final int descriptionY = dail[5];
-			final int descriptionStartX = dail[6];
-			final int fieldSizeX = dail[7];
+			final int rewardX = guild_settings.getDailyRewardX();
+			final int rewardY = guild_settings.getDailyRewardY();
+			final int generalTextFontSize = guild_settings.getDailyTextFontSize();
+			final int descriptionMode = guild_settings.getDailyDescriptionMode();
+			final int descriptionX = guild_settings.getDailyDescriptionX();
+			final int descriptionY = guild_settings.getDailyDescriptionY();
+			final int descriptionStartX = guild_settings.getDailyDescriptionStartX();
+			final int fieldSizeX = guild_settings.getDailyFieldSizeX();
 			
 			int dailyW = daily.getWidth();
 			int dailyH = daily.getHeight();

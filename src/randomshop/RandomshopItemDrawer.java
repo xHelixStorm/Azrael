@@ -13,8 +13,8 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.Guilds;
 import constructors.Weapons;
-import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -22,23 +22,23 @@ import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEve
 public class RandomshopItemDrawer {
 	private final static Logger logger = LoggerFactory.getLogger(RandomshopItemDrawer.class);
 	
-	public static void drawItems(GuildMessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<Weapons> weapons, int current_page, int last_page, int theme_id) {
+	public static void drawItems(GuildMessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<Weapons> weapons, int current_page, int last_page, Guilds guild_settings) {
 		try {
+			var theme_id = guild_settings.getThemeID();
 			BufferedImage randomshop = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Randomshop/randomshop_blank.png"));
 			
-			int [] rand = GuildIni.getWholeRandomshopItems((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()));
-			final var startX = rand[0];
-			final var startY = rand[1];
-			final var pageX = rand[2];
-			final var pageY = rand[3];
-			final var generalFontSize = rand[4];
-			final var sizeX = rand[5];
-			final var sizeY = rand[6];
-			final var itemSizeX = rand[7];
-			final var itemSizeY = rand[8];
-			final var moveX = rand[9];
-			final var moveY = rand[10];
-			final var rowLimit = rand[11];
+			final var startX = guild_settings.getRandomshopStartX();
+			final var startY = guild_settings.getRandomshopStartY();
+			final var pageX = guild_settings.getRandomshopPageX();
+			final var pageY = guild_settings.getRandomshopPageY();
+			final var generalFontSize = guild_settings.getRandomshopTextFontSize();
+			final var sizeX = guild_settings.getRandomshopBoxSizeX();
+			final var sizeY = guild_settings.getRandomshopBoxSizeY();
+			final var itemSizeX = guild_settings.getRandomshopItemSizeX();
+			final var itemSizeY = guild_settings.getRandomshopItemSizeY();
+			final var moveX = guild_settings.getRandomshopNextBoxX();
+			final var moveY = guild_settings.getRandomshopNextBoxY();
+			final var rowLimit = guild_settings.getRandomshopRowLimit();
 			
 			int overlayW = randomshop.getWidth();
 			int overlayH = randomshop.getHeight();
