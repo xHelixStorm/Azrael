@@ -300,13 +300,13 @@ public class UserExecution {
 										Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
 										var mute_role = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 										if(mute_role != null) {
-											_e.getGuild().removeRoleFromMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role.getRole_ID())).complete();
+											_e.getGuild().removeRoleFromMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
 											long assignedRole = 0;
 											Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
 											if(user_details != null) {
 												assignedRole = user_details.getCurrentRole();
 											}
-											_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(assignedRole)).complete();
+											_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(assignedRole)).queue();
 											_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle("User unmuted!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+_e.getGuild().getMemberById(user_id).getUser().getName()+"#"+_e.getGuild().getMemberById(user_id).getUser().getDiscriminator() + "** with the ID Number **" +user_id+ "** has been unmuted from his/her infinite mute!").build()).queue();
 										}
 										else {

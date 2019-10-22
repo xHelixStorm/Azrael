@@ -86,7 +86,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted").build()).queue();
 					}
 					if(e.getJDA().getGuildById(guild_id).getMembers().parallelStream().filter(f -> f.getUser().getIdLong() == e.getGuild().getMemberById(user_id).getUser().getIdLong()).findAny().orElse(null) != null) {
-						e.getJDA().getGuildById(e.getGuild().getIdLong()).removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).complete();
+						e.getJDA().getGuildById(e.getGuild().getIdLong()).removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
 						if(assignedRole != 0){e.getJDA().getGuildById(e.getGuild().getId()).addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
 					}
 				}
@@ -99,7 +99,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator() + "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted and the timer has been interrupted!").build()).queue();
 					}
 					if(e.getJDA().getGuildById(guild_id).getMembers().parallelStream().filter(f -> f.getUser().getIdLong() == e.getMember().getUser().getIdLong()).findAny().orElse(null) != null) {
-						e.getJDA().getGuildById(e.getGuild().getIdLong()).removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).complete();
+						e.getJDA().getGuildById(e.getGuild().getIdLong()).removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
 						if(assignedRole != 0){e.getJDA().getGuildById(e.getGuild().getId()).addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
 					}
 				}

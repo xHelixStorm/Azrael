@@ -38,372 +38,372 @@ public class MeowExecution {
 				
 				if(variable[0].equalsIgnoreCase("meow")) {
 					file = new File(path+"meow01.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("art")) {
 					file = new File(path+"meow02.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("attention")) {
 					file = new File(path+"meow03.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("baker")) {
 					file = new File(path+"meow04.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("bicycle")) {
 					file = new File(path+"meow05.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("birthday")) {
 					file = new File(path+"meow06.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("blonde")) {
 					file = new File(path+"meow07.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("blue")) {
 					file = new File(path+"meow08.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("box")) {
 					file = new File(path+"meow09.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("broken")) {
 					file = new File(path+"meow10.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("brunette")) {
 					file = new File(path+"meow11.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("car")) {
 					file = new File(path+"meow12.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("catrick")) {
 					file = new File(path+"meow13.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("chef")) {
 					file = new File(path+"meow14.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("chicks")) {
 					file = new File(path+"meow15.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("christmas")) {
 					file = new File(path+"meow16.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("cup")) {
 					file = new File(path+"meow17.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("distracted")) {
 					file = new File(path+"meow18.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("down")) {
 					file = new File(path+"meow19.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("elvis")) {
 					file = new File(path+"meow20.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("excited")) {
 					file = new File(path+"meow21.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("family")) {
 					file = new File(path+"meow22.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("gaming")) {
 					file = new File(path+"meow23.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("happy")) {
 					file = new File(path+"meow24.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("kidmeow")) {
 					file = new File(path+"meow25.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("laundry")) {
 					file = new File(path+"meow26.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("life")) {
 					file = new File(path+"meow27.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("litter")) {
 					file = new File(path+"meow28.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("love")) {
 					file = new File(path+"meow29.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("loveyou")) {
 					file = new File(path+"meow30.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("mess")) {
 					file = new File(path+"meow31.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("mexican")) {
 					file = new File(path+"meow32.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("moustache")) {
 					file = new File(path+"meow33.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("munching")) {
 					file = new File(path+"meow34.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("nudge")) {
 					file = new File(path+"meow35.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("online")) {
 					file = new File(path+"meow36.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("piano")) {
 					file = new File(path+"meow37.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("pikachu")) {
 					file = new File(path+"meow38.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("powerpuffmeow")) {
 					file = new File(path+"meow39.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("present")) {
 					file = new File(path+"meow40.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("relaxed")) {
 					file = new File(path+"meow41.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("ripped")) {
 					file = new File(path+"meow42.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("sad")) {
 					file = new File(path+"meow43.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("satisfied")) {
 					file = new File(path+"meow44.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("seal")) {
 					file = new File(path+"meow45.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("sia")) {
 					file = new File(path+"meow46.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("sir")) {
 					file = new File(path+"meow47.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("sleeping")) {
 					file = new File(path+"meow48.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("string")) {
 					file = new File(path+"meow49.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("study")) {
 					file = new File(path+"meow50.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("unicorn")) {
 					file = new File(path+"meow51.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("tumblr")) {
 					file = new File(path+"meow52.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("viking")) {
 					file = new File(path+"meow53.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("winkyface")) {
 					file = new File(path+"meow54.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("wool")) {
 					file = new File(path+"meow55.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("workout")) {
 					file = new File(path+"meow56.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("wrapped")) {
 					file = new File(path+"meow57.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("cake")) {
 					file = new File(path+"meow58.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("chickenwings")) {
 					file = new File(path+"meow59.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("cookies")) {
 					file = new File(path+"meow60.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("cupcake")) {
 					file = new File(path+"meow61.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("diet")) {
 					file = new File(path+"meow62.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("donut")) {
 					file = new File(path+"meow63.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("fishy")) {
 					file = new File(path+"meow64.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("hotchocolate")) {
 					file = new File(path+"meow65.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("icecream")) {
 					file = new File(path+"meow66.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("mcmeow")) {
 					file = new File(path+"meow67.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("noodles")) {
 					file = new File(path+"meow68.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("nutella")) {
 					file = new File(path+"meow69.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("onigiri")) {
 					file = new File(path+"meow70.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("pizza")) {
 					file = new File(path+"meow71.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("sushy")) {
 					file = new File(path+"meow72.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("sweetmountain")) {
 					file = new File(path+"meow73.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("toast")) {
 					file = new File(path+"meow74.png");
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("random-emoji")) {
@@ -468,7 +468,7 @@ public class MeowExecution {
 						case 57 -> pictureName = "meow57.png";
 					}
 					file = new File(path+""+pictureName);
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("random-food")) {
@@ -493,7 +493,7 @@ public class MeowExecution {
 						case 18 -> pictureName = "meow74.png";
 					}
 					file = new File(path+""+pictureName);
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				
 				else if(variable[0].equalsIgnoreCase("random-meow")) {
@@ -575,7 +575,7 @@ public class MeowExecution {
 						case 74 -> pictureName = "meow74.png";
 					}
 					file = new File(path+""+pictureName);
-					e.getChannel().sendFile(file, "meow.png").complete();
+					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				else {
 					e.getChannel().sendMessage("Cat not found. Please try again!").queue();

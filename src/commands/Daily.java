@@ -22,7 +22,6 @@ import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import inventory.DrawDaily;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 import sql.Azrael;
@@ -125,9 +124,9 @@ public class Daily implements CommandPublic {
 					}
 					else if(list.get(random).getType().equals("cod")) {
 						//send a private message
-						PrivateChannel pc = e.getMember().getUser().openPrivateChannel().complete();
-						pc.sendMessage("Congratulations. You have unlocked the following reward:\n"+cod_reward).queue();
-						pc.close();
+						e.getMember().getUser().openPrivateChannel().queue(channel -> {
+							channel.sendMessage("Congratulations. You have unlocked the following reward:\n"+cod_reward).queue();
+						});
 						
 						//log the reward in bot channel
 						var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);

@@ -259,7 +259,7 @@ public class EquipExecution {
 							}
 							Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
 							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-							e.getChannel().sendMessage(embed.setDescription("Weapon equipped!").build()).complete();
+							e.getChannel().sendMessage(embed.setDescription("Weapon equipped!").build()).queue();
 							equipmentItemScreen(e, guild_id, "set");
 						}
 						else {
@@ -311,7 +311,7 @@ public class EquipExecution {
 						user_details.setSkill(skill.getItemId());
 						Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
 						EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-						e.getChannel().sendMessage(embed.setDescription("Skill equipped!").build()).complete();
+						e.getChannel().sendMessage(embed.setDescription("Skill equipped!").build()).queue();
 						equipmentItemScreen(e, guild_id, "set");
 					}
 					else {
@@ -371,7 +371,7 @@ public class EquipExecution {
 								}
 								Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
 								EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-								e.getChannel().sendMessage(embed.setDescription("Weapon equipped!").build()).complete();
+								e.getChannel().sendMessage(embed.setDescription("Weapon equipped!").build()).queue();
 								equipmentItemScreen(e, guild_id, "set");
 							}
 							else {
@@ -399,7 +399,7 @@ public class EquipExecution {
 							user_details.setSkill(skill_id);
 							Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
 							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-							e.getChannel().sendMessage(embed.setDescription("Skill equipped!").build()).complete();
+							e.getChannel().sendMessage(embed.setDescription("Skill equipped!").build()).queue();
 							equipmentItemScreen(e, guild_id, "set");
 						}
 						else {

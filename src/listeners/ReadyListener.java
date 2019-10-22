@@ -141,11 +141,11 @@ public class ReadyListener extends ListenerAdapter {
 				if(log_channel != null) {
 					e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
 							messageBuild.setDescription("Bot patch notes version **"+STATIC.getVersion()+"** "+priv_notes.getDate()+"\n"+priv_notes.getMessage1())
-							.build()).complete();
+							.build()).queue();
 					if(priv_notes.getMessage2() != null && priv_notes.getMessage2().length() > 0) {
 						e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
 								messageBuild.setDescription(priv_notes.getMessage2())
-								.build()).complete();
+								.build()).queue();
 					}
 					published = true;
 				}
@@ -154,11 +154,11 @@ public class ReadyListener extends ListenerAdapter {
 				if(bot_channel != null) {
 					e.getJDA().getGuildById(guild.getId()).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
 							messageBuild.setDescription("Bot patch notes version **"+STATIC.getVersion()+"** "+publ_notes.getDate()+"\n"+publ_notes.getMessage1())
-							.build()).complete();
+							.build()).queue();
 					if(publ_notes.getMessage2() != null && publ_notes.getMessage2().length() > 0) {
 						e.getJDA().getGuildById(guild.getId()).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
 								messageBuild.setDescription(publ_notes.getMessage2())
-								.build()).complete();
+								.build()).queue();
 					}
 					published = true;
 				}

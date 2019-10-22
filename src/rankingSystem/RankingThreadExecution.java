@@ -16,7 +16,6 @@ import constructors.Roles;
 import core.Hashes;
 import fileManagement.FileSetting;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
@@ -83,9 +82,9 @@ public class RankingThreadExecution {
 					if(daily_experience > max_experience*multiplier) {
 						logger.info("{} has reached the limit of today's max experience points gain", e.getMember().getUser().getId());
 						RankingSystem.SQLInsertActionLog("medium", user_id, guild_id, "Experience limit reached", "User reached the limit of experience points");
-						PrivateChannel pc = e.getMember().getUser().openPrivateChannel().complete();
-						pc.sendMessage("You have reached the limit of experience points for today. More experience points can be collected tomorrow!").queue();
-						pc.close();
+						e.getMember().getUser().openPrivateChannel().queue(channel -> {
+							channel.sendMessage("You have reached the limit of experience points for today. More experience points can be collected tomorrow!").queue();
+						});
 					}
 				}
 			}

@@ -79,7 +79,7 @@ public class LanguageFilter implements Runnable {
 						.filter(word -> parseMessage.matches("(.|\\s){0,}\\b"+word+"\\b(.|\\s){0,}")).findAny();
 					if(option.isPresent()) {
 						Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
-						e.getMessage().delete().reason("Message removed due to bad manner!").complete();
+						e.getMessage().delete().reason("Message removed due to bad manner!").queue();
 						STATIC.handleRemovedMessages(e, null, output);
 						var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 						if(tra_channel != null) {
@@ -173,7 +173,7 @@ public class LanguageFilter implements Runnable {
 	
 	private static void deleteHeavyCensoringMessage(GuildMessageReceivedEvent e, List<Channels> allChannels, String name, String channel, String getMessage) {
 		Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
-		e.getMessage().delete().reason("Message removed due to heavy censoring!").complete();
+		e.getMessage().delete().reason("Message removed due to heavy censoring!").queue();
 		var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 		if(tra_channel != null) {
 			message.setTitle("Message removed due to **heavy censoring**!");

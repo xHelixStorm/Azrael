@@ -226,10 +226,10 @@ public class Patchnotes implements CommandPublic {
 	
 	private void printPatchNotes(GuildMessageReceivedEvent e, Patchnote note, EmbedBuilder message) {
 		message.setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the requested patch notes!");
-		e.getChannel().sendMessage(message.setDescription("Bot patch notes version **"+note.getTitle()+"** "+note.getDate()+"\n\n"+note.getMessage1()).build()).complete();
+		e.getChannel().sendMessage(message.setDescription("Bot patch notes version **"+note.getTitle()+"** "+note.getDate()+"\n\n"+note.getMessage1()).build()).queue();
 		if(note.getMessage2() != null && note.getMessage2().length() > 0) {
 			message.setTitle("Requested patch notes part two!");
-			e.getChannel().sendMessage(message.setDescription(note.getMessage2()).build()).complete();
+			e.getChannel().sendMessage(message.setDescription(note.getMessage2()).build()).queue();
 		}
 	}
 

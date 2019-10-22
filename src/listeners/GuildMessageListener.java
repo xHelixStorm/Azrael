@@ -190,11 +190,11 @@ public class GuildMessageListener extends ListenerAdapter {
 						
 						boolean createTemp = false;
 						if(current_page > 1) {
-							e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).complete();
+							e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).queue();
 							createTemp = true;
 						}
 						if(current_page < last_page) {
-							e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).complete();
+							e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).queue();
 							createTemp = true;
 						}
 						if(createTemp == true) {
@@ -214,11 +214,11 @@ public class GuildMessageListener extends ListenerAdapter {
 						
 						boolean createCache = false;
 						if(current_page > 1) {
-							e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).complete();
+							e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).queue();
 							createCache = true;
 						}
 						if(current_page < last_page) {
-							e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).complete();
+							e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).queue();
 							createCache = true;
 						}
 						if(createCache == true) {

@@ -53,7 +53,7 @@ public class RunQuiz implements Runnable{
 				//check if there are still questions left by checking, if quiz is empty. If empty, terminate the program
 				if(quiz != null) {
 					//Start to print questions
-					e.getGuild().getTextChannelById(channel).sendMessage("**"+quiz.getQuestion()+"**").complete();
+					e.getGuild().getTextChannelById(channel).sendMessage("**"+quiz.getQuestion()+"**").queue();
 					Thread.sleep(20000);
 					
 					//check the created file if someone was able to answer the question
