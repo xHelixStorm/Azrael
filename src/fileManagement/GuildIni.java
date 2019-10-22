@@ -97,6 +97,8 @@ public class GuildIni {
 		commands.put("DoubleExperience", "false");
 		commands.put("Equip", "false");
 		commands.put("Remove", "false");
+		commands.put("HeavyCensoring", "false");
+		commands.put("Mute", "false");
 		fileContent.put("Commands", commands);
 		
 		//collect all CommandLevels variables
@@ -179,7 +181,9 @@ public class GuildIni {
 		commandLevels.put("Patchnotes", "1");
 		commandLevels.put("DoubleExperience", "1");
 		commandLevels.put("Equip", "1");
-		commandLevels.put("Remove", "1");
+		commandLevels.put("Remove", "20");
+		commandLevels.put("HeavyCensoring", "20");
+		commandLevels.put("Mute", "20");
 		fileContent.put("CommandLevels", commandLevels);
 	}
 	
@@ -876,12 +880,20 @@ public class GuildIni {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "Remove", int.class);
 	}
-	public static boolean getHeavyCensoring(long guild_id) {
+	public static boolean getHeavyCensoringCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "HeavyCensoring", boolean.class);
 	}
 	public static int getHeavyCensoringLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "HeavyCensoring", int.class);
+	}
+	public static boolean getMuteCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Mute", boolean.class);
+	}
+	public static int getMuteLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Mute", int.class);
 	}
 }

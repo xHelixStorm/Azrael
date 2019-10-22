@@ -22,6 +22,7 @@ import commands.HeavyCensoring;
 import commands.Help;
 import commands.Inventory;
 import commands.Meow;
+import commands.Mute;
 import commands.Patchnotes;
 import commands.Profile;
 import commands.Pug;
@@ -196,6 +197,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("equip", new Equip());
 		CommandHandler.commandsPublic.put("remove", new Remove());
 		CommandHandler.commandsPublic.put("heavycensoring", new HeavyCensoring());
+		CommandHandler.commandsPublic.put("mute", new Mute());
 	}
 	
 	public static void addPrivateCommands() {

@@ -18,7 +18,7 @@ public class HeavyCensoring implements CommandPublic {
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		if(GuildIni.getHeavyCensoring(e.getGuild().getIdLong())) {
+		if(GuildIni.getHeavyCensoringCommand(e.getGuild().getIdLong())) {
 			final var commandLevel = GuildIni.getHeavyCensoringLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
 				return true;

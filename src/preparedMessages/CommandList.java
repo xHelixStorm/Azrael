@@ -10,7 +10,7 @@ public class CommandList {
 		boolean entertainment = false;
 		boolean other = false;
 		
-		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getRssCommand(guild_id)) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoring(guild_id)) {
+		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getRssCommand(guild_id)) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoringCommand(guild_id) || GuildIni.getMuteCommand(guild_id)) {
 			administration = true;
 		}
 		
@@ -33,7 +33,8 @@ public class CommandList {
 			if(GuildIni.getRoleReactionCommand(guild_id))textCollector.append("**-"+prefix+"roleReaction**\nenable / disable the role reaction and remove roles on disable\n\n");
 			if(GuildIni.getRssCommand(guild_id))textCollector.append("**-"+prefix+"rss**\ninsert rss feeds\n\n");
 			if(GuildIni.getDoubleExperienceCommand(guild_id))textCollector.append("**-"+prefix+"doubleExperience**\nenable, disable or set the double experience mode to auto\n\n");
-			if(GuildIni.getHeavyCensoring(guild_id))textCollector.append("**-"+prefix+"**enable/disable the heavycensoring for cases when it will get hard to moderate\n\n");
+			if(GuildIni.getHeavyCensoringCommand(guild_id))textCollector.append("**-"+prefix+"heavycensoring**\nenable/disable the heavycensoring for cases when it will get hard to moderate\n\n");
+			if(GuildIni.getMuteCommand(guild_id))textCollector.append("**-"+prefix+"mute**\nto mute one or multiple users on the server. Optional with reason\n\n");
 		}
 		if(entertainment == true) {
 			textCollector.append("**_Entertainment:_**\n");
