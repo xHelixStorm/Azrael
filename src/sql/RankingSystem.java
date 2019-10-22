@@ -1820,11 +1820,12 @@ public class RankingSystem {
 				setInventory.setExpiration(rs.getTimestamp(5));
 				setInventory.setDescription(rs.getString(6));
 				setInventory.setType(rs.getString(7));
-				setInventory.setWeaponDescription(rs.getString(8));
-				setInventory.setStat(rs.getString(9));
-				setInventory.setWeaponCategoryID(rs.getInt(10));
+				setInventory.setFileType(rs.getString(8));
+				setInventory.setWeaponDescription(rs.getString(9));
+				setInventory.setStat(rs.getString(10));
+				setInventory.setWeaponCategoryID(rs.getInt(11));
 				setInventory.setWeaponCategoryDescription(rs.getString(11));
-				setInventory.setSkillDescription(rs.getString(12));
+				setInventory.setSkillDescription(rs.getString(13));
 				inventory.add(setInventory);
 			}
 			return inventory;
@@ -1863,11 +1864,12 @@ public class RankingSystem {
 				setInventory.setExpiration(rs.getTimestamp(5));
 				setInventory.setDescription(rs.getString(6));
 				setInventory.setType(rs.getString(7));
-				setInventory.setWeaponDescription(rs.getString(8));
-				setInventory.setStat(rs.getString(9));
-				setInventory.setWeaponCategoryID(rs.getInt(10));
-				setInventory.setWeaponCategoryDescription(rs.getString(11));
-				setInventory.setSkillDescription(rs.getString(12));
+				setInventory.setFileType(rs.getString(8));
+				setInventory.setWeaponDescription(rs.getString(9));
+				setInventory.setStat(rs.getString(10));
+				setInventory.setWeaponCategoryID(rs.getInt(11));
+				setInventory.setWeaponCategoryDescription(rs.getString(12));
+				setInventory.setSkillDescription(rs.getString(13));
 				inventory.add(setInventory);
 			}
 			return inventory;
@@ -1906,11 +1908,12 @@ public class RankingSystem {
 				setInventory.setExpiration(rs.getTimestamp(5));
 				setInventory.setDescription(rs.getString(6));
 				setInventory.setType(rs.getString(7));
-				setInventory.setWeaponDescription(rs.getString(8));
-				setInventory.setStat(rs.getString(9));
-				setInventory.setWeaponCategoryID(rs.getInt(10));
-				setInventory.setWeaponCategoryDescription(rs.getString(11));
-				setInventory.setSkillDescription(rs.getString(12));
+				setInventory.setFileType(rs.getString(8));
+				setInventory.setWeaponDescription(rs.getString(9));
+				setInventory.setStat(rs.getString(10));
+				setInventory.setWeaponCategoryID(rs.getInt(11));
+				setInventory.setWeaponCategoryDescription(rs.getString(12));
+				setInventory.setSkillDescription(rs.getString(13));
 				inventory.add(setInventory);
 			}
 			return inventory;
@@ -1959,11 +1962,12 @@ public class RankingSystem {
 				setInventory.setExpiration(rs.getTimestamp(5));
 				setInventory.setDescription(rs.getString(6));
 				setInventory.setType(rs.getString(7));
-				setInventory.setWeaponDescription(rs.getString(8));
-				setInventory.setStat(rs.getString(9));
-				setInventory.setWeaponCategoryID(rs.getInt(10));
-				setInventory.setWeaponCategoryDescription(rs.getString(11));
-				setInventory.setSkillDescription(rs.getString(12));
+				setInventory.setFileType(rs.getString(8));
+				setInventory.setWeaponDescription(rs.getString(9));
+				setInventory.setStat(rs.getString(10));
+				setInventory.setWeaponCategoryID(rs.getInt(11));
+				setInventory.setWeaponCategoryDescription(rs.getString(12));
+				setInventory.setSkillDescription(rs.getString(13));
 				inventory.add(setInventory);
 			}
 			return inventory;
@@ -2002,6 +2006,7 @@ public class RankingSystem {
 				setInventory.setExpiration(rs.getTimestamp(5));
 				setInventory.setDescription(rs.getString(6));
 				setInventory.setType(rs.getString(7));
+				setInventory.setFileType(rs.getString(8));
 				inventory.add(setInventory);
 			}
 			return inventory;

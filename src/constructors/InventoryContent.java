@@ -15,78 +15,85 @@ public class InventoryContent {
 	private int weapon_category_id;
 	private String weapon_category_description;
 	private String skill_description;
+	private String file_type;
 	
 	public void setUserID(long _user_id){
-		user_id = _user_id;
+		this.user_id = _user_id;
 	}
 	public void setDescription(String _description){
-		description = _description;
+		this.description = _description;
 	}
 	public void setTimestamp(Timestamp _timestamp){
-		timestamp = _timestamp;
+		this.timestamp = _timestamp;
 	}
 	public void setNumber(int _number){
-		number = _number;
+		this.number = _number;
 	}
 	public void setType(String _type){
-		type = _type;
+		this.type = _type;
 	}
 	public void setStatus(String _status){
-		status = _status;
+		this.status = _status;
 	}
 	public void setExpiration(Timestamp _expiration){
-		expiration = _expiration;
+		this.expiration = _expiration;
 	}
 	public void setWeaponDescription(String _weapon_description) {
-		weapon_description = _weapon_description;
+		this.weapon_description = _weapon_description;
 	}
 	public void setStat(String _stat) {
-		stat = _stat;
+		this.stat = _stat;
 	}
 	public void setWeaponCategoryID(int _weapon_category_id) {
-		weapon_category_id = _weapon_category_id;
+		this.weapon_category_id = _weapon_category_id;
 	}
 	public void setWeaponCategoryDescription(String _weapon_category_description) {
-		weapon_category_description = _weapon_category_description;
+		this.weapon_category_description = _weapon_category_description;
 	}
 	public void setSkillDescription(String _skill_description) {
-		skill_description = _skill_description;
+		this.skill_description = _skill_description;
+	}
+	public void setFileType(String _file_type) {
+		this.file_type = _file_type;
 	}
 	
 	public long getUserID(){
-		return user_id;
+		return this.user_id;
 	}
 	public String getDescription(){
-		return description;
+		return this.description;
 	}
 	public Timestamp getTimestamp(){
-		return timestamp;
+		return this.timestamp;
 	}
 	public int getNumber(){
-		return number;
+		return this.number;
 	}
 	public String getType(){
-		return type;
+		return this.type;
 	}
 	public String getStatus(){
-		return status;
+		return this.status;
 	}
 	public Timestamp getExpiration(){
-		return expiration;
+		return this.expiration;
 	}
 	public String getWeaponDescription(){
-		return weapon_description;
+		return this.weapon_description;
 	}
 	public String getStat() {
-		return stat;
+		return this.stat;
 	}
 	public int getWeaponCategoryID() {
-		return weapon_category_id;
+		return this.weapon_category_id;
 	}
 	public String getWeaponCategoryDescription() {
-		return weapon_category_description;
+		return this.weapon_category_description;
 	}
 	public String getSkillDescription() {
-		return skill_description;
+		return this.skill_description;
+	}
+	public String getFileType() {
+		return this.file_type;
 	}
 }
