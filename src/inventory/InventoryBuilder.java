@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
@@ -59,13 +60,17 @@ public class InventoryBuilder {
 			int i = 0;
 			var currentX = startX;
 			var currentY = startY;
-			for(InventoryContent inventory : _items){
+			for(InventoryContent inventory : _items) {
 				i++;
 				BufferedImage item;
 				if(inventory.getType() != null && inventory.getType().equals("ite"))
 					item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Items/"+inventory.getDescription()+".png"));
 				else if(inventory.getType() != null)
-					item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/"+inventory.getDescription()+".png"));
+					try {
+						item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/"+inventory.getDescription()+".png"));
+					} catch(IIOException e) {
+						item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/"+inventory.getDescription()+".gif"));
+					}
 				else if(inventory.getSkillDescription() == null)
 					item = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Weapons/"+inventory.getWeaponDescription()+".png"));
 				else
