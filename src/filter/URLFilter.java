@@ -45,20 +45,25 @@ public class URLFilter implements Runnable{
 	public void run() {
 		var guild_id = (e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong());
 		User user = (e != null ? e.getMember().getUser() : e2.getMember().getUser());
-		if(!UserPrivs.isUserAdmin(user, guild_id) && !UserPrivs.isUserMod(user, guild_id) && GuildIni.getAdmin(guild_id) != user.getIdLong()) {
+		if(!UserPrivs.isUserBot(user, guild_id) && !UserPrivs.isUserAdmin(user, guild_id) && !UserPrivs.isUserMod(user, guild_id) && GuildIni.getAdmin(guild_id) != user.getIdLong()) {
 			String incomingURL = (e != null ? e.getMessage().getContentRaw() : e2.getMessage().getContentRaw());
-			Pattern urlPattern = Pattern.compile("[\\w]{1,1}[a-zA-Z0-9@:%._+~#=-]{1,256}\\.[a-zA-Z]{1,1}[a-zA-Z0-9()]{1,6}\\b");
+			Pattern urlPattern = Pattern.compile("[\\w]{1,1}[a-zA-Z0-9@:%._+~#=-]{1,256}\\.[a-zA-Z]{1,1}[a-zA-Z0-9()]{1,6}[\\/a-zA-z0-9\\-?=&%.,+]*\\b");
 			Matcher matcher = urlPattern.matcher(incomingURL);
 			while(matcher.find()) {
 				var foundURL = matcher.group();
 				if(foundURL.length() >= 4 && !Pattern.compile("[.]{2,}").matcher(foundURL).find()) {
+					var shortURL = "";
+					Matcher matcher2 = Pattern.compile("[\\w]{1,1}[a-zA-Z0-9@:%._+~#=-]{1,256}\\.[a-zA-Z]{1,1}[a-zA-Z0-9()]{1,6}\\b").matcher(foundURL);
+					if(matcher2.find())
+						shortURL = matcher2.group();
+					final var fqdn = shortURL;
 					var fullBlacklist = GuildIni.getURLBlacklist(guild_id);
 					if(fullBlacklist) {
-						if(Hashes.findGlobalURLBlacklist(foundURL)) {
+						if(Hashes.findGlobalURLBlacklist(fqdn)) {
 							//Whitelist check, if this url should be ignored
 							var whitelist = Azrael.SQLgetURLWhitelist(guild_id);
-							if(whitelist == null || whitelist.parallelStream().filter(f -> foundURL.contains(f)).findAny().orElse(null) == null) {
-								printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang), allChannels);
+							if(whitelist == null || whitelist.parallelStream().filter(f -> fqdn.contains(f)).findAny().orElse(null) == null) {
+								printMessage(e, e2, fqdn, fullBlacklist, buildReplyMessageLang(lang), allChannels);
 								break;
 							}
 						}
@@ -66,11 +71,11 @@ public class URLFilter implements Runnable{
 							//Do a web check and confirm that the url is valid or not and then insert into global blacklist
 							try {
 								if(pingHost(foundURL)) {
-									Hashes.addGlobalURLBlacklist(foundURL);
+									Hashes.addGlobalURLBlacklist(fqdn);
 									//check the url with the whitelist and don't delete message if found
 									var whitelist = Azrael.SQLgetURLWhitelist(guild_id);
-									if(whitelist == null || whitelist.parallelStream().filter(f -> foundURL.contains(foundURL)).findAny().orElse(null) == null) {
-										printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang), allChannels);
+									if(whitelist == null || whitelist.parallelStream().filter(f -> fqdn.contains(f)).findAny().orElse(null) == null) {
+										printMessage(e, e2, fqdn, fullBlacklist, buildReplyMessageLang(lang), allChannels);
 										break;
 									}
 								}
