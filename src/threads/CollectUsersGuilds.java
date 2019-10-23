@@ -1,5 +1,6 @@
 package threads;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +17,9 @@ import sql.RankingSystem;
 import sql.Azrael;
 
 public class CollectUsersGuilds implements Runnable{
-	private final Logger logger = LoggerFactory.getLogger(CollectUsersGuilds.class);
+	private static final Logger logger = LoggerFactory.getLogger(CollectUsersGuilds.class);
+	private static final List<Long> checkedGuilds = new ArrayList<Long>();
+	
 	ReadyEvent e;
 	GuildJoinEvent e2;
 	
@@ -29,16 +32,19 @@ public class CollectUsersGuilds implements Runnable{
 	public void run() {
 		for(Guild g : (e != null ? e.getJDA().getGuilds() : e2.getJDA().getGuilds())) {
 			long guild_id = g.getIdLong();
-			List<Member> users = g.getMembers().parallelStream().filter(m -> !UserPrivs.isUserCommunity(m) && !UserPrivs.isUserMuted(m) && !UserPrivs.isUserBot(m)).collect(Collectors.toList());
-			if(users.size() > 0) {
-				Azrael.SQLBulkInsertUsers(users);
-				Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
-				if(guild_settings != null && guild_settings.getRankingState()) {
-					RankingSystem.SQLBulkInsertUsers(users, guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
-					RankingSystem.SQLBulkInsertUserDetails(users, 0, 0, 50000, 0);
+			if(!checkedGuilds.contains(guild_id)) {
+				List<Member> users = g.getMembers().parallelStream().filter(m -> !UserPrivs.isUserCommunity(m) && !UserPrivs.isUserMuted(m) && !UserPrivs.isUserBot(m)).collect(Collectors.toList());
+				if(users.size() > 0) {
+					Azrael.SQLBulkInsertUsers(users);
+					Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
+					if(guild_settings != null && guild_settings.getRankingState()) {
+						RankingSystem.SQLBulkInsertUsers(users, guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
+						RankingSystem.SQLBulkInsertUserDetails(users, 0, 0, 50000, 0);
+					}
 				}
+				checkedGuilds.add(guild_id);
+				logger.debug("Start up user registration complete in {}", g.getId());
 			}
-			logger.debug("Start up user registration complete in {}", g.getId());
 		}
 	}
 }
