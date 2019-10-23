@@ -20,7 +20,7 @@ import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import sql.Azrael;
@@ -44,8 +44,8 @@ public class URLFilter implements Runnable{
 	@Override
 	public void run() {
 		var guild_id = (e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong());
-		User user = (e != null ? e.getMember().getUser() : e2.getMember().getUser());
-		if(!UserPrivs.isUserBot(user, guild_id) && !UserPrivs.isUserAdmin(user, guild_id) && !UserPrivs.isUserMod(user, guild_id) && GuildIni.getAdmin(guild_id) != user.getIdLong()) {
+		Member member = (e != null ? e.getMember() : e2.getMember());
+		if(!UserPrivs.isUserBot(member) && !UserPrivs.isUserMod(member) && !UserPrivs.isUserAdmin(member)) {
 			String incomingURL = (e != null ? e.getMessage().getContentRaw() : e2.getMessage().getContentRaw());
 			Pattern urlPattern = Pattern.compile("[\\w]{1,1}[a-zA-Z0-9@:%._+~#=-]{1,256}\\.[a-zA-Z]{1,1}[a-zA-Z0-9()]{1,6}[\\/a-zA-z0-9\\-?=&%.,+]*\\b");
 			Matcher matcher = urlPattern.matcher(incomingURL);

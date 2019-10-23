@@ -11,16 +11,15 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.DiscordRoles;
 
 public class UserPrivs {
 	final static private Logger logger = LoggerFactory.getLogger(UserPrivs.class);
 	
-	public static boolean isUserAdmin(User user, long _guild_id) {
-		for(Role r : user.getJDA().getGuildById(_guild_id).getMember(user).getRoles()) {
-			Roles category = DiscordRoles.SQLgetRoles(_guild_id).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
+	public static boolean isUserAdmin(Member member) {
+		for(Role r : member.getRoles()) {
+			Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
 			if(category != null && category.getCategory_Name().length() > 0) {
 				if(category.getCategory_Name().equals("Administrator")) {
 					return true;
@@ -30,9 +29,9 @@ public class UserPrivs {
 		return false;
 	}
 	
-	public static boolean isUserMod(User user, long _guild_id) {
-		for(Role r : user.getJDA().getGuildById(_guild_id).getMember(user).getRoles()) {
-			Roles category = DiscordRoles.SQLgetRoles(_guild_id).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
+	public static boolean isUserMod(Member member) {
+		for(Role r : member.getRoles()) {
+			Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
 			if(category != null && category.getCategory_Name().length() > 0) {
 				if(category.getCategory_Name().equals("Moderator")) {
 					return true;
@@ -42,9 +41,9 @@ public class UserPrivs {
 		return false;
 	}
 	
-	public static boolean isUserBot(User user, long _guild_id) {
-		for(Role r : user.getJDA().getGuildById(_guild_id).getMember(user).getRoles()) {
-			Roles category = DiscordRoles.SQLgetRoles(_guild_id).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
+	public static boolean isUserBot(Member member) {
+		for(Role r : member.getRoles()) {
+			Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
 			if(category != null && category.getCategory_Name().length() > 0) {
 				if(category.getCategory_Name().equals("Bot")) {
 					return true;
@@ -54,9 +53,9 @@ public class UserPrivs {
 		return false;
 	}
 	
-	public static boolean isUserMuted(User user, long _guild_id) {
-		for(Role r : user.getJDA().getGuildById(_guild_id).getMember(user).getRoles()) {
-			Roles category = DiscordRoles.SQLgetRoles(_guild_id).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
+	public static boolean isUserMuted(Member member) {
+		for(Role r : member.getRoles()) {
+			Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
 			if(category != null && category.getCategory_Name().length() > 0) {
 				if(category.getCategory_Name().equals("Mute")) {
 					return true;
@@ -66,9 +65,9 @@ public class UserPrivs {
 		return false;
 	}
 	
-	public static boolean isUserCommunity(User user, long _guild_id) {
-		for(Role r : user.getJDA().getGuildById(_guild_id).getMember(user).getRoles()) {
-			Roles category = DiscordRoles.SQLgetRoles(_guild_id).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
+	public static boolean isUserCommunity(Member member) {
+		for(Role r : member.getRoles()) {
+			Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
 			if(category != null && category.getCategory_ABV().length() > 0) {
 				if(category.getCategory_Name().equals("Community")) {
 					return true;

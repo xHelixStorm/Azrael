@@ -25,8 +25,8 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent e) {
 		new Thread(() ->  {
-			if(!UserPrivs.isUserBot(e.getUser(), e.getGuild().getIdLong())) {
-				if(!UserPrivs.isUserMuted(e.getUser(), e.getGuild().getIdLong())) {
+			if(!UserPrivs.isUserBot(e.getGuild().getMember(e.getUser()))) {
+				if(!UserPrivs.isUserMuted(e.getGuild().getMember(e.getUser()))) {
 					if(Azrael.SQLgetCommandExecutionReaction(e.getGuild().getIdLong())) {
 						var reactionRoles = DiscordRoles.SQLgetReactionRoles(e.getGuild().getIdLong());
 						if(reactionRoles != null && reactionRoles.size() > 0) {

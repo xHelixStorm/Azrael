@@ -46,7 +46,7 @@ public class Patchnotes implements CommandPublic {
 			ArrayList<Patchnote> game_notes = null;
 			var modRights = false;
 			//retrieve patchnotes
-			if(UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+			if(UserPrivs.isUserMod(e.getMember()) || UserPrivs.isUserAdmin(e.getMember()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				modRights = true;
 			}
 			if(modRights)

@@ -179,7 +179,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					
 					final var inventory_bot = Hashes.getTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-					if(inventory_bot != null && UserPrivs.isUserBot(e.getMember().getUser(), guild_id) && inventory_bot.getExpiration() - System.currentTimeMillis() > 0) {
+					if(inventory_bot != null && UserPrivs.isUserBot(e.getMember()) && inventory_bot.getExpiration() - System.currentTimeMillis() > 0) {
 						String cache_content = inventory_bot.getAdditionalInfo();
 						String [] array = cache_content.split("_");
 						final long member_id = Long.parseLong(array[0]);
@@ -204,7 +204,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					
 					final var randomshop_bot = Hashes.getTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-					if(randomshop_bot != null && UserPrivs.isUserBot(e.getMember().getUser(), guild_id) && randomshop_bot.getExpiration() - System.currentTimeMillis() > 0) {
+					if(randomshop_bot != null && UserPrivs.isUserBot(e.getMember()) && randomshop_bot.getExpiration() - System.currentTimeMillis() > 0) {
 						String cache_content = randomshop_bot.getAdditionalInfo();
 						String [] array = cache_content.split("_");
 						final long member_id = Long.parseLong(array[0]);
@@ -228,7 +228,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					
 					final var rss = Hashes.getTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-					if(rss != null && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id) && rss.getExpiration() - System.currentTimeMillis() > 0) {
+					if(rss != null && !UserPrivs.isUserBot(e.getMember()) && rss.getExpiration() - System.currentTimeMillis() > 0) {
 						String task = rss.getAdditionalInfo();
 						if(!message.equalsIgnoreCase("exit")) {
 							if(task.equals("register") && message.startsWith("http")) {
@@ -280,8 +280,8 @@ public class GuildMessageListener extends ListenerAdapter {
 						String content = runquiz.getAdditionalInfo();
 						if(!content.equals("skip-question") || !content.equals("interrupt-questions")) {
 							var qui_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("qui")).findAny().orElse(null);
-							if(qui_channel != null && qui_channel.getChannel_ID() == e.getChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
-								if(UserPrivs.isUserAdmin(e.getMember().getUser(), guild_id) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
+							if(qui_channel != null && qui_channel.getChannel_ID() == e.getChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember())) {
+								if(UserPrivs.isUserAdmin(e.getMember()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
 									if(message.equals("skip-question") || message.equals("interrupt-questions")) {
 										Hashes.addTempCache("quiztime"+e.getGuild().getId(), new Cache(0, message));
 									}
@@ -324,7 +324,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						}
 						else {
 							var channels = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("bot") || f.getChannel_Type().equals("qui"))).collect(Collectors.toList());
-							if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) == null) {
+							if(!UserPrivs.isUserBot(e.getMember()) && channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) == null) {
 								int roleAssignLevel = 0;
 								long role_id = 0;
 								final var ranking_levels = RankingSystem.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getLevel() == (user_details.getLevel()+1)).findAny().orElse(null);
@@ -359,7 +359,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					new Thread(new URLFilter(e, null, filter_lang, allChannels)).start();
 				}
 				var log = GuildIni.getChannelAndCacheLog(guild_id);
-				if((log[0] || log[1]) && !UserPrivs.isUserBot(e.getMember().getUser(), guild_id)) {
+				if((log[0] || log[1]) && !UserPrivs.isUserBot(e.getMember())) {
 					StringBuilder image_url = new StringBuilder();
 					for(Attachment attch : e.getMessage().getAttachments()) {
 						image_url.append((e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? "("+attch.getProxyUrl()+")" : "\n("+attch.getProxyUrl()+")");

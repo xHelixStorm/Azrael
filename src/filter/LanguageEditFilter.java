@@ -33,7 +33,7 @@ public class LanguageEditFilter implements Runnable {
 	@SuppressWarnings("preview")
 	@Override
 	public void run() {
-		if(!UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong()) && !UserPrivs.isUserMod(e.getMember().getUser(), e.getGuild().getIdLong()) && !UserPrivs.isUserAdmin(e.getMember().getUser(), e.getGuild().getIdLong())) {
+		if(!UserPrivs.isUserBot(e.getMember()) && !UserPrivs.isUserMod(e.getMember()) && !UserPrivs.isUserAdmin(e.getMember())) {
 			boolean exceptionFound = false;
 			String [] output = new String[2];
 			

@@ -33,7 +33,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 			Bancollect warnedUser = Azrael.SQLgetData(user_id, guild_id);
 			
 			try{
-				if(!UserPrivs.isUserMuted(e.getUser(), guild_id) && (warnedUser.getUnmute() == null || (warnedUser.getUnmute().getTime() - System.currentTimeMillis()) > 0)  && warnedUser.getMuted()) {
+				if(!UserPrivs.isUserMuted(e.getGuild().getMember(e.getUser())) && (warnedUser.getUnmute() == null || (warnedUser.getUnmute().getTime() - System.currentTimeMillis()) > 0)  && warnedUser.getMuted()) {
 					String trigger_user_name = "NA";
 					if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
 						AuditLogPaginationAction logs = e.getGuild().retrieveAuditLogs();
@@ -65,7 +65,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 					logger.debug("{} got the mute role removed before the time expired in guild {}", e.getUser().getId(), e.getGuild().getId());
 					Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE_HALFWAY", user_id, guild_id, "Mute role removed manually");
 				}
-				else if(!UserPrivs.isUserMuted(e.getUser(), guild_id) && warnedUser.getUserID() != 0 && warnedUser.getMuted()) {
+				else if(!UserPrivs.isUserMuted(e.getGuild().getMember(e.getUser())) && warnedUser.getUserID() != 0 && warnedUser.getMuted()) {
 					if(Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false) == 999) {
 						logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
 					}

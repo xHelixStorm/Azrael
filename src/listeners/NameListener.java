@@ -69,7 +69,7 @@ public class NameListener extends ListenerAdapter {
 										updateNickname(member, guild, nickname);
 									}
 									else {
-										if(!UserPrivs.isUserAdmin(member.getUser(), guild_id) && !UserPrivs.isUserMod(member.getUser(), guild_id)) {
+										if(!UserPrivs.isUserAdmin(member) && !UserPrivs.isUserMod(member)) {
 											e.getUser().openPrivateChannel().complete().sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").complete();
 											e.getJDA().getGuildById(guild_id).kick(member).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
 											Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", "Kicked for having an invalid word inside his name!", 0);

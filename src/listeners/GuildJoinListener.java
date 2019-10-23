@@ -9,7 +9,7 @@ import fileManagement.GuildIni;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.RankingSystem;
-import threads.BotStartAssign;
+import threads.CollectUsersGuilds;
 import sql.DiscordRoles;
 import sql.Patchnotes;
 import sql.Azrael;
@@ -40,7 +40,7 @@ public class GuildJoinListener extends ListenerAdapter {
 		}
 		if(!new File("./ini/"+guild_id+".ini").exists())
 			GuildIni.createIni(e.getGuild().getIdLong());
-		new Thread(new BotStartAssign(null, e)).start();
+		new Thread(new CollectUsersGuilds(null, e)).start();
 		Azrael.SQLInsertActionLog("GUILD_JOIN", e.getGuild().getIdLong(), e.getGuild().getIdLong(), guild_name);
 	}
 }

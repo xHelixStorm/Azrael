@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import constructors.Roles;
 import constructors.Skins;
 import core.Hashes;
 import fileManagement.IniFileReader;
+import net.dv8tion.jda.api.entities.Member;
 import util.STATIC;
 
 public class RankingSystem {
@@ -92,6 +94,35 @@ public class RankingSystem {
 		} catch (SQLException e) {
 			logger.error("SQLInsertUser Exception", e);
 			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLBulkInsertUsers(List<Member> members, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin) {
+		logger.debug("SQLBulkInsertUsers launched. Passed params member list, {}, {}, {}, {}", _level_skin, _rank_skin, _profile_skin, _icon_skin);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip, "&rewriteBatchedStatements=true"), username, password);
+			myConn.setAutoCommit(false);
+			String sql = ("INSERT INTO users (user_id, name, level_skin, rank_skin, profile_skin, icon_skin, fk_guild_id) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			stmt = myConn.prepareStatement(sql);
+			for(Member member : members) {
+				stmt.setLong(1, member.getUser().getIdLong());
+				stmt.setString(2, member.getUser().getName()+"#"+member.getUser().getDiscriminator());
+				stmt.setInt(3, _level_skin);
+				stmt.setInt(4, _rank_skin);
+				stmt.setInt(5, _profile_skin);
+				stmt.setInt(6, _icon_skin);
+				stmt.setLong(7, member.getGuild().getIdLong());
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			myConn.commit();
+		} catch (SQLException e) {
+			logger.error("SQLBulkInsertUsers Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -554,6 +585,34 @@ public class RankingSystem {
 		} catch (SQLException e) {
 			logger.error("SQLInsertUserDetails Exception", e);
 			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLBulkInsertUserDetails(List<Member> members,  int _level, long _experience, long _currency, long _assigned_role) {
+		logger.debug("SQLBulkInsertUserDetails launched. Passed params members list, {}, {}, {}, {}", _level, _experience, _currency, _assigned_role);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip, "&rewriteBatchedStatements=true"), username, password);
+			myConn.setAutoCommit(false);
+			String sql = ("INSERT IGNORE INTO user_details (`fk_user_id`, `level`, `experience`, `currency`, `current_role`, `fk_guild_id`) VALUES (?, ?, ?, ?, ?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			for(Member member : members) {
+				stmt.setLong(1, member.getUser().getIdLong());
+				stmt.setInt(2, _level);
+				stmt.setLong(3, _experience);
+				stmt.setLong(4, _currency);
+				stmt.setLong(5, _assigned_role);
+				stmt.setLong(6, member.getGuild().getIdLong());
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			myConn.commit();
+		} catch (SQLException e) {
+			logger.error("SQLBulkInsertUserDetails Exception", e);
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }

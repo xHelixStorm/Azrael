@@ -90,7 +90,7 @@ public class Mute implements CommandPublic {
 					if(mute_role != null) {
 						for(final var member : users) {
 							if(e.getGuild().getSelfMember().canInteract(member)) {
-								if(!UserPrivs.isUserMuted(member.getUser(), e.getGuild().getIdLong())) {
+								if(!UserPrivs.isUserMuted(member)) {
 									var applyReason = (reason.toString().length() > 0 ? reason.toString() : "No reason has been provided!");
 									Azrael.SQLInsertHistory(member.getUser().getIdLong(), e.getGuild().getIdLong(), "mute", applyReason, 0);
 									Hashes.addTempCache("mute_time_gu"+e.getGuild().getId()+"us"+member.getUser().getId(), new Cache(e.getMember().getAsMention(), applyReason));

@@ -589,7 +589,7 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("warning")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					if(!Azrael.SQLisBanned(user_id, _e.getGuild().getIdLong()) && ( _e.getGuild().getMemberById(user_id) == null || !UserPrivs.isUserMuted(_e.getGuild().getMemberById(user_id).getUser(), _e.getGuild().getIdLong()))) {
+					if(!Azrael.SQLisBanned(user_id, _e.getGuild().getIdLong()) && ( _e.getGuild().getMemberById(user_id) == null || !UserPrivs.isUserMuted(_e.getGuild().getMemberById(user_id)))) {
 						int db_warning = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID();
 						if(db_warning != 0) {
 							int warning_id = Integer.parseInt(_message.replaceAll("[^0-9]*", ""));

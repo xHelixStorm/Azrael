@@ -43,14 +43,14 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 								if(!Hashes.containsActionlog(entry.getId()+entry.getOptionByName("count")) && removed_messages != null && removed_messages.get(0).getUserID() == entry.getTargetIdLong()) {
 									Hashes.addActionlog(entry.getId()+entry.getOptionByName("count"));
 									send_message = true;
-									if(e.getChannel().getId().equals(entry.getOptionByName("channel_id").toString()) && (UserPrivs.isUserAdmin(e.getGuild().getMemberById(entry.getUser().getId()).getUser(), e.getGuild().getIdLong()) || UserPrivs.isUserMod(e.getGuild().getMemberById(entry.getUser().getId()).getUser(), e.getGuild().getIdLong()))) {
+									if(e.getChannel().getId().equals(entry.getOptionByName("channel_id").toString()) && (UserPrivs.isUserAdmin(e.getGuild().getMemberById(entry.getUser().getId())) || UserPrivs.isUserMod(e.getGuild().getMemberById(entry.getUser().getId())))) {
 										removed_from = entry.getTargetIdLong();
-										if(!UserPrivs.isUserBot(e.getGuild().getMemberById(removed_from).getUser(), e.getGuild().getIdLong())) {
+										if(!UserPrivs.isUserBot(e.getGuild().getMemberById(removed_from))) {
 											trigger_user_id = entry.getUser().getIdLong();
 											trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 											break;
 										}
-										else if(removed_from != e.getJDA().getSelfUser().getIdLong() && UserPrivs.isUserBot(e.getGuild().getMemberById(removed_from).getUser(), e.getGuild().getIdLong())) {
+										else if(removed_from != e.getJDA().getSelfUser().getIdLong() && UserPrivs.isUserBot(e.getGuild().getMemberById(removed_from))) {
 											suppress_deleted = true;
 											break;
 										}
@@ -72,7 +72,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 									}
 								}
 							}
-							else if(GuildIni.getSelfDeletedMessage(e.getGuild().getIdLong()) && !suppress_deleted && removed_messages != null && !UserPrivs.isUserBot(e.getGuild().getMemberById(removed_messages.get(0).getUserID()).getUser(), e.getGuild().getIdLong())) {
+							else if(GuildIni.getSelfDeletedMessage(e.getGuild().getIdLong()) && !suppress_deleted && removed_messages != null && !UserPrivs.isUserBot(e.getGuild().getMemberById(removed_messages.get(0).getUserID()))) {
 								if(removed_messages != null && removed_messages.get(0).getMessage().length() > 0) {
 									var traAndDel_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("tra") || f.getChannel_Type().equals("del"))).collect(Collectors.toList());
 									var tra_channel = traAndDel_channel.parallelStream().filter(f -> f.getChannel_Type().equals("tra")).findAny().orElse(null);

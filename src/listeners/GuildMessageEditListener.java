@@ -56,7 +56,7 @@ public class GuildMessageEditListener extends ListenerAdapter{
 				}
 				
 				var log = GuildIni.getChannelAndCacheLog(e.getGuild().getIdLong());
-				if((log[0] || log[1]) && !UserPrivs.isUserBot(e.getMember().getUser(), e.getGuild().getIdLong())) {
+				if((log[0] || log[1]) && !UserPrivs.isUserBot(e.getMember())) {
 					StringBuilder image_url = new StringBuilder();
 					for(Attachment attch : e.getMessage().getAttachments()){
 						image_url.append((e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? "("+attch.getProxyUrl()+")" : "\n("+attch.getProxyUrl()+")");

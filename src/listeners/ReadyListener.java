@@ -29,7 +29,7 @@ import sql.RankingSystem;
 import sql.Azrael;
 import sql.DiscordRoles;
 import sql.Patchnotes;
-import threads.BotStartAssign;
+import threads.CollectUsersGuilds;
 import threads.RoleExtend;
 import timerTask.ClearCommentedUser;
 import timerTask.ClearHashes;
@@ -176,7 +176,7 @@ public class ReadyListener extends ListenerAdapter {
 		
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.execute(() -> { Azrael.SQLgetWholeWatchlist(); });
-		executor.execute(new BotStartAssign(e, null));
+		executor.execute(new CollectUsersGuilds(e, null));
 		for(Guild g : e.getJDA().getGuilds()) {
 			executor.execute(new RoleExtend(e, g.getIdLong()));
 			for(TextChannel tc : g.getTextChannels()){

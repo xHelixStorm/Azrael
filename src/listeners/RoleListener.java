@@ -41,7 +41,7 @@ public class RoleListener extends ListenerAdapter {
 			double unmute;
 			boolean customTimeMute = false;
 			
-			if(UserPrivs.isUserMuted(e.getMember().getUser(), e.getGuild().getIdLong())) {
+			if(UserPrivs.isUserMuted(e.getMember())) {
 				var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 				var mute_id = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null).getRole_ID();
 				Bancollect warnedUser = Azrael.SQLgetData(user_id, guild_id);
