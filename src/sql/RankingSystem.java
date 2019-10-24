@@ -530,7 +530,7 @@ public class RankingSystem {
 				return roles;
 			} catch (SQLException e) {
 				logger.error("SQLgetRoles Exception", e);
-				return null;
+				return roles;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }

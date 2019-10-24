@@ -5,7 +5,9 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,7 @@ import sql.RankingSystem;
 public class RankingThreadExecution {
 	private final static Logger logger = LoggerFactory.getLogger(RankingThreadExecution.class);
 	
-	public static void setProgress(GuildMessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, int percent_multiplier, Rank user_details, Guilds guild_settings){
+	public static void setProgress(GuildMessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, int percent_multiplier, Rank user_details, Guilds guild_settings) {
 		RankingSystem.SQLDeleteInventory();
 		int multiplier = 1;
 		
@@ -43,12 +45,12 @@ public class RankingThreadExecution {
 		int messageLength = message.length();
 		
 		int adder = 0;
-		if(messageLength >= 5 && messageLength <= 10){adder = ThreadLocalRandom.current().nextInt(1, 11);}
-		else if(messageLength >= 11 && messageLength <= 20){adder = ThreadLocalRandom.current().nextInt(11, 21);}
-		else if(messageLength >= 21 && messageLength <= 30){adder = ThreadLocalRandom.current().nextInt(21, 31);}
-		else if(messageLength >= 31 && messageLength <= 40){adder = ThreadLocalRandom.current().nextInt(31, 41);}
-		else if(messageLength >= 41 && messageLength <= 50){adder = ThreadLocalRandom.current().nextInt(41, 51);}
-		else if(messageLength > 50){adder = ThreadLocalRandom.current().nextInt(51, 71);}
+		if(messageLength >= 5 && messageLength <= 10) {adder = ThreadLocalRandom.current().nextInt(1, 11);}
+		else if(messageLength >= 11 && messageLength <= 20) {adder = ThreadLocalRandom.current().nextInt(11, 21);}
+		else if(messageLength >= 21 && messageLength <= 30) {adder = ThreadLocalRandom.current().nextInt(21, 31);}
+		else if(messageLength >= 31 && messageLength <= 40) {adder = ThreadLocalRandom.current().nextInt(31, 41);}
+		else if(messageLength >= 41 && messageLength <= 50) {adder = ThreadLocalRandom.current().nextInt(41, 51);}
+		else if(messageLength > 50) {adder = ThreadLocalRandom.current().nextInt(51, 71);}
 		
 		var doubleExperience = Hashes.getTempCache("doubleExp");
 		var doubleExperienceGuild = Hashes.getTempCache("doubleExp_gu"+guild_id);
@@ -127,14 +129,14 @@ public class RankingThreadExecution {
 			if(level != max_level) {
 				rankUpExperience = RankingSystem.SQLgetLevels(guild_settings.getThemeID()).parallelStream().filter(f -> f.getLevel() == (newLevel+1)).findAny().orElse(null).getExperience() - levelDetails.getExperience();
 			}
-			else{
+			else {
 				rankUpExperience = 0;
 			}
 			
 			Roles current_role = null;
 			final var rankingRoles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
-			if(level == roleAssignLevel){
-				for(final Role r : e.getMember().getRoles()){
+			if(level == roleAssignLevel) {
+				for(final Role r : e.getMember().getRoles()) {
 					for(final var role : rankingRoles) {
 						if(r.getIdLong() == role.getRole_ID()) {
 							e.getGuild().removeRoleFromMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(r.getIdLong())).queue();
@@ -151,12 +153,12 @@ public class RankingThreadExecution {
 			user_details.setExperience(experience);
 			user_details.setCurrency(currency);
 			
-			if(current_role != null){
+			if(current_role != null) {
 				user_details.setCurrentRole(current_role.getRole_ID());
 			}
 			
 			var editedRows = 0;
-			if(max_experience_enabled == true){
+			if(max_experience_enabled == true) {
 				user_details.setDailyExperience(daily_experience);
 				user_details.setDailyReset(reset);
 				editedRows = RankingSystem.SQLInsertDailyExperience(daily_experience, user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getDailyReset());
@@ -182,16 +184,28 @@ public class RankingThreadExecution {
 				logger.error("RankingSystem.daily_experience table couldn't be updated with the latest experience information for the user {}", user_details.getUser_ID());
 			}
 		}
-		else{
+		else {
 			user_details.setCurrentExperience(currentExperience);
 			user_details.setExperience(experience);
 			
 			var editedRows = 0;
-			if(max_experience_enabled == true){
+			if(max_experience_enabled == true) {
 				user_details.setDailyExperience(daily_experience);
 				user_details.setDailyReset(reset);
 				editedRows = RankingSystem.SQLInsertDailyExperience(daily_experience, user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getDailyReset());
 			}
+			
+			//verify that the current set ranking role is correct and if it's not, assign it to the user
+			final var rankingRoles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
+			List<Role> current_roles = e.getMember().getRoles().parallelStream().filter(f -> f.getIdLong() != user_details.getCurrentRole() && rankingRoles.parallelStream().filter(r -> r.getRole_ID() == f.getIdLong()).findAny().orElse(null) != null).collect(Collectors.toList());
+			if(current_roles.size() > 0) {
+				current_roles.parallelStream().forEach(role -> {
+					e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(role.getIdLong())).queue();
+				});
+				e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(user_details.getCurrentRole())).queue();
+			}
+			else if(user_details.getCurrentRole() != 0 && rankingRoles.size() > 0)
+				e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(user_details.getCurrentRole())).queue();
 			
 			if(RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getExperience()) > 0) {
 				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);

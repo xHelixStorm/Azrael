@@ -64,7 +64,7 @@ public class RegisterRankingRole {
 						logger.debug("{} has registered the ranking role {} with the level requirement {} in the guild {}", _e.getMember().getUser().getId(), role_name, level_requirement, _e.getGuild().getName());
 						_e.getChannel().sendMessage("**The role named "+role_name+" can now be unlocked by reaching level "+level_requirement+"**").queue();
 						Hashes.removeRankingRoles(guild_id);
-						if(RankingSystem.SQLgetRoles(guild_id) != null) {
+						if(RankingSystem.SQLgetRoles(guild_id).size() > 0) {
 							if(RankingSystem.SQLgetLevels(RankingSystem.SQLgetGuild(guild_id).getThemeID()).size() == 0) {
 								logger.error("Levels for the ranking system from RankingSystem.level_list couldn't be retrieved and cached");
 								_e.getChannel().sendMessage("An internal error occurred. All levels for the ranking system couldn't be retrieved from the table RankingSystem.level_list").queue();

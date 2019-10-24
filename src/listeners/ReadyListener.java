@@ -117,9 +117,8 @@ public class ReadyListener extends ListenerAdapter {
 				logger.error("Guild information from RankingSystem.guilds couldn't be retrieved and cached");
 				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Guild information from RankingSystem.guilds couldn't be called and cached").queue();
 			}
-			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetRoles(guild.getIdLong()) == null) {
-				logger.error("Roles from RankingSystem.roles couldn't be called and cached");
-				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
+			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetRoles(guild.getIdLong()).size() == 0) {
+				logger.warn("Roles from RankingSystem.roles couldn't be called and cached");
 			}
 			if(themesRetrieved == false) {
 				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Themes from RankingSystem.themes couldn't be called and cached").queue();
