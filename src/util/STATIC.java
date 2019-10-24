@@ -1,5 +1,16 @@
 package util;
 
+/**
+ * The STATIC class contains the current version number of the bot,
+ * global variables that get initialized from the config.ini file
+ * or by passing parameters on bot launch.
+ * 
+ * It additionally contains methods to retrieve the mysql url String,
+ * to collect running threads, to terminate specific collected threads,
+ * to handle removed messages by the filter, and other things which are
+ * used in multiple classes.  
+ */
+
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,6 +39,7 @@ import constructors.Channels;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -40,7 +52,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.9.348";
+	private static final String VERSION = "6.9.350";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
@@ -61,6 +73,7 @@ public class STATIC {
 		return VERSION;
 	}
 	
+	//default mysql url String to access the database. As parameters, the database name and ip address to the mysql server are required
 	public static String getDatabaseURL(final String _dbName, final String _ip) {
 		return "jdbc:mysql://"+_ip+"/"+_dbName+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="+IniFileReader.getTimezone();
 	}
@@ -152,6 +165,7 @@ public class STATIC {
 		return TEMP;
 	}
 	
+	//collect a running thread (for example a user mute due to the Thread.sleep) to concurrent array and assign a name to it
 	public static void addThread(Thread thread, final String name) {
 		if(threads.parallelStream().filter(f -> f.getName().equals(name)).findAny().orElse(null) != null)
 			return;
@@ -159,6 +173,7 @@ public class STATIC {
 		thread.setName(name);
 		threads.add(thread);
 	}
+	//kill a specific thread basing by the name of the thread
 	public static boolean killThread(final String name) {
 		var thread = threads.parallelStream().filter(f -> f.getName().equals(name)).findAny().orElse(null);
 		if(thread != null) {
@@ -170,10 +185,12 @@ public class STATIC {
 			return false;
 		}
 	}
+	//remove a thread from the array. Either gets called from the method killThread or after the thread in question terminates on its own
 	public static void removeThread(final Thread thread) {
 		threads.remove(thread);
 	}
 	
+	//collect a timer into the concurrent array
 	public static void addTimer(Timer timer) {
 		if(timers.parallelStream().filter(f -> f.equals(timer)).findAny().orElse(null) != null)
 			return;
@@ -181,6 +198,7 @@ public class STATIC {
 		timers.add(timer);
 	}
 	
+	//terminate all currently running timers
 	public static void killAllTimers() {
 		for(Timer timer : timers) {
 			timer.cancel();
@@ -188,6 +206,7 @@ public class STATIC {
 		timers.clear();
 	}
 	
+	//retrieve a list of channels in String format. For example when a command can't be executed and then has to reference to one or more bot channel(s)
 	public static String getChannels(List<Channels> channels) {
 		StringBuilder out = new StringBuilder();
 		var first = true;
@@ -203,6 +222,7 @@ public class STATIC {
 		return out.toString();
 	}
 	
+	//define the default privilege level for different role types. Used during role registrations. 0 is lowest and 100 is highest privilege
 	@SuppressWarnings("preview")
 	public static int getLevel(String category) {
 		return switch(category) {
@@ -214,9 +234,9 @@ public class STATIC {
 		};
 	}
 	
+	//Called by LanguageFilter and LanguageEditFilter class. Keeps track of removed messages, warns the user accordingly and mutes when the limit has been reached
 	@SuppressWarnings("unused")
 	public static void handleRemovedMessages(GuildMessageReceivedEvent e, GuildMessageUpdateEvent e2, String [] output) {
-		Logger logger = LoggerFactory.getLogger(STATIC.class);
 		logger.debug("Message removed from {} in guild {}", (e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId()), e.getGuild().getName());
 		var muteRole = DiscordRoles.SQLgetRoles((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong())).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 		if(muteRole == null) {
@@ -237,14 +257,22 @@ public class STATIC {
 					Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "2"));
 				}
 				else if(cache.getAdditionalInfo().equals("2")) {
-					if(e != null)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(muteRole.getRole_ID())).queue();
-					else		 e.getGuild().addRoleToMember(e2.getMember(), e2.getGuild().getRoleById(muteRole.getRole_ID())).queue();
+					if((e != null ? e.getGuild().getSelfMember() : e2.getGuild().getSelfMember()).hasPermission(Permission.MANAGE_ROLES)) {
+						if(e != null)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(muteRole.getRole_ID())).queue();
+						else		 e2.getGuild().addRoleToMember(e2.getMember(), e2.getGuild().getRoleById(muteRole.getRole_ID())).queue();
+					}
+					else {
+						final var log_channel = Azrael.SQLgetChannels(e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+						if(log_channel != null) (e != null ? e.getGuild() : e2.getGuild()).getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Mute role couldn't be assigned after the third censoring warning because the MANAGE ROLES permission is missing!").build()).queue();
+						logger.warn("MANAGE ROLES permission required to mute members for guild {}!", (e != null ? e.getGuild().getId() : e2.getGuild().getId()));
+					}
 					Hashes.clearTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 		}
 	}
 	
+	//remove the watch state from a user that either got banned or kicked from a server
 	public static void handleUnwatch(GuildBanEvent e, GuildMemberLeaveEvent e2, short type) {
 		var user_id = (e != null ? e.getUser().getIdLong() : e2.getMember().getUser().getIdLong());
 		var guild_id = (e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong());
@@ -265,6 +293,7 @@ public class STATIC {
 		}
 	}
 	
+	//method to trust all certificates and to retrieve the html code from a webpage
 	public static BufferedReader retrieveWebPageCode(String link) throws IOException {
  
         try {
@@ -305,6 +334,7 @@ public class STATIC {
 		return new BufferedReader(new InputStreamReader(con.getInputStream()));
 	}
 	
+	//login into twitter. Only done if required and the bot has been set up to collect tweets with a specific hashtag
 	public static void loginTwitter() {
 		if(twitterFactory == null) {
 			final var tokens = IniFileReader.getTwitterKeys();
