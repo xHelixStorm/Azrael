@@ -26,6 +26,7 @@ import core.UserPrivs;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.Role;
@@ -217,15 +218,23 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 					case "delete-messages" -> {
-						final var deleteMessagesLevel = GuildIni.getUserDeleteMessagesLevel(_e.getGuild().getIdLong());
-						if(UserPrivs.comparePrivilege(_e.getMember(), deleteMessagesLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
-							message.setTitle("You chose to delete a number of messages!");
-							_e.getChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
-							cache.updateDescription("delete-messages"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
+						if(_e.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE)) {
+							final var deleteMessagesLevel = GuildIni.getUserDeleteMessagesLevel(_e.getGuild().getIdLong());
+							if(UserPrivs.comparePrivilege(_e.getMember(), deleteMessagesLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+								message.setTitle("You chose to delete a number of messages!");
+								_e.getChannel().sendMessage(message.setDescription("Please choose how many messages should be removed between 1 and 100!").build()).queue();
+								cache.updateDescription("delete-messages"+user_id).setExpiration(180000);
+								Hashes.addTempCache(key, cache);
+							}
+							else {
+								UserPrivs.throwNotEnoughPrivilegeError(_e, deleteMessagesLevel);
+								Hashes.clearTempCache(key);
+							}
 						}
 						else {
-							UserPrivs.throwNotEnoughPrivilegeError(_e, deleteMessagesLevel);
+							message.setTitle("Messages can't be deleted!").setColor(Color.RED);
+							_e.getChannel().sendMessage(message.setDescription("The delete-messages parameter can't be used because the MANAGE MESSAGES permission is missing!").build()).queue();
+							logger.warn("MANAGE MESSAGES permission required for deleting messages in guild {}!", _e.getGuild().getId());
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -243,74 +252,95 @@ public class UserExecution {
 						}
 					}
 					case "mute" -> {
-						final var muteLevel = GuildIni.getUserMuteLevel(_e.getGuild().getIdLong());
-						if(UserPrivs.comparePrivilege(_e.getMember(), muteLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
-							message.setTitle("You chose to mute!");
-							if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
-								_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
-								cache.updateDescription("mute-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
-								Hashes.addTempCache(key, cache);
+						if(_e.getGuild().getSelfMember().canInteract(_e.getGuild().getMemberById(user_id))) {
+							if(_e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+								final var muteLevel = GuildIni.getUserMuteLevel(_e.getGuild().getIdLong());
+								if(UserPrivs.comparePrivilege(_e.getMember(), muteLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+									message.setTitle("You chose to mute!");
+									if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
+										_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
+										cache.updateDescription("mute-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+										Hashes.addTempCache(key, cache);
+									}
+									else {
+										message.addField("YES", "Provide a reason", true);
+										message.addField("NO", "Don't provide a reason", true);
+										_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a reason to the mute?").build()).queue();
+										cache.updateDescription("mute"+user_id).setExpiration(180000);
+										Hashes.addTempCache(key, cache);
+									}
+								}
+								else {
+									UserPrivs.throwNotEnoughPrivilegeError(_e, muteLevel);
+									Hashes.clearTempCache(key);
+								}
 							}
 							else {
-								message.addField("YES", "Provide a reason", true);
-								message.addField("NO", "Don't provide a reason", true);
-								_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a reason to the mute?").build()).queue();
-								cache.updateDescription("mute"+user_id).setExpiration(180000);
-								Hashes.addTempCache(key, cache);
+								message.setTitle("User can't get muted").setColor(Color.RED);
+								_e.getChannel().sendMessage(message.setDescription("The mute parameter can't be used because the MANAGE ROLES permission is missing!").build()).queue();
+								logger.warn("MANAGE ROLES permission required to mute a user in guild {}!", _e.getGuild().getId());
+								Hashes.clearTempCache(key);
 							}
 						}
 						else {
-							UserPrivs.throwNotEnoughPrivilegeError(_e, muteLevel);
+							message.setTitle("User can't get muted").setColor(Color.RED);
+							_e.getChannel().sendMessage(message.setDescription("The mute parameter can't be used because this user has higher privileges!").build()).queue();
 							Hashes.clearTempCache(key);
 						}
 					}
 					case "unmute" -> {
-						final var unmuteLevel = GuildIni.getUserUnmuteLevel(_e.getGuild().getIdLong());
-						if(UserPrivs.comparePrivilege(_e.getMember(), unmuteLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
-							if(!Azrael.SQLisBanned(user_id, _e.getGuild().getIdLong())) {
-								EmbedBuilder notice = new EmbedBuilder().setColor(Color.BLUE);
-								if(Azrael.SQLgetCustomMuted(user_id, _e.getGuild().getIdLong())) {
-									if(STATIC.killThread("mute_gu"+_e.getGuild().getId()+"us"+user_id)) {
-										notice.setTitle("Unmute action issued!");
-										_e.getChannel().sendMessage(notice.setDescription("Action issued to interrupt the mute! Please note that warnings don't get reverted while applying a custom mute time!").build()).queue();
-									}
-									else {
-										notice.setColor(Color.RED).setTitle("Member is not muted!");
-										_e.getChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
-									}
-								}
-								else if(Azrael.SQLgetMuted(user_id, _e.getGuild().getIdLong())) {
-									if(STATIC.killThread("mute_gu"+_e.getGuild().getId()+"us"+user_id)) {
-										notice.setTitle("Unmute action issued!");
-										_e.getChannel().sendMessage(notice.setDescription("Action issued to interrupt the mute! Undoing the previous warning!").build()).queue();
-										var warning = Azrael.SQLgetWarning(user_id, _e.getGuild().getIdLong());
-										if(warning == 1) {
-											Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
-										}
-										else if(warning > 1) {
-											Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-											Azrael.SQLInsertData(user_id, _e.getGuild().getIdLong(), warning-1, 1, timestamp, timestamp, false, false);
+						if(_e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+							final var unmuteLevel = GuildIni.getUserUnmuteLevel(_e.getGuild().getIdLong());
+							if(UserPrivs.comparePrivilege(_e.getMember(), unmuteLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+								if(!Azrael.SQLisBanned(user_id, _e.getGuild().getIdLong())) {
+									EmbedBuilder notice = new EmbedBuilder().setColor(Color.BLUE);
+									if(Azrael.SQLgetCustomMuted(user_id, _e.getGuild().getIdLong())) {
+										if(STATIC.killThread("mute_gu"+_e.getGuild().getId()+"us"+user_id)) {
+											notice.setTitle("Unmute action issued!");
+											_e.getChannel().sendMessage(notice.setDescription("Action issued to interrupt the mute! Please note that warnings don't get reverted while applying a custom mute time!").build()).queue();
 										}
 										else {
 											notice.setColor(Color.RED).setTitle("Member is not muted!");
 											_e.getChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
 										}
 									}
-									else if(GuildIni.getOverrideBan(_e.getGuild().getIdLong()) && Azrael.SQLgetWarning(user_id, _e.getGuild().getIdLong()) == Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong()) && Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getUnmute() == null) {
-										Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
-										var mute_role = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
-										if(mute_role != null) {
-											_e.getGuild().removeRoleFromMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
-											long assignedRole = 0;
-											Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
-											if(user_details != null) {
-												assignedRole = user_details.getCurrentRole();
+									else if(Azrael.SQLgetMuted(user_id, _e.getGuild().getIdLong())) {
+										if(STATIC.killThread("mute_gu"+_e.getGuild().getId()+"us"+user_id)) {
+											notice.setTitle("Unmute action issued!");
+											_e.getChannel().sendMessage(notice.setDescription("Action issued to interrupt the mute! Undoing the previous warning!").build()).queue();
+											var warning = Azrael.SQLgetWarning(user_id, _e.getGuild().getIdLong());
+											if(warning == 1) {
+												Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
 											}
-											_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(assignedRole)).queue();
-											_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle("User unmuted!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+_e.getGuild().getMemberById(user_id).getUser().getName()+"#"+_e.getGuild().getMemberById(user_id).getUser().getDiscriminator() + "** with the ID Number **" +user_id+ "** has been unmuted from his/her infinite mute!").build()).queue();
+											else if(warning > 1) {
+												Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+												Azrael.SQLInsertData(user_id, _e.getGuild().getIdLong(), warning-1, 1, timestamp, timestamp, false, false);
+											}
+											else {
+												notice.setColor(Color.RED).setTitle("Member is not muted!");
+												_e.getChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
+											}
+										}
+										else if(GuildIni.getOverrideBan(_e.getGuild().getIdLong()) && Azrael.SQLgetWarning(user_id, _e.getGuild().getIdLong()) == Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong()) && Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getUnmute() == null) {
+											Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
+											var mute_role = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+											if(mute_role != null) {
+												_e.getGuild().removeRoleFromMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
+												long assignedRole = 0;
+												Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
+												if(user_details != null) {
+													assignedRole = user_details.getCurrentRole();
+												}
+												_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(assignedRole)).queue();
+												_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle("User unmuted!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+_e.getGuild().getMemberById(user_id).getUser().getName()+"#"+_e.getGuild().getMemberById(user_id).getUser().getDiscriminator() + "** with the ID Number **" +user_id+ "** has been unmuted from his/her infinite mute!").build()).queue();
+											}
+											else {
+												_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("Mute role doesn't exist! Please verify that the mute role is still registered! Action aborted!").build()).queue();
+											}
 										}
 										else {
-											_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("Mute role doesn't exist! Please verify that the mute role is still registered! Action aborted!").build()).queue();
+											notice.setColor(Color.RED).setTitle("Member is not muted!");
+											_e.getChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
 										}
 									}
 									else {
@@ -319,62 +349,93 @@ public class UserExecution {
 									}
 								}
 								else {
-									notice.setColor(Color.RED).setTitle("Member is not muted!");
-									_e.getChannel().sendMessage(notice.setDescription("The member is not muted! Please apply this action, if you want to unmute a muted user!").build()).queue();
+									EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
+									_e.getChannel().sendMessage(error.setDescription("Action can't be executed! The user is currently banned").build()).queue();
 								}
+								logger.debug("{} has used the unmute action on {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo());
 							}
 							else {
-								EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
-								_e.getChannel().sendMessage(error.setDescription("Action can't be executed! The user is currently banned").build()).queue();
+								UserPrivs.throwNotEnoughPrivilegeError(_e, unmuteLevel);
 							}
-							logger.debug("{} has used the unmute action on {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo());
 						}
 						else {
-							UserPrivs.throwNotEnoughPrivilegeError(_e, unmuteLevel);
+							message.setTitle("User can't get unmuted").setColor(Color.RED);
+							_e.getChannel().sendMessage(message.setDescription("The unmute parameter can't be used because the MANAGE ROLES permission is missing!").build()).queue();
+							logger.warn("MANAGE ROLES permission required to unmute a user in guild {}!", _e.getGuild().getId());
 						}
 						Hashes.clearTempCache(key);
 					}
 					case "ban" -> {
-						final var banLevel = GuildIni.getUserBanLevel(_e.getGuild().getIdLong());
-						if(UserPrivs.comparePrivilege(_e.getMember(), banLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
-							message.setTitle("You chose to ban!");
-							if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
-								_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
-								cache.updateDescription("ban-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
-								Hashes.addTempCache(key, cache);
+						if(_e.getGuild().getSelfMember().canInteract(_e.getGuild().getMemberById(user_id))) {
+							if(_e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
+								final var banLevel = GuildIni.getUserBanLevel(_e.getGuild().getIdLong());
+								if(UserPrivs.comparePrivilege(_e.getMember(), banLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+									message.setTitle("You chose to ban!");
+									if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
+										_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
+										cache.updateDescription("ban-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+										Hashes.addTempCache(key, cache);
+									}
+									else {
+										message.addField("YES", "Provide a reason", true);
+										message.addField("NO", "Don't provide a reason", true);
+										_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the ban?").build()).queue();
+										cache.updateDescription("ban"+user_id).setExpiration(180000);
+										Hashes.addTempCache(key, cache);
+									}
+								}
+								else {
+									UserPrivs.throwNotEnoughPrivilegeError(_e, banLevel);
+									Hashes.clearTempCache(key);
+								}
 							}
 							else {
-								message.addField("YES", "Provide a reason", true);
-								message.addField("NO", "Don't provide a reason", true);
-								_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the ban?").build()).queue();
-								cache.updateDescription("ban"+user_id).setExpiration(180000);
-								Hashes.addTempCache(key, cache);
+								message.setTitle("User can't get banned!").setColor(Color.RED);
+								_e.getChannel().sendMessage(message.setDescription("The ban parameter can't be used because the BAN MEMBERS permission is missing!").build()).queue();
+								logger.warn("BAN MEMBERS permission required to ban a user in guild {}!", _e.getGuild().getId());
+								Hashes.clearTempCache(key);
 							}
 						}
 						else {
-							UserPrivs.throwNotEnoughPrivilegeError(_e, banLevel);
+							message.setTitle("User can't get banned!").setColor(Color.RED);
+							_e.getChannel().sendMessage(message.setDescription("The ban parameter can't be used because this user has higher permissions!").build()).queue();
 							Hashes.clearTempCache(key);
 						}
 					}
 					case "kick" -> {
-						final var kickLevel = GuildIni.getUserKickLevel(_e.getGuild().getIdLong());
-						if(UserPrivs.comparePrivilege(_e.getMember(), kickLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
-							message.setTitle("You chose to kick!");
-							if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
-								_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
-								cache.updateDescription("kick-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
-								Hashes.addTempCache(key, cache);
+						if(_e.getGuild().getSelfMember().canInteract(_e.getGuild().getMemberById(user_id))) {
+							if(_e.getGuild().getSelfMember().hasPermission(Permission.KICK_MEMBERS)) {
+								final var kickLevel = GuildIni.getUserKickLevel(_e.getGuild().getIdLong());
+								if(UserPrivs.comparePrivilege(_e.getMember(), kickLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+									message.setTitle("You chose to kick!");
+									if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
+										_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
+										cache.updateDescription("kick-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+										Hashes.addTempCache(key, cache);
+									}
+									else {
+										message.addField("YES", "Provide a reason", true);
+										message.addField("NO", "Don't provide a reason", true);
+										_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the kick?").build()).queue();
+										cache.updateDescription("kick"+user_id).setExpiration(180000);
+										Hashes.addTempCache(key, cache);
+									}
+								}
+								else {
+									UserPrivs.throwNotEnoughPrivilegeError(_e, kickLevel);
+									Hashes.clearTempCache(key);
+								}
 							}
 							else {
-								message.addField("YES", "Provide a reason", true);
-								message.addField("NO", "Don't provide a reason", true);
-								_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a reson to the kick?").build()).queue();
-								cache.updateDescription("kick"+user_id).setExpiration(180000);
-								Hashes.addTempCache(key, cache);
+								message.setTitle("User can't be kicked!").setColor(Color.RED);
+								_e.getChannel().sendMessage(message.setDescription("The kick parameter can't be used because the KICK MEMBERS permission is missing!").build()).queue();
+								logger.warn("KICK MEMBERS permission required to kick a user in guild {}!", _e.getGuild().getId());
+								Hashes.clearTempCache(key);
 							}
 						}
 						else {
-							UserPrivs.throwNotEnoughPrivilegeError(_e, kickLevel);
+							message.setTitle("User can't be kicked!").setColor(Color.RED);
+							_e.getChannel().sendMessage(message.setDescription("The kick parameter can't be used because the KICK MEMBERS permission is missing!").build()).queue();
 							Hashes.clearTempCache(key);
 						}
 					}
