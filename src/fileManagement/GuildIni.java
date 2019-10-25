@@ -706,43 +706,43 @@ public class GuildIni {
 	}
 	public static int getUserLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "UserLevel", int.class);
+		return ini.get("CommandLevels", "User", int.class);
 	}
 	public static int getUserInformationLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "UserInformationLevel", int.class);
+		return ini.get("CommandLevels", "UserInformation", int.class);
 	}
 	public static int getUserDeleteMessagesLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "UserDeleteMessagesLevel", int.class);
+		return ini.get("CommandLevels", "UserDeleteMessages", int.class);
 	}
 	public static int getUserWarningLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "UserWarningLevel", int.class);
+		return ini.get("CommandLevels", "UserWarning", int.class);
 	}
 	public static int getUserWarningForceLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "UserWarningForceLevel", int.class);
+		return ini.get("CommandLevels", "UserWarningForce", int.class);
 	}
 	public static int getUserMuteLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "UserMuteLevel", int.class);
+		return ini.get("CommandLevels", "UserMute", int.class);
 	}
 	public static int getUserUnmuteLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "UserUnmuteLevel", int.class);
+		return ini.get("CommandLevels", "UserUnmute", int.class);
 	}
 	public static int getUserBanLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "UserBanLevel", int.class);
+		return ini.get("CommandLevels", "UserBan", int.class);
 	}
 	public static int getUserKickLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "UserKickLevel", int.class);
+		return ini.get("CommandLevels", "UserKick", int.class);
 	}
 	public static int getUserHistoryLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "UserHistoryLevel", int.class);
+		return ini.get("CommandLevels", "UserHistory", int.class);
 	}
 	public static int getUserWatchLevel(long guild_id) {
 		Ini ini = readIni(guild_id);

@@ -1,5 +1,17 @@
 package filter;
 
+/**
+ * This class gets executed when a message has been sent into a channel
+ * that has been registered to filter urls. It gets called from 
+ * GuildMessageListener and GuildMessageEditListener.
+ * 
+ * Depending if the full url deletion mode has been enabled by the
+ * guild ini file, this class will either remove messages, which contain
+ * a url, basing a blacklist or ignore urls basing a whitelist. 
+ * Depending on the guild mode, only the blacklist or whitelist can be
+ * used.
+ */
+
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,20 +59,29 @@ public class URLFilter implements Runnable{
 	public void run() {
 		var guild_id = (e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong());
 		Member member = (e != null ? e.getMember() : e2.getMember());
+		//filtered has to be everything that wasn't posted by a bot, moderator or administrator
 		if(!UserPrivs.isUserBot(member) && !UserPrivs.isUserMod(member) && !UserPrivs.isUserAdmin(member)) {
+			//get the whole message
 			String incomingURL = (e != null ? e.getMessage().getContentRaw() : e2.getMessage().getContentRaw());
-			Pattern urlPattern = Pattern.compile("[\\w]{1,1}[a-zA-Z0-9@:%._+~#=-]{1,256}\\.[a-zA-Z]{1,1}[a-zA-Z0-9()]{1,6}[\\/a-zA-z0-9\\-?=&%.,+]*\\b");
+			//Regex pattern to retrieve a full url (e.g github.com/xHelixStorm/Azrael) which the retrieved message could contain
+			Pattern urlPattern = Pattern.compile("[\\w]{1,1}[a-zA-Z0-9@:%._+~#=-]{0,256}\\.[a-zA-Z]{1,1}[a-zA-Z0-9()]{1,5}[\\/a-zA-z0-9\\-?=&%.,+]*\\b");
 			Matcher matcher = urlPattern.matcher(incomingURL);
+			//proceed if an url have been found. Repeat search in case of false detections
 			while(matcher.find()) {
+				//save the found value to variable 
 				var foundURL = matcher.group();
+				//allow urls only if they are larger than 4 letters and if multiple dots aren't written together (e.g youtube..com)
 				if(foundURL.length() >= 4 && !Pattern.compile("[.]{2,}").matcher(foundURL).find()) {
+					//get the fully qualified domain name with the second regex
 					var shortURL = "";
-					Matcher matcher2 = Pattern.compile("[\\w]{1,1}[a-zA-Z0-9@:%._+~#=-]{1,256}\\.[a-zA-Z]{1,1}[a-zA-Z0-9()]{1,6}\\b").matcher(foundURL);
+					Matcher matcher2 = Pattern.compile("[\\w]{1,1}[a-zA-Z0-9@:%._+~#=-]{0,256}\\.[a-zA-Z]{1,1}[a-zA-Z0-9()]{1,5}\\b").matcher(foundURL);
 					if(matcher2.find())
 						shortURL = matcher2.group();
 					final var fqdn = shortURL;
+					//check if the bot is in full url delete mode for this server, if not, remove urls basing a blacklist table 
 					var fullBlacklist = GuildIni.getURLBlacklist(guild_id);
 					if(fullBlacklist) {
+						//remove url if that fqdn had been used before
 						if(Hashes.findGlobalURLBlacklist(fqdn)) {
 							//Whitelist check, if this url should be ignored
 							var whitelist = Azrael.SQLgetURLWhitelist(guild_id);
@@ -70,7 +91,7 @@ public class URLFilter implements Runnable{
 							}
 						}
 						else {
-							//Do a web check and confirm that the url is valid or not and then insert into global blacklist
+							//Do a ping check and confirm that the url is valid or not and then insert into global blacklist
 							try {
 								if(pingHost(foundURL)) {
 									Hashes.addGlobalURLBlacklist(fqdn);
@@ -130,6 +151,7 @@ public class URLFilter implements Runnable{
 			}
 			return false;
 		} catch(SSLHandshakeException e) {
+			//still return true if there are any certificate issues but the website exists
 			return true;
 		}
 	}
@@ -138,37 +160,43 @@ public class URLFilter implements Runnable{
 	private static String [] buildReplyMessageLang(List<String> lang) {
 		String [] output = new String[3];
 		if(lang.size() == 1) {
+			//defined messages for german, french and the rest in english
 			switch(lang.get(0)) {
 				case "ger" -> {
 					output[0] = " Die Nachricht wurde wegen eines nicht erlaubten URL entfernt!";
 					output[1] = " Dies ist deine zweite Warnung. Eine weitere entfernte Nachricht und du wirst auf diesem Server **stumm geschaltet**!";
-					output[2] = " Die Eingabe von URLs ist auf diesem Server nicht gestattet! URL entfernt!";
+					output[2] = " Die Eingabe von URLs ist auf diesem Kanal nicht gestattet! URL entfernt!";
 				}
 				case "fre" -> {
 					output[0] = " Le message a été supprimé pour l'affichage d'une url non autorisée !";
 					output[1] = " C'est votre deuxième avertissement. Encore une fois et vous serez **mis sous silence** sur le serveur !";
-					output[2] = " La saisie d'URLs n'est pas autorisée sur ce serveur ! URL supprimée !";
+					output[2] = " La saisie d'URLs n'est pas autorisée sur ce chenal ! URL supprimée !";
 				}
 				default -> {
 					output[0] = " Message has been removed for posting a not allowed url!";
 					output[1] = " This has been the second warning. One more and you'll be **muted** from the server!";
-					output[2] = " The input of URLs is not allowed on this server! URL removed!";
+					output[2] = " The input of URLs is not allowed in this channel! URL removed!";
 				}
 			}
 		}
+		//always use english if multiple filter languages have been set for a channel or if no filter language has been set
 		else {
 			output[0] = " Message has been removed for posting a not allowed url!";
 			output[1] = " This has been the second warning. One more and you'll be **muted** from the server!";
-			output[2] = " The input of URLs is not allowed on this server! URL removed!";
+			output[2] = " The input of URLs is not allowed in this channel! URL removed!";
 		}
 		return output;
 	}
 	
 	private static void printMessage(GuildMessageReceivedEvent e, GuildMessageUpdateEvent e2, String foundURL, boolean defaultBlacklist, String [] output, List<Channels> allChannels) {
+		//for sent messages
 		if(e != null) {
+			//delete message which contains the url
 			e.getMessage().delete().reason("Not allowed URL found!").queue(success -> {
+				//if the overall blacklist is enabled, print the message that urls are not allowed, else keep count of the removed messages and warn the user
 				if(defaultBlacklist) {e.getChannel().sendMessage(e.getMember().getAsMention()+output[2]).queue();}
 				else {STATIC.handleRemovedMessages(e, e2, output);}
+				//retrieve the trash channel to print the removed message. If not available, don't print any message
 				final Channels tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 				if(tra_channel != null) {
 					e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder()
@@ -185,13 +213,18 @@ public class URLFilter implements Runnable{
 					).queue();
 				}
 			}, error -> {
+				//when the message already has been removed, usually by another bot
 				logger.warn("Message containing a url has been already deleted! URL: {}", foundURL);
 			});
 		}
+		//for edited messages
 		else {
+			//delete message which contains the url
 			e2.getMessage().delete().reason("Not allowed URL found!").queue(success -> {
+				//if the overall blacklist is enabled, print the message that urls are not allowed, else keep count of the removed messages and warn the user
 				if(defaultBlacklist) {e2.getChannel().sendMessage(e2.getMember().getAsMention()+output[2]).queue();}
 				else {STATIC.handleRemovedMessages(e, e2, output);}
+				//retrieve the trash channel to print the removed message. If not available, don't print any message
 				final Channels tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 				if(tra_channel != null) {
 					e2.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder()
@@ -208,6 +241,7 @@ public class URLFilter implements Runnable{
 					).queue();
 				}
 			}, error -> {
+				//when the message already has been removed, usually by another bot
 				logger.warn("Message containing a url has been already deleted! URL: {}", foundURL);
 			});
 		}
