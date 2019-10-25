@@ -15,8 +15,8 @@ import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -52,7 +52,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "6.9.351";
+	private static final String VERSION = "6.9.352";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
@@ -328,8 +328,9 @@ public class STATIC {
 		}
  
 		URL url = new URL(link);
-		URLConnection con = url.openConnection();
-		con.setConnectTimeout(5000);
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36");
+		con.setConnectTimeout(10000);
 		con.setReadTimeout(10000);
 		return new BufferedReader(new InputStreamReader(con.getInputStream()));
 	}

@@ -4,13 +4,15 @@ import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.SSLHandshakeException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,28 +104,34 @@ public class URLFilter implements Runnable{
 	}
 	
 	private static boolean pingHost(String foundURL) throws MalformedURLException, IOException {
-		//http ping
-		URL url = new URL("http://"+foundURL);
-		URLConnection con = url.openConnection();
-		con.setConnectTimeout(5000);
-		con.setReadTimeout(5000);
-		con.connect();
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		if(in.readLine() != null) {
+		try {
+			//http ping
+			URL url = new URL("http://"+foundURL);
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36");
+			con.setConnectTimeout(5000);
+			con.setReadTimeout(5000);
+			con.connect();
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			if(in.readLine() != null) {
+				return true;
+			}
+			
+			//https ping
+			url = new URL("https://"+foundURL);
+			con = (HttpURLConnection) url.openConnection();
+			con.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36");
+			con.setConnectTimeout(5000);
+			con.setReadTimeout(5000);
+			con.connect();
+			in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			if(in.readLine() != null) {
+				return true;
+			}
+			return false;
+		} catch(SSLHandshakeException e) {
 			return true;
 		}
-		
-		//https ping
-		url = new URL("https://"+foundURL);
-		con = url.openConnection();
-		con.setConnectTimeout(5000);
-		con.setReadTimeout(5000);
-		con.connect();
-		in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		if(in.readLine() != null) {
-			return true;
-		}
-		return false;
 	}
 	
 	@SuppressWarnings("preview")
