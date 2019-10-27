@@ -108,8 +108,8 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
 							if(assignedRole != 0){e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
 						}
-						else if(channel != null) {
-							e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setTitle("Permission required!").setDescription("The mute role couldn't be removed from **"+user_name+"** with the id number **"+user_id+"** because the permission MANAGE ROLES is missing").build()).queue();
+						else {
+							if(channel != null) e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setTitle("Permission required!").setDescription("The mute role couldn't be removed from **"+user_name+"** with the id number **"+user_id+"** because the permission MANAGE ROLES is missing").build()).queue();
 							logger.warn("MANAGE ROLES permission required to remove the mute role in guild {}", guild_id);
 						}
 					}
@@ -132,7 +132,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							if(assignedRole != 0){e.getJDA().getGuildById(e.getGuild().getId()).addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
 						}
 						else {
-							e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setTitle("Permission required!").setDescription("The mute role couldn't be removed from **"+user_name+"** with the id number **"+user_id+"** because the permission MANAGE ROLES is missing").build()).queue();
+							if(channel != null) e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setTitle("Permission required!").setDescription("The mute role couldn't be removed from **"+user_name+"** with the id number **"+user_id+"** because the permission MANAGE ROLES is missing").build()).queue();
 							logger.warn("MANAGE ROLES permission required to remove the mute role in guild {}", guild_id);
 						}
 					}

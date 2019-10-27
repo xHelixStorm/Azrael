@@ -1,5 +1,13 @@
 package listeners;
 
+/**
+ * First event that gets executed on start up and on succesfull login to Discord
+ * 
+ * collect themes, roles, settings, etc before the bot is fully operational for taking
+ * commands, restart timers for muted users and start timers for regular check ups and 
+ * clean ups
+ */
+
 import java.awt.Color;
 import java.io.File;
 import java.util.Calendar;
@@ -42,6 +50,7 @@ public class ReadyListener extends ListenerAdapter {
 	
 	@Override
 	public void onReady(ReadyEvent e) {
+		//create the temp directory and verify if multiple sessions are running. If yes, terminate this session
 		FileSetting.createTemp(e);
 		if(new File(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr").exists() && FileSetting.readFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr").contains("1")) {
 			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "2");
@@ -50,41 +59,50 @@ public class ReadyListener extends ListenerAdapter {
 		}
 		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "1");
 		
+		//print default message + version
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the latest patch notes!");
 		System.out.println();
 		System.out.println("Azrael Version: "+STATIC.getVersion()+"\nAll credits to xHelixStorm");
 		System.out.println();
 		
+		//initialize variables of ini files and login into twitter, if the keys have been provided
 		GuildIni.initialize();
 		STATIC.loginTwitter();
 
+		//retrieve all available ranking themes
 		var themesRetrieved = true;
 		if(RankingSystem.SQLgetThemes() == false) {
 			themesRetrieved = false;
 			logger.error("Themes couldn't be retried from RankingSystem.themes");
 		}
+		//Iterate through all joined guilds
 		for(Guild guild : e.getJDA().getGuilds()) {
+			//create a guild ini file for new servers or verify if there are any old or missing variables that need to be added or removed
+			FileSetting.createGuildDirectory(guild);
 			if(!new File("ini/"+guild.getId()+".ini").exists())
 				GuildIni.createIni(guild.getIdLong());
 			else
 				GuildIni.verifyIni(guild.getIdLong());
 			
-			FileSetting.createGuildDirectory(guild);
+			//verify that the guild is registered in the database, if not insert the current guild into the database
 			if(Azrael.SQLgetGuild(guild.getIdLong()) == 0) {
 				if(Azrael.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
 					logger.error("Azrael.guild is empty and couldn't be filled! for guild {}", guild.getId());
 				}
 			}
+			//verify that the guild is registered in the discord roles database and do the same step
 			if(DiscordRoles.SQLgetGuild(guild.getIdLong()) == 0) {
 				if(DiscordRoles.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
 					logger.error("DiscordRoles.guilds is empty and couldn't be filled! for guild {}", guild.getId());
 				}
 			}
+			//verify that the guild is registered in the ranking system database and do the same step
 			if(RankingSystem.SQLgetGuild(guild.getIdLong()) == null) {
 				if(RankingSystem.SQLInsertGuild(guild.getIdLong(), guild.getName(), false) == 0) {
 					logger.error("RankingSystem.guild is empty and couldn't be filled! for guild {}", guild.getId());
 				}
 			}
+			//verify that the guild is registered in the patch notes database and do the same step
 			if(Patchnotes.SQLgetGuild(guild.getIdLong()) == 0) {
 				if(Patchnotes.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
 					logger.error("Patchnotes.guilds is empty and couldn't be filled! for guild {}", guild.getId());
@@ -92,14 +110,16 @@ public class ReadyListener extends ListenerAdapter {
 			}
 			Channels log_channel = null;
 			Channels bot_channel = null;
+			//Retrieve all registered channels and throw warning, if no channel has been registered. If found, check for the log and bot channel
 			var channels = Azrael.SQLgetChannels(guild.getIdLong());
 			if(channels == null || channels.size() == 0) {
-				logger.error("Channel information from Azrael.channels couldn't be retrieved and cached for guild {}", guild.getId());
+				logger.warn("Channel information from Azrael.channels couldn't be retrieved and cached for guild {}", guild.getId());
 			}
 			else {
 				log_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 				bot_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null);
 			}
+			//retrieve all registered discord roles, if empty insert the roles into the database and throw an error if this fails as well
 			if(DiscordRoles.SQLgetRoles(guild.getIdLong()).size() == 0) {
 				var result = DiscordRoles.SQLInsertRoles(guild.getIdLong(), guild.getRoles());
 				if(result != null && result.length > 0 && result[0] == 1) {
@@ -112,29 +132,37 @@ public class ReadyListener extends ListenerAdapter {
 					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occured. Roles for DiscordRoles.roles couldn't be inserted!").queue();
 				}
 			}
+			//retrieve all settings for the guild
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild.getIdLong());
 			if(guild_settings == null) {
 				logger.error("Guild information from RankingSystem.guilds couldn't be retrieved and cached");
 				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Guild information from RankingSystem.guilds couldn't be called and cached").queue();
 			}
+			//if the ranking system is enabled, retrieve all registered ranking roles
 			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetRoles(guild.getIdLong()).size() == 0) {
 				logger.warn("Roles from RankingSystem.roles couldn't be called and cached");
 			}
+			//notify the members of a guild if no themes could be retrieved
 			if(themesRetrieved == false) {
 				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Themes from RankingSystem.themes couldn't be called and cached").queue();
 			}
+			//retrieve all registered rss feeds and start the timer to make these display on the server
 			Azrael.SQLgetRSSFeeds(guild.getIdLong());
 			ParseRSS.runTask(e, guild.getIdLong());
 			
+			//print bot is now operational message for the current server
 			if(log_channel != null){e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("Bot is now operational!").queue();}
 			
+			//print public and private patch notes, if available for the current version of the bot
 			Patchnote priv_notes = null;
 			Patchnote publ_notes = null;
+			//check if the newest patch notes have been already printed, if not, make it possible to print
 			if(!Patchnotes.SQLcheckPublishedPatchnotes(guild.getIdLong())) {
 				priv_notes = Patchnotes.SQLgetPrivatePatchnotes();
 				publ_notes = Patchnotes.SQLgetPublicPatchnotes();
 			}
 			
+			//retrieve private patch notes
 			var published = false;
 			if(priv_notes != null && GuildIni.getPrivatePatchNotes(guild.getIdLong())) {
 				if(log_channel != null) {
@@ -149,6 +177,7 @@ public class ReadyListener extends ListenerAdapter {
 					published = true;
 				}
 			}
+			//retrieve public patch notes
 			if(publ_notes != null && GuildIni.getPublicPatchNotes(guild.getIdLong())) {
 				if(bot_channel != null) {
 					e.getJDA().getGuildById(guild.getId()).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
@@ -162,29 +191,32 @@ public class ReadyListener extends ListenerAdapter {
 					published = true;
 				}
 			}
+			//if patch notes have been printed, mark it as printed for the current guild in the database
 			if(published) {
 				Patchnotes.SQLInsertPublishedPatchnotes(guild.getIdLong());
 			}
 			
-			//check if the double exp should be enabled or disabled for the current guild
+			//check if double exp should be enabled or disabled for the current guild
 			var doubleExp = GuildIni.getDoubleExperienceMode(guild.getIdLong());
 			if(!doubleExp.equals("auto"))
 				Hashes.addTempCache("doubleExp_gu"+guild.getId(), new Cache(0, doubleExp));
 		}
 		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		
+		//execute background threads to collect current users, users under watch, text channels and muted users 
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.execute(() -> { Azrael.SQLgetWholeWatchlist(); });
 		executor.execute(new CollectUsersGuilds(e, null));
-		for(Guild g : e.getJDA().getGuilds()) {
-			executor.execute(new RoleExtend(e, g.getIdLong()));
+		e.getJDA().getGuilds().parallelStream().forEach(g -> {
+			executor.execute(new RoleExtend(g));
 			for(TextChannel tc : g.getTextChannels()){
 				if(Azrael.SQLInsertChannels(tc.getIdLong(), tc.getName()) == 0) {
 					logger.error("channel {} couldn't be registered", tc.getId());
 				}
 			}
-		}
+		});
 		
+		//if double experience is enabled, run 2 tasks for the start time and end time
 		if(IniFileReader.getDoubleExpEnabled()) {
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(Calendar.DAY_OF_WEEK, Weekday.getDay(IniFileReader.getDoubleExpStart()));
@@ -193,14 +225,17 @@ public class ReadyListener extends ListenerAdapter {
 			calendar2.set(Calendar.HOUR_OF_DAY, 23);
 			calendar2.set(Calendar.MINUTE, 59);
 			var currentTime = System.currentTimeMillis();
+			//if the bot has started right between the double experience time
 			if(calendar.getTime().getTime() < currentTime && calendar2.getTime().getTime() > currentTime)
 				Hashes.addTempCache("doubleExp", new Cache("on"));
 			DoubleExperienceStart.runTask(e, null, null, null);
 			DoubleExperienceOff.runTask();
 		}
 		ClearHashes.runTask();
+		//check later on if there are any residual muted users which were not unmuted
 		VerifyMutedMembers.runTask(e, null, null, true);
 		
+		//check if the ranking system should have a timeout for gaining experience points
 		var timeout = IniFileReader.getMessageTimeout();
 		if(timeout != 0)
 			ClearCommentedUser.runTask(timeout);
