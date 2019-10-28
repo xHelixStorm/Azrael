@@ -1,5 +1,12 @@
 package listeners;
 
+/**
+ * This class gets executed when a user updates his avatar.
+ * 
+ * The updated avatar will be inserted into the Azrael.users
+ * table.
+ */
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,8 +20,9 @@ public class AvatarUpdateListener extends ListenerAdapter {
 	@Override
 	public void onUserUpdateAvatar(UserUpdateAvatarEvent e) {
 		new Thread(() -> {
+			//update user avatar with the newest avatar
 			if(Azrael.SQLUpdateAvatar(e.getUser().getIdLong(), e.getUser().getEffectiveAvatarUrl()) > 0) {
-				logger.debug("{} has updated his/her avatar: {}", e.getUser().getId(), e.getUser().getEffectiveAvatarUrl());
+				logger.trace("{} has updated his/her avatar: {}", e.getUser().getId(), e.getUser().getEffectiveAvatarUrl());
 			}
 			else
 				logger.error("Avatar of {} couldn't be updated in Azrael.users", e.getUser().getId());
