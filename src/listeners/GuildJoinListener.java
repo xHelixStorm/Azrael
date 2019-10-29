@@ -1,5 +1,12 @@
 package listeners;
 
+/**
+ * This class gets executed when the bot joins a new server.
+ * 
+ * On execution, the guild details will be inserted into all
+ * tables and a guild ini file will be created if not available.
+ */
+
 import java.io.File;
 
 import org.slf4j.Logger;
@@ -24,22 +31,28 @@ public class GuildJoinListener extends ListenerAdapter {
 		long guild_id = e.getGuild().getIdLong();
 		String guild_name = e.getGuild().getName();
 		
+		//insert into Azrael table
 		if(Azrael.SQLInsertGuild(guild_id, guild_name) == 0) {
-			logger.error("guild information couldn't be inserted into Azrael.guilds table for the guild {}", guild_name);
+			logger.error("guild information couldn't be inserted into Azrael.guilds table for the guild {}", guild_id);
 		}
-		if(RankingSystem.SQLInsertGuild(guild_id, guild_name, false) > 0) {
-			if(DiscordRoles.SQLInsertGuild(guild_id, guild_name) == 0) {
-				logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", guild_name);
-			}
+		//insert into DiscordRoles table
+		if(DiscordRoles.SQLInsertGuild(guild_id, guild_name) == 0) {
+			logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", guild_id);
 		}
-		else {
-			logger.error("guild settings couldn't be inserted into RankingSystem.guilds table for the guild {}", guild_name);
+		//insert into RankingSystem table
+		if(RankingSystem.SQLInsertGuild(guild_id, guild_name, false) == 0) {
+			logger.error("guild settings couldn't be inserted into RankingSystem.guilds table for the guild {}", guild_id);
 		}
+		//insert into Patchnotes table
 		if(Patchnotes.SQLInsertGuild(guild_id, guild_name) == 0) {
-			logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", guild_name);
+			logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", guild_id);
 		}
+		//check if guild ini file exists, else create a new one or verify content
 		if(!new File("./ini/"+guild_id+".ini").exists())
-			GuildIni.createIni(e.getGuild().getIdLong());
+			GuildIni.createIni(guild_id);
+		else
+			GuildIni.verifyIni(guild_id);
+		//collect all users in the server
 		new Thread(new CollectUsersGuilds(null, e)).start();
 		Azrael.SQLInsertActionLog("GUILD_JOIN", e.getGuild().getIdLong(), e.getGuild().getIdLong(), guild_name);
 	}
