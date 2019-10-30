@@ -51,7 +51,7 @@ public class GuildListener extends ListenerAdapter {
 			long guild_id = e.getGuild().getIdLong();
 			long currentTime = System.currentTimeMillis();;
 			boolean badName = false;
-			long unmute;
+			long unmute = 0;
 			boolean muted;
 			
 			//retrieve the log channel
@@ -83,14 +83,17 @@ public class GuildListener extends ListenerAdapter {
 				if(log_channel != null && muted == false) {e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(":warning: The user **" + user_name + "** with the ID Number **" + user_id + "** joined **" + e.getGuild().getName() + "**").build()).queue();}
 			}
 			
-			try{
+			//retrieve the unmute time if available and if not, check if the user is marked as muted and if muted, reassign the mute role regardless
+			boolean permMute = false;
+			if(warnedUser.getUnmute() != null) {
 				unmute = warnedUser.getUnmute().getTime();
-			} catch(NullPointerException npe) {			
-				unmute = 0;
+			}
+			else if(warnedUser.getWarningID() != 0 && warnedUser.getMuted()) {
+				permMute = true;
 			}
 			
-			//mute the user if the time isn't elapsed and if the user is still marked as muted
-			if((unmute - currentTime) > 0 && muted) {
+			//mute the user if the time isn't elapsed and if the user is still marked as muted or if the user should receive back the perm mute
+			if(permMute || ((unmute - currentTime) > 0 && muted)) {
 				//verify that the bot has the manage roles permission before muting again
 				if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 					var mute_role = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
@@ -105,6 +108,7 @@ public class GuildListener extends ListenerAdapter {
 					Azrael.SQLUpdateGuildLeft(user_id, guild_id, false);
 					if(log_channel != null)
 						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The joined user **"+user_name+"** with the id number **"+user_id+"** couldn't get muted because the MANAGE ROLES permission is mssing!").build()).queue();
+					logger.warn("MANAGE ROLES permission missing to mute a user in guild {}!", e.getGuild().getId());
 				}
 			}
 			else {
