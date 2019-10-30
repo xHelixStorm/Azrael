@@ -1,5 +1,16 @@
 package listeners;
 
+/**
+ * This class gets executed when a reaction has been added
+ * to a message. 
+ * 
+ * It is either used to let users assign roles to themselves
+ * through reactions or to switch pages of the inventory
+ * or randomshop.
+ */
+
+import java.awt.Color;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +22,8 @@ import core.Hashes;
 import core.UserPrivs;
 import fileManagement.GuildIni;
 import inventory.InventoryBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.DiscordRoles;
@@ -25,71 +38,106 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent e) {
 		new Thread(() ->  {
+			//no action should be taken, if a bot has added a reaction
 			if(!UserPrivs.isUserBot(e.getGuild().getMember(e.getUser()))) {
+				//any action below won't apply for muted users
 				if(!UserPrivs.isUserMuted(e.getGuild().getMember(e.getUser()))) {
+					//verify that the custom server reactions is enabled
 					if(Azrael.SQLgetCommandExecutionReaction(e.getGuild().getIdLong())) {
-						var reactionRoles = DiscordRoles.SQLgetReactionRoles(e.getGuild().getIdLong());
-						if(reactionRoles != null && reactionRoles.size() > 0) {
-							var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rea")).findAny().orElse(null);
-							String reactionName = "";
-							if((EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":one:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":two:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":three:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":four:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":five:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":six:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":seven:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":eight:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":nine:")) && e.getChannel().getIdLong() == rea_channel.getChannel_ID()) {
-								reactionName = EmojiParser.parseToAliases(e.getReactionEmote().getName()).replaceAll(":", "");
-							}
-							else if(rea_channel != null && e.getChannel().getIdLong() == rea_channel.getChannel_ID()) {
-								reactionName = e.getReactionEmote().getName();
-							}
-							
-							if(reactionName.length() > 0) {
-								String [] reactions = GuildIni.getReactions(e.getGuild().getIdLong());
-								boolean emoteFound = false;
-								if(GuildIni.getReactionEnabled(e.getGuild().getIdLong())) {
-									for(int i = 0; i < reactionRoles.size(); i++) {
-										if(reactions[i].length() > 0 && (reactionName.equals(reactions[i]) || EmojiParser.parseToAliases(reactionName).replaceAll(":", "").equals(reactions[i]))) {
-											e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(i).getRole_ID())).queue();
-											emoteFound = true;
-											break;
-										}
-										if(i == 8) break;
-									}
-									if(emoteFound == false) {
-										int emote = STATIC.returnEmote(reactionName);
-										e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
-									}
+						//check for any registered reaction channel and execute logic only if it happened in that channel
+						var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rea")).findAny().orElse(null);
+						if(rea_channel != null && rea_channel.getChannel_ID() == e.getChannel().getIdLong()) {
+							//retrieve all reaction roles which will be assigned to a user when reacted
+							var reactionRoles = DiscordRoles.SQLgetReactionRoles(e.getGuild().getIdLong());
+							if(reactionRoles != null && reactionRoles.size() > 0) {
+								String reactionName = "";
+								//check if the basic reactions one to nine have been used
+								if((EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":one:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":two:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":three:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":four:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":five:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":six:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":seven:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":eight:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":nine:")) && e.getChannel().getIdLong() == rea_channel.getChannel_ID()) {
+									reactionName = EmojiParser.parseToAliases(e.getReactionEmote().getName()).replaceAll(":", "");
 								}
+								//else retrieve the name of the emote which isn't the default emote
 								else {
-									int emote = STATIC.returnEmote(reactionName);
-									e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
+									reactionName = e.getReactionEmote().getName();
 								}
-								logger.debug("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+								
+								//continue if a reaction name has been found
+								if(reactionName.length() > 0) {
+									//retrieve all names of the reactions from the guild ini file
+									String [] reactions = GuildIni.getReactions(e.getGuild().getIdLong());
+									boolean emoteFound = false;
+									//check if the custom emote mode is enabled, else assign roles to members basing on the default emote
+									if(GuildIni.getReactionEnabled(e.getGuild().getIdLong())) {
+										//iterate through all reaction roles in order
+										for(int i = 0; i < reactionRoles.size(); i++) {
+											//check if the reacted reaction is the same which is saved in the ini file, if yes assign role basing that reaction
+											if(reactions[i].length() > 0 && (reactionName.equals(reactions[i]) || EmojiParser.parseToAliases(reactionName).replaceAll(":", "").equals(reactions[i]))) {
+												//check if the bot has the manage roles permission
+												if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+													e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(i).getRole_ID())).queue();
+												else
+													printPermissionError(e);
+												emoteFound = true;
+												break;
+											}
+											//interrupt loop if more than 9 roles are registered
+											if(i == 8) break;
+										}
+										//return to default emotes, if the name of the reaction wasn't added in the ini file
+										if(emoteFound == false) {
+											int emote = STATIC.returnEmote(reactionName);
+											//check if the bot has the manage roles permission
+											if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+												e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
+											else
+												printPermissionError(e);
+										}
+									}
+									else {
+										int emote = STATIC.returnEmote(reactionName);
+										//check if the bot has the manage roles permission
+										if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+											e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
+										else
+											printPermissionError(e);
+									}
+									logger.debug("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+								}
 							}
+							else
+								logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());
 						}
-						else
-							logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());
 					}
 				}
 				
+				//check if either the arrow left or arrow right reaction has been used
 				if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:")) {
 					//inventory reactions
 					var inventory = Hashes.getTempCache("inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId());
 					//randomshop reactions
 					var randomshop = Hashes.getTempCache("randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId());
 					
+					//execute if it's an inventory reaction
 					if(inventory != null) {
+						//retrieve all inventory details
 						String cache_content = inventory.getAdditionalInfo();
 						String [] array = cache_content.split("_");
 						int current_page = Integer.parseInt(array[0]);
 						final int last_page = Integer.parseInt(array[1]);
 						final String inventory_tab = array[2];
 						final String sub_tab = array[3];
+						//either return to the previous page or go to the next page and redraw the inventory
 						if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") && current_page != 1)
 							current_page--;
 						else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && current_page != last_page)
 							current_page++;
+						//delete previously drawn inventory so that the new inventory image can be drawn
 						e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
 						Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab));
-						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-						var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
+						//retrieve current theme and max items in the current inventory
+						final var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
+						final var theme = guild_settings.getThemeID();
 						final int maxItems = guild_settings.getInventoryMaxItems();
+						//draw inventory depending on the category that was chosen
 						if(inventory_tab.equalsIgnoreCase("weapons")) {
 							if(!sub_tab.equalsIgnoreCase("total"))
 								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, sub_tab, theme), current_page, last_page, guild_settings);
@@ -101,16 +149,20 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 						else
 							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
 					}
+					//execute if it's a randomshop reaction
 					else if(randomshop != null) {
+						//retrieve all randomshop details
 						String cache_content = randomshop.getAdditionalInfo();
 						String [] array = cache_content.split("_");
 						int current_page = Integer.parseInt(array[0]);
 						final int last_page = Integer.parseInt(array[1]);
 						final String input = array[2];
+						//either return to the previous page or go to the next page and redraw the randomshop
 						if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") && current_page != 1)
 							current_page--;
 						else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && current_page != last_page)
 							current_page++;
+						//delete previous randomshop image and redraw the new one
 						e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 						RandomshopExecution.inspectItems(null, e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), theme), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme, false), input, current_page);
@@ -118,5 +170,15 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 				}
 			}
 		}).start();
+	}
+	
+	/**
+	 * Print error that the manage roles permission is missing!
+	 * @param e
+	 */
+	private static void printPermissionError(GuildMessageReactionAddEvent e) {
+		final var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+		if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Permission missing!").setDescription("Reaction role couldn't be applied for user **"+e.getUser().getName()+"#"+e.getUser().getDiscriminator()+"** with the id number **"+e.getUser().getId()+"** because the MANAGE ROLES permission is missing!").build()).queue();
+		logger.warn("MANAGE ROLES permission missing to apply reaction roles in guild {}!", e.getGuild().getId());
 	}
 }
