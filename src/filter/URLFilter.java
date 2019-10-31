@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -102,6 +103,8 @@ public class URLFilter implements Runnable{
 										break;
 									}
 								}
+							} catch(SocketTimeoutException e1) {
+								logger.warn("URL {} couldn't be verified for guild {}", foundURL, guild_id);
 							} catch(UnknownHostException e1) {
 								logger.warn("Invalid URL {} for guild {}", foundURL, guild_id);
 							} catch (MalformedURLException e1) {
