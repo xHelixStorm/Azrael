@@ -1,5 +1,12 @@
 package listeners;
 
+/**
+ * This class gets executed when a new role gets created.
+ * 
+ * The newly created role will be inserted into the 
+ * DiscordRoles.roles table.
+ */
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +20,7 @@ public class RoleCreateListener extends ListenerAdapter {
 	@Override
 	public void onRoleCreate(RoleCreateEvent e) {
 		new Thread(() -> {
-			//When a new role gets created, insert it into table as default role
+			//When a new role gets created, insert it into table with the default role attribute
 			var inserted = DiscordRoles.SQLInsertRole(e.getGuild().getIdLong(), e.getRole().getIdLong(), 1, e.getRole().getName(), "def");
 			if(inserted > 0) {
 				DiscordRoles.SQLgetRoles(e.getGuild().getIdLong());

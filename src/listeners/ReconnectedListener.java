@@ -1,5 +1,12 @@
 package listeners;
 
+/**
+ * This class gets executed when the bot was able to 
+ * reconnect to Discord. 
+ * 
+ * Main task is the restart of timers.
+ */
+
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -13,12 +20,16 @@ public class ReconnectedListener extends ListenerAdapter{
 	
 	@Override
 	public void onReconnect(ReconnectedEvent e) {
+		//clear all timers
 		STATIC.killAllTimers();
+		//restart timers for the double experience event
 		if(IniFileReader.getDoubleExpEnabled()) {
 			DoubleExperienceStart.runTask(null, e, null, null);
 			DoubleExperienceOff.runTask();
 		}
+		//clear temporary Hashes
 		ClearHashes.runTask();
+		//check for users that are still muted even though the time elapsed
 		VerifyMutedMembers.runTask(null, e, null, false);
 	}
 }

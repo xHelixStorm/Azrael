@@ -1,5 +1,13 @@
 package listeners;
 
+/**
+ * This class gets executed when a role gets deleted.
+ * 
+ * The deleted role will be removed from DiscordRoles.roles
+ * and from RankingSystem.roles + current assigned ranking
+ * role.
+ */
+
 import java.awt.Color;
 
 import org.slf4j.Logger;
@@ -31,7 +39,9 @@ public class RoleDeleteListener extends ListenerAdapter {
 			//check if a ranking role has been deleted
 			if(RankingSystem.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == e.getRole().getIdLong()).findAny().orElse(null) != null) {
 				Hashes.removeRankingRoles(e.getGuild().getIdLong());
+				//set the current role of everyone to 0
 				if(RankingSystem.SQLUpdateCurrentRole(e.getGuild().getIdLong(), 0) > 0) {
+					//then delete role from table
 					if(RankingSystem.SQLremoveSingleRole(e.getRole().getIdLong(), e.getGuild().getIdLong()) == 0) {
 						EmbedBuilder message = new EmbedBuilder();
 						var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
