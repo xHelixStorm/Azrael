@@ -35,7 +35,7 @@ public class UnbanListener extends ListenerAdapter {
 		new Thread(() -> {
 			String trigger_user_name = "NaN";
 			String append_message = "";
-			//check if the bot able to view the audit logs, if not then set a default message at the end of the unban
+			//check if the bot is able to view the audit logs, if not then set a default message at the end of the unban
 			if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
 				AuditLogPaginationAction logs = e.getGuild().retrieveAuditLogs();
 				for (AuditLogEntry entry : logs)

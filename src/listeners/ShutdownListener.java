@@ -1,9 +1,14 @@
 package listeners;
 
-import java.io.File;
+/**
+ * This class gets executed when the Bot has shutdown
+ * 
+ * Verify if that what was shutdown was a duplicate session
+ * or a normal session and if it should be restarted.
+ */
+
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +25,15 @@ public class ShutdownListener extends ListenerAdapter {
 	
 	@Override
 	public void onShutdown(ShutdownEvent e) {
+		//retrieve the file with the bot state (e.g. running / not running)
 		String filecontent = FileSetting.readFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr");
 		
+		//support only linux for a restart operation
 		if(SystemUtils.IS_OS_LINUX) {
+			//execute if the bot is labeled as running
 			if(filecontent.contains("1")) {
-				deleteTemp();
 				try {
+					//execute screen command to restart the bot
 					Process proc;
 					proc = Runtime.getRuntime().exec("screen -dm "+(STATIC.getSessionName().length() > 0 ? "-S "+STATIC.getSessionName()+" " : "")+"java -jar --enable-preview Azrael.jar "+STATIC.getToken()+(STATIC.getSessionName().length() > 0 ? " "+STATIC.getSessionName() : "")+(STATIC.getAdmin() != 0 ? " "+STATIC.getAdmin() : ""));
 					proc.waitFor();
@@ -34,23 +42,17 @@ public class ShutdownListener extends ListenerAdapter {
 				}
 			}
 		}
+		//check if a duplicate session has been started and terminate the current session, if it occurred
 		if(filecontent.contains("2")) {
 			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "1");
 			logger.warn("Duplicate running session shut down!");
 			Azrael.SQLInsertActionLog("DUPLICATE_SESSION", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
 		}
+		//do a regular shutdown
 		else {
 			logger.debug("Bot has shut down or reboot has been commenced");
 			Azrael.SQLInsertActionLog("BOT_SHUTDOWN", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
 		}
 		System.exit(0);
-	}
-	
-	private static void deleteTemp() {
-		try {
-			FileUtils.forceDelete(new File(IniFileReader.getTempDirectory()));
-		} catch (IOException e2) {
-			logger.error("Temp directory couldn't be deleted", e2);
-		}
 	}
 }

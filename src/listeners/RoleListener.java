@@ -1,5 +1,13 @@
 package listeners;
 
+/**
+ * this class gets executed when a user receives a role.
+ * 
+ * Handled is when a user receives the mute role. After
+ * receiving the mute role, it will be checked what
+ * kind and level of punishment the user will receive.
+ */ 
+
 import java.awt.Color;
 import java.sql.Timestamp;
 
