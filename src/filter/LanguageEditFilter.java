@@ -14,6 +14,7 @@ import core.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import sql.Azrael;
+import sql.DiscordRoles;
 import util.CharacterReplacer;
 import util.STATIC;
 
@@ -92,7 +93,8 @@ public class LanguageEditFilter implements Runnable {
 								}
 							}
 							message.setTitle("Message removed! The word **"+option.get()+"** from filter **"+filter+"** has been detected!");
-							e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();
+							final String printMessage = "Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage;
+							e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 						}
 						break;
 					}
@@ -100,15 +102,34 @@ public class LanguageEditFilter implements Runnable {
 						blockHeavyCensor = true;
 						var heavyCensoring = Hashes.getHeavyCensoring(e.getGuild().getIdLong());
 						if(heavyCensoring != null && heavyCensoring) {
+							var blockSaveMessage = false;
+							var messageDeleted = false;
 							var censorMessage = Hashes.getCensorMessage(e.getGuild().getIdLong());
-							if(parseMessage.length() == 1 || !parseMessage.matches("(.|\\s){0,}[\\w\\d](.|\\s){0,}") || (censorMessage != null && censorMessage.contains(parseMessage))) {
-								Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
-								e.getMessage().delete().reason("Message removed due to heavy censoring!").queue();
-								var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
-								if(tra_channel != null) {
-									message.setTitle("Message removed due to **heavy censoring**!");
-									e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();
+							if(parseMessage.length() == 1 || (censorMessage != null && censorMessage.contains(parseMessage))) {
+								deleteHeavyCensoringMessage(e, allChannels, name, channel, getMessage);
+								messageDeleted = true;
+								if(parseMessage.length() == 1)
+									blockSaveMessage = true;
+							}
+							else {
+								var splitWords = parseMessage.split(" ");
+								if(splitWords.length >= 9) {
+									var count = 0;
+									var searchWord = splitWords[0];
+									for(final var word : splitWords) {
+										if(word.equals(searchWord))
+											count++;
+										else
+											break;
+										if(count == 9) {
+											deleteHeavyCensoringMessage(e, allChannels, name, channel, getMessage);
+											messageDeleted = true;
+											blockSaveMessage = true;
+										}
+									}
 								}
+							}
+							if(!blockSaveMessage) {
 								if(censorMessage == null) {
 									ArrayList<String> saveMessage = new ArrayList<String>();
 									saveMessage.add(parseMessage);
@@ -120,12 +141,45 @@ public class LanguageEditFilter implements Runnable {
 										censorMessage.remove(0);
 									Hashes.addCensorMessage(e.getGuild().getIdLong(), censorMessage);
 								}
+							}
+							if(messageDeleted) {
+								var threshold = Hashes.getFilterThreshold(e.getGuild().getIdLong());
+								if(threshold != null) {
+									var count = Integer.parseInt(threshold);
+									if(++count == 30) {
+										var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+										if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("Heavy censoring has reached the critical threshold! Everyone who will have his messages removed due to the heavy censoring will get muted!").queue();
+									}
+									if(count >= 30) {
+										var mute_role = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+										if(mute_role != null) {
+											Azrael.SQLInsertHistory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "mute", "Heavy censoring mute after reaching the threshold", 0);
+											e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
+										}
+									}
+									if(count <= 99)
+										Hashes.addFilterThreshold(e.getGuild().getIdLong(), ""+count);
+								}
+								else if(threshold == null) {
+									Hashes.addFilterThreshold(e.getGuild().getIdLong(), ""+1);
+								}
 								break;
 							}
 						}
 					}
 				}
 			}
+		}
+	}
+	
+	private static void deleteHeavyCensoringMessage(GuildMessageUpdateEvent e, List<Channels> allChannels, String name, String channel, String getMessage) {
+		Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
+		e.getMessage().delete().reason("Message removed due to heavy censoring!").queue();
+		var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
+		if(tra_channel != null) {
+			message.setTitle("Message removed due to **heavy censoring**!");
+			final String printMessage = "Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage;
+			e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 		}
 	}
 }

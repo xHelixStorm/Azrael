@@ -100,7 +100,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 											//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 											for(final var cachedMessage : removed_messages) {
 												message.setTitle(trigger_user_name+" has removed "+(cachedMessage.isEdit() ? "an **edited message**" : "a **message**")+" from #"+e.getChannel().getName()+"!");
-												e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage()).build()).queue();
+												final var printMessage = "["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage();
+												e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 											}
 										}
 									}
@@ -117,7 +118,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 											//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 											for(final var cachedMessage : removed_messages) {
 												message.setTitle("User has removed his own "+(cachedMessage.isEdit() ? "**edited message**" : "**message**")+" from #"+e.getChannel().getName()+"!");
-												e.getGuild().getTextChannelById((del_channel != null ? del_channel.getChannel_ID() : tra_channel.getChannel_ID())).sendMessage(message.setDescription("["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage()).build()).queue();
+												final var printMessage = "["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage();
+												e.getGuild().getTextChannelById((del_channel != null ? del_channel.getChannel_ID() : tra_channel.getChannel_ID())).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 											}
 										}
 									}
@@ -131,7 +133,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 									//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 									for(final var cachedMessage : removed_messages) {
 										message.setTitle((cachedMessage.isEdit() ? "**Edited message**" : "**Message**")+" removed from #"+e.getChannel().getName()+"!");
-										e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage()).build()).queue();
+										final var printMessage = "["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage();
+										e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 									}
 								}
 								Hashes.clearTempCache("message-removed_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+removed_messages.get(0).getUserID());
@@ -153,7 +156,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 						//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 						for(final var cachedMessage : removed_messages) {
 							message.setTitle("Logged deleted "+(cachedMessage.isEdit() ? "**edited message**" : "**message**")+" due to watching!");
-							e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(message.setDescription("["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage()).build()).queue();
+							final var printMessage = "["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage();
+							e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 						}
 					}
 				}

@@ -446,9 +446,10 @@ public class GuildMessageListener extends ListenerAdapter {
 				//if the watched member level equals 2, then print all written messages from that user in a separate channel
 				if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
 					var cachedMessage = sentMessage.get(0);
+					var printMessage = "["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+"]: "+cachedMessage.getMessage();
 					e.getGuild().getTextChannelById(watchedMember.getWatchChannel()).sendMessage(new EmbedBuilder()
 						.setTitle("Logged written message due to watching!").setColor(Color.YELLOW)
-						.setDescription("["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+"]: "+cachedMessage.getMessage()).build()).queue();
+						.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 				}
 				//print an error if the cache log is not enabled
 				else if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage == null) {

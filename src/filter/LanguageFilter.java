@@ -93,7 +93,8 @@ public class LanguageFilter implements Runnable {
 								}
 							}
 							message.setTitle("Message removed! The word **"+option.get()+"** from filter **"+filter+"** has been detected!");
-							e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();
+							final String printMessage = "Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage;
+							e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 						}
 						break;
 					}
@@ -177,7 +178,8 @@ public class LanguageFilter implements Runnable {
 		var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 		if(tra_channel != null) {
 			message.setTitle("Message removed due to **heavy censoring**!");
-			e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription("Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage).build()).queue();
+			final String printMessage = "Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage;
+			e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 		}
 	}
 }
