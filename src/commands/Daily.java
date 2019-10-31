@@ -1,5 +1,11 @@
 package commands;
 
+/**
+ * The Daily command sends the user a random defined reward
+ * which can be retrieved once a day as long the ranking 
+ * system is enabled
+ */
+
 import java.awt.Color;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -32,6 +38,7 @@ public class Daily implements CommandPublic {
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+		//check if the command is enabled and that the user has enough permissions
 		if(GuildIni.getDailyCommand(e.getGuild().getIdLong())) {
 			final var commandLevel = GuildIni.getDailyLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
@@ -44,35 +51,48 @@ public class Daily implements CommandPublic {
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
+		//check if the user is spamming the command before it's completed (attempt to retrieve multiple rewards)
 		var cache = Hashes.getTempCache("dailyDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 		if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
+			//set timeout
 			Hashes.addTempCache("dailyDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(3000));
+			//retrieve all bot channels
 			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+			//execute block only if no bot channel is registered or if the current channel is a bot channel
 			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
 				long time_for_daily = 0;
-				try {
-					time_for_daily = RankingSystem.SQLgetDailiesUsage(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong()).getTime()-System.currentTimeMillis();
-				} catch(NullPointerException npe){
+				//check if the daily command can be used again today as long the current time is bigger than the saved time
+				var dailiesUsage = RankingSystem.SQLgetDailiesUsage(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+				if(dailiesUsage != null)
+					time_for_daily = dailiesUsage.getTime()-System.currentTimeMillis();
+				else
 					time_for_daily = -1;
-				}
+				//enter this block when the user is allowed to retrieve a daily again
 				if(time_for_daily < 0){
-					// confirm if there are any available rewards to send in private message
+					//confirm that there are any available rewards to send in private message (e.g. giveaways)
 					String cod_reward = RankingSystem.SQLRetrieveGiveawayReward(e.getGuild().getIdLong());
 					boolean exclude_cod = false;
 					if(cod_reward.length() == 0)
 						exclude_cod = true;
-					//
+					//retrieve guild settings and all registered daily items which a user can win
 					constructors.Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 					List<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong(), guild_settings.getThemeID());
 					var tot_weight = 0;
+					//exclude rewards which get sent in private message, if there is no available reward
 					if(exclude_cod == true) {
+						//collect the total probability of all items together without special rewards (e.g. currency reward = 5% + special item = 1% = tot_weight = 6%)
 						tot_weight = daily_items.parallelStream().filter(i -> !i.getType().equals("cod")).mapToInt(i -> i.getWeight()).sum();
+						//remove all special items from the daily_items
 						daily_items = daily_items.parallelStream().filter(i -> !i.getType().equals("cod")).collect(Collectors.toList());
 					}
+					//get the weight of everything if special rewards are included
 					else
 						tot_weight = daily_items.parallelStream().mapToInt(i -> i.getWeight()).sum();
+					//get a random number between 1 and the total weight (probability)
 					int random = ThreadLocalRandom.current().nextInt(1, tot_weight);
 					
+					//iterate through the daily items and insert all items into the daily array depending by how big the probability is
+					//(e.g. if a currency reward equals 5% then it will be inserted 5 times into the array)
 					ArrayList<Dailies> list = new ArrayList<Dailies>();
 					for(Dailies daily : daily_items){
 						for(int i = 1; i <= daily.getWeight(); i++){
@@ -80,14 +100,12 @@ public class Daily implements CommandPublic {
 							this_daily.setDescription(daily.getDescription());
 							this_daily.SetType(daily.getType());
 							this_daily.setAction(daily.getAction());
-							if(daily.getType().equals("cod") && cod_reward.length() > 0) 
-								list.add(this_daily);
-							
-							else if(daily.getType().equals("cur") || daily.getType().equals("exp"))
-								list.add(this_daily);
+							list.add(this_daily);
 						}
 					}
+					//get the index of an array depending on the random number and draw the reward into the screen
 					DrawDaily.draw(e, list.get(random).getDescription(), guild_settings);
+					//set the daily reset to next midnight time
 					long time = System.currentTimeMillis();
 					Timestamp timestamp = new Timestamp(time);
 					LocalTime midnight = LocalTime.MIDNIGHT;
@@ -95,23 +113,25 @@ public class Daily implements CommandPublic {
 					LocalDateTime tomorrowMidnight = LocalDateTime.of(today, midnight).plusDays(1);
 					Timestamp timestamp2 = Timestamp.valueOf(tomorrowMidnight);
 					var editedRows = 0;
-					if(list.get(random).getType().equals("cur")){
+					//if it's a currency reward, add it directly to the total currency of the user and update the db
+					if(list.get(random).getType().equals("cur")) {
 						constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 						user_details.setCurrency(user_details.getCurrency()+Long.parseLong(list.get(random).getDescription().replaceAll("[^0-9]*", "")));
 						editedRows = RankingSystem.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency());
 						if(editedRows > 0)
 							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 					}
-					else if(list.get(random).getType().equals("exp")){
+					//if it's a experience boost reward, add it to inventory and activate it, if the action is set to 'use'
+					else if(list.get(random).getType().equals("exp")) {
 						var item_id = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(i -> i.getShopDescription().equals(list.get(random).getDescription())).findAny().orElse(null).getItemID();
-						if(list.get(random).getAction().equals("keep")){
+						if(list.get(random).getAction().equals("keep")) {
 							InventoryContent inventory = RankingSystem.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), list.get(random).getDescription(), "perm", guild_settings.getThemeID());
 							if(inventory != null)
 								editedRows = RankingSystem.SQLInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, inventory.getNumber()+1, "perm", guild_settings.getThemeID());
 							else
 								editedRows = RankingSystem.SQLInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, 1, "perm", guild_settings.getThemeID());
 						}
-						else if(list.get(random).getAction().equals("use")){
+						else if(list.get(random).getAction().equals("use")) {
 							InventoryContent inventory = RankingSystem.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), list.get(random).getDescription(), "limit", guild_settings.getThemeID());
 							try {
 								Timestamp timestamp3 = new Timestamp(inventory.getExpiration().getTime()+1000*60*60*24);
@@ -122,6 +142,7 @@ public class Daily implements CommandPublic {
 							}
 						}
 					}
+					//if it's a special reward, send it in private message to the user and print it in the log channel at the same time
 					else if(list.get(random).getType().equals("cod")) {
 						//send a private message
 						e.getMember().getUser().openPrivateChannel().queue(channel -> {
@@ -138,6 +159,7 @@ public class Daily implements CommandPublic {
 						//mark the code as used
 						editedRows = RankingSystem.SQLUpdateUsedOnReward(cod_reward, e.getGuild().getIdLong());
 					}
+					//if the inventory has been updated, set the daily for this user and the current day as opened
 					if(editedRows > 0) {
 						if(RankingSystem.SQLInsertDailiesUsage(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), timestamp, timestamp2) > 0) {
 							logger.debug("{} received {} out of the Daily command", e.getMember().getUser().getId(), list.get(random).getDescription());
@@ -155,13 +177,14 @@ public class Daily implements CommandPublic {
 					}
 					list.clear();
 				}
-				else{
+				//notify the user that he can't use the daily command yet
+				else {
 					long hours = time_for_daily/1000/60/60;
 					long minutes = time_for_daily/1000/60%60;
 					e.getChannel().sendMessage("Wait, slow down! You can open your next daily in **"+hours+" hours and "+minutes+" minutes**!").queue();
 				}
 			}
-			else{
+			else {
 				e.getChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
 			}
 		}

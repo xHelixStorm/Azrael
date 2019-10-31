@@ -1,5 +1,10 @@
 package commands;
 
+/**
+ * The Equip command will allow a user to equip weapons
+ * and skills in private message. 
+ */
+
 import java.awt.Color;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,8 +28,10 @@ import sql.RankingSystem;
 public class Equip implements CommandPublic, CommandPrivate {
 	private final static Logger logger = LoggerFactory.getLogger(Equip.class);
 	
+	//PUBLIC COMMAND SECTION START
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+		//check if the command is enabled
 		if(GuildIni.getEquipCommand(e.getGuild().getIdLong()))
 			return true;
 		return false;
@@ -32,7 +39,8 @@ public class Equip implements CommandPublic, CommandPrivate {
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
-		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" My apologies young padawan, please try to use this command in a private message to me by just writing equip without prefix!").build()).queue();
+		//print message to write the command in private message
+		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" My apologies young padawan, please try to use this command in a private message to me by just writing '!equip'!").build()).queue();
 	}
 
 	@Override
@@ -40,8 +48,10 @@ public class Equip implements CommandPublic, CommandPrivate {
 		logger.debug("{} has used Equip command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 
+	//PRIVATE COMMAND SECTION START
 	@Override
 	public boolean called(String[] args, PrivateMessageReceivedEvent e) {
+		//private message is always enabled
 		return true;
 	}
 
@@ -51,10 +61,12 @@ public class Equip implements CommandPublic, CommandPrivate {
 		List<Guild> mutualGuilds = e.getAuthor().getMutualGuilds().parallelStream().filter(f -> RankingSystem.SQLgetGuild(f.getIdLong()).getRankingState() && GuildIni.getEquipCommand(f.getIdLong())).collect(Collectors.toList());
 		//If there's at least 1 guild with an enabled ranking state, proceed!
 		if(mutualGuilds != null && mutualGuilds.size() > 0) {
+			//if only one guild has been found
 			if(mutualGuilds.size() == 1) {
+				//check if the user is allowed to use this command
 				if(UserPrivs.comparePrivilege(e.getJDA().getGuildById(mutualGuilds.get(0).getId()).getMemberById(e.getAuthor().getId()), GuildIni.getEquipLevel(mutualGuilds.get(0).getIdLong()))) {
-					//directly make the selection screen appear (e.g. equip, unequip, etc)
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Equip command").setDescription("Write one of the following available options to equip a weapon and/or skill. You have 3 minutes to select an option or use 'exit' to terminate!\n\n"
+					//directly make the selection screen appear (e.g. show, set, etc)
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Equip command").setDescription("Write one of the following available options to equip/unequip a weapon and/or skill. You have 3 minutes to select an option or use 'exit' to terminate!\n\n"
 							+ "**show**\n"
 							+ "**set**\n"
 							+ "**remove**\n"
@@ -66,6 +78,7 @@ public class Equip implements CommandPublic, CommandPrivate {
 					e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(GuildIni.getEquipLevel(mutualGuilds.get(0).getIdLong()), mutualGuilds.get(0))).build()).queue();
 				}
 			}
+			//if multiple guilds have been found
 			else {
 				//show the guild selection screen and then go over to the action selection screen
 				StringBuilder out = new StringBuilder();
@@ -84,10 +97,12 @@ public class Equip implements CommandPublic, CommandPrivate {
 						guilds += guild.getId();
 					i++;
 				}
-				try {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Select the server by sending a digit of the server you wish to edit your equipment! You have 3 minutes to select a server or write 'exit' to terminate!\n\n"+out.toString()).build()).queue();
+				final var printMessage = "Select the server by sending a digit of the server you wish to edit your equipment! You have 3 minutes to select a server or write 'exit' to terminate!\n\n"+out.toString();
+				if(printMessage.length() <= 2048) {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(printMessage).build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guilds, "wait"));
-				} catch(IllegalArgumentException iae) {
+				}
+				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("I'm active in too many servers to display the server selection page. Please either write the server name or the server id to directly select the server!").build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guilds, "err"));
 				}

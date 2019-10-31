@@ -1,5 +1,11 @@
 package commands;
 
+/**
+ * The Display command can print details of various things
+ * like all roles, registered roles, text channels, registered
+ * text channels and so on. 
+ */
+
 import java.awt.Color;
 import java.util.List;
 
@@ -29,6 +35,7 @@ public class Display implements CommandPublic{
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+		//check if the command is enabled and that the user has enough permissions
 		if(GuildIni.getDisplayCommand(e.getGuild().getIdLong())) {
 			var commandLevel = GuildIni.getDisplayLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong()))
@@ -45,7 +52,9 @@ public class Display implements CommandPublic{
 		long guild_id = e.getGuild().getIdLong();
 		StringBuilder out = new StringBuilder();
 		
+		//get the current set command prefix
 		final String prefix = GuildIni.getCommandPrefix(guild_id);
+		//if no arguments have been added to the command, print a list of all available parameters
 		if(args.length == 0) {
 			out.append("Use these parameters after the display command like **"+prefix+"display -roles** for further information on what to display:\n\n"
 					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong())) || adminPermission 				? "**-roles**: Display all roles from this guild.\n" : "")
@@ -59,9 +68,12 @@ public class Display implements CommandPublic{
 					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong())) || adminPermission 		? "**-command-levels**: Display the privilege level of each command and subcommand." : ""));
 			e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue();
 		}
+		//display all roles
 		else if(args[0].equalsIgnoreCase("-roles")) {
+			//verify that the current user is allowed to use this parameter
 			final var rolesLevel = GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), rolesLevel) || adminPermission) {
+				//retrieve roles from the server
 				for(Role r : e.getGuild().getRoles()) {
 					out.append(r.getName() + " (" + r.getId() + ") \n");
 				}
@@ -71,9 +83,12 @@ public class Display implements CommandPublic{
 				UserPrivs.throwNotEnoughPrivilegeError(e, rolesLevel);
 			}
 		}
+		//display all registered roles
 		else if(args[0].equalsIgnoreCase("-registered-roles")) {
+			//verify that the current user is allowed to use this parameter
 			final var registeredRolesLevel = GuildIni.getDisplayRegisteredRolesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredRolesLevel) || adminPermission) {
+				//retrieve roles from table
 				for(Roles r : DiscordRoles.SQLgetRoles(guild_id)) {
 					if(!r.getCategory_ABV().equals("def"))
 						out.append(r.getRole_Name() + " (" + r.getRole_ID() + ") \nrole type: "+r.getCategory_Name()+"\nPrivilege level: "+r.getLevel()+"\n\n");
@@ -84,10 +99,14 @@ public class Display implements CommandPublic{
 				UserPrivs.throwNotEnoughPrivilegeError(e, registeredRolesLevel);
 			}
 		}
+		//display all registered ranking roles
 		else if(args[0].equalsIgnoreCase("-ranking-roles")) {
+			//verify that the current user is allowed to use this parameter
 			final var rankingRolesLevel = GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), rankingRolesLevel) || adminPermission) {
+				//confirm that the ranking system is enabled
 				if(RankingSystem.SQLgetGuild(guild_id).getRankingState()) {
+					//retrieve all ranking roles from table
 					for(final var r : RankingSystem.SQLgetRoles(guild_id)) {
 						out.append(r.getRole_Name() + " (" + r.getRole_ID() + ") \nlevel to unlock: " + r.getLevel() + "\n");
 					}
@@ -101,9 +120,12 @@ public class Display implements CommandPublic{
 				UserPrivs.throwNotEnoughPrivilegeError(e, rankingRolesLevel);
 			}
 		}
+		//display all text channels
 		else if(args[0].equalsIgnoreCase("-textchannels")) {
+			//verify that the current user is allowed to use this parameter
 			final var textChannelsLevel = GuildIni.getDisplayTextChannelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), textChannelsLevel) || adminPermission) {
+				//retrieve all text channels from the server
 				for(TextChannel tc : e.getGuild().getTextChannels()) {
 					out.append(tc.getName() + " (" + tc.getId() + ") \n");
 				}
@@ -113,9 +135,12 @@ public class Display implements CommandPublic{
 				UserPrivs.throwNotEnoughPrivilegeError(e, textChannelsLevel);
 			}
 		}
+		//display all voice channels
 		else if(args[0].equalsIgnoreCase("-voicechannels")) {
+			//verify that the current user is allowed to use this parameter
 			final var voiceChannelsLevel = GuildIni.getDisplayVoiceChannelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), voiceChannelsLevel) || adminPermission) {
+				//retrieve all voice channels from the server
 				for(VoiceChannel vc : e.getGuild().getVoiceChannels()) {
 					out.append(vc.getName() + " (" + vc.getId() + ") \n");
 				}
@@ -125,16 +150,18 @@ public class Display implements CommandPublic{
 				UserPrivs.throwNotEnoughPrivilegeError(e, voiceChannelsLevel);
 			}
 		}
+		//display all registered text channels
 		else if(args[0].equalsIgnoreCase("-registered-channels")) {
+			//verify that the current user is allowed to use this parameter
 			final var registeredChannelsLevel = GuildIni.getDisplayRegisteredChannelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredChannelsLevel) || adminPermission) {
+				//retrieve all registered text channels from table
 				for(Channels ch : Azrael.SQLgetChannels(guild_id)) {
-					if(!out.toString().contains(""+ch.getChannel_ID())) {
-						out.append("\n\n"+ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \nChannel type: "+(ch.getChannel_Type_Name() != null ? ch.getChannel_Type_Name() : "none")+" Channel\nURL censoring: "+(ch.getURLCensoring() ? "enabled" : "disabled")+"\nFilter(s) in use: "+ch.getLang_Filter());
-					}
-					else if(out.toString().contains(""+ch.getChannel_ID())) {
-						out.append(", "+ch.getLang_Filter());
-					}
+					out.append(ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \n"
+						+ "Channel type: "+(ch.getChannel_Type_Name() != null ? ch.getChannel_Type_Name() : "none")+" Channel\n"
+						+ "URL censoring: "+(ch.getURLCensoring() ? "enabled" : "disabled")+"\n"
+						+ "Text removal: "+(ch.getTxtRemoval() ? "enabled" : "disabled")+"\n"
+						+ "Filter(s) in use: "+ch.getLang_Filter()+"\n\n");
 				}
 				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out.toString() : "No channel has been registered!").build()).queue();
 			}
@@ -142,9 +169,12 @@ public class Display implements CommandPublic{
 				UserPrivs.throwNotEnoughPrivilegeError(e, registeredChannelsLevel);
 			}
 		}
+		//display all registered daily rewards
 		else if(args[0].equalsIgnoreCase("-dailies")) {
+			//verify that the current user is allowed to use this parameter
 			final var dailiesLevel = GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), dailiesLevel) || adminPermission) {
+				//retrieve all daily rewards from table
 				for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID())) {
 					out.append(daily.getDescription()+"\nWeight: "+daily.getWeight()+"\n\n");
 				}
@@ -154,16 +184,20 @@ public class Display implements CommandPublic{
 				UserPrivs.throwNotEnoughPrivilegeError(e, dailiesLevel);
 			}
 		}
+		//display all users that are being watched
 		else if(args[0].equalsIgnoreCase("-watched-users")) {
+			//verify that the current user is allowed to use this parameter
 			final var watchedUsersLevel = GuildIni.getDisplayWatchedUsersLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), watchedUsersLevel) || adminPermission) {
 				List<String> watchedUsers = null;
+				//verify that the current user is allowed to use the watch channel, if yes, retrieve users that can get displayed in that channel
 				if(!UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUserUseWatchChannelLevel(e.getGuild().getIdLong()))) {
 					watchedUsers = Azrael.SQLgetWholeWatchlist(e.getGuild().getIdLong(), false);
 				}
 				else {
 					watchedUsers = Azrael.SQLgetWholeWatchlist(e.getGuild().getIdLong(), true);
 				}
+				//list the watched users
 				for(final var watchedUser : watchedUsers) {
 					out.append(watchedUser+"\n");
 				}
@@ -173,9 +207,12 @@ public class Display implements CommandPublic{
 				UserPrivs.throwNotEnoughPrivilegeError(e, watchedUsersLevel);
 			}
 		}
+		//display all available commands with their permission level
 		else if(args[0].equalsIgnoreCase("-command-levels")) {
+			//verify that the current user is allowed to use this parameter
 			var commandsLevel = GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandsLevel) || adminPermission) {
+				//collect commands and command levels
 				out.append("About command: "+GuildIni.getAboutLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Commands command: "+GuildIni.getCommandsLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Hidden commands: "+GuildIni.getCommandsAdminLevel(e.getGuild().getIdLong())+"\n");
@@ -217,10 +254,10 @@ public class Display implements CommandPublic{
 				out.append("Set default icon skin subcommand: "+GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Set daily item sucommand: "+GuildIni.getSetDailyItemLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Set giveaway items subcommand: "+GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong())+"\n");
-				
+				//print the first half
 				e.getChannel().sendMessage("`"+out.toString()+"`").queue();
 				out.setLength(0);
-				
+				//collect the second half
 				out.append("Set privilege level sucommand: "+GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Shop command: "+GuildIni.getShopLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Top command: "+GuildIni.getTopLevel(e.getGuild().getIdLong())+"\n");
@@ -261,7 +298,7 @@ public class Display implements CommandPublic{
 				out.append("Remove command: "+GuildIni.getRemoveLevel(e.getGuild().getIdLong())+"\n");
 				out.append("HeavyCensoring command: "+GuildIni.getHeavyCensoringLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Mute command: "+GuildIni.getMuteLevel(e.getGuild().getIdLong())+"\n");
-				
+				//print second part
 				e.getChannel().sendMessage("`"+out.toString()+"`").queue();
 			}
 			else{

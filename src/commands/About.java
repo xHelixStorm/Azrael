@@ -1,5 +1,9 @@
 package commands;
 
+/**
+ * The About command prints all current bot details
+ */
+
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -18,6 +22,7 @@ public class About implements CommandPublic {
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+		//check if the command is enabled and that the user has enough permissions
 		if(GuildIni.getAboutCommand(e.getGuild().getIdLong())) {
 			final var commandLevel = GuildIni.getAboutLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
@@ -31,13 +36,16 @@ public class About implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		long guild_id = e.getGuild().getIdLong();
+		//retrieve all registered bot channels and check if the current channel is registered
 		var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 		var this_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		
+		//if any bot channels are registered and if the current channel isn't a bot channel, then throw a message that this command can't be executed
 		if(this_channel == null && bot_channels.size() > 0) {
 			e.getChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
 		}
 		else {
+			//Build message and print it to the user
 			EmbedBuilder messageBuilder = new EmbedBuilder().setColor(0x00AE86).setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl()).setTitle("About Page!");
 			messageBuilder.setAuthor("Azrael", e.getJDA().getSelfUser().getEffectiveAvatarUrl());
 			messageBuilder.setDescription("Here are all details about myself!");
