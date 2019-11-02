@@ -1647,7 +1647,7 @@ public class RankingSystem {
 					guild.setInventoryStartY(rs.getInt(23));
 					guild.setInventoryTabX(rs.getInt(24));
 					guild.setInventoryTabY(rs.getInt(25));
-					guild.setInventoryTextFontSize(rs.getInt(26));
+					guild.setInventoryPageFontSize(rs.getInt(26));
 					guild.setInventoryPageX(rs.getInt(27));
 					guild.setInventoryPageY(rs.getInt(28));
 					guild.setInventoryTextFontSize(rs.getInt(29));
@@ -1883,7 +1883,7 @@ public class RankingSystem {
 				setInventory.setWeaponDescription(rs.getString(9));
 				setInventory.setStat(rs.getString(10));
 				setInventory.setWeaponCategoryID(rs.getInt(11));
-				setInventory.setWeaponCategoryDescription(rs.getString(11));
+				setInventory.setWeaponCategoryDescription(rs.getString(12));
 				setInventory.setSkillDescription(rs.getString(13));
 				inventory.add(setInventory);
 			}

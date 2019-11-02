@@ -56,9 +56,7 @@ public class Mute implements CommandPublic {
 							userFound = true;
 						}
 						else {
-							e.getChannel().sendMessage("The user **"+argument+"** doesn't exist on this server! Please try again!").queue();
-							users.clear();
-							break;
+							e.getChannel().sendMessage("The user **"+argument+"** doesn't exist on this server!").queue();
 						}
 					}
 					else if(argument.matches("([0-9]{17,18}|<@[0-9]{17,18}>)")) {
@@ -70,9 +68,7 @@ public class Mute implements CommandPublic {
 							userFound = true;
 						}
 						else {
-							e.getChannel().sendMessage("The user with the id number **"+argument+"** doesn't exist on this server! Please try again!").queue();
-							users.clear();
-							break;
+							e.getChannel().sendMessage("The user with the id number **"+argument+"** doesn't exist on this server!").queue();
 						}
 					}
 					else if(userFound) {

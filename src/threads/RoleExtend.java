@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import constructors.Guilds;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -67,7 +66,8 @@ public class RoleExtend implements Runnable {
 					new Thread(new MuteRestart(member.getUser().getIdLong(), guild, member.getUser().getName()+"#"+member.getUser().getDiscriminator(), log_channel, mute_role, unmute, assignedRole, rankingState)).start();
 					i++;
 				}
-				else {
+				//functionality temporarily removed
+				/*else {
 					//check if the bot has the permission to remove and add roles
 					if(guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 						guild.removeRoleFromMember(member, mute_role).queue();
@@ -81,7 +81,7 @@ public class RoleExtend implements Runnable {
 						if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The user **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** with the id number **"+member.getUser().getId()+"** was found muted on start up but no details of an succesfull mute has been found! The mute role couldn't be removed because the MANAGE ROLES permission is missing!").build()).queue();
 						logger.warn("MANAGE ROLES permission to remove the mute role is missing in guild {}!", guild.getId());
 					}
-				}
+				}*/
 			}
 			//display the amount of users that are still muted
 			if(banHammerFound == true && log_channel != null) {

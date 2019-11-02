@@ -105,7 +105,7 @@ public class LanguageFilter implements Runnable {
 							var blockSaveMessage = false;
 							var messageDeleted = false;
 							var censorMessage = Hashes.getCensorMessage(e.getGuild().getIdLong());
-							if(parseMessage.length() == 1 || (censorMessage != null && censorMessage.contains(parseMessage))) {
+							if(parseMessage.length() == 1 || (censorMessage != null && censorMessage.contains(parseMessage)) || parseMessage.matches("[^\\w\\s]")) {
 								deleteHeavyCensoringMessage(e, allChannels, name, channel, getMessage);
 								messageDeleted = true;
 								if(parseMessage.length() == 1)

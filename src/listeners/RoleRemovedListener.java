@@ -90,7 +90,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 				//print message for removing the mute role manually
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				if(log_channel != null) {e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** has manually removed the mute role from **"+member_name+"** with the ID number **"+user_id+"**!\n"
-					+ "**The user who removed the role couldn't be retrieved because the VIEW AUDIT LOGS permission is missing!**").build()).queue();}
+					+ (!view_audit_log ? "**The user who removed the role couldn't be retrieved because the VIEW AUDIT LOGS permission is missing!**" : "")).build()).queue();}
 				logger.debug("{} got the mute role removed before the time expired in guild {}", e.getUser().getId(), e.getGuild().getId());
 				Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE_HALFWAY", user_id, guild_id, "Mute role removed manually");
 			}
