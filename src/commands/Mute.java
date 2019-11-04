@@ -1,5 +1,11 @@
 package commands;
 
+/**
+ * The Mute command allows the one who utilizes it to mute
+ * multiple users from a server at the same time. A reason
+ * can be applied in the end as well.
+ */
+
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -23,6 +29,7 @@ public class Mute implements CommandPublic {
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+		//check if the command is enabled and that the user has enough permissions
 		if(GuildIni.getMuteCommand(e.getGuild().getIdLong())) {
 			final var commandLevel = GuildIni.getMuteLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
@@ -35,10 +42,13 @@ public class Mute implements CommandPublic {
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
+		//confirm that the bot has the manage roles permission
 		if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+			//print the help message for this command
 			if(args.length == 0) {
 				e.getChannel().sendMessage("Write this command together with multiple user IDs or user names with discriminators to mute them at the same time. As last parameter, a reason can be applied as well!").queue();
 			}
+			//mute all users that have passed in the parameters
 			else {
 				args = e.getMessage().getContentRaw().substring(GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length()+5).split(" ");
 				boolean userFound = false;
@@ -46,11 +56,14 @@ public class Mute implements CommandPublic {
 				ArrayList<Member> users = new ArrayList<Member>();
 				//iterate through all parameters to find users to mute and eventually a reason
 				for(final var argument : args) {
+					//execute this block if the discord name has been passed
 					if(argument.matches(".*?#[0-9]{4}")) {
 						//search for the user to retrieve the id
 						var name = argument.split("#");
 						Member member = e.getGuild().getMemberByTag(name[0], name[1]);
+						//confirm that this member is still present in the server
 						if(member != null) {
+							//already inserted users shouldn't be muted twice
 							if(!users.contains(member))
 								users.add(member);
 							userFound = true;
@@ -59,10 +72,12 @@ public class Mute implements CommandPublic {
 							e.getChannel().sendMessage("The user **"+argument+"** doesn't exist on this server!").queue();
 						}
 					}
+					//execute this block if a user id has been passed
 					else if(argument.matches("([0-9]{17,18}|<@[0-9]{17,18}>)")) {
-						//users to mute
 						Member member = e.getGuild().getMemberById(argument.replaceAll("[<@>]*", ""));
+						//confirm that this member is still present in the server
 						if(member != null) {
+							//already inserted users shouldn't be muted twice
 							if(!users.contains(member))
 								users.add(member);
 							userFound = true;
@@ -81,12 +96,19 @@ public class Mute implements CommandPublic {
 						break;
 					}
 				}
+				//enter this block if users to mute have been found and added to the array
 				if(users.size() > 0) {
+					//retrieve the mute role
 					final var mute_role = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+					//execute only if a mute role has been registered
 					if(mute_role != null) {
+						//iterate through the collected users
 						for(final var member : users) {
+							//verify that this user doesn't have higher privileges than the bot
 							if(e.getGuild().getSelfMember().canInteract(member)) {
+								//verify that this user isn't already muted
 								if(!UserPrivs.isUserMuted(member)) {
+									//mute this user
 									var applyReason = (reason.toString().length() > 0 ? reason.toString() : "No reason has been provided!");
 									Azrael.SQLInsertHistory(member.getUser().getIdLong(), e.getGuild().getIdLong(), "mute", applyReason, 0);
 									Hashes.addTempCache("mute_time_gu"+e.getGuild().getId()+"us"+member.getUser().getId(), new Cache(e.getMember().getAsMention(), applyReason));

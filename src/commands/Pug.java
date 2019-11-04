@@ -1,5 +1,9 @@
 package commands;
 
+/**
+ * The Pug command allows a user to print a pug image of choice.
+ */
+
 import java.io.IOException;
 import java.util.stream.Collectors;
 
@@ -19,6 +23,7 @@ public class Pug implements CommandPublic {
 	
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+		//check if the command is enabled and that the user has enough permissions
 		if(GuildIni.getPugCommand(e.getGuild().getIdLong())) {
 			final var commandLevel = GuildIni.getPugLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
@@ -34,30 +39,37 @@ public class Pug implements CommandPublic {
 		long guild_id = e.getGuild().getIdLong();
 		String path = "./files/Pug/";
 		
+		//retrieve all bot channels
 		var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 		var this_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		
+		//verify that this command is allowed to be used on the current server through the execution_id
 		var execution_id = Azrael.SQLgetExecutionID(guild_id);
-		if(execution_id == 0){
+		//command can't be used on this server
+		if(execution_id == 0) {
 			e.getChannel().sendMessage("This command is disabled on this server. Please ask an administrator or moderator to activate it!").queue();
 		}
-		else if(execution_id == 2 || execution_id == 1){
-			if(execution_id != 1){
+		//execute this block, if this command is allowed to be used in all channels or only bot channels
+		else if(execution_id == 2 || execution_id == 1) {
+			//execute if it's allowed to be used on all channels
+			if(execution_id == 2) {
 				try {
 					PugExecution.Execute(e, args, path, e.getChannel().getIdLong());
 				} catch (IOException e1) {
 					logger.error("Selected pug picture couldn't be found", e1);
 				}
 			}
-			else{
-				if(bot_channels.size() > 0 && this_channel != null){
+			//execute if it's allowed to be used only in bot channels
+			else {
+				//check if any bot channel is registered, else print the image anyway
+				if(bot_channels.size() > 0 && this_channel != null) {
 					try {
 						PugExecution.Execute(e, args, path, this_channel.getChannel_ID());
 					} catch (IOException e1) {
 						logger.error("Selected pug picture couldn't be found", e1);
 					}
 				}
-				else{
+				else {
 					e.getChannel().sendMessage("This command can be used only in "+STATIC.getChannels(bot_channels)).queue();
 				}
 			}

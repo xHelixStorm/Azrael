@@ -78,7 +78,9 @@ public class GuildMessageListener extends ListenerAdapter {
 					//If the channel doesn't allow any text input but only screenshots, then delete
 					if(currentChannel != null && currentChannel.getTxtRemoval() && e.getMessage().getAttachments().size() == 0) {
 						Hashes.addTempCache("message-removed_gu"+guild_id+"ch"+channel_id+"us"+user_id, new Cache(10000));
-						e.getMessage().delete().reason("Messages not allowed!").queue();
+						e.getMessage().delete().reason("Text comment without screenshot not allowed!").queue(success -> {}, error -> {
+							logger.warn("Message already removed!");
+						});
 					}
 					
 					//if the warning parameter has been used under the set command, then forward the user for the next step

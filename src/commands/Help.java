@@ -1,5 +1,10 @@
 package commands;
 
+/**
+ * The Help command is meant to print a message that an
+ * administrator has defined.
+ */
+
 import java.awt.Color;
 
 import org.slf4j.Logger;
@@ -17,6 +22,7 @@ public class Help implements CommandPublic {
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+		//check if the command is enabled and that the user has enough permissions
 		if(GuildIni.getHelpCommand(e.getGuild().getIdLong())) {
 			final var commandLevel = GuildIni.getHelpLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
@@ -29,6 +35,7 @@ public class Help implements CommandPublic {
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
+		//print message from whithin the text or file or print the default message
 		var fileInput = FileSetting.readFile("files/Guilds/"+e.getGuild().getId()+"/helpmessage.txt");
 		e.getChannel().sendMessage(new EmbedBuilder().setTitle("Coming to the rescue!").setColor(Color.BLUE).setDescription((fileInput != null && fileInput.length() > 0 ? fileInput : "The help command message has not been configured!")).build()).queue();
 	}

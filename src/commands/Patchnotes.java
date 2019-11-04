@@ -21,6 +21,7 @@ public class Patchnotes implements CommandPublic {
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+		//check if the command is enabled and that the user has enough permissions
 		if(GuildIni.getPatchnotesCommand(e.getGuild().getIdLong())) {
 			final var commandLevel = GuildIni.getPatchnotesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
@@ -33,10 +34,13 @@ public class Patchnotes implements CommandPublic {
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
+		//retrieve all channels where patchnotes can be printed
 		var allowed_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("bot") || f.getChannel_Type().equals("log"))).collect(Collectors.toList());
 		var bot_channels = allowed_channels.parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 		var this_channel = allowed_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
-		if(this_channel == null && allowed_channels.size() > 0){
+		//throw error if it was printed in a channel which is not a bot channel or log channel
+		//if no bot channel is registered, print anyway
+		if(this_channel == null && allowed_channels.size() > 0) {
 			e.getChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
 		}
 		else {
@@ -49,19 +53,25 @@ public class Patchnotes implements CommandPublic {
 			if(UserPrivs.isUserMod(e.getMember()) || UserPrivs.isUserAdmin(e.getMember()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				modRights = true;
 			}
+			//if the user is a mod, retrieve also private patch notes
 			if(modRights)
 				priv_notes = sql.Patchnotes.SQLgetPrivatePatchnotesArray();
 			publ_notes = sql.Patchnotes.SQLgetPublicPatchnotesArray();
 			game_notes = sql.Patchnotes.SQLgetGamePatchnotesArray(e.getGuild().getIdLong());
 			
+			//if there's no single patch note, throw a message
 			if(priv_notes == null && publ_notes == null && game_notes == null) {
 				message.setTitle("No patch notes are available!").setColor(Color.RED);
 				e.getChannel().sendMessage(message.setDescription("Patch notes need to be registered before displaying them!").build()).queue();
 			}
+			//execute this block if there are any public and private patch notes but no game related patch notes (e.g. url to a patchnote)
 			else if((priv_notes != null || publ_notes != null) && game_notes == null) {
+				//if the user is a moderator or administrator, give the user a choice to either display the private or public patch notes
 				if(modRights) {
+					//check if a parameter has been passed, else notify the user
 					if(args.length == 0)
 						e.getChannel().sendMessage("Please select if you want to display the public or private patch notes!").queue();
+					//execute if the parameter equals 'private' or 'public'
 					else if(args.length == 1 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public"))) {
 						ArrayList<Patchnote> display_notes = null;
 						if(args[0].equalsIgnoreCase("private"))
@@ -69,6 +79,7 @@ public class Patchnotes implements CommandPublic {
 						else
 							display_notes = publ_notes;
 						
+						//print patch notes list
 						if(display_notes == null || display_notes.size() == 0) {
 							message.setTitle("No patch notes available!").setColor(Color.RED);
 							e.getChannel().sendMessage(message.setDescription("No Patchnotes available for this filter option").build()).queue();

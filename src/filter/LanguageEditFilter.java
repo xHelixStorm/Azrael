@@ -7,6 +7,9 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import constructors.Cache;
 import constructors.Channels;
 import core.Hashes;
@@ -19,6 +22,7 @@ import util.CharacterReplacer;
 import util.STATIC;
 
 public class LanguageEditFilter implements Runnable {
+	private final static Logger logger = LoggerFactory.getLogger(LanguageEditFilter.class);
 	private final static EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle("Message removed after edit!");
 	
 	private GuildMessageUpdateEvent e;
@@ -79,7 +83,9 @@ public class LanguageEditFilter implements Runnable {
 						.filter(word -> parseMessage.matches("(.|\\s){0,}\\b"+word+"\\b(.|\\s){0,}")).findAny();
 					if(option.isPresent()) {
 						Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
-						e.getMessage().delete().reason("Message removed due to bad manner!").queue();
+						e.getMessage().delete().reason("Message removed due to bad manner!").queue(success -> {}, error -> {
+							logger.warn("Message already removed!");
+						});
 						STATIC.handleRemovedMessages(null, e, output);
 						var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 						if(tra_channel != null) {

@@ -1,5 +1,11 @@
 package commands;
 
+/**
+ * The Filter command allows the user to edit various lists
+ * for words, names and urls which are used to filter or 
+ * assign names in different circumstances.
+ */
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +20,7 @@ public class Filter implements CommandPublic {
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+		//check if the command is enabled and that the user has enough permissions
 		if(GuildIni.getFilterCommand(e.getGuild().getIdLong())) {
 			final var commandLevel = GuildIni.getFilterLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
@@ -26,8 +33,10 @@ public class Filter implements CommandPublic {
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
+		//run help if no arguments have been added
 		if(args.length == 0)
 			FilterExecution.runHelp(e);
+		//execute task
 		else if(args.length > 0)
 			FilterExecution.runTask(e, args[0]);
 	}
