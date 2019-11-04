@@ -12,7 +12,6 @@ import core.Hashes;
 import fileManagement.FileSetting;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class RunQuiz implements Runnable{
@@ -61,21 +60,24 @@ public class RunQuiz implements Runnable{
 						long user_id = Long.parseLong(FileSetting.readFile(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr"));
 						logger.debug("{} received the reward {} out of the quiz in guild {}", e.getMember().getUser().getId(), quiz.getReward(), e.getGuild().getId());
 						e.getGuild().getTextChannelById(channel).sendMessage("Question number "+index+" goes to "+e.getGuild().getMemberById(user_id).getAsMention()+". Congratulations!").queue();
-						try {
-							//send the reward in private message to the user and log the reward and user at the same time in the log channel.
-							PrivateChannel pc = e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete();
-							pc.sendMessage("Congratulations. Here is your reward. Note that you need to wait 3 questions before you get eligible to get another reward:\n"
-									+ "**"+quiz.getReward()+"**").queue();
-							pc.close();
-							e.getGuild().getTextChannelById(log_channel).sendMessage(message.setDescription("The user **"+e.getGuild().getMemberById(user_id).getUser().getName()+"#"+e.getGuild().getMemberById(user_id).getUser().getDiscriminator()+"** "
-									+ "received the following reward:\n**"+quiz.getReward()+"**").build()).queue();
-						} catch(Exception ex) {
-							//When the reward couldn't be sent, throw this error.
-							EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("Reward couldn't be sent to the user");
-							e.getGuild().getTextChannelById(log_channel).sendMessage(error.setDescription("The user **"+e.getGuild().getMemberById(user_id).getUser().getName()+"#"+e.getGuild().getMemberById(user_id).getUser().getDiscriminator()+"** "
-									+ "couldn't receive the reward. A possible reason could be that private messages were disabled. This is the code he should receive:\n"
-									+ "**"+quiz.getReward()+"**").build()).queue();
-						}
+						
+						//send the reward in private message to the user and log the reward and user at the same time in the log channel.
+						e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().queue(pchannel -> {
+							pchannel.sendMessage("Congratulations. Here is your reward. Note that you need to wait 3 questions before you get eligible to get another reward:\n"
+									+ "**"+quiz.getReward()+"**").queue(success -> {
+										e.getGuild().getTextChannelById(log_channel).sendMessage(message.setDescription("The user **"+e.getGuild().getMemberById(user_id).getUser().getName()+"#"+e.getGuild().getMemberById(user_id).getUser().getDiscriminator()+"** "
+												+ "received the following reward:\n**"+quiz.getReward()+"**").build()).queue();
+										pchannel.close().queue();
+									}, error -> {
+										//When the reward couldn't be sent, throw this error.
+										EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle("Reward couldn't be sent to the user");
+										e.getGuild().getTextChannelById(log_channel).sendMessage(err.setDescription("The user **"+e.getGuild().getMemberById(user_id).getUser().getName()+"#"+e.getGuild().getMemberById(user_id).getUser().getDiscriminator()+"** "
+												+ "couldn't receive the reward. A possible reason could be that private messages were disabled. This is the code he should receive:\n"
+												+ "**"+quiz.getReward()+"**").build()).queue();
+										pchannel.close().queue();
+									});
+						});
+						
 						//if mode is 2 then allow a 3 questions threshold for everyone who wins a price and collect the name of winners only when the mode isn't set to 1 with no limits
 						if(modality == 2) {
 							Hashes.removeQuizWinners();

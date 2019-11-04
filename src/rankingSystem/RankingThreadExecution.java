@@ -107,7 +107,7 @@ public class RankingThreadExecution {
 						logger.info("{} has reached the limit of today's max experience points gain", e.getMember().getUser().getId());
 						RankingSystem.SQLInsertActionLog("medium", user_id, guild_id, "Experience limit reached", "User reached the limit of experience points");
 						e.getMember().getUser().openPrivateChannel().queue(channel -> {
-							channel.sendMessage("You have reached the limit of experience points for today. More experience points can be collected tomorrow!").queue();
+							channel.sendMessage("You have reached the limit of experience points for today. More experience points can be collected tomorrow!").queue(success -> channel.close().queue(), error -> channel.close().queue());
 						});
 					}
 				}

@@ -182,12 +182,22 @@ public class GuildListener extends ListenerAdapter {
 				//ban a joined user
 				else if(rejoinAction.getType().equals("ban")) {
 					//send a private message before banning
-					e.getUser().openPrivateChannel().complete().sendMessage("You have been banned from "+e.getGuild().getName()+". Thank you for your understanding.\n"
-							+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
-							+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? "Provided reason: "+rejoinAction.getReason() : "")).complete();
-					Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
-					e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
-					Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0);
+					e.getUser().openPrivateChannel().queue(channel -> {
+						channel.sendMessage("You have been banned from "+e.getGuild().getName()+". Thank you for your understanding.\n"
+								+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
+								+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? "Provided reason: "+rejoinAction.getReason() : "")).queue(success -> {
+									Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
+									e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
+									Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0);
+									channel.close().queue();
+								}, error -> {
+									if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription("The banned user with the id number **"+e.getMember().getUser().getId()+"** has locked the direct private messaging!").build()).queue();
+									Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
+									e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
+									Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0);
+									channel.close().queue();
+								});
+					});
 					Hashes.removeRejoinTask(e.getGuild().getId()+"_"+e.getMember().getUser().getId());
 				}
 			}

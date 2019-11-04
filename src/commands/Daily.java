@@ -144,13 +144,17 @@ public class Daily implements CommandPublic {
 					}
 					//if it's a special reward, send it in private message to the user and print it in the log channel at the same time
 					else if(list.get(random).getType().equals("cod")) {
-						//send a private message
+						//log the reward in bot channel and send a private message
+						var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 						e.getMember().getUser().openPrivateChannel().queue(channel -> {
-							channel.sendMessage("Congratulations. You have unlocked the following reward:\n"+cod_reward).queue();
+							channel.sendMessage("Congratulations. You have unlocked the following reward:\n"+cod_reward).queue(success -> {
+								channel.close().queue();
+							}, error -> {
+								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription("The user with the id number **"+e.getMember().getUser().getId()+"** has locked the direct private messaging and couldn't receive the reward!").build()).queue();
+								channel.close().queue();
+							});
 						});
 						
-						//log the reward in bot channel
-						var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 						if(log_channel != null) {
 							EmbedBuilder message = new EmbedBuilder().setColor(Color.getHSBColor(268, 81, 88)).setTitle("Reward was sent to user!");
 							e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" has received a rare reward from the daily commands. This is the reward:\n"+cod_reward).build()).queue();

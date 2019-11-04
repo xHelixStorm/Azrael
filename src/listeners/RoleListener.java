@@ -23,7 +23,6 @@ import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
-import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -156,7 +155,13 @@ public class RoleListener extends ListenerAdapter {
 						e.getUser().openPrivateChannel().queue(channel -> {
 							channel.sendMessage("You have been muted on "+e.getGuild().getName()+". Your current mute will last for **"+hour_add+and_add+minute_add+"** . Except for the first mute, your warning counter won't increase.\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
 									+ "On an important note, this is an automated reply. You'll receive no reply in any way.\n"
-									+ (GuildIni.getMuteSendReason(guild_id) ? "Provided reason: **"+reason+"**" : "")).queue();
+									+ (GuildIni.getMuteSendReason(guild_id) ? "Provided reason: **"+reason+"**" : "")).queue(success -> {
+										//success callback not required
+										channel.close().queue();
+									}, error -> {
+										if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription("The muted user with the id number **"+e.getMember().getUser().getId()+"** has locked the direct private messaging!").build()).queue();
+										channel.close().queue();
+									});
 						});
 						//unmute after a specific amount of time
 						new Thread(new RoleTimer(e, mute_time, log_channel, mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0, issuer, reason)).start();
@@ -194,7 +199,13 @@ public class RoleListener extends ListenerAdapter {
 							e.getUser().openPrivateChannel().queue(channel -> {
 								channel.sendMessage("You have been muted on "+e.getGuild().getName()+". Your current mute will last for **"+hour_add+and_add+minute_add+"** for being your "+warn.getDescription()+". Warning **"+(warning_id+1)+"**/**"+max_warning+"**\nPlease, refrain from rejoining the server, since it will result in consequences.\n"
 										+ "On an important note, this is an automated reply. You'll receive no reply in any way.\n"
-										+ (GuildIni.getMuteSendReason(guild_id) ? "Provided reason: **"+reason+"**" : "")).queue();
+										+ (GuildIni.getMuteSendReason(guild_id) ? "Provided reason: **"+reason+"**" : "")).queue(success -> {
+											//success callback not required
+											channel.close().queue();
+										}, error -> {
+											if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription("The muted user with the id number **"+e.getMember().getUser().getId()+"** has locked the direct private messaging!").build()).queue();
+											channel.close().queue();
+										});
 							});
 							//run RoleTimer for automatic unmute
 							new Thread(new RoleTimer(e, mute_time, log_channel, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning, issuer, reason)).start();
@@ -206,14 +217,22 @@ public class RoleListener extends ListenerAdapter {
 							if(!GuildIni.getOverrideBan(guild_id)) {
 								if(e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
 									//send a private message to the user
-									PrivateChannel pc = e.getUser().openPrivateChannel().complete();
-									pc.sendMessage("You have been banned from "+e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
-											+ "On an important note, this is an automated reply. You'll receive no reply in any way.\n"
-											+ (GuildIni.getBanSendReason(guild_id) ? "Provided reason: **"+reason+"**" : "")).complete();
-									pc.close();
-									//ban the user
-									e.getGuild().ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").queue();
-									logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+									e.getUser().openPrivateChannel().queue(channel -> {
+										channel.sendMessage("You have been banned from "+e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
+												+ "On an important note, this is an automated reply. You'll receive no reply in any way.\n"
+												+ (GuildIni.getBanSendReason(guild_id) ? "Provided reason: **"+reason+"**" : "")).queue(success -> {
+													//ban the user
+													e.getGuild().ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").queue();
+													logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+													channel.close().queue();
+												}, error -> {
+													if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription("The banned user with the id number **"+e.getMember().getUser().getId()+"** has locked the direct private messaging!").build()).queue();
+													//ban the user
+													e.getGuild().ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").queue();
+													logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+													channel.close().queue();
+												});
+									});
 								}
 								else {
 									if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Permission missing!").setDescription("This user couldn't be banned after reaching the limit of allowed mutes because the BAN MEMBERS permission is missing!").build()).queue();
@@ -230,7 +249,13 @@ public class RoleListener extends ListenerAdapter {
 								e.getUser().openPrivateChannel().queue(channel -> {
 									channel.sendMessage("You have been muted without expiration from "+e.getGuild().getName()+". Rejoining the server will reapply the mute.\n"
 											+ "On an important note, this is an automated reply. You'll receive no reply in any way.\n"
-											+ (GuildIni.getMuteSendReason(guild_id) ? "Provided reason: **"+reason+"**" : "")).queue();
+											+ (GuildIni.getMuteSendReason(guild_id) ? "Provided reason: **"+reason+"**" : "")).queue(success -> {
+												//no callback required
+												channel.close().queue();
+											}, error -> {
+												if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription("The muted user with the id number **"+e.getMember().getUser().getId()+"** has locked the direct private messaging!").build()).queue();
+												channel.close().queue();
+											});
 								});
 								//execute RoleTimer
 								new Thread(new RoleTimer(e, log_channel, mute_id, issuer, reason)).start();

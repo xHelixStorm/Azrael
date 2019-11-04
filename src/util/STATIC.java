@@ -40,6 +40,9 @@ import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -51,7 +54,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
-	private static final String VERSION = "6.9.363";
+	private static final String VERSION = "6.9.364";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
@@ -234,38 +237,36 @@ public class STATIC {
 	}
 	
 	//Called by LanguageFilter and LanguageEditFilter class. Keeps track of removed messages, warns the user accordingly and mutes when the limit has been reached
-	@SuppressWarnings("unused")
 	public static void handleRemovedMessages(GuildMessageReceivedEvent e, GuildMessageUpdateEvent e2, String [] output) {
-		logger.debug("Message removed from {} in guild {}", (e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId()), e.getGuild().getName());
-		var muteRole = DiscordRoles.SQLgetRoles((e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong())).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+		Member member = (e != null ? e.getMember() : e2.getMember());
+		Guild guild = (e != null ? e.getGuild() : e2.getGuild());
+		TextChannel channel = (e != null ? e.getChannel() : e2.getChannel());
+		logger.debug("Message removed from {} in guild {}", member.getUser().getId(), guild.getId());
+		var muteRole = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 		if(muteRole == null) {
-			if(e != null)e.getChannel().sendMessage(e.getMember().getAsMention()+" "+output[0]).queue();
-			else 		 e2.getChannel().sendMessage(e2.getMember().getAsMention()+" "+output[0]).queue();
+			channel.sendMessage(member.getAsMention()+" "+output[0]).queue();
 		}
 		else {
 			var cache = Hashes.getTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 			if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
-				if(e != null)e.getChannel().sendMessage(e.getMember().getAsMention()+" "+output[0]).queue();
-				else 		 e2.getChannel().sendMessage(e2.getMember().getAsMention()+" "+output[0]).queue();
-				Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "1"));
+				channel.sendMessage(member.getAsMention()+" "+output[0]).queue();
+				Hashes.addTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId(), new Cache(300000, "1"));
 			}
 			else if(cache != null) {
 				if(cache.getAdditionalInfo().equals("1")) {
-					if(e != null)e.getChannel().sendMessage(e.getMember().getAsMention()+" "+output[1]).queue();
-					else 		 e2.getChannel().sendMessage(e2.getMember().getAsMention()+" "+output[1]).queue();
-					Hashes.addTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(300000, "2"));
+					channel.sendMessage(member.getAsMention()+" "+output[1]).queue();
+					Hashes.addTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId(), new Cache(300000, "2"));
 				}
 				else if(cache.getAdditionalInfo().equals("2")) {
-					if((e != null ? e.getGuild().getSelfMember() : e2.getGuild().getSelfMember()).hasPermission(Permission.MANAGE_ROLES)) {
-						if(e != null)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(muteRole.getRole_ID())).queue();
-						else		 e2.getGuild().addRoleToMember(e2.getMember(), e2.getGuild().getRoleById(muteRole.getRole_ID())).queue();
+					if(guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+						guild.addRoleToMember(member, guild.getRoleById(muteRole.getRole_ID())).queue();
 					}
 					else {
-						final var log_channel = Azrael.SQLgetChannels(e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-						if(log_channel != null) (e != null ? e.getGuild() : e2.getGuild()).getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Mute role couldn't be assigned after the third censoring warning because the MANAGE ROLES permission is missing!").build()).queue();
-						logger.warn("MANAGE ROLES permission required to mute members for guild {}!", (e != null ? e.getGuild().getId() : e2.getGuild().getId()));
+						final var log_channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+						if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Mute role couldn't be assigned after the third censoring warning because the MANAGE ROLES permission is missing!").build()).queue();
+						logger.warn("MANAGE ROLES permission required to mute members for guild {}!", guild.getId());
 					}
-					Hashes.clearTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
+					Hashes.clearTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId());
 				}
 			}
 		}

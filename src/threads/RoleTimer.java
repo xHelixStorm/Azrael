@@ -102,7 +102,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted").build()).queue();
 					}
 					//if the user is still present on the server, remove the mute role and assign back a ranking role, if available
-					if(e.getMember() != null) {
+					if(e.getGuild().getMember(e.getMember().getUser()) != null) {
 						//verify that the user has the manage roles permission before removing the mute role
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
@@ -125,7 +125,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator() + "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted and the timer has been interrupted!").build()).queue();
 					}
 					//if the user is still present on the server, remove the mute role and assign back a ranking role, if available
-					if(e.getMember() != null) {
+					if(e.getGuild().getMember(e.getMember().getUser()) != null) {
 						//verify that the user has the manage roles permission before removing the mute role
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();

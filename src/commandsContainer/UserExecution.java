@@ -926,13 +926,13 @@ public class UserExecution {
 								pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 										+ "On a important note, this is an automatic reply. You'll receive no reply in any way.\n"
 										+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).queue();
-								pc.close();
+								pc.close().queue();
 							}
 							else {
 								pc.sendMessage("You have been banned from "+_e.getGuild().getName()+". Thank you for your understanding.\n"
 										+ "On a important note, this is an automatic reply. You'll receive no reply in any way.\n"
 										+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).queue();
-								pc.close();
+								pc.close().queue();
 							}
 							_e.getChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
 							_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason("User has been banned with the bot command!").queue();
@@ -972,13 +972,13 @@ public class UserExecution {
 							pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 									+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
 									+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: "+_message : "")).queue();
-							pc.close();
+							pc.close().queue();
 						}
 						else {
 							pc.sendMessage("You have been banned from "+_e.getGuild().getName()+". Thank you for your understanding.\n"
 									+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
 									+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: "+_message : "")).queue();
-							pc.close();
+							pc.close().queue();
 						}
 						_e.getChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
 						_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
@@ -1029,7 +1029,7 @@ public class UserExecution {
 						if(member != null) {
 							_e.getChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
 							Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), "No reason has been provided!"));
-							_e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete()
+							member.getUser().openPrivateChannel().complete()
 							.sendMessage("You have been kicked from **"+_e.getGuild().getName()+"**.Thank you for your understanding.\n" 
 									+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
 									+ (GuildIni.getKickSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).complete();
@@ -1063,7 +1063,7 @@ public class UserExecution {
 					if(member != null) {
 						_e.getChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
 						Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
-						_e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete()
+						member.getUser().openPrivateChannel().complete()
 						.sendMessage("You have been kicked from **"+_e.getGuild().getName()+"**.Thank you for your understanding.\n" 
 								+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
 								+ (GuildIni.getKickSendReason(_e.getGuild().getIdLong()) ? "Provided reason: "+_message : "")).complete();
