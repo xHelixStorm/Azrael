@@ -1,5 +1,11 @@
 package commands;
 
+/**
+ * The Patchnotes command allows a user to display past 
+ * patch notes which are either public, private or game
+ * related, if available. 
+ */
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -88,6 +94,7 @@ public class Patchnotes implements CommandPublic {
 							collectPatchNotes(e, display_notes, message);
 						}
 					}
+					//print the specific patch note from the private or public category
 					else if(args.length == 2 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public"))) {
 						Patchnote note = null;
 						if(args[0].equalsIgnoreCase("private"))
@@ -122,10 +129,13 @@ public class Patchnotes implements CommandPublic {
 					}
 				}
 			}
+			//execute this block if game notes exist while everything else doesn't
 			else if(priv_notes == null && publ_notes == null && game_notes != null) {
+				//show the game related patch notes list without parameters
 				if(args.length == 0) {
 					collectPatchNotes(e, game_notes, message);
 				}
+				//display the specific game patch note
 				else if(args.length == 1) {
 					var note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[0])).findAny().orElse(null);
 					if(note == null) {
@@ -137,10 +147,14 @@ public class Patchnotes implements CommandPublic {
 					}
 				}
 			}
+			//execute when game notes, private notes and public notes aren't empty
 			else {
+				//enter this block is the user is an administrator or moderator
 				if(modRights) {
+					//Without parameter, give the user a choice to which patch notes the user wishes to access
 					if(args.length == 0)
 						e.getChannel().sendMessage("Please select if you want to display the public, private or game patch notes!").queue();
+					//enter this block if either 'private', 'public' or 'game' has been written
 					else if(args.length == 1 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public") || args[0].equalsIgnoreCase("game"))) {
 						ArrayList<Patchnote> display_notes = null;
 						if(args[0].equalsIgnoreCase("private"))
@@ -150,6 +164,7 @@ public class Patchnotes implements CommandPublic {
 						else
 							display_notes = game_notes;
 						
+						//print the patch notes list
 						if(display_notes == null || display_notes.size() == 0) {
 							message.setTitle("No patch notes available!").setColor(Color.RED);
 							e.getChannel().sendMessage(message.setDescription("No Patchnotes available for this filter option").build()).queue();
@@ -158,6 +173,7 @@ public class Patchnotes implements CommandPublic {
 							collectPatchNotes(e, display_notes, message);
 						}
 					}
+					//display the selected parameter if 2 parameters have been used
 					else if(args.length == 2 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public") || args[0].equalsIgnoreCase("game"))) {
 						Patchnote note = null;
 						if(args[0].equalsIgnoreCase("private"))
@@ -179,9 +195,12 @@ public class Patchnotes implements CommandPublic {
 						e.getChannel().sendMessage(message.setDescription("Please either write private, public or game as first parameter!").build()).queue();
 					}
 				}
+				//if the user doesn't have any elevated position
 				else {
+					//if there's no parameter, give the user a choice to select between 'bot' for public patch notes and 'game' for game patch notes
 					if(args.length == 0)
 						e.getChannel().sendMessage("Please select if you want to display the bot or game patch notes!").queue();
+					//list all available patch notes, if either 'bot' or 'game' has been selected
 					else if(args.length == 1 && (args[0].equalsIgnoreCase("bot") || args[0].equalsIgnoreCase("game"))) {
 						ArrayList<Patchnote> display_notes = null;
 						if(args[0].equalsIgnoreCase("bot"))
@@ -189,6 +208,7 @@ public class Patchnotes implements CommandPublic {
 						else
 							display_notes = game_notes;
 						
+						//print the patch notes list
 						if(display_notes == null || display_notes.size() == 0) {
 							message.setTitle("No patch notes available!").setColor(Color.RED);
 							e.getChannel().sendMessage(message.setDescription("No Patchnotes available for this filter option").build()).queue();
@@ -197,6 +217,7 @@ public class Patchnotes implements CommandPublic {
 							collectPatchNotes(e, display_notes, message);
 						}
 					}
+					//display the selected patch notes, if 2 parameters have been passed
 					else if(args.length == 2 && (args[0].equalsIgnoreCase("bot") || args[0].equalsIgnoreCase("game"))) {
 						Patchnote note = null;
 						if(args[0].equalsIgnoreCase("bot"))
@@ -227,15 +248,18 @@ public class Patchnotes implements CommandPublic {
 
 	private void collectPatchNotes(GuildMessageReceivedEvent e, ArrayList<Patchnote> display_notes, EmbedBuilder message) {
 		StringBuilder out = new StringBuilder();
+		//iterate through the patch notes and convert it into readable text list
 		for(Patchnote note : display_notes) {
 			out.append(note.getDate()+":\t **"+note.getTitle()+"**\n");
 		}
+		//print message
 		message.setTitle("Here a list of patch notes!").setColor(Color.BLUE);
 		e.getChannel().sendMessage(message.setDescription("Please write one of the following patch note title together with the full command to display the notes.\n\n"
 				+ out.toString()).build()).queue();
 	}
 	
 	private void printPatchNotes(GuildMessageReceivedEvent e, Patchnote note, EmbedBuilder message) {
+		//print the selected patch notes
 		message.setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the requested patch notes!");
 		e.getChannel().sendMessage(message.setDescription("Bot patch notes version **"+note.getTitle()+"** "+note.getDate()+"\n\n"+note.getMessage1()).build()).queue();
 		if(note.getMessage2() != null && note.getMessage2().length() > 0) {

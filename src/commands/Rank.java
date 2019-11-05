@@ -1,5 +1,11 @@
 package commands;
 
+/**
+ * The Rank command prints the current rank page of a user
+ * depending on the selected skin. It's possible to display
+ * the rank page of someone else by mentioning
+ */
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -25,6 +31,7 @@ public class Rank implements CommandPublic {
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+		//check if the command is enabled and that the user has enough permissions
 		if(GuildIni.getRankCommand(e.getGuild().getIdLong())) {
 			final var commandLevel = GuildIni.getRankLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
@@ -37,35 +44,43 @@ public class Rank implements CommandPublic {
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
+		//retrieve all registered bot channels
 		var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 		var this_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		
+		//don't print the rank image, if a bot channel exists but the current channel isn't a bot channel
 		if(this_channel == null && bot_channels.size() > 0) {
 			e.getChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
 		}
 		else {
-			long user_id = 0;
+			long user = 0;
+			//check if the user has mentioned a different member and if yes, display the mentioned member's rank
 			if(args.length > 0) {
 				String id = args[0];
 				try {
 					id = id.replaceAll("[^0-9]", "");
-					user_id = id.length() > 0 ? Long.parseLong(id) : 0;
-					e.getGuild().getMemberById(user_id).getUser();
+					user = id.length() > 0 ? Long.parseLong(id) : 0;
+					e.getGuild().getMemberById(user).getUser();
 				} catch(Exception exc) {
-					user_id = e.getMember().getUser().getIdLong();
+					user = e.getMember().getUser().getIdLong();
 				}
 			}
 			else {
-				user_id = e.getMember().getUser().getIdLong();
+				user = e.getMember().getUser().getIdLong();
 			}
 			
+			final long user_id = user;
 			long guild_id = e.getGuild().getIdLong();
 			var rank = 0;
 			
+			//retrieve the guild settings and confirm that the ranking system is enabled
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 			if(guild_settings.getRankingState()) {
+				//verify if the command has been used from this user already and if yes, don't print the rank
+				//until the timeout elapses 
 				var cache = Hashes.getTempCache("rankDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 				if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
+					//put the command in timeout for the user
 					Hashes.addTempCache("rankDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(30000));
 					
 					constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
@@ -93,27 +108,31 @@ public class Rank implements CommandPublic {
 					float currentExperience = user_details.getCurrentExperience();
 					float rankUpExperience = user_details.getRankUpExperience();
 					
+					//verify that the rank and icon default skins are defined, else throw error
 					if(user_details.getRankingRank() != 0 && user_details.getRankingIcon() != 0) {
+						//set a static experience value if the current level is the same as the max level
 						if(user_details.getLevel() == guild_settings.getMaxLevel()) {
 							currentExperience = 999999; rankUpExperience = 999999;
 						}
 						
+						//calculate the current experience percentage
 						experienceCounter = (currentExperience / rankUpExperience)*100;
 						convertedExperience = (int) experienceCounter;
 						if(convertedExperience > 100) {
 							convertedExperience = 100;
 						}
 						
+						//collect the current ranking on the server
 						ArrayList<constructors.Rank> rankList = RankingSystem.SQLRanking(guild_id);
 						if(rankList.size() > 0) {
-							search: for(constructors.Rank ranking : rankList){
-								if(user_id == ranking.getUser_ID()){
-									rank = ranking.getRank();
-									break search;
-								}
-							}
+							final var ranking = rankList.parallelStream().filter(f -> f.getUser_ID() == user_id).findAny().orElse(null);
+							if(ranking != null)
+								rank = ranking.getRank();
+							else
+								rank = 0;
 						}
 						
+						//print the rank page, if the current experience isn't in the negative area
 						if(currentExperience >= 0) {
 							RankingMethods.getRank(e, name, avatar, convertedExperience, rank, guild_settings.getThemeID(), user_details);
 						}
