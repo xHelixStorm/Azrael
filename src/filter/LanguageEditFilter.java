@@ -108,14 +108,11 @@ public class LanguageEditFilter implements Runnable {
 						blockHeavyCensor = true;
 						var heavyCensoring = Hashes.getHeavyCensoring(e.getGuild().getIdLong());
 						if(heavyCensoring != null && heavyCensoring) {
-							var blockSaveMessage = false;
 							var messageDeleted = false;
 							var censorMessage = Hashes.getCensorMessage(e.getGuild().getIdLong());
 							if(parseMessage.length() == 1 || (censorMessage != null && censorMessage.contains(parseMessage))) {
 								deleteHeavyCensoringMessage(e, allChannels, name, channel, getMessage);
 								messageDeleted = true;
-								if(parseMessage.length() == 1)
-									blockSaveMessage = true;
 							}
 							else {
 								var splitWords = parseMessage.split(" ");
@@ -130,22 +127,8 @@ public class LanguageEditFilter implements Runnable {
 										if(count == 9) {
 											deleteHeavyCensoringMessage(e, allChannels, name, channel, getMessage);
 											messageDeleted = true;
-											blockSaveMessage = true;
 										}
 									}
-								}
-							}
-							if(!blockSaveMessage) {
-								if(censorMessage == null) {
-									ArrayList<String> saveMessage = new ArrayList<String>();
-									saveMessage.add(parseMessage);
-									Hashes.addCensorMessage(e.getGuild().getIdLong(), saveMessage);
-								}
-								else {
-									censorMessage.add(parseMessage);
-									if(censorMessage.size() > 30)
-										censorMessage.remove(0);
-									Hashes.addCensorMessage(e.getGuild().getIdLong(), censorMessage);
 								}
 							}
 							if(messageDeleted) {

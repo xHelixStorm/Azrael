@@ -39,20 +39,29 @@ public class GuildMessageEditListener extends ListenerAdapter{
 			var allChannels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
 			//execute only one thread at the same time
 			ExecutorService executor = Executors.newSingleThreadExecutor();
-			executor.execute(() -> {
-				//collect all gilter languages for the current channel
-				var filter_lang = Azrael.SQLgetChannel_Filter(channel_id);
-				if(filter_lang.size() > 0) {
-					//run the word filter, if languages have been found for edited messages
-					new Thread(new LanguageEditFilter(e, filter_lang, allChannels)).start();
-					//if url censoring is allowed, execute that filter as well
-					if(allChannels.parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getURLCensoring()).findAny().orElse(null) != null)
+			//check if the edited message has been already checked, in case if it's the same message like before an edit
+			var messages = Hashes.getMessagePool(e.getMessageIdLong());
+			var sameMessage = false;
+			if(messages != null) {
+				if(messages.parallelStream().filter(f -> f.getMessage().equalsIgnoreCase(e.getMessage().getContentRaw())).findAny().orElse(null) != null)
+					sameMessage = true;
+			}
+			if(messages == null || sameMessage == false) {
+				executor.execute(() -> {
+					//collect all gilter languages for the current channel
+					var filter_lang = Azrael.SQLgetChannel_Filter(channel_id);
+					if(filter_lang.size() > 0) {
+						//run the word filter, if languages have been found for edited messages
+						new Thread(new LanguageEditFilter(e, filter_lang, allChannels)).start();
+						//if url censoring is allowed, execute that filter as well
+						if(allChannels.parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getURLCensoring()).findAny().orElse(null) != null)
+							new Thread(new URLFilter(null, e, filter_lang, allChannels)).start();
+					}
+					//if the url censoring is enabled but no languages to filter have been set, start the url censoring anyway
+					else if(allChannels.parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getURLCensoring()).findAny().orElse(null) != null)
 						new Thread(new URLFilter(null, e, filter_lang, allChannels)).start();
-				}
-				//if the url censoring is enabled but no languages to filter have been set, start the url censoring anyway
-				else if(allChannels.parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getURLCensoring()).findAny().orElse(null) != null)
-					new Thread(new URLFilter(null, e, filter_lang, allChannels)).start();
-			});
+				});
+			}
 			
 			executor.execute(() -> {
 				//check if edited messages should be collected and printed in a channel
@@ -93,7 +102,6 @@ public class GuildMessageEditListener extends ListenerAdapter{
 					
 					if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "EDIT ["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
 					if(log[1]) {
-						var messages = Hashes.getMessagePool(e.getMessageIdLong());
 						if(messages != null) {
 							messages.add(collectedMessage);
 							Hashes.addMessagePool(e.getMessageIdLong(), messages);
