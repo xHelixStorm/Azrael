@@ -106,11 +106,11 @@ public class URLFilter implements Runnable{
 							} catch(SocketTimeoutException e1) {
 								logger.warn("URL {} couldn't be verified for guild {}", foundURL, guild_id);
 							} catch(UnknownHostException e1) {
-								logger.warn("Invalid URL {} for guild {}", foundURL, guild_id);
+								logger.trace("Invalid URL {} for guild {}", foundURL, guild_id);
 							} catch (MalformedURLException e1) {
-								logger.error("URL malformed error for url {} and guild {}", foundURL, guild_id, e1);
+								logger.warn("URL malformed error for url {} and guild {}", foundURL, guild_id, e1);
 							} catch (IOException e1) {
-								logger.warn("Invalid URL {} for guild {}", foundURL, guild_id, e1);
+								logger.trace("Invalid URL {} for guild {}", foundURL, guild_id, e1);
 							}
 						}
 					}
@@ -245,7 +245,7 @@ public class URLFilter implements Runnable{
 				}
 			}, error -> {
 				//when the message already has been removed, usually by another bot
-				logger.warn("Message containing a url has been already deleted! URL: {}", foundURL);
+				logger.trace("Message containing a url has been already deleted! URL: {}", foundURL);
 			});
 		}
 	}

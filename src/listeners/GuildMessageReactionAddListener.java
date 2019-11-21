@@ -87,7 +87,9 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 											int emote = STATIC.returnEmote(reactionName);
 											//check if the bot has the manage roles permission
 											if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
-												e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
+												//A tenth emote possibility doesn't exist
+												if(emote != 9)
+													e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
 											else
 												printPermissionError(e);
 										}
@@ -96,7 +98,9 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 										int emote = STATIC.returnEmote(reactionName);
 										//check if the bot has the manage roles permission
 										if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
-											e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
+											//A tenth emote possibility doesn't exist
+											if(emote != 9)
+												e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
 										else
 											printPermissionError(e);
 									}

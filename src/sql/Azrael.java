@@ -475,7 +475,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO nickname VALUES (?, ?, ?)");
+			String sql = ("INSERT INTO nickname VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nickname=VALUES(nickname)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);

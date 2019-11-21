@@ -18,11 +18,13 @@ public class UserPrivs {
 	final static private Logger logger = LoggerFactory.getLogger(UserPrivs.class);
 	
 	public static boolean isUserAdmin(Member member) {
-		for(Role r : member.getRoles()) {
-			Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
-			if(category != null && category.getCategory_Name().length() > 0) {
-				if(category.getCategory_Name().equals("Administrator")) {
-					return true;
+		if(member != null) {
+			for(Role r : member.getRoles()) {
+				Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
+				if(category != null && category.getCategory_Name().length() > 0) {
+					if(category.getCategory_Name().equals("Administrator")) {
+						return true;
+					}
 				}
 			}
 		}
@@ -30,11 +32,13 @@ public class UserPrivs {
 	}
 	
 	public static boolean isUserMod(Member member) {
-		for(Role r : member.getRoles()) {
-			Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
-			if(category != null && category.getCategory_Name().length() > 0) {
-				if(category.getCategory_Name().equals("Moderator")) {
-					return true;
+		if(member != null) {
+			for(Role r : member.getRoles()) {
+				Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
+				if(category != null && category.getCategory_Name().length() > 0) {
+					if(category.getCategory_Name().equals("Moderator")) {
+						return true;
+					}
 				}
 			}
 		}
@@ -42,11 +46,13 @@ public class UserPrivs {
 	}
 	
 	public static boolean isUserBot(Member member) {
-		for(Role r : member.getRoles()) {
-			Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
-			if(category != null && category.getCategory_Name().length() > 0) {
-				if(category.getCategory_Name().equals("Bot")) {
-					return true;
+		if(member != null) {
+			for(Role r : member.getRoles()) {
+				Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
+				if(category != null && category.getCategory_Name().length() > 0) {
+					if(category.getCategory_Name().equals("Bot")) {
+						return true;
+					}
 				}
 			}
 		}
@@ -54,11 +60,13 @@ public class UserPrivs {
 	}
 	
 	public static boolean isUserMuted(Member member) {
-		for(Role r : member.getRoles()) {
-			Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
-			if(category != null && category.getCategory_Name().length() > 0) {
-				if(category.getCategory_Name().equals("Mute")) {
-					return true;
+		if(member != null) {
+			for(Role r : member.getRoles()) {
+				Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
+				if(category != null && category.getCategory_Name().length() > 0) {
+					if(category.getCategory_Name().equals("Mute")) {
+						return true;
+					}
 				}
 			}
 		}
@@ -66,11 +74,13 @@ public class UserPrivs {
 	}
 	
 	public static boolean isUserCommunity(Member member) {
-		for(Role r : member.getRoles()) {
-			Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
-			if(category != null && category.getCategory_ABV().length() > 0) {
-				if(category.getCategory_Name().equals("Community")) {
-					return true;
+		if(member != null) {
+			for(Role r : member.getRoles()) {
+				Roles category = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == r.getIdLong()).findAny().orElse(null);
+				if(category != null && category.getCategory_ABV().length() > 0) {
+					if(category.getCategory_Name().equals("Community")) {
+						return true;
+					}
 				}
 			}
 		}
@@ -79,16 +89,18 @@ public class UserPrivs {
 	
 	public static boolean comparePrivilege(Member member, int requiredLevel) {
 		var highestLevel = 0;
-		for(final var role : member.getRoles()) {
-			var level = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == role.getIdLong()).findAny().orElse(null);
-			if(level != null) {
-				if(level.getLevel() > highestLevel) {
-					highestLevel = level.getLevel();
+		if(member != null) {
+			for(final var role : member.getRoles()) {
+				var level = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == role.getIdLong()).findAny().orElse(null);
+				if(level != null) {
+					if(level.getLevel() > highestLevel) {
+						highestLevel = level.getLevel();
+					}
 				}
-			}
-			else {
-				if(DiscordRoles.SQLInsertRole(member.getGuild().getIdLong(), role.getIdLong(), 0, role.getName(), "def") == 0) {
-					logger.error("The role id {} couldn't be inserted into DiscordRoles.roles table", role.getId());
+				else {
+					if(DiscordRoles.SQLInsertRole(member.getGuild().getIdLong(), role.getIdLong(), 0, role.getName(), "def") == 0) {
+						logger.error("The role id {} couldn't be inserted into DiscordRoles.roles table", role.getId());
+					}
 				}
 			}
 		}

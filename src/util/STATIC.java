@@ -54,7 +54,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
-	private static final String VERSION = "6.9.367";
+	private static final String VERSION = "6.9.368";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
@@ -247,7 +247,7 @@ public class STATIC {
 			channel.sendMessage(member.getAsMention()+" "+output[0]).queue();
 		}
 		else {
-			var cache = Hashes.getTempCache("report_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
+			var cache = Hashes.getTempCache("report_gu"+e.getGuild().getId()+"us"+member.getUser().getId());
 			if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
 				channel.sendMessage(member.getAsMention()+" "+output[0]).queue();
 				Hashes.addTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId(), new Cache(300000, "1"));
