@@ -766,6 +766,8 @@ public class UserExecution {
 				message.setTitle("Mute action!");
 				message.addField("YES", "Provide a mute time", true);
 				message.addField("NO", "Don't provide a mute time", true);
+				if(GuildIni.getOverrideBan(_e.getGuild().getIdLong()))
+					message.addField("PERM", "Mute permanently", true);
 				_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a self chosen mute timer? By providing a self chosen mute timer, the warning value won't increment unless the user has been never warned before!").build()).queue();
 				cache.updateDescription("mute-action"+user_id).updateDescription2(_message).setExpiration(180000);
 				Hashes.addTempCache(key, cache);
@@ -780,7 +782,7 @@ public class UserExecution {
 					cache.updateDescription("mute-time"+user_id).setExpiration(180000);
 					Hashes.addTempCache(key, cache);
 				}
-				else if(comment.equals("no")) {
+				else if(comment.equals("no") || (GuildIni.getOverrideBan(_e.getGuild().getIdLong()) && comment.equals("perm"))) {
 					Member member = _e.getGuild().getMemberById(user_id);
 					if(member != null && !_e.getGuild().getSelfMember().canInteract(_e.getGuild().getMemberById(user_id))) {
 						message.setTitle("User can't get muted").setColor(Color.RED);
@@ -789,6 +791,16 @@ public class UserExecution {
 						return;
 					}
 					if(_e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+						var permMute = false;
+						if(!comment.equals("no")) {
+							var timestamp = new Timestamp(System.currentTimeMillis());
+							if(Azrael.SQLInsertData(member.getUser().getIdLong(), _e.getGuild().getIdLong(), Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong()), 1, timestamp, timestamp, false, false) > 0) {
+								permMute = true;
+							}
+							else {
+								
+							}
+						}
 						var mute_role_id = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 						if(mute_role_id != null) {
 							if(member != null) {
@@ -796,7 +808,7 @@ public class UserExecution {
 								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id.getRole_ID())).queue();
 								var mute_time = (long)Azrael.SQLgetWarning(_e.getGuild().getIdLong(), Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID()+1).getTimer();
 								Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "mute", (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!"), (mute_time/1000/60));
-								_e.getChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
+								_e.getChannel().sendMessage(message.setDescription((permMute ? "Perm mute" : "Mute")+" order has been issued!").build()).queue();
 								checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 							}
 							else {
@@ -925,14 +937,12 @@ public class UserExecution {
 							if(warning_id == max_warning_id) {
 								pc.sendMessage("You have been banned from "+_e.getGuild().getName()+", since you have exceeded the max amount of allowed mutes on this server. Thank you for your understanding.\n"
 										+ "On a important note, this is an automatic reply. You'll receive no reply in any way.\n"
-										+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).queue();
-								pc.close().queue();
+										+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).complete();
 							}
 							else {
 								pc.sendMessage("You have been banned from "+_e.getGuild().getName()+". Thank you for your understanding.\n"
 										+ "On a important note, this is an automatic reply. You'll receive no reply in any way.\n"
-										+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).queue();
-								pc.close().queue();
+										+ (GuildIni.getBanSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).complete();
 							}
 							_e.getChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
 							_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason("User has been banned with the bot command!").queue();
