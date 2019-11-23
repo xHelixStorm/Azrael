@@ -87,7 +87,8 @@ public class Main {
 			if(args[0].equals("list")) {
 				System.out.println("These are all available parameters. If nothing has been provided, the values from config.ini will be taken:\n\n"
 						+ "admin:<NUMERIC> (17/18 digit long user id that defines the admin for shutdown and reboot)\n"
-						+ "timezone:<String> (timezone location like 'Europe/Berlin' for mysql databases)"
+						+ "timezone:<String> (timezone location like 'Europe/Berlin' for mysql databases)\n"
+						+ "sessionname: <String> (if the bot should be started multiple times, assign a name)"
 						+ "actionlog:<BOOLEAN> (true/false parameter to log actions related to the ranking system and other updates)\n"
 						+ "doubleexperience:<BOOLEAN> (true/false parameter to either enable or disable double experience events)\n"
 						+ "doubleexperiencestart:<WEEKDAY> (Regular days from Monday to Sunday as parameter to define the start day of double experience events)\n"
@@ -101,15 +102,15 @@ public class Main {
 			else {
 				//initialize all static variables
 				STATIC.setToken(args[0].trim());
-				if(args.length > 1)
-					STATIC.setSessionName(args[1].trim());
-				if(args.length > 2) {
+				if(args.length > 1) {
 					for(final var argument : args) {
 						final var currentArgument = argument.toLowerCase();
 						if(currentArgument.startsWith("admin:"))
 							STATIC.setAdmin(Long.parseLong(argument.split(":")[1].trim()));
 						if(currentArgument.startsWith("timezone:"))
 							STATIC.setTimezone(argument.split(":")[1].trim());
+						if(currentArgument.startsWith("sessionname: "))
+							STATIC.setSessionName(argument.split(":")[1].trim());
 						if(currentArgument.startsWith("actionlog:"))
 							STATIC.setActionLog(argument.split(":")[1].trim());
 						if(currentArgument.startsWith("doubleexperience:"))
