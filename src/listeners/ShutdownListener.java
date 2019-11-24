@@ -35,7 +35,7 @@ public class ShutdownListener extends ListenerAdapter {
 				try {
 					//execute screen command to restart the bot
 					Process proc;
-					proc = Runtime.getRuntime().exec("screen -dm "+(STATIC.getSessionName().length() > 0 ? "-S "+STATIC.getSessionName()+" " : "")+"java -jar --enable-preview Azrael.jar "+STATIC.getToken()+(STATIC.getSessionName().length() > 0 ? " "+STATIC.getSessionName() : "")+(STATIC.getAdmin() != 0 ? " "+STATIC.getAdmin() : ""));
+					proc = Runtime.getRuntime().exec("screen -dm "+(STATIC.getSessionName().length() > 0 ? "-S "+STATIC.getSessionName()+" " : "")+"java -jar --enable-preview Azrael.jar "+STATIC.getToken()+(STATIC.getSessionName().length() > 0 ? " "+"sessionname:"+STATIC.getSessionName() : "")+(STATIC.getAdmin() != 0 ? " "+STATIC.getAdmin() : ""));
 					proc.waitFor();
 				} catch (IOException | InterruptedException e1) {
 					logger.error("Bot couldn't be restarted!");

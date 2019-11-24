@@ -31,7 +31,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 					if(Azrael.SQLgetCommandExecutionReaction(e.getGuild().getIdLong())) {
 						//check for any registered reaction channel and execute logic only if it happened in that channel
 						var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rea")).findAny().orElse(null);
-						if(rea_channel != null) {
+						if(rea_channel != null && rea_channel.getChannel_ID() == e.getChannel().getIdLong()) {
 							//retrieve all reaction roles which will be assigned to a user when reacted
 							var reactionRoles = DiscordRoles.SQLgetReactionRoles(e.getGuild().getIdLong());
 							if(reactionRoles != null && reactionRoles.size() > 0) {

@@ -37,7 +37,7 @@ public class Pastebin {
 		return link.getLink().toString();
 	}
 	
-	public static String unlistedPermanentPaste(String _title, String _contents, long guild_id) throws LoginException, PasteException, IllegalStateException {
+	public static String unlistedPermanentPaste(String _title, String _contents, long guild_id) throws LoginException, PasteException, IllegalStateException, RuntimeException {
 		String[] credentials = GuildIni.getPastebinCredentials(guild_id);
 		
 		String title = _title; // insert your own title

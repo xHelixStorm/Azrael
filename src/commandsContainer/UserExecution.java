@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
@@ -345,7 +346,11 @@ public class UserExecution {
 												if(user_details != null) {
 													assignedRole = user_details.getCurrentRole();
 												}
-												_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(assignedRole)).queue();
+												if(assignedRole != 0) {
+													Role role = _e.getGuild().getRoleById(assignedRole);
+													if(role != null)
+														_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(assignedRole)).queue();
+												}
 												_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle("User unmuted!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+_e.getGuild().getMemberById(user_id).getUser().getName()+"#"+_e.getGuild().getMemberById(user_id).getUser().getDiscriminator() + "** with the ID Number **" +user_id+ "** has been unmuted from his/her infinite mute!").build()).queue();
 											}
 											else {
@@ -1516,10 +1521,14 @@ public class UserExecution {
 								_e.getChannel().sendMessage(message.setDescription("The comments of the selected user have been succesfully removed: "+paste_link).build()).queue();
 								Azrael.SQLInsertActionLog("MESSAGES_DELETED", user_id, _e.getGuild().getIdLong(), paste_link);
 								logger.debug("{} has bulk deleted messages from {}", _e.getMember().getUser().getId(), userMessage.getUserID());
-							} catch (IllegalStateException | LoginException | PasteException e) {
+							} catch(IllegalStateException | LoginException | PasteException e) {
 								logger.warn("Error on creating paste", e);
 								error.setTitle("New Paste couldn't be created!");
 								_e.getChannel().sendMessage(error.setDescription("A new Paste couldn't be created. Please ensure that valid login credentials and a valid Pastebing API key has been inserted into the config.ini file!").build()).queue();
+							} catch(RuntimeException e) {
+								logger.warn("New Paste couldn't be created!", e);
+								error.setTitle("New Paste couldn't be created!");
+								_e.getChannel().sendMessage(error.setDescription("A new Paste couldn't be created. Pastebin login page couldn't be reached!").build()).queue();
 							}
 						}
 						else {

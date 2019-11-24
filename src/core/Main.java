@@ -109,7 +109,7 @@ public class Main {
 							STATIC.setAdmin(Long.parseLong(argument.split(":")[1].trim()));
 						if(currentArgument.startsWith("timezone:"))
 							STATIC.setTimezone(argument.split(":")[1].trim());
-						if(currentArgument.startsWith("sessionname: "))
+						if(currentArgument.startsWith("sessionname:"))
 							STATIC.setSessionName(argument.split(":")[1].trim());
 						if(currentArgument.startsWith("actionlog:"))
 							STATIC.setActionLog(argument.split(":")[1].trim());
