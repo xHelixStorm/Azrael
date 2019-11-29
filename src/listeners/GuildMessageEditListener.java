@@ -64,6 +64,8 @@ public class GuildMessageEditListener extends ListenerAdapter{
 			}
 			
 			executor.execute(() -> {
+				long destinationChannel = 0;
+				boolean printEditHistory = false;
 				//check if edited messages should be collected and printed in a channel
 				if(GuildIni.getEditedMessage(e.getGuild().getIdLong())) {
 					//retrieve any registered trash and edit channels but use the edit channel if it exists and print the message
@@ -71,13 +73,21 @@ public class GuildMessageEditListener extends ListenerAdapter{
 					var tra_channel = traAndEdiChannels.parallelStream().filter(f -> f.getChannel_Type().equals("tra")).findAny().orElse(null);
 					var edi_channel = traAndEdiChannels.parallelStream().filter(f -> f.getChannel_Type().equals("edi")).findAny().orElse(null);
 					if(tra_channel != null || edi_channel != null) {
-						if(edi_channel != null) {
-							e.getGuild().getTextChannelById(edi_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.YELLOW).setTitle("User has edited his message!")
-								.setDescription("["+LocalDateTime.now().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+e.getMessage().getContentRaw()).build()).queue();
+						//verify if the message history has to be printed and not just the edited message
+						if(GuildIni.getEditedMessageHistory(e.getGuild().getIdLong())) {
+							printEditHistory = true;
+							destinationChannel = (edi_channel != null ? edi_channel.getChannel_ID() : tra_channel.getChannel_ID());
 						}
 						else {
-							e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.YELLOW).setTitle("User has edited his message!")
-									.setDescription("["+LocalDateTime.now().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+e.getMessage().getContentRaw()).build()).queue();
+							final var printMessage = "["+LocalDateTime.now().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+e.getMessage().getContentRaw();
+							if(edi_channel != null) {
+								e.getGuild().getTextChannelById(edi_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setTitle("User has edited his message!")
+									.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+							}
+							else {
+								e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setTitle("User has edited his message!")
+										.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+							}
 						}
 					}
 				}
@@ -108,6 +118,17 @@ public class GuildMessageEditListener extends ListenerAdapter{
 						}
 					}
 				}
+				
+				//if true, print the message history on message edit
+				if(printEditHistory && destinationChannel != 0) {
+					var messageCounter = 0;
+					for(final var message : messages) {
+						final var printMessage = "["+message.getTime().toString()+" - "+message.getUserName()+" ("+message.getUserID()+")]:\n"+message.getMessage();
+						e.getGuild().getTextChannelById(destinationChannel).sendMessage(new EmbedBuilder().setTitle("Message history after edit. Message "+(++messageCounter)+" / "+messages.size())
+							.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+					}
+				}
+				
 				//check if the current user is being watched and that the cache log is enabled
 				var watchedMember = Azrael.SQLgetWatchlist(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 				var sentMessage = Hashes.getMessagePool(e.getMessageIdLong());

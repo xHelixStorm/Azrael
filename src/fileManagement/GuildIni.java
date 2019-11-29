@@ -36,6 +36,7 @@ public class GuildIni {
 		general.put("URLBlacklist", "false");
 		general.put("SelfDeletedMessage", "false");
 		general.put("EditedMessage", "false");
+		general.put("EditedMessageHistory", "false");
 		fileContent.put("General", general);
 		
 		//collect all Patch variables
@@ -359,6 +360,10 @@ public class GuildIni {
 	public static boolean getEditedMessage(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "EditedMessage", boolean.class);
+	}
+	public static boolean getEditedMessageHistory(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "EditedMessageHistory", boolean.class);
 	}
 	
 	public static boolean getPrivatePatchNotes(long guild_id) {
