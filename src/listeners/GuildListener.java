@@ -38,13 +38,13 @@ import sql.Azrael;
 
 public class GuildListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildListener.class);
-	private final static EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
-	private final static EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("Not allowed name found!");
 	private final static EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle("An error occurred!");
 	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent e) {
 		new Thread(() -> {
+			final EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
+			final EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("Not allowed name found!");
 			logger.debug("{} has joined the guild {}", e.getUser().getId(), e.getGuild().getId());
 			long user_id = e.getMember().getUser().getIdLong();
 			String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
