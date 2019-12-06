@@ -377,7 +377,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						else {
 							//retrieve all bots and quiz channels to exclude users from gaining experience points in these channels. also keep bots away from gaining experience points
 							var channels = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("bot") || f.getChannel_Type().equals("qui"))).collect(Collectors.toList());
-							if(e.getMember().getUser().isBot() && !UserPrivs.isUserBot(e.getMember()) && channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) == null) {
+							if(!e.getMember().getUser().isBot() && channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) == null) {
 								int roleAssignLevel = 0;
 								long role_id = 0;
 								//check if there's a ranking role to unlock when the user reaches the next level
