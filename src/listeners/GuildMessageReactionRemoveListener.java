@@ -57,8 +57,10 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 											//check if the reacted reaction is the same which is saved in the ini file, if yes assign role basing that reaction
 											if(reactions[i].length() > 0 && (reactionName.equals(reactions[i]) || EmojiParser.parseToAliases(reactionName).replaceAll(":", "").equals(reactions[i]))) {
 												//check if the bot has the manage roles permission
-												if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+												if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 													e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(i).getRole_ID())).queue();
+													logger.debug("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+												}
 												else
 													printPermissionError(e);
 												emoteFound = true;
@@ -70,10 +72,13 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 										if(emoteFound == false) {
 											int emote = STATIC.returnEmote(reactionName);
 											//check if the bot has the manage roles permission
-											if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+											if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 												//A tenth emote possibility doesn't exist
-												if(emote != 9)
+												if(emote != 9) {
 													e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
+													logger.debug("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+												}
+											}
 											else
 												printPermissionError(e);
 										}
@@ -83,13 +88,14 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 										//check if the bot has the manage roles permission
 										if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
 											//A tenth emote possibility doesn't exist
-											if(emote != 9)
+											if(emote != 9) {
 												e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
+												logger.debug("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+											}
 										else
 											printPermissionError(e);
 									}
 								}
-								logger.debug("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
 							}
 							else
 								logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());

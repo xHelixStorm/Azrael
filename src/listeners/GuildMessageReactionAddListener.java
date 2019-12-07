@@ -72,8 +72,10 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 											//check if the reacted reaction is the same which is saved in the ini file, if yes assign role basing that reaction
 											if(reactions[i].length() > 0 && (reactionName.equals(reactions[i]) || EmojiParser.parseToAliases(reactionName).replaceAll(":", "").equals(reactions[i]))) {
 												//check if the bot has the manage roles permission
-												if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+												if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 													e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(i).getRole_ID())).queue();
+													logger.debug("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+												}
 												else
 													printPermissionError(e);
 												emoteFound = true;
@@ -86,10 +88,13 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 										if(emoteFound == false) {
 											int emote = STATIC.returnEmote(reactionName);
 											//check if the bot has the manage roles permission
-											if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+											if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 												//A tenth emote possibility doesn't exist
-												if(emote != 9)
+												if(emote != 9) {
 													e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
+													logger.debug("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+												}
+											}
 											else
 												printPermissionError(e);
 										}
@@ -99,12 +104,13 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 										//check if the bot has the manage roles permission
 										if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
 											//A tenth emote possibility doesn't exist
-											if(emote != 9)
+											if(emote != 9) {
 												e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
+												logger.debug("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+											}
 										else
 											printPermissionError(e);
 									}
-									logger.debug("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
 								}
 							}
 							else
