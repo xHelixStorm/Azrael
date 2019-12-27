@@ -27,7 +27,9 @@ public class RegisterRole {
 		String parseMessage = null;
 		
 		final String prefix = GuildIni.getCommandPrefix(_e.getGuild().getIdLong());
-		parseMessage = "Please write the command in this format:\n**"+prefix+"register -role <role_type> role-id**\n\nRole-ids can be displayed with the command **"+prefix+"display -roles**. Here are all available role_types:\n\n";
+		parseMessage = "Please write the command in this format:\n**"+prefix+"register -role <role_type> role-id**\n\nRole-ids can be displayed with the command **"+prefix+"display -roles**.\n"
+				+ "At the end of the command, the persistant parameter can be added to make a reaction role not removable with the rolereaction command.\n"
+				+ "Here are all available role_types:\n\n";
 		for(Roles categories : DiscordRoles.SQLgetCategories()){
 			strB.append("**"+categories.getCategory_ABV()+"** for the **"+categories.getCategory_Name()+"** role\n");
 		}
@@ -44,11 +46,11 @@ public class RegisterRole {
 			if(_args.length > 2 && _args[1].equalsIgnoreCase("adm")) {
 				category_abv = "adm";
 				role = _args[2].replaceAll("[^0-9]*", "");
-				if(role.length() == 18){
+				if(role.length() == 18) {
 					try {
 						role_id = Long.parseLong(role);
 						role_name = _e.getGuild().getRoleById(role_id).getName();
-						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, STATIC.getLevel(category_abv), role_name, category_abv) > 0) {
+						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, STATIC.getLevel(category_abv), role_name, category_abv, false) > 0) {
 							logger.debug("Administrator role registered {} for guild {}", role_id, _e.getGuild().getName());
 							_e.getChannel().sendMessage("**The primary Administrator role has been registered!**").queue();
 							DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong());
@@ -57,7 +59,7 @@ public class RegisterRole {
 							logger.error("Role {} couldn't be registered into DiscordRoles.roles for the guild {}", role_id, _e.getGuild().getName());
 							_e.getChannel().sendMessage("An internal error occurred. Role "+role_id+" couldn't be registered into DiscordRoles.roles table").queue();
 						}
-					} catch(NullPointerException npe){
+					} catch(NullPointerException npe) {
 						_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();
 					}
 				}
@@ -88,7 +90,14 @@ public class RegisterRole {
 						role_id = Long.parseLong(role);
 						role_name = _e.getGuild().getRoleById(role_id).getName();
 						var level = STATIC.getLevel(category_abv);
-						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, level, role_name, category_abv) > 0) {
+						boolean persistant = false;
+						if(_args.length == 4 && _args[3].equals("persistant"))
+							persistant = true;
+						else if(_args.length >= 4) {
+							_e.getChannel().sendMessage("Parameter **"+_args[3]+"** doesn't exist!").queue();
+							return;
+						}
+						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, level, role_name, category_abv, persistant) > 0) {
 							logger.debug("{} has registered the role {} with the category {} in guild {}", _e.getMember().getUser().getId(), role_name, category_abv, _e.getGuild().getId());
 							_e.getChannel().sendMessage("**The role has been registered!**").queue();
 							Hashes.removeDiscordRoles(_e.getGuild().getIdLong());

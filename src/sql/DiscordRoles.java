@@ -77,19 +77,20 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static int SQLInsertRole(long _guild_id, long _role_id, int _level, String _role_name, String _category_abv) {
-		logger.debug("SQLInsertRole launched. Passed params {}, {}, {}, {}, {}", _guild_id, _role_id, _level, _role_name, _category_abv);
+	public static int SQLInsertRole(long _guild_id, long _role_id, int _level, String _role_name, String _category_abv, boolean _persistant) {
+		logger.debug("SQLInsertRole launched. Passed params {}, {}, {}, {}, {}, {}", _guild_id, _role_id, _level, _role_name, _category_abv, _persistant);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
-			String sql = ("INSERT INTO roles(role_id, name, level, fk_category_abv, fk_guild_id) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name), level=VALUES(level), fk_category_abv=VALUES(fk_category_abv)");
+			String sql = ("INSERT INTO roles(role_id, name, level, fk_category_abv, fk_guild_id, persistant) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name), level=VALUES(level), fk_category_abv=VALUES(fk_category_abv), persistant=VALUES(persistant)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _role_id);
 			stmt.setString(2, _role_name);
 			stmt.setInt(3, _level);
 			stmt.setString(4, _category_abv);
 			stmt.setLong(5, _guild_id);
+			stmt.setBoolean(6, _persistant);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertRole Exception", e);
@@ -107,7 +108,7 @@ public class DiscordRoles {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("INSERT INTO roles(role_id, name, level, fk_category_abv, fk_guild_id) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name), level=VALUES(level), fk_category_abv=VALUES(fk_category_abv)");
+			String sql = ("INSERT INTO roles(role_id, name, level, fk_category_abv, fk_guild_id, persistant) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name), level=VALUES(level), fk_category_abv=VALUES(fk_category_abv), persistant=VALUES(persistant)");
 			stmt = myConn.prepareStatement(sql);
 			for(var role : roles) {
 				if(!role.getName().equals("@everyone")) {
@@ -116,6 +117,7 @@ public class DiscordRoles {
 					stmt.setInt(3, 0);
 					stmt.setString(4, "def");
 					stmt.setLong(5, _guild_id);
+					stmt.setBoolean(6, false);
 					stmt.addBatch();
 				}
 			}
@@ -191,7 +193,8 @@ public class DiscordRoles {
 						rs.getString(2),
 						rs.getInt(3),
 						rs.getString(4),
-						rs.getString(5)
+						rs.getString(5),
+						rs.getBoolean(6)
 					);
 					roles.add(roleDetails);
 				}
@@ -228,7 +231,8 @@ public class DiscordRoles {
 						rs.getString(2),
 						rs.getInt(3),
 						rs.getString(4),
-						rs.getString(5)
+						rs.getString(5),
+						rs.getBoolean(7)
 					));
 				}
 				Hashes.addReactionRoles(_guild_id, reactionRoles);

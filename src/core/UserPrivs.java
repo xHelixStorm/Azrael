@@ -101,7 +101,7 @@ public class UserPrivs {
 					}
 				}
 				else {
-					if(DiscordRoles.SQLInsertRole(member.getGuild().getIdLong(), role.getIdLong(), 0, role.getName(), "def") == 0) {
+					if(DiscordRoles.SQLInsertRole(member.getGuild().getIdLong(), role.getIdLong(), 0, role.getName(), "def", false) == 0) {
 						logger.error("The role id {} couldn't be inserted into DiscordRoles.roles table", role.getId());
 					}
 				}
@@ -125,7 +125,7 @@ public class UserPrivs {
 				out.append((!role.getName().equals("@everyone") && currentRole.getLevel() >= requiredLevel ? role.getAsMention()+" " : ""));
 			}
 			else {
-				if(DiscordRoles.SQLInsertRole(guild.getIdLong(), role.getIdLong(), 0, role.getName(), "def") > 0) {
+				if(DiscordRoles.SQLInsertRole(guild.getIdLong(), role.getIdLong(), 0, role.getName(), "def", false) > 0) {
 					Hashes.removeDiscordRoles(guild.getIdLong());
 				}
 				else {

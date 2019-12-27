@@ -1632,7 +1632,7 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLInsertChannel_Filter(long _channel_id, String _filter_lang) {
+	public static int SQLInsertChannel_Filter(long _channel_id, String _filter_lang) {
 		logger.debug("SQLInsertChannel_Filter launched. Passed params {}, {}", _channel_id, _filter_lang);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1642,9 +1642,10 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _channel_id);
 			stmt.setString(2, _filter_lang);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertChannel_Filter Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }

@@ -32,6 +32,7 @@ public class ShutdownListener extends ListenerAdapter {
 		if(SystemUtils.IS_OS_LINUX) {
 			//execute if the bot is labeled as running
 			if(filecontent.contains("1")) {
+				FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
 				try {
 					//execute screen command to restart the bot
 					Process proc;

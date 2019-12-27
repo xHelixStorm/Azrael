@@ -91,7 +91,10 @@ public class Display implements CommandPublic{
 				//retrieve roles from table
 				for(Roles r : DiscordRoles.SQLgetRoles(guild_id)) {
 					if(!r.getCategory_ABV().equals("def"))
-						out.append(r.getRole_Name() + " (" + r.getRole_ID() + ") \nrole type: "+r.getCategory_Name()+"\nPrivilege level: "+r.getLevel()+"\n\n");
+						out.append(r.getRole_Name() + " (" + r.getRole_ID() + ") \n"
+							+ "role type: "+r.getCategory_Name()+"\n"
+							+ "Privilege level: "+r.getLevel()+"\n"
+							+ "Persistant: "+(r.isPersistant() ? "yes" : "no")+"\n\n");
 				}
 				e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue();
 			}
@@ -155,13 +158,21 @@ public class Display implements CommandPublic{
 			//verify that the current user is allowed to use this parameter
 			final var registeredChannelsLevel = GuildIni.getDisplayRegisteredChannelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredChannelsLevel) || adminPermission) {
+				long prevChannelID = 0;
 				//retrieve all registered text channels from table
 				for(Channels ch : Azrael.SQLgetChannels(guild_id)) {
-					out.append(ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \n"
-						+ "Channel type: "+(ch.getChannel_Type_Name() != null ? ch.getChannel_Type_Name() : "none")+" Channel\n"
-						+ "URL censoring: "+(ch.getURLCensoring() ? "enabled" : "disabled")+"\n"
-						+ "Text removal: "+(ch.getTxtRemoval() ? "enabled" : "disabled")+"\n"
-						+ "Filter(s) in use: "+ch.getLang_Filter()+"\n\n");
+					if(prevChannelID != ch.getChannel_ID()) {
+						if(out.length() > 0)
+							out.append("\n\n");
+						out.append(ch.getChannel_Name() + " (" + ch.getChannel_ID() + ") \n"
+							+ "Channel type: "+(ch.getChannel_Type_Name() != null ? ch.getChannel_Type_Name()+" Channel" : "none")+"\n"
+							+ "URL censoring: "+(ch.getURLCensoring() ? "enabled" : "disabled")+"\n"
+							+ "Text removal: "+(ch.getTxtRemoval() ? "enabled" : "disabled")+"\n"
+							+ "Filter(s) in use: "+(ch.getLang_Filter() != null ? ch.getLang_Filter() : "none"));
+					}
+					else {
+						out.append(", "+ch.getLang_Filter());
+					}
 				}
 				e.getChannel().sendMessage(messageBuild.setDescription((out.length() > 0) ? out.toString() : "No channel has been registered!").build()).queue();
 			}

@@ -83,7 +83,7 @@ public class Set implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase("-channel-filter")) {
 				commandLevel = GuildIni.getSetChannelFilterLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					e.getChannel().sendMessage(messageBuild.setDescription("Use the command with this parameter to set one or few self chosen filters on a channel. Write the command as the following example:\n\n**"+prefix+"set -channel-filter #yourchannel eng,ger,fre**\nThese languages can be added to the filter:\n**eng** for English\n**ger** for German\n**fre** for French\n**tur** for Turkish\n**rus** for Russian").build()).queue();
+					e.getChannel().sendMessage(messageBuild.setDescription("Use the command with this parameter to set one or few self chosen filters on a channel. Write the command as the following example:\n\n**"+prefix+"set -channel-filter #yourchannel eng,ger,fre**\nThese languages can be added to the filter:\n\n**all** for all languages\n**eng** for English\n**ger** for German\n**fre** for French\n**tur** for Turkish\n**rus** for Russian\n**spa** for Spanish\n**por** for Portuguese\n**ita** for Italian").build()).queue();
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);

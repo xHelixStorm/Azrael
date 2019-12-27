@@ -6,6 +6,7 @@ public class Roles {
 	private int level;
 	private String category_abv;
 	private String category_name;
+	private boolean persistant;
 	
 	public Roles(String _category_abv, String _category_name) {
 		this.role_id = 0;
@@ -13,6 +14,7 @@ public class Roles {
 		this.level = 0;
 		this.category_abv = _category_abv;
 		this.category_name = _category_name;
+		this.persistant = false;
 	}
 	
 	public Roles(long _role_id, String _role_name, int _level) {
@@ -21,30 +23,35 @@ public class Roles {
 		this.level = _level;
 		this.category_abv = null;
 		this.category_name = null;
+		this.persistant = false;
 	}
 	
-	public Roles(long _role_id, String _role_name, int _level, String _category_abv, String _category_name) {
+	public Roles(long _role_id, String _role_name, int _level, String _category_abv, String _category_name, boolean _persistant) {
 		this.role_id = _role_id;
 		this.role_name = _role_name;
 		this.level = _level;
 		this.category_abv = _category_abv;
 		this.category_name = _category_name;
+		this.persistant = _persistant;
 	}
 	
 	public long getRole_ID() {
-		return role_id;
+		return this.role_id;
 	}
 	public String getRole_Name() {
-		return role_name;
+		return this.role_name;
 	}
 	public int getLevel() {
-		return level;
+		return this.level;
 	}
 	public String getCategory_ABV() {
-		return category_abv;
+		return this.category_abv;
 	}
 	public String getCategory_Name() {
-		return category_name;
+		return this.category_name;
+	}
+	public boolean isPersistant() {
+		return this.persistant;
 	}
 	
 }

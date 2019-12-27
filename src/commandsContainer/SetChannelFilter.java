@@ -1,5 +1,6 @@
 package commandsContainer;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -7,6 +8,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 
@@ -39,12 +41,23 @@ public class SetChannelFilter {
 					}
 					i++;
 				}
-				if(languageError ==  false){
-					for(String language : filter_lang){
-						Azrael.SQLInsertChannel_Filter(channel_id, language);
-						logger.debug("{} has set the channel filter {} for channel {} in guild {}", _e.getMember().getUser().getId(), language, channel_id, _e.getGuild().getId());
-						_e.getChannel().sendMessage("**Filter for <#"+channel_id+"> has been updated!**").queue();
+				if(languageError ==  false) {
+					boolean filterUpdated = false;
+					int errorCount = 0;
+					for(String language : filter_lang) {
+						if(Azrael.SQLInsertChannel_Filter(channel_id, language) > 0) {
+							filterUpdated = true;
+							logger.debug("{} has set the channel filter {} for channel {} in guild {}", _e.getMember().getUser().getId(), language, channel_id, _e.getGuild().getId());
+						}
+						else {
+							errorCount++;
+							logger.error("channel filter {} couldn't be updated for the channel {} in guild {}", language, channel_id, _e.getGuild().getId());
+							_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("An error occurred!").setDescription("**Filter for <#"+channel_id+"> couldn't be updated!**").build()).queue();
+						}
 					}
+					if(filterUpdated && errorCount != filter_lang.size())
+						_e.getChannel().sendMessage("**Filter for <#"+channel_id+"> has been updated!**").queue();
+					
 				}
 				else{
 					_e.getChannel().sendMessage(_e.getMember().getAsMention()+" please define one or more available/valid languages!").queue();

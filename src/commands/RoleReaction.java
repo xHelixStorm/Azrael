@@ -65,9 +65,11 @@ public class RoleReaction implements CommandPublic {
 					var reactionRoles = DiscordRoles.SQLgetReactionRoles(e.getGuild().getIdLong());
 					if(reactionRoles != null && reactionRoles.size() > 0) {
 						for(int i = 0; i < reactionRoles.size(); i++) {
-							long role_id = reactionRoles.get(i).getRole_ID();
-							for(Member m : e.getGuild().getMembersWithRoles(e.getGuild().getRoleById(role_id))) {
-								e.getGuild().removeRoleFromMember(m, e.getGuild().getRoleById(role_id)).queue();
+							if(!reactionRoles.get(i).isPersistant()) {
+								long role_id = reactionRoles.get(i).getRole_ID();
+								for(Member m : e.getGuild().getMembersWithRoles(e.getGuild().getRoleById(role_id))) {
+									e.getGuild().removeRoleFromMember(m, e.getGuild().getRoleById(role_id)).queue();
+								}
 							}
 							if(i == 8) break;
 						}
