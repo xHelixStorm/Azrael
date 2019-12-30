@@ -63,7 +63,7 @@ public class UserExecution {
 			}
 		}
 		else {
-			final User user = Azrael.SQLgetUserThroughID(raw_input);
+			final User user = Azrael.SQLgetUserThroughID(raw_input, _e.getGuild().getIdLong());
 			if(user != null)
 				user_name = user.getUserName();
 		}
@@ -111,7 +111,7 @@ public class UserExecution {
 					case "information" -> {
 						final var informationLevel = GuildIni.getUserInformationLevel(_e.getGuild().getIdLong());
 						if(UserPrivs.comparePrivilege(_e.getMember(), informationLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
-							User user = Azrael.SQLgetUserThroughID(cache.getAdditionalInfo());
+							User user = Azrael.SQLgetUserThroughID(cache.getAdditionalInfo(), _e.getGuild().getIdLong());
 							message.setTitle("Here the requested information!");
 							if(user.getAvatar() != null)
 								message.setThumbnail(user.getAvatar());
@@ -123,7 +123,8 @@ public class UserExecution {
 							message.addField("TOTAL WARNINGS", "**"+Azrael.SQLgetSingleActionEventCount("MEMBER_MUTE_ADD", user_id, _e.getGuild().getIdLong())+"**", true);
 							message.addField("TOTAL BANS", "**"+Azrael.SQLgetSingleActionEventCount("MEMBER_BAN_ADD", user_id, _e.getGuild().getIdLong())+"**", true);
 							message.addField("BANNED", warnedUser.getBanID() == 2 ? "**YES**" : "**NO**", true);
-							message.addField("JOIN DATE", "**"+user.getJoinDate()+"**", true);
+							message.addField("ORIGINAL JOIN DATE", "**"+user.getOriginalJoinDate()+"**", true);
+							message.addField("NEWEST JOIN DATE", "**"+user.getNewestJoinDate()+"**", true);
 							message.addField("USER ID", "**"+cache.getAdditionalInfo()+"**", true);
 							var watchedUser = Azrael.SQLgetWatchlist(user_id, _e.getGuild().getIdLong());
 							if(watchedUser == null || (watchedUser.hasHigherPrivileges() && !UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserUseWatchChannelLevel(_e.getGuild().getIdLong()))))

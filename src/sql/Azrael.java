@@ -262,18 +262,17 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertUser(long _user_id, String _name, String _avatar, String _join_date) {
-		logger.debug("SQLInsertUser launched. Passed params {}, {}, {}, {}", _user_id, _name, _avatar, _join_date);
+	public static int SQLInsertUser(long _user_id, String _name, String _avatar) {
+		logger.debug("SQLInsertUser launched. Passed params {}, {}, {}", _user_id, _name, _avatar);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO users (user_id, name, avatar_url, join_date) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
+			String sql = ("INSERT INTO users (user_id, name, avatar_url) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _name);
 			stmt.setString(3, _avatar);
-			stmt.setString(4, _join_date);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertUser Exception", e);
@@ -291,13 +290,12 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip, "&rewriteBatchedStatements=true"), username, password);
 			myConn.setAutoCommit(false); 
-			String sql = ("INSERT INTO users (user_id, name, avatar_url, join_date) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
+			String sql = ("INSERT INTO users (user_id, name, avatar_url) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
 			stmt = myConn.prepareStatement(sql);
 			for(Member member : members) {
 				stmt.setLong(1, member.getUser().getIdLong());
 				stmt.setString(2, member.getUser().getName()+"#"+member.getUser().getDiscriminator());
 				stmt.setString(3, member.getUser().getEffectiveAvatarUrl());
-				stmt.setString(4, member.getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE));
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
@@ -330,6 +328,79 @@ public class Azrael {
 		}
 	}
 	
+	public static int SQLInsertJoinDate(long _user_id, long _guild_id, String _join_date) {
+		logger.debug("SQLInsertJoinDate launched. Passed params {}, {}, {}", _user_id, _guild_id, _join_date);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("INSERT IGNORE INTO join_dates (fk_user_id, fk_guild_id, first_join, join_date) VALUES(?,?,1,?), (?,?,0,?)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, _join_date);
+			stmt.setLong(4, _user_id);
+			stmt.setLong(5, _guild_id);
+			stmt.setString(6, _join_date);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertJoinDate Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLBulkInsertJoinDates(List<Member> members) {
+		logger.debug("SQLBulkInsertJoinDates launched. Passed member list params");
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip, "&rewriteBatchedStatements=true"), username, password);
+			myConn.setAutoCommit(false); 
+			String sql = ("INSERT IGNORE INTO join_dates (fk_user_id, fk_guild_id, first_join, join_date) VALUES (?, ?, ?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			for(int i = 0; i <= 1; i++) {
+				for(Member member : members) {
+					stmt.setLong(1, member.getUser().getIdLong());
+					stmt.setLong(2, member.getGuild().getIdLong());
+					stmt.setInt(3, i);
+					stmt.setString(4, member.getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE));
+					stmt.addBatch();
+				}
+			}
+			stmt.executeBatch();
+			myConn.commit();
+		} catch (SQLException e) {
+			logger.error("SQLBulkInsertJoinDates Exception", e);
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateJoinDate(long _user_id, long _guild_id, String _join_date) {
+		logger.debug("SQLUpdateJoinDate launched. Passed params {}, {}, {}", _user_id, _guild_id, _join_date);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE join_dates SET join_date = ? WHERE fk_user_id = ? AND fk_guild_id = ? AND first_join = 0");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _join_date);
+			stmt.setLong(2, _user_id);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateJoinDate Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static User SQLgetUser(String _name) {
 		logger.debug("SqlgetUser launched. Passed params {}", _name);
 		Connection myConn = null;
@@ -354,19 +425,23 @@ public class Azrael {
 		}
 	}
 	
-	public static User SQLgetUserThroughID(String _user_id) {
-		logger.debug("SQLgetUserThroughID launched. Passed params {}");
+	public static User SQLgetUserThroughID(String _user_id, long _guild_id) {
+		logger.debug("SQLgetUserThroughID launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM users WHERE user_id = ?");
+			String sql = ("SELECT user_id, (SELECT fk_guild_id FROM join_dates WHERE fk_guild_id = ? AND fk_user_id = user_id AND first_join = 1) AS guild_id, name, avatar_url, (SELECT join_date FROM join_dates WHERE fk_user_id = user_id AND fk_guild_id = ? AND first_join = 1) AS original_join_date, (SELECT join_date FROM join_dates WHERE fk_user_id = user_id AND fk_guild_id = ? AND first_join = 0) AS newest_join_date FROM users WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _user_id);
+			stmt.setLong(1, _guild_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setLong(3, _guild_id);
+			stmt.setString(4, _user_id);
 			rs = stmt.executeQuery();
-			if(rs.next()) {
-				return new User(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4));
+			while(rs.next()) {
+				if(rs.getLong(2) == _guild_id)
+					return new User(rs.getLong(1), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6));
 			}
 			return null;
 		} catch (SQLException e) {

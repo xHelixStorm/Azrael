@@ -36,6 +36,7 @@ public class CollectUsersGuilds implements Runnable{
 				List<Member> users = g.getMembers().parallelStream().filter(m -> !UserPrivs.isUserCommunity(m) && !UserPrivs.isUserMuted(m) && !UserPrivs.isUserBot(m)).collect(Collectors.toList());
 				if(users.size() > 0) {
 					Azrael.SQLBulkInsertUsers(users);
+					Azrael.SQLBulkInsertJoinDates(users);
 					Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 					if(guild_settings != null && guild_settings.getRankingState()) {
 						RankingSystem.SQLBulkInsertUsers(users, guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());

@@ -57,9 +57,22 @@ public class GuildListener extends ListenerAdapter {
 			//retrieve the log channel
 			var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 			//insert or update the name of the user into Azrael.users
-			if(Azrael.SQLInsertUser(user_id, user_name, e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
+			if(Azrael.SQLInsertUser(user_id, user_name, e.getMember().getUser().getEffectiveAvatarUrl()/*, e.getMember().getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE)*/) == 0) {
 				if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **Azrael.users** table").build()).queue();
 				logger.error("User {} couldn't be inserted into the table Azrael.users for guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+			}
+			//insert or update the join_date
+			final int insertJoinDateResult = Azrael.SQLInsertJoinDate(user_id, guild_id, e.getMember().getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE));
+			if(insertJoinDateResult == 0) {
+				//Update the join date, if no rows have been inserted with the insert statement and no error has been thrown
+				if(Azrael.SQLUpdateJoinDate(user_id, guild_id, e.getMember().getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
+					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The server join date of the user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be updated into **Azrael.join_dates** table").build()).queue();
+					logger.error("The join date of user {} couldn't be updated into the table Azrael.join_dates for guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+				}
+			}
+			else if(insertJoinDateResult == -1) {
+				if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The server join date of the user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **Azrael.join_dates** table").build()).queue();
+				logger.error("The join date of user {} couldn't be inserted into the table Azrael.join_dates for guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 			}
 			//retrieve current guild settings
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
