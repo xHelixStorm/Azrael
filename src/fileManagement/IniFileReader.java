@@ -108,6 +108,11 @@ public class IniFileReader {
 		}
 	}
 	
+	public static boolean getLinuxScreen() {
+		Ini ini = readConfig();
+		return ini.get("Bot", "LinuxScreen", boolean.class);
+	}
+	
 	public static String getPastebinDeveloperKey() {
 		Ini ini = readConfig();
 		return ini.get("Pastebin", "DeveloperKey");

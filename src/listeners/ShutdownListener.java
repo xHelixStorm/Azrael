@@ -9,7 +9,6 @@ package listeners;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,21 +27,19 @@ public class ShutdownListener extends ListenerAdapter {
 		//retrieve the file with the bot state (e.g. running / not running)
 		String filecontent = FileSetting.readFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr");
 		
-		//support only linux for a restart operation
-		if(SystemUtils.IS_OS_LINUX) {
-			//execute if the bot is labeled as running
-			if(filecontent.contains("1")) {
-				FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
-				try {
-					//execute screen command to restart the bot
-					Process proc;
-					proc = Runtime.getRuntime().exec("screen -dm "+(STATIC.getSessionName().length() > 0 ? "-S "+STATIC.getSessionName()+" " : "")+"java -jar --enable-preview Azrael.jar "+STATIC.getToken()+(STATIC.getSessionName().length() > 0 ? " "+"sessionname:"+STATIC.getSessionName() : "")+(STATIC.getAdmin() != 0 ? " "+STATIC.getAdmin() : ""));
-					proc.waitFor();
-				} catch (IOException | InterruptedException e1) {
-					logger.error("Bot couldn't be restarted!");
-				}
+		//execute if the bot is labeled as running
+		if(filecontent.contains("1")) {
+			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
+			try {
+				Process proc;
+				//execute command to restart the bot
+				proc = Runtime.getRuntime().exec((IniFileReader.getLinuxScreen() ? "screen -dm "+(STATIC.getSessionName().length() > 0 ? "-S "+STATIC.getSessionName()+" " : "") : "")+"java -jar --enable-preview Azrael.jar "+compileParameters());
+				proc.waitFor();
+			} catch (IOException | InterruptedException e1) {
+				logger.error("Bot couldn't be restarted!");
 			}
 		}
+		
 		//check if a duplicate session has been started and terminate the current session, if it occurred
 		if(filecontent.contains("2")) {
 			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "1");
@@ -55,5 +52,34 @@ public class ShutdownListener extends ListenerAdapter {
 			Azrael.SQLInsertActionLog("BOT_SHUTDOWN", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
 		}
 		System.exit(0);
+	}
+	
+	private static String compileParameters() {
+		StringBuilder params = new StringBuilder();
+		params.append(STATIC.getToken());
+		if(STATIC.getSessionName().length() > 0)
+			params.append(" sessionname:"+STATIC.getSessionName());
+		if(STATIC.getAdmin() > 0)
+			params.append(" admin:"+STATIC.getAdmin());
+		if(STATIC.getTimezone().length() > 0)
+			params.append(" timezone:"+STATIC.getTimezone());
+		if(STATIC.getActionLog().length() > 0)
+			params.append(" actionlog:"+STATIC.getActionLog());
+		if(STATIC.getDoubleExperience().length() > 0)
+			params.append(" doubleexperience:"+STATIC.getDoubleExperience());
+		if(STATIC.getDoubleExperienceStart().length() > 0)
+			params.append(" doubleexperiencestart:"+STATIC.getDoubleExperienceStart());
+		if(STATIC.getDoubleExperienceEnd().length() > 0)
+			params.append(" doubleexperienceend:"+STATIC.getDoubleExperienceEnd());
+		if(STATIC.getCountMembers().length() > 0)
+			params.append(" countmembers:"+STATIC.getCountMembers());
+		if(STATIC.getFileLogger().length() > 0)
+			params.append(" filelogger:"+STATIC.getFileLogger());
+		if(STATIC.getGameMessage().length() > 0)
+			params.append(" gamemessage:"+STATIC.getGameMessage());
+		if(STATIC.getTemp().length() > 0)
+			params.append(" temp:"+STATIC.getTemp());
+		
+		return params.toString();
 	}
 }

@@ -27,6 +27,6 @@
 	<classpathentry kind="lib" path="lib/jackson-annotations-2.9.9.jar"/>
 	<classpathentry kind="lib" path="lib/twitter4j-core-4.0.7.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-8.0.17.jar"/>
-	<classpathentry kind="lib" path="lib/JDA-4.0.0_51.jar"/>
+	<classpathentry kind="lib" path="lib/JDA-4.1.0_81.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
