@@ -154,6 +154,18 @@ public class GuildListener extends ListenerAdapter {
 								var mute_time = (long)Azrael.SQLgetWarning(guild_id, Azrael.SQLgetData(user_id, guild_id).getWarningID()+1).getTimer();
 								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
 							}
+							//this is a perm mute
+							else if(rejoinAction.getInfo().equals("perm")) {
+								Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
+								var timestamp = new Timestamp(System.currentTimeMillis());
+								if(Azrael.SQLInsertData(e.getUser().getIdLong(), e.getGuild().getIdLong(), Azrael.SQLgetMaxWarning(e.getGuild().getIdLong()), 1, timestamp, timestamp, false, false) == 0) {
+									logger.error("The perm mute flag for user {} in guild {} couldn't be inserted into Azrael.bancollect", user_id, guild_id);
+									if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The perm mute flag couldn't be set in Azrael.bancollect!").queue();
+								}
+								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
+								var mute_time = (long)Azrael.SQLgetWarning(guild_id, Azrael.SQLgetData(user_id, guild_id).getWarningID()+1).getTimer();
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
+							}
 							//this is a time defined mute
 							else {
 								var mute_time = Long.parseLong(rejoinAction.getInfo());
@@ -163,7 +175,7 @@ public class GuildListener extends ListenerAdapter {
 								if(Azrael.SQLgetData(user_id, guild_id).getWarningID() != 0) {
 									if(Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp, unmute_timestamp, true, true) == 0) {
 										logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, guild_id);
-										if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The unmute time couldn't be updated on Azrael.bancollect").queue();
+										if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The unmute time couldn't be updated on Azrael.bancollect!").queue();
 									}
 									else {
 										Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
@@ -173,7 +185,7 @@ public class GuildListener extends ListenerAdapter {
 								else {
 									if(Azrael.SQLInsertData(user_id, guild_id, 1, 1, timestamp, unmute_timestamp, true, true) == 0) {
 										logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", user_id, guild_id);
-										if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
+										if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect!").queue();
 									}
 									else {
 										Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
