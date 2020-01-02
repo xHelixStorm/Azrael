@@ -21,6 +21,7 @@ public class Guilds {
 	private int theme_id;
 	private String currency;
 	private long randomshop_price;
+	private long start_currency;
 	
 	private int inventory_startx;
 	private int inventory_starty;
@@ -127,6 +128,9 @@ public class Guilds {
 	}
 	public void setRandomshopPrice(long _randomshop_price) {
 		this.randomshop_price = _randomshop_price;
+	}
+	public void setStartCurrency(long _start_currency) {
+		this.start_currency = _start_currency;
 	}
 	public void setMessageTimeout(long _messageTimeout) {
 		this.messageTimeout = _messageTimeout;
@@ -314,6 +318,9 @@ public class Guilds {
 	}
 	public long getRandomshopPrice() {
 		return this.randomshop_price;
+	}
+	public long getStartCurrency() {
+		return this.start_currency;
 	}
 	public long getMessageTimeout() {
 		return this.messageTimeout;

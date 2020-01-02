@@ -358,7 +358,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						if(user_details == null) {
 							//if no user details have been found, insert the user into the users table and into the user details table
 							if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
-								if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, 50000, 0) > 0) {
+								if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, guild_settings.getStartCurrency(), 0) > 0) {
 									var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 									if(log_channel != null) {
 										EmbedBuilder success = new EmbedBuilder().setColor(Color.GREEN).setTitle("Table insertion successful!");
@@ -366,7 +366,7 @@ public class GuildMessageListener extends ListenerAdapter {
 									}
 								}
 							}
-							else if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, 50000, 0) > 0) {
+							else if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, guild_settings.getStartCurrency(), 0) > 0) {
 								var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 								if(log_channel != null) {
 									EmbedBuilder success = new EmbedBuilder().setColor(Color.GREEN).setTitle("Table insertion successful!");

@@ -79,7 +79,7 @@ public class GuildListener extends ListenerAdapter {
 			//if the ranking system is enabled, insert the joined user into RankingSystem.users and RankingSystem.user_details
 			if(guild_settings.getRankingState() == true) {
 				if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
-					RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, 50000, 0);
+					RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, guild_settings.getStartCurrency(), 0);
 				}
 				else {
 					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **RankingSystem.users** table").build()).queue();

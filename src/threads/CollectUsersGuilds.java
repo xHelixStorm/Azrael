@@ -40,7 +40,7 @@ public class CollectUsersGuilds implements Runnable{
 					Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
 					if(guild_settings != null && guild_settings.getRankingState()) {
 						RankingSystem.SQLBulkInsertUsers(users, guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
-						RankingSystem.SQLBulkInsertUserDetails(users, 0, 0, 50000, 0);
+						RankingSystem.SQLBulkInsertUserDetails(users, 0, 0, guild_settings.getStartCurrency(), 0);
 					}
 				}
 				checkedGuilds.add(guild_id);
