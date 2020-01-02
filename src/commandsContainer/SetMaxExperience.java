@@ -21,7 +21,7 @@ public class SetMaxExperience {
 			var editedRows = 0;
 			if(matcher.group().equals("enable")){
 				guild_settings.setMaxExpEnabled(true);
-				editedRows = RankingSystem.SQLInsertMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), _e.getGuild().getIdLong());
+				editedRows = RankingSystem.SQLUpdateMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), _e.getGuild().getIdLong());
 				if(editedRows > 0)
 					_e.getChannel().sendMessage("The max experience limitation has been enabled!").queue();
 				else 
@@ -29,7 +29,7 @@ public class SetMaxExperience {
 			}
 			else if(matcher.group().equals("disable")){
 				guild_settings.setMaxExpEnabled(false);
-				editedRows = RankingSystem.SQLInsertMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), _e.getGuild().getIdLong());
+				editedRows = RankingSystem.SQLUpdateMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), _e.getGuild().getIdLong());
 				if(editedRows > 0)
 					_e.getChannel().sendMessage("The max experience limitation has been disabled!").queue();
 				else
@@ -47,7 +47,7 @@ public class SetMaxExperience {
 			try{
 				guild_settings.setMaxExperience(Long.parseLong(_input.replaceAll("[^0-9]", "")));
 				guild_settings.setMaxExpEnabled(true);
-				if(RankingSystem.SQLInsertMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), _e.getGuild().getIdLong()) > 0) {
+				if(RankingSystem.SQLUpdateMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), _e.getGuild().getIdLong()) > 0) {
 					logger.debug("{} has set the max experience limitation to {} exp in guild {}", _e.getMember().getUser().getId(), guild_settings.getMaxExperience(), _e.getGuild().getId());
 					Hashes.addStatus(_e.getGuild().getIdLong(), guild_settings);
 					_e.getChannel().sendMessage("**The max experience per day is now "+guild_settings.getMaxExperience()+" and has been automatically enabled!**").queue();

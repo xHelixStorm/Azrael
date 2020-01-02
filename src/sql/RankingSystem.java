@@ -308,7 +308,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("INSERT INTO guilds (guild_id, name, ranking_state) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), ranking_state=VALUES(ranking_state)");
+			String sql = ("INSERT INTO guilds (guild_id, name, ranking_state, max_experience, enabled) VALUES (?, ?, ?, 0, 0) ON DUPLICATE KEY UPDATE name=VALUES(name), ranking_state=VALUES(ranking_state)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setString(2, _name);
@@ -316,6 +316,27 @@ public class RankingSystem {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertGuild Exception", e);
+			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateMaxExperience(long _experience, boolean _enabled, long _guild_id) {
+		logger.debug("SQLUpdateMaxExperience launched. Passed params {}, {}, {}", _experience, _enabled, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			String sql = ("UPDATE guilds SET max_experience = ?, enabled = ? WHERE guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _experience);
+			stmt.setBoolean(2, _enabled);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateMaxExperience Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -758,28 +779,6 @@ public class RankingSystem {
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 			try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	//max_exp table
-	public static int SQLInsertMaxExperience(long _experience, boolean _enabled, long _guild_id) {
-		logger.debug("SQLInsertMaxExperience launched. Passed params {}, {}, {}", _experience, _enabled, _guild_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("INSERT INTO max_exp (max_exp_id, experience, enabled, fk_guild_id) VALUES (NULL, ?, ?, ?) ON DUPLICATE KEY UPDATE experience=VALUES(experience), enabled=VALUES(enabled)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _experience);
-			stmt.setBoolean(2, _enabled);
-			stmt.setLong(3, _guild_id);
-			return stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLInsertMaxExperience Exception", e);
-			return 0;
-		} finally {
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
