@@ -55,7 +55,7 @@ public class Hashes {
     private static final Set<String> actionlog = new LinkedHashSet<String>();
     private static final ConcurrentHashMap<Long, Guilds> status = new ConcurrentHashMap<Long, Guilds>();
     private static final ConcurrentMap<Long, ArrayList<Roles>> ranking_roles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
-    private static final LinkedHashMap<Integer, ArrayList<Level>> ranking_levels = new LinkedHashMap<Integer, ArrayList<Level>>();
+    private static final LinkedHashMap<String, ArrayList<Level>> ranking_levels = new LinkedHashMap<String, ArrayList<Level>>();
     private static final ConcurrentMap<Long, ArrayList<Roles>> reaction_roles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
     private static final ConcurrentMap<Long, Long> reaction_message = new ConcurrentHashMap<Long, Long>();
     private static final ConcurrentMap<Integer, Quizes> quiz = new ConcurrentHashMap<Integer, Quizes>();
@@ -113,7 +113,7 @@ public class Hashes {
 	public static void addRankingRoles(Long _key, ArrayList<Roles> _details) {
 		ranking_roles.put(_key, _details);
 	}
-	public static void addRankingLevels(Integer _key, ArrayList<Level> _levels) {
+	public static void addRankingLevels(String _key, ArrayList<Level> _levels) {
 		ranking_levels.put(_key, _levels);
 	}
 	public static void addReactionRoles(Long _key, ArrayList<Roles> _roles) {
@@ -244,7 +244,7 @@ public class Hashes {
 	public static ArrayList<Roles> getRankingRoles(Long _key) {
 		return ranking_roles.get(_key);
 	}
-	public static ArrayList<Level> getRankingLevels(int _key) {
+	public static ArrayList<Level> getRankingLevels(String _key) {
 		return ranking_levels.get(_key);
 	}
 	public static ArrayList<Roles> getReactionRoles(Long _key) {

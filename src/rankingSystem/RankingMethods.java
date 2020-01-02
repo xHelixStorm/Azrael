@@ -33,14 +33,15 @@ import gif.GifOptimizer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import sql.RankingSystem;
 
 public class RankingMethods extends ListenerAdapter {
 	//Class for drawing level ups, ranks and profiles basing on the user settings
 	private final static Logger logger = LoggerFactory.getLogger(RankingMethods.class);
 	
-	public static void getRankUp(GuildMessageReceivedEvent e , int theme_id, Rank user_details) {		
+	public static void getRankUp(GuildMessageReceivedEvent e , int theme_id, Rank user_details, int rank_icon) {		
 		try {
-			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+user_details.getLevel()+"."+user_details.getFileTypeIcon()));
+			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+rank_icon+"."+user_details.getFileTypeIcon()));
 			String name = e.getMember().getEffectiveName();
 			int characterCounter = name.length();
 			int level = user_details.getLevel();
@@ -165,7 +166,8 @@ public class RankingMethods extends ListenerAdapter {
 			else {
 				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+0+"_"+0+".png"));
 			}
-			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+user_details.getLevel()+"."+user_details.getFileTypeIcon()));
+			int rankIcon = RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), theme_id).parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null).getRankIcon();
+			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+user_details.getFileTypeIcon()));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -292,7 +294,8 @@ public class RankingMethods extends ListenerAdapter {
 			else {
 				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+0+"_"+0+".png"));
 			}
-			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+user_details.getLevel()+"."+user_details.getFileTypeIcon()));
+			int rankIcon = RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), theme_id).parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null).getRankIcon();
+			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+user_details.getFileTypeIcon()));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();

@@ -149,10 +149,12 @@ public class RankingThreadExecution {
 			level += 1;
 			final var newLevel = level;
 			currentExperience -= rankUpExperience;
-			var levelDetails = RankingSystem.SQLgetLevels(guild_settings.getThemeID()).parallelStream().filter(f -> f.getLevel() == newLevel).findAny().orElse(null);
+			var levels = RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild_settings.getThemeID());
+			var levelDetails = levels.parallelStream().filter(f -> f.getLevel() == newLevel).findAny().orElse(null);
+			int rankIcon = levelDetails.getRankIcon();
 			currency += levelDetails.getCurrency();
 			if(level != max_level) {
-				rankUpExperience = RankingSystem.SQLgetLevels(guild_settings.getThemeID()).parallelStream().filter(f -> f.getLevel() == (newLevel+1)).findAny().orElse(null).getExperience() - levelDetails.getExperience();
+				rankUpExperience = levels.parallelStream().filter(f -> f.getLevel() == (newLevel+1)).findAny().orElse(null).getExperience() - levelDetails.getExperience();
 			}
 			else {
 				rankUpExperience = 0;
@@ -206,7 +208,7 @@ public class RankingThreadExecution {
 				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
 				if(user_details.getRankingLevel() != 0 && user_details.getRankingIcon() != 0) {
 					//Upload level up image
-					RankingMethods.getRankUp(e, guild_settings.getThemeID(), user_details);
+					RankingMethods.getRankUp(e, guild_settings.getThemeID(), user_details, rankIcon);
 				}
 				else {
 					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");

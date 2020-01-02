@@ -1200,7 +1200,7 @@ public class UserExecution {
 					long assign_role = 0;
 					boolean toBreak = false;
 					var roles = RankingSystem.SQLgetRoles(_e.getGuild().getIdLong());
-					for(final var ranks : RankingSystem.SQLgetLevels(guild_settings.getThemeID())) {
+					for(final var ranks : RankingSystem.SQLgetLevels(_e.getGuild().getIdLong(), guild_settings.getThemeID())) {
 						if((user_details.getExperience() + experience) >= ranks.getExperience()) {
 							totExperience = ranks.getExperience();
 							level = ranks.getLevel();
@@ -1271,7 +1271,7 @@ public class UserExecution {
 					long assign_role = 0;
 					boolean toBreak = false;
 					var roles = RankingSystem.SQLgetRoles(_e.getGuild().getIdLong());
-					for(final var ranks : RankingSystem.SQLgetLevels(guild_settings.getThemeID())) {
+					for(final var ranks : RankingSystem.SQLgetLevels(_e.getGuild().getIdLong(), guild_settings.getThemeID())) {
 						if(experience >= ranks.getExperience()) {
 							totExperience = ranks.getExperience();
 							level = ranks.getLevel();
@@ -1341,7 +1341,7 @@ public class UserExecution {
 						long assign_role = 0;
 						boolean toBreak = false;
 						var roles = RankingSystem.SQLgetRoles(_e.getGuild().getIdLong());
-						for(final var ranks : RankingSystem.SQLgetLevels(guild_settings.getThemeID())) {
+						for(final var ranks : RankingSystem.SQLgetLevels(_e.getGuild().getIdLong(), guild_settings.getThemeID())) {
 							var role = roles.parallelStream().filter(f -> f.getLevel() == ranks.getLevel()).findAny().orElse(null);
 							if(role != null && toBreak == false) {
 								assign_role = role.getRole_ID();

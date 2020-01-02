@@ -54,7 +54,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
-	private static final String VERSION = "6.9.380";
+	private static final String VERSION = "6.9.381";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;

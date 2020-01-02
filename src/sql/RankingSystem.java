@@ -1701,23 +1701,24 @@ public class RankingSystem {
 		return Hashes.getStatus(_guild_id);
 	}
 	
-	public static ArrayList<Level> SQLgetLevels(int _theme_id) {
-		logger.debug("SQLgetLevels launched. Passed params {}", _theme_id);
-		if(Hashes.getRankingLevels(_theme_id) == null) {
+	public static ArrayList<Level> SQLgetLevels(long _guild_id, int _theme_id) {
+		logger.debug("SQLgetLevels launched. Passed params {}, {}", _guild_id, _theme_id);
+		if(Hashes.getRankingLevels(_guild_id+"_"+_theme_id) == null) {
 			ArrayList<Level> levels = new ArrayList<Level>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-				String sql = ("SELECT * FROM level_list WHERE fk_theme_id = ?");
+				String sql = ("SELECT * FROM level_list WHERE fk_guild_id = ? AND fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setInt(1, _theme_id);
+				stmt.setLong(1, _guild_id);
+				stmt.setInt(2, _theme_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
-					levels.add(new Level(rs.getInt(1), rs.getInt(2), rs.getInt(3)));
+					levels.add(new Level(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4)));
 				}
-				Hashes.addRankingLevels(_theme_id, levels);
+				Hashes.addRankingLevels(_guild_id+"_"+_theme_id, levels);
 				return levels;
 			} catch (SQLException e) {
 				logger.error("SQLgetLevels Exception", e);
@@ -1728,7 +1729,7 @@ public class RankingSystem {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getRankingLevels(_theme_id);
+		return Hashes.getRankingLevels(_guild_id+"_"+_theme_id);
 	}
 	
 	public static ArrayList<Skins> SQLgetSkinshopContentAndType(long _guild_id, int _theme_id) {
