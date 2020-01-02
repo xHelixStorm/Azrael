@@ -53,6 +53,7 @@ public class RegisterRole {
 						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, STATIC.getLevel(category_abv), role_name, category_abv, false) > 0) {
 							logger.debug("Administrator role registered {} for guild {}", role_id, _e.getGuild().getName());
 							_e.getChannel().sendMessage("**The primary Administrator role has been registered!**").queue();
+							Hashes.removeDiscordRoles(_e.getGuild().getIdLong());
 							DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong());
 						}
 						else {

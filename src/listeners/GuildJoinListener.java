@@ -12,6 +12,7 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -47,6 +48,7 @@ public class GuildJoinListener extends ListenerAdapter {
 		if(Patchnotes.SQLInsertGuild(guild_id, guild_name) == 0) {
 			logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", guild_id);
 		}
+		FileSetting.createGuildDirectory(e.getGuild());
 		//check if guild ini file exists, else create a new one or verify content
 		if(!new File("./ini/"+guild_id+".ini").exists())
 			GuildIni.createIni(guild_id);
