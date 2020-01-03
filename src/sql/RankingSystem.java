@@ -594,14 +594,15 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("INSERT IGNORE INTO user_details (`fk_user_id`, `level`, `experience`, `currency`, `current_role`, `fk_guild_id`) VALUES (?, ?, ?, ?, ?, ?)");
+			String sql = ("INSERT IGNORE INTO user_details (`fk_user_id`, `level`, `experience`, `currency`, `current_role`, `last_update`, `fk_guild_id`) VALUES (?, ?, ?, ?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _level);
 			stmt.setLong(3, _experience);
 			stmt.setLong(4, _currency);
 			stmt.setLong(5, _assigned_role);
-			stmt.setLong(6, _guild_id);
+			stmt.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+			stmt.setLong(7, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertUserDetails Exception", e);
@@ -619,7 +620,7 @@ public class RankingSystem {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip, "&rewriteBatchedStatements=true"), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("INSERT IGNORE INTO user_details (`fk_user_id`, `level`, `experience`, `currency`, `current_role`, `fk_guild_id`) VALUES (?, ?, ?, ?, ?, ?)");
+			String sql = ("INSERT IGNORE INTO user_details (`fk_user_id`, `level`, `experience`, `currency`, `current_role`, `last_update`, `fk_guild_id`) VALUES (?, ?, ?, ?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			for(Member member : members) {
 				stmt.setLong(1, member.getUser().getIdLong());
@@ -627,7 +628,8 @@ public class RankingSystem {
 				stmt.setLong(3, _experience);
 				stmt.setLong(4, _currency);
 				stmt.setLong(5, _assigned_role);
-				stmt.setLong(6, member.getGuild().getIdLong());
+				stmt.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+				stmt.setLong(7, member.getGuild().getIdLong());
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
@@ -666,17 +668,18 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateExperience(long _user_id, long _guild_id, long _experience) {
-		logger.debug("SQLUpdateExperience launched. Passed params {}, {}, {}", _user_id, _guild_id, _experience);
+	public static int SQLUpdateExperience(long _user_id, long _guild_id, long _experience, Timestamp _last_update) {
+		logger.debug("SQLUpdateExperience launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _experience, _last_update);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("UPDATE user_details SET `experience` = ? WHERE `fk_user_id` = ? AND `fk_guild_id` = ?");
+			String sql = ("UPDATE user_details SET `experience` = ?, `last_update` = ? WHERE `fk_user_id` = ? AND `fk_guild_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _experience);
-			stmt.setLong(2, _user_id);
-			stmt.setLong(3, _guild_id);
+			stmt.setTimestamp(2, _last_update);
+			stmt.setLong(3, _user_id);
+			stmt.setLong(4, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateExperience Exception", e);
@@ -687,20 +690,21 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLsetLevelUp(long _user_id, long _guild_id, int _level, long _experience, long _currency, long _assigned_role) {
-		logger.debug("SQLsetLevelUp launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _level, _experience, _currency, _assigned_role);
+	public static int SQLsetLevelUp(long _user_id, long _guild_id, int _level, long _experience, long _currency, long _assigned_role, Timestamp _last_update) {
+		logger.debug("SQLsetLevelUp launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _level, _experience, _currency, _assigned_role, _last_update);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("UPDATE user_details SET `level` = ?, `experience` = ?, `currency` = ?, `current_role` = ? WHERE `fk_user_id` = ? AND `fk_guild_id` = ?");
+			String sql = ("UPDATE user_details SET `level` = ?, `experience` = ?, `currency` = ?, `current_role` = ?, `last_update` = ? WHERE `fk_user_id` = ? AND `fk_guild_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _level);
 			stmt.setLong(2, _experience);
 			stmt.setLong(3, _currency);
 			stmt.setLong(4, _assigned_role);
-			stmt.setLong(5, _user_id);
-			stmt.setLong(6, _guild_id);
+			stmt.setTimestamp(5, _last_update);
+			stmt.setLong(6, _user_id);
+			stmt.setLong(7, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLsetLevelUp Exception", e);
@@ -731,17 +735,18 @@ public class RankingSystem {
 		}
 	}
 	
-	public static int SQLUpdateCurrency(long _user_id, long _guild_id, long _currency) {
-		logger.debug("SQLUpdateCurrency launched. Passed params {}, {}, {}", _user_id, _guild_id, _currency);
+	public static int SQLUpdateCurrency(long _user_id, long _guild_id, long _currency, Timestamp _last_update) {
+		logger.debug("SQLUpdateCurrency launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _currency, _last_update);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("UPDATE user_details SET `currency` = ? WHERE `fk_user_id` = ? AND `fk_guild_id` = ?");
+			String sql = ("UPDATE user_details SET `currency` = ?, `last_update` = ? WHERE `fk_user_id` = ? AND `fk_guild_id` = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _currency);
-			stmt.setLong(2, _user_id);
-			stmt.setLong(3, _guild_id);
+			stmt.setTimestamp(2, _last_update);
+			stmt.setLong(3, _user_id);
+			stmt.setLong(4, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateCurrency Exception", e);
@@ -1592,6 +1597,7 @@ public class RankingSystem {
 					rank.setWeapon2(rs.getInt(96));
 					rank.setWeapon3(rs.getInt(97));
 					rank.setSkill(rs.getInt(98));
+					rank.setLastUpdate(rs.getTimestamp(99));
 					Hashes.addRanking(_guild_id+"_"+_user_id, rank);
 					return rank;
 				}
@@ -1716,7 +1722,7 @@ public class RankingSystem {
 				stmt.setInt(2, _theme_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
-					levels.add(new Level(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4)));
+					levels.add(new Level(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getInt(5), rs.getInt(6)));
 				}
 				Hashes.addRankingLevels(_guild_id+"_"+_theme_id, levels);
 				return levels;
@@ -2190,11 +2196,12 @@ public class RankingSystem {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("UPDATE user_details SET currency = ? WHERE fk_user_id = ? AND fk_guild_id = ?");
+			String sql = ("UPDATE user_details SET currency = ?, last_update = ? WHERE fk_user_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _currency);
-			stmt.setLong(2, _user_id);
-			stmt.setLong(3, _guild_id);
+			stmt.setTimestamp(2, _position);
+			stmt.setLong(3, _user_id);
+			stmt.setLong(4, _guild_id);
 			stmt.executeUpdate();
 			
 			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_item_id, position, number, fk_status, fk_guild_id, fk_theme_id) VALUES(?, ?, ?, ?, \"perm\", ?, ?) ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number) ");
@@ -2223,18 +2230,19 @@ public class RankingSystem {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLUpdateCurrencyAndRemoveInventory(long _user_id, long _guild_id, long _currency, int _item_id, int _theme_id) {
-		logger.debug("SQLUpdateCurrencyAndRemoveInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _theme_id);
+	public static int SQLUpdateCurrencyAndRemoveInventory(long _user_id, long _guild_id, long _currency, int _item_id, int _theme_id, Timestamp _last_update) {
+		logger.debug("SQLUpdateCurrencyAndRemoveInventory launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _theme_id, _last_update);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("UPDATE user_details SET currency = ? WHERE fk_user_id = ? AND fk_guild_id = ?");
+			String sql = ("UPDATE user_details SET currency = ?, last_update = ? WHERE fk_user_id = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _currency);
-			stmt.setLong(2, _user_id);
-			stmt.setLong(3, _guild_id);
+			stmt.setTimestamp(2, _last_update);
+			stmt.setLong(3, _user_id);
+			stmt.setLong(4, _guild_id);
 			stmt.executeUpdate();
 			
 			String sql2 = ("DELETE FROM inventory WHERE fk_user_id = ? AND fk_item_id = ? AND fk_guild_id = ? AND fk_theme_id = ?");

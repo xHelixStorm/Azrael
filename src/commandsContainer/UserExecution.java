@@ -1224,7 +1224,8 @@ public class UserExecution {
 					user_details.setRankUpExperience((int) rankUpExperience);
 					user_details.setLevel(level);
 					user_details.setCurrentRole(assign_role);
-					if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole()) > 0) {
+					user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+					if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0) {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Experience points gifted", "User received "+experience+" experience points");
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						if(roles.size() > 0) {
@@ -1295,7 +1296,8 @@ public class UserExecution {
 					user_details.setRankUpExperience((int) rankUpExperience);
 					user_details.setLevel(level);
 					user_details.setCurrentRole(assign_role);
-					if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole()) > 0) {
+					user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+					if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0) {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Experience points edited", "User has been set to "+experience+" experience points");
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						if(roles.size() > 0) {
@@ -1360,7 +1362,8 @@ public class UserExecution {
 						user_details.setCurrentExperience(0);
 						user_details.setRankUpExperience((int) rankUpExperience);
 						user_details.setCurrentRole(assign_role);
-						if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole()) > 0) {
+						user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+						if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0) {
 							RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Level changed", "User is now level "+user_details.getLevel());
 							Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 							if(roles.size() > 0) {
@@ -1405,7 +1408,8 @@ public class UserExecution {
 					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(user_details.getCurrency()+currency);
-					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getCurrency()) > 0) {
+					user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getCurrency(), user_details.getLastUpdate()) > 0) {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money gifted", "User received money in value of "+currency+" "+guild_settings.getCurrency());
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						_e.getChannel().sendMessage("Currency has been updated!").queue();
@@ -1423,7 +1427,8 @@ public class UserExecution {
 					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(currency);
-					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getCurrency()) > 0) {
+					user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), _e.getGuild().getIdLong(), user_details.getCurrency(), user_details.getLastUpdate()) > 0) {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), _e.getGuild().getIdLong(), "Money set", "Currency value for the user has been changed to "+currency+" "+guild_settings.getCurrency());
 						Hashes.addRanking(_e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
 						_e.getChannel().sendMessage("Currency has been updated!").queue();

@@ -116,7 +116,8 @@ public class PurchaseExecution {
 		if(!type.equals("wep") && !type.equals("ski")) {
 			var skin = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(s -> s.getItemID() == item_id).findAny().orElse(null);
 			var newCurrency = user_details.getCurrency()+(skin.getPrice()/10);
-			if(RankingSystem.SQLUpdateCurrencyAndRemoveInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), newCurrency, skin.getItemID(), guild_settings.getThemeID()) > 0) {
+			user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+			if(RankingSystem.SQLUpdateCurrencyAndRemoveInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), newCurrency, skin.getItemID(), guild_settings.getThemeID(), user_details.getLastUpdate()) > 0) {
 				user_details.setCurrency(newCurrency);
 				if(user_details.getLevelDescription().equals(skin.getShopDescription())) {
 					user_details.setLevelDescription(guild_settings.getLevelDescription());

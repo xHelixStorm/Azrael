@@ -133,6 +133,8 @@ public class Rank {
 	private int weapon3;
 	private int skill;
 	
+	private Timestamp last_update;
+	
 	public void setNameLengthLimit_Level(int _nameLengthLimit_level) {
 		this.nameLengthLimit_level = _nameLengthLimit_level;
 	}
@@ -447,6 +449,9 @@ public class Rank {
 	}
 	public void setSkill(int _skill) {
 		this.skill = _skill;
+	}
+	public void setLastUpdate(Timestamp _last_update) {
+		this.last_update = _last_update;
 	}
 	
 	public int getNameLengthLimit_Level() {
@@ -763,5 +768,8 @@ public class Rank {
 	}
 	public int getSkill() {
 		return this.skill;
+	}
+	public Timestamp getLastUpdate() {
+		return this.last_update;
 	}
 }

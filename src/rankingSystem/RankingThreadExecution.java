@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
+import constructors.Level;
 import constructors.Rank;
 import constructors.Roles;
 import core.Hashes;
@@ -139,6 +141,52 @@ public class RankingThreadExecution {
 			Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
 		}
 		
+		boolean editLevel = false;
+		var levels = RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild_settings.getThemeID());
+		final var current_level = levels.parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null);
+		if(current_level.getExpLoss() > 0) {
+			long passedTime = System.currentTimeMillis() - user_details.getLastUpdate().getTime();
+			//remove 2 days from the passed time
+			passedTime -= 172800000;
+			//reduce experience points per minute only if 2 days of inactivity have passed before the last message
+			if(passedTime > 0) {
+				//turn the passedTime variable from milliseconds to minutes
+				passedTime = (passedTime / 1000 / 60);
+				int exp_loss = current_level.getExpLoss();
+				Map<Integer, Level> all_levels = levels.parallelStream().collect(Collectors.toMap(Level::getLevel, level -> level));
+				//retract experience points from user and degrade due to inactivity
+				while(passedTime > 0) {
+					if(user_details.getExperience() > 0 && exp_loss != 0) {
+						user_details.setExperience(user_details.getExperience() - exp_loss);
+						user_details.setCurrentExperience(user_details.getCurrentExperience() - exp_loss);
+						if(user_details.getCurrentExperience() < 0) {
+							long oldRequiredExperience = all_levels.get(user_details.getLevel()).getExperience();
+							long newRequiredExperience = all_levels.get(user_details.getLevel() - 1).getExperience();
+							long newRankUpExperience = oldRequiredExperience - newRequiredExperience;
+							user_details.setLevel(user_details.getLevel() - 1);
+							user_details.setRankUpExperience((int) newRankUpExperience);
+							user_details.setCurrentExperience(user_details.getCurrentExperience() + user_details.getRankUpExperience());
+							exp_loss = all_levels.get(user_details.getLevel()).getExpLoss();
+						}
+					}
+					else
+						break;
+					
+					passedTime --;
+				}
+				editLevel = true;
+				currentExperience = user_details.getCurrentExperience();
+				experience = user_details.getExperience();
+				
+				//reset the assigned role, if the user got degraded enough
+				Roles current_role = updateRole(e, user_details.getLevel(), user_details.getLevel(), user_details.getLevel());
+				if(current_role != null)
+					user_details.setCurrentRole(current_role.getRole_ID());
+				else
+					user_details.setCurrentRole(0);
+			}
+		}
+		
 		int rankUpExperience = user_details.getRankUpExperience();
 		int max_level = guild_settings.getMaxLevel();
 		int level = user_details.getLevel();
@@ -149,7 +197,28 @@ public class RankingThreadExecution {
 			level += 1;
 			final var newLevel = level;
 			currentExperience -= rankUpExperience;
-			var levels = RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild_settings.getThemeID());
+			
+			//check if the current level has a fail rate to reach the next level
+			if(current_level.getFailRate() != 0) {
+				int result = ThreadLocalRandom.current().nextInt(1, 101);
+				if(result <= current_level.getFailRate()) {
+					user_details.setCurrentExperience(0);
+					user_details.setExperience(current_level.getExperience());
+					user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+					
+					//reset experience points to the beginning of the current level
+					if(RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getExperience(), user_details.getLastUpdate()) > 0) {
+						Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Level up failed!").setDescription(e.getMember().getAsMention()+" Your level up promotion has failed! You will have to start again from the beginning of level "+user_details.getLevel()).build()).queue();
+						FileSetting.appendFile("./log/rankingdetails.txt", "["+new Timestamp(System.currentTimeMillis())+"] "+user_details.getUser_ID()+" reached level "+user_details.getLevel()+", has "+user_details.getExperience()+" experience and "+user_details.getDailyExperience()+" daily experience from guild "+e.getGuild().getIdLong()+"\n");
+					}
+					else {
+						logger.error("Experience points for the user {} in the guild {} couldn't be updated in the table RankingSystem.user_details", e.getMember().getUser().getId(), e.getGuild().getId());
+					}
+					return;
+				}
+			}
+			
 			var levelDetails = levels.parallelStream().filter(f -> f.getLevel() == newLevel).findAny().orElse(null);
 			int rankIcon = levelDetails.getRankIcon();
 			currency += levelDetails.getCurrency();
@@ -160,27 +229,7 @@ public class RankingThreadExecution {
 				rankUpExperience = 0;
 			}
 			
-			Roles current_role = null;
-			//check that the bot has the manage roles permission to remove and assign roles
-			if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-				//if a new ranking role has been unlocked, remove old ones and assign the newest one
-				final var rankingRoles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
-				if(level == roleAssignLevel) {
-					for(final Role r : e.getMember().getRoles()) {
-						for(final var role : rankingRoles) {
-							if(r.getIdLong() == role.getRole_ID()) {
-								e.getGuild().removeRoleFromMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(r.getIdLong())).queue();
-							}
-						}
-					}
-					current_role = rankingRoles.parallelStream().filter(f -> f.getLevel() == newLevel).findAny().orElse(null);
-					if(current_role != null) e.getGuild().addRoleToMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(current_role.getRole_ID())).queue();
-				}
-			}
-			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Permission error!").setDescription("The newest unlocked role couldn't be assigned because the MANAGE ROLES permission is missing!").build()).queue();
-				logger.warn("MANAGE ROLES permission for assigning a ranking role is missing for guild {}!", e.getGuild().getId());
-			}
+			Roles current_role = updateRole(e, level, newLevel, roleAssignLevel);
 			
 			//update all user details regarding the level up
 			user_details.setLevel(level);
@@ -188,6 +237,7 @@ public class RankingThreadExecution {
 			user_details.setRankUpExperience(rankUpExperience);
 			user_details.setExperience(experience);
 			user_details.setCurrency(currency);
+			user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
 			
 			if(current_role != null) {
 				user_details.setCurrentRole(current_role.getRole_ID());
@@ -202,7 +252,7 @@ public class RankingThreadExecution {
 			}
 			
 			//update all level up details to table and log the details
-			if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole()) > 0) {
+			if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0) {
 				FileSetting.appendFile("./log/rankingdetails.txt", "["+new Timestamp(System.currentTimeMillis())+"] "+user_details.getUser_ID()+" reached level "+user_details.getLevel()+", has "+user_details.getExperience()+" experience and "+user_details.getDailyExperience()+" daily experience from guild "+e.getGuild().getIdLong()+"\n");
 				RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Level Up", "User reached level "+user_details.getLevel());
 				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
@@ -213,7 +263,7 @@ public class RankingThreadExecution {
 				else {
 					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
 					e.getChannel().sendMessage(error.setDescription("Default skins aren't defined. Please contact an administrator!").build()).queue();
-					logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
+					logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getId());
 				}
 			}
 			else {
@@ -227,6 +277,7 @@ public class RankingThreadExecution {
 			//update all regular user details regarding the gain of experience
 			user_details.setCurrentExperience(currentExperience);
 			user_details.setExperience(experience);
+			user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
 			
 			//update the daily experience if the daily experience limit is enabled
 			var editedRows = 0;
@@ -260,16 +311,42 @@ public class RankingThreadExecution {
 			}
 			
 			//update the gained experience points on table
-			if(RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getExperience()) > 0) {
+			if((!editLevel && RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getExperience(), user_details.getLastUpdate()) > 0) ||
+				(editLevel && RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0)) {
 				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
 				FileSetting.appendFile("./log/rankingdetails.txt", "["+new Timestamp(System.currentTimeMillis())+"] "+user_details.getUser_ID()+" reached level "+user_details.getLevel()+", has "+user_details.getExperience()+" experience and "+user_details.getDailyExperience()+" daily experience from guild "+e.getGuild().getIdLong()+"\n");
 			}
 			else {
-				logger.error("Experience points for the user {} in the guild {} couldn't be updated in the table RankingSystem.user_details", e.getMember().getUser().getId(), e.getGuild().getName());
+				logger.error("Experience points for the user {} in the guild {} couldn't be updated in the table RankingSystem.user_details", e.getMember().getUser().getId(), e.getGuild().getId());
 			}
 			if(max_experience_enabled == true && editedRows == 0) {
 				logger.error("RankingSystem.daily_experience table couldn't be updated with the latest experience information for the user {}", user_details.getUser_ID());
 			}
 		}
+	}
+	
+	private static Roles updateRole(GuildMessageReceivedEvent e, final int level, final int newLevel, int roleAssignLevel) {
+		Roles current_role = null;
+		//check that the bot has the manage roles permission to remove and assign roles
+		if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+			//if a new ranking role has been unlocked, remove old ones and assign the newest one
+			final var rankingRoles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
+			if(level == roleAssignLevel) {
+				for(final Role r : e.getMember().getRoles()) {
+					for(final var role : rankingRoles) {
+						if(r.getIdLong() == role.getRole_ID()) {
+							e.getGuild().removeRoleFromMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(r.getIdLong())).queue();
+						}
+					}
+				}
+				current_role = rankingRoles.parallelStream().filter(f -> f.getLevel() == newLevel).findAny().orElse(null);
+				if(current_role != null) e.getGuild().addRoleToMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(current_role.getRole_ID())).queue();
+			}
+		}
+		else {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Permission error!").setDescription("The newest unlocked role couldn't be assigned because the MANAGE ROLES permission is missing!").build()).queue();
+			logger.warn("MANAGE ROLES permission for assigning a ranking role is missing for guild {}!", e.getGuild().getId());
+		}
+		return current_role;
 	}
 }
