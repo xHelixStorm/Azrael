@@ -65,7 +65,7 @@ public class Hashes {
     private static final ConcurrentMap<Long, ArrayList<Rank>> rankListProfile = new ConcurrentHashMap<Long, ArrayList<Rank>>();
     private static final ConcurrentMap<Long, ArrayList<Rank>> rankListIcons = new ConcurrentHashMap<Long, ArrayList<Rank>>();
     private static final ConcurrentMap<Long, ArrayList<Skins>> shopContent = new ConcurrentHashMap<Long, ArrayList<Skins>>();
-    private static final ConcurrentMap<String, ArrayList<Dailies>> daily_items = new ConcurrentHashMap<String, ArrayList<Dailies>>();
+    private static final ConcurrentMap<Long, ArrayList<Dailies>> daily_items = new ConcurrentHashMap<Long, ArrayList<Dailies>>();
     private static final ConcurrentMap<Long, ArrayList<Roles>> discordRoles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
     private static final ConcurrentMap<Long, ArrayList<RSS>> feeds = new ConcurrentHashMap<Long, ArrayList<RSS>>();
     private static final ConcurrentMap<Long, ArrayList<Weapons>> weaponShopContent = new ConcurrentHashMap<Long, ArrayList<Weapons>>();
@@ -143,7 +143,7 @@ public class Hashes {
 	public static void addShopContent(Long _key, ArrayList<Skins> _skin_content) {
 		shopContent.put(_key, _skin_content);
 	}
-	public static void addDailyItems(String _key, ArrayList<Dailies> _daily_items) {
+	public static void addDailyItems(Long _key, ArrayList<Dailies> _daily_items) {
 		daily_items.put(_key, _daily_items);
 	}
 	public static void addDiscordRole(Long _key, ArrayList<Roles> _roles) {
@@ -277,7 +277,7 @@ public class Hashes {
 	public static ArrayList<Skins> getShopContent(Long _key) {
 		return shopContent.get(_key);
 	}
-	public static ArrayList<Dailies> getDailyItems(String _key) {
+	public static ArrayList<Dailies> getDailyItems(Long _key) {
 		return daily_items.get(_key);
 	}
 	public static ArrayList<Roles> getDiscordRole(Long _key) {
@@ -418,6 +418,9 @@ public class Hashes {
 	}
 	public static void clearShopContent() {
 		shopContent.clear();
+	}
+	public static void removeDailyItems(long _key) {
+		daily_items.remove(_key);
 	}
 	public static void clearDailyItems() {
 		daily_items.clear();

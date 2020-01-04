@@ -2151,7 +2151,7 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<Dailies> SQLgetDailiesAndType(long _guild_id, int _theme_id) {
-		if(Hashes.getDailyItems("dailies") == null) {
+		if(Hashes.getDailyItems(_guild_id) == null) {
 			logger.debug("SQLgetDailiesAndType launched. Params passed {}, {}", _guild_id, _theme_id);
 			ArrayList<Dailies> dailies = new ArrayList<Dailies>();
 			Connection myConn = null;
@@ -2173,7 +2173,7 @@ public class RankingSystem {
 					setDaily.setAction(rs.getString(6));
 					dailies.add(setDaily);
 				}
-				Hashes.addDailyItems("dailies", dailies);
+				Hashes.addDailyItems(_guild_id, dailies);
 				return dailies;
 			} catch (SQLException e) {
 				logger.error("SQLgetDailiesAndType Exception", e);
@@ -2184,7 +2184,7 @@ public class RankingSystem {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getDailyItems("dailies");
+		return Hashes.getDailyItems(_guild_id);
 	}
 	
 	//Transaction

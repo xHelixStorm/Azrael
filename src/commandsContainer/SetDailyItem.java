@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Dailies;
+import core.Hashes;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 
@@ -42,6 +43,7 @@ public class SetDailyItem {
 								if(type.equals("cur") || type.equals("exp") || type.equals("cod")){
 									if(_weight+Integer.parseInt(weight) <= 100){
 										if(RankingSystem.SQLInsertDailyItems(description.replaceAll("[\"]", ""), Integer.parseInt(weight), type, _e.getGuild().getIdLong(), RankingSystem.SQLgetGuild(_e.getGuild().getIdLong()).getThemeID()) > 0) {
+											Hashes.removeDailyItems(_e.getGuild().getIdLong());
 											logger.debug("{} has inserted the item {} into the daily items pool with the weight {}", _e.getMember().getUser().getId(), description.replaceAll("[\"]", ""), weight);
 											_e.getChannel().sendMessage("New daily item has been set. Your current free weight is **"+(100-_weight-Integer.parseInt(weight))+"** now!").queue();
 										}
