@@ -249,6 +249,27 @@ public class DiscordRoles {
 		return Hashes.getReactionRoles(_guild_id);
 	}
 	
+	public static int SQLUpdateRoleName(long _guild_id, long _role_id, String _name) {
+		logger.debug("SQLUpdateRoleName launched. Passed params {}, {}, {}", _guild_id, _role_id, _name);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
+			String sql = ("UPDATE roles SET name = ? WHERE role_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _name);
+			stmt.setLong(2, _role_id);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateRoleName Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static ArrayList<Roles> SQLgetCategories() {
 		logger.debug("SQLgetCategories launched. No params passed");
 		ArrayList<Roles> roles = new ArrayList<Roles>();

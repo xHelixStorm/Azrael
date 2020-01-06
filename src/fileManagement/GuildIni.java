@@ -115,7 +115,7 @@ public class GuildIni {
 		commandLevels.put("DisplayVoiceChannels", "20");
 		commandLevels.put("DisplayRegisteredChannels", "20");
 		commandLevels.put("DisplayDailies", "1");
-		commandLevels.put("WatchedUsers", "20");
+		commandLevels.put("DisplayWatchedUsers", "20");
 		commandLevels.put("DisplayCommandLevels", "20");
 		commandLevels.put("Help", "1");
 		commandLevels.put("Inventory", "1");

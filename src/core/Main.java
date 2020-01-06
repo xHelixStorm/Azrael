@@ -59,6 +59,7 @@ import listeners.ReconnectedListener;
 import listeners.ResumedListener;
 import listeners.RoleCreateListener;
 import listeners.RoleListener;
+import listeners.RoleNameUpdateListener;
 import listeners.RoleRemovedListener;
 import listeners.ShutdownListener;
 import listeners.StatusListener;
@@ -229,7 +230,8 @@ public class Main {
 			new ReconnectedListener(),
 			new ResumedListener(),
 			new RoleCreateListener(),
-			new TextChannelListener()
+			new TextChannelListener(),
+			new RoleNameUpdateListener()
 		);
 	}
 }
