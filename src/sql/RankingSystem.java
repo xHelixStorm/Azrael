@@ -43,7 +43,7 @@ public class RankingSystem {
 	
 	//action_log
 	public static void SQLInsertActionLog(String _warning_level, long _entity, long _guild_id, String _event, String _notes) {
-		logger.debug("SQLInsertActionLog launched. Passed params {}, {}, {}, {}, {}", _warning_level, _entity, _guild_id, _event, _notes);
+		logger.info("SQLInsertActionLog launched. Passed params {}, {}, {}, {}, {}", _warning_level, _entity, _guild_id, _event, _notes);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -66,7 +66,7 @@ public class RankingSystem {
 	
 	//users table
 	public static int SQLInsertUser(long _user_id, long _guild_id, String _name, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin) {
-		logger.debug("SQLInsertUser launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _name, _level_skin, _rank_skin, _profile_skin, _icon_skin);
+		logger.info("SQLInsertUser launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _name, _level_skin, _rank_skin, _profile_skin, _icon_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -101,7 +101,7 @@ public class RankingSystem {
 	}
 	
 	public static void SQLBulkInsertUsers(List<Member> members, int _level_skin, int _rank_skin, int _profile_skin, int _icon_skin) {
-		logger.debug("SQLBulkInsertUsers launched. Passed params member list, {}, {}, {}, {}", _level_skin, _rank_skin, _profile_skin, _icon_skin);
+		logger.info("SQLBulkInsertUsers launched. Passed params member list, {}, {}, {}, {}", _level_skin, _rank_skin, _profile_skin, _icon_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -130,7 +130,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateUserLevelSkin(long _user_id, long _guild_id, String _name, int _skin_id) {
-		logger.debug("SQLUpdateUserLevelSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
+		logger.info("SQLUpdateUserLevelSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -152,7 +152,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateUsersDefaultLevelSkin(int _skin_id_old, int _skin_id_new, long _guild_id) {
-		logger.debug("SQLUpdateUsersDefaultLevelSkin launched. Passed params {}, {}, {}", _skin_id_old, _skin_id_new, _guild_id);
+		logger.info("SQLUpdateUsersDefaultLevelSkin launched. Passed params {}, {}, {}", _skin_id_old, _skin_id_new, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -173,7 +173,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateUserRankSkin(long _user_id, long _guild_id, String _name, int _skin_id) {
-		logger.debug("SQLUpdateUserRankSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
+		logger.info("SQLUpdateUserRankSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -195,7 +195,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateUsersDefaultRankSkin(int _skin_id_old, int _skin_id_new, long _guild_id) {
-		logger.debug("SQLUpdateUsersDefaultRankSkin launched. Passed params {}, {}, {}", _skin_id_old, _skin_id_new, _guild_id);
+		logger.info("SQLUpdateUsersDefaultRankSkin launched. Passed params {}, {}, {}", _skin_id_old, _skin_id_new, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -216,7 +216,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateUserProfileSkin(long _user_id, long _guild_id, String _name, int _skin_id) {
-		logger.debug("SQLUpdateUserProfileSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
+		logger.info("SQLUpdateUserProfileSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -238,7 +238,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateUsersDefaultProfileSkin(int _skin_id_old, int _skin_id_new, long _guild_id) {
-		logger.debug("SQLUpdateUsersDefaultProfileSkin launched. Passed params {}, {}, {}", _skin_id_old, _skin_id_new, _guild_id);
+		logger.info("SQLUpdateUsersDefaultProfileSkin launched. Passed params {}, {}, {}", _skin_id_old, _skin_id_new, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -259,7 +259,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateUserIconSkin(long _user_id, long _guild_id, String _name, int _skin_id) {
-		logger.debug("SQLUpdateUserIconSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
+		logger.info("SQLUpdateUserIconSkin launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _name, _skin_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -281,7 +281,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateUsersDefaultIconSkin(int _skin_id_old, int _skin_id_new, long _guild_id) {
-		logger.debug("SQLUpdateUsersDefaultIconSkin launched. Passed params {}, {}, {}", _skin_id_old, _skin_id_new, _guild_id);
+		logger.info("SQLUpdateUsersDefaultIconSkin launched. Passed params {}, {}, {}", _skin_id_old, _skin_id_new, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -303,7 +303,7 @@ public class RankingSystem {
 	
 	//guilds table 
 	public static int SQLInsertGuild(long _guild_id, String _name, boolean _enabled) {
-		logger.debug("SQLInsertGuild launched. Passed params {}, {}, {}", _guild_id, _name, _enabled);
+		logger.info("SQLInsertGuild launched. Passed params {}, {}, {}", _guild_id, _name, _enabled);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -324,7 +324,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateMaxExperience(long _experience, boolean _enabled, long _guild_id) {
-		logger.debug("SQLUpdateMaxExperience launched. Passed params {}, {}, {}", _experience, _enabled, _guild_id);
+		logger.info("SQLUpdateMaxExperience launched. Passed params {}, {}, {}", _experience, _enabled, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -345,7 +345,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateRankingSystem(long _guild_id, String _guild_name, boolean _ranking_state) {
-		logger.debug("SQLUpdateRankingSystem launched. Passed params {}, {}, {}", _guild_id, _guild_name, _ranking_state);
+		logger.info("SQLUpdateRankingSystem launched. Passed params {}, {}, {}", _guild_id, _guild_name, _ranking_state);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -366,7 +366,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateLevelDefaultSkin(long _guild_id, String _guild_name, int _level_skin) {
-		logger.debug("SQLUpdateLevelDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _level_skin);
+		logger.info("SQLUpdateLevelDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _level_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -387,7 +387,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateRankDefaultSkin(long _guild_id, String _guild_name, int _rank_skin) {
-		logger.debug("SQLUpdateRankDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _rank_skin);
+		logger.info("SQLUpdateRankDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _rank_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -408,7 +408,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateProfileDefaultSkin(long _guild_id, String _guild_name, int _profile_skin) {
-		logger.debug("SQLUpdateProfileDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _profile_skin);
+		logger.info("SQLUpdateProfileDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _profile_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -429,7 +429,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateIconDefaultSkin(long _guild_id, String _guild_name, int _icon_skin) {
-		logger.debug("SQLUpdateIconDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _icon_skin);
+		logger.info("SQLUpdateIconDefaultSkin launched. Passed params {}, {}, {}", _guild_id, _guild_name, _icon_skin);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -451,7 +451,7 @@ public class RankingSystem {
 	
 	//roles table
 	public static int SQLInsertRoles(long _role_id, String _name, int _role_level_requirement, long _guild_id) {
-		logger.debug("SQLInsertRoles launched. Passed params {}, {}, {}, {}", _role_id, _name, _role_level_requirement, _guild_id);
+		logger.info("SQLInsertRoles launched. Passed params {}, {}, {}, {}", _role_id, _name, _role_level_requirement, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -473,7 +473,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLremoveSingleRole(long _role_id, long _guild_id) {
-		logger.debug("SQLremoveSingleRole launched. Passed params {}, {}", _role_id, _guild_id);
+		logger.info("SQLremoveSingleRole launched. Passed params {}, {}", _role_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -493,7 +493,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLDeleteRole(long _role_id, long _guild_id) {
-		logger.debug("SQLDeleteRole launched. Passed params {}, {}", _role_id, _guild_id);
+		logger.info("SQLDeleteRole launched. Passed params {}, {}", _role_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -513,7 +513,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLclearRoles(long _guild_id) {
-		logger.debug("SQLclearRoles launched. Passed params {}", _guild_id);
+		logger.info("SQLclearRoles launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -533,7 +533,7 @@ public class RankingSystem {
 	
 	public static ArrayList<Roles> SQLgetRoles(long _guild_id) {
 		if(Hashes.getRankingRoles(_guild_id) == null) {
-			logger.debug("SQLgetRoles launched. Passed params {}", _guild_id);
+			logger.info("SQLgetRoles launched. Passed params {}", _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -562,7 +562,7 @@ public class RankingSystem {
 	}
 	
 	public static boolean SQLgetRole(long _role_id, long _guild_id) {
-		logger.debug("SQLgetRole launched. Passed params {}, {}", _role_id, _guild_id);
+		logger.info("SQLgetRole launched. Passed params {}, {}", _role_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -589,7 +589,7 @@ public class RankingSystem {
 	
 	//user_details table
 	public static int SQLInsertUserDetails(long _user_id, long _guild_id, int _level, long _experience, long _currency, long _assigned_role) {
-		logger.debug("SQLInsertUserDetails launched. Passed params {}, {}, {}, {}, {}", _user_id, _level, _experience, _currency, _assigned_role);
+		logger.info("SQLInsertUserDetails launched. Passed params {}, {}, {}, {}, {}", _user_id, _level, _experience, _currency, _assigned_role);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -614,7 +614,7 @@ public class RankingSystem {
 	}
 	
 	public static void SQLBulkInsertUserDetails(List<Member> members,  int _level, long _experience, long _currency, long _assigned_role) {
-		logger.debug("SQLBulkInsertUserDetails launched. Passed params members list, {}, {}, {}, {}", _level, _experience, _currency, _assigned_role);
+		logger.info("SQLBulkInsertUserDetails launched. Passed params members list, {}, {}, {}, {}", _level, _experience, _currency, _assigned_role);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -643,7 +643,7 @@ public class RankingSystem {
 	}
 	
 	public static long SQLgetAssignedRole(long _user_id, long _guild_id) {
-		logger.debug("SQLgetAssignedRole launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.info("SQLgetAssignedRole launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -669,7 +669,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateExperience(long _user_id, long _guild_id, long _experience, Timestamp _last_update) {
-		logger.debug("SQLUpdateExperience launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _experience, _last_update);
+		logger.info("SQLUpdateExperience launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _experience, _last_update);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -691,7 +691,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLsetLevelUp(long _user_id, long _guild_id, int _level, long _experience, long _currency, long _assigned_role, Timestamp _last_update) {
-		logger.debug("SQLsetLevelUp launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _level, _experience, _currency, _assigned_role, _last_update);
+		logger.info("SQLsetLevelUp launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _level, _experience, _currency, _assigned_role, _last_update);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -716,7 +716,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateCurrentRole(long _guild_id, long _role_assign) {
-		logger.debug("SQLUpdateCurrentRole launched. Passed params {}, {}", _guild_id, _role_assign);
+		logger.info("SQLUpdateCurrentRole launched. Passed params {}, {}", _guild_id, _role_assign);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -736,7 +736,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateCurrency(long _user_id, long _guild_id, long _currency, Timestamp _last_update) {
-		logger.debug("SQLUpdateCurrency launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _currency, _last_update);
+		logger.info("SQLUpdateCurrency launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _currency, _last_update);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -758,7 +758,7 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<Rank> SQLRanking(long _guild_id) {
-		logger.debug("SQLgetRanking launched. Passed params {}", _guild_id);
+		logger.info("SQLgetRanking launched. Passed params {}", _guild_id);
 		ArrayList<Rank> rankList = new ArrayList<Rank>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -790,7 +790,7 @@ public class RankingSystem {
 	
 	//daily_experience table
 	public static int SQLInsertDailyExperience(long _experience, long _user_id, long _guild_id, Timestamp _reset) {
-		logger.debug("SQLInsertDailyExperience launched. Passed params {}, {}, {}, {}", _experience, _user_id, _guild_id, _reset);
+		logger.info("SQLInsertDailyExperience launched. Passed params {}, {}, {}, {}", _experience, _user_id, _guild_id, _reset);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -812,7 +812,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLDeleteDailyExperience(long _user_id, long _guild_id) {
-		logger.debug("SQLDeleteDailyExperience launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.info("SQLDeleteDailyExperience launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -833,8 +833,8 @@ public class RankingSystem {
 	
 	//ranking_level
 	public static ArrayList<Rank> SQLgetRankingLevel(long _guild_id) {
-		logger.debug("SQLgetRankingLevel launched. Params passed {}", _guild_id);
 		if(Hashes.getRankListLevel(_guild_id) == null) {
+			logger.info("SQLgetRankingLevel launched. Params passed {}", _guild_id);
 			ArrayList<Rank> rankList = new ArrayList<Rank>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -882,8 +882,8 @@ public class RankingSystem {
 	
 	//ranking_rank
 	public static ArrayList<Rank> SQLgetRankingRank(long _guild_id) {
-		logger.debug("SQLgetRankingrank launched. Params passed {}", _guild_id);
 		if(Hashes.getRankListRank(_guild_id) == null) {
+			logger.info("SQLgetRankingrank launched. Params passed {}", _guild_id);
 			ArrayList<Rank> rankList = new ArrayList<Rank>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -942,8 +942,8 @@ public class RankingSystem {
 	
 	//ranking_profile
 	public static ArrayList<Rank> SQLgetRankingProfile(long _guild_id) {
-		logger.debug("SQLgetRankingProfile launched. Params passed {}", _guild_id);
 		if(Hashes.getRankListProfile(_guild_id) == null) {
+			logger.info("SQLgetRankingProfile launched. Params passed {}", _guild_id);
 			ArrayList<Rank> rankList = new ArrayList<Rank>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1011,8 +1011,8 @@ public class RankingSystem {
 	
 	//ranking_icon
 	public static ArrayList<Rank> SQLgetRankingIcons(long _guild_id) {
-		logger.debug("SQLgetRankingIcons launched. Params passed {}", _guild_id);
 		if(Hashes.getRankListIcons(_guild_id) == null) {
+			logger.info("SQLgetRankingIcons launched. Params passed {}", _guild_id);
 			ArrayList<Rank> rankList = new ArrayList<Rank>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1046,7 +1046,7 @@ public class RankingSystem {
 	
 	//daily_items
 	public static int SQLInsertDailyItems(String _description, int _weight, String _type, long _guild_id, int _theme_id) {
-		logger.debug("SQLInsertDailyItems launched. Passed params {}, {}, {}, {}, {}", _description, _weight, _type, _guild_id, _theme_id);
+		logger.info("SQLInsertDailyItems launched. Passed params {}, {}, {}, {}, {}", _description, _weight, _type, _guild_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1069,7 +1069,7 @@ public class RankingSystem {
 	
 	//inventory
 	public static int SQLInsertInventory(long _user_id, long _guild_id, int _item_id, Timestamp _position, int _number, String _status, int _theme_id) {
-		logger.debug("SQLInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _item_id, _position, _number, _status, _theme_id);
+		logger.info("SQLInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _item_id, _position, _number, _status, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1094,7 +1094,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLInsertInventoryWithLimit(long _user_id, long _guild_id, int _item_id, Timestamp _position, int _number, String _status, Timestamp _expires, int _theme_id) {
-		logger.debug("SQLInsertInventoryWithLimit launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _item_id, _position, _number, _status, _expires, _theme_id);
+		logger.info("SQLInsertInventoryWithLimit launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _item_id, _position, _number, _status, _expires, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1120,7 +1120,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLgetNumberLimitFromInventory(long _user_id, long _guild_id, int _item_id, int _theme_id) {
-		logger.debug("SQLgetNumberLimitFromInventory launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _item_id, _theme_id);
+		logger.info("SQLgetNumberLimitFromInventory launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _item_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1148,7 +1148,7 @@ public class RankingSystem {
 	}
 	
 	public static Timestamp SQLgetExpirationFromInventory(long _user_id, long _guild_id, int _item_id, int _theme_id) {
-		logger.debug("SQLgetExpirationFromInventory launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _item_id, _theme_id);
+		logger.info("SQLgetExpirationFromInventory launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _item_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1176,7 +1176,7 @@ public class RankingSystem {
 	}
 	
 	public static void SQLDeleteInventory() {
-		logger.debug("SQLDeleteInventory launched. No params passed");
+		logger.info("SQLDeleteInventory launched. No params passed");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1193,7 +1193,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, int _theme_id) {
-		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}", _user_id, _guild_id, _maxItems, _theme_id);
+		logger.info("SQLgetTotalItemNumber launched. Passed params {}, {}, {}", _user_id, _guild_id, _maxItems, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1220,7 +1220,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, String _type, int _maxItems, int _theme_id) {
-		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _type, _maxItems, _theme_id);
+		logger.info("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _type, _maxItems, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1248,7 +1248,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, String _ignore, boolean _boolIgnore, int _theme_id) {
-		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _maxItems, _ignore, _boolIgnore, _theme_id);
+		logger.info("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _maxItems, _ignore, _boolIgnore, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1276,7 +1276,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, boolean _oneType, int _theme_id) {
-		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _maxItems, _oneType, _theme_id);
+		logger.info("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _maxItems, _oneType, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1303,7 +1303,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLgetTotalItemNumber(long _user_id, long _guild_id, int _maxItems, boolean _oneType, String _category, int _theme_id) {
-		logger.debug("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _maxItems, _oneType, _category, _theme_id);
+		logger.info("SQLgetTotalItemNumber launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _maxItems, _oneType, _category, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1332,7 +1332,7 @@ public class RankingSystem {
 	
 	//dailies_usage
 	public static Timestamp SQLgetDailiesUsage(long _user_id, long _guild_id) {
-		logger.debug("SQLgetDailiesUsage launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.info("SQLgetDailiesUsage launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1358,7 +1358,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLInsertDailiesUsage(long _user_id, long _guild_id, Timestamp _opened, Timestamp _next_daily) {
-		logger.debug("SQLInsertDailiesUsage launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _opened, _next_daily);
+		logger.info("SQLInsertDailiesUsage launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _opened, _next_daily);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1381,7 +1381,7 @@ public class RankingSystem {
 	
 	//giveaway
 	public static boolean SQLBulkInsertGiveawayRewards(String [] rewards, Timestamp timestamp, long _guild_id) {
-		logger.debug("SQLbulkInsertGiveawayRewards launched. Passed params {}, {}, {}", rewards, timestamp, _guild_id);
+		logger.info("SQLbulkInsertGiveawayRewards launched. Passed params {}, {}, {}", rewards, timestamp, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1410,7 +1410,7 @@ public class RankingSystem {
 	}
 	
 	public static String SQLRetrieveGiveawayReward(long _guild_id) {
-		logger.debug("SQLRetrieveGiveawayReward launched. Params passed {}", _guild_id);
+		logger.info("SQLRetrieveGiveawayReward launched. Params passed {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1437,7 +1437,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLUpdateUsedOnReward(String _code, long _guild_id) {
-		logger.debug("SQLUpdateUserOnReward launched. Passed params {}, {}", _code, _guild_id);
+		logger.info("SQLUpdateUserOnReward launched. Passed params {}, {}", _code, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1458,7 +1458,7 @@ public class RankingSystem {
 	
 	//themes
 	public static boolean SQLgetThemes() {
-		logger.debug("SQLgetThemes launched. No params has been passed");
+		logger.info("SQLgetThemes launched. No params has been passed");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1486,7 +1486,7 @@ public class RankingSystem {
 	//JOINS
 	public synchronized static Rank SQLgetWholeRankView(long _user_id, long _guild_id) {
 		if(Hashes.getRanking(_guild_id+"_"+_user_id) == null) {
-			logger.debug("SQLgetWholeRankView launched. Passed params {}, {}", _user_id, _guild_id);
+			logger.info("SQLgetWholeRankView launched. Passed params {}, {}", _user_id, _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -1616,7 +1616,7 @@ public class RankingSystem {
 	
 	public static Guilds SQLgetGuild(long _guild_id) {
 		if(Hashes.getStatus(_guild_id) == null) {
-			logger.debug("SQLgetGuild launched. Passed params {}", _guild_id);
+			logger.info("SQLgetGuild launched. Passed params {}", _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -1708,8 +1708,8 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<Level> SQLgetLevels(long _guild_id, int _theme_id) {
-		logger.debug("SQLgetLevels launched. Passed params {}, {}", _guild_id, _theme_id);
 		if(Hashes.getRankingLevels(_guild_id+"_"+_theme_id) == null) {
+			logger.info("SQLgetLevels launched. Passed params {}, {}", _guild_id, _theme_id);
 			ArrayList<Level> levels = new ArrayList<Level>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1739,12 +1739,12 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<Skins> SQLgetSkinshopContentAndType(long _guild_id, int _theme_id) {
-		logger.debug("SQLgetSkinshopContentAndType launched. Params passed {}, {}", _guild_id, _theme_id);
-		ArrayList<Skins> set_skin = new ArrayList<Skins>();
 		if(Hashes.getShopContent(_guild_id) == null) {
+			logger.info("SQLgetSkinshopContentAndType launched. Params passed {}, {}", _guild_id, _theme_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
+			ArrayList<Skins> set_skin = new ArrayList<Skins>();
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				String sql = ("SELECT * FROM all_enabled_skins WHERE fk_theme_id = ?");
@@ -1777,7 +1777,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLgetItemID(long _user_id, long _guild_id, int _item_id, int _theme_id) {
-		logger.debug("SQLgetItemID launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _item_id, _theme_id);
+		logger.info("SQLgetItemID launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _item_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1805,7 +1805,7 @@ public class RankingSystem {
 	}
 	
 	public static Inventory SQLgetItemIDAndSkinType(long _user_id, long _guild_id, String _description, int _theme_id) {
-		logger.debug("SQLgetItemIDAndSkinType launched. Passed params {}, {}, {}", _user_id, _guild_id, _description, _theme_id);
+		logger.info("SQLgetItemIDAndSkinType launched. Passed params {}, {}, {}", _user_id, _guild_id, _description, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1833,7 +1833,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLgetInventoryNumber(long _user_id, long _guild_id, String _description, String _status, int _theme_id) {
-		logger.debug("SQLgetInventoryNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _description, _status, _theme_id);
+		logger.info("SQLgetInventoryNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _description, _status, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1862,7 +1862,7 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptions(long _user_id, long _guild_id, int _limit, int _maxItems, int _theme_id) {
-		logger.debug("SQLgetInventoryAndDescriptions launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _theme_id);
+		logger.info("SQLgetInventoryAndDescriptions launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _theme_id);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1906,7 +1906,7 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionsItems(long _user_id, long _guild_id, int _limit, int _maxItems, int _theme_id) {
-		logger.debug("SQLgetInventoryAndDescriptionsItems launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _theme_id);
+		logger.info("SQLgetInventoryAndDescriptionsItems launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _theme_id);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1950,7 +1950,7 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionsWeapons(long _user_id, long _guild_id, int _limit, int _maxItems, int _theme_id) {
-		logger.debug("SQLgetInventoryAndDescriptionsWeapons launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _theme_id);
+		logger.info("SQLgetInventoryAndDescriptionsWeapons launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _theme_id);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1994,7 +1994,7 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionsWeapons(long _user_id, long _guild_id, int _limit, int _maxItems, String _category, int _theme_id) {
-		logger.debug("SQLgetInventoryAndDescriptionsWeapons launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _category, _theme_id);
+		logger.info("SQLgetInventoryAndDescriptionsWeapons launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _category, _theme_id);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2048,7 +2048,7 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionsSkins(long _user_id, long _guild_id, int _limit, int _maxItems, int _theme_id) {
-		logger.debug("SQLgetInventoryAndDescriptions launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _theme_id);
+		logger.info("SQLgetInventoryAndDescriptions launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _limit, _maxItems, _theme_id);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2087,7 +2087,7 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<InventoryContent> SQLgetInventoryAndDescriptionWithoutLimit(long _user_id, long _guild_id, int _theme_id) {
-		logger.debug("SQLgetInventoryAndDescritpionWithoutLimit launched. Passed params {}, {}, {}", _user_id, _guild_id, _theme_id);
+		logger.info("SQLgetInventoryAndDescritpionWithoutLimit launched. Passed params {}, {}, {}", _user_id, _guild_id, _theme_id);
 		ArrayList<InventoryContent> inventory = new ArrayList<InventoryContent>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2119,7 +2119,7 @@ public class RankingSystem {
 	}
 	
 	public static InventoryContent SQLgetNumberAndExpirationFromInventory(long _user_id, long _guild_id, String _description, String _status, int _theme_id) {
-		logger.debug("SQLgetNumberAndExpirationFromInventory launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _description, _status, _theme_id);
+		logger.info("SQLgetNumberAndExpirationFromInventory launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _description, _status, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2152,7 +2152,7 @@ public class RankingSystem {
 	
 	public static ArrayList<Dailies> SQLgetDailiesAndType(long _guild_id, int _theme_id) {
 		if(Hashes.getDailyItems(_guild_id) == null) {
-			logger.debug("SQLgetDailiesAndType launched. Params passed {}, {}", _guild_id, _theme_id);
+			logger.info("SQLgetDailiesAndType launched. Params passed {}, {}", _guild_id, _theme_id);
 			ArrayList<Dailies> dailies = new ArrayList<Dailies>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -2190,7 +2190,7 @@ public class RankingSystem {
 	//Transaction
 	@SuppressWarnings("resource")
 	public static int SQLUpdateCurrencyAndInsertInventory(long _user_id, long _guild_id, long _currency, int _item_id, Timestamp _position, int _number, int _theme_id) {
-		logger.debug("SQLUpdateCurrencyAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _position, _number, _theme_id);
+		logger.info("SQLUpdateCurrencyAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _position, _number, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2231,7 +2231,7 @@ public class RankingSystem {
 	
 	@SuppressWarnings("resource")
 	public static int SQLUpdateCurrencyAndRemoveInventory(long _user_id, long _guild_id, long _currency, int _item_id, int _theme_id, Timestamp _last_update) {
-		logger.debug("SQLUpdateCurrencyAndRemoveInventory launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _theme_id, _last_update);
+		logger.info("SQLUpdateCurrencyAndRemoveInventory launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _theme_id, _last_update);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2270,7 +2270,7 @@ public class RankingSystem {
 	
 	@SuppressWarnings("resource")
 	public static int SQLUpdateAndInsertInventory(long _user_id, long _guild_id, int _number, int _number_limit, int _item_id, Timestamp _position, Timestamp _expiration, int _theme_id) {
-		logger.debug("SQLUpdateAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _number, _number_limit, _item_id, _position, _expiration, _theme_id);
+		logger.info("SQLUpdateAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _number, _number_limit, _item_id, _position, _expiration, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2313,7 +2313,7 @@ public class RankingSystem {
 	
 	@SuppressWarnings("resource")
 	public static int SQLDeleteAndInsertInventory(long _user_id, long _guild_id, int _number, int _item_id, Timestamp _position, Timestamp _expiration, int _theme_id) {
-		logger.debug("SQLDeleteAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _number, _item_id, _position, _expiration, _theme_id);
+		logger.info("SQLDeleteAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _number, _item_id, _position, _expiration, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2355,7 +2355,7 @@ public class RankingSystem {
 	
 	//EXISTS
 	public static String SQLExpBoosterExistsInInventory(long _user_id, long _guild_id, int _theme_id) {
-		logger.debug("SQLExpBoosterExistsInInventory launched. Passed params {}, {}, {}", _user_id, _guild_id, _theme_id);
+		logger.info("SQLExpBoosterExistsInInventory launched. Passed params {}, {}, {}", _user_id, _guild_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;

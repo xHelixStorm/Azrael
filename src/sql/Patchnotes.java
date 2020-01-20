@@ -30,7 +30,7 @@ public class Patchnotes {
 	}
 	
 	public static Patchnote SQLgetPrivatePatchnotes() {
-		logger.debug("SQLgetPrivatePatchnotes launched without params");
+		logger.info("SQLgetPrivatePatchnotes launched without params");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -59,7 +59,7 @@ public class Patchnotes {
 	}
 	
 	public static Patchnote SQLgetPublicPatchnotes() {
-		logger.debug("SQLgetPublicPatchnotes launched without params");
+		logger.info("SQLgetPublicPatchnotes launched without params");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -88,7 +88,7 @@ public class Patchnotes {
 	}
 	
 	public static void SQLInsertPublishedPatchnotes(long _guild_id) {
-		logger.debug("SQLInsertPublishedPatchnotes launched. Params passed {}", _guild_id);
+		logger.info("SQLInsertPublishedPatchnotes launched. Params passed {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -107,7 +107,7 @@ public class Patchnotes {
 	}
 	
 	public static boolean SQLcheckPublishedPatchnotes(long _guild_id) {
-		logger.debug("SQLcheckPublishedPatchnotes launched. Params passed {}", _guild_id);
+		logger.info("SQLcheckPublishedPatchnotes launched. Params passed {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -133,7 +133,7 @@ public class Patchnotes {
 	}
 	
 	public static long SQLgetGuild(long _guild_id) {
-		logger.debug("SQLgetGuild launched. Passed params {}", _guild_id);
+		logger.info("SQLgetGuild launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -158,7 +158,7 @@ public class Patchnotes {
 	}
 	
 	public static int SQLInsertGuild(long _guild_id, String _name) {
-		logger.debug("SQLInsertGuilds launched. Params passed {}, {}", _guild_id, _name);
+		logger.info("SQLInsertGuilds launched. Params passed {}, {}", _guild_id, _name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -178,7 +178,7 @@ public class Patchnotes {
 	}
 	
 	public static boolean SQLcheckPublishedBotPatchnotes(long _guild_id) {
-		logger.debug("SQLcheckPublishedBotPatchnotes launched. Params passed {}", _guild_id);
+		logger.info("SQLcheckPublishedBotPatchnotes launched. Params passed {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -203,7 +203,7 @@ public class Patchnotes {
 	}
 	
 	public static ArrayList<Patchnote> SQLgetPrivatePatchnotesArray() {
-		logger.debug("SQLgetPrivatePatchnotesArray launched without params");
+		logger.info("SQLgetPrivatePatchnotesArray launched without params");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -238,7 +238,7 @@ public class Patchnotes {
 	}
 	
 	public static ArrayList<Patchnote> SQLgetPublicPatchnotesArray() {
-		logger.debug("SQLgetPublicPatchnotesArray launched without params");
+		logger.info("SQLgetPublicPatchnotesArray launched without params");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -273,7 +273,7 @@ public class Patchnotes {
 	}
 	
 	public static ArrayList<Patchnote> SQLgetGamePatchnotesArray(long _guild_id) {
-		logger.debug("SQLgetGamePatchnotesArray launched. Params passed {}", _guild_id);
+		logger.info("SQLgetGamePatchnotesArray launched. Params passed {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;

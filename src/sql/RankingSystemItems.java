@@ -38,7 +38,7 @@ public class RankingSystemItems {
 	
 	//users
 	public static int SQLRemoveEquippedWeapon(long _user_id, long _guild_id, int _slot) {
-		logger.debug("SQLRemoveEquippedWeapon launched. Passed params {}, {}, {}", _user_id, _guild_id, _slot);
+		logger.info("SQLRemoveEquippedWeapon launched. Passed params {}, {}, {}", _user_id, _guild_id, _slot);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -58,7 +58,7 @@ public class RankingSystemItems {
 	}
 	
 	public static int SQLRemoveEquippedSkill(long _user_id, long _guild_id) {
-		logger.debug("SQLRemoveEquippedSkill launched. Passed params {}, {}, {}", _user_id, _guild_id);
+		logger.info("SQLRemoveEquippedSkill launched. Passed params {}, {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -78,7 +78,7 @@ public class RankingSystemItems {
 	}
 	
 	public static int SQLEquipWeapon(long _user_id, long _guild_id, int _item_id, int _slot) {
-		logger.debug("SQLEquipWeapon launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _item_id, _slot);
+		logger.info("SQLEquipWeapon launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _item_id, _slot);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -99,7 +99,7 @@ public class RankingSystemItems {
 	}
 	
 	public static int SQLUnequipWeapon(long _user_id, long _guild_id, int _slot) {
-		logger.debug("SQLUnequipWeapon launched. Passed params {}, {}, {}", _user_id, _guild_id, _slot);
+		logger.info("SQLUnequipWeapon launched. Passed params {}, {}, {}", _user_id, _guild_id, _slot);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -119,7 +119,7 @@ public class RankingSystemItems {
 	}
 	
 	public static int SQLUnequipWholeEquipment(long _user_id, long _guild_id) {
-		logger.debug("SQLUnequipWeapon launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.info("SQLUnequipWeapon launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -139,7 +139,7 @@ public class RankingSystemItems {
 	}
 	
 	public static int SQLEquipSkill(long _user_id, long _guild_id, int _item_id) {
-		logger.debug("SQLEquipSkill launched. Passed params {}, {}, {}", _user_id, _guild_id, _item_id);
+		logger.info("SQLEquipSkill launched. Passed params {}, {}, {}", _user_id, _guild_id, _item_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -161,7 +161,7 @@ public class RankingSystemItems {
 	
 	//inventory
 	public static int SQLgetNumberOfWeaponID(long _guild_id, int _weapon_id, int _theme_id) {
-		logger.debug("SQLgetNumberOfWeaponID launched. Params passed {}, {}, {}", _guild_id, _weapon_id, _theme_id);
+		logger.info("SQLgetNumberOfWeaponID launched. Params passed {}, {}, {}", _guild_id, _weapon_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -189,7 +189,7 @@ public class RankingSystemItems {
 	
 	//weapon_shop_content
 	public static int SQLgetRandomWeaponIDByAbbv(String _abbv, int _stat_id, int _theme_id) {
-		logger.debug("SQLgetRandomWeaponIDByAbbv launched. Params passed {}, {}, {}", _abbv, _stat_id, _theme_id);
+		logger.info("SQLgetRandomWeaponIDByAbbv launched. Params passed {}, {}, {}", _abbv, _stat_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -216,7 +216,7 @@ public class RankingSystemItems {
 	}
 	
 	public static int SQLgetRandomWeaponIDByCategory(long _guild_id, String _category, int _stat_id, int _theme_id) {
-		logger.debug("SQLgetRandomWeaponIDByAbbv launched. Params passed {}, {}, {}, {}", _guild_id, _category, _stat_id, _theme_id);
+		logger.info("SQLgetRandomWeaponIDByAbbv launched. Params passed {}, {}, {}, {}", _guild_id, _category, _stat_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -246,9 +246,9 @@ public class RankingSystemItems {
 	
 	//weapon_category
 	public static ArrayList<String> SQLgetWeaponCategories(long _guild_id, int _theme_id, boolean _overrideSkill){
-		logger.debug("SQLgetWeaponCategories launched. Params passed {}, {}", _guild_id, _theme_id);
-		ArrayList<String> categories = new ArrayList<String>();
 		if(Hashes.getWeaponCategories(_guild_id) == null) {
+			logger.info("SQLgetWeaponCategories launched. Params passed {}, {}", _guild_id, _theme_id);
+			ArrayList<String> categories = new ArrayList<String>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -277,9 +277,9 @@ public class RankingSystemItems {
 	
 	//weapon_abbreviation
 	public static ArrayList<WeaponAbbvs> SQLgetWeaponAbbvs(long _guild_id, int _theme_id) {
-		logger.debug("SQLgetWeaponAbbvs launched. Params passed {}, {}", _guild_id, _theme_id);
-		ArrayList<WeaponAbbvs> abbreviations = new ArrayList<WeaponAbbvs>();
 		if(Hashes.getWeaponAbbreviations(_guild_id) == null) {
+			logger.info("SQLgetWeaponAbbvs launched. Params passed {}, {}", _guild_id, _theme_id);
+			ArrayList<WeaponAbbvs> abbreviations = new ArrayList<WeaponAbbvs>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -309,9 +309,9 @@ public class RankingSystemItems {
 	
 	//weapon_stats
 	public static ArrayList<WeaponStats> SQLgetWeaponStats(long _guild_id, int _theme_id) {
-		logger.debug("SQLgetWeaponStats launched. Params passed {}, {}", _guild_id, _theme_id);
-		ArrayList<WeaponStats> stats = new ArrayList<WeaponStats>();
 		if(Hashes.getWeaponStats(_guild_id) == null) {
+			logger.info("SQLgetWeaponStats launched. Params passed {}, {}", _guild_id, _theme_id);
+			ArrayList<WeaponStats> stats = new ArrayList<WeaponStats>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -341,9 +341,9 @@ public class RankingSystemItems {
 	
 	//JOINS
 	public static ArrayList<Weapons> SQLgetWholeWeaponShop(long _guild_id, int _theme_id) {
-		logger.debug("SQLgetWholeWeaponShop launched. Params passed {}", _guild_id);
-		ArrayList<Weapons> weapons = new ArrayList<Weapons>();
 		if(Hashes.getWeaponShopContent(_guild_id) == null) {
+			logger.info("SQLgetWholeWeaponShop launched. Params passed {}", _guild_id);
+			ArrayList<Weapons> weapons = new ArrayList<Weapons>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -436,9 +436,9 @@ public class RankingSystemItems {
 	}
 	
 	public static ArrayList<Skills> SQLgetSkills(long _guild_id, int _theme_id) {
-		logger.debug("SQLgetSkills launched. Params passed {}, {}", _guild_id, _theme_id);
-		ArrayList<Skills> skills = new ArrayList<Skills>();
 		if(Hashes.getSkillShop(_guild_id) == null) {
+			logger.info("SQLgetSkills launched. Params passed {}, {}", _guild_id, _theme_id);
+			ArrayList<Skills> skills = new ArrayList<Skills>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -473,7 +473,7 @@ public class RankingSystemItems {
 	}
 	
 	public static InventoryContent SQLgetNumberAndExpirationFromInventory(long _user_id, long _guild_id, int _item_id, String _status, int _theme_id, boolean _weapon){
-		logger.debug("SQLgetNumberAndExpirationFromInventory launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _item_id, _status, _theme_id, _weapon);
+		logger.info("SQLgetNumberAndExpirationFromInventory launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _item_id, _status, _theme_id, _weapon);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -510,7 +510,7 @@ public class RankingSystemItems {
 	}
 	
 	public static String SQLgetEquippedWeaponDescription(long _user_id, long _guild_id, int slot) {
-		logger.debug("SQLgetEquippedWeaponDescription launched. Params passed {}, {}", _user_id, _guild_id);
+		logger.info("SQLgetEquippedWeaponDescription launched. Params passed {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -541,7 +541,7 @@ public class RankingSystemItems {
 	}
 	
 	public static String SQLgetEquippedSkillDescription(long _user_id, long _guild_id) {
-		logger.debug("SQLgetEquippedSkillDescription launched. Params passed {}, {}", _user_id, _guild_id);
+		logger.info("SQLgetEquippedSkillDescription launched. Params passed {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -572,7 +572,7 @@ public class RankingSystemItems {
 	}
 	
 	public static ArrayList<ItemEquip> SQLfilterInventoryWeapons(long _user_id, long _guild_id, String _item) {
-		logger.debug("SQLfilterInventoryWeapons launched. Params passed {}, {}, {}", _user_id, _guild_id, _item);
+		logger.info("SQLfilterInventoryWeapons launched. Params passed {}, {}, {}", _user_id, _guild_id, _item);
 		ArrayList<ItemEquip> items = new ArrayList<ItemEquip>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -605,7 +605,7 @@ public class RankingSystemItems {
 	}
 	
 	public static ArrayList<ItemEquip> SQLfilterInventorySkills(long _user_id, long _guild_id, String _item) {
-		logger.debug("SQLfilterInventorySkills launched. Params passed {}, {}, {}", _user_id, _guild_id, _item);
+		logger.info("SQLfilterInventorySkills launched. Params passed {}, {}, {}", _user_id, _guild_id, _item);
 		ArrayList<ItemEquip> items = new ArrayList<ItemEquip>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -638,7 +638,7 @@ public class RankingSystemItems {
 	//Transaction
 	@SuppressWarnings("resource")
 	public static int SQLUpdateCurrencyAndInsertTimedInventory(long _user_id, long _guild_id, long _currency, int _item_id, long _position, long _expires, int _number, int _theme_id, boolean _weapon){
-		logger.debug("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _position, _expires, _number, _theme_id, _weapon);
+		logger.info("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _position, _expires, _number, _theme_id, _weapon);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -683,7 +683,7 @@ public class RankingSystemItems {
 	
 	@SuppressWarnings("resource")
 	public static int SQLUpdateCurrencyAndInsertWeaponRandomshop(long _user_id, long _guild_id, long _currency, int _weapon_id, Timestamp _timestamp, int _number, int _theme_id){
-		logger.debug("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _weapon_id, _timestamp, _number, _theme_id);
+		logger.info("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _weapon_id, _timestamp, _number, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {

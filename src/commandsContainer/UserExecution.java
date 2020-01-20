@@ -88,7 +88,7 @@ public class UserExecution {
 			Hashes.addTempCache(key, new Cache(180000, raw_input));
 		}
 		else {
-			_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Error, user doesn't exist. Please try again!").queue();
+			_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Error! User doesn't exist. Please try again!").queue();
 		}
 	}
 	
@@ -112,111 +112,116 @@ public class UserExecution {
 						final var informationLevel = GuildIni.getUserInformationLevel(_e.getGuild().getIdLong());
 						if(UserPrivs.comparePrivilege(_e.getMember(), informationLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							User user = Azrael.SQLgetUserThroughID(cache.getAdditionalInfo(), _e.getGuild().getIdLong());
-							message.setTitle("Here the requested information!");
-							if(user.getAvatar() != null)
-								message.setThumbnail(user.getAvatar());
-							message.setAuthor(user.getUserName());
-							message.setDescription("Here you can inspect all current information for this user!");
-							message.addBlankField(false);
-							Bancollect warnedUser = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong());
-							message.addField("CURRENT WARNING", "**"+warnedUser.getWarningID()+"**/**"+Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong())+"**", true);
-							message.addField("TOTAL WARNINGS", "**"+Azrael.SQLgetSingleActionEventCount("MEMBER_MUTE_ADD", user_id, _e.getGuild().getIdLong())+"**", true);
-							message.addField("TOTAL BANS", "**"+Azrael.SQLgetSingleActionEventCount("MEMBER_BAN_ADD", user_id, _e.getGuild().getIdLong())+"**", true);
-							message.addField("BANNED", warnedUser.getBanID() == 2 ? "**YES**" : "**NO**", true);
-							message.addField("ORIGINAL JOIN DATE", "**"+user.getOriginalJoinDate()+"**", true);
-							message.addField("NEWEST JOIN DATE", "**"+user.getNewestJoinDate()+"**", true);
-							message.addField("USER ID", "**"+cache.getAdditionalInfo()+"**", true);
-							var watchedUser = Azrael.SQLgetWatchlist(user_id, _e.getGuild().getIdLong());
-							if(watchedUser == null || (watchedUser.hasHigherPrivileges() && !UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserUseWatchChannelLevel(_e.getGuild().getIdLong()))))
-								message.addField("WATCH LEVEL", "**0**", true);
-							else
-								message.addField("WATCH LEVEL", "**"+watchedUser.getLevel()+"**", true);
-							message.addBlankField(false);
-							Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
-							if(guild_settings.getRankingState() == true) {
-								message.addField("LEVEL", "**"+user_details.getLevel()+"**/**"+guild_settings.getMaxLevel()+"**", true);
-								message.addField("EXPERIENCE", "**"+user_details.getCurrentExperience()+"**/**"+user_details.getRankUpExperience()+"**", true);
-								if(user_details.getCurrentRole() != 0) {
-									message.addField("UNLOCKED ROLE", _e.getGuild().getRoleById(user_details.getCurrentRole()).getAsMention(), true);
-								}
-								else {
-									message.addField("UNLOCKED ROLE", "**N/A**", true);
-								}
-								message.addField("TOTAL EXPERIENCE", "**"+user_details.getExperience()+"**", true);
-							}
-							StringBuilder out = new StringBuilder();
-							try {
-								for(String description : Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, _e.getGuild().getIdLong())) {
-									out.append("[`"+description+"`] ");
-								}
-								out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
-								message.addField("USED NAMES", out.toString(), false);
-								out.setLength(0);
-								for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, _e.getGuild().getIdLong())) {
-									out.append("[`"+description+"`] ");
-								}
-								out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
-								message.addField("USED NICKNAMES", out.toString(), false);
-								out.setLength(0);
-								_e.getChannel().sendMessage(message.build()).queue();
-							} catch(IllegalArgumentException iae) {
-								_e.getChannel().sendMessage(message.build()).queue();
-								message.clear();
-								out.setLength(0);
-								for(String description : Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, _e.getGuild().getIdLong())) {
-									out.append("[`"+description+"`] ");
-								}
-								out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
-								try {
-									message.setColor(Color.BLUE).setTitle("USED NAMES").setDescription(out.toString());
-								} catch(IllegalArgumentException iae2) {
-									try {
-										String pastebin_link = Pastebin.unlistedPaste("USED NAMES", out.toString(), _e.getGuild().getIdLong());
-										message.setColor(Color.BLUE).setTitle("USED NAMES").setDescription("Names posted on Pastebin as unlisted: "+pastebin_link);
-									} catch (IllegalStateException | LoginException | PasteException e) {
-										logger.warn("Error on creating paste!", e);
-										message.setColor(Color.RED).setTitle("USED NAMES").setDescription("Names couldn't be displayed because it exceeded the limit of characters. Please bind the bot with a Pastebin account to display the names on Pastebin!");
+							if(user != null) {
+								message.setTitle("Here the requested information!");
+								if(user.getAvatar() != null)
+									message.setThumbnail(user.getAvatar());
+								message.setAuthor(user.getUserName());
+								message.setDescription("Here you can inspect all current information for this user!");
+								message.addBlankField(false);
+								Bancollect warnedUser = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong());
+								message.addField("CURRENT WARNING", "**"+warnedUser.getWarningID()+"**/**"+Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong())+"**", true);
+								message.addField("TOTAL WARNINGS", "**"+Azrael.SQLgetSingleActionEventCount("MEMBER_MUTE_ADD", user_id, _e.getGuild().getIdLong())+"**", true);
+								message.addField("TOTAL BANS", "**"+Azrael.SQLgetSingleActionEventCount("MEMBER_BAN_ADD", user_id, _e.getGuild().getIdLong())+"**", true);
+								message.addField("BANNED", warnedUser.getBanID() == 2 ? "**YES**" : "**NO**", true);
+								message.addField("ORIGINAL JOIN DATE", "**"+user.getOriginalJoinDate()+"**", true);
+								message.addField("NEWEST JOIN DATE", "**"+user.getNewestJoinDate()+"**", true);
+								message.addField("USER ID", "**"+cache.getAdditionalInfo()+"**", true);
+								var watchedUser = Azrael.SQLgetWatchlist(user_id, _e.getGuild().getIdLong());
+								if(watchedUser == null || (watchedUser.hasHigherPrivileges() && !UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserUseWatchChannelLevel(_e.getGuild().getIdLong()))))
+									message.addField("WATCH LEVEL", "**0**", true);
+								else
+									message.addField("WATCH LEVEL", "**"+watchedUser.getLevel()+"**", true);
+								message.addBlankField(false);
+								Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
+								if(guild_settings.getRankingState() == true) {
+									message.addField("LEVEL", "**"+user_details.getLevel()+"**/**"+guild_settings.getMaxLevel()+"**", true);
+									message.addField("EXPERIENCE", "**"+user_details.getCurrentExperience()+"**/**"+user_details.getRankUpExperience()+"**", true);
+									if(user_details.getCurrentRole() != 0) {
+										message.addField("UNLOCKED ROLE", _e.getGuild().getRoleById(user_details.getCurrentRole()).getAsMention(), true);
 									}
-								}
-								_e.getChannel().sendMessage(message.build()).queue();
-								message.clear();
-								for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, _e.getGuild().getIdLong())) {
-									out.append("[`"+description+"`] ");
-								}
-								out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
-								try {
-									message.setColor(Color.BLUE).setTitle("USED NICKNAMES").setDescription(out.toString());
-								} catch(IllegalArgumentException iae2) {
-									try {
-										String pastebin_link = Pastebin.unlistedPaste("USED NICKNAMES", out.toString(), _e.getGuild().getIdLong());
-										message.setColor(Color.BLUE).setTitle("USED NICKNAMES").setDescription("Nicknames posted on Pastebin as unlisted: "+pastebin_link);
-									} catch (IllegalStateException | LoginException | PasteException e) {
-										logger.warn("Error on creating paste!", e);
-										message.setColor(Color.RED).setTitle("USED NICKNAMES").setDescription("Nicknames couldn't be displayed because it exceeded the limit of characters. Please bind the bot with a Pastebin account to display the names on Pastebin!");
+									else {
+										message.addField("UNLOCKED ROLE", "**N/A**", true);
 									}
+									message.addField("TOTAL EXPERIENCE", "**"+user_details.getExperience()+"**", true);
 								}
-								_e.getChannel().sendMessage(message.build()).queue();
+								StringBuilder out = new StringBuilder();
+								try {
+									for(String description : Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, _e.getGuild().getIdLong())) {
+										out.append("[`"+description+"`] ");
+									}
+									out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
+									message.addField("USED NAMES", out.toString(), false);
+									out.setLength(0);
+									for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, _e.getGuild().getIdLong())) {
+										out.append("[`"+description+"`] ");
+									}
+									out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
+									message.addField("USED NICKNAMES", out.toString(), false);
+									out.setLength(0);
+									_e.getChannel().sendMessage(message.build()).queue();
+								} catch(IllegalArgumentException iae) {
+									_e.getChannel().sendMessage(message.build()).queue();
+									message.clear();
+									out.setLength(0);
+									for(String description : Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, _e.getGuild().getIdLong())) {
+										out.append("[`"+description+"`] ");
+									}
+									out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
+									try {
+										message.setColor(Color.BLUE).setTitle("USED NAMES").setDescription(out.toString());
+									} catch(IllegalArgumentException iae2) {
+										try {
+											String pastebin_link = Pastebin.unlistedPaste("USED NAMES", out.toString(), _e.getGuild().getIdLong());
+											message.setColor(Color.BLUE).setTitle("USED NAMES").setDescription("Names posted on Pastebin as unlisted: "+pastebin_link);
+										} catch (IllegalStateException | LoginException | PasteException e) {
+											logger.warn("Error on creating paste!", e);
+											message.setColor(Color.RED).setTitle("USED NAMES").setDescription("Names couldn't be displayed because it exceeded the limit of characters. Please bind the bot with a Pastebin account to display the names on Pastebin!");
+										}
+									}
+									_e.getChannel().sendMessage(message.build()).queue();
+									message.clear();
+									for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, _e.getGuild().getIdLong())) {
+										out.append("[`"+description+"`] ");
+									}
+									out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**N/A**") : out;
+									try {
+										message.setColor(Color.BLUE).setTitle("USED NICKNAMES").setDescription(out.toString());
+									} catch(IllegalArgumentException iae2) {
+										try {
+											String pastebin_link = Pastebin.unlistedPaste("USED NICKNAMES", out.toString(), _e.getGuild().getIdLong());
+											message.setColor(Color.BLUE).setTitle("USED NICKNAMES").setDescription("Nicknames posted on Pastebin as unlisted: "+pastebin_link);
+										} catch (IllegalStateException | LoginException | PasteException e) {
+											logger.warn("Error on creating paste!", e);
+											message.setColor(Color.RED).setTitle("USED NICKNAMES").setDescription("Nicknames couldn't be displayed because it exceeded the limit of characters. Please bind the bot with a Pastebin account to display the names on Pastebin!");
+										}
+									}
+									_e.getChannel().sendMessage(message.build()).queue();
+								}
+								if(IniFileReader.getActionLog()) {
+									message.clear();
+									message.setColor(Color.BLUE).setTitle("DELETED MESSAGES ON PASTEBIN");
+									out.setLength(0);
+									for(String description : Azrael.SQLgetSingleActionEventDescriptionsOrdered("MESSAGES_DELETED", user_id, _e.getGuild().getIdLong())) {
+										out.append(description+"\n");
+									}
+									message.setDescription(out);
+									if(out.length() > 0)_e.getChannel().sendMessage(message.build()).queue();
+									
+									message.clear();
+									message.setColor(Color.BLUE).setTitle("EVENTS");
+									out.setLength(0);
+									for(String description : Azrael.SQLgetCriticalActionEvents(user_id, _e.getGuild().getIdLong())) {
+										out.append(description+"\n");
+									}
+									message.setDescription(out);
+									if(out.length() > 0)_e.getChannel().sendMessage(message.build()).queue();
+								}
+								logger.debug("{} has displayed information of the user {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo());
 							}
-							if(IniFileReader.getActionLog()) {
-								message.clear();
-								message.setColor(Color.BLUE).setTitle("DELETED MESSAGES ON PASTEBIN");
-								out.setLength(0);
-								for(String description : Azrael.SQLgetSingleActionEventDescriptionsOrdered("MESSAGES_DELETED", user_id, _e.getGuild().getIdLong())) {
-									out.append(description+"\n");
-								}
-								message.setDescription(out);
-								if(out.length() > 0)_e.getChannel().sendMessage(message.build()).queue();
-								
-								message.clear();
-								message.setColor(Color.BLUE).setTitle("EVENTS");
-								out.setLength(0);
-								for(String description : Azrael.SQLgetCriticalActionEvents(user_id, _e.getGuild().getIdLong())) {
-									out.append(description+"\n");
-								}
-								message.setDescription(out);
-								if(out.length() > 0)_e.getChannel().sendMessage(message.build()).queue();
+							else {
+								_e.getChannel().sendMessage("Error! information page for this user couldn't be displayed! User has to rejoin the server!").queue();
 							}
-							logger.debug("{} has displayed information of the user {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo());
 						}
 						else {
 							UserPrivs.throwNotEnoughPrivilegeError(_e, informationLevel);
