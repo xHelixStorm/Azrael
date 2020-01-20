@@ -32,9 +32,9 @@ public class ParseRSS extends TimerTask{
 		var feeds = Azrael.SQLgetRSSFeeds(guild_id);
 		try {
 			if(feeds != null) {
-				logger.info("task running for guild {}", e.getJDA().getGuildById(guild_id).getName());
 				var rss_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rss")).findAny().orElse(null);
 				if(rss_channel != null) {
+					logger.info("task running for guild {}", e.getJDA().getGuildById(guild_id).getName());
 					for(RSS rss : feeds) {
 						new Thread(() -> {
 							try {

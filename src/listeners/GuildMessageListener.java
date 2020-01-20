@@ -167,7 +167,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						}
 						//display details of the currently selected weapon
 						else if(shop.getAdditionalInfo().contains("wea-") && !shop.getAdditionalInfo2().contains("%")) {
-							if(!message.matches("[^\\d]") && message.length() <= 9) {
+							if(!message.matches("[^\\d]*") && message.length() <= 9) {
 								ShopExecution.displaySingleWeapon(e, shop.getAdditionalInfo(), shop.getAdditionalInfo2().split("-"), guild_settings, Integer.parseInt(message)-1);
 							}
 						}
@@ -183,7 +183,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						
 						//display details of the currently selected skill
 						else if(shop.getAdditionalInfo().equals("ski") && !shop.getAdditionalInfo2().contains("%")) {
-							if(!message.matches("[^\\d]") && message.length() <= 9) {
+							if(!message.matches("[^\\d]*") && message.length() <= 9) {
 								ShopExecution.displaySingleSkill(e, guild_settings, shop.getAdditionalInfo2().split("-"), Integer.parseInt(message)-1);
 							}
 						}

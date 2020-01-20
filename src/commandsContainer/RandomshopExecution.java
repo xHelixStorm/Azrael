@@ -122,7 +122,7 @@ public class RandomshopExecution {
 								editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1), guild_settings.getThemeID());
 							}
 							else {
-								e.getChannel().sendMessage("Weapons for this weapon type have not been configured. Please contact an administrator!").queue();
+								e.getChannel().sendMessage("Weapons for this weapon type have not been configured or does not exist!").queue();
 								logger.warn("Table weapon_shop_content is not configured for the weapon abbreviation {} in guild {}", abbv, e.getGuild().getId());
 							}
 						}
@@ -133,7 +133,7 @@ public class RandomshopExecution {
 								editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1), guild_settings.getThemeID());
 							}
 							else {
-								e.getChannel().sendMessage("Weapons for this weapon category have not been configured. Please contact an administrator!").queue();
+								e.getChannel().sendMessage("Weapons for this weapon category have not been configured or does not exist!").queue();
 								logger.warn("Table weapon_shop_content is not configured for the weapon category {} in guild {}", category, e.getGuild().getId());
 							}
 						}

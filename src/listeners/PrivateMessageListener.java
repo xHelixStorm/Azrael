@@ -91,7 +91,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 					}
 					//select a slot for the weapon or skill to equip after
 					else if(equip.getAdditionalInfo2().equals("set")) {
-						if(!e.getMessage().getContentRaw().matches("[^\\d]"))
+						if(!e.getMessage().getContentRaw().matches("[^\\d]*"))
 							EquipExecution.slotSelection(e, equip.getAdditionalInfo(), Integer.parseInt(e.getMessage().getContentRaw()), "set");
 						else
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select one of the visible digits on the screen!").build()).queue();
