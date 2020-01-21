@@ -280,32 +280,40 @@ public class UserExecution {
 							Hashes.clearTempCache(key);
 							return;
 						}
-						if(_e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-							final var muteLevel = GuildIni.getUserMuteLevel(_e.getGuild().getIdLong());
-							if(UserPrivs.comparePrivilege(_e.getMember(), muteLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
-								message.setTitle("You chose to mute!");
-								if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
-									_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
-									cache.updateDescription("mute-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
-									Hashes.addTempCache(key, cache);
+						//abort if the user is already muted and warn to unmute before muting again
+						if(!UserPrivs.isUserMuted(member)) {
+							if(_e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+								final var muteLevel = GuildIni.getUserMuteLevel(_e.getGuild().getIdLong());
+								if(UserPrivs.comparePrivilege(_e.getMember(), muteLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+									message.setTitle("You chose to mute!");
+									if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
+										_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
+										cache.updateDescription("mute-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+										Hashes.addTempCache(key, cache);
+									}
+									else {
+										message.addField("YES", "Provide a reason", true);
+										message.addField("NO", "Don't provide a reason", true);
+										_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a reason to the mute?").build()).queue();
+										cache.updateDescription("mute"+user_id).setExpiration(180000);
+										Hashes.addTempCache(key, cache);
+									}
 								}
 								else {
-									message.addField("YES", "Provide a reason", true);
-									message.addField("NO", "Don't provide a reason", true);
-									_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a reason to the mute?").build()).queue();
-									cache.updateDescription("mute"+user_id).setExpiration(180000);
-									Hashes.addTempCache(key, cache);
+									UserPrivs.throwNotEnoughPrivilegeError(_e, muteLevel);
+									Hashes.clearTempCache(key);
 								}
 							}
 							else {
-								UserPrivs.throwNotEnoughPrivilegeError(_e, muteLevel);
+								message.setTitle("User can't get muted").setColor(Color.RED);
+								_e.getChannel().sendMessage(message.setDescription("The mute parameter can't be used because the MANAGE ROLES permission is missing!").build()).queue();
+								logger.warn("MANAGE ROLES permission required to mute a user in guild {}!", _e.getGuild().getId());
 								Hashes.clearTempCache(key);
 							}
 						}
 						else {
 							message.setTitle("User can't get muted").setColor(Color.RED);
-							_e.getChannel().sendMessage(message.setDescription("The mute parameter can't be used because the MANAGE ROLES permission is missing!").build()).queue();
-							logger.warn("MANAGE ROLES permission required to mute a user in guild {}!", _e.getGuild().getId());
+							_e.getChannel().sendMessage(message.setDescription("The user is already muted! Please use unmute before reapplying a mute again!").build()).queue();
 							Hashes.clearTempCache(key);
 						}
 					}
