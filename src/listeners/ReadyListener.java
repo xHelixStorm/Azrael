@@ -1,13 +1,5 @@
 package listeners;
 
-/**
- * First event that gets executed on start up and on succesfull login to Discord
- * 
- * collect themes, roles, settings, etc before the bot is fully operational for taking
- * commands, restart timers for muted users and start timers for regular check ups and 
- * clean ups
- */
-
 import java.awt.Color;
 import java.io.File;
 import java.util.Calendar;
@@ -28,7 +20,6 @@ import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import rankingSystem.DoubleExperienceOff;
@@ -44,6 +35,16 @@ import timerTask.ClearHashes;
 import timerTask.ParseRSS;
 import timerTask.VerifyMutedMembers;
 import util.STATIC;
+
+/**
+ * First event that gets executed on start up and on succesfull login to Discord
+ * 
+ * collect themes, roles, settings, etc before the bot is fully operational for taking
+ * commands, restart timers for muted users and start timers for regular check ups and 
+ * clean ups
+ * @author xHelixStorm
+ *
+ */
 
 public class ReadyListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(ReadyListener.class);
@@ -209,11 +210,7 @@ public class ReadyListener extends ListenerAdapter {
 		executor.execute(new CollectUsersGuilds(e, null));
 		e.getJDA().getGuilds().parallelStream().forEach(g -> {
 			executor.execute(new RoleExtend(g));
-			for(TextChannel tc : g.getTextChannels()){
-				if(Azrael.SQLInsertChannels(tc.getIdLong(), tc.getName()) == 0) {
-					logger.error("channel {} couldn't be registered", tc.getId());
-				}
-			}
+			Azrael.SQLBulkInsertChannels(g.getTextChannels());
 		});
 		
 		//if double experience is enabled, run 2 tasks for the start time and end time

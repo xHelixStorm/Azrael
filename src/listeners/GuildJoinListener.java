@@ -1,12 +1,5 @@
 package listeners;
 
-/**
- * This class gets executed when the bot joins a new server.
- * 
- * On execution, the guild details will be inserted into all
- * tables and a guild ini file will be created if not available.
- */
-
 import java.io.File;
 
 import org.slf4j.Logger;
@@ -21,6 +14,15 @@ import threads.CollectUsersGuilds;
 import sql.DiscordRoles;
 import sql.Patchnotes;
 import sql.Azrael;
+
+/**
+ * This class gets executed when the bot joins a new server.
+ * 
+ * On execution, the guild details will be inserted into all
+ * tables and a guild ini file will be created if not available.
+ * @author Giuseppe-Emanuele
+ *
+ */
 
 public class GuildJoinListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildJoinListener.class);
@@ -48,6 +50,9 @@ public class GuildJoinListener extends ListenerAdapter {
 		if(Patchnotes.SQLInsertGuild(guild_id, guild_name) == 0) {
 			logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", guild_id);
 		}
+		//insert all channels into table
+		Azrael.SQLBulkInsertChannels(e.getGuild().getTextChannels());
+		
 		FileSetting.createGuildDirectory(e.getGuild());
 		//check if guild ini file exists, else create a new one or verify content
 		if(!new File("./ini/"+guild_id+".ini").exists())

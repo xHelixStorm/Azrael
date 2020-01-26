@@ -55,7 +55,7 @@ public class ReactionMessage {
 						});
 			
 			else
-				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("This channel can be used to assign yourself unique roles to display your main game style in the game. "
+				e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription("Assign yourself a unique role!. "
 						+ "To assign yourself a role, react with one or more of the available emojis that are below this message. "
 						+ "It can be used to remove the same role as well. These are the currently available emojis to react to with their unique role:\n\n"
 						+ ""+sb.toString()).build()).queue(response -> {

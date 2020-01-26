@@ -61,34 +61,66 @@ public class RegisterChannel {
 				channel = _args[2].replaceAll("[^0-9]*", "");
 				if(channel.length() == 18) {
 					channel_id = Long.parseLong(channel);
+					var result = 0;
 					switch(channel_type) {
 						case "eng", "ger", "fre", "tur", "rus", "spa", "por", "ita", "all" -> {
-							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
-							Azrael.SQLDeleteChannel_Filter(channel_id);
-							Azrael.SQLInsertChannel_Filter(channel_id, channel_type);
+							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
+							if(result > 0) {
+								result = Azrael.SQLDeleteChannel_Filter(channel_id);
+								if(result > 0) {
+									result = Azrael.SQLInsertChannel_Filter(channel_id, channel_type);
+									if(result == 0)
+										logger.error("New channel filter {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
+								}
+								else
+									logger.error("Channel filter for channel {} couldn't be cleared before inserting the new filter in guild {}", channel_id, _guild_id);
+							}
+							else
+								logger.error("Channel type {} couldn't be saved for channel {} into Azrael.channel_conf for guild {]", channel_type, channel_id, _guild_id);
 						}
 						case "bot", "mus" -> {
-							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
-							Azrael.SQLDeleteChannel_Filter(channel_id);
-							Azrael.SQLInsertChannel_Filter(channel_id, "all");
+							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
+							if(result > 0) {
+								result = Azrael.SQLDeleteChannel_Filter(channel_id);
+								if(result > 0) {
+									result = Azrael.SQLInsertChannel_Filter(channel_id, "all");
+									if(result == 0)
+										logger.error("New channel filter all couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_id, _guild_id);
+								}
+								else
+									logger.error("Channel filter for channel {} couldn't be cleared before inserting the new filter in guild {}", channel_id, _guild_id);
+							}
+							else
+								logger.error("Channel type {} couldn't be saved for channel {} into Azrael.channel_conf for guild {]", channel_type, channel_id, _guild_id);
 						}
 						case "log", "tra", "rea", "qui", "rss", "wat", "del", "edi" -> {
-							Azrael.SQLDeleteChannelType(channel_type, _guild_id);
-							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
+							result = Azrael.SQLDeleteChannelType(channel_type, _guild_id);
+							if(result > 0) {
+								result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
+								if(result == 0)
+									logger.error("New channel filter {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
+							}
+							else
+								logger.error("Old channel type {} couldn't be deleted for channel {} in guild {} from Azrael.channel_conf", channel_type, channel_id, _guild_id);
 						}
 					}
 					Hashes.removeChannels(_guild_id);
-					logger.debug("{} has registered the channel {} as {} channel in guild {}", _e.getMember().getUser().getId(), channel_type, channel_type, _e.getGuild().getId());
-					_e.getChannel().sendMessage("**The channel has been registered!**").queue();
-					if(channel_type.equals("rea")) {
-						//use the temp cache to append reactions after the bot sends a message
-						if(Azrael.SQLUpdateReaction(_e.getGuild().getIdLong(), true) > 0) {
-							ReactionMessage.print(_e, channel_id);
+					if(result > 0) {
+						logger.debug("{} has registered the channel {} as {} channel in guild {}", _e.getMember().getUser().getId(), channel_type, channel_type, _guild_id);
+						_e.getChannel().sendMessage("**The channel has been registered!**").queue();
+						if(channel_type.equals("rea")) {
+							//use the temp cache to append reactions after the bot sends a message
+							if(Azrael.SQLUpdateReaction(_guild_id, true) > 0) {
+								ReactionMessage.print(_e, channel_id);
+							}
+							else {
+								logger.error("Role reactions couldn't be set to enable for guild {}", _guild_id);
+								_e.getChannel().sendMessage("An internal error occurred. The reactions couldn't be marked as enabled in the table Azrael.commands").queue();
+							}
 						}
-						else {
-							logger.error("Role reactions couldn't be set to enable for guild {}", _e.getGuild().getName());
-							_e.getChannel().sendMessage("An internal error occurred. The reactions couldn't be marked as enabled in the table Azrael.commands").queue();
-						}
+					}
+					else {
+						_e.getChannel().sendMessage("An internal error occurred. Text channel couldn't be registered!").queue();
 					}
 				}
 			}

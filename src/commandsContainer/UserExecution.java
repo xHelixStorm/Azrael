@@ -116,7 +116,7 @@ public class UserExecution {
 								message.setTitle("Here the requested information!");
 								if(user.getAvatar() != null)
 									message.setThumbnail(user.getAvatar());
-								message.setAuthor(user.getUserName());
+								message.setAuthor(user.getUserName()+ "ID: "+cache.getAdditionalInfo());
 								message.setDescription("Here you can inspect all current information for this user!");
 								message.addBlankField(false);
 								Bancollect warnedUser = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong());
@@ -126,7 +126,6 @@ public class UserExecution {
 								message.addField("BANNED", warnedUser.getBanID() == 2 ? "**YES**" : "**NO**", true);
 								message.addField("ORIGINAL JOIN DATE", "**"+user.getOriginalJoinDate()+"**", true);
 								message.addField("NEWEST JOIN DATE", "**"+user.getNewestJoinDate()+"**", true);
-								message.addField("USER ID", "**"+cache.getAdditionalInfo()+"**", true);
 								var watchedUser = Azrael.SQLgetWatchlist(user_id, _e.getGuild().getIdLong());
 								if(watchedUser == null || (watchedUser.hasHigherPrivileges() && !UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getUserUseWatchChannelLevel(_e.getGuild().getIdLong()))))
 									message.addField("WATCH LEVEL", "**0**", true);

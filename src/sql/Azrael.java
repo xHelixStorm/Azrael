@@ -24,6 +24,7 @@ import constructors.Watchlist;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import util.STATIC;
 
 public class Azrael {
@@ -1130,6 +1131,29 @@ public class Azrael {
 		}
 	}
 	
+	public static void SQLBulkInsertChannels(List<TextChannel> _textChannels) {
+		logger.info("SQLBulkInsertChannels launched. Array param passed");
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn.setAutoCommit(false); 
+			String sql = ("INSERT INTO channels (channel_id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)");
+			stmt = myConn.prepareStatement(sql);
+			for(final var channel : _textChannels) {
+				stmt.setLong(1, channel.getIdLong());
+				stmt.setString(2, channel.getName());
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+		} catch (SQLException e) {
+			logger.error("SQLInsertChannels Exception", e);
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLDeleteChannels(long _channel_id) {
 		logger.info("SQLDeleteChannels launched. Passed params {}", _channel_id);
 		Connection myConn = null;
@@ -1251,7 +1275,7 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLDeleteChannelType(String _channel_type, long _guild_id) {
+	public static int SQLDeleteChannelType(String _channel_type, long _guild_id) {
 		logger.info("SQLDeleteChannelType launched. Passed params {}, {}", _channel_type, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1261,9 +1285,10 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _channel_type);
 			stmt.setLong(2, _guild_id);
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteChannelType Exception", e);
+			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
