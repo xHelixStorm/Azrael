@@ -1972,7 +1972,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO rss (url, fk_guild_id, format, type) VALUES (?, ?, ?, ?)");
+			String sql = ("INSERT INTO rss (url, fk_guild_id, format, type, videos, pictures, text) VALUES (?, ?, ?, ?, 1, 1, 1)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _url);
 			stmt.setLong(2, _guild_id);
@@ -1991,6 +1991,33 @@ public class Azrael {
 		}
 	}
 	
+	public static ArrayList<String> SQLgetSubTweets(long _guild_id, String _tweet) {
+		logger.info("SQLgetSubTweets launched. Params passed {}, {}", _guild_id, _tweet);
+		ArrayList<String> tweets = new ArrayList<String>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT child_tweet FROM sub_tweets WHERE fk_guild_id = ? && parent_tweet = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setString(2, _tweet);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				tweets.add(rs.getString(1));
+			}
+			return tweets;
+		} catch (SQLException e) {
+			logger.error("SQLgetSubTweets Exception", e);
+			return tweets;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static ArrayList<RSS> SQLgetRSSFeeds(long _guild_id) {
 		logger.info("SQLgetRSSFeeds launched. Params passed {}", _guild_id);
 		ArrayList<RSS> feeds = new ArrayList<RSS>();
@@ -1999,12 +2026,22 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT url, format, type FROM rss WHERE fk_guild_id = ? ORDER BY timestamp asc");
+			String sql = ("SELECT url, format, type, videos, pictures, text FROM rss WHERE fk_guild_id = ? ORDER BY timestamp asc");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				feeds.add(new RSS(rs.getString(1), rs.getString(2), rs.getInt(3)));
+				feeds.add(
+					new RSS(
+						rs.getString(1),
+						rs.getString(2),
+						rs.getInt(3),
+						rs.getBoolean(4),
+						rs.getBoolean(5),
+						rs.getBoolean(6),
+						SQLgetSubTweets(_guild_id, rs.getString(1))
+					)
+				);
 			}
 			Hashes.addFeeds(_guild_id, feeds);
 			return feeds;

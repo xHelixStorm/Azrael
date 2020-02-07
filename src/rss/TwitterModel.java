@@ -38,17 +38,30 @@ public class TwitterModel {
 			Query query = new Query(rss.getURL());
 			QueryResult result;
 			result = twitter.search(query);
-	        List<Status> tweets = result.getTweets();
+	        List<Status> tweets = result.getTweets().subList(0, 29);
 	        final String pattern = "https:\\/\\/t.co\\/[\\w\\d]*";
 	        for (Status tweet : tweets) {
 	        	if(!tweet.isRetweet()) {
 	        		String message = tweet.getText();
+	        		boolean tweetProhibited = false;
 	        		final String fullName = tweet.getUser().getName();
 	        		final String username = "@"+tweet.getUser().getScreenName();
 	        		final String pubDate = tweet.getCreatedAt().toString();
-	        		boolean tweetProhibited = false;
+	        		
+	        		if(rss.getChildTweets().size() > 0) {
+	        			boolean tweetFound = false;
+	        			for(final String childTweet : rss.getChildTweets()) {
+	        				if(message.contains(childTweet)) {
+	        					tweetFound = true;
+	        					break;
+	        				}
+	        			}
+	        			if(!tweetFound)
+	        				tweetProhibited = true;
+	        		}
 	        		if(Azrael.SQLgetTweetBlacklist(guild_id).parallelStream().filter(f -> username.equals(f)).findAny().orElse(null) != null)
 	        			tweetProhibited = true;
+	        		
 	        		if(!tweetProhibited) {
 	        			final String compareMessage = message.toLowerCase();
 	        			find: for(var filter : Azrael.SQLgetChannel_Filter(rss_channel.getChannel_ID())) {
@@ -62,30 +75,108 @@ public class TwitterModel {
 						}
 	        		}
 	        		if(!tweetProhibited) {
+	        			var picturePosted = false;
+	        			var videoPosted = false;
+	        			
 	        			for(MediaEntity media : tweet.getMediaEntities()) {
-	                		if(message.contains("https://t.co"))
-	                			message = message.replaceFirst(pattern, media.getExpandedURL());
-	                		else
-	                			message += "\n"+media.getExpandedURL();
+	        				//replace url if it starts with https://t.co
+	                		if(message.contains("https://t.co")) {
+	                			if((media.getType().equals("photo") || media.getType().equals("animated_gif")) && rss.getPictures()) {
+	                				message = message.replaceFirst(pattern, media.getExpandedURL());
+	                				picturePosted = true;
+	                			}
+	                			else if((media.getType().equals("photo") || media.getType().equals("animated_gif")) && !rss.getPictures())
+	                				message = message.replaceFirst(pattern, "");
+	                			else if(media.getType().equals("video") && rss.getVideos()) {
+	                				message = message.replaceFirst(pattern, media.getExpandedURL());
+	                				videoPosted = true;
+	                			}
+	                			else if(media.getType().equals("video") && !rss.getVideos())
+	                				message = message.replaceFirst(pattern, "");
+	                		}
+	                		//parse url
+	                		else {
+	                			if((media.getType().equals("photo") || media.getType().equals("animated_gif")) && rss.getPictures()) {
+	                				message += "\n"+media.getExpandedURL();
+	                				picturePosted = true;
+	                			}
+	                			else if(media.getType().equals("video") && rss.getVideos()) {
+	                				message += "\n"+media.getExpandedURL();
+	                				videoPosted = true;
+	                			}
+	                		}
 	                	}
 	                	for(URLEntity url : tweet.getURLEntities()) {
-	                		if(message.contains("https://t.co"))
-	                			message = message.replaceFirst(pattern, url.getExpandedURL());
-	                		else
-	                			message += "\n"+url.getExpandedURL();
+	                		//replace url if it starts with https://t.co
+	                		if(message.contains("https://t.co")) {
+	                			if((url.getExpandedURL().endsWith(".jpg") || url.getExpandedURL().endsWith(".jpeg") || url.getExpandedURL().endsWith(".png") || url.getExpandedURL().endsWith(".gif")) && rss.getPictures()) {
+	                				message = message.replaceFirst(pattern, url.getExpandedURL());
+	                				picturePosted = true;
+	                			}
+	                			else if((url.getExpandedURL().endsWith(".jpg") || url.getExpandedURL().endsWith(".jpeg") || url.getExpandedURL().endsWith(".png") || url.getExpandedURL().endsWith(".gif")) && !rss.getPictures())
+	                				message = message.replaceFirst(pattern, "");
+	                			else if((url.getExpandedURL().startsWith("https://youtu.be") || url.getExpandedURL().startsWith("https://youtube.com") || url.getExpandedURL().startsWith("https://m.youtube.com")) && rss.getVideos()) {
+	                				message = message.replaceFirst(pattern, url.getExpandedURL());
+	                				videoPosted = true;
+	                			}
+	                			else if((url.getExpandedURL().startsWith("https://youtu.be") || url.getExpandedURL().startsWith("https://youtube.com") || url.getExpandedURL().startsWith("https://m.youtube.com")) && !rss.getVideos())
+	                				message = message.replaceFirst(pattern, "");
+	                			else if(!url.getExpandedURL().endsWith(".jpg") && !url.getExpandedURL().endsWith(".jpeg") && !url.getExpandedURL().endsWith(".png") && !url.getExpandedURL().endsWith(".gif") && !url.getExpandedURL().startsWith("https://youtu.be") && !url.getExpandedURL().startsWith("https://youtube.com") && !url.getExpandedURL().startsWith("https://m.youtube.com") && rss.getText()) {
+	                				message = message.replaceFirst(pattern, url.getExpandedURL());
+	                			}
+	                		}
+	                		//parse url
+	                		else {
+	                			if((url.getExpandedURL().endsWith(".jpg") || url.getExpandedURL().endsWith(".jpeg") || url.getExpandedURL().endsWith(".png") || url.getExpandedURL().endsWith(".gif")) && rss.getPictures()) {
+	                				message += "\n"+url.getExpandedURL();
+	                				picturePosted = true;
+	                			}
+	                			else if((url.getExpandedURL().startsWith("https://youtu.be") || url.getExpandedURL().startsWith("https://youtube.com") || url.getExpandedURL().startsWith("https://m.youtube.com")) && rss.getVideos()) {
+	                				message += "\n"+url.getExpandedURL();
+	                				videoPosted = true;
+	                			}
+	                			else if(!url.getExpandedURL().endsWith(".jpg") && !url.getExpandedURL().endsWith(".jpeg") && !url.getExpandedURL().endsWith(".png") && !url.getExpandedURL().endsWith(".gif") && !url.getExpandedURL().startsWith("https://youtu.be") && !url.getExpandedURL().startsWith("https://youtube.com") && !url.getExpandedURL().startsWith("https://m.youtube.com") && rss.getText()) {
+	                				message += "\n"+url.getExpandedURL();
+	                			}
+	                		}
 	                	}
-	                	String format = rss.getFormat();
-	                	String out = format.replace("{description}", message);
-						out = out.replace("{pubDate}", pubDate);
-						out = out.replace("{fullName}", fullName);
-						out = out.replace("{username}", username);
-	                	final String outMessage = EmojiParser.parseToUnicode(out);
-	                	MessageHistory history = new MessageHistory(e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()));
-						List<Message> msg = history.retrievePast(30).complete();
-						Message historyMessage = msg.parallelStream().filter(f -> f.getContentRaw().contains(outMessage)).findAny().orElse(null);
-						
-						if(historyMessage == null)
-							e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
+	                	
+	                	boolean printMessage = false;
+	                	if(rss.getPictures() && rss.getVideos() && rss.getText())
+	                		printMessage = true;
+	                	else if(!rss.getPictures() && rss.getVideos() && rss.getText()) {
+	                		printMessage = true;
+	                	}
+	                	else if(rss.getPictures() && !rss.getVideos() && rss.getText()) {
+	                		printMessage = true;
+	                	}
+	                	else if(rss.getPictures() && rss.getVideos() && !rss.getText() && (picturePosted || videoPosted)) {
+	                		printMessage = true;
+	                	}
+	                	else if(!rss.getPictures() && !rss.getVideos() && rss.getText()) {
+	                		printMessage = true;
+	                	}
+	                	else if(!rss.getPictures() && rss.getVideos() && !rss.getText() && !picturePosted && videoPosted) {
+	                		printMessage = true;
+	                	}
+	                	else if(rss.getPictures() && !rss.getVideos() && !rss.getText() && picturePosted && !videoPosted) {
+	                		printMessage = true;
+	                	}
+	                	
+	                	if(printMessage) {
+	                		String format = rss.getFormat();
+		                	String out = format.replace("{description}", message);
+							out = out.replace("{pubDate}", pubDate);
+							out = out.replace("{fullName}", fullName);
+							out = out.replace("{username}", username);
+		                	final String outMessage = EmojiParser.parseToUnicode(out);
+		                	MessageHistory history = new MessageHistory(e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()));
+							List<Message> msg = history.retrievePast(30).complete();
+							Message historyMessage = msg.parallelStream().filter(f -> f.getContentRaw().contains(outMessage)).findAny().orElse(null);
+							
+							if(historyMessage == null)
+								e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
+	                	}
 	        		}
 	        	}
 	        }
