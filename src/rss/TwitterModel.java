@@ -3,6 +3,8 @@ package rss;
 import java.awt.Color;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +40,11 @@ public class TwitterModel {
 			Query query = new Query(rss.getURL());
 			QueryResult result;
 			result = twitter.search(query);
-	        List<Status> tweets = result.getTweets().subList(0, 29);
+			List<Status> tweets;
+			if(result.getTweets().size() >= 30)
+				tweets = result.getTweets().subList(0, 29);
+			else
+				tweets = result.getTweets().subList(0, result.getTweets().size());
 	        final String pattern = "https:\\/\\/t.co\\/[\\w\\d]*";
 	        for (Status tweet : tweets) {
 	        	if(!tweet.isRetweet()) {
@@ -49,11 +55,15 @@ public class TwitterModel {
 	        		final String pubDate = tweet.getCreatedAt().toString();
 	        		
 	        		if(rss.getChildTweets().size() > 0) {
+	        			var reviewMessage = message.toLowerCase();
 	        			boolean tweetFound = false;
-	        			for(final String childTweet : rss.getChildTweets()) {
-	        				if(message.contains(childTweet)) {
-	        					tweetFound = true;
-	        					break;
+	        			search: for(final String childTweet : rss.getChildTweets()) {
+	        				Matcher matcher = Pattern.compile(childTweet.toLowerCase()+"(\\w{0,}|\\d{0,})").matcher(reviewMessage);
+	        				while(matcher.find()) {
+	        					if(matcher.group().equalsIgnoreCase(childTweet)) {
+	        						tweetFound = true;
+	        						break search;
+	        					}
 	        				}
 	        			}
 	        			if(!tweetFound)
@@ -109,7 +119,7 @@ public class TwitterModel {
 	                	for(URLEntity url : tweet.getURLEntities()) {
 	                		//replace url if it starts with https://t.co
 	                		if(message.contains("https://t.co")) {
-	                			if((url.getExpandedURL().endsWith(".jpg") || url.getExpandedURL().endsWith(".jpeg") || url.getExpandedURL().endsWith(".png") || url.getExpandedURL().endsWith(".gif")) && rss.getPictures()) {
+	                			if((url.getExpandedURL().endsWith(".jpg") || url.getExpandedURL().endsWith(".jpeg") || url.getExpandedURL().endsWith(".png") || url.getExpandedURL().endsWith(".gif"))) {
 	                				message = message.replaceFirst(pattern, url.getExpandedURL());
 	                				picturePosted = true;
 	                			}
@@ -121,21 +131,26 @@ public class TwitterModel {
 	                			}
 	                			else if((url.getExpandedURL().startsWith("https://youtu.be") || url.getExpandedURL().startsWith("https://youtube.com") || url.getExpandedURL().startsWith("https://m.youtube.com")) && !rss.getVideos())
 	                				message = message.replaceFirst(pattern, "");
-	                			else if(!url.getExpandedURL().endsWith(".jpg") && !url.getExpandedURL().endsWith(".jpeg") && !url.getExpandedURL().endsWith(".png") && !url.getExpandedURL().endsWith(".gif") && !url.getExpandedURL().startsWith("https://youtu.be") && !url.getExpandedURL().startsWith("https://youtube.com") && !url.getExpandedURL().startsWith("https://m.youtube.com") && rss.getText()) {
+	                			else if(rss.getText())
 	                				message = message.replaceFirst(pattern, url.getExpandedURL());
-	                			}
+	                			else
+	                				message = message.replaceFirst(pattern, "");
 	                		}
 	                		//parse url
 	                		else {
-	                			if((url.getExpandedURL().endsWith(".jpg") || url.getExpandedURL().endsWith(".jpeg") || url.getExpandedURL().endsWith(".png") || url.getExpandedURL().endsWith(".gif")) && rss.getPictures()) {
-	                				message += "\n"+url.getExpandedURL();
-	                				picturePosted = true;
+	                			if((url.getExpandedURL().endsWith(".jpg") || url.getExpandedURL().endsWith(".jpeg") || url.getExpandedURL().endsWith(".png") || url.getExpandedURL().endsWith(".gif"))) {
+	                				if(rss.getPictures()) {
+	                					message += "\n"+url.getExpandedURL();
+		                				picturePosted = true;
+	                				}
 	                			}
-	                			else if((url.getExpandedURL().startsWith("https://youtu.be") || url.getExpandedURL().startsWith("https://youtube.com") || url.getExpandedURL().startsWith("https://m.youtube.com")) && rss.getVideos()) {
-	                				message += "\n"+url.getExpandedURL();
-	                				videoPosted = true;
+	                			else if((url.getExpandedURL().startsWith("https://youtu.be") || url.getExpandedURL().startsWith("https://youtube.com") || url.getExpandedURL().startsWith("https://m.youtube.com"))) {
+	                				if(rss.getVideos()) {
+	                					message += "\n"+url.getExpandedURL();
+		                				videoPosted = true;
+	                				}
 	                			}
-	                			else if(!url.getExpandedURL().endsWith(".jpg") && !url.getExpandedURL().endsWith(".jpeg") && !url.getExpandedURL().endsWith(".png") && !url.getExpandedURL().endsWith(".gif") && !url.getExpandedURL().startsWith("https://youtu.be") && !url.getExpandedURL().startsWith("https://youtube.com") && !url.getExpandedURL().startsWith("https://m.youtube.com") && rss.getText()) {
+	                			else if(rss.getText()) {
 	                				message += "\n"+url.getExpandedURL();
 	                			}
 	                		}
