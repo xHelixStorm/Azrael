@@ -268,7 +268,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						//check if the user wishes to close the rss window
 						if(!message.equalsIgnoreCase("exit")) {
 							//register a rss feed if selected
-							if(task.equals("register") && message.startsWith("http")) {
+							if(task.equals("register") && ((message.startsWith("http") && rss.getAdditionalInfo2().equals("1")) || (message.startsWith("#") && rss.getAdditionalInfo2().equals("2")))) {
 								Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 								RssExecution.registerFeed(e, message, Integer.parseInt(rss.getAdditionalInfo2()));
 							}
@@ -288,6 +288,16 @@ public class GuildMessageListener extends ListenerAdapter {
 							//do a test print of one selected feed
 							else if(task.equals("test") && message.replaceAll("[0-9]", "").length() == 0) {
 								RssExecution.runTest(e, Integer.parseInt(message)-1);
+							}
+							//change the options of a tweet
+							else if(task.equals("options") && message.replaceAll("[0-9]", "").length() == 0) {
+								RssExecution.changeOptions(e, Integer.parseInt(message)-1, "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+							}
+							//update the hashtag options
+							else if(task.equals("options-page")) {
+								final String lowCaseMessage = message.toLowerCase();
+								if(lowCaseMessage.startsWith("enable") || lowCaseMessage.startsWith("disable") || lowCaseMessage.startsWith("add-child") || lowCaseMessage.startsWith("remove-child"))
+									RssExecution.updateOptions(e, Integer.parseInt(rss.getAdditionalInfo2()), "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 							}
 						}
 						else {

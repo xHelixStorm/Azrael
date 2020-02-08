@@ -40,6 +40,7 @@ public class Rss implements CommandPublic {
 			e.getChannel().sendMessage(message.setDescription("Use this command to set up RSS pages or Twitter hashtags that will be displayed in a dedicated channel:\n\n"
 					+ "**-register**: register an rss url or twitter hashtag for this server\n"
 					+ "**-format**: change the format of how rss feeds and hashtags should be displayed\n"
+					+ "**-options**: change the options for your tweets to display only specific tweets\n"
 					+ "**-remove**: remove an rss or hashtag from this server\n"
 					+ "**-test**: picks the first rss feed or hashtag to test the settings\n"
 					+ "**-display**: display the current registered feeds and hashtags for this server").build()).queue();
@@ -85,7 +86,7 @@ public class Rss implements CommandPublic {
 			}
 			message.setColor(Color.BLUE);
 			e.getChannel().sendMessage(message.setDescription("Please select a digit for the RSS feed or hashtag to be removed:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
-			logger.debug("{} chose to remove a feed", e.getMember().getUser().getId());
+			logger.debug("{} chose to remove a feed in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			if(out.length() > 0)
 				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "remove"));
 		}
@@ -98,9 +99,26 @@ public class Rss implements CommandPublic {
 			}
 			message.setColor(Color.BLUE);
 			e.getChannel().sendMessage(message.setDescription("Please select a digit for the RSS feed or hashtag to be personalized:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
-			logger.debug("{} chose to change the format of a feed", e.getMember().getUser().getId());
+			logger.debug("{} chose to change the format of a feed in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			if(out.length() > 0)
 				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "format"));
+		}
+		else if(args[0].equalsIgnoreCase("-options")) {
+			int counter = 1;
+			StringBuilder out = new StringBuilder();
+			for(RSS feed: Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong(), 2)) {
+				out.append("**Hashtag "+counter+":** "+feed.getURL()+"\n");
+				counter++;
+			}
+			message.setColor(Color.BLUE);
+			if(out.length() > 0) {
+				e.getChannel().sendMessage(message.setDescription("Please select a digit to change the options of a hashtag:\n\n"+out.toString()).build()).queue();
+				logger.debug("{} choose to change the options of a tweet in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "options"));
+			}
+			else {
+				e.getChannel().sendMessage(message.setDescription("No hashtags for Twitter have been registered. Register at least one tweet before being able to set the options.").build()).queue();
+			}
 		}
 		else if(args[0].equalsIgnoreCase("-test")) {
 			//test a feed
@@ -112,7 +130,7 @@ public class Rss implements CommandPublic {
 			}
 			message.setColor(Color.BLUE);
 			e.getChannel().sendMessage(message.setDescription("Please select a digit for the RSS or hashtag that needs to be tested:\n\n"+(out.length() > 0 ? out.toString(): "<no rss feeds have been registered>")).build()).queue();
-			logger.debug("{} chose to change the format of a feed", e.getMember().getUser().getId());
+			logger.debug("{} chose to change the format of a feed in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			if(out.length() > 0)
 				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "test"));
 		}

@@ -2019,16 +2019,57 @@ public class Azrael {
 	}
 	
 	public static ArrayList<RSS> SQLgetRSSFeeds(long _guild_id) {
-		logger.info("SQLgetRSSFeeds launched. Params passed {}", _guild_id);
+		if(Hashes.getFeed(_guild_id) == null) {
+			logger.info("SQLgetRSSFeeds launched. Params passed {}", _guild_id);
+			ArrayList<RSS> feeds = new ArrayList<RSS>();
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				String sql = ("SELECT url, format, type, videos, pictures, text FROM rss WHERE fk_guild_id = ? ORDER BY timestamp asc");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()) {
+					feeds.add(
+						new RSS(
+							rs.getString(1),
+							rs.getString(2),
+							rs.getInt(3),
+							rs.getBoolean(4),
+							rs.getBoolean(5),
+							rs.getBoolean(6),
+							SQLgetSubTweets(_guild_id, rs.getString(1))
+						)
+					);
+				}
+				Hashes.addFeeds(_guild_id, feeds);
+				return feeds;
+			} catch (SQLException e) {
+				logger.error("SQLgetRSSFeeds Exception", e);
+				return feeds;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		return Hashes.getFeed(_guild_id);
+	}
+	
+	public static ArrayList<RSS> SQLgetRSSFeeds(long _guild_id, int _type) {
+		logger.info("SQLgetRSSFeeds launched. Params passed {}, {}", _guild_id, _type);
 		ArrayList<RSS> feeds = new ArrayList<RSS>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT url, format, type, videos, pictures, text FROM rss WHERE fk_guild_id = ? ORDER BY timestamp asc");
+			String sql = ("SELECT url, format, type, videos, pictures, text FROM rss WHERE fk_guild_id = ? AND type = ? ORDER BY timestamp asc");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
+			stmt.setInt(2, _type);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				feeds.add(
@@ -2050,6 +2091,111 @@ public class Azrael {
 			return feeds;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateRSSPictures(String _url, long _guild_id, boolean _option) {
+		logger.info("SQLUpdateRSSPictures launched. Params passed {}, {}, {}", _url, _guild_id, _option);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE rss SET pictures = ? WHERE url = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setBoolean(1, _option);
+			stmt.setString(2, _url);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateRSSPictures Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateRSSVideos(String _url, long _guild_id, boolean _option) {
+		logger.info("SQLUpdateRSSVideos launched. Params passed {}, {}, {}", _url, _guild_id, _option);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE rss SET videos = ? WHERE url = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setBoolean(1, _option);
+			stmt.setString(2, _url);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateRSSVideos Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateRSSText(String _url, long _guild_id, boolean _option) {
+		logger.info("SQLUpdateRSSText launched. Params passed {}, {}, {}", _url, _guild_id, _option);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE rss SET text = ? WHERE url = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setBoolean(1, _option);
+			stmt.setString(2, _url);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateRSSText Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLInsertChildTweet(String _urlParent, String _urlChild, long _guild_id) {
+		logger.info("SQLInsertChildTweet launched. Params passed {}, {}, {}", _urlParent, _urlChild, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("INSERT IGNORE INTO sub_tweets (parent_tweet, child_tweet, fk_guild_id) VALUES(?, ?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _urlParent);
+			stmt.setString(2, _urlChild);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertChildTweet Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteChildTweet(String _urlParent, String _urlChild, long _guild_id) {
+		logger.info("SQLDeleteChildTweet launched. Params passed {}, {}, {}", _urlParent, _urlChild, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM sub_tweets WHERE parent_tweet = ? AND child_tweet = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _urlParent);
+			stmt.setString(2, _urlChild);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteChildTweet Exception", e);
+			return 0;
+		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}

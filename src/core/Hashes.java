@@ -431,6 +431,9 @@ public class Hashes {
 	public static void clearDiscordRoles() {
 		discordRoles.clear();
 	}
+	public static void removeFeeds(long _key) {
+		feeds.remove(_key);
+	}
 	public static void clearFeeds() {
 		feeds.clear();
 	}
