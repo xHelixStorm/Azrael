@@ -23,6 +23,7 @@ import constructors.RejoinTask;
 import constructors.Roles;
 import constructors.Skills;
 import constructors.Skins;
+import constructors.SpamDetection;
 import constructors.Watchlist;
 import constructors.WeaponAbbvs;
 import constructors.WeaponStats;
@@ -88,6 +89,7 @@ public class Hashes {
     private static final ConcurrentHashMap<Long, Guilds> old_guild_settings = new ConcurrentHashMap<Long, Guilds>();
     private static final ConcurrentHashMap<Long, String> filter_threshold = new ConcurrentHashMap<Long, String>();
     private static final ConcurrentHashMap<Long, Thread> heavyCensoringThread = new ConcurrentHashMap<Long, Thread>();
+    private static final ConcurrentHashMap<String, SpamDetection> spamDetection = new ConcurrentHashMap<String, SpamDetection>();
 	
 	public static void addMessagePool(long _message_id, ArrayList<Messages> _messages) {
 		message_pool.put(_message_id, _messages);
@@ -212,7 +214,9 @@ public class Hashes {
 	public static void addHeavyCensoringThread(Long _key, Thread _thread) {
 		heavyCensoringThread.put(_key, _thread);
 	}
-	
+	public static void addSpamMessage(String _key, SpamDetection _message) {
+		spamDetection.put(_key, _message);
+	}
 	
 	public static ArrayList<Messages> getMessagePool(long _message_id) {
 		return message_pool.get(_message_id);
@@ -348,6 +352,9 @@ public class Hashes {
 	}
 	public static Thread getHeavyCensoringThread(Long _key) {
 		return heavyCensoringThread.get(_key);
+	}
+	public static SpamDetection getSpamDetection(String _key) {
+		return spamDetection.get(_key);
 	}
 	
 	public static void removeMessagePool(long _message_id) {
@@ -513,5 +520,15 @@ public class Hashes {
 	}
 	public static void removeHeavyCensoringThread(long _key) {
 		heavyCensoringThread.remove(_key);
+	}
+	public static void removeSpamDetection(String _key) {
+		spamDetection.remove(_key);
+	}
+	public static void clearExpiredSpamDetection() {
+		spamDetection.keySet().parallelStream().forEach(key -> {
+			if(spamDetection.get(key).isExpired()) {
+				spamDetection.remove(key);
+			}
+		});
 	}
 }

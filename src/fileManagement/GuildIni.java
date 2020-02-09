@@ -16,6 +16,7 @@ public class GuildIni {
 	
 	public static void initialize() {
 		LinkedHashMap<String, String> general = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> messages = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> patch = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> muteKickBan = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> pastebin = new LinkedHashMap<String, String>();
@@ -38,6 +39,13 @@ public class GuildIni {
 		general.put("EditedMessage", "false");
 		general.put("EditedMessageHistory", "false");
 		fileContent.put("General", general);
+		
+		//collect all Messages variables
+		messages.put("SpamDetection", "false");
+		messages.put("MessagesLimit", "5");
+		messages.put("MessagesOverChannelsLimit", "3");
+		messages.put("Expires", "5");
+		fileContent.put("Messages", messages);
 		
 		//collect all Patch variables
 		patch.put("PrivatePatchNotes", "true");
@@ -364,6 +372,23 @@ public class GuildIni {
 	public static boolean getEditedMessageHistory(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "EditedMessageHistory", boolean.class);
+	}
+	
+	public static boolean getSpamDetection(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Messages", "SpamDetection", boolean.class);
+	}
+	public static int getMessagesLimit(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Messages", "MessagesLimit", int.class);
+	}
+	public static int getMessageOverChannelsLimit(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Messages", "MessagesOverChannelsLimit", int.class);
+	}
+	public static long getMessageExpires(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Messages", "Expires", long.class)*60*1000;
 	}
 	
 	public static boolean getPrivatePatchNotes(long guild_id) {

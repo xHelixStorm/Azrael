@@ -11,12 +11,19 @@ import org.slf4j.LoggerFactory;
 import core.Hashes;
 import util.STATIC;
 
+/**
+ * Cache clearing for every 4 hours
+ * @author xHelixStorm
+ *
+ */
+
 public class ClearHashes extends TimerTask {
 	private final static Logger logger = LoggerFactory.getLogger(ClearHashes.class);
-	//this class is meant to clear temporary caches every 4 hours
 
 	@Override
 	public void run() {
+		//Admire the wonderful backward stairs!! Anyway, clearing cache in set interval
+		Hashes.clearExpiredSpamDetection();
 		Hashes.clearWeaponAbbreviations();
 		Hashes.clearWeaponShopContent();
 		Hashes.clearWeaponCategories();

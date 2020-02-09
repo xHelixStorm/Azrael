@@ -1,16 +1,5 @@
 package util;
 
-/**
- * The STATIC class contains the current version number of the bot,
- * global variables that get initialized from the config.ini file
- * or by passing parameters on bot launch.
- * 
- * It additionally contains methods to retrieve the mysql url String,
- * to collect running threads, to terminate specific collected threads,
- * to handle removed messages by the filter, and other things which are
- * used in multiple classes.  
- */
-
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +9,9 @@ import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -36,7 +27,10 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Cache;
 import constructors.Channels;
+import constructors.SpamDetection;
 import core.Hashes;
+import core.UserPrivs;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -52,9 +46,22 @@ import sql.DiscordRoles;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
+/**
+ * The STATIC class contains the current version number of the bot,
+ * global variables that get initialized from the config.ini file
+ * or by passing parameters on bot launch.
+ * 
+ * It additionally contains methods to retrieve the mysql url String,
+ * to collect running threads, to terminate specific collected threads,
+ * to handle removed messages by the filter, and other things which are
+ * used in multiple classes.  
+ * @author xHelixStorm
+ *
+ */
+
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
-	private static final String VERSION = "6.11.393";
+	private static final String VERSION = "6.11.394";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
@@ -368,5 +375,120 @@ public class STATIC {
 			case "nine"  -> 8;
 			default 	 -> 9;
 		};
+	}
+	
+	public static boolean spamDetected(GuildMessageReceivedEvent e) {
+		final long user_id = e.getMember().getUser().getIdLong();
+		final long guild_id = e.getGuild().getIdLong();
+		final long channel_id = e.getChannel().getIdLong();
+		final String message = e.getMessage().getContentRaw();
+		
+		//verify if the current user is spamming
+		if(GuildIni.getSpamDetection(guild_id)) {
+			//User doesn't have to be an admin, moderator or bot user and they are only allowed to spam in a bot channel
+			if(!UserPrivs.isUserBot(e.getMember()) && !UserPrivs.isUserMod(e.getMember()) && !UserPrivs.isUserAdmin(e.getMember()) && Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getChannel_Type().equals("bot")).findAny().orElse(null) == null) {
+				final int messagesLimit = GuildIni.getMessagesLimit(e.getGuild().getIdLong());
+				final int messagesOverChannelsLimit = GuildIni.getMessageOverChannelsLimit(guild_id);
+				final var cache = Hashes.getTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+				if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
+					if(cache.getAdditionalInfo().equalsIgnoreCase(message)) {
+						if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
+							final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+							if(mute != null) {
+								e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason("Muted due to spamming the same message!").queue();
+								final int warning = Azrael.SQLgetWarning(user_id, guild_id);
+								final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", "Muted due to spamming the same message", penalty);
+								Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+								return true;
+							}
+						}
+						else {
+							Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+						}
+					}
+				}
+				else if(cache != null && cache.getExpiration() - System.currentTimeMillis() <= 0)
+					Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+				
+				//collect messages
+				final String lcMessage = message.toLowerCase();
+				var spamMessages = Hashes.getSpamDetection(user_id+"_"+guild_id);
+				if(spamMessages == null) {
+					spamMessages = new SpamDetection(GuildIni.getMessageExpires(guild_id));
+					spamMessages.put(lcMessage, channel_id);
+				}
+				else if(!spamMessages.isExpired()) {
+					if(spamMessages.getMessages().get(0).getMessage().equalsIgnoreCase(lcMessage))
+						spamMessages.put(lcMessage, channel_id);
+					else {
+						spamMessages.clear();
+						spamMessages.put(lcMessage, channel_id);
+					}
+				}
+				else {
+					spamMessages.clear();
+					spamMessages.put(lcMessage, channel_id);
+				}
+				
+				//warn the user if the messages limit has been hit or directly mute if the user starts to spam a different message
+				if(messagesLimit != 0 && spamMessages.size() == messagesLimit) {
+					Hashes.removeSpamDetection(user_id+"_"+guild_id);
+					if(cache == null) {
+						e.getChannel().sendMessage(e.getMember().getAsMention()+" Spam attempt detected! Please avoid to spam or you'll be muted from the server!").queue();
+						Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage));
+					}
+					else {
+						if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
+							final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+							if(mute != null) {
+								e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason("Muted due to spamming the same message!").queue();
+								final int warning = Azrael.SQLgetWarning(user_id, guild_id);
+								final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", "Muted due to spamming the same message", penalty);
+								Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+								return true;
+							}
+						}
+						else {
+							Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+						}
+					}
+				}
+				else {
+					Set<Long> channels = new HashSet<Long>();
+					for(final var spamMessage : spamMessages.getMessages()) {
+						if(!channels.contains(spamMessage.getChannelID()))
+							channels.add(spamMessage.getChannelID());
+					}
+					if(messagesOverChannelsLimit != 0 && channels.size() == messagesOverChannelsLimit) {
+						Hashes.removeSpamDetection(user_id+"_"+guild_id);
+						if(cache == null) {
+							e.getChannel().sendMessage(e.getMember().getAsMention()+" Spam attempt detected! Please avoid to spam or you'll be muted from the server!").queue();
+							Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage));
+						}
+						else {
+							if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
+								final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+								if(mute != null) {
+									e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason("Muted due to spamming the same message!").queue();
+									final int warning = Azrael.SQLgetWarning(user_id, guild_id);
+									final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
+									Azrael.SQLInsertHistory(user_id, guild_id, "mute", "Muted due to spamming the same message", penalty);
+									Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+									return true;
+								}
+							}
+							else {
+								Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+							}
+						}
+					}
+					else if(messagesLimit != 0 || messagesOverChannelsLimit != 0)
+						Hashes.addSpamMessage(user_id+"_"+guild_id, spamMessages);
+				}
+			}
+		}
+		return false;
 	}
 }

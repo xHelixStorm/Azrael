@@ -47,6 +47,7 @@ import rankingSystem.RankingThreadExecution;
 import sql.RankingSystem;
 import sql.Azrael;
 import threads.RunQuiz;
+import util.STATIC;
 
 public class GuildMessageListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
@@ -67,7 +68,10 @@ public class GuildMessageListener extends ListenerAdapter {
 				//allow to run only one thread at the same time
 				ExecutorService executor = Executors.newSingleThreadExecutor();
 				executor.execute(() -> {
-					//execute commands first
+					if(STATIC.spamDetected(e))
+						return;
+					
+					//execute commands
 					if(e.getMessage().getContentRaw().startsWith(GuildIni.getCommandPrefix(e.getGuild().getIdLong())) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
 						var prefixLength = GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length();
 						if(!CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength).toLowerCase(), e, null))) {
