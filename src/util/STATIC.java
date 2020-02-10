@@ -61,7 +61,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
-	private static final String VERSION = "6.11.394";
+	private static final String VERSION = "6.11.395";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
@@ -330,7 +330,6 @@ public class STATIC {
 	     // Install the all-trusting host verifier
 	        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
 		} catch (KeyManagementException | NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
  
@@ -386,7 +385,7 @@ public class STATIC {
 		//verify if the current user is spamming
 		if(GuildIni.getSpamDetection(guild_id)) {
 			//User doesn't have to be an admin, moderator or bot user and they are only allowed to spam in a bot channel
-			if(!UserPrivs.isUserBot(e.getMember()) && !UserPrivs.isUserMod(e.getMember()) && !UserPrivs.isUserAdmin(e.getMember()) && Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getChannel_Type().equals("bot")).findAny().orElse(null) == null) {
+			if(!UserPrivs.isUserBot(e.getMember()) && !UserPrivs.isUserMod(e.getMember()) && !UserPrivs.isUserAdmin(e.getMember()) && Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null) == null) {
 				final int messagesLimit = GuildIni.getMessagesLimit(e.getGuild().getIdLong());
 				final int messagesOverChannelsLimit = GuildIni.getMessageOverChannelsLimit(guild_id);
 				final var cache = Hashes.getTempCache("spamDetection_gu"+guild_id+"us"+user_id);
