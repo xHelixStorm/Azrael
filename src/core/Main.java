@@ -75,7 +75,8 @@ public class Main {
 	static {System.setProperty("logback.configurationFile", "./logback.xml");}
 	public static JDABuilder builder;
 	
-	public static void main(String [] args){
+	public static void main(String [] args) {
+		
 		Logger logger = LoggerFactory.getLogger(Main.class);
 		boolean [] dir = new boolean[3];
 		dir[0] = (new File("./log")).mkdirs();
