@@ -59,6 +59,11 @@ public class GuildLeaveListener extends ListenerAdapter {
 						Hashes.clearTempCache("kick_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 						logger.debug("{} has been kicked from guild {}", e.getUser().getId(), e.getGuild().getId());
 						
+						//Run google service, if enabled
+						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
+							
+						}
+						
 						//Unwatch the kicked user, if he's being watched
 						STATIC.handleUnwatch(null, e, (short)2);
 					}
@@ -79,6 +84,11 @@ public class GuildLeaveListener extends ListenerAdapter {
 								e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(kick.setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+user_name+"** with the id number **"+e.getUser().getId()+"** got kicked from **"+guild_name+"**!\n Kicked by: "+kick_issuer+"\nReason: "+kick_reason).build()).queue();
 								Azrael.SQLInsertActionLog("MEMBER_KICK", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
 								logger.debug("{} has been kicked from guild {}", e.getUser().getId(), e.getGuild().getId());
+								
+								//Run google service, if enabled
+								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
+									
+								}
 								
 								//Unwatch the kicked user, if he's being watched
 								STATIC.handleUnwatch(null, e, (short)2);

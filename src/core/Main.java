@@ -18,6 +18,7 @@ import commands.Display;
 import commands.DoubleExperience;
 import commands.Equip;
 import commands.Filter;
+import commands.Google;
 import commands.HeavyCensoring;
 import commands.Help;
 import commands.Inventory;
@@ -201,6 +202,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("remove", new Remove());
 		CommandHandler.commandsPublic.put("heavycensoring", new HeavyCensoring());
 		CommandHandler.commandsPublic.put("mute", new Mute());
+		CommandHandler.commandsPublic.put("google", new Google());
 	}
 	
 	public static void addPrivateCommands() {

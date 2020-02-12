@@ -16,6 +16,7 @@ public class GuildIni {
 	
 	public static void initialize() {
 		LinkedHashMap<String, String> general = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> google = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> messages = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> patch = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> muteKickBan = new LinkedHashMap<String, String>();
@@ -39,6 +40,12 @@ public class GuildIni {
 		general.put("EditedMessage", "false");
 		general.put("EditedMessageHistory", "false");
 		fileContent.put("General", general);
+		
+		//collect all Google variables
+		google.put("FunctionalitiesEnabled", "false");
+		google.put("SpreadsheetsEnabled", "false");
+		google.put("DocsEnabled", "false");
+		fileContent.put("Google", google);
 		
 		//collect all Messages variables
 		messages.put("SpamDetection", "false");
@@ -108,6 +115,7 @@ public class GuildIni {
 		commands.put("Remove", "false");
 		commands.put("HeavyCensoring", "false");
 		commands.put("Mute", "false");
+		commands.put("Google", "false");
 		fileContent.put("Commands", commands);
 		
 		//collect all CommandLevels variables
@@ -193,6 +201,7 @@ public class GuildIni {
 		commandLevels.put("Remove", "20");
 		commandLevels.put("HeavyCensoring", "20");
 		commandLevels.put("Mute", "20");
+		commandLevels.put("Google", "20");
 		fileContent.put("CommandLevels", commandLevels);
 	}
 	
@@ -203,6 +212,16 @@ public class GuildIni {
 			//General
 			fileContent.get("General").forEach((key, value) -> {
 				ini.add("General", key, value);
+			});
+			
+			//Google
+			fileContent.get("Google").forEach((key, value) -> {
+				ini.add("Google", key, value);
+			});
+			
+			//General
+			fileContent.get("Messages").forEach((key, value) -> {
+				ini.add("Messages", key, value);
 			});
 			
 			//Patch
@@ -372,6 +391,19 @@ public class GuildIni {
 	public static boolean getEditedMessageHistory(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "EditedMessageHistory", boolean.class);
+	}
+	
+	public static boolean getGoogleFunctionalitiesEnabled(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Google", "FunctionalitiesEnabled", boolean.class);
+	}
+	public static boolean getGoogleSpreadsheetsEnabled(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Google", "SpreadsheetsEnabled", boolean.class);
+	}
+	public static boolean getGoogleDocsEnabled(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Google", "DocsEnabled", boolean.class);
 	}
 	
 	public static boolean getSpamDetection(long guild_id) {
@@ -925,5 +957,13 @@ public class GuildIni {
 	public static int getMuteLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "Mute", int.class);
+	}
+	public static boolean getGoogleCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Google", boolean.class);
+	}
+	public static int getGoogleLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandsLevels", "Google", int.class);
 	}
 }

@@ -16,6 +16,7 @@ import java.sql.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -69,6 +70,11 @@ public class UnbanListener extends ListenerAdapter {
 			//log action
 			logger.debug("{} has been unbanned from guild {}", user_id, e.getGuild().getName());
 			Azrael.SQLInsertActionLog("MEMBER_BAN_REMOVE", user_id, guild_id, "User Unbanned");
+			
+			//Run google service, if enabled
+			if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
+				
+			}
 		}).start();
 	}
 }

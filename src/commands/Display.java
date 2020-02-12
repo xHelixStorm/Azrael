@@ -309,6 +309,7 @@ public class Display implements CommandPublic{
 				out.append("Remove command: "+GuildIni.getRemoveLevel(e.getGuild().getIdLong())+"\n");
 				out.append("HeavyCensoring command: "+GuildIni.getHeavyCensoringLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Mute command: "+GuildIni.getMuteLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Google command: "+GuildIni.getGoogleLevel(e.getGuild().getIdLong()));
 				//print second part
 				e.getChannel().sendMessage("`"+out.toString()+"`").queue();
 			}

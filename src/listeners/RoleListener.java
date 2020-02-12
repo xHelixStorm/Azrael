@@ -166,6 +166,11 @@ public class RoleListener extends ListenerAdapter {
 						//unmute after a specific amount of time
 						new Thread(new RoleTimer(e, mute_time, log_channel, mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0, issuer, reason)).start();
 						logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getId());
+						
+						//Run google service, if enabled
+						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
+							
+						}
 					}
 					//execute this block if a regular mute has been applied
 					else {
@@ -210,6 +215,11 @@ public class RoleListener extends ListenerAdapter {
 							//run RoleTimer for automatic unmute
 							new Thread(new RoleTimer(e, mute_time, log_channel, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning, issuer, reason)).start();
 							logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getId());
+							
+							//Run google service, if enabled
+							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
+								
+							}
 						}
 						//ban or perm mute if the current warning exceeded the max allowed warning
 						else if((warning_id+1) > max_warning) {
@@ -225,12 +235,20 @@ public class RoleListener extends ListenerAdapter {
 													e.getGuild().ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").queue();
 													logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 													channel.close().queue();
+													//Run google service, if enabled
+													if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
+														
+													}
 												}, error -> {
 													if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription("The banned user with the id number **"+e.getMember().getUser().getId()+"** has locked the direct private messaging!").build()).queue();
 													//ban the user
 													e.getGuild().ban(e.getMember(), 0).reason("User has been muted after reaching the limit of max allowed mutes!").queue();
 													logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 													channel.close().queue();
+													//Run google service, if enabled
+													if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
+														
+													}
 												});
 									});
 								}
@@ -259,6 +277,11 @@ public class RoleListener extends ListenerAdapter {
 								});
 								//execute RoleTimer
 								new Thread(new RoleTimer(e, log_channel, mute_id, issuer, reason)).start();
+								
+								//Run google service, if enabled
+								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
+									
+								}
 							}
 						}
 					}

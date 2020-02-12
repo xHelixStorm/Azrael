@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Bancollect;
 import constructors.Channels;
 import core.Hashes;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -82,6 +83,11 @@ public class BanListener extends ListenerAdapter {
 					}
 					//clear cache afterwards
 					Hashes.clearTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
+					
+					//Run google service, if enabled
+					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
+						
+					}
 				}
 				else {
 					//check if the bot has permission to read the audit logs
@@ -126,6 +132,11 @@ public class BanListener extends ListenerAdapter {
 					}
 					else if(user.getWarningID() == max_warning_id) {
 						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+					}
+					
+					//Run google service, if enabled
+					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
+						
 					}
 				}
 				else {
