@@ -125,11 +125,11 @@ public class TwitterModel {
 	                			}
 	                			else if((url.getExpandedURL().endsWith(".jpg") || url.getExpandedURL().endsWith(".jpeg") || url.getExpandedURL().endsWith(".png") || url.getExpandedURL().endsWith(".gif")) && !rss.getPictures())
 	                				message = message.replaceFirst(pattern, "");
-	                			else if((url.getExpandedURL().startsWith("https://youtu.be") || url.getExpandedURL().startsWith("https://youtube.com") || url.getExpandedURL().startsWith("https://m.youtube.com")) && rss.getVideos()) {
+	                			else if((url.getDisplayURL().startsWith("youtu.be") || url.getDisplayURL().startsWith("youtube.com") || url.getDisplayURL().startsWith("m.youtube.com")) && rss.getVideos()) {
 	                				message = message.replaceFirst(pattern, url.getExpandedURL());
 	                				videoPosted = true;
 	                			}
-	                			else if((url.getExpandedURL().startsWith("https://youtu.be") || url.getExpandedURL().startsWith("https://youtube.com") || url.getExpandedURL().startsWith("https://m.youtube.com")) && !rss.getVideos())
+	                			else if((url.getDisplayURL().startsWith("youtu.be") || url.getDisplayURL().startsWith("youtube.com") || url.getDisplayURL().startsWith("m.youtube.com")) && !rss.getVideos())
 	                				message = message.replaceFirst(pattern, "");
 	                			else if(rss.getText())
 	                				message = message.replaceFirst(pattern, url.getExpandedURL());
