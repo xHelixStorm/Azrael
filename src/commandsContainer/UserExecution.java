@@ -63,9 +63,11 @@ public class UserExecution {
 			}
 		}
 		else {
-			final User user = Azrael.SQLgetUserThroughID(raw_input, _e.getGuild().getIdLong());
-			if(user != null)
+			User user = Azrael.SQLgetUserThroughID(raw_input);
+			if(user != null) {
+				user = Azrael.SQLgetJoinDatesFromUser(Long.parseLong(raw_input), _e.getGuild().getIdLong(), user);
 				user_name = user.getUserName();
+			}
 		}
 		
 		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17) && user_name != null && user_name.length() > 0) {
@@ -111,8 +113,9 @@ public class UserExecution {
 					case "information" -> {
 						final var informationLevel = GuildIni.getUserInformationLevel(_e.getGuild().getIdLong());
 						if(UserPrivs.comparePrivilege(_e.getMember(), informationLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
-							User user = Azrael.SQLgetUserThroughID(cache.getAdditionalInfo(), _e.getGuild().getIdLong());
+							User user = Azrael.SQLgetUserThroughID(cache.getAdditionalInfo());
 							if(user != null) {
+								user = Azrael.SQLgetJoinDatesFromUser(user_id, _e.getGuild().getIdLong(), user);
 								message.setTitle("Here the requested information!");
 								if(user.getAvatar() != null)
 									message.setThumbnail(user.getAvatar());

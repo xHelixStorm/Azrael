@@ -426,28 +426,56 @@ public class Azrael {
 		}
 	}
 	
-	public static User SQLgetUserThroughID(String _user_id, long _guild_id) {
-		logger.info("SQLgetUserThroughID launched. Passed params {}, {}", _user_id, _guild_id);
+	public static User SQLgetUserThroughID(String _user_id) {
+		logger.info("SQLgetUserThroughID launched. Passed params {}", _user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT user_id, (SELECT fk_guild_id FROM join_dates WHERE fk_guild_id = ? AND fk_user_id = user_id AND first_join = 1) AS guild_id, name, avatar_url, (SELECT join_date FROM join_dates WHERE fk_user_id = user_id AND fk_guild_id = ? AND first_join = 1) AS original_join_date, (SELECT join_date FROM join_dates WHERE fk_user_id = user_id AND fk_guild_id = ? AND first_join = 0) AS newest_join_date FROM users WHERE user_id = ?");
+			String sql = ("SELECT * FROM users WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _guild_id);
-			stmt.setLong(3, _guild_id);
-			stmt.setString(4, _user_id);
+			stmt.setString(1, _user_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				if(rs.getLong(2) == _guild_id)
-					return new User(rs.getLong(1), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6));
+				return new User(rs.getLong(1), rs.getString(2), rs.getString(3));
 			}
 			return null;
 		} catch (SQLException e) {
 			logger.error("SQLgetUserThroughID Exception", e);
 			return null;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static User SQLgetJoinDatesFromUser(long _user_id, long _guild_id, User _user) {
+		logger.info("SQLgetJoinDatesFromUser launched. Passed params {}, {}, User object", _user_id, _guild_id);
+		String originalJoinDate = "N/A";
+		String newestJoinDate = "N/A";
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT join_date FROM join_dates WHERE fk_user_id = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			rs = stmt.executeQuery();
+			int count = 0;
+			while(rs.next()) {
+				if(count == 0)
+					originalJoinDate = rs.getString(1);
+				else
+					newestJoinDate = rs.getString(1);
+				count++;
+			}
+			return _user.setJoinDates(originalJoinDate, newestJoinDate);
+		} catch (SQLException e) {
+			logger.error("SQLgetJoinDatesFromUser Exception", e);
+			return _user.setJoinDates(originalJoinDate, newestJoinDate);
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
