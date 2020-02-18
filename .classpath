@@ -53,5 +53,6 @@
 	<classpathentry kind="lib" path="lib/opencensus-contrib-http-util-0.24.0.jar"/>
 	<classpathentry kind="lib" path="lib/grpc-context-1.27.0.jar"/>
 	<classpathentry kind="lib" path="lib/google-api-services-sheets-v4-rev606-1.25.0.jar"/>
+	<classpathentry kind="lib" path="lib/google-api-services-drive-v3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

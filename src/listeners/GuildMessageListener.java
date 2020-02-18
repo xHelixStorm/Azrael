@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import com.vdurmont.emoji.EmojiManager;
 
 import commandsContainer.FilterExecution;
+import commandsContainer.GoogleSpreadsheetsExecution;
 import commandsContainer.PurchaseExecution;
 import commandsContainer.RssExecution;
 import commandsContainer.SetWarning;
@@ -359,6 +360,26 @@ public class GuildMessageListener extends ListenerAdapter {
 									}
 								}
 							}
+						}
+					}
+					
+					//check if the google command has been used
+					final var google = Hashes.getTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+					if(google != null) {
+						if(!message.equalsIgnoreCase("exit")) {
+							//actions for google docs
+							if(google.getAdditionalInfo().equals("docs")) {
+								
+							}
+							
+							//actions for google spreadsheets
+							else if(google.getAdditionalInfo().equals("spreadsheets")) {
+								GoogleSpreadsheetsExecution.runTask(e);
+							}
+						}
+						else {
+							//remove the google command from cache
+							Hashes.clearTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 						}
 					}
 				});

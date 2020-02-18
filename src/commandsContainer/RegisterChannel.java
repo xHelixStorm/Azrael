@@ -64,44 +64,25 @@ public class RegisterChannel {
 					var result = 0;
 					switch(channel_type) {
 						case "eng", "ger", "fre", "tur", "rus", "spa", "por", "ita", "all" -> {
-							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
-							if(result > 0) {
-								result = Azrael.SQLDeleteChannel_Filter(channel_id);
-								if(result > 0) {
-									result = Azrael.SQLInsertChannel_Filter(channel_id, channel_type);
-									if(result == 0)
-										logger.error("New channel filter {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
-								}
-								else
-									logger.error("Channel filter for channel {} couldn't be cleared before inserting the new filter in guild {}", channel_id, _guild_id);
-							}
-							else
-								logger.error("Channel type {} couldn't be saved for channel {} into Azrael.channel_conf for guild {]", channel_type, channel_id, _guild_id);
+							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
+							Azrael.SQLDeleteChannel_Filter(channel_id);
+							result = Azrael.SQLInsertChannel_Filter(channel_id, channel_type);
+							if(result == 0)
+								logger.error("New channel filter {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
 						}
 						case "bot", "mus" -> {
-							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
-							if(result > 0) {
-								result = Azrael.SQLDeleteChannel_Filter(channel_id);
-								if(result > 0) {
-									result = Azrael.SQLInsertChannel_Filter(channel_id, "all");
-									if(result == 0)
-										logger.error("New channel filter all couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_id, _guild_id);
-								}
-								else
-									logger.error("Channel filter for channel {} couldn't be cleared before inserting the new filter in guild {}", channel_id, _guild_id);
-							}
-							else
-								logger.error("Channel type {} couldn't be saved for channel {} into Azrael.channel_conf for guild {]", channel_type, channel_id, _guild_id);
+							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
+							Azrael.SQLDeleteChannel_Filter(channel_id);
+							result = Azrael.SQLInsertChannel_Filter(channel_id, "all");
+							if(result == 0)
+								logger.error("New channel filter all couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_id, _guild_id);
+							
 						}
 						case "log", "tra", "rea", "qui", "rss", "wat", "del", "edi" -> {
-							result = Azrael.SQLDeleteChannelType(channel_type, _guild_id);
-							if(result > 0) {
-								result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
-								if(result == 0)
-									logger.error("New channel filter {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
-							}
-							else
-								logger.error("Old channel type {} couldn't be deleted for channel {} in guild {} from Azrael.channel_conf", channel_type, channel_id, _guild_id);
+							Azrael.SQLDeleteChannelType(channel_type, _guild_id);
+							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
+							if(result == 0)
+								logger.error("New channel filter {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
 						}
 					}
 					Hashes.removeChannels(_guild_id);

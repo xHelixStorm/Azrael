@@ -9,15 +9,14 @@ public class GoogleDocuments {
 	
 	/**
 	 * Retrieve documents service
-	 * @param guild_id to retrieve the credentials from
 	 * @return Documents service
 	 * @throws Exception Any error along the way
 	 */
 	
-	public static Docs getDocumentClientService(final long guild_id) throws Exception {
+	public static Docs getDocumentClientService() throws Exception {
 		//Build a new authorized API client service
 		final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-		return new Docs.Builder(httpTransport, GoogleUtils.getJacksonFactory(), GoogleUtils.getCredentials(httpTransport, guild_id, "docs"))
+		return new Docs.Builder(httpTransport, GoogleUtils.getJacksonFactory(), GoogleUtils.getCredentials(httpTransport, "docs"))
 			.setApplicationName("Azrael")
 			.build();
 	}

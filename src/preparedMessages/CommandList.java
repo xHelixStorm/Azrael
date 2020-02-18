@@ -10,15 +10,15 @@ public class CommandList {
 		boolean entertainment = false;
 		boolean other = false;
 		
-		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getRssCommand(guild_id)) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoringCommand(guild_id) || GuildIni.getMuteCommand(guild_id)) {
+		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getRssCommand(guild_id) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoringCommand(guild_id) || GuildIni.getMuteCommand(guild_id) || GuildIni.getGoogleCommand(guild_id))) {
 			administration = true;
 		}
 		
-		if(GuildIni.getEquipCommand(guild_id) || GuildIni.getPugCommand(guild_id) || GuildIni.getMeowCommand(guild_id) || GuildIni.getRankCommand(guild_id) || GuildIni.getProfileCommand(guild_id) || GuildIni.getTopCommand(guild_id) || GuildIni.getUseCommand(guild_id) || GuildIni.getShopCommand(guild_id) || GuildIni.getInventoryCommand(guild_id) || GuildIni.getDailyCommand(guild_id) || GuildIni.getQuizCommand(guild_id) || GuildIni.getRandomshopCommand(guild_id)){
+		if(GuildIni.getEquipCommand(guild_id) || GuildIni.getPugCommand(guild_id) || GuildIni.getMeowCommand(guild_id) || GuildIni.getRankCommand(guild_id) || GuildIni.getProfileCommand(guild_id) || GuildIni.getTopCommand(guild_id) || GuildIni.getUseCommand(guild_id) || GuildIni.getShopCommand(guild_id) || GuildIni.getInventoryCommand(guild_id) || GuildIni.getDailyCommand(guild_id) || GuildIni.getQuizCommand(guild_id) || GuildIni.getRandomshopCommand(guild_id) || GuildIni.getEquipCommand(guild_id)) {
 			entertainment = true;
 		}
 		
-		if(GuildIni.getAboutCommand(guild_id) || GuildIni.getHelpCommand(guild_id) || GuildIni.getDisplayCommand(guild_id) || GuildIni.getPatchnotesCommand(guild_id)){
+		if(GuildIni.getAboutCommand(guild_id) || GuildIni.getHelpCommand(guild_id) || GuildIni.getDisplayCommand(guild_id) || GuildIni.getPatchnotesCommand(guild_id)) {
 			other = true;
 		}
 		

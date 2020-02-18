@@ -2,7 +2,6 @@ package google;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,6 +10,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.docs.v1.DocsScopes;
+import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.sheets.v4.SheetsScopes;
 
 /**
@@ -24,29 +24,27 @@ public class GoogleUtils {
 	private static final JacksonFactory jacksonFactory = JacksonFactory.getDefaultInstance();
 	private static final List<String> SCOPESDOCS = Collections.singletonList(DocsScopes.DOCUMENTS);
 	private static final List<String> SCOPESSHEETS = Collections.singletonList(SheetsScopes.SPREADSHEETS);
+	private static final List<String> SCOPESDRIVE = Collections.singletonList(DriveScopes.DRIVE);
 	
 	/**
 	 * Retrieve credentials
 	 * @param httpTransport Trusted GoogleNetHttpTransport
-	 * @param guild_id load json from location
 	 * @return Credential
 	 * @throws Exception File error / other errors
 	 */
 	
 	@SuppressWarnings({ "preview" })
-	public static Credential getCredentials(final NetHttpTransport httpTransport, final long guild_id, final String type) throws Exception {
-		//Load client secrets
-		InputStream in = new FileInputStream(new File("files/Google/credentials.json"));
-		
+	public static Credential getCredentials(final NetHttpTransport httpTransport, final String type) throws Exception {
 		//use the fitting scopes
 		List<String> scopes;
 		switch(type) {
 			case "docs" -> scopes = SCOPESDOCS;
 			case "sheets" -> scopes = SCOPESSHEETS;
+			case "drive" -> scopes = SCOPESDRIVE;
 			default -> scopes = null;
 		}
 		
-		return GoogleCredential.fromStream(in).createScoped(scopes);
+		return GoogleCredential.fromStream(new FileInputStream(new File("files/Google/credentials.json"))).createScoped(scopes);
 	}
 	
 	/**
