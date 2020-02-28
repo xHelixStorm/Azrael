@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Bancollect;
 import constructors.Channels;
+import constructors.GoogleAPISetup;
+import constructors.GoogleEvents;
 import constructors.History;
 import constructors.NameFilter;
 import constructors.RSS;
@@ -2581,7 +2583,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteWatchlist(long _user_id, long _guild_id) {
-		logger.info("SQLDeleteWatchlist launched. Passed params {}, {}, {}, {}", _user_id, _guild_id);
+		logger.info("SQLDeleteWatchlist launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2593,6 +2595,253 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteWatchlist Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static List<GoogleAPISetup> SQLgetGoogleAPISetupOnGuildAndAPI(long _guild_id, int _api_id) {
+		logger.info("SQLgetGoogleAPISetupOnGuild launched. Params passed {}, {}", _guild_id, _api_id);
+		ArrayList<GoogleAPISetup> setup = new ArrayList<GoogleAPISetup>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT * FROM google_apis_setup_view WHERE fk_guild_id = ? AND fk_api_id = ? ORDER BY timestamp asc");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setInt(2, _api_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				setup.add(new GoogleAPISetup(rs.getString(1), rs.getString(3), rs.getInt(4), rs.getString(5)));
+			}
+			return setup;
+		} catch (SQLException e) {
+			logger.error("SQLgetGoogleAPISetupOnGuild Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLInsertGoogleAPISetup(String _file_id, long _guild_id, String _title, int _api_id) {
+		logger.info("SQLInsertGoogleAPISetup launched. Passed params {}, {}, {}, {}", _file_id, _guild_id, _title, _api_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("INSERT INTO google_apis_setup (file_id, fk_guild_id, title, fk_api_id) VALUES(?, ?, ?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _file_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, _title);
+			stmt.setInt(4, _api_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertGoogleAPISetup Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteGoogleAPISetup(String _file_id, long _guild_id) {
+		logger.info("SQLDeleteGoogleAPISetup launched. Passed params {}, {}, {}, {}", _file_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM google_apis_setup WHERE file_id = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _file_id);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteGoogleAPISetup Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<GoogleEvents> SQLgetGoogleEventsSupportSpreadsheet() {
+		logger.info("SQLgetGoogleEventsSupportSpreadsheet launched. No params passed");
+		ArrayList<GoogleEvents> events = new ArrayList<GoogleEvents>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT * FROM google_event_types WHERE support_spreadsheets = 1");
+			stmt = myConn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				events.add(new GoogleEvents(rs.getInt(1), rs.getString(2), rs.getBoolean(3), rs.getBoolean(4), rs.getBoolean(5)));
+			}
+			return events;
+		} catch (SQLException e) {
+			logger.error("SQLgetGoogleEventsSupportSpreadsheet Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLBatchInsertGoogleFileToEventLink(String _file_id, List<Integer> _events) {
+		logger.info("SQLBatchInsertGoogleFileToEventLink launched. Passed params {}, array", _file_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("INSERT INTO google_file_to_event (fk_file_id, fk_event_id) VALUES(?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			for(final int event: _events) {
+				stmt.setString(1, _file_id);
+				stmt.setInt(2, event);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			return true;
+		} catch (SQLException e) {
+			logger.error("SQLBatchInsertGoogleFileToEventLink Exception", e);
+			return false;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLBatchDeleteGoogleSpreadsheetSheet(String _file_id, List<Integer> _events) {
+		logger.info("SQLBatchDeleteGoogleSpreadsheetSheet launched. Passed params {}, array", _file_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM google_spreadsheet_sheet WHERE fk_file_id = ? AND fk_event_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			for(final int event: _events) {
+				stmt.setString(1, _file_id);
+				stmt.setInt(2, event);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			return true;
+		} catch (SQLException e) {
+			logger.error("SQLBatchDeleteGoogleSpreadsheetSheet Exception", e);
+			return false;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteGoogleSpreadsheetSheet(String _file_id) {
+		logger.info("SQLDeleteGoogleSpreadsheetSheet launched. Passed params {}", _file_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM google_spreadsheet_sheet WHERE fk_file_id = ? AND fk_event_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _file_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteGoogleSpreadsheetSheet Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLBatchDeleteGoogleSpreadsheetMapping(String _file_id, List<Integer> _events) {
+		logger.info("SQLBatchDeleteGoogleSpreadsheetMapping launched. Passed params {}, array", _file_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM google_spreadsheet_mapping WHERE fk_file_id = ? AND fk_event_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			for(final int event: _events) {
+				stmt.setString(1, _file_id);
+				stmt.setInt(2, event);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			return true;
+		} catch (SQLException e) {
+			logger.error("SQLBatchDeleteGoogleSpreadsheetMapping Exception", e);
+			return false;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteGoogleSpreadsheetMapping(String _file_id) {
+		logger.info("SQLDeleteGoogleSpreadsheetMapping launched. Passed params {}", _file_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM google_spreadsheet_mapping WHERE fk_file_id = ? AND fk_event_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _file_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteGoogleSpreadsheetMapping Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLBatchDeleteGoogleFileToEvent(String _file_id, List<Integer> _events) {
+		logger.info("SQLBatchDeleteGoogleFileToEvent launched. Passed params {}, array", _file_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM google_file_to_event WHERE fk_file_id = ? AND fk_event_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			for(final int event: _events) {
+				stmt.setString(1, _file_id);
+				stmt.setInt(2, event);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			return true;
+		} catch (SQLException e) {
+			logger.error("SQLBatchDeleteGoogleFileToEvent Exception", e);
+			return false;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteGoogleFileToEvent(String _file_id) {
+		logger.info("SQLDeleteGoogleFileToEvent launched. Passed params {}", _file_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM google_file_to_event WHERE fk_file_id = ? AND fk_event_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _file_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteGoogleFileToEvent Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

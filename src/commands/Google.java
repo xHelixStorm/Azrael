@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
+import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -40,7 +41,13 @@ public class Google implements CommandPublic {
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		//print help message and all currently available APIs
 		if(args.length == 0) {
-			e.getChannel().sendMessage(message.setDescription("Make use of a google API and assign events upon to interact with any available platform of google. For example google docs / spreadsheets.\n"
+			String email;
+			String [] credentialContent = FileSetting.readFileIntoFixedArray("./files/Google/credentials.json");
+			if(credentialContent.length > 0)
+				email = credentialContent[4].replaceAll("\"client-email\":", "").replaceAll("[\",]", "").trim();
+			else 
+				email = "N/A";
+			e.getChannel().sendMessage(message.setDescription("Make use of a google API and assign events upon to interact with any available platform of google. For example google docs / spreadsheets. Operations on these files are handled by **"+email+"**\n"
 				+ "Available APIs and parameters:\n\n"
 				+ "**docs**: build an interface with google docs\n"
 				+ "**spreadsheets** : build an interface with google spreadsheets").build()).queue();

@@ -41,14 +41,28 @@ public class GoogleSheets {
 	/**
 	 * Create a new spreadsheet and return the id
 	 * @param service Sheets client service
+	 * @param title Title for the new spreadsheet
 	 * @return spreadsheet id
 	 * @throws IOException
 	 */
 	
-	public static String createSpreadsheet(final Sheets service) throws IOException {
+	public static String createSpreadsheet(final Sheets service, final String title) throws IOException {
 		//create Spreadsheet
-		Spreadsheet spreadsheet = new Spreadsheet().setProperties(new SpreadsheetProperties().setTitle("New Spreadsheet"));
+		Spreadsheet spreadsheet = new Spreadsheet().setProperties(new SpreadsheetProperties().setTitle(title));
 		Spreadsheet result = service.spreadsheets().create(spreadsheet).execute();
 		return result.getSpreadsheetId();
+	}
+	
+	/**
+	 * Retrieve an accessible spreadsheet
+	 * @param service Sheets client service
+	 * @param file_id ID of the file on google drive
+	 * @return Spreadsheet object
+	 * @throws IOException
+	 */
+	
+	public static Spreadsheet getSpreadsheet(final Sheets service, final String file_id) throws IOException {
+		Spreadsheet result = service.spreadsheets().get(file_id).execute();
+		return result;
 	}
 }

@@ -43,6 +43,7 @@ public class GuildIni {
 		
 		//collect all Google variables
 		google.put("FunctionalitiesEnabled", "false");
+		google.put("MainEmail", "");
 		google.put("SpreadsheetsEnabled", "false");
 		google.put("DocsEnabled", "false");
 		fileContent.put("Google", google);
@@ -396,6 +397,10 @@ public class GuildIni {
 	public static boolean getGoogleFunctionalitiesEnabled(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Google", "FunctionalitiesEnabled", boolean.class);
+	}
+	public static String getGoogleMainEmail(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Google", "MainEmail");
 	}
 	public static boolean getGoogleSpreadsheetsEnabled(long guild_id) {
 		Ini ini = readIni(guild_id);

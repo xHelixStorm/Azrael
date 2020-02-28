@@ -55,4 +55,20 @@ public class GoogleUtils {
 	public static JacksonFactory getJacksonFactory() {
 		return jacksonFactory;
 	}
+	
+	/**
+	 * Build a url depending on the api id
+	 * @param file_id
+	 * @param api_id
+	 * @return
+	 */
+	
+	@SuppressWarnings("preview")
+	public static String buildFileURL(String file_id, int api_id) {
+		return switch(api_id) {
+			case 1 -> "https://docs.google.com/document/d/"+file_id;
+			case 2 -> "https://docs.google.com/spreadsheets/d/"+file_id;
+			default -> "";
+		};
+	}
 }
