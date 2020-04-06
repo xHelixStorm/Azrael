@@ -127,7 +127,7 @@ public class GuildMessageEditListener extends ListenerAdapter{
 						if(messages.size() == 2) {
 							for(final var message : messages) {
 								final var printMessage = "["+message.getTime().toString()+" - "+message.getUserName()+" ("+message.getUserID()+")]:\n"+message.getMessage();
-								e.getGuild().getTextChannelById(destinationChannel).sendMessage(new EmbedBuilder().setTitle("Message history after edit. Message "+(++messageCounter)+" / "+messages.size())
+								e.getGuild().getTextChannelById(destinationChannel).sendMessage(new EmbedBuilder().setTitle("Message history after edit. Message "+(++messageCounter))
 									.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 							}
 						}
@@ -135,7 +135,7 @@ public class GuildMessageEditListener extends ListenerAdapter{
 							int num = messages.size();
 							final var message = messages.get(num-1);
 							final var printMessage = "["+message.getTime().toString()+" - "+message.getUserName()+" ("+message.getUserID()+")]:\n"+message.getMessage();
-							e.getGuild().getTextChannelById(destinationChannel).sendMessage(new EmbedBuilder().setTitle("Message history after edit. Message "+num+" / "+num)
+							e.getGuild().getTextChannelById(destinationChannel).sendMessage(new EmbedBuilder().setTitle("Message history after edit. Message "+num)
 									.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 						}
 					}
