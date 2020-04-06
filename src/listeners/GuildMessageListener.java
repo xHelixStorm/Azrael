@@ -365,7 +365,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					
 					//check if the google command has been used
 					final var google = Hashes.getTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-					if(google != null) {
+					if(google != null && google.getExpiration() - System.currentTimeMillis() > 0) {
 						final String key = "google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
 						final String lcMessage = message.toLowerCase();
 						if(!lcMessage.equals("exit")) {
@@ -389,12 +389,32 @@ public class GuildMessageListener extends ListenerAdapter {
 									GoogleSpreadsheetsExecution.events(e, key);
 								else if(lcMessage.startsWith("sheet"))
 									GoogleSpreadsheetsExecution.sheet(e, key);
+								else if(lcMessage.startsWith("map"))
+									GoogleSpreadsheetsExecution.map(e, key);
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-events") && lcMessage.matches("[\\d]*")) {
 								GoogleSpreadsheetsExecution.eventsFileSelection(e, Integer.parseInt(message)-1, key);
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-events-update") && (lcMessage.startsWith("add ") || lcMessage.startsWith("remove "))) {
 								GoogleSpreadsheetsExecution.eventsFileHandler(e, lcMessage, google.getAdditionalInfo2(), key);
+							}
+							else if(google.getAdditionalInfo().equals("spreadsheets-sheet") && lcMessage.matches("[\\d]*")) {
+								GoogleSpreadsheetsExecution.sheetSelection(e, Integer.parseInt(message)-1, key);
+							}
+							else if(google.getAdditionalInfo().equals("spreadsheets-sheet-events")) {
+								GoogleSpreadsheetsExecution.sheetEvents(e, google.getAdditionalInfo2(), message.toUpperCase(), key);
+							}
+							else if(google.getAdditionalInfo().equals("spreadsheets-sheet-update")) {
+								GoogleSpreadsheetsExecution.sheetUpdate(e, google.getAdditionalInfo2(), google.getAdditionalInfo3(), message, key);
+							}
+							else if(google.getAdditionalInfo().equals("spreadsheets-map") && lcMessage.matches("[\\d]*")) {
+								GoogleSpreadsheetsExecution.map(e, key);
+							}
+							else if(google.getAdditionalInfo().equals("spreadsheets-map-events")) {
+								GoogleSpreadsheetsExecution.mapEvents(e, google.getAdditionalInfo2(), message.toUpperCase(), key);
+							}
+							else if(google.getAdditionalInfo().equals("spreadsheets-map-update")) {
+								GoogleSpreadsheetsExecution.mapUpdate(e, google.getAdditionalInfo2(), Integer.parseInt(google.getAdditionalInfo3()), lcMessage, key);
 							}
 						}
 						else {

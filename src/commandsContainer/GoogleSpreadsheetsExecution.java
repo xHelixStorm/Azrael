@@ -13,6 +13,8 @@ import com.google.api.services.sheets.v4.model.Spreadsheet;
 import constructors.Cache;
 import constructors.GoogleAPISetup;
 import core.Hashes;
+import enums.GoogleDD;
+import enums.GoogleEvent;
 import fileManagement.GuildIni;
 import google.GoogleDrive;
 import google.GoogleSheets;
@@ -182,12 +184,12 @@ public class GoogleSpreadsheetsExecution {
 				final GoogleAPISetup currentSetup = setup.get(i);
 				out.append("**"+(i+1)+"**:\nTITLE: "+currentSetup.getTitle()+"\nURL:   "+GoogleUtils.buildFileURL(currentSetup.getFileID(), currentSetup.getApiID())+"\nTYPE:  "+currentSetup.getAPI()+"\n\n");
 			}
-			e.getChannel().sendMessage(message.setDescription("The following spreadsheets are linked. Please select a file that you wish to add or remove events from:\n\n"+out.toString()).build()).queue();
+			e.getChannel().sendMessage(message.setDescription("The following spreadsheets are linked. Please select a spreadsheet that you wish to add or remove events from:\n\n"+out.toString()).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-events"));
 		}
 		else {
 			//nothing found information
-			e.getChannel().sendMessage(message.setDescription("No linked file has been found. Please link / create a google file before using this command!").build()).queue();
+			e.getChannel().sendMessage(message.setDescription("No linked file has been found. Please link / create a google spreadsheet before using this command!").build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
 	}
@@ -293,7 +295,7 @@ public class GoogleSpreadsheetsExecution {
 		var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
 		if(setup == null) {
 			//db error
-			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Files from database couldn't be retrieved").build()).queue();
+			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Spreadsheets from database couldn't be retrieved").build()).queue();
 			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
@@ -304,17 +306,201 @@ public class GoogleSpreadsheetsExecution {
 				final GoogleAPISetup currentSetup = setup.get(i);
 				out.append("**"+(i+1)+"**:\nTITLE: "+currentSetup.getTitle()+"\nURL:   "+GoogleUtils.buildFileURL(currentSetup.getFileID(), currentSetup.getApiID())+"\nTYPE:  "+currentSetup.getAPI()+"\n\n");
 			}
-			e.getChannel().sendMessage(message.setDescription("The following spreadsheets are linked. Please select a file that you wish to configure the starting point:\n\n"+out.toString()).build()).queue();
+			e.getChannel().sendMessage(message.setDescription("The following spreadsheets are linked. Please select a spreadsheet to edit the starting point through the shown number:\n\n"+out.toString()).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-sheet"));
 		}
 		else {
 			//nothing found information
-			e.getChannel().sendMessage(message.setDescription("No linked file has been found. Please link / create a google file before using this command!").build()).queue();
+			e.getChannel().sendMessage(message.setDescription("No linked spreadsheet has been found. Please link / create a google spreadsheet before using this command!").build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
 	}
 	
+	public static void sheetSelection(GuildMessageReceivedEvent e, int selection, final String key) {
+		final var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
+		if(setup == null) {
+			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Spreadsheets from database couldn't be retrieved. Returning to the spreadsheets parameters selection page...").build()).queue();
+			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+		}
+		else if(selection >= 0 && selection < setup.size()) {
+			final var file = setup.get(selection);
+			final var events = Azrael.SQLgetGoogleLinkedEvents(file.getFileID());
+			if(events == null) {
+				e.getChannel().sendMessage(error.setDescription("An internal error occurred! Linked events couldn't be retrieved. Returning to the spreadsheets parameter selection page...").build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+				logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file.getFileID());
+			}
+			else if(events.size() > 0) {
+				StringBuilder out = new StringBuilder();
+				int count = 0;
+				for(final int event : events) {
+					if(count == 0)
+						out.append("`"+GoogleEvent.valueOfId(event).value+"`");
+					else
+						out.append(",`"+GoogleEvent.valueOfId(event).value+"`");
+					count++;
+				}
+				e.getChannel().sendMessage(message.setDescription("**"+GoogleUtils.buildFileURL(file.getFileID(), 2)+"**\nNow please select an event before defining the starting point by typing the name of the event. These are the events to choose from:\n"+out.toString()).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-sheet-events", file.getFileID()));
+			}
+			else {
+				e.getChannel().sendMessage(error.setDescription("There's no event linked to this spreadsheet. Please link it to one or more events before proceeding. Returning to the spreadsheets parameters selection page...").build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+			}
+		}
+	}
+	
+	public static void sheetEvents(GuildMessageReceivedEvent e, String file_id, String event, final String key) {
+		final var events = Azrael.SQLgetGoogleLinkedEvents(file_id);
+		if(events == null || events.size() == 0) {
+			e.getChannel().sendMessage(error.setDescription("An internal error occurred! Linked events couldn't be retrieved. Returning to the spreadsheets parameter selection page...").build()).queue();
+			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+			logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file_id);
+		}
+		else {
+			GoogleEvent EVENT = GoogleEvent.valueOfEvent(event);
+			if(EVENT != null && events.parallelStream().filter(f -> f == EVENT.id).findAny().orElse(null) != null) {
+				e.getChannel().sendMessage(message.setDescription("**"+GoogleUtils.buildFileURL(file_id, 2)+"**\nNow please submit the starting point (e.g. 'A1'). If there are multiple sheets, please write the name of the sheet and then the starting point (e.g. 'Sheet1!A1')").build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-sheet-update", file_id, event));
+			}
+		}
+	}
+	
+	public static void sheetUpdate(GuildMessageReceivedEvent e, String file_id, String event, String startingPoint, final String key) {
+		if(startingPoint.matches("([a-zA-Z0-9\\s]{0}|[a-zA-Z0-9\\s]{1,}[a-zA-Z]{1}[!]{1})[A-Z]{1,3}[1-9]{1}[0-9]*")) {
+			if(Azrael.SQLInsertGoogleSpreadsheetSheet(file_id, GoogleEvent.valueOfEvent(event).id, startingPoint) > 0) {
+				e.getChannel().sendMessage(message.setDescription("The starting point has been saved for this spreadsheet and event! Returning to the spreadsheets parameter selection page...").build()).queue();
+				logger.debug("Google spreadsheet starting point updated for guild {}, spreadsheet {}, event {} with value {}", e.getGuild().getId(), file_id, event, startingPoint);
+			}
+			else {
+				e.getChannel().sendMessage(error.setDescription("An internal error occurred! Starting point couldn't be updated! Returning to the spreadsheets parameter selection page...").build()).queue();
+				logger.error("Google spreadsheet starting point couldn't be updated for guild {}, spreadsheet {}, event {} with value {}", e.getGuild().getId(), file_id, event, startingPoint);
+			}
+		}
+	}
+	
 	public static void map(GuildMessageReceivedEvent e, final String key) {
-		
+		var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
+		if(setup == null) {
+			//db error
+			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Spreadsheets from database couldn't be retrieved").build()).queue();
+			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+		}
+		else if(setup.size() > 0) {
+			//list files
+			StringBuilder out = new StringBuilder();
+			for(int i = 0; i < setup.size(); i++) {
+				final GoogleAPISetup currentSetup = setup.get(i);
+				out.append("**"+(i+1)+"**:\nTITLE: "+currentSetup.getTitle()+"\nURL:   "+GoogleUtils.buildFileURL(currentSetup.getFileID(), currentSetup.getApiID())+"\nTYPE:  "+currentSetup.getAPI()+"\n\n");
+			}
+			e.getChannel().sendMessage(message.setDescription("The following spreadsheets are linked. Please select a spreadsheet to map the columns with a data dictionary item through the shown number:\n\n"+out.toString()).build()).queue();
+			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-map"));
+		}
+		else {
+			//nothing found information
+			e.getChannel().sendMessage(message.setDescription("No linked spreadsheet has been found. Please link / create a google spreadsheet before using this command!").build()).queue();
+			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+		}
+	}
+	
+	public static void mapSelection(GuildMessageReceivedEvent e, int selection, final String key) {
+		final var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
+		if(setup == null) {
+			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Spreadsheets from database couldn't be retrieved. Returning to the spreadsheets parameters selection page...").build()).queue();
+			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+		}
+		else if(selection >= 0 && selection < setup.size()) {
+			final var file = setup.get(selection);
+			final var events = Azrael.SQLgetGoogleLinkedEvents(file.getFileID());
+			if(events == null) {
+				e.getChannel().sendMessage(error.setDescription("An internal error occurred! Linked events couldn't be retrieved. Returning to the spreadsheets parameter selection page...").build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+				logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file.getFileID());
+			}
+			else if(events.size() > 0) {
+				StringBuilder out = new StringBuilder();
+				int count = 0;
+				for(final int event : events) {
+					if(count == 0)
+						out.append("`"+GoogleEvent.valueOfId(event).value+"`");
+					else
+						out.append(",`"+GoogleEvent.valueOfId(event).value+"`");
+					count++;
+				}
+				e.getChannel().sendMessage(message.setDescription("**"+GoogleUtils.buildFileURL(file.getFileID(), 2)+"**\nNow please select an event before defining the starting point by typing the name of the event. These are the events to choose from:\n"+out.toString()).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-map-events", file.getFileID()));
+			}
+			else {
+				e.getChannel().sendMessage(error.setDescription("There's no event linked to this spreadsheet. Please link it to one or more events before proceeding. Returning to the spreadsheets parameters selection page...").build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+			}
+		}
+	}
+	
+	public static void mapEvents(GuildMessageReceivedEvent e, String file_id, String event, final String key) {
+		final var events = Azrael.SQLgetGoogleLinkedEvents(file_id);
+		if(events == null || events.size() == 0) {
+			e.getChannel().sendMessage(error.setDescription("An internal error occurred! Linked events couldn't be retrieved. Returning to the spreadsheets parameter selection page...").build()).queue();
+			logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file_id);
+			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+		}
+		else {
+			GoogleEvent EVENT = GoogleEvent.valueOfEvent(event);
+			if(EVENT != null && events.parallelStream().filter(f -> f == EVENT.id).findAny().orElse(null) != null) {
+				final var items = Azrael.SQLgetGoogleEventsToDD(2, EVENT.id);
+				if(items == null) {
+					e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Available data dictionary items for the mapping couldn't be retrieved! Returning to the spreadsheets parameter selection page...").build()).queue();
+					Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+					logger.error("Data dictionary items couldn't be retrieved from Azrael.google_events_to_dd for api id 2 and event id {} for guild {}", EVENT.id, e.getGuild().getId());
+				}
+				else if(items.size() > 0) {
+					StringBuilder out = new StringBuilder();
+					int count = 0;
+					for(final String item : items) {
+						if(count == 0)
+							out.append("`"+item+"`");
+						else
+							out.append(", `"+item+"`");
+						count++;
+					}
+					e.getChannel().sendMessage(message.setDescription("**"+GoogleUtils.buildFileURL(file_id, 2)+"**\nNow please submit a list of data items, divided by a comma and in the exact order that it has to write into the spreadsheet. For example 'user_id,nickname,name'. These are the available data dictionary items for this event:\n"+out.toString()).build()).queue();
+					Hashes.addTempCache(key, new Cache(180000, "spreadsheets-map-update", file_id, ""+EVENT.id));
+				}
+				else {
+					e.getChannel().sendMessage(error.setDescription("No available data dictionary items have been found for this event and spreadsheets. Returning to the spreadsheets parameter selection page...").build()).queue();
+				}
+			}
+		}
+	}
+	
+	public static void mapUpdate(GuildMessageReceivedEvent e, String file_id, int event, String dditems, final String key) {
+		ArrayList<Integer> item_ids = new ArrayList<Integer>();
+		String [] items = dditems.split(",");
+		for(var i = 0; i < items.length; i++) {
+			GoogleDD ITEM = GoogleDD.valueOfItem(items[i]);
+			if(ITEM != null)
+				item_ids.add(ITEM.id);
+		}
+		if(item_ids.size() > 0) {
+			if(Azrael.SQLDeleteGoogleSpreadsheetMapping(file_id, event) != -1) {
+				int [] result = Azrael.SQLBatchInsertGoogleSpreadsheetMapping(file_id, event, item_ids);
+				if(result[0] > 0) {
+					e.getChannel().sendMessage(message.setDescription("Data dictionary items have been registered for this event and spreadsheet!").build()).queue();
+				}
+				else if(result[0] == -1) {
+					e.getChannel().sendMessage(error.setDescription("An internal error has occurred. data dictionary items couldn't be saved for this file and event. Returning to the spreadsheets parameter selection page...").build()).queue();
+					logger.error("Batch insert error occurred on Azrael.google_spreadsheet_mapping for the spreadsheet {}, event id {} from guild {}", file_id, event, e.getGuild().getId());
+				}
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+			}
+			else {
+				e.getChannel().sendMessage(error.setDescription("An internal error has occurred! The current spreadsheet mapping couldn't be cleared. Returning to the spreadsheets parameter selection page...").build()).queue();
+				logger.error("Table Azrael.google_spreadsheet_mapping couldn't be cleared for spreadsheet {} and event id {} for guild {}", file_id, event, e.getGuild().getId());
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+			}
+		}
 	}
 }
