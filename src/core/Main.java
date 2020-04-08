@@ -16,6 +16,7 @@ import commands.Commands;
 import commands.Daily;
 import commands.Display;
 import commands.DoubleExperience;
+import commands.Edit;
 import commands.Equip;
 import commands.Filter;
 import commands.Google;
@@ -41,6 +42,7 @@ import commands.ShutDown;
 import commands.Top;
 import commands.Use;
 import commands.User;
+import commands.Write;
 import fileManagement.IniFileReader;
 import listeners.AvatarUpdateListener;
 import listeners.BanListener;
@@ -203,6 +205,8 @@ public class Main {
 		CommandHandler.commandsPublic.put("heavycensoring", new HeavyCensoring());
 		CommandHandler.commandsPublic.put("mute", new Mute());
 		CommandHandler.commandsPublic.put("google", new Google());
+		CommandHandler.commandsPublic.put("write", new Write());
+		CommandHandler.commandsPublic.put("edit", new Edit());
 	}
 	
 	public static void addPrivateCommands() {

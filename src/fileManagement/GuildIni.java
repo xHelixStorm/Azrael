@@ -117,6 +117,8 @@ public class GuildIni {
 		commands.put("HeavyCensoring", "false");
 		commands.put("Mute", "false");
 		commands.put("Google", "false");
+		commands.put("Write", "false");
+		commands.put("Edit", "false");
 		fileContent.put("Commands", commands);
 		
 		//collect all CommandLevels variables
@@ -203,6 +205,8 @@ public class GuildIni {
 		commandLevels.put("HeavyCensoring", "20");
 		commandLevels.put("Mute", "20");
 		commandLevels.put("Google", "20");
+		commandLevels.put("Write", "20");
+		commandLevels.put("Edit", "20");
 		fileContent.put("CommandLevels", commandLevels);
 	}
 	
@@ -970,5 +974,21 @@ public class GuildIni {
 	public static int getGoogleLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandsLevels", "Google", int.class);
+	}
+	public static boolean getWriteCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Write", boolean.class);
+	}
+	public static int getWriteLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandsLevels", "Write", int.class);
+	}
+	public static boolean getEditCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Edit", boolean.class);
+	}
+	public static int getEditLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandsLevels", "Edit", int.class);
 	}
 }

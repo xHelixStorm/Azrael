@@ -28,6 +28,7 @@ import commandsContainer.RssExecution;
 import commandsContainer.SetWarning;
 import commandsContainer.ShopExecution;
 import commandsContainer.UserExecution;
+import commandsContainer.WriteEditExecution;
 import constructors.Cache;
 import constructors.Guilds;
 import constructors.Messages;
@@ -420,6 +421,22 @@ public class GuildMessageListener extends ListenerAdapter {
 						else {
 							//remove the google command from cache
 							Hashes.clearTempCache(key);
+						}
+					}
+					
+					final var writeEdit = Hashes.getTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+					if(writeEdit != null && writeEdit.getExpiration() - System.currentTimeMillis() > 0) {
+						if(writeEdit.getAdditionalInfo().equals("W")) {
+							WriteEditExecution.writeHelp(e, writeEdit);
+						}
+						else if(writeEdit.getAdditionalInfo().equals("WE")) {
+							WriteEditExecution.runWrite(e, writeEdit, message);
+						}
+						else if(writeEdit.getAdditionalInfo().equals("E")) {
+							WriteEditExecution.editHelp(e, writeEdit);
+						}
+						else if(writeEdit.getAdditionalInfo().equals("EE")) {
+							WriteEditExecution.runEdit(e, writeEdit, message);
 						}
 					}
 				});
