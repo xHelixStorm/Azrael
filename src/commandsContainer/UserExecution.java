@@ -119,7 +119,7 @@ public class UserExecution {
 								message.setTitle("Here the requested information!");
 								if(user.getAvatar() != null)
 									message.setThumbnail(user.getAvatar());
-								message.setAuthor(user.getUserName()+ "ID: "+cache.getAdditionalInfo());
+								message.setAuthor(user.getUserName()+ " ID: "+cache.getAdditionalInfo());
 								message.setDescription("Here you can inspect all current information for this user!");
 								message.addBlankField(false);
 								Bancollect warnedUser = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong());
