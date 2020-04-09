@@ -70,24 +70,29 @@ public class Azrael {
 		}
 	}
 	
-	public static void SQLInsertHistory(long _user_id, long _guild_id, String _type, String _reason, long _penalty) {
-		logger.info("SQLInsertHistory launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _type, _reason, _penalty);
+	public static void SQLInsertHistory(long _user_id, long _guild_id, String _type, String _reason, long _penalty, String _info) {
+		logger.info("SQLInsertHistory launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _type, _reason, _penalty, _info);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO history (fk_user_id, fk_guild_id, type, reason, time, penalty) VALUES(?, ?, ?, ?, ?, "+(_penalty != 0 ? "?" : "NULL")+")");
+			String sql = ("INSERT INTO history (fk_user_id, fk_guild_id, type, reason, time, penalty, info) VALUES(?, ?, ?, ?, ?, "+(_penalty != 0 ? "?" : "NULL")+", ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
 			stmt.setString(3, _type);
 			stmt.setString(4, _reason);
 			stmt.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
-			if(_penalty != 0)
+			if(_penalty != 0) {
 				stmt.setLong(6, _penalty);
+				stmt.setString(7, _info);
+			}
+			else {
+				stmt.setString(6, _info);
+			}
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLInsertActionLog Exception", e);
+			logger.error("SQLInsertHistory Exception", e);
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -102,7 +107,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT type, reason, time, penalty FROM history WHERE fk_user_id = ? && fk_guild_id = ?");
+			String sql = ("SELECT type, reason, time, penalty, info FROM history WHERE fk_user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -113,7 +118,8 @@ public class Azrael {
 						rs.getString(1),
 						rs.getString(2),
 						rs.getTimestamp(3),
-						rs.getLong(4)
+						rs.getLong(4),
+						rs.getString(5)
 					)	
 				);
 			}
@@ -219,7 +225,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT description, timestamp FROM action_log WHERE target_id = ? && guild_id = ? && (event LIKE \"MEMBER_KICK\" || event LIKE \"MEMBER_BAN_ADD\" || event LIKE \"MEMBER_BAN_REMOVE\" || event LIKE \"MEMBER_MUTE_ADD\") ORDER BY timestamp desc LIMIT 30");
+			String sql = ("SELECT description, timestamp FROM action_log WHERE target_id = ? && guild_id = ? && (event LIKE \"MEMBER_KICK\" || event LIKE \"MEMBER_BAN_ADD\" || event LIKE \"MEMBER_BAN_REMOVE\" || event LIKE \"MEMBER_MUTE_ADD\" || event LIKE \"MEMBER_ROLE_ADD\") ORDER BY timestamp desc LIMIT 30");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
 			stmt.setLong(2, _guild_id);

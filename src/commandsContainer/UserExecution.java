@@ -79,6 +79,7 @@ public class UserExecution {
 				+ "**unmute** To unmute the member and to terminate the running task\n"
 				+ "**ban**: To ban the user\n"
 				+ "**kick**: To kick the user\n"
+				+ "**assign-role**: To assign a role with logging\n"
 				+ "**history**: To display the whole kick/ban/mute history with reasons\n"
 				+ "**watch**: To either log all messages or only deleted messages from this user\n"
 				+ "**unwatch**: To remove this user from the watchlist\n"
@@ -108,7 +109,7 @@ public class UserExecution {
 				return;
 			}
 			var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
-			if(!cache.getAdditionalInfo().matches("[a-zA-Z\\-]{1,}[\\d]*") && (comment.equals("information") || comment.equals("delete-messages") || comment.equals("warning") || comment.equals("mute") || comment.equals("unmute") || comment.equals("ban") || comment.equals("kick") || comment.equals("history") || comment.equals("watch") || comment.equals("unwatch") || comment.equals("gift-experience") || comment.equals("set-experience") || comment.equals("set-level") || comment.equals("gift-currency") || comment.equals("set-currency"))) {
+			if(!cache.getAdditionalInfo().matches("[a-zA-Z\\-]{1,}[\\d]*") && (comment.equals("information") || comment.equals("delete-messages") || comment.equals("warning") || comment.equals("mute") || comment.equals("unmute") || comment.equals("ban") || comment.equals("kick") || comment.equals("assign-role") ||comment.equals("history") || comment.equals("watch") || comment.equals("unwatch") || comment.equals("gift-experience") || comment.equals("set-experience") || comment.equals("set-level") || comment.equals("gift-currency") || comment.equals("set-currency"))) {
 				switch(comment) {
 					case "information" -> {
 						final var informationLevel = GuildIni.getUserInformationLevel(_e.getGuild().getIdLong());
@@ -481,13 +482,45 @@ public class UserExecution {
 							Hashes.clearTempCache(key);
 						}
 					}
+					case "assign-role" -> {
+						final var assignRoleLevel = GuildIni.getUserAssignRoleLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), assignRoleLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							int count = 0;
+							ArrayList<Long> roles = new ArrayList<Long>();
+							StringBuilder out = new StringBuilder();
+							for(final var role : _e.getGuild().getRoles()) {
+								if(_e.getGuild().getSelfMember().canInteract(role) && !role.getName().equals("@everyone")) {
+									out.append(++count+": "+role.getName()+" ("+role.getId()+")\n");
+									roles.add(role.getIdLong());
+								}
+							}
+							if(roles.size() > 0) {
+								message.setTitle("You chose to assign a role!");
+								_e.getChannel().sendMessage(message.setDescription("These are the roles which the bot is able to assign. Select the digit for the role you wish to assign:\n\n"+out.toString()).build()).queue();
+								cache.updateDescription("assign-role"+user_id).setExpiration(180000).setObject(roles);
+								Hashes.addTempCache(key, cache);
+							}
+							else {
+								message.setTitle("There are no roles available that can be assigned!").setColor(Color.RED);
+								_e.getChannel().sendMessage(message.setDescription("No role available which could be assigned to the user through the bot. Please be sure that a role exists and that the role level is lower than the one of the bot!").build()).queue();
+								Hashes.clearTempCache(key);
+							}
+						}
+						else {
+							UserPrivs.throwNotEnoughPrivilegeError(_e, assignRoleLevel);
+							Hashes.clearTempCache(key);
+						}
+					}
 					case "history" -> {
 						final var historyLevel = GuildIni.getUserHistoryLevel(_e.getGuild().getIdLong());
 						if(UserPrivs.comparePrivilege(_e.getMember(), historyLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							message.setTitle("You chose to display the history!");
 							StringBuilder out = new StringBuilder();
 							for(var history : Azrael.SQLgetHistory(user_id, _e.getGuild().getIdLong())) {
-								out.append(history.getTime()+": **"+history.getType()+(history.getPenalty() != 0 ? " for "+history.getPenalty()+" minutes" : "")+"**\nReason: **"+history.getReason()+"**\n\n");
+								if(history.getType().equals("role"))
+									out.append(history.getTime()+": **"+history.getType()+"**\n"+history.getInfo()+" assigned from: **"+history.getReason()+"**\n\n");
+								else
+									out.append(history.getTime()+": **"+history.getType()+(history.getPenalty() != 0 ? " for "+history.getPenalty()+" minutes" : "")+"**\nReason: **"+history.getReason()+"**\n\n");
 							}
 							if(out.length() > 0)
 								_e.getChannel().sendMessage(message.setDescription("Here the requested history of this user\n\n"+out.toString()).build()).queue();
@@ -838,7 +871,7 @@ public class UserExecution {
 							}
 							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id.getRole_ID())).queue();
 							var mute_time = (long)Azrael.SQLgetWarning(_e.getGuild().getIdLong(), Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID()+1).getTimer();
-							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "mute", (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!"), (mute_time/1000/60));
+							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "mute", (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!"), (mute_time/1000/60), "");
 							_e.getChannel().sendMessage(message.setDescription((permMute ? "Perm mute" : "Mute")+" order has been issued!").build()).queue();
 							checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 						}
@@ -901,11 +934,11 @@ public class UserExecution {
 							}
 							if(cache.getAdditionalInfo2().length() > 0) {
 								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id.getRole_ID())).reason(cache.getAdditionalInfo2()).queue();
-								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), (mute_time/1000/60));
+								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), (mute_time/1000/60), "");
 							}
 							else {
 								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id.getRole_ID())).reason("No reason has been provided!").queue();
-								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", "No reason has been provided!", (mute_time/1000/60));
+								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", "No reason has been provided!", (mute_time/1000/60), "");
 							}
 							_e.getChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
 							logger.debug("{} has muted {} in guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getId());
@@ -971,7 +1004,7 @@ public class UserExecution {
 							}
 							_e.getChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
 							_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason("User has been banned with the bot command!").queue();
-							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "ban", "No reason has been provided!", 0);
+							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "ban", "No reason has been provided!", 0, "");
 							logger.debug("{} has banned {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getId());
 							checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 						}
@@ -1015,7 +1048,7 @@ public class UserExecution {
 						}
 						_e.getChannel().sendMessage(message.setDescription("Ban order has been issued!").build()).queue();
 						_e.getGuild().ban(_e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
-						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", _message, 0);
+						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "ban", _message, 0, "");
 						logger.debug("{} has banned {} in guild {}", _e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), _e.getGuild().getId());
 						checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 					}
@@ -1067,7 +1100,7 @@ public class UserExecution {
 									+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
 									+ (GuildIni.getKickSendReason(_e.getGuild().getIdLong()) ? "Provided reason: No reason has been provided!" : "")).complete();
 							_e.getGuild().kick(_e.getGuild().getMemberById(user_id)).reason("No reason has been provided!").queue();
-							Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", "No reason has been provided!", 0);
+							Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", "No reason has been provided!", 0, "");
 							logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getName());
 							checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 						}
@@ -1101,7 +1134,7 @@ public class UserExecution {
 								+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
 								+ (GuildIni.getKickSendReason(_e.getGuild().getIdLong()) ? "Provided reason: "+_message : "")).complete();
 						_e.getGuild().kick(_e.getGuild().getMemberById(user_id)).reason(_message).queue();
-						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", _message, 0);
+						Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "kick", _message, 0, "");
 						logger.debug("{} has kicked {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getName());
 						checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 					}
@@ -1115,6 +1148,54 @@ public class UserExecution {
 					_e.getChannel().sendMessage(message.setDescription("Kick is not possible because the KICK MEMBERS permission is missing!").build()).queue();
 					logger.warn("KICK MEMBERS permission required to kick a user in guild {}!", _e.getGuild().getId());
 					Hashes.clearTempCache(key);
+				}
+			}
+			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("assign-role")) {
+				@SuppressWarnings("unchecked")
+				ArrayList<Long> roles = (ArrayList<Long>)cache.getObject();
+				if(_message.replaceAll("[0-9]*", "").isBlank()) {
+					int number = Integer.parseInt(_message);
+					if(roles.size() >= number) {
+						final long role_id = roles.get(number-1);
+						final var member = _e.getGuild().getMemberById(user_id);
+						if(member != null) {
+							if(member.getRoles().parallelStream().filter(f -> f.getIdLong() == role_id).findAny().orElse(null) == null) {
+								final var role = _e.getGuild().getRoleById(role_id);
+								if(_e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+									_e.getGuild().addRoleToMember(member, role).queue(success -> {
+										Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "role", _e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator(), 0, role.getName());
+										Azrael.SQLInsertActionLog("MEMBER_ROLE_ADD", user_id, _e.getGuild().getIdLong(), "Received the role "+role.getName()+" from "+_e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator());
+										message.setTitle("Success");
+										_e.getChannel().sendMessage(message.setDescription("The user **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** with the ID number **"+member.getUser().getId()+"** has received the role **"+role.getName()+"** from **"+_e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator()+"**").build()).queue();
+										logger.debug("The user {} has received the role {} by the bot in guild {}", user_id, role_id, _e.getGuild().getId());
+										Hashes.clearTempCache(key);
+									});
+								}
+								else {
+									message.setTitle("Permission required!").setColor(Color.RED);
+									_e.getChannel().sendMessage(message.setDescription("The MANAGE_ROLES permission is required to assign roles!").build()).queue();
+									logger.warn("MANAGE_ROLES permission required to assign roles in guild {}", _e.getGuild().getId());
+									Hashes.clearTempCache(key);
+								}
+							}
+							else {
+								message.setTitle("User already has this role!").setColor(Color.RED);
+								_e.getChannel().sendMessage(message.setDescription("This user is not present on the server!").build()).queue();
+								Hashes.clearTempCache(key);
+							}
+						}
+						else {
+							message.setTitle("User has left the server!").setColor(Color.RED);
+							_e.getChannel().sendMessage(message.setDescription("This user is not present on the server!").build()).queue();
+							Hashes.clearTempCache(key);
+						}
+					}
+					else {
+						message.setTitle("Digit not defined!").setColor(Color.RED);
+						_e.getChannel().sendMessage(message.setDescription("Please select one of the displayed digits!").build()).queue();
+						cache.setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("watch")) {

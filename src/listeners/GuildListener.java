@@ -152,7 +152,7 @@ public class GuildListener extends ListenerAdapter {
 								Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
 								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
 								var mute_time = (long)Azrael.SQLgetWarning(guild_id, Azrael.SQLgetData(user_id, guild_id).getWarningID()+1).getTimer();
-								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60), "");
 							}
 							//this is a perm mute
 							else if(rejoinAction.getInfo().equals("perm")) {
@@ -164,14 +164,14 @@ public class GuildListener extends ListenerAdapter {
 								}
 								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
 								var mute_time = (long)Azrael.SQLgetWarning(guild_id, Azrael.SQLgetData(user_id, guild_id).getWarningID()+1).getTimer();
-								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60), "");
 							}
 							//this is a time defined mute
 							else {
 								var mute_time = Long.parseLong(rejoinAction.getInfo());
 								Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 								Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
-								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60));
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60), "");
 								if(Azrael.SQLgetData(user_id, guild_id).getWarningID() != 0) {
 									if(Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp, unmute_timestamp, true, true) == 0) {
 										logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, guild_id);
@@ -213,13 +213,13 @@ public class GuildListener extends ListenerAdapter {
 								+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? "Provided reason: "+rejoinAction.getReason() : "")).queue(success -> {
 									Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
 									e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
-									Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0);
+									Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
 									channel.close().queue();
 								}, error -> {
 									if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription("The banned user with the id number **"+e.getMember().getUser().getId()+"** has locked the direct private messaging!").build()).queue();
 									Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
 									e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
-									Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0);
+									Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
 									channel.close().queue();
 								});
 					});
@@ -277,7 +277,7 @@ public class GuildListener extends ListenerAdapter {
 								//send a private message and then kick the user
 								e.getMember().getUser().openPrivateChannel().complete().sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").complete();
 								e.getGuild().kick(e.getMember()).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
-								Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", "Kicked for having an invalid word inside his name!", 0);
+								Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", "Kicked for having an invalid word inside his name!", 0, "");
 								nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("User kicked for having a not allowed name!");
 								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. The user has been kicked automatically from the server due to this word: **"+word.getName().toUpperCase()+"**").build()).queue();
 							}

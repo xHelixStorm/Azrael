@@ -159,7 +159,7 @@ public class LanguageFilter implements Runnable {
 									if(count >= 30) {
 										var mute_role = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 										if(mute_role != null) {
-											Azrael.SQLInsertHistory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "mute", "Heavy censoring mute after reaching the threshold", 0);
+											Azrael.SQLInsertHistory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "mute", "Heavy censoring mute after reaching the threshold", 0, "");
 											e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
 										}
 									}

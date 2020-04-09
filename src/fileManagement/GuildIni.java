@@ -176,6 +176,7 @@ public class GuildIni {
 		commandLevels.put("UserUnmute", "20");
 		commandLevels.put("UserBan", "20");
 		commandLevels.put("UserKick", "20");
+		commandLevels.put("UserAssignRole", "20");
 		commandLevels.put("UserHistory", "20");
 		commandLevels.put("UserWatch", "20");
 		commandLevels.put("UserUnwatch", "20");
@@ -810,6 +811,10 @@ public class GuildIni {
 	public static int getUserKickLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "UserKick", int.class);
+	}
+	public static int getUserAssignRoleLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "UserAssignRole", int.class);
 	}
 	public static int getUserHistoryLevel(long guild_id) {
 		Ini ini = readIni(guild_id);

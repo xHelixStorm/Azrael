@@ -107,14 +107,14 @@ public class NameListener extends ListenerAdapter {
 											channel.sendMessage("You have been automatically kicked from "+guild.getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").queue(success -> {
 												Hashes.addTempCache("kick-ignore_gu"+guild.getId()+"us"+e.getUser().getId(), new Cache(3000));
 												guild.kick(member).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
-												Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild.getIdLong(), "kick", "Kicked for having an invalid word inside his name!", 0);
+												Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild.getIdLong(), "kick", "Kicked for having an invalid word inside his name!", 0, "");
 												message.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("User kicked for having a not allowed name!");
 												if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** and was kicked for containing the following word in his name: **"+word.getName().toUpperCase()+"**").build()).queue();
 												channel.close().queue();
 											}, error -> {
 												Hashes.addTempCache("kick-ignore_gu"+guild.getId()+"us"+e.getUser().getId(), new Cache(3000));
 												guild.kick(member).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
-												Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild.getIdLong(), "kick", "Kicked for having an invalid word inside his name!", 0);
+												Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild.getIdLong(), "kick", "Kicked for having an invalid word inside his name!", 0, "");
 												message.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("User kicked for having a not allowed name!");
 												if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** and was kicked for containing the following word in his name: **"+word.getName().toUpperCase()+"**").build()).queue();
 												channel.close().queue();

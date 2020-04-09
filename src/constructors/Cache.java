@@ -12,6 +12,7 @@ public class Cache {
 	private String additionalInfo2;
 	private String additionalInfo3;
 	private boolean expire;
+	private Object object;
 	
 	/**
 	 * Empty cache with only the expiration time in miliseconds + the time of now
@@ -114,12 +115,23 @@ public class Cache {
 	}
 	
 	/**
+	 * Save any type of object
+	 * @param _object
+	 * @return
+	 */
+	
+	public Cache setObject(Object _object) {
+		this.object = _object;
+		return this;
+	}
+	
+	/**
 	 * Retrieve the expiration time in miliseconds
 	 * @return
 	 */
 	
 	public long getExpiration() {
-		return expiration;
+		return this.expiration;
 	}
 	
 	/**
@@ -128,7 +140,7 @@ public class Cache {
 	 */
 	
 	public String getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 	
 	/**
@@ -137,7 +149,7 @@ public class Cache {
 	 */
 	
 	public String getAdditionalInfo2() {
-		return additionalInfo2;
+		return this.additionalInfo2;
 	}
 	
 	/**
@@ -146,7 +158,7 @@ public class Cache {
 	 */
 	
 	public String getAdditionalInfo3() {
-		return additionalInfo3;
+		return this.additionalInfo3;
 	}
 	
 	/**
@@ -155,7 +167,7 @@ public class Cache {
 	 */
 	
 	public boolean getExpire() {
-		return expire;
+		return this.expire;
 	}
 	
 	/**
@@ -200,5 +212,14 @@ public class Cache {
 	public Cache updateDescription3(String description) {
 		this.additionalInfo3 = description;
 		return this;
+	}
+	
+	/**
+	 * Return saved object
+	 * @return
+	 */
+	
+	public Object getObject() {
+		return this.object;
 	}
 }

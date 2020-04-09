@@ -61,7 +61,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
-	private static final String VERSION = "6.12.405";
+	private static final String VERSION = "6.13.406";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
@@ -397,7 +397,7 @@ public class STATIC {
 								e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason("Muted due to spamming the same message!").queue();
 								final int warning = Azrael.SQLgetWarning(user_id, guild_id);
 								final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
-								Azrael.SQLInsertHistory(user_id, guild_id, "mute", "Muted due to spamming the same message", penalty);
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", "Muted due to spamming the same message", penalty, "");
 								Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
 								return true;
 							}
@@ -444,7 +444,7 @@ public class STATIC {
 								e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason("Muted due to spamming the same message!").queue();
 								final int warning = Azrael.SQLgetWarning(user_id, guild_id);
 								final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
-								Azrael.SQLInsertHistory(user_id, guild_id, "mute", "Muted due to spamming the same message", penalty);
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", "Muted due to spamming the same message", penalty, "");
 								Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
 								return true;
 							}
@@ -473,7 +473,7 @@ public class STATIC {
 									e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason("Muted due to spamming the same message!").queue();
 									final int warning = Azrael.SQLgetWarning(user_id, guild_id);
 									final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
-									Azrael.SQLInsertHistory(user_id, guild_id, "mute", "Muted due to spamming the same message", penalty);
+									Azrael.SQLInsertHistory(user_id, guild_id, "mute", "Muted due to spamming the same message", penalty, "");
 									Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
 									return true;
 								}
