@@ -87,7 +87,7 @@ public class UserExecution {
 				+ "**set-experience**: To set an experience value\n"
 				+ "**set-level**: To assign a level\n"
 				+ "**gift-currency**: To gift money\n"
-				+ "**set-currency**: To se a money value").build()).queue();
+				+ "**set-currency**: To set a money value").build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, raw_input));
 		}
 		else {
