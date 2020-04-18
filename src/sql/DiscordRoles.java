@@ -317,4 +317,70 @@ public class DiscordRoles {
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
+	
+	public static int SQLInsertReaction(long _message_id, String _emoji, long _role_id) {
+		logger.info("SQLInsertReaction launched. Passed params {}, {}, {}", _message_id, _emoji, _role_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
+			String sql = ("INSERT INTO reactions (message_id, emoji, role_id) VALUES(?, ?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _message_id);
+			stmt.setString(2, _emoji);
+			stmt.setLong(3, _role_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertReaction Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static long SQLgetReactionRole(long _message_id, String _emoji) {
+		logger.info("SQLgetReactionRole launched. Passed params {}", _message_id, _emoji);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
+			String sql = ("SELECT role_id FROM reactions WHERE message_id = ? and emoji LIKE ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _message_id);
+			stmt.setString(2, _emoji);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				return rs.getLong(1);
+			}
+			return 0;
+		} catch (SQLException e) {
+			logger.error("SQLgetReactionRole Exception", e);
+			return 0;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteReactions(long _message_id) {
+		logger.info("SQLDeleteReactions launched. Passed params {}", _message_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
+			String sql = ("DELETE FROM reactions WHERE message_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _message_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteReactions Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
 }

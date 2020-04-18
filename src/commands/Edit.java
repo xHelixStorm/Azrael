@@ -33,7 +33,8 @@ public class Edit implements CommandPublic {
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		if(args.length == 0) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("This command allows you to update any message written by the bot!\n"
-					+ "share the text channel first, the message id for second and write it together with the command to start...").build()).queue();
+					+ "share the text channel first, the message id for second and write it together with the command to start...\n"
+					+ "If you wish to add or clear all reactions, add either add-reaction or clear-reactions as parameter. If you add a reaction, you will also be able to add a role to be assigned when selected!").build()).queue();
 		}
 		else if (args.length == 2) {
 			String channel_id = args[0].replaceAll("[<>#]", "");
@@ -45,8 +46,24 @@ public class Edit implements CommandPublic {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Error! Text channel doesn't exist!").build()).queue();
 			}
 		}
+		else if(args.length == 3) {
+			if(args[2].equalsIgnoreCase("add-reaction") || args[2].equalsIgnoreCase("clear-reactions")) {
+				String channel_id = args[0].replaceAll("[<>#]", "");
+				String message_id = args[1];
+				String parameter = args[2].toLowerCase();
+				if(e.getGuild().getTextChannelById(channel_id) != null) {
+					Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, (parameter.equals("add-reaction") ? "RA" : "RC"), channel_id, message_id));
+				}
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Error! Text channel doesn't exist!").build()).queue();
+				}
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Error! Parameter doesn't exist!").build()).queue();
+			}
+		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Error. Please use two parameters with this command! The first is for the text channel and the second for the message id!").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Error. Please use at least two parameters with this command to edit a message! The first is for the text channel and the second for the message id!").build()).queue();
 		}
 	}
 

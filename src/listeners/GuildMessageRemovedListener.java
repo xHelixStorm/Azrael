@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import sql.Azrael;
+import sql.DiscordRoles;
 
 public class GuildMessageRemovedListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageRemovedListener.class);
@@ -34,7 +35,9 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageDelete(GuildMessageDeleteEvent e) {
-		new Thread(() ->{
+		new Thread(() -> {
+			//remove reaction messages from db
+			DiscordRoles.SQLDeleteReactions(e.getMessageIdLong());
 			//verify that the message in cache logger is enabled
 			if(GuildIni.getCacheLog(e.getGuild().getIdLong())) {
 				//retrieve current message id, the message as a whole that got deleted and delete the message from cache

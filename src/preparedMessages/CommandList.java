@@ -36,8 +36,8 @@ public class CommandList {
 			if(GuildIni.getHeavyCensoringCommand(guild_id))textCollector.append("**-"+prefix+"heavycensoring**\nenable/disable the heavycensoring for cases when it will get hard to moderate\n\n");
 			if(GuildIni.getMuteCommand(guild_id))textCollector.append("**-"+prefix+"mute**\nto mute one or multiple users on the server. Optional with reason\n\n");
 			if(GuildIni.getGoogleCommand(guild_id))textCollector.append("**-"+prefix+"google**\nto configure integrations for specific actions with google services\n\n");
-			if(GuildIni.getGoogleCommand(guild_id))textCollector.append("**-"+prefix+"write**\nto write a message as the bot\n\n");
-			if(GuildIni.getGoogleCommand(guild_id))textCollector.append("**-"+prefix+"edit**\nto update a message of the bot\n\n");
+			if(GuildIni.getWriteCommand(guild_id))textCollector.append("**-"+prefix+"write**\nto write a message as the bot\n\n");
+			if(GuildIni.getEditCommand(guild_id))textCollector.append("**-"+prefix+"edit**\nto update a message of the bot\n\n");
 		}
 		if(entertainment == true) {
 			textCollector.append("**_Entertainment:_**\n");
