@@ -43,7 +43,7 @@ public class GoogleSpreadsheetsExecution {
 		e.getChannel().sendMessage(message.setDescription("Use one of the below parameters to navigate through the spreadsheets setup or type **exit** to close the setup any time. This message is shown only once\n\n"
 			+ "**create**: create a spreadsheets table\n"
 			+ "**add**: add an already existing spreadsheet table\n"
-			+ "**remove**: remove a linked spreadsheet table (no deletion)"
+			+ "**remove**: remove a linked spreadsheet table (no deletion)\n"
 			+ "**events**: select an already existing spreadsheet table\n"
 			+ "**sheet**: Define the sheet and row/column to operate on\n"
 			+ "**map**: map the available table fields with values from the bot\n\n"
@@ -66,8 +66,10 @@ public class GoogleSpreadsheetsExecution {
 				try {
 					processStep = "Spreadsheet Creation";
 					file_id = GoogleSheets.createSpreadsheet(GoogleSheets.getSheetsClientService(), title);
-					GoogleDrive.transferOwnerOfFile(GoogleDrive.getDriveClientService(), file_id, GuildIni.getGoogleMainEmail(e.getGuild().getIdLong()));
+					Azrael.SQLInsertActionLog("GOOGLE_SPREADSHEET_CREATE", 0, e.getGuild().getIdLong(), file_id);
 					processStep = "Ownership Transfer";
+					Azrael.SQLInsertActionLog("GOOGLE_SPREADSHEET_OWNERSHIP", 0, e.getGuild().getIdLong(), email);
+					GoogleDrive.transferOwnerOfFile(GoogleDrive.getDriveClientService(), file_id, email);
 				} catch (Exception e1) {
 					logger.error("An error occurred on process step \"{}\"", processStep, e1);
 					e.getChannel().sendMessage(error.setDescription(e1.getMessage()).build()).queue();
@@ -116,6 +118,7 @@ public class GoogleSpreadsheetsExecution {
 					if(Azrael.SQLInsertGoogleAPISetup(spreadsheet.getSpreadsheetId(), e.getGuild().getIdLong(), spreadsheet.getProperties().getTitle(), 2) > 0) {
 						e.getChannel().sendMessage(message.setDescription("Google Spreadsheet has been linked to the bot.").build()).queue();
 						logger.debug("Spreadsheet with the file id {} has been linked to the bot in guild {}", file_id, e.getGuild().getIdLong());
+						Azrael.SQLInsertActionLog("GOOGLE_SPREADSHEET_LINK", 0, e.getGuild().getIdLong(), file_id);
 					}
 					else {
 						e.getChannel().sendMessage(error.setDescription("An internal error has occurred. Google Spreadsheet couldn't be linked to the bot.").build()).queue();
@@ -155,6 +158,7 @@ public class GoogleSpreadsheetsExecution {
 					if(Azrael.SQLDeleteGoogleAPISetup(spreadsheet.getSpreadsheetId(), e.getGuild().getIdLong()) > 0) {
 						e.getChannel().sendMessage(message.setDescription("Link of the Google Spreadsheet has been severed!").build()).queue();
 						logger.debug("Link of the spreadsheet with the file id {} has been severed from the bot in guild {}", file_id, e.getGuild().getIdLong());
+						Azrael.SQLInsertActionLog("GOOGLE_SPREADSHEET_UNLINK", 0, e.getGuild().getIdLong(), file_id);
 					}
 					else {
 						e.getChannel().sendMessage(error.setDescription("An internal error has occurred. Link to the Google Spreadsheet couldn't be severed from the bot.").build()).queue();
@@ -203,9 +207,9 @@ public class GoogleSpreadsheetsExecution {
 		}
 		else if(selection >= 0 && selection < setup.size()) {
 			final var events = Azrael.SQLgetGoogleEventsSupportSpreadsheet();
-			if(events == null) {
+			if(events.size() == 0) {
 				//db error
-				e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Events from database couldn't be retrieved. Returning to the spreadsheets parameters selection page...").build()).queue();
+				e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Events from the database couldn't be retrieved. Returning to the spreadsheets parameters selection page...").build()).queue();
 				logger.error("Data from Azrael.google_events couldn't be retrieved for guild {}", e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 			}
@@ -221,7 +225,7 @@ public class GoogleSpreadsheetsExecution {
 						out.append(", `"+event.getEvent()+"`");
 				}
 				
-				e.getChannel().sendMessage(message.setDescription("Now type in the required events starting with either add or remove. If multiple events should be inserted, separate them with a ',' These are the supported events for spreadsheets: \n\n"+out.toString()).build()).queue();
+				e.getChannel().sendMessage(message.setDescription("Now type in the required events starting with either **add** or **remove**. If multiple events should be inserted, separate them with a ',' These are the supported events for spreadsheets: \n\n"+out.toString()).build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-events-update", file.getFileID()));
 			}
 			else {
@@ -253,16 +257,17 @@ public class GoogleSpreadsheetsExecution {
 			final int iterator = i;
 			final var event = fixedEvents.parallelStream().filter(f -> f.getEvent().equalsIgnoreCase(events[iterator])).findAny().orElse(null);
 			if(event == null)
-				e.getChannel().sendMessage(error.setDescription("The event **"+events[iterator]+"** either doesn't exist or is not supported for this event").build()).queue();
+				e.getChannel().sendMessage(error.setDescription("The event **"+events[iterator]+"** either doesn't exist or is not supported for spreadsheets").build()).queue();
 			else
 				handleEvents.add(event.getEventID());
 		}
 		if(handleEvents.size() > 0) {
-			if(addEvents)
+			if(addEvents) {
 				if(Azrael.SQLBatchInsertGoogleFileToEventLink(file_id, handleEvents)) {
 					e.getChannel().sendMessage(message.setDescription("Event(s) have been linked with the file. Don't forget to map the columns and to define the starting point!").build()).queue();
 					logger.debug("Events added for file_id {} in guild {}", file_id, e.getGuild().getId());
 				}
+			}
 			else {
 				if(Azrael.SQLBatchDeleteGoogleSpreadsheetSheet(file_id, handleEvents)) {
 					logger.debug("Events removed from Azrael.google_spreadsheetsheet for file_id {} in guild {}", file_id, e.getGuild().getId());
@@ -466,7 +471,7 @@ public class GoogleSpreadsheetsExecution {
 							out.append(", `"+item+"`");
 						count++;
 					}
-					e.getChannel().sendMessage(message.setDescription("**"+GoogleUtils.buildFileURL(file_id, 2)+"**\nNow please submit a list of data items, divided by a comma and in the exact order that it has to write into the spreadsheet. For example 'user_id,nickname,name'. These are the available data dictionary items for this event:\n"+out.toString()).build()).queue();
+					e.getChannel().sendMessage(message.setDescription("**"+GoogleUtils.buildFileURL(file_id, 2)+"**\nNow please submit a list of data items, divided by a comma and in the exact order that it has to write into the spreadsheet. Few data dictionary items have the possibility for additional formatting by typing the format type after a /. Example input 'timestamp/dd-MM-yyyy,user_id,nickname/UPPER_CASE,name'. These are the available data dictionary items for this event:\n"+out.toString()).build()).queue();
 					Hashes.addTempCache(key, new Cache(180000, "spreadsheets-map-update", file_id, ""+EVENT.id));
 				}
 				else {
@@ -478,15 +483,21 @@ public class GoogleSpreadsheetsExecution {
 	
 	public static void mapUpdate(GuildMessageReceivedEvent e, String file_id, int event, String dditems, final String key) {
 		ArrayList<Integer> item_ids = new ArrayList<Integer>();
+		ArrayList<String> item_formats = new ArrayList<String>();
 		String [] items = dditems.split(",");
 		for(var i = 0; i < items.length; i++) {
-			GoogleDD ITEM = GoogleDD.valueOfItem(items[i]);
+			String [] dd = items[i].split("/");
+			GoogleDD ITEM = GoogleDD.valueOfItem(dd[0]);
 			if(ITEM != null)
 				item_ids.add(ITEM.id);
+			if(dd[1] != null)
+				item_formats.add(dd[1]);
+			else
+				item_formats.add("");
 		}
 		if(item_ids.size() > 0) {
 			if(Azrael.SQLDeleteGoogleSpreadsheetMapping(file_id, event) != -1) {
-				int [] result = Azrael.SQLBatchInsertGoogleSpreadsheetMapping(file_id, event, item_ids);
+				int [] result = Azrael.SQLBatchInsertGoogleSpreadsheetMapping(file_id, event, item_ids, item_formats);
 				if(result[0] > 0) {
 					e.getChannel().sendMessage(message.setDescription("Data dictionary items have been registered for this event and spreadsheet!").build()).queue();
 				}

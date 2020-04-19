@@ -372,7 +372,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						if(!lcMessage.equals("exit")) {
 							//actions for google docs
 							if(google.getAdditionalInfo().equals("docs")) {
-								//empty for now
+								//TODO: add google docs logic
 							}
 							
 							//actions for google spreadsheets
@@ -416,6 +416,11 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-map-update")) {
 								GoogleSpreadsheetsExecution.mapUpdate(e, google.getAdditionalInfo2(), Integer.parseInt(google.getAdditionalInfo3()), lcMessage, key);
+							}
+							
+							//actions for google drive
+							else if(google.getAdditionalInfo().equals("drive")) {
+								//TODO: add google drive logic
 							}
 						}
 						else {

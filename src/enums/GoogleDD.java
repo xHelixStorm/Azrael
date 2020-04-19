@@ -10,9 +10,10 @@ import java.util.Map;
  */
 
 public enum GoogleDD {
-	USER_ID		(1, "user_id"),
-	NAME		(2, "name"),
-	USERNAME	(3, "username");
+	TIMESTAMP	(1, "timestamp"),
+	USER_ID		(2, "user_id"),
+	NAME		(3, "name"),
+	USERNAME	(4, "username");
 	
 	/**
 	 * Maps defined here to retrieve enum either by id or value

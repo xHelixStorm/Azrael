@@ -44,13 +44,14 @@ public class Google implements CommandPublic {
 			String email;
 			String [] credentialContent = FileSetting.readFileIntoFixedArray("./files/Google/credentials.json");
 			if(credentialContent.length > 0)
-				email = credentialContent[4].replaceAll("\"client-email\":", "").replaceAll("[\",]", "").trim();
+				email = credentialContent[5].replaceAll("client_email", "").replaceAll("[\",:\\s]", "").trim();
 			else 
 				email = "N/A";
-			e.getChannel().sendMessage(message.setDescription("Make use of a google API and assign events upon to interact with any available platform of google. For example google docs / spreadsheets. Operations on these files are handled by **"+email+"**\n"
+			e.getChannel().sendMessage(message.setDescription("Make use of a google API and assign events upon it to interact with any available platform of google. For example google docs or google spreadsheets. Operations on these files are handled by **"+email+"**\n"
 				+ "Available APIs and parameters:\n\n"
-				+ "**docs**: build an interface with google docs\n"
-				+ "**spreadsheets** : build an interface with google spreadsheets").build()).queue();
+				+ "**docs**: build an ineraction with google docs\n"
+				+ "**spreadsheets**: build an interaction with google spreadsheets\n"
+				+ "**drive**: build an interaction with google drive").build()).queue();
 		}
 		else if(args.length == 1) {
 			//Write in cache to display options related to google docs
@@ -60,6 +61,10 @@ public class Google implements CommandPublic {
 			//Write in cache to display options related to google spreadsheets
 			else if(args[0].equalsIgnoreCase("spreadsheets")) {
 				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "spreadsheets"));
+			}
+			//Write in cache to display options related to google drive
+			else if(args[0].equalsIgnoreCase("drive")) {
+				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "drive"));
 			}
 			else {
 				e.getChannel().sendMessage(message.setDescription("API doesn't exist or was not written correctly. Please try again!").build()).queue();

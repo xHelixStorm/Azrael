@@ -2688,6 +2688,7 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			String sql = ("SELECT fk_event_id FROM google_file_to_event WHERE fk_file_id = ?");
 			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _file_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				events.add(rs.getInt(1));
@@ -2803,7 +2804,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM google_spreadsheet_sheet WHERE fk_file_id = ? AND fk_event_id = ?");
+			String sql = ("DELETE FROM google_spreadsheet_sheet WHERE fk_file_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _file_id);
 			return stmt.executeUpdate();
@@ -2846,7 +2847,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM google_spreadsheet_mapping WHERE fk_file_id = ? AND fk_event_id = ?");
+			String sql = ("DELETE FROM google_spreadsheet_mapping WHERE fk_file_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _file_id);
 			return stmt.executeUpdate();
@@ -2949,22 +2950,21 @@ public class Azrael {
 		}
 	}
 	
-	public static int [] SQLBatchInsertGoogleSpreadsheetMapping(String _file_id, int _event_id, List<Integer> _dd_items) {
-		logger.info("SQLBatchInsertGoogleSpreadsheetMapping launched. Passed params {}, {}, array", _file_id, _event_id);
+	public static int [] SQLBatchInsertGoogleSpreadsheetMapping(String _file_id, int _event_id, List<Integer> _dd_items, List<String> _dd_formats) {
+		logger.info("SQLBatchInsertGoogleSpreadsheetMapping launched. Passed params {}, {}, array1, array2", _file_id, _event_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO google_spreadsheet_mapping (fk_file_id, fk_event_id, column_number, fk_dd_id) VALUES(?, ?, ?, ?)");
+			String sql = ("INSERT INTO google_spreadsheet_mapping (fk_file_id, fk_event_id, column_number, fk_dd_id, format) VALUES(?, ?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
-			int columnNumber = 1;
-			for(final int dd: _dd_items) {
+			for(int columnNumber = 0; columnNumber < _dd_items.size(); columnNumber++) {
 				stmt.setString(1, _file_id);
 				stmt.setInt(2, _event_id);
-				stmt.setInt(3, columnNumber);
-				stmt.setInt(4, dd);
+				stmt.setInt(3, columnNumber+1);
+				stmt.setInt(4, _dd_items.get(columnNumber));
+				stmt.setString(5, _dd_formats.get(columnNumber));
 				stmt.addBatch();
-				columnNumber++;
 			}
 			return stmt.executeBatch();
 		} catch (SQLException e) {
