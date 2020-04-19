@@ -225,7 +225,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT description, timestamp FROM action_log WHERE target_id = ? && guild_id = ? && (event LIKE \"MEMBER_KICK\" || event LIKE \"MEMBER_BAN_ADD\" || event LIKE \"MEMBER_BAN_REMOVE\" || event LIKE \"MEMBER_MUTE_ADD\" || event LIKE \"MEMBER_ROLE_ADD\") ORDER BY timestamp desc LIMIT 30");
+			String sql = ("SELECT description, timestamp FROM action_log WHERE target_id = ? && guild_id = ? && (event LIKE \"MEMBER_KICK\" || event LIKE \"MEMBER_BAN_ADD\" || event LIKE \"MEMBER_BAN_REMOVE\" || event LIKE \"MEMBER_MUTE_ADD\" || event LIKE \"MEMBER_ROLE_ADD\" || event LIKE \"MEMBER_ROLE_REMOVE\") ORDER BY timestamp desc LIMIT 30");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
 			stmt.setLong(2, _guild_id);

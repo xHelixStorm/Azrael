@@ -81,6 +81,7 @@ public class UserExecution {
 				+ "**unban**: To unban the user\n"
 				+ "**kick**: To kick the user\n"
 				+ "**assign-role**: To assign a role with logging\n"
+				+ "**remove-role**: To remove a role with logging\n"
 				+ "**history**: To display the whole kick/ban/mute history with reasons\n"
 				+ "**watch**: To either log all messages or only deleted messages from this user\n"
 				+ "**unwatch**: To remove this user from the watchlist\n"
@@ -110,7 +111,7 @@ public class UserExecution {
 				return;
 			}
 			var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
-			if(!cache.getAdditionalInfo().matches("[a-zA-Z\\-]{1,}[\\d]*") && (comment.equals("information") || comment.equals("delete-messages") || comment.equals("warning") || comment.equals("mute") || comment.equals("unmute") || comment.equals("ban") || comment.equals("unban") || comment.equals("kick") || comment.equals("assign-role") ||comment.equals("history") || comment.equals("watch") || comment.equals("unwatch") || comment.equals("gift-experience") || comment.equals("set-experience") || comment.equals("set-level") || comment.equals("gift-currency") || comment.equals("set-currency"))) {
+			if(!cache.getAdditionalInfo().matches("[a-zA-Z\\-]{1,}[\\d]*") && (comment.equals("information") || comment.equals("delete-messages") || comment.equals("warning") || comment.equals("mute") || comment.equals("unmute") || comment.equals("ban") || comment.equals("unban") || comment.equals("kick") || comment.equals("assign-role") ||  comment.equals("remove-role") || comment.equals("history") || comment.equals("watch") || comment.equals("unwatch") || comment.equals("gift-experience") || comment.equals("set-experience") || comment.equals("set-level") || comment.equals("gift-currency") || comment.equals("set-currency"))) {
 				switch(comment) {
 					case "information" -> {
 						final var informationLevel = GuildIni.getUserInformationLevel(_e.getGuild().getIdLong());
@@ -548,14 +549,45 @@ public class UserExecution {
 							Hashes.clearTempCache(key);
 						}
 					}
+					case "remove-role" -> {
+						final var removeRoleLevel = GuildIni.getUserRemoveRoleLevel(_e.getGuild().getIdLong());
+						if(UserPrivs.comparePrivilege(_e.getMember(), removeRoleLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+							int count = 0;
+							ArrayList<Long> roles = new ArrayList<Long>();
+							StringBuilder out = new StringBuilder();
+							for(final var role : _e.getGuild().getRoles()) {
+								if(_e.getGuild().getSelfMember().canInteract(role) && !role.getName().equals("@everyone")) {
+									out.append(++count+": "+role.getName()+" ("+role.getId()+")\n");
+									roles.add(role.getIdLong());
+								}
+							}
+							if(roles.size() > 0) {
+								message.setTitle("You chose to remove a role!");
+								_e.getChannel().sendMessage(message.setDescription("These are the roles which the bot is able to remove. Select the digit for the role you wish to remove:\n\n"+out.toString()).build()).queue();
+								cache.updateDescription("remove-role"+user_id).setExpiration(180000).setObject(roles);
+								Hashes.addTempCache(key, cache);
+							}
+							else {
+								message.setTitle("There are no roles available that can be removed!").setColor(Color.RED);
+								_e.getChannel().sendMessage(message.setDescription("No role available which could be removed from the user through the bot. Please be sure that a role exists and that the role level is lower than the one of the bot!").build()).queue();
+								Hashes.clearTempCache(key);
+							}
+						}
+						else {
+							UserPrivs.throwNotEnoughPrivilegeError(_e, removeRoleLevel);
+							Hashes.clearTempCache(key);
+						}
+					}
 					case "history" -> {
 						final var historyLevel = GuildIni.getUserHistoryLevel(_e.getGuild().getIdLong());
 						if(UserPrivs.comparePrivilege(_e.getMember(), historyLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
 							message.setTitle("You chose to display the history!");
 							StringBuilder out = new StringBuilder();
 							for(var history : Azrael.SQLgetHistory(user_id, _e.getGuild().getIdLong())) {
-								if(history.getType().equals("role"))
+								if(history.getType().equals("roleAdd"))
 									out.append(history.getTime()+": **"+history.getType()+"**\n"+history.getInfo()+" assigned from: **"+history.getReason()+"**\n\n");
+								else if(history.getType().equals("roleRemove"))
+									out.append(history.getTime()+": **"+history.getType()+"**\n"+history.getInfo()+" removed from: **"+history.getReason()+"**\n\n");
 								else
 									out.append(history.getTime()+": **"+history.getType()+(history.getPenalty() != 0 ? " for "+history.getPenalty()+" minutes" : "")+"**\nReason: **"+history.getReason()+"**\n\n");
 							}
@@ -1244,7 +1276,7 @@ public class UserExecution {
 								final var role = _e.getGuild().getRoleById(role_id);
 								if(_e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 									_e.getGuild().addRoleToMember(member, role).queue(success -> {
-										Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "role", _e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator(), 0, role.getName());
+										Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "roleAdd", _e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator(), 0, role.getName());
 										Azrael.SQLInsertActionLog("MEMBER_ROLE_ADD", user_id, _e.getGuild().getIdLong(), "Received the role "+role.getName()+" from "+_e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator());
 										message.setTitle("Success");
 										_e.getChannel().sendMessage(message.setDescription("The user **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** with the ID number **"+member.getUser().getId()+"** has received the role **"+role.getName()+"** from **"+_e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator()+"**").build()).queue();
@@ -1261,7 +1293,55 @@ public class UserExecution {
 							}
 							else {
 								message.setTitle("User already has this role!").setColor(Color.RED);
-								_e.getChannel().sendMessage(message.setDescription("This user is not present on the server!").build()).queue();
+								_e.getChannel().sendMessage(message.setDescription("The user already has this role!").build()).queue();
+								Hashes.clearTempCache(key);
+							}
+						}
+						else {
+							message.setTitle("User has left the server!").setColor(Color.RED);
+							_e.getChannel().sendMessage(message.setDescription("This user is not present on the server!").build()).queue();
+							Hashes.clearTempCache(key);
+						}
+					}
+					else {
+						message.setTitle("Digit not defined!").setColor(Color.RED);
+						_e.getChannel().sendMessage(message.setDescription("Please select one of the displayed digits!").build()).queue();
+						cache.setExpiration(180000);
+						Hashes.addTempCache(key, cache);
+					}
+				}
+			}
+			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("remove-role")) {
+				@SuppressWarnings("unchecked")
+				ArrayList<Long> roles = (ArrayList<Long>)cache.getObject();
+				if(_message.replaceAll("[0-9]*", "").isBlank()) {
+					int number = Integer.parseInt(_message);
+					if(roles.size() >= number) {
+						final long role_id = roles.get(number-1);
+						final var member = _e.getGuild().getMemberById(user_id);
+						if(member != null) {
+							if(member.getRoles().parallelStream().filter(f -> f.getIdLong() == role_id).findAny().orElse(null) != null) {
+								final var role = _e.getGuild().getRoleById(role_id);
+								if(_e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+									_e.getGuild().removeRoleFromMember(member, role).queue(success -> {
+										Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "roleRemove", _e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator(), 0, role.getName());
+										Azrael.SQLInsertActionLog("MEMBER_ROLE_REMOVE", user_id, _e.getGuild().getIdLong(), "Retracted the role "+role.getName()+" from "+_e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator());
+										message.setTitle("Success");
+										_e.getChannel().sendMessage(message.setDescription("The user **"+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+"** with the ID number **"+member.getUser().getId()+"** got the role **"+role.getName()+"** removed from **"+_e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator()+"**").build()).queue();
+										logger.debug("The user {} got the role {} retracted by the bot in guild {}", user_id, role_id, _e.getGuild().getId());
+										Hashes.clearTempCache(key);
+									});
+								}
+								else {
+									message.setTitle("Permission required!").setColor(Color.RED);
+									_e.getChannel().sendMessage(message.setDescription("The MANAGE_ROLES permission is required to remove roles!").build()).queue();
+									logger.warn("MANAGE_ROLES permission required to remove roles in guild {}", _e.getGuild().getId());
+									Hashes.clearTempCache(key);
+								}
+							}
+							else {
+								message.setTitle("User doesn't have this role!").setColor(Color.RED);
+								_e.getChannel().sendMessage(message.setDescription("The user doesn't have this role!").build()).queue();
 								Hashes.clearTempCache(key);
 							}
 						}
