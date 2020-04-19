@@ -281,6 +281,7 @@ public class Display implements CommandPublic{
 				out.append("User mute subcommand: "+GuildIni.getUserMuteLevel(e.getGuild().getIdLong())+"\n");
 				out.append("User unmute subcommand: "+GuildIni.getUserUnmuteLevel(e.getGuild().getIdLong())+"\n");
 				out.append("User ban subcommand: "+GuildIni.getUserBanLevel(e.getGuild().getIdLong())+"\n");
+				out.append("User unban subcommand: "+GuildIni.getUserUnbanLevel(e.getGuild().getIdLong())+"\n");
 				out.append("User kick subcommand: "+GuildIni.getUserKickLevel(e.getGuild().getIdLong())+"\n");
 				out.append("User history subcommand: "+GuildIni.getUserHistoryLevel(e.getGuild().getIdLong())+"\n");
 				out.append("User assign-role subcommand: "+GuildIni.getUserAssignRoleLevel(e.getGuild().getIdLong())+"\n");

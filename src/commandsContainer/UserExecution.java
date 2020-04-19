@@ -78,6 +78,7 @@ public class UserExecution {
 				+ "**mute**: To assign the mute role\n"
 				+ "**unmute** To unmute the member and to terminate the running task\n"
 				+ "**ban**: To ban the user\n"
+				+ "**unban**: To unban the user\n"
 				+ "**kick**: To kick the user\n"
 				+ "**assign-role**: To assign a role with logging\n"
 				+ "**history**: To display the whole kick/ban/mute history with reasons\n"
@@ -109,7 +110,7 @@ public class UserExecution {
 				return;
 			}
 			var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
-			if(!cache.getAdditionalInfo().matches("[a-zA-Z\\-]{1,}[\\d]*") && (comment.equals("information") || comment.equals("delete-messages") || comment.equals("warning") || comment.equals("mute") || comment.equals("unmute") || comment.equals("ban") || comment.equals("kick") || comment.equals("assign-role") ||comment.equals("history") || comment.equals("watch") || comment.equals("unwatch") || comment.equals("gift-experience") || comment.equals("set-experience") || comment.equals("set-level") || comment.equals("gift-currency") || comment.equals("set-currency"))) {
+			if(!cache.getAdditionalInfo().matches("[a-zA-Z\\-]{1,}[\\d]*") && (comment.equals("information") || comment.equals("delete-messages") || comment.equals("warning") || comment.equals("mute") || comment.equals("unmute") || comment.equals("ban") || comment.equals("unban") || comment.equals("kick") || comment.equals("assign-role") ||comment.equals("history") || comment.equals("watch") || comment.equals("unwatch") || comment.equals("gift-experience") || comment.equals("set-experience") || comment.equals("set-level") || comment.equals("gift-currency") || comment.equals("set-currency"))) {
 				switch(comment) {
 					case "information" -> {
 						final var informationLevel = GuildIni.getUserInformationLevel(_e.getGuild().getIdLong());
@@ -437,6 +438,42 @@ public class UserExecution {
 							message.setTitle("User can't get banned!").setColor(Color.RED);
 							_e.getChannel().sendMessage(message.setDescription("The ban parameter can't be used because the BAN MEMBERS permission is missing!").build()).queue();
 							logger.warn("BAN MEMBERS permission required to ban a user in guild {}!", _e.getGuild().getId());
+							Hashes.clearTempCache(key);
+						}
+					}
+					case "unban" -> {
+						if(_e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
+							final var unbanLevel = GuildIni.getUserUnbanLevel(_e.getGuild().getIdLong());
+							if(UserPrivs.comparePrivilege(_e.getMember(), unbanLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
+								_e.getGuild().retrieveBanById(user_id).queue(success -> {
+									message.setTitle("You chose to unban!");
+									if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
+										_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
+										cache.updateDescription("unban-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
+										Hashes.addTempCache(key, cache);
+									}
+									else {
+										message.addField("YES", "Provide a reason", true);
+										message.addField("NO", "Don't provide a reason", true);
+										_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a reson for the unban?").build()).queue();
+										cache.updateDescription("unban"+user_id).setExpiration(180000);
+										Hashes.addTempCache(key, cache);
+									}
+								}, error -> {
+									message.setTitle("User is not banned!").setColor(Color.RED);
+									_e.getChannel().sendMessage(message.setDescription("This user is not banned and hence can't be unbanned!").build()).queue();
+									Hashes.clearTempCache(key);
+								});
+							}
+							else {
+								UserPrivs.throwNotEnoughPrivilegeError(_e, unbanLevel);
+								Hashes.clearTempCache(key);
+							}
+						}
+						else {
+							message.setTitle("User can't get unbanned!").setColor(Color.RED);
+							_e.getChannel().sendMessage(message.setDescription("The unban parameter can't be used because the BAN MEMBERS permission is missing!").build()).queue();
+							logger.warn("BAN MEMBERS permission required to unban a user in guild {}!", _e.getGuild().getId());
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -1073,6 +1110,50 @@ public class UserExecution {
 				}
 				else if(_message.equalsIgnoreCase("no")) {
 					_e.getChannel().sendMessage(message.setDescription("Action aborted!").build()).queue();
+					Hashes.clearTempCache(key);
+				}
+			}
+			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("unban")) {
+				if(comment.equals("yes")) {
+					message.setTitle("You chose to provide a reason!");
+					_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
+					cache.updateDescription("unban-reason"+user_id).setExpiration(180000);
+					Hashes.addTempCache(key, cache);
+				}
+				else if(comment.equals("no")) {
+					if(_e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
+						Hashes.addTempCache("unban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), "No reason has been provided!"));
+						_e.getChannel().sendMessage(message.setDescription("Unban order has been issued!").build()).queue();
+						_e.getGuild().retrieveBanById(user_id).queue(ban -> {
+							_e.getGuild().unban(ban.getUser()).reason("User has been unbanned with the bot command!").queue();
+						});
+						Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "unban", "No reason has been provided!", 0, "");
+						logger.debug("{} has unbanned {} from guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getId());
+						Hashes.clearTempCache(key);
+					}
+					else {
+						message.setTitle("User can't get unbanned!").setColor(Color.RED);
+						_e.getChannel().sendMessage(message.setDescription("User can't be unbanned because the BAN MEMBERS permission is missing!").build()).queue();
+						logger.warn("BAN MEMBERS permission required to unban a user in guild {}!", _e.getGuild().getId());
+						Hashes.clearTempCache(key);
+					}
+				}
+			}
+			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("unban-reason")) {
+				if(_e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
+					Hashes.addTempCache("unban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
+					_e.getChannel().sendMessage(message.setDescription("Unban order has been issued!").build()).queue();
+					_e.getGuild().retrieveBanById(user_id).queue(ban -> {
+						_e.getGuild().unban(ban.getUser()).reason(_message).queue();
+					});
+					Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "unban", _message, 0, "");
+					logger.debug("{} has unbanned {} in guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getId());
+					Hashes.clearTempCache(key);
+				}
+				else {
+					message.setTitle("User can't get unbanned!").setColor(Color.RED);
+					_e.getChannel().sendMessage(message.setDescription("User can't be unbanned because the BAN MEMBERS permission is missing!").build()).queue();
+					logger.warn("BAN MEMBERS permission required to unban a user in guild {}!", _e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
 			}
