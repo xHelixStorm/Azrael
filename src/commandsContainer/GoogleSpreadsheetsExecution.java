@@ -177,7 +177,7 @@ public class GoogleSpreadsheetsExecution {
 		var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
 		if(setup == null) {
 			//db error
-			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Files from database couldn't be retrieved").build()).queue();
+			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Spreadsheets from database couldn't be retrieved. Returning to the spreadsheets parameters selection page...").build()).queue();
 			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
@@ -186,7 +186,7 @@ public class GoogleSpreadsheetsExecution {
 			StringBuilder out = new StringBuilder();
 			for(int i = 0; i < setup.size(); i++) {
 				final GoogleAPISetup currentSetup = setup.get(i);
-				out.append("**"+(i+1)+"**:\nTITLE: "+currentSetup.getTitle()+"\nURL:   "+GoogleUtils.buildFileURL(currentSetup.getFileID(), currentSetup.getApiID())+"\nTYPE:  "+currentSetup.getAPI()+"\n\n");
+				out.append("**"+(i+1)+": TITLE: "+currentSetup.getTitle()+"**\nURL:   "+GoogleUtils.buildFileURL(currentSetup.getFileID(), currentSetup.getApiID())+"\n\n");
 			}
 			e.getChannel().sendMessage(message.setDescription("The following spreadsheets are linked. Please select a spreadsheet that you wish to add or remove events from:\n\n"+out.toString()).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-events"));
@@ -201,13 +201,13 @@ public class GoogleSpreadsheetsExecution {
 	public static void eventsFileSelection(GuildMessageReceivedEvent e, int selection, final String key) {
 		final var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
 		if(setup == null) {
-			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Files from database couldn't be retrieved. Returning to the spreadsheets parameters selection page...").build()).queue();
+			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Spreadsheets from database couldn't be retrieved. Returning to the spreadsheets parameters selection page...").build()).queue();
 			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
 		else if(selection >= 0 && selection < setup.size()) {
 			final var events = Azrael.SQLgetGoogleEventsSupportSpreadsheet();
-			if(events.size() == 0) {
+			if(events == null) {
 				//db error
 				e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Events from the database couldn't be retrieved. Returning to the spreadsheets parameters selection page...").build()).queue();
 				logger.error("Data from Azrael.google_events couldn't be retrieved for guild {}", e.getGuild().getId());
@@ -225,12 +225,25 @@ public class GoogleSpreadsheetsExecution {
 						out.append(", `"+event.getEvent()+"`");
 				}
 				
-				e.getChannel().sendMessage(message.setDescription("Now type in the required events starting with either **add** or **remove**. If multiple events should be inserted, separate them with a ',' These are the supported events for spreadsheets: \n\n"+out.toString()).build()).queue();
+				final var registeredEvents = Azrael.SQLgetGoogleLinkedEvents(file.getFileID());
+				StringBuilder out2 = new StringBuilder();
+				int count = 0;
+				for(final int event_id : registeredEvents) {
+					if(count == 0)
+						out2.append("`"+GoogleEvent.valueOfId(event_id).name()+"`");
+					else
+						out2.append(", `"+GoogleEvent.valueOfId(event_id).name()+"`");
+					count++; 
+				}
+				if(registeredEvents.size() == 0)
+					out2.append("N/A");
+				
+				e.getChannel().sendMessage(message.setDescription("Now type in the required events starting with either **add** or **remove**. If multiple events should be inserted, separate them with a ','.\nThese are the supported events for spreadsheets: "+out.toString()+"\nRegistered events: "+out2.toString()).build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-events-update", file.getFileID()));
 			}
 			else {
 				//nothing found information
-				e.getChannel().sendMessage(error.setDescription("Events have not been configured! Please contact the administrator for the Bot! Returning to the spreadsheets parameters selection page...").build()).queue();
+				e.getChannel().sendMessage(error.setDescription("Events have not been configured! Please contact the Bot administrator! Returning to the spreadsheets parameters selection page...").build()).queue();
 				logger.error("Google spreadsheets events are not defined!");
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 			}
@@ -292,15 +305,15 @@ public class GoogleSpreadsheetsExecution {
 					logger.error("Events couldn't be removed from Azrael.google_spreadsheet_sheet with file_id {} in guild {}", file_id, e.getGuild().getId());
 				}
 			}
-			Hashes.addTempCache(key, new Cache(180000, "spreadsheet-selection"));
 		}
+		Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 	}
 	
 	public static void sheet(GuildMessageReceivedEvent e, final String key) {
 		var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
 		if(setup == null) {
 			//db error
-			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Spreadsheets from database couldn't be retrieved").build()).queue();
+			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Spreadsheets from database couldn't be retrieved. Returning to the spreadsheets parameters selection page...").build()).queue();
 			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
@@ -309,7 +322,7 @@ public class GoogleSpreadsheetsExecution {
 			StringBuilder out = new StringBuilder();
 			for(int i = 0; i < setup.size(); i++) {
 				final GoogleAPISetup currentSetup = setup.get(i);
-				out.append("**"+(i+1)+"**:\nTITLE: "+currentSetup.getTitle()+"\nURL:   "+GoogleUtils.buildFileURL(currentSetup.getFileID(), currentSetup.getApiID())+"\nTYPE:  "+currentSetup.getAPI()+"\n\n");
+				out.append("**"+(i+1)+": TITLE: "+currentSetup.getTitle()+"**\nURL:   "+GoogleUtils.buildFileURL(currentSetup.getFileID(), currentSetup.getApiID())+"\n\n");
 			}
 			e.getChannel().sendMessage(message.setDescription("The following spreadsheets are linked. Please select a spreadsheet to edit the starting point through the shown number:\n\n"+out.toString()).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-sheet"));
@@ -346,7 +359,19 @@ public class GoogleSpreadsheetsExecution {
 						out.append(",`"+GoogleEvent.valueOfId(event).value+"`");
 					count++;
 				}
-				e.getChannel().sendMessage(message.setDescription("**"+GoogleUtils.buildFileURL(file.getFileID(), 2)+"**\nNow please select an event before defining the starting point by typing the name of the event. These are the events to choose from:\n"+out.toString()).build()).queue();
+				final var sheets = Azrael.SQLgetGoogleSpreadsheetSheets(file.getFileID());
+				StringBuilder out2 = new StringBuilder();
+				int i = 0;
+				for(final var sheet : sheets) {
+					if(i == 0)
+						out2.append("`"+sheet.getEvent().name()+":"+sheet.getSheetRowStart()+"`");
+					else
+						out2.append(", `"+sheet.getEvent().name()+":"+sheet.getSheetRowStart()+"`");
+				}
+				if(out2.length() == 0)
+					out2.append("N/A");
+				
+				e.getChannel().sendMessage(message.setDescription("Now please select an event before defining the starting point by typing the name of the event. These are the events to choose from: "+out.toString()+"\nDefined events with starting point: "+out2.toString()).build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-sheet-events", file.getFileID()));
 			}
 			else {
@@ -366,7 +391,7 @@ public class GoogleSpreadsheetsExecution {
 		else {
 			GoogleEvent EVENT = GoogleEvent.valueOfEvent(event);
 			if(EVENT != null && events.parallelStream().filter(f -> f == EVENT.id).findAny().orElse(null) != null) {
-				e.getChannel().sendMessage(message.setDescription("**"+GoogleUtils.buildFileURL(file_id, 2)+"**\nNow please submit the starting point (e.g. 'A1'). If there are multiple sheets, please write the name of the sheet and then the starting point (e.g. 'Sheet1!A1')").build()).queue();
+				e.getChannel().sendMessage(message.setDescription("Now please submit the starting point (e.g. 'A1'). If there are multiple sheets, please write the name of the sheet and then the starting point (e.g. 'Sheet1!A1')").build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-sheet-update", file_id, event));
 			}
 		}
@@ -382,6 +407,7 @@ public class GoogleSpreadsheetsExecution {
 				e.getChannel().sendMessage(error.setDescription("An internal error occurred! Starting point couldn't be updated! Returning to the spreadsheets parameter selection page...").build()).queue();
 				logger.error("Google spreadsheet starting point couldn't be updated for guild {}, spreadsheet {}, event {} with value {}", e.getGuild().getId(), file_id, event, startingPoint);
 			}
+			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
 	}
 	
@@ -389,7 +415,7 @@ public class GoogleSpreadsheetsExecution {
 		var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
 		if(setup == null) {
 			//db error
-			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Spreadsheets from database couldn't be retrieved").build()).queue();
+			e.getChannel().sendMessage(error.setDescription("An internal error has occurred! Spreadsheets from database couldn't be retrieved. Returning to the spreadsheets parameters selection page...").build()).queue();
 			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
@@ -398,7 +424,7 @@ public class GoogleSpreadsheetsExecution {
 			StringBuilder out = new StringBuilder();
 			for(int i = 0; i < setup.size(); i++) {
 				final GoogleAPISetup currentSetup = setup.get(i);
-				out.append("**"+(i+1)+"**:\nTITLE: "+currentSetup.getTitle()+"\nURL:   "+GoogleUtils.buildFileURL(currentSetup.getFileID(), currentSetup.getApiID())+"\nTYPE:  "+currentSetup.getAPI()+"\n\n");
+				out.append("**"+(i+1)+": TITLE: "+currentSetup.getTitle()+"**\nURL:   "+GoogleUtils.buildFileURL(currentSetup.getFileID(), currentSetup.getApiID())+"\n\n");
 			}
 			e.getChannel().sendMessage(message.setDescription("The following spreadsheets are linked. Please select a spreadsheet to map the columns with a data dictionary item through the shown number:\n\n"+out.toString()).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-map"));
@@ -435,7 +461,7 @@ public class GoogleSpreadsheetsExecution {
 						out.append(",`"+GoogleEvent.valueOfId(event).value+"`");
 					count++;
 				}
-				e.getChannel().sendMessage(message.setDescription("**"+GoogleUtils.buildFileURL(file.getFileID(), 2)+"**\nNow please select an event before defining the starting point by typing the name of the event. These are the events to choose from:\n"+out.toString()).build()).queue();
+				e.getChannel().sendMessage(message.setDescription("Now please select an event before mapping the sheet cells. These are the events to choose from: "+out.toString()).build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-map-events", file.getFileID()));
 			}
 			else {
@@ -471,11 +497,12 @@ public class GoogleSpreadsheetsExecution {
 							out.append(", `"+item+"`");
 						count++;
 					}
-					e.getChannel().sendMessage(message.setDescription("**"+GoogleUtils.buildFileURL(file_id, 2)+"**\nNow please submit a list of data items, divided by a comma and in the exact order that it has to write into the spreadsheet. Few data dictionary items have the possibility for additional formatting by typing the format type after a /. Example input 'timestamp/dd-MM-yyyy,user_id,nickname/UPPER_CASE,name'. These are the available data dictionary items for this event:\n"+out.toString()).build()).queue();
+					e.getChannel().sendMessage(message.setDescription("Now please submit a list of data items, divided by a comma in the exact order that it has to write into the spreadsheet sheet. Few data dictionary items can be additionally formated by separating item and format by '/'.\nExample input: 'timestamp/dd-MM-yyyy,user_id,nickname/UPPER_CASE,name'.\n\nThese are the available data dictionary items for this event: "+out.toString()).build()).queue();
 					Hashes.addTempCache(key, new Cache(180000, "spreadsheets-map-update", file_id, ""+EVENT.id));
 				}
 				else {
 					e.getChannel().sendMessage(error.setDescription("No available data dictionary items have been found for this event and spreadsheets. Returning to the spreadsheets parameter selection page...").build()).queue();
+					Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 				}
 			}
 		}
@@ -484,18 +511,33 @@ public class GoogleSpreadsheetsExecution {
 	public static void mapUpdate(GuildMessageReceivedEvent e, String file_id, int event, String dditems, final String key) {
 		ArrayList<Integer> item_ids = new ArrayList<Integer>();
 		ArrayList<String> item_formats = new ArrayList<String>();
+		int invalidCount = 0;
+		StringBuilder invalidItems = new StringBuilder();
 		String [] items = dditems.split(",");
 		for(var i = 0; i < items.length; i++) {
-			String [] dd = items[i].split("/");
+			String [] dd = items[i].trim().split("/");
+			dd[0] = dd[0].toUpperCase();
 			GoogleDD ITEM = GoogleDD.valueOfItem(dd[0]);
-			if(ITEM != null)
+			if(ITEM != null) {
 				item_ids.add(ITEM.id);
-			if(dd[1] != null)
-				item_formats.add(dd[1]);
-			else
-				item_formats.add("");
+				if(dd.length == 2)
+					item_formats.add(dd[1]);
+				else
+					item_formats.add("");
+			}
+			else {
+				if(invalidCount == 0)
+					invalidItems.append("`"+dd[0]+"`");
+				else
+					invalidItems.append(",`"+dd[0]+"`");
+				invalidCount++;
+			}
 		}
-		if(item_ids.size() > 0) {
+		if(invalidCount > 0) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The following data dictionary items are invalid. Please resubmit your items:\n"+invalidItems.toString()).build()).queue();
+			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-map-update", file_id, ""+event));
+		}
+		else if(item_ids.size() > 0) {
 			if(Azrael.SQLDeleteGoogleSpreadsheetMapping(file_id, event) != -1) {
 				int [] result = Azrael.SQLBatchInsertGoogleSpreadsheetMapping(file_id, event, item_ids, item_formats);
 				if(result[0] > 0) {

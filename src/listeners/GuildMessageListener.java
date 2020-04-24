@@ -409,7 +409,7 @@ public class GuildMessageListener extends ListenerAdapter {
 								GoogleSpreadsheetsExecution.sheetUpdate(e, google.getAdditionalInfo2(), google.getAdditionalInfo3(), message, key);
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-map") && lcMessage.matches("[\\d]*")) {
-								GoogleSpreadsheetsExecution.map(e, key);
+								GoogleSpreadsheetsExecution.mapSelection(e, Integer.parseInt(message)-1, key);
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-map-events")) {
 								GoogleSpreadsheetsExecution.mapEvents(e, google.getAdditionalInfo2(), message.toUpperCase(), key);

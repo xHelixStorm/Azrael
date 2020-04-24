@@ -303,7 +303,7 @@ public class RoleListener extends ListenerAdapter {
 						logger.warn("MANAGE ROLES permission missing to retract the mute role in guild {}!", e.getGuild().getId());
 					}
 				}
-				if(unmute_time - System.currentTimeMillis() < 0 && !permMute) {
+				if(unmute_time - System.currentTimeMillis() < 0) {
 					Azrael.SQLInsertActionLog("MEMBER_MUTE_ADD", user_id, guild_id, "User Muted");
 				}
 			}

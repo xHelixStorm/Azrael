@@ -17,6 +17,7 @@ import constructors.Bancollect;
 import constructors.Channels;
 import constructors.GoogleAPISetup;
 import constructors.GoogleEvents;
+import constructors.GoogleSheet;
 import constructors.History;
 import constructors.NameFilter;
 import constructors.RSS;
@@ -25,6 +26,7 @@ import constructors.Warning;
 import constructors.Watchlist;
 import core.Hashes;
 import enums.GoogleDD;
+import enums.GoogleEvent;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -2793,6 +2795,32 @@ public class Azrael {
 			logger.error("SQLInsertGoogleSpreadsheetSheet Exception", e);
 			return 0;
 		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<GoogleSheet> SQLgetGoogleSpreadsheetSheets(String _file_id) {
+		logger.info("SQLgetGoogleSpreadsheetSheets launched. Params passed {}", _file_id);
+		ArrayList<GoogleSheet> sheets = new ArrayList<GoogleSheet>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT fk_event_id, sheet_row_start FROM google_spreadsheet_sheet WHERE fk_file_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _file_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				sheets.add(new GoogleSheet(GoogleEvent.valueOfId(rs.getInt(1)), rs.getString(2)));
+			}
+			return sheets;
+		} catch (SQLException e) {
+			logger.error("SQLgetGoogleSpreadsheetSheets Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
