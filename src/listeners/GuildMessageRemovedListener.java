@@ -31,11 +31,11 @@ import sql.DiscordRoles;
 
 public class GuildMessageRemovedListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageRemovedListener.class);
-	private static final EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE);
 	
 	@Override
 	public void onGuildMessageDelete(GuildMessageDeleteEvent e) {
 		new Thread(() -> {
+			final EmbedBuilder message = new EmbedBuilder();
 			//remove reaction messages from db
 			DiscordRoles.SQLDeleteReactions(e.getMessageIdLong());
 			//verify that the message in cache logger is enabled
@@ -100,6 +100,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 										//retrieve the trash channel to print the removed message
 										var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 										if(tra_channel != null) {
+											message.setColor(Color.CYAN);
 											//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 											for(final var cachedMessage : removed_messages) {
 												message.setTitle(trigger_user_name+" has removed "+(cachedMessage.isEdit() ? "an **edited message**" : "a **message**")+" from #"+e.getChannel().getName()+"!");
@@ -118,6 +119,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 										var tra_channel = traAndDel_channel.parallelStream().filter(f -> f.getChannel_Type().equals("tra")).findAny().orElse(null);
 										var del_channel = traAndDel_channel.parallelStream().filter(f -> f.getChannel_Type().equals("del")).findAny().orElse(null);
 										if(tra_channel != null || del_channel != null) {
+											message.setColor(Color.GRAY);
 											//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 											for(final var cachedMessage : removed_messages) {
 												message.setTitle("User has removed his own "+(cachedMessage.isEdit() ? "**edited message**" : "**message**")+" from #"+e.getChannel().getName()+"!");
@@ -128,11 +130,12 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 									}
 								}
 							}
-							//log messages which were removed from a channel that don't allow text input as long there is a message to print
+							//log messages which were removed from a channel that doesn't allow text input as long there is a message to print
 							else if(removed_messages.get(0).getMessage().length() > 0) {
 								//retrieve the trash channel to print the removed message
 								var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 								if(tra_channel != null) {
+									message.setColor(Color.ORANGE);
 									//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 									for(final var cachedMessage : removed_messages) {
 										message.setTitle((cachedMessage.isEdit() ? "**Edited message**" : "**Message**")+" removed from #"+e.getChannel().getName()+"!");
@@ -156,6 +159,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 					//Log additional removed messages from users that are being watched with watch level 1
 					var watchedUser = Azrael.SQLgetWatchlist(removed_messages.get(0).getUserID(), e.getGuild().getIdLong());
 					if(watchedUser != null && watchedUser.getLevel() == 1) {
+						message.setColor(Color.DARK_GRAY);
 						//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 						for(final var cachedMessage : removed_messages) {
 							message.setTitle("Logged deleted "+(cachedMessage.isEdit() ? "**edited message**" : "**message**")+" due to watching!");
