@@ -9,20 +9,28 @@ package listeners;
  */ 
 
 import java.awt.Color;
+import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Bancollect;
+import constructors.Channels;
 import constructors.Rank;
 import constructors.Warning;
 import core.Hashes;
 import core.UserPrivs;
+import enums.GoogleDD;
 import fileManagement.GuildIni;
+import google.GoogleSheets;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -141,7 +149,8 @@ public class RoleListener extends ListenerAdapter {
 						//get cache with reason and user who applied the mute
 						var cache = Hashes.getTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 						mute_time = Long.parseLong(cache.getAdditionalInfo());
-						var issuer = cache.getAdditionalInfo2();
+						var reporter = e.getGuild().getMemberById(cache.getAdditionalInfo2());
+						var issuer = reporter.getAsMention();
 						var reason = cache.getAdditionalInfo3();
 						Hashes.clearTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 						//calculate the mute time in a user friendly, visible form
@@ -168,15 +177,16 @@ public class RoleListener extends ListenerAdapter {
 						logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getId());
 						
 						//Run google service, if enabled
-						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-							
+						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+							handleSpreadsheetRequest(e, new Timestamp(time), user_name, reporter, reason, hour_add+minute_add+and_add, ""+(warning_id+1), new Timestamp(time+mute_time), log_channel);
 						}
 					}
 					//execute this block if a regular mute has been applied
 					else {
 						//check if the cache contains a reason and a name of who applied the mute
 						var cache = Hashes.getTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
-						var issuer = (cache != null ? cache.getAdditionalInfo() : (from_user != 0 ? e.getGuild().getMemberById(from_user).getAsMention() : "NaN"));
+						var reporter = (cache != null ? e.getGuild().getMemberById(cache.getAdditionalInfo()) : (from_user != 0 ? e.getGuild().getMemberById(from_user) : null));
+						var issuer = (reporter != null ? reporter.getAsMention() : "NaN");
 						var reason = (cache != null ? cache.getAdditionalInfo2() : "No reason has been provided!");
 						Hashes.clearTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 						//retrieve current warning and the time to mute
@@ -217,8 +227,8 @@ public class RoleListener extends ListenerAdapter {
 							logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getId());
 							
 							//Run google service, if enabled
-							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-								
+							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+								handleSpreadsheetRequest(e, timestamp, user_name, reporter, reason, hour_add+minute_add+and_add, ""+(warning_id+1), unmute_timestamp, log_channel);
 							}
 						}
 						//ban or perm mute if the current warning exceeded the max allowed warning
@@ -279,8 +289,8 @@ public class RoleListener extends ListenerAdapter {
 								new Thread(new RoleTimer(e, log_channel, mute_id, issuer, reason)).start();
 								
 								//Run google service, if enabled
-								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-									
+								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+									handleSpreadsheetRequest(e, timestamp, user_name, reporter, reason, "PERMANENT", ""+(warning_id+1), unmute_timestamp, log_channel);
 								}
 							}
 						}
@@ -329,5 +339,67 @@ public class RoleListener extends ListenerAdapter {
 			return false;
 		}
 		return true;
+	}
+	
+	@SuppressWarnings("preview")
+	private void handleSpreadsheetRequest(GuildMemberRoleAddEvent e, Timestamp timestamp, String name, Member reporter, String reason, String time, String warning_id, Timestamp unmute_timestamp, Channels log_channel) {
+		final String [] array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, 1);
+		final String file_id = array[0];
+		final String sheetRowStart = array[1];
+		if(file_id != null && file_id.length() > 0 && sheetRowStart != null && !sheetRowStart.isBlank()) {
+			final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, 1);
+			if(columns != null && columns.size() > 0) {
+				ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+				for(final var column : columns) {
+					GoogleDD item = column.getItem();
+					switch(item) {
+						case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+						case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(e.getUser().getId(), column.getFormatter())));
+						case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+						case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(e.getMember().getEffectiveName(), column.getFormatter())));
+						case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), column.getFormatter())));
+						case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporter.getEffectiveName(), column.getFormatter())));
+						case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
+						case TIME ->				values.add(Arrays.asList(item.valueFormatter(time, column.getFormatter())));
+						case ACTION ->				values.add(Arrays.asList(item.valueFormatter("MUTED", column.getFormatter())));
+						case WARNING ->				values.add(Arrays.asList(item.valueFormatter(warning_id, column.getFormatter())));
+						case UNMUTE_TIME -> 		values.add(Arrays.asList(item.valueFormatter(unmute_timestamp, column.getFormatter())));
+						case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+						default -> {}
+					}
+				}
+				try {
+					GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
+				} catch (IOException e1) {
+					logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, e.getGuild().getId(), e1);
+				} catch (Exception e1) {
+					logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, e.getGuild().getId(), e1);
+				}
+			}
+			else if(columns.size() == 0) {
+				if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle("Warning!").setDescription("No column mapping has been found!").build()).queue();
+				logger.warn("Mute spreadsheet {} is not mapped for event id 1 in guild {}", file_id, e.getGuild().getId());
+			}
+			else {
+				if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred! The columns mapping couldn't be retrieved!").build()).queue();
+				logger.error("Mapping couldn't be retrieved from Azrael.google_spreadsheet_mapping for file id {}, event id 1 and guild ", file_id, e.getGuild().getId());
+			}
+		}
+		else if(sheetRowStart == null) {
+			if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred! Mute Spreadsheet couldn't be retrieved!").build()).queue();
+			logger.error("Spreadsheet starting point couldn't be retrieved from google_files_and_events for event id 1 and guild {}", e.getGuild().getId());
+		}
+		else if(sheetRowStart.isBlank()) {
+			if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle("Warning!").setDescription("No Spreadsheet starting point couldn't be found for this event!").build()).queue();
+			logger.warn("Spreadsheet starting point couldn't be found for event id 1 and guild {}", e.getGuild().getId());
+		}
+		else if(file_id == null) {
+			if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred! Mute Spreadsheet couldn't be retrieved!").build()).queue();
+			logger.error("Mute spreadsheet couldn't be retrieved from google_files_and_events for event id 1 and guild {}", e.getGuild().getId());
+		}
+		else {
+			if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle("Warning!").setDescription("No spreadsheet has been found with the mute event!").build()).queue();
+			logger.warn("Mute spreadsheet couldn't be found for event id 1 and guild {}", e.getGuild().getId());
+		}
 	}
 }

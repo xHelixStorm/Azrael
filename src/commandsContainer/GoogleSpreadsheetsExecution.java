@@ -497,7 +497,7 @@ public class GoogleSpreadsheetsExecution {
 							out.append(", `"+item+"`");
 						count++;
 					}
-					e.getChannel().sendMessage(message.setDescription("Now please submit a list of data items, divided by a comma in the exact order that it has to write into the spreadsheet sheet. Few data dictionary items can be additionally formated by separating item and format by '/'.\nExample input: 'timestamp/dd-MM-yyyy,user_id,nickname/UPPER_CASE,name'.\n\nThese are the available data dictionary items for this event: "+out.toString()).build()).queue();
+					e.getChannel().sendMessage(message.setDescription("Now please submit a list of data items, divided by a comma in the exact order that it has to write into the spreadsheet sheet. Few data dictionary items can be additionally formated by separating item and format by '+'.\nExample input: 'timestamp+dd-MM-yyyy,user_id,nickname+UPPER_CASE,name'.\n\nThese are the available data dictionary items for this event: "+out.toString()).build()).queue();
 					Hashes.addTempCache(key, new Cache(180000, "spreadsheets-map-update", file_id, ""+EVENT.id));
 				}
 				else {
@@ -515,12 +515,12 @@ public class GoogleSpreadsheetsExecution {
 		StringBuilder invalidItems = new StringBuilder();
 		String [] items = dditems.split(",");
 		for(var i = 0; i < items.length; i++) {
-			String [] dd = items[i].trim().split("/");
+			String [] dd = items[i].trim().split("+");
 			dd[0] = dd[0].toUpperCase();
 			GoogleDD ITEM = GoogleDD.valueOfItem(dd[0]);
 			if(ITEM != null) {
 				item_ids.add(ITEM.id);
-				if(dd.length == 2)
+				if(dd.length >= 2)
 					item_formats.add(dd[1]);
 				else
 					item_formats.add("");

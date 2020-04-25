@@ -415,7 +415,7 @@ public class GuildMessageListener extends ListenerAdapter {
 								GoogleSpreadsheetsExecution.mapEvents(e, google.getAdditionalInfo2(), message.toUpperCase(), key);
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-map-update")) {
-								GoogleSpreadsheetsExecution.mapUpdate(e, google.getAdditionalInfo2(), Integer.parseInt(google.getAdditionalInfo3()), lcMessage, key);
+								GoogleSpreadsheetsExecution.mapUpdate(e, google.getAdditionalInfo2(), Integer.parseInt(google.getAdditionalInfo3()), message, key);
 							}
 							
 							//actions for google drive

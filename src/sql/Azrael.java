@@ -18,6 +18,7 @@ import constructors.Channels;
 import constructors.GoogleAPISetup;
 import constructors.GoogleEvents;
 import constructors.GoogleSheet;
+import constructors.GoogleSheetColumn;
 import constructors.History;
 import constructors.NameFilter;
 import constructors.RSS;
@@ -2979,7 +2980,7 @@ public class Azrael {
 	}
 	
 	public static int [] SQLBatchInsertGoogleSpreadsheetMapping(String _file_id, int _event_id, List<Integer> _dd_items, List<String> _dd_formats) {
-		logger.info("SQLBatchInsertGoogleSpreadsheetMapping launched. Passed params {}, {}, array1, array2", _file_id, _event_id);
+		logger.info("SQLBatchInsertGoogleSpreadsheetMapping launched. Passed params {}, {}, array1, array2, array3", _file_id, _event_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3000,6 +3001,63 @@ public class Azrael {
 			int[] val = { -1 };
 			return val;
 		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<GoogleSheetColumn> SQLgetGoogleSpreadsheetMapping(String _file_id, int _event_id) {
+		logger.info("SQLgetGoogleSpreadsheetMapping launched. Params passed {}, {}", _file_id, _event_id);
+		ArrayList<GoogleSheetColumn> items = new ArrayList<GoogleSheetColumn>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT fk_dd_id, format FROM google_spreadsheet_mapping WHERE fk_file_id = ? AND fk_event_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _file_id);
+			stmt.setInt(2, _event_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				items.add(new GoogleSheetColumn(rs.getInt(1), rs.getString(2)));
+			}
+			return items;
+		} catch (SQLException e) {
+			logger.error("SQLgetGoogleSpreadsheetMapping Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static String [] SQLgetGoogleFilesAndEvent(long _guild_id, int _api_id, int _event_id) {
+		logger.info("SQLgetGoogleFilesAndEvent launched. Params passed {}, {}, {}", _guild_id, _api_id, _event_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT file_id, sheet_row_start FROM google_files_and_events WHERE guild_id = ? AND api_id = ? AND event_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setInt(2, _api_id);
+			stmt.setInt(3, _event_id);
+			rs = stmt.executeQuery();
+			String [] array = new String [2];
+			if(rs.next()) {
+				array[0] = rs.getString(1);
+				array[1] = rs.getString(2);
+				return array;
+			}
+			return array;
+		} catch (SQLException e) {
+			logger.error("SQLgetGoogleFilesAndEvent Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}

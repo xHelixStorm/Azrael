@@ -1,5 +1,7 @@
 package enums;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,10 +12,18 @@ import java.util.Map;
  */
 
 public enum GoogleDD {
-	TIMESTAMP	(1, "TIMESTAMP"),
-	USER_ID		(2, "USER_ID"),
-	NAME		(3, "NAME"),
-	USERNAME	(4, "USERNAME");
+	TIMESTAMP			(1, "TIMESTAMP", 1),
+	USER_ID				(2, "USER_ID", 0),
+	NAME				(3, "NAME", 2),
+	USERNAME			(4, "USERNAME", 2),
+	REPORTER_NAME		(5, "REPORTER_NAME", 2),
+	REPORTER_USERNAME	(6, "REPORTER_USERNAME", 2),
+	REASON				(7, "REASON", 2),
+	TIME				(8, "TIME", 0),
+	ACTION				(9, "ACTION", 3),
+	WARNING				(10, "WARNING", 0),
+	UNMUTE_TIME			(11, "UNMUTE_TIME", 1),
+	PLACEHOLDER			(12, "PLACEHOLDER", 0);
 	
 	/**
 	 * Maps defined here to retrieve enum either by id or value
@@ -35,16 +45,19 @@ public enum GoogleDD {
 	
 	public final int id;
 	public final String item;
+	public final int type;
 	
 	/**
 	 * Default constructor
 	 * @param _id
 	 * @param _item
+	 * @param _type
 	 */
 	
-	private GoogleDD(int _id, String _item) {
+	private GoogleDD(int _id, String _item, int _type) {
 		this.id = _id;
 		this.item = _item;
+		this.type = _type;
 	}
 	
 	/**
@@ -65,5 +78,59 @@ public enum GoogleDD {
 	
 	public static GoogleDD valueOfItem(String _item) {
 		return BY_ITEM.get(_item);
+	}
+	
+	/**
+	 * Format received values based on the type of the enum
+	 * @param _value
+	 * @param _format
+	 * @return
+	 */
+	
+	@SuppressWarnings("preview")
+	public String valueFormatter(Object _value, String _format) {
+		String formattedValue = null;
+		
+		switch(this.type) {
+			//format the timestamp with a date formatter
+			case 1 -> {
+				Timestamp timestamp = (Timestamp)_value;
+				if(_format != null && !_format.isBlank())
+					formattedValue = new SimpleDateFormat(_format).format(timestamp);
+				else
+					formattedValue = timestamp.toString();
+			}
+			//format names, usernames and so on
+			case 2 -> {
+				String value = (String)_value;
+				if(_format == null)
+					formattedValue = value;
+				if(_format.equalsIgnoreCase("UPPER_CASE"))
+					formattedValue = value.toUpperCase();
+				else if(_format.equalsIgnoreCase("LOWER_CASE"))
+					formattedValue = value.toLowerCase();
+				else
+					formattedValue = value;
+			}
+			//overwrite these values with the formatter if not blank
+			case 3 -> {
+				if(_format == null || _format.isBlank())
+					formattedValue = (String)_value;
+				else
+					formattedValue = _format;
+			}
+			//No formats available
+			default -> {
+				if(_value instanceof Long)
+					formattedValue = ""+(long)_value;
+				else if(_value instanceof Integer)
+					formattedValue = ""+(int)_value;
+				else if(_value instanceof Double)
+					formattedValue = ""+(double)_value;
+				else
+					formattedValue = (String)_value;
+			}
+		}
+		return formattedValue;
 	}
 }

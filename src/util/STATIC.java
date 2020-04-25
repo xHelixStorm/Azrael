@@ -61,7 +61,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
-	private static final String VERSION = "6.16.412";
+	private static final String VERSION = "6.16.413";
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
@@ -266,7 +266,8 @@ public class STATIC {
 				}
 				else if(cache.getAdditionalInfo().equals("2")) {
 					if(guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-						guild.addRoleToMember(member, guild.getRoleById(muteRole.getRole_ID())).queue();
+						Azrael.SQLInsertHistory(member.getUser().getIdLong(), guild.getIdLong(), "mute", "User muted after censoring 3 messages", 0, "");
+						guild.addRoleToMember(member, guild.getRoleById(muteRole.getRole_ID())).reason("User muted after censoring 3 messages").queue();
 					}
 					else {
 						final var log_channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);

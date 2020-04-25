@@ -290,7 +290,7 @@ public class UserExecution {
 							if(_e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 								final var muteLevel = GuildIni.getUserMuteLevel(_e.getGuild().getIdLong());
 								if(UserPrivs.comparePrivilege(_e.getMember(), muteLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
-									message.setTitle("You chose to mute!");
+									message.setTitle("You chose to mute!").setColor(Color.BLUE);
 									if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
 										_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
 										cache.updateDescription("mute-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
@@ -416,7 +416,7 @@ public class UserExecution {
 						if(_e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
 							final var banLevel = GuildIni.getUserBanLevel(_e.getGuild().getIdLong());
 							if(UserPrivs.comparePrivilege(_e.getMember(), banLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
-								message.setTitle("You chose to ban!");
+								message.setTitle("You chose to ban!").setColor(Color.BLUE);
 								if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
 									_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
 									cache.updateDescription("ban-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
@@ -494,7 +494,7 @@ public class UserExecution {
 						if(_e.getGuild().getSelfMember().hasPermission(Permission.KICK_MEMBERS)) {
 							final var kickLevel = GuildIni.getUserKickLevel(_e.getGuild().getIdLong());
 							if(UserPrivs.comparePrivilege(_e.getMember(), kickLevel) || GuildIni.getAdmin(_e.getGuild().getIdLong()) == _e.getMember().getUser().getIdLong()) {
-								message.setTitle("You chose to kick!");
+								message.setTitle("You chose to kick!").setColor(Color.BLUE);
 								if(GuildIni.getForceReason(_e.getGuild().getIdLong())) {
 									_e.getChannel().sendMessage(message.setDescription("Please provide a reason!").build()).queue();
 									cache.updateDescription("kick-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
@@ -930,7 +930,7 @@ public class UserExecution {
 					if(_e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 						var mute_role_id = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 						if(mute_role_id != null) {
-							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
+							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getUser().getId(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
 							if(permMute) {
 								var timestamp = new Timestamp(System.currentTimeMillis());
 								if(Azrael.SQLInsertData(member.getUser().getIdLong(), _e.getGuild().getIdLong(), Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong()), 1, timestamp, timestamp, false, false) == 0) {
@@ -988,7 +988,7 @@ public class UserExecution {
 						Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
 						var mute_role_id = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 						if(mute_role_id != null) {
-							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(""+mute_time, _e.getMember().getAsMention(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
+							Hashes.addTempCache("mute_time_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(""+mute_time, _e.getMember().getUser().getId(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
 							if(Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID() != 0) {
 								if(Azrael.SQLUpdateUnmute(user_id, _e.getGuild().getIdLong(), timestamp, unmute_timestamp, true, true) == 0) {
 									logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, _e.getGuild().getId());
@@ -1032,7 +1032,7 @@ public class UserExecution {
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("mute-delay")) {
 				if(_message.equalsIgnoreCase("yes")) {
 					_e.getChannel().sendMessage(message.setDescription("Mute reminder has been set!").build()).queue();
-					Hashes.addRejoinTask(_e.getGuild().getId()+"_"+user_id, new RejoinTask(user_id, _e.getGuild().getIdLong(), cache.getAdditionalInfo3(), _e.getMember().getAsMention(), "mute", cache.getAdditionalInfo2()));
+					Hashes.addRejoinTask(_e.getGuild().getId()+"_"+user_id, new RejoinTask(user_id, _e.getGuild().getIdLong(), cache.getAdditionalInfo3(), _e.getMember().getUser().getId(), "mute", cache.getAdditionalInfo2()));
 					Hashes.clearTempCache(key);
 				}
 				else if(_message.equalsIgnoreCase("no")) {
