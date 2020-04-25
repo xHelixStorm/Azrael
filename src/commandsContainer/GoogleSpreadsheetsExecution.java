@@ -515,7 +515,7 @@ public class GoogleSpreadsheetsExecution {
 		StringBuilder invalidItems = new StringBuilder();
 		String [] items = dditems.split(",");
 		for(var i = 0; i < items.length; i++) {
-			String [] dd = items[i].trim().split("+");
+			String [] dd = items[i].trim().split("\\+");
 			dd[0] = dd[0].toUpperCase();
 			GoogleDD ITEM = GoogleDD.valueOfItem(dd[0]);
 			if(ITEM != null) {
