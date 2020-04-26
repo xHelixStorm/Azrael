@@ -19,11 +19,15 @@ public enum GoogleDD {
 	REPORTER_NAME		(5, "REPORTER_NAME", 2),
 	REPORTER_USERNAME	(6, "REPORTER_USERNAME", 2),
 	REASON				(7, "REASON", 2),
-	TIME				(8, "TIME", 0),
+	TIME				(8, "TIME", 2),
 	ACTION				(9, "ACTION", 3),
 	WARNING				(10, "WARNING", 0),
 	UNMUTE_TIME			(11, "UNMUTE_TIME", 1),
-	PLACEHOLDER			(12, "PLACEHOLDER", 0);
+	PLACEHOLDER			(12, "PLACEHOLDER", 0),
+	GUILD_ID			(13, "GUILD_ID", 0),
+	GUILD_NAME			(14, "GUILD_NAME", 2),
+	ROLE_ID				(15, "ROLE_ID", 0),
+	ROLE_NAME			(16, "ROLE_NAME", 2);
 	
 	/**
 	 * Maps defined here to retrieve enum either by id or value

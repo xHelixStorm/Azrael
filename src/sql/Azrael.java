@@ -3052,6 +3052,7 @@ public class Azrael {
 				array[1] = rs.getString(2);
 				return array;
 			}
+			array[0] = "empty";
 			return array;
 		} catch (SQLException e) {
 			logger.error("SQLgetGoogleFilesAndEvent Exception", e);

@@ -15,10 +15,16 @@ import java.sql.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.Cache;
 import constructors.Channels;
+import core.Hashes;
+import enums.GoogleEvent;
+import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
+import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
@@ -105,8 +111,10 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 					if(e.getGuild().getMember(e.getMember().getUser()) != null) {
 						//verify that the user has the manage roles permission before removing the mute role
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+							//write into cache for RoleRemovedListener to use for any google API operation
+							if(assignedRole != 0)Hashes.addTempCache("unmute_gu"+guild_id+"us"+user_id, new Cache(60000, "", ""+assignedRole));
 							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
-							if(assignedRole != 0){e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
+							if(assignedRole != 0)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
 						}
 						else {
 							if(channel != null) e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setTitle("Permission required!").setDescription("The mute role couldn't be removed from **"+user_name+"** with the id number **"+user_id+"** because the permission MANAGE ROLES is missing").build()).queue();
@@ -125,16 +133,39 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator() + "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted and the timer has been interrupted!").build()).queue();
 					}
 					//if the user is still present on the server, remove the mute role and assign back a ranking role, if available
+					Role role = null;
 					if(e.getGuild().getMember(e.getMember().getUser()) != null) {
 						//verify that the user has the manage roles permission before removing the mute role
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+							if(assignedRole != 0)role = e.getGuild().getRoleById(assignedRole);
 							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
-							if(assignedRole != 0){e.getJDA().getGuildById(e.getGuild().getId()).addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();}
+							if(role != null)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
 						}
 						else {
 							if(channel != null) e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setTitle("Permission required!").setDescription("The mute role couldn't be removed from **"+user_name+"** with the id number **"+user_id+"** because the permission MANAGE ROLES is missing").build()).queue();
 							logger.warn("MANAGE ROLES permission required to remove the mute role in guild {}", guild_id);
 						}
+					}
+					//Run google service, if enabled
+					if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+						final var cache = Hashes.getTempCache("unmute_gu"+guild_id+"us"+user_id);
+						String reporter_name = "NaN";
+						String reporter_username = "Nan";
+						String role_id = "NaN";
+						String role_name = "NaN";
+						if(cache != null) {
+							final var reporter = e.getGuild().getMemberById(cache.getAdditionalInfo());
+							if(reporter != null) {
+								reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
+								reporter_username = reporter.getEffectiveName();
+							}
+							Hashes.clearTempCache("unmute_gu"+guild_id+"us"+user_id);
+						}
+						if(role != null) {
+							role_id = role.getId();
+							role_name = role.getName();
+						}
+						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, "NaN", null, null, "UNMUTED", null, role_id, role_name, GoogleEvent.UNMUTE.id, channel);
 					}
 				}
 			}

@@ -23,8 +23,10 @@ import constructors.User;
 import constructors.Watchlist;
 import core.Hashes;
 import core.UserPrivs;
+import enums.GoogleEvent;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
+import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -329,6 +331,8 @@ public class UserExecution {
 								if(!Azrael.SQLisBanned(user_id, _e.getGuild().getIdLong())) {
 									EmbedBuilder notice = new EmbedBuilder().setColor(Color.BLUE);
 									if(Azrael.SQLgetCustomMuted(user_id, _e.getGuild().getIdLong())) {
+										//write into cache for RoleTimer and RoleRemovedListener to use for any google API operation
+										Hashes.addTempCache("unmute_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(60000, ""+_e.getMember().getUser().getId()));
 										if(STATIC.killThread("mute_gu"+_e.getGuild().getId()+"us"+user_id)) {
 											notice.setTitle("Unmute action issued!");
 											_e.getChannel().sendMessage(notice.setDescription("Action issued to interrupt the mute! Please note that warnings don't get reverted while applying a custom mute time!").build()).queue();
@@ -339,6 +343,8 @@ public class UserExecution {
 										}
 									}
 									else if(Azrael.SQLgetMuted(user_id, _e.getGuild().getIdLong())) {
+										//write into cache for RoleTimer to use for any google API operation
+										Hashes.addTempCache("unmute_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(60000, ""+_e.getMember().getUser().getId()));
 										if(STATIC.killThread("mute_gu"+_e.getGuild().getId()+"us"+user_id)) {
 											notice.setTitle("Unmute action issued!");
 											_e.getChannel().sendMessage(notice.setDescription("Action issued to interrupt the mute! Undoing the previous warning!").build()).queue();
@@ -356,24 +362,53 @@ public class UserExecution {
 											}
 										}
 										else if(GuildIni.getOverrideBan(_e.getGuild().getIdLong()) && Azrael.SQLgetWarning(user_id, _e.getGuild().getIdLong()) == Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong()) && Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getUnmute() == null) {
-											Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
-											var mute_role = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
-											if(mute_role != null) {
-												_e.getGuild().removeRoleFromMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
-												long assignedRole = 0;
-												Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
-												if(user_details != null) {
-													assignedRole = user_details.getCurrentRole();
+											Member member = _e.getGuild().getMemberById(user_id);
+											if(member != null) {
+												Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
+												var mute_role = DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+												if(mute_role != null) {
+													long assignedRole = 0;
+													Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, _e.getGuild().getIdLong());
+													if(user_details != null) {
+														assignedRole = user_details.getCurrentRole();
+													}
+													//write into cache for RoleTimer and RoleRemovedListener to use for any google API operation
+													if(assignedRole != 0)Hashes.addTempCache("unmute_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(60000, ""+_e.getMember().getUser().getId(), ""+assignedRole));
+													_e.getGuild().removeRoleFromMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
+													Role role = null;
+													if(assignedRole != 0) {
+														role = _e.getGuild().getRoleById(assignedRole);
+														if(role != null)
+															_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(assignedRole)).queue();
+													}
+													_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle("User unmuted!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+_e.getGuild().getMemberById(user_id).getUser().getName()+"#"+_e.getGuild().getMemberById(user_id).getUser().getDiscriminator() + "** with the ID Number **" +user_id+ "** has been unmuted from his/her infinite mute!").build()).queue();
+													Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, _e.getGuild().getIdLong(), "Permanent mute terminated");
+													//Run google service, if enabled
+													if(GuildIni.getGoogleFunctionalitiesEnabled(_e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(_e.getGuild().getIdLong())) {
+														String role_id = "NaN";
+														String role_name = "NaN";
+														if(role != null) {
+															role_id = role.getId();
+															role_name = role.getName();
+														}
+														GoogleUtils.handleSpreadsheetRequest(_e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), _e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator(), _e.getMember().getEffectiveName(), "NaN", null, null, "UNMUTED", null, role_id, role_name, GoogleEvent.UNMUTE.id, Azrael.SQLgetChannels(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null));
+													}
 												}
-												if(assignedRole != 0) {
-													Role role = _e.getGuild().getRoleById(assignedRole);
-													if(role != null)
-														_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(assignedRole)).queue();
+												else {
+													_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("Mute role doesn't exist! Please verify that the mute role is still registered! Action aborted!").build()).queue();
+													Hashes.clearTempCache("unmute_gu"+_e.getGuild().getId()+"us"+user_id);
 												}
-												_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle("User unmuted!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+_e.getGuild().getMemberById(user_id).getUser().getName()+"#"+_e.getGuild().getMemberById(user_id).getUser().getDiscriminator() + "** with the ID Number **" +user_id+ "** has been unmuted from his/her infinite mute!").build()).queue();
 											}
 											else {
-												_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("Mute role doesn't exist! Please verify that the mute role is still registered! Action aborted!").build()).queue();
+												Azrael.SQLDeleteData(user_id, _e.getGuild().getIdLong());
+												_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle("User unmuted!").setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+_e.getGuild().getMemberById(user_id).getUser().getName()+"#"+_e.getGuild().getMemberById(user_id).getUser().getDiscriminator() + "** with the ID Number **" +user_id+ "** has been unmuted from his/her infinite mute!").build()).queue();
+												Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, _e.getGuild().getIdLong(), "Permanent mute terminated");
+												//Run google service, if enabled
+												if(GuildIni.getGoogleFunctionalitiesEnabled(_e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(_e.getGuild().getIdLong())) {
+													var user = Azrael.SQLgetUserThroughID(""+user_id);
+													String username = (user != null ? user.getUserName() : "NaN");
+													GoogleUtils.handleSpreadsheetRequest(_e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), username, username.replaceAll("#[0-9]{4}$", ""), _e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator(), _e.getMember().getEffectiveName(), "NaN", null, null, "UNMUTED", null, "", "", GoogleEvent.UNMUTE.id, Azrael.SQLgetChannels(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null));
+												}
 											}
 										}
 										else {
@@ -883,8 +918,10 @@ public class UserExecution {
 					message.setTitle("Mute action!");
 					message.addField("YES", "Provide a mute time", true);
 					message.addField("NO", "Don't provide a mute time", true);
+					if(GuildIni.getOverrideBan(_e.getGuild().getIdLong()))
+						message.addField("PERM", "Mute permanently", true);
 					_e.getChannel().sendMessage(message.setDescription("Do you wish to provide a self chosen mute timer? By providing a self chosen mute timer, the warning value won't increment unless the user has been never warned before!").build()).queue();
-					cache.updateDescription("mute-action"+user_id).setExpiration(180000);
+					cache.updateDescription("mute-action"+user_id).setExpiration(180000).updateDescription2("No reason has been provided!");
 					Hashes.addTempCache(key, cache);
 				}
 			}
@@ -940,7 +977,7 @@ public class UserExecution {
 							}
 							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id.getRole_ID())).queue();
 							var mute_time = (long)Azrael.SQLgetWarning(_e.getGuild().getIdLong(), Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID()+1).getTimer();
-							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "mute", (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!"), (mute_time/1000/60), "");
+							Azrael.SQLInsertHistory(user_id, _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), (mute_time/1000/60), "");
 							_e.getChannel().sendMessage(message.setDescription((permMute ? "Perm mute" : "Mute")+" order has been issued!").build()).queue();
 							checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
 						}
@@ -1001,14 +1038,8 @@ public class UserExecution {
 									_e.getChannel().sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
 								}
 							}
-							if(cache.getAdditionalInfo2().length() > 0) {
-								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id.getRole_ID())).reason(cache.getAdditionalInfo2()).queue();
-								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), (mute_time/1000/60), "");
-							}
-							else {
-								_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id.getRole_ID())).reason("No reason has been provided!").queue();
-								Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", "No reason has been provided!", (mute_time/1000/60), "");
-							}
+							_e.getGuild().addRoleToMember(_e.getGuild().getMemberById(user_id), _e.getGuild().getRoleById(mute_role_id.getRole_ID())).reason(cache.getAdditionalInfo2()).queue();
+							Azrael.SQLInsertHistory(_e.getGuild().getMemberById(user_id).getUser().getIdLong(), _e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), (mute_time/1000/60), "");
 							_e.getChannel().sendMessage(message.setDescription("Mute order has been issued!").build()).queue();
 							logger.debug("{} has muted {} in guild {}", _e.getMember().getUser().getId(), user_id, _e.getGuild().getId());
 							checkIfDeleteMessagesAfterAction(_e, cache, user_id, _message, message, key);
