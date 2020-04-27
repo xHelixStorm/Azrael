@@ -39,7 +39,7 @@ public class UnbanListener extends ListenerAdapter {
 	public void onGuildUnban(GuildUnbanEvent e) {
 		new Thread(() -> {
 			String trigger_user_name = "NaN";
-			String reason = "NaN";
+			String reason = "No reason has been provided!";
 			String append_message = "";
 			//retrieve reason and applier if it has been cached, else retrieve the user from the audit log
 			var cache = Hashes.getTempCache("unban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());

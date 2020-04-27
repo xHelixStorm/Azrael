@@ -150,7 +150,7 @@ public class BanListener extends ListenerAdapter {
 					
 					//Run google service, if enabled
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getIdLong()).getEffectiveName(), ban_reason, null, ""+user.getWarningID(), "BAN", null, null, null, GoogleEvent.BAN.id, log_channel);
+						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), ban_reason, null, ""+user.getWarningID(), "BAN", null, null, null, GoogleEvent.BAN.id, log_channel);
 					}
 				}
 				else {

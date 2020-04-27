@@ -93,7 +93,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 								
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getIdLong()).getEffectiveName(), kick_reason, null, null, "KICK", null, null, null, GoogleEvent.KICK.id, log_channel);
+									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), kick_reason, null, null, "KICK", null, null, null, GoogleEvent.KICK.id, log_channel);
 								}
 								
 								//Unwatch the kicked user, if he's being watched
