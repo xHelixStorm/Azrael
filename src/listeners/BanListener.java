@@ -41,14 +41,22 @@ public class BanListener extends ListenerAdapter {
 		
 		//either update user as banned or if not available, insert directly as banned
 		if(user.getBanID() == 1 && user.getWarningID() > 0) {
-			if(Azrael.SQLUpdateBan(user_id, guild_id, 2) == 0) {
+			if(Azrael.SQLUpdateBan(user_id, guild_id, 2) > 0) {
+				//terminate mute timer for the banned user if it's running
+				STATIC.killThread("mute_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
+			}
+			else {
 				logger.error("banned user {} couldn't be marked as banned on Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
 				if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. User couldn't be marked as banned in Azrael.bancollect").queue();
 			}
 		}
 		else{
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			if(Azrael.SQLInsertData(user_id, guild_id, 0, 2, timestamp, timestamp, true, false) == 0) {
+			if(Azrael.SQLInsertData(user_id, guild_id, 0, 2, timestamp, timestamp, true, false) > 0) {
+				//terminate mute timer for the banned user if it's running
+				STATIC.killThread("mute_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
+			}
+			else {
 				logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
 				if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
 			}

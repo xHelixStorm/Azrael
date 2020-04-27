@@ -117,8 +117,13 @@ public class GuildListener extends ListenerAdapter {
 				}
 				else {
 					//throw an error and set the user to not muted and joined, if the permission is missing but is still muted
-					Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false);
-					Azrael.SQLUpdateGuildLeft(user_id, guild_id, false);
+					if(Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false) > 0) {
+						if(Azrael.SQLUpdateGuildLeft(user_id, guild_id, false) == 0) {
+							logger.error("Guild left state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild_id);
+						}
+					}
+					else
+						logger.error("Mute end state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild_id);
 					if(log_channel != null)
 						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The joined user **"+user_name+"** with the id number **"+user_id+"** couldn't get muted because the MANAGE ROLES permission is mssing!").build()).queue();
 					logger.warn("MANAGE ROLES permission missing to mute a user in guild {}!", e.getGuild().getId());
@@ -127,8 +132,13 @@ public class GuildListener extends ListenerAdapter {
 			else {
 				//Remove the muted and guild left label from this user, if he joined the server after the mute time expired and is still marked as muted
 				if(muted) {
-					Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false);
-					Azrael.SQLUpdateGuildLeft(user_id, guild_id, false);
+					if(Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false) > 0) {
+						if(Azrael.SQLUpdateGuildLeft(user_id, guild_id, false) == 0) {
+							logger.error("Guild left state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild_id);
+						}
+					}
+					else
+						logger.error("Mute end state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild_id);
 				}
 				//Assign an unlocked ranking role after verifying that the ranking system is enabled
 				if(guild_settings.getRankingState()) {

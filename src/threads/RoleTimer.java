@@ -102,9 +102,9 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 				//put the thread to wait for a determined time
 				Thread.sleep(timer);
 				//check if the user has been banned during the wait and if not, check if he's still muted. If muted, print message that the mute has been lifted
-				if(!Azrael.SQLisBanned(user_id, guild_id)) {
-					if(channel != null && Azrael.SQLgetMuted(user_id, guild_id) == true) {
-						timestamp = new Timestamp(System.currentTimeMillis());
+				if(!Azrael.SQLisBanned(user_id, guild_id) && Azrael.SQLgetMuted(user_id, guild_id)) {
+					timestamp = new Timestamp(System.currentTimeMillis());
+					if(channel != null) {
 						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted").build()).queue();
 					}
 					//if the user is still present on the server, remove the mute role and assign back a ranking role, if available
@@ -121,13 +121,28 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							logger.warn("MANAGE ROLES permission required to remove the mute role in guild {}", guild_id);
 						}
 					}
+					//if the user is not present on the server, remove the mute state
+					else {
+						if(Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false) > 0) {
+							if(Azrael.SQLUpdateGuildLeft(user_id, guild_id, false) == 0) {
+								logger.error("Guild left state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild_id);
+							}
+							Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild_id, "Mute role removed");
+							//Run google service, if enabled
+							if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), "", "", "NaN", null, null, "UNMUTED", null, "NaN", "NaN", GoogleEvent.UNMUTE.id, channel);
+							}
+						}
+						else
+							logger.error("Mute end state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild_id);
+					}
 				}
 			} catch (InterruptedException e1) {
 				//executed when H!user unmute was used to interrupt the Thread.sleep
 				logger.info("The mute of {} in guild {} has been interrupted!", e.getMember().getUser().getId(), e.getGuild().getId());
 				//verify that the user is not banned and still labeled as muted before printing a message and before updating the unmute time
 				if(!Azrael.SQLisBanned(user_id, guild_id)) {
-					if(channel != null && (Azrael.SQLgetMuted(user_id, guild_id) == true || Azrael.SQLgetData(user_id, guild_id).getUserID() == 0)) {
+					if(channel != null) {
 						timestamp = new Timestamp(System.currentTimeMillis());
 						Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp);
 						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator() + "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted and the timer has been interrupted!").build()).queue();
@@ -146,6 +161,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							logger.warn("MANAGE ROLES permission required to remove the mute role in guild {}", guild_id);
 						}
 					}
+					Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild_id, "Mute role removed");
 					//Run google service, if enabled
 					if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
 						final var cache = Hashes.getTempCache("unmute_gu"+guild_id+"us"+user_id);

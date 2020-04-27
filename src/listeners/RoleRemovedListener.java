@@ -111,7 +111,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 				//retrieve the log channel
 				var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 				//update mute state
-				if(Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false) == 999) {
+				if(Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false) == 0) {
 					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred. The mute end state couldn't be updated in table Azrael.bancollect").build()).queue();
 					logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
 				}
