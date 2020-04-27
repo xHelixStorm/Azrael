@@ -268,9 +268,9 @@ public class GoogleSpreadsheetsExecution {
 		ArrayList<Integer> handleEvents = new ArrayList<Integer>();
 		for(int i = 0; i < events.length; i++) {
 			final int iterator = i;
-			final var event = fixedEvents.parallelStream().filter(f -> f.getEvent().equalsIgnoreCase(events[iterator])).findAny().orElse(null);
+			final var event = fixedEvents.parallelStream().filter(f -> f.getEvent().equalsIgnoreCase(events[iterator].trim())).findAny().orElse(null);
 			if(event == null)
-				e.getChannel().sendMessage(error.setDescription("The event **"+events[iterator]+"** either doesn't exist or is not supported for spreadsheets").build()).queue();
+				e.getChannel().sendMessage(error.setDescription("The event **"+events[iterator].trim()+"** either doesn't exist or is not supported for spreadsheets").build()).queue();
 			else
 				handleEvents.add(event.getEventID());
 		}

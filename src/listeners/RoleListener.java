@@ -71,33 +71,71 @@ public class RoleListener extends ListenerAdapter {
 				}
 				//enter this block if the user is already permanently muted
 				if(permMute) {
+					Hashes.clearTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 					//set mute status to true
 					if(Azrael.SQLUpdateMuted(user_id, guild_id, true) == 0) {
 						logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
 						if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The mute state couldn't be updated in table Azrael.bancollect").queue();
-					}
-					if(log_channel != null) {
-						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned and is again permanently muted! Reason may be due to manually reassigning the mute role or due to rejoining the server!").build()).queue();
 					}
 					//remove all roles, except the mute role when the muted user has more than 1 assigned role
 					if(e.getMember().getRoles().size() > 1 && !removeRoles(e, mute_id) && log_channel != null)
 						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Permission error!").setDescription("MANAGE ROLES permission required to remove all roles! Roles removal interrupted!").build()).queue();
+					if(!warnedUser.getGuildLeft()) {
+						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+						if(log_channel != null) {
+							e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned and is again permanently muted! The mute role has been reassigned manually!").build()).queue();
+						}
+						Azrael.SQLInsertActionLog("MEMBER_PERM_MUTE_READD", user_id, guild_id, "Permanent Mute role reassigned");
+						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+							Object [] object = getReporterFromAuditLog(e);
+							var reporter = e.getGuild().getMemberById((long)object[0]);
+							String reason = (String)object[1];
+							String reporter_name = "NaN";
+							String reporter_username = "NaN";
+							if(reporter != null) {
+								reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
+								reporter_username = reporter.getEffectiveName();
+							}
+							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, GoogleEvent.MUTE_READD.id, log_channel);
+						}
+					}
+					else {
+						Azrael.SQLUpdateGuildLeft(user_id, guild_id, false);
+						if(log_channel != null) {
+							Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+							e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned and is again permanently muted! The mute role has been reassigned by rejoining the server!").build()).queue();
+						}
+					}
 				}
 				//enter if a mute timer has been defined but the user itself is not yet marked as muted on the table (e.g. manually removing and adding the mute role)
 				else if(unmute_time - System.currentTimeMillis() > 0 && !warnedUser.getMuted()) {
+					Hashes.clearTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 					//set mute status to true
 					if(Azrael.SQLUpdateMuted(user_id, guild_id, true) == 0) {
 						logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
 						if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The mute state couldn't be updated in table Azrael.bancollect").queue();
 					}
+					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					if(log_channel != null) {
-						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID number **"+e.getMember().getUser().getId()+"** got his mute role reassigned before the mute time elapsed! Reason may be due to manually reassigning the mute role!").build()).queue();
 					}
 					//remove all roles, except the mute role when the muted user has more than 1 assigned role
 					if(e.getMember().getRoles().size() > 1 && !removeRoles(e, mute_id) && log_channel != null)
 						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Permission error!").setDescription("MANAGE ROLES permission required to remove all roles! Roles removal interrupted!").build()).queue();
+					Azrael.SQLInsertActionLog("MEMBER_MUTE_READD", user_id, guild_id, "Mute role reassigned");
+					//Run google service, if enabled
+					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+						Object [] object = getReporterFromAuditLog(e);
+						var reporter = e.getGuild().getMemberById((long)object[0]);
+						String reason = (String)object[1];
+						String reporter_name = "NaN";
+						String reporter_username = "NaN";
+						if(reporter != null) {
+							reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
+							reporter_username = reporter.getEffectiveName();
+						}
+						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, GoogleEvent.MUTE_READD.id, log_channel);
+					}
 				}
 				//enter in this block, if the user has been already muted but rejoined the server before the time elapsed
 				else if(unmute_time - System.currentTimeMillis() > 0 && warnedUser.getMuted() && warnedUser.getGuildLeft()) {
@@ -110,20 +148,8 @@ public class RoleListener extends ListenerAdapter {
 				}
 				//for manual mutes without command and which isn't permanent and for users that can be interacted with
 				else if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
-					long from_user = 0;
-					//check if the bot has able to view the audit logs
-					if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
-						var roleLog = e.getGuild().retrieveAuditLogs();
-						//iterate through the log
-						for(final var entry : roleLog) {
-							//retrieve the first log about a role update
-							if(entry.getType() == ActionType.MEMBER_ROLE_UPDATE) {
-								//retrieve the user who applied the mute role
-								from_user = entry.getUser().getIdLong();
-							}
-							break;
-						}
-					}
+					Object [] object = getReporterFromAuditLog(e);
+					long from_user = (long)object[0];
 					
 					//remove all roles, except the mute role when the muted user has more than 1 assigned role
 					if(e.getMember().getRoles().size() > 1 && !removeRoles(e, mute_id) && log_channel != null)
@@ -181,7 +207,7 @@ public class RoleListener extends ListenerAdapter {
 						var cache = Hashes.getTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 						var reporter = (cache != null ? e.getGuild().getMemberById(cache.getAdditionalInfo()) : (from_user != 0 ? e.getGuild().getMemberById(from_user) : null));
 						var issuer = (reporter != null ? reporter.getAsMention() : "NaN");
-						var reason = (cache != null ? cache.getAdditionalInfo2() : "No reason has been provided!");
+						var reason = (cache != null ? cache.getAdditionalInfo2() : (String)object[1]);
 						Hashes.clearTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 						//retrieve current warning and the time to mute
 						Warning warn = Azrael.SQLgetWarning(e.getGuild().getIdLong(), (warning_id+1));
@@ -312,6 +338,25 @@ public class RoleListener extends ListenerAdapter {
 				}
 			}
 		}).start();
+	}
+	
+	private Object [] getReporterFromAuditLog(GuildMemberRoleAddEvent e) {
+		Object [] object = {0, "No reason has been provided!"};
+		//check if the bot has able to view the audit logs
+		if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
+			var roleLog = e.getGuild().retrieveAuditLogs();
+			//iterate through the log
+			for(final var entry : roleLog) {
+				//retrieve the first log about a role update
+				if(entry.getType() == ActionType.MEMBER_ROLE_UPDATE) {
+					//retrieve the user who applied the mute role and reason
+					object[0] = entry.getUser().getIdLong();
+					if(entry.getReason() != null) object[1] = entry.getReason();
+					return object;
+				}
+			}
+		}
+		return object;
 	}
 	
 	private boolean removeRoles(GuildMemberRoleAddEvent e, long mute_id) {

@@ -107,7 +107,7 @@ public class GoogleUtils {
 				for(final var column : columns) {
 					GoogleDD item = column.getItem();
 					switch(EVENT) {
-						case MUTE -> {
+						case MUTE, MUTE_READD -> {
 							switch(item) {
 								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
 								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
@@ -126,7 +126,7 @@ public class GoogleUtils {
 								default -> {}
 							}
 						}
-						case UNMUTE -> {
+						case UNMUTE, UNMUTE_MANUAL -> {
 							switch(item) {
 								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
 								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));

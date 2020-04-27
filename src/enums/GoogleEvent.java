@@ -14,11 +14,13 @@ public enum GoogleEvent {
 	 * Enums defined here 
 	 */
 	
-	MUTE	(1, "MUTE"),
-	UNMUTE	(2, "UNMUTE"),
-	KICK	(3, "KICK"),
-	BAN		(4, "BAN"),
-	UNBAN	(5, "UNBAN");
+	MUTE			(1, "MUTE"),
+	MUTE_READD		(2, "MUTE_READD"),
+	UNMUTE			(3, "UNMUTE"),
+	UNMUTE_MANUAL	(4, "UNMUTE_MANUAL"),
+	KICK			(5, "KICK"),
+	BAN				(6, "BAN"),
+	UNBAN			(7, "UNBAN");
 	
 	/**
 	 * Maps defined here to retrieve enum either by id or value
