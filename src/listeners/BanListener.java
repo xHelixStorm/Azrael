@@ -16,12 +16,15 @@ import org.slf4j.LoggerFactory;
 import constructors.Bancollect;
 import constructors.Channels;
 import core.Hashes;
+import enums.GoogleEvent;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
+import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
@@ -74,27 +77,29 @@ public class BanListener extends ListenerAdapter {
 				var cache = Hashes.getTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 				if(cache != null) {
 					//apply stored reason and ban applier to variable
-					var ban_issuer = cache.getAdditionalInfo();
+					Member member = e.getGuild().getMemberById(cache.getAdditionalInfo());
+					var ban_issuer = member.getAsMention();
 					var ban_reason = cache.getAdditionalInfo2();
 					
 					EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User banned!");
 					//retrieve max allowed warnings per guild and print a message depending on the applied warnings before ban
 					int max_warning_id = Azrael.SQLgetMaxWarning(guild_id);
+					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					if(user.getWarningID() == 0) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without any protocolled warnings!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without any protocolled warnings!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
 					}
 					else if(user.getWarningID() < max_warning_id) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without enough protocolled warnings! Warnings: "+user.getWarningID()+"\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without enough protocolled warnings! Warnings: "+user.getWarningID()+"\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
 					}
 					else if(user.getWarningID() == max_warning_id) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
 					}
 					//clear cache afterwards
 					Hashes.clearTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 					
 					//Run google service, if enabled
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-						
+						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), ban_reason, null, ""+user.getWarningID(), "BAN", null, null, null, GoogleEvent.BAN.id, log_channel);
 					}
 				}
 				else {
@@ -132,19 +137,20 @@ public class BanListener extends ListenerAdapter {
 					EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User banned!");
 					//retrieve max allowed warnings per guild and print a message depending on the applied warnings before ban
 					int max_warning_id = Azrael.SQLgetMaxWarning(guild_id);
+					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					if(user.getWarningID() == 0) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without any protocolled warnings!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without any protocolled warnings!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
 					}
 					else if(user.getWarningID() < max_warning_id) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without enough protocolled warnings! Warnings: "+user.getWarningID()+"\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without enough protocolled warnings! Warnings: "+user.getWarningID()+"\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
 					}
 					else if(user.getWarningID() == max_warning_id) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
 					}
 					
 					//Run google service, if enabled
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-						
+						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getIdLong()).getEffectiveName(), ban_reason, null, ""+user.getWarningID(), "BAN", null, null, null, GoogleEvent.BAN.id, log_channel);
 					}
 				}
 				else {

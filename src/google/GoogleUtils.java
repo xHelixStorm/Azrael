@@ -144,6 +144,39 @@ public class GoogleUtils {
 								default -> {}
 							}
 						}
+						case KICK, UNBAN -> {
+							switch(item) {
+								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+								case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
+								case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
+								case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
+								case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
+								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+								default -> {}
+							}
+						}
+						case BAN -> {
+							switch(item) {
+								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+								case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
+								case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
+								case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
+								case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
+								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+								case WARNING ->				values.add(Arrays.asList(item.valueFormatter(warning_id, column.getFormatter())));
+								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+								default -> {}
+							}
+						}
 						default -> {}
 					}
 				}

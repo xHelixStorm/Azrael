@@ -17,12 +17,15 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Bancollect;
 import core.Hashes;
+import enums.GoogleEvent;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
+import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
@@ -52,16 +55,18 @@ public class GuildLeaveListener extends ListenerAdapter {
 					var cache = Hashes.getTempCache("kick_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 					if(cache != null) {
 						//retrieve the user who kicked and the reason is available from cache
-						var kick_issuer = cache.getAdditionalInfo();
+						Member member = e.getGuild().getMemberById(cache.getAdditionalInfo());
+						var kick_issuer = member.getAsMention();
 						var kick_reason = cache.getAdditionalInfo2();
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(kick.setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+user_name+"** with the id number **"+e.getUser().getId()+"** got kicked from **"+guild_name+"**!\n Kicked by: "+kick_issuer+"\nReason: "+kick_reason).build()).queue();
+						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(kick.setDescription("["+timestamp.toString()+"] **"+user_name+"** with the id number **"+e.getUser().getId()+"** got kicked from **"+guild_name+"**!\n Kicked by: "+kick_issuer+"\nReason: "+kick_reason).build()).queue();
 						Azrael.SQLInsertActionLog("MEMBER_KICK", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
 						Hashes.clearTempCache("kick_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 						logger.debug("{} has been kicked from guild {}", e.getUser().getId(), e.getGuild().getId());
 						
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-							
+							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), kick_reason, null, null, "KICK", null, null, null, GoogleEvent.KICK.id, log_channel);
 						}
 						
 						//Unwatch the kicked user, if he's being watched
@@ -81,13 +86,14 @@ public class GuildLeaveListener extends ListenerAdapter {
 								//retrieve the user who kicked and the reason is available from the audit log entry
 								var kick_issuer = entry.getUser().getAsMention();
 								var kick_reason = (entry.getReason() != null && entry.getReason().length() > 0 ? entry.getReason() : "No reason has been provided!");
-								e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(kick.setDescription("["+new Timestamp(System.currentTimeMillis()).toString()+"] **"+user_name+"** with the id number **"+e.getUser().getId()+"** got kicked from **"+guild_name+"**!\n Kicked by: "+kick_issuer+"\nReason: "+kick_reason).build()).queue();
+								Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+								e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(kick.setDescription("["+timestamp.toString()+"] **"+user_name+"** with the id number **"+e.getUser().getId()+"** got kicked from **"+guild_name+"**!\n Kicked by: "+kick_issuer+"\nReason: "+kick_reason).build()).queue();
 								Azrael.SQLInsertActionLog("MEMBER_KICK", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
 								logger.debug("{} has been kicked from guild {}", e.getUser().getId(), e.getGuild().getId());
 								
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-									
+									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getIdLong()).getEffectiveName(), kick_reason, null, null, "KICK", null, null, null, GoogleEvent.KICK.id, log_channel);
 								}
 								
 								//Unwatch the kicked user, if he's being watched

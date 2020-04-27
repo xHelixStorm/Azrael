@@ -367,6 +367,7 @@ public class GoogleSpreadsheetsExecution {
 						out2.append("`"+sheet.getEvent().name()+":"+sheet.getSheetRowStart()+"`");
 					else
 						out2.append(", `"+sheet.getEvent().name()+":"+sheet.getSheetRowStart()+"`");
+					i++;
 				}
 				if(out2.length() == 0)
 					out2.append("N/A");

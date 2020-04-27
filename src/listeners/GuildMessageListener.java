@@ -424,7 +424,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Command exited!").build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Google command aborted!").build()).queue();
 							//remove the google command from cache
 							Hashes.clearTempCache(key);
 						}

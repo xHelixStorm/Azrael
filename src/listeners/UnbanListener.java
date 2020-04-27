@@ -17,12 +17,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
+import enums.GoogleEvent;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
+import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.GuildUnbanEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
@@ -40,8 +43,10 @@ public class UnbanListener extends ListenerAdapter {
 			String append_message = "";
 			//retrieve reason and applier if it has been cached, else retrieve the user from the audit log
 			var cache = Hashes.getTempCache("unban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
+			Member member = null;
 			if(cache != null) {
-				trigger_user_name = cache.getAdditionalInfo();
+				member = e.getGuild().getMemberById(cache.getAdditionalInfo());
+				trigger_user_name = member.getAsMention();
 				reason = cache.getAdditionalInfo2();
 				//clear cache afterwards
 				Hashes.clearTempCache("unban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
@@ -53,6 +58,7 @@ public class UnbanListener extends ListenerAdapter {
 					for (AuditLogEntry entry : logs)
 					{
 						if(entry.getType() == ActionType.UNBAN && entry.getGuild().getIdLong() == e.getGuild().getIdLong() && entry.getTargetIdLong() == e.getUser().getIdLong()) {
+							member = e.getGuild().getMemberById(entry.getUser().getId());
 							trigger_user_name = entry.getUser().getAsMention();
 						}
 						break;
@@ -71,8 +77,8 @@ public class UnbanListener extends ListenerAdapter {
 			String user_name = e.getUser().getName()+"#"+e.getUser().getDiscriminator();
 			
 			//print unban message if a log channel has been registered
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			if(log_channel != null) {
-				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp+"] **" + user_name + "** with the ID number **" + user_id + "** has been unbanned!\nUnbanned by: "+trigger_user_name+"\nReason: "+reason+append_message).build()).queue();
 			}
 			//remove the affected user from the bancollect table to symbolize that all current warnings have been removed
@@ -86,7 +92,7 @@ public class UnbanListener extends ListenerAdapter {
 			
 			//Run google service, if enabled
 			if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-				
+				GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), reason, null, null, "UNBAN", null, null, null, GoogleEvent.UNBAN.id, log_channel);
 			}
 		}).start();
 	}

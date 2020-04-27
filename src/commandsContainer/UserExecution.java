@@ -1088,7 +1088,7 @@ public class UserExecution {
 					}
 					if(_e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
 						if(member != null) {
-							Hashes.addTempCache("ban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), "No reason has been provided!"));
+							Hashes.addTempCache("ban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getId(), "No reason has been provided!"));
 							PrivateChannel pc = _e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete();
 							int warning_id = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID();
 							int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
@@ -1132,7 +1132,7 @@ public class UserExecution {
 				}
 				if(_e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
 					if(member != null) {
-						Hashes.addTempCache("ban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
+						Hashes.addTempCache("ban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getId(), _message));
 						PrivateChannel pc = _e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().complete();
 						int warning_id = Azrael.SQLgetData(user_id, _e.getGuild().getIdLong()).getWarningID();
 						int max_warning_id = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
@@ -1168,7 +1168,7 @@ public class UserExecution {
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban-delay")) {
 				if(_message.equalsIgnoreCase("yes")) {
 					_e.getChannel().sendMessage(message.setDescription("Ban reminder has been set!").build()).queue();
-					Hashes.addRejoinTask(_e.getGuild().getId()+"_"+user_id, new RejoinTask(user_id, _e.getGuild().getIdLong(), "", _e.getMember().getAsMention(), "ban", cache.getAdditionalInfo2()));
+					Hashes.addRejoinTask(_e.getGuild().getId()+"_"+user_id, new RejoinTask(user_id, _e.getGuild().getIdLong(), "", _e.getMember().getId(), "ban", cache.getAdditionalInfo2()));
 					Hashes.clearTempCache(key);
 				}
 				else if(_message.equalsIgnoreCase("no")) {
@@ -1185,7 +1185,7 @@ public class UserExecution {
 				}
 				else if(comment.equals("no")) {
 					if(_e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
-						Hashes.addTempCache("unban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), "No reason has been provided!"));
+						Hashes.addTempCache("unban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getId(), "No reason has been provided!"));
 						_e.getChannel().sendMessage(message.setDescription("Unban order has been issued!").build()).queue();
 						_e.getGuild().retrieveBanById(user_id).queue(ban -> {
 							_e.getGuild().unban(ban.getUser()).reason("User has been unbanned with the bot command!").queue();
@@ -1204,7 +1204,7 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("unban-reason")) {
 				if(_e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
-					Hashes.addTempCache("unban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
+					Hashes.addTempCache("unban_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getId(), _message));
 					_e.getChannel().sendMessage(message.setDescription("Unban order has been issued!").build()).queue();
 					_e.getGuild().retrieveBanById(user_id).queue(ban -> {
 						_e.getGuild().unban(ban.getUser()).reason(_message).queue();
@@ -1238,7 +1238,7 @@ public class UserExecution {
 					if(_e.getGuild().getSelfMember().hasPermission(Permission.KICK_MEMBERS)) {
 						if(member != null) {
 							_e.getChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
-							Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), "No reason has been provided!"));
+							Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getUser().getId(), "No reason has been provided!"));
 							member.getUser().openPrivateChannel().complete()
 							.sendMessage("You have been kicked from **"+_e.getGuild().getName()+"**.Thank you for your understanding.\n" 
 									+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
@@ -1272,7 +1272,7 @@ public class UserExecution {
 				if(_e.getGuild().getSelfMember().hasPermission(Permission.KICK_MEMBERS)) {
 					if(member != null) {
 						_e.getChannel().sendMessage(message.setDescription("Kick order has been issued!").build()).queue();
-						Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getAsMention(), _message));
+						Hashes.addTempCache("kick_gu"+_e.getGuild().getId()+"us"+user_id, new Cache(_e.getMember().getId(), _message));
 						member.getUser().openPrivateChannel().complete()
 						.sendMessage("You have been kicked from **"+_e.getGuild().getName()+"**.Thank you for your understanding.\n" 
 								+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
