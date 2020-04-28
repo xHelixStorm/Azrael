@@ -65,8 +65,8 @@ public class GuildLeaveListener extends ListenerAdapter {
 						logger.debug("{} has been kicked from guild {}", e.getUser().getId(), e.getGuild().getId());
 						
 						//Run google service, if enabled
-						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), kick_reason, null, null, "KICK", null, null, null, GoogleEvent.KICK.id, log_channel);
+						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), kick_reason, null, null, "KICK", null, null, null, null, null, GoogleEvent.KICK.id, log_channel);
 						}
 						
 						//Unwatch the kicked user, if he's being watched
@@ -92,8 +92,8 @@ public class GuildLeaveListener extends ListenerAdapter {
 								logger.debug("{} has been kicked from guild {}", e.getUser().getId(), e.getGuild().getId());
 								
 								//Run google service, if enabled
-								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), kick_reason, null, null, "KICK", null, null, null, GoogleEvent.KICK.id, log_channel);
+								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), kick_reason, null, null, "KICK", null, null, null, null, null, GoogleEvent.KICK.id, log_channel);
 								}
 								
 								//Unwatch the kicked user, if he's being watched

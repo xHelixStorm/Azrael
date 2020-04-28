@@ -130,7 +130,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild_id, "Mute role removed");
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
-								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), "", "", "NaN", null, null, "UNMUTED", null, "NaN", "NaN", GoogleEvent.UNMUTE.id, channel);
+								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), "", "", "NaN", null, null, "UNMUTED", null, "NaN", "NaN", null, null, GoogleEvent.UNMUTE.id, channel);
 							}
 						}
 						else
@@ -181,7 +181,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							role_id = role.getId();
 							role_name = role.getName();
 						}
-						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, "NaN", null, null, "UNMUTED", null, role_id, role_name, GoogleEvent.UNMUTE.id, channel);
+						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, "NaN", null, null, "UNMUTED", null, role_id, role_name, null, null, GoogleEvent.UNMUTE.id, channel);
 					}
 				}
 			}

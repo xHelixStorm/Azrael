@@ -84,7 +84,7 @@ public class MuteRestart implements Runnable {
 						Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild.getIdLong(), "Mute role removed");
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
-							GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, timestamp, user_name, effectiveName, "", "", "NaN", null, null, "UNMUTED", null, "NaN", "NaN", GoogleEvent.UNMUTE.id, channel);
+							GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, timestamp, user_name, effectiveName, "", "", "NaN", null, null, "UNMUTED", null, "NaN", "NaN", null, null, GoogleEvent.UNMUTE.id, channel);
 						}
 					}
 					else
@@ -136,7 +136,7 @@ public class MuteRestart implements Runnable {
 						role_id = role.getId();
 						role_name = role.getName();
 					}
-					GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, effectiveName, reporter_name, reporter_username, "NaN", null, null, "UNMUTED", null, role_id, role_name, GoogleEvent.UNMUTE.id, channel);
+					GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, effectiveName, reporter_name, reporter_username, "NaN", null, null, "UNMUTED", null, role_id, role_name, null, null, GoogleEvent.UNMUTE.id, channel);
 				}
 			}
 		}

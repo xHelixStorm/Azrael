@@ -1,5 +1,24 @@
 package listeners;
 
+import java.awt.Color;
+import java.sql.Timestamp;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import constructors.Cache;
+import core.Hashes;
+import enums.GoogleEvent;
+import fileManagement.GuildIni;
+import fileManagement.IniFileReader;
+import google.GoogleUtils;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import sql.Azrael;
+
 /**
  * This class gets executed when a user changes his Discord name!
  * 
@@ -10,22 +29,8 @@ package listeners;
  * gets compared with not allowed words. If the name contains not allowed
  * names or words, the user will either receive a nickname or will get kicked
  * from the server.
+ * @author xHelixStorm
  */
-
-import java.awt.Color;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import constructors.Cache;
-import core.Hashes;
-import fileManagement.IniFileReader;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import sql.Azrael;
 
 public class NameListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(NameListener.class);
@@ -34,6 +39,8 @@ public class NameListener extends ListenerAdapter {
 	@Override
 	public void onUserUpdateName(UserUpdateNameEvent e) {
 		new Thread(() -> {
+			Azrael.SQLInsertActionLog("MEMBER_NAME_UPDATE", e.getUser().getIdLong(), 0, e.getUser().getName()+"#"+e.getUser().getDiscriminator());
+			
 			String oldname = e.getOldName()+"#"+e.getUser().getDiscriminator();
 			String newname = e.getUser().getName()+"#"+e.getUser().getDiscriminator();
 			long user_id = e.getUser().getIdLong();
@@ -43,8 +50,8 @@ public class NameListener extends ListenerAdapter {
 			if(Azrael.SQLUpdateUser(user_id, newname) == 0) {
 				logger.error("Azrael.users couldn't be updated with a name update from {}",user_id);
 			}
-			//process every guild in parallel
-			e.getJDA().getGuilds().parallelStream().forEach(guild -> {
+			//process every mutual guild in parallel
+			e.getUser().getMutualGuilds().parallelStream().forEach(guild -> {
 				boolean staff_name = false;
 				//verify that the user exists in the current server
 				Member member = guild.getMemberById(user_id);
@@ -61,10 +68,15 @@ public class NameListener extends ListenerAdapter {
 								//retrieve a random nickname and assign to the user
 								String nickname = Azrael.SQLgetRandomName(guild.getIdLong());
 								e.getJDA().getGuildById(guild.getIdLong()).modifyNickname(member, nickname).queue();
-								Hashes.addTempCache("nickname_add_gu"+guild.getId()+"us"+user_id, new Cache(600000));
+								Hashes.addTempCache("nickname_add_gu"+guild.getId()+"us"+user_id, new Cache(60000));
 								updateNickname(member, nickname);
 								message.setColor(Color.RED).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle("Impersonation attempt found!");
 								if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**\nPlease review in case of impersonation!").build()).queue();
+								Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild.getIdLong(), newname);
+								//Run google service, if enabled
+								if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+									GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), "Impersonating a staff member!", null, null, "RENAMED", null, null, null, oldname, newname, GoogleEvent.RENAME.id, log_channel);
+								}
 							}
 							else {
 								if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("**"+oldname+"** changed his name and tried to impersonate a staff member but no nickname could have been assigned becuase the MANAGE NICKNAMES permission is missing!").build()).queue();
@@ -89,10 +101,15 @@ public class NameListener extends ListenerAdapter {
 										//retrieve a random nickname and assign to the user
 										String nickname = Azrael.SQLgetRandomName(guild.getIdLong());
 										guild.modifyNickname(member, nickname).queue();
-										Hashes.addTempCache("nickname_add_gu"+guild.getId()+"us"+user_id, new Cache(600000));
+										Hashes.addTempCache("nickname_add_gu"+guild.getId()+"us"+user_id, new Cache(60000));
 										updateNickname(member, nickname);
 										message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("Not allowed name change found!");
 										if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"**. Hence, he received the following nickname: **"+nickname+"**").build()).queue();
+										Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild.getIdLong(), newname);
+										//Run google service, if enabled
+										if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+											GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), "Renamed due to the current name filter settings!", null, null, "RENAMED", null, null, null, oldname, newname, GoogleEvent.RENAME.id, log_channel);
+										}
 									}
 									else {
 										if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setColor(Color.RED).setDescription("**"+oldname+"** with the id number **"+user_id+"** changed his name into **"+newname+"** but no nickname could have been assigned because the MANAGE NICKNAMES permission is missing!").build()).queue();
@@ -103,23 +120,23 @@ public class NameListener extends ListenerAdapter {
 									//verify if the bot has the permission to kick users
 									if(guild.getSelfMember().hasPermission(Permission.KICK_MEMBERS)) {
 										//send a private message and then kick the user
+										Hashes.addTempCache("kick-ignore_gu"+guild.getId()+"us"+e.getUser().getId(), new Cache(60000));
 										member.getUser().openPrivateChannel().queue(channel -> {
 											channel.sendMessage("You have been automatically kicked from "+guild.getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").queue(success -> {
-												Hashes.addTempCache("kick-ignore_gu"+guild.getId()+"us"+e.getUser().getId(), new Cache(3000));
-												guild.kick(member).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
-												Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild.getIdLong(), "kick", "Kicked for having an invalid word inside his name!", 0, "");
-												message.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("User kicked for having a not allowed name!");
-												if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** and was kicked for containing the following word in his name: **"+word.getName().toUpperCase()+"**").build()).queue();
+												guild.kick(member).reason("User kicked for having "+word.getName().toUpperCase()+" inside the name").queue();
 												channel.close().queue();
 											}, error -> {
-												Hashes.addTempCache("kick-ignore_gu"+guild.getId()+"us"+e.getUser().getId(), new Cache(3000));
-												guild.kick(member).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
-												Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild.getIdLong(), "kick", "Kicked for having an invalid word inside his name!", 0, "");
-												message.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("User kicked for having a not allowed name!");
-												if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** and was kicked for containing the following word in his name: **"+word.getName().toUpperCase()+"**").build()).queue();
+												guild.kick(member).reason("User kicked for having "+word.getName().toUpperCase()+" inside the name").queue();
 												channel.close().queue();
 											});
 										});
+										message.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("User kicked for having a not allowed name!");
+										if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user **"+oldname+"** with the id number **"+user_id+"**, tried to change his name into **"+newname+"** and was kicked for having the following word inside the name: **"+word.getName().toUpperCase()+"**").build()).queue();
+										Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild.getIdLong(), "kick", "Kicked for having "+word.getName().toUpperCase()+" inside the name!", 0, "");
+										//Run google service, if enabled
+										if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+											GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), member.getEffectiveName(), guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), "User kicked for having "+word.getName().toUpperCase()+" inside the name!", null, null, "KICK", null, null, null, null, null, GoogleEvent.KICK.id, log_channel);
+										}
 									}
 									else {
 										message.setColor(Color.RED).setTitle("User couldn't be kicked!");
@@ -136,8 +153,6 @@ public class NameListener extends ListenerAdapter {
 					}
 				}
 			});
-			
-			Azrael.SQLInsertActionLog("MEMBER_NAME_UPDATE", e.getUser().getIdLong(), 0, e.getUser().getName()+"#"+e.getUser().getDiscriminator());
 		}).start();
 	}
 	

@@ -391,7 +391,7 @@ public class UserExecution {
 															role_id = role.getId();
 															role_name = role.getName();
 														}
-														GoogleUtils.handleSpreadsheetRequest(_e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), _e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator(), _e.getMember().getEffectiveName(), "NaN", null, null, "UNMUTED", null, role_id, role_name, GoogleEvent.UNMUTE.id, Azrael.SQLgetChannels(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null));
+														GoogleUtils.handleSpreadsheetRequest(_e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), _e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator(), _e.getMember().getEffectiveName(), "NaN", null, null, "UNMUTED", null, role_id, role_name, null, null, GoogleEvent.UNMUTE.id, Azrael.SQLgetChannels(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null));
 													}
 												}
 												else {
@@ -407,7 +407,7 @@ public class UserExecution {
 												if(GuildIni.getGoogleFunctionalitiesEnabled(_e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(_e.getGuild().getIdLong())) {
 													var user = Azrael.SQLgetUserThroughID(""+user_id);
 													String username = (user != null ? user.getUserName() : "NaN");
-													GoogleUtils.handleSpreadsheetRequest(_e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), username, username.replaceAll("#[0-9]{4}$", ""), _e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator(), _e.getMember().getEffectiveName(), "NaN", null, null, "UNMUTED", null, "", "", GoogleEvent.UNMUTE.id, Azrael.SQLgetChannels(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null));
+													GoogleUtils.handleSpreadsheetRequest(_e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), username, username.replaceAll("#[0-9]{4}$", ""), _e.getMember().getUser().getName()+"#"+_e.getMember().getUser().getDiscriminator(), _e.getMember().getEffectiveName(), "NaN", null, null, "UNMUTED", null, "", "", null, null, GoogleEvent.UNMUTE.id, Azrael.SQLgetChannels(_e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null));
 												}
 											}
 										}

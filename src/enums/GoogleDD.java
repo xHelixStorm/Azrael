@@ -27,7 +27,9 @@ public enum GoogleDD {
 	GUILD_ID			(13, "GUILD_ID", 0),
 	GUILD_NAME			(14, "GUILD_NAME", 2),
 	ROLE_ID				(15, "ROLE_ID", 0),
-	ROLE_NAME			(16, "ROLE_NAME", 2);
+	ROLE_NAME			(16, "ROLE_NAME", 2),
+	OLD_NAME			(17, "OLD_NAME", 2),
+	NEW_NAME			(18, "NEW_NAME", 2);
 	
 	/**
 	 * Maps defined here to retrieve enum either by id or value

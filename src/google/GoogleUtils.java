@@ -89,7 +89,7 @@ public class GoogleUtils {
 	}
 	
 	@SuppressWarnings({ "preview" })
-	public static void handleSpreadsheetRequest(Guild guild, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, int event_id, Channels log_channel) {
+	public static void handleSpreadsheetRequest(Guild guild, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, int event_id, Channels log_channel) {
 		//Retrieve the file id and row start for this event
 		final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, event_id);
 		//If nothing has been found, don't try to write into the spreadsheet
@@ -174,6 +174,39 @@ public class GoogleUtils {
 								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
 								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
 								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+								default -> {}
+							}
+						}
+						case RENAME -> {
+								switch(item) {
+								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+								case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
+								case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
+								case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
+								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+								case OLD_NAME -> 			values.add(Arrays.asList(item.valueFormatter(oldname, column.getFormatter())));
+								case NEW_NAME -> 			values.add(Arrays.asList(item.valueFormatter(newname, column.getFormatter())));
+								default -> {}
+							}
+						}
+						case RENAME_MANUAL -> {
+							switch(item) {
+								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+								case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
+								case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
+								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+								case OLD_NAME -> 			values.add(Arrays.asList(item.valueFormatter(oldname, column.getFormatter())));
+								case NEW_NAME -> 			values.add(Arrays.asList(item.valueFormatter(newname, column.getFormatter())));
 								default -> {}
 							}
 						}

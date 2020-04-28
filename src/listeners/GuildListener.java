@@ -26,8 +26,10 @@ import constructors.Cache;
 import constructors.Guilds;
 import constructors.Rank;
 import core.Hashes;
+import enums.GoogleEvent;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
+import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -247,10 +249,15 @@ public class GuildListener extends ListenerAdapter {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.NICKNAME_MANAGE)) {
 						//retrieve a random nickname and assign to the user
 						nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
-						Hashes.addTempCache("nickname_add_gu"+guild_id+"us"+user_id, new Cache(600000));
+						Hashes.addTempCache("nickname_add_gu"+guild_id+"us"+user_id, new Cache(60000));
 						e.getGuild().modifyNickname(e.getMember(), nickname).queue();
 						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server and tried to impersonate a staff member. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
 						logger.info("Impersonation attempt found from {} in guild {}", user_id, guild_id);
+						Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild_id, nickname);
+						//Run google service, if enabled
+						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), "Impersonating a staff member!", null, null, "RENAMED", null, null, null, e.getMember().getEffectiveName(), nickname, GoogleEvent.RENAME.id, log_channel);
+						}
 					}
 					else {
 						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server and tried to impersonate a staff member but no nickname could have been assigned becuase the MANAGE NICKNAMES permission is missing!").build()).queue();
@@ -269,10 +276,15 @@ public class GuildListener extends ListenerAdapter {
 							if(e.getGuild().getSelfMember().hasPermission(Permission.NICKNAME_MANAGE)) {
 								//retrieve a random nickname and assign to the user
 								nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
-								Hashes.addTempCache("nickname_add_gu"+guild_id+"us"+user_id, new Cache(600000));
+								Hashes.addTempCache("nickname_add_gu"+guild_id+"us"+user_id, new Cache(60000));
 								e.getGuild().modifyNickname(e.getMember(), nickname).queue();
 								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
 								logger.info("Improper name found from {} in guild {}", user_id, guild_id);
+								Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild_id, nickname);
+								//Run google service, if enabled
+								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), "Renamed due to the current name filter settings!", null, null, "RENAMED", null, null, null, e.getMember().getEffectiveName(), nickname, GoogleEvent.RENAME.id, log_channel);
+								}
 							}
 							else {
 								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setColor(Color.RED).setDescription("**"+user_name+"** joined this server with an unproper name but no nickname could have been assigned because the MANAGE NICKNAMES permission is missing!").build()).queue();
@@ -285,11 +297,22 @@ public class GuildListener extends ListenerAdapter {
 							//verify if the bot has the permission to kick users
 							if(e.getGuild().getSelfMember().hasPermission(Permission.KICK_MEMBERS)) {
 								//send a private message and then kick the user
-								e.getMember().getUser().openPrivateChannel().complete().sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").complete();
-								e.getGuild().kick(e.getMember()).reason("User kicked for having "+word.getName().toUpperCase()+" inside his name").queue();
-								Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", "Kicked for having an invalid word inside his name!", 0, "");
+								e.getMember().getUser().openPrivateChannel().queue(channel -> {
+									channel.sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").queue(success -> {
+										e.getGuild().kick(e.getMember()).reason("User kicked for having "+word.getName().toUpperCase()+" inside the name").queue();
+										channel.close();
+									}, error -> {
+										e.getGuild().kick(e.getMember()).reason("User kicked for having "+word.getName().toUpperCase()+" inside the name").queue();
+										channel.close();
+									});
+								});
+								Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", "Kicked for having the word "+word.getName()+" inside the name!", 0, "");
 								nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("User kicked for having a not allowed name!");
-								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. The user has been kicked automatically from the server due to this word: **"+word.getName().toUpperCase()+"**").build()).queue();
+								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. The user has been kicked automatically from the server for having this word inside the name: **"+word.getName().toUpperCase()+"**").build()).queue();
+								//Run google service, if enabled
+								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), "User kicked for having "+word.getName().toUpperCase()+" inside the name!", null, null, "KICK", null, null, null, null, null, GoogleEvent.KICK.id, log_channel);
+								}
 							}
 							else {
 								nick_assign.setColor(Color.RED).setTitle("User couldn't be kicked!");

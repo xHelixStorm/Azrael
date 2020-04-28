@@ -112,7 +112,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 						role_id = role.getId();
 						role_name = role.getName();
 					}
-					GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, member_name, e.getMember().getEffectiveName(), trigger_user_name, trigger_effective_name, "The mute has been removed manually", null, null, "MANUALLY_UNMUTED", null, role_id, role_name, GoogleEvent.UNMUTE_MANUAL.id, log_channel);
+					GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, member_name, e.getMember().getEffectiveName(), trigger_user_name, trigger_effective_name, "The mute has been removed manually", null, null, "MANUALLY_UNMUTED", null, role_id, role_name, null, null, GoogleEvent.UNMUTE_MANUAL.id, log_channel);
 				}
 			}
 			//execute this block if the mute time has ended and the user doesn't have the mute role anymore
@@ -144,7 +144,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 						}
 						Hashes.clearTempCache("unmute_gu"+guild_id+"us"+user_id);
 					}
-					GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), member_name, e.getMember().getEffectiveName(), "", "", "The mute has ended after the given time", null, null, "UNMUTED", null, role_id, role_name, GoogleEvent.UNMUTE.id, log_channel);
+					GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), member_name, e.getMember().getEffectiveName(), "", "", "The mute has ended after the given time", null, null, "UNMUTED", null, role_id, role_name, null, null, GoogleEvent.UNMUTE.id, log_channel);
 				}
 			}
 		}).start();

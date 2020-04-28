@@ -1,5 +1,7 @@
 package listeners;
 
+import java.sql.Timestamp;
+
 /**
  * This class gets executed when the nickname of a user gets updated!
  * 
@@ -13,6 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
+import enums.GoogleEvent;
+import fileManagement.GuildIni;
+import google.GoogleUtils;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
@@ -40,13 +47,34 @@ public class NicknameListener extends ListenerAdapter {
 				}
 				//if the nickname has been set or changed, insert/update to table
 				else {
-					if(nickname != null && Azrael.SQLInsertNickname(user_id, guild_id, nickname) > 0) {
+					if(Azrael.SQLInsertNickname(user_id, guild_id, nickname) > 0) {
 						logger.debug("{} received the nickname {} in guild {}", user_id, nickname, guild_id);
 						Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild_id, nickname);
 					}
 					else {
 						logger.error("The nickname {} for user {} in guild {} couldn't be updated on the table Azrael.nickname", nickname, user_id, guild_id);
 					}
+				}
+				//Run google service, if enabled
+				if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+					String reporter_name = "NaN";
+					String reporter_effectivename = "NaN";
+					if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
+						var roleLog = e.getGuild().retrieveAuditLogs();
+						//iterate through the log
+						for(final var entry : roleLog) {
+							//retrieve the first log about a role update
+							if(entry.getType() == ActionType.MEMBER_UPDATE) {
+								reporter_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
+								reporter_effectivename = e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName();
+								break;
+							}
+						}
+					}
+					else {
+						logger.warn("Lacking VIEW_AUDIT_LOGS permission in guild {}", guild_id);
+					}
+					GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, reporter_name, reporter_effectivename, null, null, null, "RENAMED", null, null, null, e.getOldValue(), e.getNewValue(), GoogleEvent.RENAME_MANUAL.id, Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null));
 				}
 			}
 			else

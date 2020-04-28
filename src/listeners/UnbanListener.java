@@ -91,8 +91,8 @@ public class UnbanListener extends ListenerAdapter {
 			Azrael.SQLInsertActionLog("MEMBER_BAN_REMOVE", user_id, guild_id, "User Unbanned");
 			
 			//Run google service, if enabled
-			if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-				GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), reason, null, null, "UNBAN", null, null, null, GoogleEvent.UNBAN.id, log_channel);
+			if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+				GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), reason, null, null, "UNBAN", null, null, null, null, null, GoogleEvent.UNBAN.id, log_channel);
 			}
 		}).start();
 	}
