@@ -399,7 +399,7 @@ public class GoogleSpreadsheetsExecution {
 	}
 	
 	public static void sheetUpdate(GuildMessageReceivedEvent e, String file_id, String event, String startingPoint, final String key) {
-		if(startingPoint.matches("([a-zA-Z0-9\\s]{0}|[a-zA-Z0-9\\s]{1,}[a-zA-Z]{1}[!]{1})[A-Z]{1,3}[1-9]{1}[0-9]*")) {
+		if(startingPoint.matches("([a-zA-Z0-9\\[\\]\\s]{0}|[a-zA-Z0-9\\[\\]\\s]{1,}[a-zA-Z]{1}[!]{1})[A-Z]{1,3}[1-9]{1}[0-9]*")) {
 			if(Azrael.SQLInsertGoogleSpreadsheetSheet(file_id, GoogleEvent.valueOfEvent(event).id, startingPoint) > 0) {
 				e.getChannel().sendMessage(message.setDescription("The starting point has been saved for this spreadsheet and event! Returning to the spreadsheets parameter selection page...").build()).queue();
 				logger.debug("Google spreadsheet starting point updated for guild {}, spreadsheet {}, event {} with value {}", e.getGuild().getId(), file_id, event, startingPoint);
