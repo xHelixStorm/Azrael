@@ -165,13 +165,13 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 									});
 								}
 								else {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MESSAGE_ADD_REACTION.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ADD_REACTION.getName()).build()).queue();
 									logger.error("MESSAGE_ADD_REACTION permission missing for channel {} in guild {} to add a reaction", channel_id, e.getGuild().getId());
 									Hashes.clearTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getUserId()+"me"+e.getMessageId());
 								}
 							}
 							else {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MESSAGE_HISTORY.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_HISTORY.getName()).build()).queue();
 								logger.error("MESSAGE_HISTORY permission missing for channel {} in guild {} to read the history", channel_id, e.getGuild().getId());
 								Hashes.clearTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getUserId()+"me"+e.getMessageId());
 							}

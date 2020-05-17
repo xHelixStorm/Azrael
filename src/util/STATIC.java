@@ -66,7 +66,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.21.424";
+	private static final String VERSION = "7.21.425";
 	
 	private static final JSONObject en_lang = new JSONObject(FileSetting.readFile("./files/Languages/en_lang.json"));
 	

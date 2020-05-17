@@ -136,7 +136,7 @@ public class Mute implements CommandPublic {
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
 			logger.warn("MANAGE_ROLES permission required to mute users for guild {}", e.getGuild().getId());
 		}
 	}

@@ -257,14 +257,14 @@ public class UserExecution {
 							}
 							else {
 								message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-								e.getChannel().sendMessage(message.setDescription(Permission.MESSAGE_HISTORY.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_HISTORY.getName()).build()).queue();
 								logger.warn("MESSAGE HISTORY permission required for deleting messages in guild {}!", e.getGuild().getId());
 								Hashes.clearTempCache(key);
 							}
 						}
 						else {
 							message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-							e.getChannel().sendMessage(message.setDescription(Permission.MESSAGE_MANAGE.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_MANAGE.getName()).build()).queue();
 							logger.warn("MANAGE MESSAGES permission required for deleting messages in guild {}!", e.getGuild().getId());
 							Hashes.clearTempCache(key);
 						}
@@ -317,7 +317,7 @@ public class UserExecution {
 							}
 							else {
 								message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-								e.getChannel().sendMessage(message.setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
 								logger.warn("MANAGE ROLES permission required to mute a user in guild {}!", e.getGuild().getId());
 								Hashes.clearTempCache(key);
 							}
@@ -437,7 +437,7 @@ public class UserExecution {
 						}
 						else {
 							message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-							e.getChannel().sendMessage(message.setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
 							logger.warn("MANAGE ROLES permission required to unmute a user in guild {}!", e.getGuild().getId());
 						}
 						Hashes.clearTempCache(key);
@@ -476,7 +476,7 @@ public class UserExecution {
 						}
 						else {
 							message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-							e.getChannel().sendMessage(message.setDescription(Permission.BAN_MEMBERS.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.BAN_MEMBERS.getName()).build()).queue();
 							logger.warn("BAN MEMBERS permission required to ban a user in guild {}!", e.getGuild().getId());
 							Hashes.clearTempCache(key);
 						}
@@ -511,7 +511,7 @@ public class UserExecution {
 						}
 						else {
 							message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-							e.getChannel().sendMessage(message.setDescription(Permission.BAN_MEMBERS.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.BAN_MEMBERS.getName()).build()).queue();
 							logger.warn("BAN MEMBERS permission required to unban a user in guild {}!", e.getGuild().getId());
 							Hashes.clearTempCache(key);
 						}
@@ -553,7 +553,7 @@ public class UserExecution {
 						}
 						else {
 							message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-							e.getChannel().sendMessage(message.setDescription(Permission.KICK_MEMBERS.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.KICK_MEMBERS.getName()).build()).queue();
 							logger.warn("KICK MEMBERS permission required to kick a user in guild {}!", e.getGuild().getId());
 							Hashes.clearTempCache(key);
 						}
@@ -972,7 +972,7 @@ public class UserExecution {
 					}
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-						e.getChannel().sendMessage(message.setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
 						logger.warn("MANAGE ROLES permission required to mute a user in guild {}!", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
@@ -1035,7 +1035,7 @@ public class UserExecution {
 					}
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-						e.getChannel().sendMessage(message.setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
 						logger.warn("MANAGE ROLES permission required to mute a user in guild {}!", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
@@ -1109,7 +1109,7 @@ public class UserExecution {
 					}
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-						e.getChannel().sendMessage(message.setDescription(Permission.BAN_MEMBERS.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.BAN_MEMBERS.getName()).build()).queue();
 						logger.warn("BAN MEMBERS permission required to ban a user in guild {}!", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
@@ -1162,7 +1162,7 @@ public class UserExecution {
 				}
 				else {
 					message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-					e.getChannel().sendMessage(message.setDescription(Permission.BAN_MEMBERS+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.BAN_MEMBERS.getName()).build()).queue();
 					logger.warn("BAN MEMBERS permission required to ban a user in guild {}!", e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
@@ -1198,7 +1198,7 @@ public class UserExecution {
 					}
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-						e.getChannel().sendMessage(message.setDescription(Permission.BAN_MEMBERS+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.BAN_MEMBERS.getName()).build()).queue();
 						logger.warn("BAN MEMBERS permission required to unban a user in guild {}!", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
@@ -1217,7 +1217,7 @@ public class UserExecution {
 				}
 				else {
 					message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-					e.getChannel().sendMessage(message.setDescription(Permission.BAN_MEMBERS+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.BAN_MEMBERS.getName()).build()).queue();
 					logger.warn("BAN MEMBERS permission required to unban a user in guild {}!", e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
@@ -1260,7 +1260,7 @@ public class UserExecution {
 					}
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED);
-						e.getChannel().sendMessage(message.setDescription(Permission.KICK_MEMBERS+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.KICK_MEMBERS.getName()).build()).queue();
 						logger.warn("KICK MEMBERS permission required to kick a user in guild {}!", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
@@ -1297,7 +1297,7 @@ public class UserExecution {
 				}
 				else {
 					message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-					e.getChannel().sendMessage(message.setDescription(Permission.KICK_MEMBERS+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.KICK_MEMBERS.getName()).build()).queue();
 					logger.warn("KICK MEMBERS permission required to kick a user in guild {}!", e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
@@ -1324,7 +1324,7 @@ public class UserExecution {
 								}
 								else {
 									message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-									e.getChannel().sendMessage(message.setDescription(Permission.MANAGE_ROLES+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES).build()).queue();
 									logger.warn("MANAGE_ROLES permission required to assign roles in guild {}", e.getGuild().getId());
 									Hashes.clearTempCache(key);
 								}
@@ -1371,7 +1371,7 @@ public class UserExecution {
 								}
 								else {
 									message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
-									e.getChannel().sendMessage(message.setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
 									logger.warn("MANAGE_ROLES permission required to remove roles in guild {}", e.getGuild().getId());
 									Hashes.clearTempCache(key);
 								}
@@ -1541,7 +1541,7 @@ public class UserExecution {
 								}
 							}
 							else {
-								e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED).setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+								e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
 								logger.warn("MANAGE ROLES permission missing to assign a ranking role in guild {}!", e.getGuild().getId());
 							}
 						}
@@ -1613,7 +1613,7 @@ public class UserExecution {
 								}
 							}
 							else {
-								e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED).setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+								e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
 								logger.warn("MANAGE ROLES permission missing to assign a ranking role in guild {}!", e.getGuild().getId());
 							}
 						}
@@ -1679,7 +1679,7 @@ public class UserExecution {
 									}
 								}
 								else {
-									e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED).setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+									e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
 									logger.warn("MANAGE ROLES permission missing to assign a ranking role in guild {}!", e.getGuild().getId());
 								}
 							}
@@ -1804,7 +1804,7 @@ public class UserExecution {
 								else {
 									if(channelErr.contains(currentMessage.getChannelID())) {
 										error.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS));
-										e.getChannel().sendMessage(error.setDescription(Permission.MESSAGE_HISTORY.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN)+"<#"+currentMessage.getChannelID()+">").build()).queue();
+										e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_HISTORY.getName())+"<#"+currentMessage.getChannelID()+">").build()).queue();
 										logger.warn("MESSAGE HISTORY permission to retrieve messages is missing in guild {}!", e.getGuild().getId());
 										channelErr.add(currentMessage.getChannelID());
 									}
@@ -1842,7 +1842,7 @@ public class UserExecution {
 						}
 					}
 					else {
-						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MESSAGE_MANAGE.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_MANAGE.getName()).build()).queue();
 						logger.warn("MANAGE MESSAGES permission for message deletions is missing in guild {}!", e.getGuild().getId());
 					}
 				}
