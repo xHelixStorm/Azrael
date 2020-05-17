@@ -9,6 +9,12 @@ import core.Hashes;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
+/**
+ * Extension of the google documents command
+ * @author xHelixStorm
+ *
+ */
+
 public class GoogleDocsExecution {
 	private final static Logger logger = LoggerFactory.getLogger(GoogleDocsExecution.class);
 	

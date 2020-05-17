@@ -1,11 +1,5 @@
 package commands;
 
-/**
- * The Quiz command can be used to register questions and
- * rewards and to run a quiz session for every participant
- * to enjoy.
- */
-
 import java.awt.Color;
 import java.io.File;
 
@@ -16,12 +10,22 @@ import commandsContainer.QuizExecution;
 import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
+import util.STATIC;
+
+/**
+ * The Quiz command can be used to register questions and
+ * rewards and to run a quiz session for every participant
+ * to enjoy.
+ * @author xHelixStorm
+ *
+ */
 
 public class Quiz implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Quiz.class);
@@ -43,26 +47,14 @@ public class Quiz implements CommandPublic {
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		//be sure that the quiz session isn't already running
 		if(Hashes.getTempCache("quiztime"+e.getGuild().getId()) == null) {
-			EmbedBuilder message = new EmbedBuilder().setTitle("It's Quiz time!").setColor(Color.BLUE);
+			EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 			//execute the command help if no parameters have been applied to the command
 			if(args.length == 0) {
-				e.getChannel().sendMessage(message.setDescription("The Quiz command will allow you to register questions to provide the best quiz experience in a Discord server! At your disposal are parameters to register questions from a pastebin link, register rewards in form of codes that get sent to the user who answers a question correctly in private message and to start and interrupt the quiz session.\n\n"
-						+ "If a question gets answered, the next questions will appear after a 20 seconds and if they don't get replied within 20 seconds, users will receive a reminder that no one has yet answered the question and if available, it will write a hint to facilitate the question. These are the available parameters. Use them together with the quiz command:\n\n"
-						+ "**-register-codes**: To register the rewards that get sent to one user who answers a question correctly\n"
-						+ "**-register-questions**: To register questions with answer possibilities and hints\n"
-						+ "**-clear**: To clear all questions and rewards that were saved in the cache\n"
-						+ "**-run**: To start the quiz in a designated channel\n"
-						+ "**-save**: To save the settings on the local machine\n"
-						+ "**-load**: To load presaved questions").build()).queue();
+				e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ABOUT)).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_HELP)).build()).queue();
 			}
 			//help command to register quiz rewards when there's just one parameter
 			else if(args.length == 1 && args[0].equalsIgnoreCase("-register-rewards")) {
-				e.getChannel().sendMessage("To register the rewards, attach a pastebin link after the full command. The pastebin format should look like this:\n"
-						+ "```\nxxx-xx-xx-0001\n"
-						+ "xxx-xx-xx-0002\n"
-						+ "xxx-xx-xx-0003\n"
-						+ "...```"
-						+ "write one reward per line so that the bot can recognize every single reward!").queue();
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_REWARDS_HELP)).build()).queue();
 			}
 			//register quiz rewards when we have 2 parameters
 			else if(args.length > 1 && args[0].equalsIgnoreCase("-register-rewards")) {
@@ -70,19 +62,7 @@ public class Quiz implements CommandPublic {
 			}
 			//help command to register questions
 			else if(args.length == 1 && args[0].equalsIgnoreCase("-register-questions")) {
-				e.getChannel().sendMessage("To register questions, attach a pastebin link after the full command. The pastebin format should look like this:\n"
-						+ "```\n"
-						+ "START\n"
-						+ "1. Guess my hair color.\n"
-						+ ":black\n"
-						+ ";It's typical south oriental.\n"
-						+ "END\nSTART\n"
-						+ "2. What is the color of a watermelon?\n"
-						+ ":green\n"
-						+ ":red\n"
-						+ "END```"
-						+ "Questions have to be separated by a numerical value. For example 1. and 2.. Solutions to the questions should begin with **:**. The words written after the : doesn't have to be written together but it will be counted as one answer. It's possible to choose up to 3 possible answers for a question. Hints are given with the **;** symbol. Also here maximal 3 hints are allowed."
-						+ "It's also possible to include rewards while registering questions in case it is easier to avoid errors. This can be done by applying the **=** before the reward.").queue();
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_QUESTIONS_HELP)).build()).queue();
 			}
 			//register quiz questions when we have 2 parameters
 			else if(args.length > 1 && args[0].equalsIgnoreCase("-register-questions")) {
@@ -90,42 +70,39 @@ public class Quiz implements CommandPublic {
 				QuizExecution.registerQuestions(e, args[1], false);
 			}
 			//clear all questions and rewards
-			else if(args[0].equalsIgnoreCase("-clear")) {
-				logger.debug("{} cleared all quiz questions and rewards", e.getMember().getUser().getId());
+			else if(args[0].equalsIgnoreCase("clear")) {
 				Hashes.clearQuiz();
-				e.getChannel().sendMessage("Cache has been cleared from registered questions and rewards!").queue();
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_CLEAR)).build()).queue();
+				logger.debug("{} cleared all quiz questions and rewards", e.getMember().getUser().getId());
 			}
 			//start the quiz in the dedicated channel
-			else if(args[0].equalsIgnoreCase("-run")) {
+			else if(args[0].equalsIgnoreCase("run")) {
 				if(Hashes.getWholeQuiz().size() > 0) {
 					//check that both questions and rewards have been set
 					if(Hashes.getQuiz(1).getQuestion().length() == 0) {
-						e.getChannel().sendMessage("Please register questions and answers before proceeding!").queue();
+						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_Q_AND_A)).build()).queue();
 					}
 					else if(Hashes.getQuiz(1).getReward().length() == 0) {
-						e.getChannel().sendMessage("Please register the rewards before proceeding!").queue();
+						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_REWARDS)).build()).queue();
 					}
 					else {
 						//confirm that a quiz channel exists and then print the message to choose a mode
 						if(Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("qui")).findAny().orElse(null) != null) {
-							e.getChannel().sendMessage(message.setDescription("Please select the fitting mode for the quiz with one of the following digits:\n"
-									+ "1: **no restrictions**\n"
-									+ "2: **participants will receive a 3 questions threshold on right answer**\n"
-									+ "3: **participants win only once for the entire quiz**").build()).queue();
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_RUN_HELP)).build()).queue();
 							//write to cache to remind the bot that we're waiting for input
 							Hashes.addTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, e.getMember().getUser().getId()));
 						}
 						else {
-							e.getChannel().sendMessage("Please register a quiz channel before starting the quiz!").queue();
+							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NOT_QUIZ_CHANNEL)).build()).queue();
 						}
 					}
 				}
 				else {
-					e.getChannel().sendMessage("Please register questions and rewards before this parameter is used!").queue();
+					e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_QA_REWARDS)).build()).queue();
 				}
 			}
 			//to save the registered rewards and questions
-			else if(args[0].equalsIgnoreCase("-save")) {
+			else if(args[0].equalsIgnoreCase("save")) {
 				if(Hashes.getWholeQuiz().size() > 0) {
 					//save all settings to file
 					QuizExecution.saveQuestions(e);
@@ -136,7 +113,7 @@ public class Quiz implements CommandPublic {
 				}
 			}
 			//load all settings from file
-			else if(args[0].equalsIgnoreCase("-load")) {
+			else if(args[0].equalsIgnoreCase("load")) {
 				File file = new File("./files/QuizBackup/quizsettings"+e.getGuild().getId()+".azr");
 				//verify that the file exists
 				if(file.exists()) {

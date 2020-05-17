@@ -24,9 +24,11 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import constructors.Channels;
 import enums.GoogleDD;
 import enums.GoogleEvent;
+import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import sql.Azrael;
+import util.STATIC;
 
 /**
  * Utils for google docs and spreadsheets API
@@ -216,37 +218,37 @@ public class GoogleUtils {
 				try {
 					GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
 				} catch (IOException e1) {
-					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Row couldn't be inserted into the Spreadsheet!").setDescription(e1.getMessage()).build()).queue();
+					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)).setDescription(e1.getMessage()).build()).queue();
 					logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
 				} catch (Exception e1) {
-					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Spreadsheet service couldn't be retrieved!").setDescription(e1.getMessage()).build()).queue();
+					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)).setDescription(e1.getMessage()).build()).queue();
 					logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
 				}
 			}
 			else if(columns.size() == 0) {
-				if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle("Warning!").setDescription("No column mapping has been found!").build()).queue();
-				logger.warn("Mute spreadsheet {} is not mapped for event id 1 in guild {}", file_id, guild.getId());
+				if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)).setDescription(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_MAPPING)).build()).queue();
+				logger.warn("Mute spreadsheet {} is not mapped in guild {}", file_id, guild.getId());
 			}
 			else {
-				if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred! The columns mapping couldn't be retrieved!").build()).queue();
-				logger.error("Mapping couldn't be retrieved from Azrael.google_spreadsheet_mapping for file id {}, event id 1 and guild ", file_id, guild.getId());
+				if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(guild, Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("Mapping couldn't be retrieved from Azrael.google_spreadsheet_mapping for file id {} in guild ", file_id, guild.getId());
 			}
 		}
 		else if(sheetRowStart == null) {
-			if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred! Mute Spreadsheet couldn't be retrieved!").build()).queue();
-			logger.error("Spreadsheet starting point couldn't be retrieved from google_files_and_events for event id 1 and guild {}", guild.getId());
+			if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(guild, Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Spreadsheet starting point couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
 		}
 		else if(sheetRowStart.isBlank()) {
-			if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle("Warning!").setDescription("No Spreadsheet starting point couldn't be found for this event!").build()).queue();
-			logger.warn("Spreadsheet starting point couldn't be found for event id 1 and guild {}", guild.getId());
+			if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)).setDescription(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_START_POINT)).build()).queue();
+			logger.warn("Spreadsheet starting point couldn't be found in guild {}", guild.getId());
 		}
 		else if(file_id == null) {
-			if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred! Mute Spreadsheet couldn't be retrieved!").build()).queue();
-			logger.error("Mute spreadsheet couldn't be retrieved from google_files_and_events for event id 1 and guild {}", guild.getId());
+			if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(guild, Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Spreadsheet couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
 		}
 		else {
-			if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle("Warning!").setDescription("No spreadsheet has been found with the mute event!").build()).queue();
-			logger.warn("Mute spreadsheet couldn't be found for event id 1 and guild {}", guild.getId());
+			if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)).setDescription(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_FOUND)).build()).queue();
+			logger.warn("Spreadsheet couldn't be found in guild {}", guild.getId());
 		}
 	}
 }

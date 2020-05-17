@@ -1,85 +1,85 @@
 package commandsContainer;
 
+import java.awt.Color;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Dailies;
 import core.Hashes;
+import enums.Translation;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
+import util.STATIC;
+
+/**
+ * Extension of the set command
+ * @author xHelixStorm
+ *
+ */
 
 public class SetDailyItem {
+	private final static Logger logger = LoggerFactory.getLogger(SetDailyItem.class);
 
-	public static void runTask(GuildMessageReceivedEvent _e, String _input, ArrayList<Dailies> _dailies, int _weight){
-		Logger logger = LoggerFactory.getLogger(SetDailyItem.class);
+	public static void runTask(GuildMessageReceivedEvent e, String[] args, ArrayList<Dailies> _dailies, int _weight) {
+		String type = null;
+		int probability = 0;
+		//be sure that enough parameters are provided
+		if(args.length < 4) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+			return;
+		}
+		//verify that the item type has been passed correctly
+		if(args[1].equalsIgnoreCase("cur") || args[1].equalsIgnoreCase("exp") || args[1].equalsIgnoreCase("cod")) {
+			type = args[1].toLowerCase();
+		}
+		else {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_INVALID_TYPE)).build()).queue();
+			return;
+		}
+		//verify that a numerical probability has been forwarded
+		if(args[2].replaceAll("[0-9]*", "").length() == 0) {
+			probability = Integer.parseInt(args[2]);
+		}
+		else {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_PROBABILITY_ERR)).build()).queue();
+			return;
+		}
+		//build together the item name
+		StringBuilder item = new StringBuilder();
+		for(int i = 3; i < args.length; i++) {
+			if(i == 3)
+				item.append(args[i]);
+			else
+				item.append(" "+args[1]);
+		}
 		
-		boolean duplicateFound = false;
-		Pattern pattern = Pattern.compile("\"[\\s\\d\\w]*\"");
-		Matcher matcher = pattern.matcher(_input);
-		if(matcher.find()){
-			String description = matcher.group();
-			for(Dailies daily : _dailies){
-				if(description.replaceAll("[\"]", "").equals(daily.getDescription())){
-					duplicateFound = true;
-				}
+		final String itemName = item.toString();
+		//check if this item has been already registered
+		if(_dailies.parallelStream().filter(f -> f.getDescription().equalsIgnoreCase(itemName)).findAny().orElse(null) == null) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_ALREADY_REGISTERED)).build()).queue();
+			return;
+		}
+		
+		//verify that the probability doesn't exceed the limit
+		if((_weight+probability) <= 10000) {
+			if(RankingSystem.SQLInsertDailyItems(itemName, probability, type, e.getGuild().getIdLong(), RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID()) > 0) {
+				Hashes.removeDailyItems(e.getGuild().getIdLong());
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_ADDED).replace("{}", ""+(_weight+probability))).build()).queue();
+				logger.debug("{} has inserted the item {} into the daily items pool with the probability {} in guild {}", e.getMember().getUser().getId(), itemName, probability, e.getGuild().getId());
 			}
-			if(duplicateFound == true){
-				_e.getChannel().sendMessage(_e.getMember().getAsMention()+ "this item has been already set into the daily item pool!").queue();
-			}
-			else{
-				try {
-					_input = _input.substring(description.length()+1);
-					if(_input.contains("-weight ")){
-						if(!_input.replaceAll("[^0-9]", "").equals("")){
-							String weight = _input.replaceAll("[^0-9]", "");
-							_input = _input.substring(weight.length()+9);
-							if(_input.contains("-type ")){
-								_input = _input.substring(6);
-								String type = _input;
-								if(type.equals("cur") || type.equals("exp") || type.equals("cod")){
-									if(_weight+Integer.parseInt(weight) <= 100){
-										if(RankingSystem.SQLInsertDailyItems(description.replaceAll("[\"]", ""), Integer.parseInt(weight), type, _e.getGuild().getIdLong(), RankingSystem.SQLgetGuild(_e.getGuild().getIdLong()).getThemeID()) > 0) {
-											Hashes.removeDailyItems(_e.getGuild().getIdLong());
-											logger.debug("{} has inserted the item {} into the daily items pool with the weight {}", _e.getMember().getUser().getId(), description.replaceAll("[\"]", ""), weight);
-											_e.getChannel().sendMessage("New daily item has been set. Your current free weight is **"+(100-_weight-Integer.parseInt(weight))+"** now!").queue();
-										}
-										else {
-											_e.getChannel().sendMessage("Internal error! Daily item couldn't be inserted!").queue();
-											logger.error("Internal error! Daily item couldn't be inserted!");
-											RankingSystem.SQLInsertActionLog("high", _e.getMember().getUser().getIdLong(), _e.getGuild().getIdLong(), "Daily item registration error", "daily item couldn't be inserted with weight "+weight+" and item "+description.replaceAll("[\"]", ""));
-										}
-									}
-									else{
-										_e.getChannel().sendMessage(_e.getMember().getAsMention()+" The total weight of 100 has been exceeded by **"+(_weight+Integer.parseInt(weight)-100)+"**! Your current free weight to distribute is **"+(100-_weight)+"**").queue();
-										logger.warn("Daily item couldn't be inserted due to weight overload");
-									}
-								}
-								else{
-									_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Something went wrong, please type either **cur** or **ite** after the -type parameter!").queue();
-								}
-							}
-							else{
-								_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Something went wrong. The **-type** parameter is missing or no value followed!").queue();
-							}
-						}
-						else{
-							_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Something went wrong, please type a proper digit value after the -weight parameter!").queue();
-						}
-					}
-					else{
-						_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Something went wrong. The **-weight** parameter is missing or no value followed!").queue();
-					}
-				} catch(StringIndexOutOfBoundsException sioobe){
-					_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Something went wrong. Please check if the syntax is complete!").queue();
-				}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("Internal error! Daily item couldn't be inserted in guild {}", e.getGuild().getId());
+				RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily item registration error", "daily item couldn't be inserted with probability "+probability+" and item "+itemName);
 			}
 		}
-		else{
-			_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Something went wrong, please recheck the syntax to put a proper description!").queue();
+		else {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_OVER_THE_LIMIT).replace("{}", ""+_weight)).build()).queue();
 		}
+		
+		
 	}
 }

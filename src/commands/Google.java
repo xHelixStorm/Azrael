@@ -2,27 +2,29 @@ package commands;
 
 import java.awt.Color;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import util.STATIC;
 
 /**
- * Google service set up for specific events
+ * Google APIs set up for specific events
  * @author xHelixStorm
  *
  */
 
 public class Google implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Google.class);
-	private final static EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle("Google interface options!");
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
@@ -42,16 +44,13 @@ public class Google implements CommandPublic {
 		//print help message and all currently available APIs
 		if(args.length == 0) {
 			String email;
-			String [] credentialContent = FileSetting.readFileIntoFixedArray("./files/Google/credentials.json");
-			if(credentialContent.length > 0)
-				email = credentialContent[5].replaceAll("client_email", "").replaceAll("[\",:\\s]", "").trim();
+			JSONObject credentialContent = new JSONObject(FileSetting.readFile("./files/Google/credentials.json"));
+			if(!credentialContent.isEmpty())
+				email = credentialContent.getString("client_email");
 			else 
-				email = "N/A";
-			e.getChannel().sendMessage(message.setDescription("Make use of a google API and assign events upon it to interact with any available platform of google. For example google docs or google spreadsheets. Operations on these files are handled by **"+email+"**\n"
-				+ "Available APIs and parameters:\n\n"
-				+ "**docs**: build an ineraction with google docs\n"
-				+ "**spreadsheets**: build an interaction with google spreadsheets\n"
-				+ "**drive**: build an interaction with google drive").build()).queue();
+				email = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
+			EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS));
+			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGlE_HELP).replace("{}", email)).build()).queue();
 		}
 		else if(args.length == 1) {
 			//Write in cache to display options related to google docs
@@ -67,11 +66,14 @@ public class Google implements CommandPublic {
 				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "drive"));
 			}
 			else {
-				e.getChannel().sendMessage(message.setDescription("API doesn't exist or was not written correctly. Please try again!").build()).queue();
+				EmbedBuilder message = new EmbedBuilder().setColor(Color.RED);
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_API_NOT_AVAILABLE)).build()).queue();
 			}
 		}
-		else
-			e.getChannel().sendMessage(message.setDescription("More than one parameters are not supported with this command!").build()).queue();
+		else {
+			EmbedBuilder message = new EmbedBuilder().setColor(Color.RED);
+			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+		}
 	}
 
 	@Override

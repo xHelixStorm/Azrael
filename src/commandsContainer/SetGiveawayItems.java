@@ -11,10 +11,18 @@ import java.time.temporal.TemporalAdjusters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 import util.Pastebin;
+import util.STATIC;
+
+/**
+ * Extension of the set command
+ * @author xHelixStorm
+ *
+ */
 
 public class SetGiveawayItems {
 	public static void runTask(GuildMessageReceivedEvent e, String _link) {
@@ -35,24 +43,23 @@ public class SetGiveawayItems {
 				boolean err = RankingSystem.SQLBulkInsertGiveawayRewards(rewards, timestamp, e.getGuild().getIdLong());
 				
 				if(err == false) {
-					logger.debug("{} has inserted giveaway items for the daily command", e.getMember().getUser().getId());
-					e.getChannel().sendMessage("Rewards from pastebin link have been inserted succesfully!").queue();
+					logger.debug("{} has inserted giveaway items for the daily command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_GIVEAWAY_ADDED)).build()).queue();
 				}
 				else {
-					EmbedBuilder error = new EmbedBuilder().setTitle("Invalid format!").setColor(Color.RED);
-					logger.error("Rewards couldn't be uploaded into the RankingSystem.giveaway table");
-					e.getChannel().sendMessage(error.setDescription("Rewards couldn't be set to table. Please verify the content of the link!").build()).queue();
+					EmbedBuilder error = new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED);
+					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("Rewards couldn't be uploaded into the RankingSystem.giveaway table in guild {}");
 				}
 			} catch (MalformedURLException | RuntimeException e1) {
-				logger.error("Reading paste failed!", e1);
-				EmbedBuilder error = new EmbedBuilder().setTitle("Reading paste failed!").setColor(Color.RED);
-				e.getChannel().sendMessage(error.setDescription("Rewards couldn't be retrieved from the Pastebin link. Please verify that the right link has been provided!").build()).queue();
+				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
+				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR_2)).build()).queue();
+				logger.error("Reading paste failed in guild {}!", e.getGuild().getId(), e1);
 			}
 		}
 		else {
-			EmbedBuilder error = new EmbedBuilder().setTitle("Invalid url!").setColor(Color.RED);
-			e.getChannel().sendMessage(error.setDescription("An invalid url has been inserted. Please insert a Pastebin link").build()).queue();
-			logger.warn("Invalid pastebin link has been inserted for the giveaway rewards");
+			EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
+			e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 		}
 	}
 }

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Cache;
 import core.Hashes;
+import enums.Translation;
 import enums.Weekday;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
@@ -51,7 +52,7 @@ public class DoubleExperienceStart extends TimerTask {
 					if(bot_channel != null) {
 						File doubleEvent = new File("./files/RankingSystem/"+RankingSystem.SQLgetGuild(guild_id).getThemeID()+"/doubleweekend.jpg");
 						event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg").queue();
-						event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\nThe double EXP weekend is here\nUse the chance to gain more experience points than usual to reach new heights. See you at the top!\nThe event will stay up from Saturday 00:01 cest till Sunday 23:59 cest!```").queue();
+						event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\n"+STATIC.getTranslation2(g, Translation.DOUBLE_EXPERIENCE_AUTO)+"```").queue();
 						logger.debug("Double experience started for guild {}!", guild_id);
 					}
 				}

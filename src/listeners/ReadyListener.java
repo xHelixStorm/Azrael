@@ -14,6 +14,7 @@ import constructors.Channels;
 import constructors.Guilds;
 import constructors.Patchnote;
 import core.Hashes;
+import enums.Translation;
 import enums.Weekday;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
@@ -37,9 +38,9 @@ import timerTask.VerifyMutedMembers;
 import util.STATIC;
 
 /**
- * First event that gets executed on start up and on succesfull login to Discord
+ * First event that gets executed on start up and on successful login to Discord
  * 
- * collect themes, roles, settings, etc before the bot is fully operational for taking
+ * collect themes, roles, settings, etc before the Bot is fully operational for taking
  * commands, restart timers for muted users and start timers for regular check ups and 
  * clean ups
  * @author xHelixStorm
@@ -61,7 +62,6 @@ public class ReadyListener extends ListenerAdapter {
 		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "1");
 		
 		//print default message + version
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle("Here the latest patch notes!");
 		System.out.println();
 		System.out.println("Azrael Version: "+STATIC.getVersion()+"\nAll credits to xHelixStorm");
 		System.out.println();
@@ -71,9 +71,7 @@ public class ReadyListener extends ListenerAdapter {
 		STATIC.loginTwitter();
 
 		//retrieve all available ranking themes
-		var themesRetrieved = true;
 		if(RankingSystem.SQLgetThemes() == false) {
-			themesRetrieved = false;
 			logger.error("Themes couldn't be retried from RankingSystem.themes");
 		}
 		//Iterate through all joined guilds
@@ -124,28 +122,21 @@ public class ReadyListener extends ListenerAdapter {
 			if(DiscordRoles.SQLgetRoles(guild.getIdLong()).size() == 0) {
 				var result = DiscordRoles.SQLInsertRoles(guild.getIdLong(), guild.getRoles());
 				if(result != null && result.length > 0 && result[0] == 1) {
-					logger.debug("Roles information from DiscordRoles.roles couldn't be retrieved and cached for guild {}. Hence all available roles have been inserted as default roles.", guild.getName());
-					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage("Roles information from DiscordRoles.roles couldn't be called and cached. Hence all roles have been inserted under the default role!").queue();
+					logger.debug("Roles information from DiscordRoles.roles couldn't be retrieved and cached for guild {}. Hence all available roles have been inserted as default roles.", guild.getId());
 					DiscordRoles.SQLgetRoles(guild.getIdLong());
 				}
 				else {
-					logger.error("Roles for DiscordRoles.roles couldn't be inserted for guild {}", guild.getName());
-					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occured. Roles for DiscordRoles.roles couldn't be inserted!").queue();
+					logger.error("Roles for DiscordRoles.roles couldn't be inserted for guild {}", guild.getId());
 				}
 			}
 			//retrieve all settings for the guild
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild.getIdLong());
 			if(guild_settings == null) {
-				logger.error("Guild information from RankingSystem.guilds couldn't be retrieved and cached");
-				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Guild information from RankingSystem.guilds couldn't be called and cached").queue();
+				logger.error("Guild information from RankingSystem.guilds couldn't be retrieved and cached in guild {}", guild.getId());
 			}
 			//if the ranking system is enabled, retrieve all registered ranking roles
 			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetRoles(guild.getIdLong()).size() == 0) {
-				logger.warn("Roles from RankingSystem.roles couldn't be called and cached");
-			}
-			//notify the members of a guild if no themes could be retrieved
-			if(themesRetrieved == false) {
-				if(log_channel != null)e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Themes from RankingSystem.themes couldn't be called and cached").queue();
+				logger.warn("Roles from RankingSystem.roles couldn't be called and cached in guild {}", guild.getId());
 			}
 			//retrieve all registered rss feeds and start the timer to make these display on the server
 			Azrael.SQLgetRSSFeeds(guild.getIdLong());
@@ -166,12 +157,13 @@ public class ReadyListener extends ListenerAdapter {
 			//retrieve private patch notes
 			var published = false;
 			if(priv_notes != null && GuildIni.getPrivatePatchNotes(guild.getIdLong())) {
+				EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle(STATIC.getTranslation2(guild, Translation.PATCHNOTES_LATEST_TITLE));
 				if(log_channel != null) {
-					e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
+					guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(
 							messageBuild.setDescription("Bot patch notes version **"+STATIC.getVersion()+"** "+priv_notes.getDate()+"\n"+priv_notes.getMessage1())
 							.build()).queue();
 					if(priv_notes.getMessage2() != null && priv_notes.getMessage2().length() > 0) {
-						e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage(
+						guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(
 								messageBuild.setDescription(priv_notes.getMessage2())
 								.build()).queue();
 					}
@@ -180,12 +172,13 @@ public class ReadyListener extends ListenerAdapter {
 			}
 			//retrieve public patch notes
 			if(publ_notes != null && GuildIni.getPublicPatchNotes(guild.getIdLong())) {
+				EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle(STATIC.getTranslation2(guild, Translation.PATCHNOTES_LATEST_TITLE));
 				if(bot_channel != null) {
-					e.getJDA().getGuildById(guild.getId()).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
+					guild.getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
 							messageBuild.setDescription("Bot patch notes version **"+STATIC.getVersion()+"** "+publ_notes.getDate()+"\n"+publ_notes.getMessage1())
 							.build()).queue();
 					if(publ_notes.getMessage2() != null && publ_notes.getMessage2().length() > 0) {
-						e.getJDA().getGuildById(guild.getId()).getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
+						guild.getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
 								messageBuild.setDescription(publ_notes.getMessage2())
 								.build()).queue();
 					}

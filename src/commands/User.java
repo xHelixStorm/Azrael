@@ -9,6 +9,12 @@ import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
+/**
+ * Display information of a user or take disciplinary actions
+ * @author xHelixStorm
+ *
+ */
+
 public class User implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(User.class);
 
@@ -26,12 +32,11 @@ public class User implements CommandPublic {
 
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
-		final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 		if(args.length == 0) {
 			UserExecution.getHelp(e);
 		}
 		else if(args.length > 0) {
-			UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]", ""), e.getMessage().getContentDisplay().substring(prefix.length()+5));
+			UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]*", ""), args[0]);
 		}
 	}
 

@@ -1,15 +1,5 @@
 package rankingSystem;
 
-/**
- * This class is meant to gain experience points basing on the 
- * retrieved messages from users. 
- * 
- * This class can calculate the daily experience limit, work 
- * with applied experience booster and simulate level ups. 
- * Also it will assign the current unlocked ranking role to the
- * user, as long any are registered.
- */
-
 import java.awt.Color;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -28,12 +18,25 @@ import constructors.Level;
 import constructors.Rank;
 import constructors.Roles;
 import core.Hashes;
-import fileManagement.FileSetting;
+import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
+import util.STATIC;
+
+/**
+ * This class is meant to gain experience points basing on the 
+ * retrieved messages from users. 
+ * 
+ * This class can calculate the daily experience limit, work 
+ * with applied experience booster and simulate level ups. 
+ * Also it will assign the current unlocked ranking role to the
+ * user, as long any are registered.
+ * @author xHelixStorm
+ * 
+ */
 
 public class RankingThreadExecution {
 	private final static Logger logger = LoggerFactory.getLogger(RankingThreadExecution.class);
@@ -109,7 +112,7 @@ public class RankingThreadExecution {
 						logger.info("{} has reached the limit of today's max experience points gain", e.getMember().getUser().getId());
 						RankingSystem.SQLInsertActionLog("medium", user_id, guild_id, "Experience limit reached", "User reached the limit of experience points");
 						e.getMember().getUser().openPrivateChannel().queue(channel -> {
-							channel.sendMessage("You have reached the limit of experience points for today. More experience points can be collected tomorrow!").queue(success -> channel.close().queue(), error -> channel.close().queue());
+							channel.sendMessage(STATIC.getTranslation(e.getMember(), Translation.EXP_LIMIT)).queue(success -> channel.close().queue(), error -> channel.close().queue());
 						});
 					}
 				}
@@ -209,8 +212,7 @@ public class RankingThreadExecution {
 					//reset experience points to the beginning of the current level
 					if(RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getExperience(), user_details.getLastUpdate()) > 0) {
 						Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Level up failed!").setDescription(e.getMember().getAsMention()+" Your level up promotion has failed! You will have to start again from the beginning of level "+user_details.getLevel()).build()).queue();
-						FileSetting.appendFile("./log/rankingdetails.txt", "["+new Timestamp(System.currentTimeMillis())+"] "+user_details.getUser_ID()+" reached level "+user_details.getLevel()+", has "+user_details.getExperience()+" experience and "+user_details.getDailyExperience()+" daily experience from guild "+e.getGuild().getIdLong()+"\n");
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_LEVEL_UP)).setDescription(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.LEVEL_PROMOTION_FAILED)+user_details.getLevel()).build()).queue();
 					}
 					else {
 						logger.error("Experience points for the user {} in the guild {} couldn't be updated in the table RankingSystem.user_details", e.getMember().getUser().getId(), e.getGuild().getId());
@@ -253,7 +255,6 @@ public class RankingThreadExecution {
 			
 			//update all level up details to table and log the details
 			if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0) {
-				FileSetting.appendFile("./log/rankingdetails.txt", "["+new Timestamp(System.currentTimeMillis())+"] "+user_details.getUser_ID()+" reached level "+user_details.getLevel()+", has "+user_details.getExperience()+" experience and "+user_details.getDailyExperience()+" daily experience from guild "+e.getGuild().getIdLong()+"\n");
 				RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Level Up", "User reached level "+user_details.getLevel());
 				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
 				if(user_details.getRankingLevel() != 0 && user_details.getRankingIcon() != 0) {
@@ -261,8 +262,8 @@ public class RankingThreadExecution {
 					RankingMethods.getRankUp(e, guild_settings.getThemeID(), user_details, rankIcon);
 				}
 				else {
-					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
-					e.getChannel().sendMessage(error.setDescription("Default skins aren't defined. Please contact an administrator!").build()).queue();
+					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DEFAULT_SKINS_ERR)).build()).queue();
 					logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getId());
 				}
 			}
@@ -314,7 +315,6 @@ public class RankingThreadExecution {
 			if((!editLevel && RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getExperience(), user_details.getLastUpdate()) > 0) ||
 				(editLevel && RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0)) {
 				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
-				FileSetting.appendFile("./log/rankingdetails.txt", "["+new Timestamp(System.currentTimeMillis())+"] "+user_details.getUser_ID()+" reached level "+user_details.getLevel()+", has "+user_details.getExperience()+" experience and "+user_details.getDailyExperience()+" daily experience from guild "+e.getGuild().getIdLong()+"\n");
 			}
 			else {
 				logger.error("Experience points for the user {} in the guild {} couldn't be updated in the table RankingSystem.user_details", e.getMember().getUser().getId(), e.getGuild().getId());
@@ -344,7 +344,7 @@ public class RankingThreadExecution {
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Permission error!").setDescription("The newest unlocked role couldn't be assigned because the MANAGE ROLES permission is missing!").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_UP_ROLE_ERR)+Permission.MANAGE_ROLES.getName()).build()).queue();
 			logger.warn("MANAGE ROLES permission for assigning a ranking role is missing for guild {}!", e.getGuild().getId());
 		}
 		return current_role;

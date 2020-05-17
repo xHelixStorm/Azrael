@@ -8,10 +8,19 @@ import org.slf4j.LoggerFactory;
 import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import util.STATIC;
+
+/**
+ * The Edit command allows a user to edit any Bot written message
+ * and also to apply or remove reactions
+ * @author xHelixStorm
+ *
+ */
 
 public class Edit implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Edit.class);
@@ -32,9 +41,7 @@ public class Edit implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		if(args.length == 0) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("This command allows you to update any message written by the bot!\n"
-					+ "share the text channel first, the message id for second and write it together with the command to start...\n"
-					+ "If you wish to add or clear all reactions, add either add-reaction or clear-reactions as parameter. If you add a reaction, you will also be able to add a role to be assigned when selected!").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_HELP)).build()).queue();
 		}
 		else if (args.length == 2) {
 			String channel_id = args[0].replaceAll("[<>#]", "");
@@ -43,7 +50,7 @@ public class Edit implements CommandPublic {
 				Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "E", channel_id, message_id));
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Error! Text channel doesn't exist!").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NO_TEXT_CHANNEL)).build()).queue();
 			}
 		}
 		else if(args.length == 3) {
@@ -55,15 +62,15 @@ public class Edit implements CommandPublic {
 					Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, (parameter.equals("add-reaction") ? "RA" : "RC"), channel_id, message_id));
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Error! Text channel doesn't exist!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NO_TEXT_CHANNEL)).build()).queue();
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Error! Parameter doesn't exist!").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Error. Please use at least two parameters with this command to edit a message! The first is for the text channel and the second for the message id!").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NOT_ENOUGH_PARAMS)).build()).queue();
 		}
 	}
 

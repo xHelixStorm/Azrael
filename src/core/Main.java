@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commands.About;
-import commands.Commands;
+import commands.Help;
 import commands.Daily;
 import commands.Display;
 import commands.DoubleExperience;
@@ -21,7 +21,6 @@ import commands.Equip;
 import commands.Filter;
 import commands.Google;
 import commands.HeavyCensoring;
-import commands.Help;
 import commands.Inventory;
 import commands.Meow;
 import commands.Mute;
@@ -35,7 +34,7 @@ import commands.Reboot;
 import commands.Register;
 import commands.Remove;
 import commands.RoleReaction;
-import commands.Rss;
+import commands.Subscribe;
 import commands.Set;
 import commands.Shop;
 import commands.ShutDown;
@@ -176,10 +175,9 @@ public class Main {
 	public static void addPublicCommands() {
 		
 		CommandHandler.commandsPublic.put("shutdown", new ShutDown());
-		CommandHandler.commandsPublic.put("help", new Help());
 		CommandHandler.commandsPublic.put("about", new About());
 		CommandHandler.commandsPublic.put("reboot", new Reboot());
-		CommandHandler.commandsPublic.put("commands", new Commands());
+		CommandHandler.commandsPublic.put("help", new Help());
 		CommandHandler.commandsPublic.put("pug", new Pug());
 		CommandHandler.commandsPublic.put("meow", new Meow());
 		CommandHandler.commandsPublic.put("rank", new Rank());
@@ -196,7 +194,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("filter", new Filter());
 		CommandHandler.commandsPublic.put("quiz", new Quiz());
 		CommandHandler.commandsPublic.put("rolereaction", new RoleReaction());
-		CommandHandler.commandsPublic.put("rss", new Rss());
+		CommandHandler.commandsPublic.put("subscribe", new Subscribe());
 		CommandHandler.commandsPublic.put("randomshop", new Randomshop());
 		CommandHandler.commandsPublic.put("patchnotes", new Patchnotes());
 		CommandHandler.commandsPublic.put("doubleexperience", new DoubleExperience());

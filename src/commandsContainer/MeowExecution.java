@@ -6,17 +6,23 @@ import java.io.IOException;
 
 import constructors.Cache;
 import core.Hashes;
+import enums.Translation;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import preparedMessages.MeowUsage;
+import util.STATIC;
+
+/**
+ * Extension of the meow command
+ * @author xHelixStorm
+ *
+ */
 
 public class MeowExecution {
-	private static String commandInfo = MeowUsage.getMeowInfos();
-
 	@SuppressWarnings("preview")
 	public static void Execute(GuildMessageReceivedEvent e, String [] _variable, String _path, long channel_id) throws IOException{
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail(IniFileReader.getMeowThumbnail()).setTitle("Help for the "+"command!");
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail(IniFileReader.getMeowThumbnail());
 		var variable = _variable;
 		String path = _path;
 		String pictureName = "";
@@ -24,13 +30,7 @@ public class MeowExecution {
 		
 		if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
 			if(variable.length == 0) {
-				long channel = e.getChannel().getIdLong();
-				if(channel == channel_id || channel_id == 0) {
-					e.getChannel().sendMessage(messageBuild.setDescription(commandInfo).build()).queue();
-				}
-				else{
-					e.getChannel().sendMessage("Please type this command in <#"+channel_id+"> to see its usage").queue();
-				}
+				e.getChannel().sendMessage(messageBuild.setDescription(MeowUsage.getMeowInfos(e)).build()).queue();
 			}
 			else {
 				Hashes.addTempCache("meowDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(30000));
@@ -578,13 +578,13 @@ public class MeowExecution {
 					e.getChannel().sendFile(file, "meow.png").queue();
 				}
 				else {
-					e.getChannel().sendMessage("Cat not found. Please try again!").queue();
+					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.IMAGE_ERR)).queue();
 					Hashes.clearTempCache("meowDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 		}
 		else {
-			e.getChannel().sendMessage("This command is currently having a cooldown. Please try again later.").queue();
+			e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.COOLDOWN)).queue();
 		}
 	}
 }

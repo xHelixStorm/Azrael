@@ -1,5 +1,6 @@
 package randomshop;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -12,8 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
 import constructors.Weapons;
+import enums.Translation;
 import fileManagement.IniFileReader;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import util.STATIC;
 
 public class RandomshopRewardDrawer {
 	private final static Logger logger = LoggerFactory.getLogger(RandomshopRewardDrawer.class);
@@ -42,9 +46,10 @@ public class RandomshopRewardDrawer {
 			e.getChannel().sendFile(file1, "reward.png").complete();
 			file1.delete();
 			
-			e.getChannel().sendMessage("Congratulations "+e.getMember().getEffectiveName()+", you have received **"+weapon.getDescription()+" "+weapon.getStatDescription()+"**. Remaining balance: **"+currency+"**").queue();
+			e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_REWARD).replaceFirst("\\{\\}", weapon.getDescription()+" "+weapon.getStatDescription()).replace("{}", ""+currency)).queue();
 		} catch(IOException e1) {
-			logger.error("An error occurred while printing the random shop price", e1);
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR_2)+weapon.getDescription()+" "+weapon.getStatDescription()).build()).queue();
+			logger.error("An error occurred while printing the random shop price {}", weapon.getDescription(), e1);
 		}
 	}
 }

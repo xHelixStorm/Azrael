@@ -14,6 +14,7 @@ import constructors.Cache;
 import constructors.Channels;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
@@ -35,33 +36,14 @@ public class LanguageFilter implements Runnable {
 		this.allChannels = _allChannels;
 	}
 
-	@SuppressWarnings("preview")
 	@Override
 	public void run() {
 		if(!UserPrivs.isUserBot(e.getMember()) && !UserPrivs.isUserMod(e.getMember()) && !UserPrivs.isUserAdmin(e.getMember())) {
 			boolean exceptionFound = false;
 			String [] output = new String[2];
 			
-			if(filter_lang.size() == 1) {
-				switch(filter_lang.get(0)) {
-					case "ger" -> {
-						output[0] = " Die Nachricht wurde wegen schlechten Benehmens entfernt!";
-						output[1] = " Dies ist deine zweite Warnung. Eine weitere entfernte Nachricht und du wirst auf diesem Server **stumm geschaltet**!";
-					}
-					case "fre" -> {
-						output[0] = " Votre message à été supprimé pour mauvais comportement !";
-						output[1] = " C'est votre deuxième avertissement. Encore une fois et vous serez **mis sous silence** sur le serveur !";
-					}
-					default -> {
-						output[0] = " Message has been removed due to bad behaviour!";
-						output[1] = " This has been the second warning. One more and you'll be **muted** from the server!";
-					}
-				}
-			}
-			else{
-				output[0] = " Message has been removed due to bad behaviour!";
-				output[1] = " This has been the second warning. One more and you'll be **muted** from the server!";
-			}
+			output[0] = STATIC.getTranslation(e.getMember(), Translation.CENSOR_REMOVED_WARN_1);
+			output[1] = STATIC.getTranslation(e.getMember(), Translation.CENSOR_REMOVED_WARN_2);
 			
 			String getMessage = e.getMessage().getContentRaw();
 			String channel = e.getChannel().getName();
@@ -98,8 +80,9 @@ public class LanguageFilter implements Runnable {
 									break;
 								}
 							}
-							message.setTitle("Message removed! The word **"+option.get()+"** from filter **"+filter+"** has been detected!");
-							final String printMessage = "Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage;
+							message.setTitle(STATIC.getTranslation(e.getMember(), Translation.CENSOR_TITLE_DETECTED).replaceFirst("\\{\\}", option.get()).replace("{}", filter));
+							message.setFooter(channel + "("+e.getChannel().getId()+")").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
+							final String printMessage = getMessage;
 							e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 						}
 						break;
@@ -108,14 +91,11 @@ public class LanguageFilter implements Runnable {
 						blockHeavyCensor = true;
 						var heavyCensoring = Hashes.getHeavyCensoring(e.getGuild().getIdLong());
 						if(heavyCensoring != null && heavyCensoring) {
-							var blockSaveMessage = false;
 							var messageDeleted = false;
 							var censorMessage = Hashes.getCensorMessage(e.getGuild().getIdLong());
-							if(parseMessage.length() == 1 || (censorMessage != null && censorMessage.contains(parseMessage)) || parseMessage.matches("[^\\w\\s]")) {
+							if(parseMessage.length() == 1 || (censorMessage != null && censorMessage.contains(parseMessage))) {
 								deleteHeavyCensoringMessage(e, allChannels, name, channel, getMessage);
 								messageDeleted = true;
-								if(parseMessage.length() == 1)
-									blockSaveMessage = true;
 							}
 							else {
 								var splitWords = parseMessage.split(" ");
@@ -130,22 +110,8 @@ public class LanguageFilter implements Runnable {
 										if(count == 9) {
 											deleteHeavyCensoringMessage(e, allChannels, name, channel, getMessage);
 											messageDeleted = true;
-											blockSaveMessage = true;
 										}
 									}
-								}
-							}
-							if(!blockSaveMessage) {
-								if(censorMessage == null) {
-									ArrayList<String> saveMessage = new ArrayList<String>();
-									saveMessage.add(parseMessage);
-									Hashes.addCensorMessage(e.getGuild().getIdLong(), saveMessage);
-								}
-								else {
-									censorMessage.add(parseMessage);
-									if(censorMessage.size() > 30)
-										censorMessage.remove(0);
-									Hashes.addCensorMessage(e.getGuild().getIdLong(), censorMessage);
 								}
 							}
 							if(messageDeleted) {
@@ -154,13 +120,13 @@ public class LanguageFilter implements Runnable {
 									var count = Integer.parseInt(threshold);
 									if(++count == 30) {
 										var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-										if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("Heavy censoring has reached the critical threshold! Everyone who will have his messages removed due to the heavy censoring will get muted!").queue();
+										if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_HARD)).queue();
 									}
 									if(count >= 30) {
 										var mute_role = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 										if(mute_role != null) {
-											Azrael.SQLInsertHistory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "mute", "Heavy censoring mute after reaching the limit", 0, "");
-											e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).reason("Heavy censoring mute after reaching the limit").queue();
+											Azrael.SQLInsertHistory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "mute", STATIC.getTranslation2(e.getGuild(), Translation.HEAVY_CENSORING_REASON), 0, "");
+											e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.HEAVY_CENSORING_REASON)).queue();
 										}
 									}
 									if(count <= 99)
@@ -183,8 +149,8 @@ public class LanguageFilter implements Runnable {
 		e.getMessage().delete().reason("Message removed due to heavy censoring!").queue();
 		var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 		if(tra_channel != null) {
-			message.setTitle("Message removed due to **heavy censoring**!");
-			final String printMessage = "Removed Message from **"+name+"** in **"+channel+"**\n"+getMessage;
+			EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.HEAVY_CENSORING_DELETED)).setFooter(channel+" ("+e.getChannel().getId()+")").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
+			final String printMessage = getMessage;
 			e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 		}
 	}

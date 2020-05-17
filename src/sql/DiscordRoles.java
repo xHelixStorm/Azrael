@@ -145,7 +145,7 @@ public class DiscordRoles {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteAllRoles Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -194,7 +194,7 @@ public class DiscordRoles {
 						rs.getInt(3),
 						rs.getString(4),
 						rs.getString(5),
-						rs.getBoolean(6)
+						rs.getBoolean(7)
 					);
 					roles.add(roleDetails);
 				}
@@ -290,7 +290,7 @@ public class DiscordRoles {
 			return roles;
 		} catch (SQLException e) {
 			logger.error("SQLgetCategories Exception", e);
-			return roles;
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

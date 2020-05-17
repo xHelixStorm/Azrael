@@ -1,19 +1,5 @@
 package listeners;
 
-/**
- * This class gets executed for all users that are joining the guild where the bot is present!
- * 
- * All joined users will get inserted into the main users table and into the ranking
- * system users table, if the ranking system is enabled. Additionally, all joined users
- * will be checked, if they were previously muted and then left the server in question.
- * 
- * If there are any residual actions that need to be done such as mute or ban on join,
- * it will be handled here as well.
- * 
- * For last, this class also includes a name check by comparing all registered staff names
- * first and then by comparing registered words which are not allowed for the current server.
- */
-
 import java.awt.Color;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
@@ -27,6 +13,7 @@ import constructors.Guilds;
 import constructors.Rank;
 import core.Hashes;
 import enums.GoogleEvent;
+import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import google.GoogleUtils;
@@ -35,18 +22,35 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.RankingSystem;
+import util.STATIC;
 import sql.DiscordRoles;
 import sql.Azrael;
 
+/**
+ * This class gets executed for all users that are joining the guild where the bot is present!
+ * 
+ * All joined users will get inserted into the main users table and into the ranking
+ * system users table, if the ranking system is enabled. Additionally, all joined users
+ * will be checked, if they were previously muted and then left the server in question.
+ * 
+ * If there are any residual actions that need to be done such as mute or ban on join,
+ * it will be handled here as well.
+ * 
+ * For last, this class also includes a name check by comparing all registered staff names
+ * first and then by comparing registered words which are not allowed for the current server.
+ * @author xHelixStorm
+ * 
+ */
+
 public class GuildListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildListener.class);
-	private final static EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle("An error occurred!");
 	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent e) {
 		new Thread(() -> {
-			final EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("User joined!");
-			final EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("Not allowed name found!");
+			final EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_TITLE));
+			final EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_TITLE));
+			final EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR));
 			logger.debug("{} has joined the guild {}", e.getUser().getId(), e.getGuild().getId());
 			long user_id = e.getMember().getUser().getIdLong();
 			String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
@@ -59,8 +63,8 @@ public class GuildListener extends ListenerAdapter {
 			//retrieve the log channel
 			var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 			//insert or update the name of the user into Azrael.users
-			if(Azrael.SQLInsertUser(user_id, user_name, e.getMember().getUser().getEffectiveAvatarUrl()/*, e.getMember().getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE)*/) == 0) {
-				if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **Azrael.users** table").build()).queue();
+			if(Azrael.SQLInsertUser(user_id, user_name, e.getMember().getUser().getEffectiveAvatarUrl()) == 0) {
+				if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 				logger.error("User {} couldn't be inserted into the table Azrael.users for guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 			}
 			//insert or update the join_date
@@ -68,12 +72,12 @@ public class GuildListener extends ListenerAdapter {
 			if(insertJoinDateResult == 0) {
 				//Update the join date, if no rows have been inserted with the insert statement and no error has been thrown
 				if(Azrael.SQLUpdateJoinDate(user_id, guild_id, e.getMember().getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
-					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The server join date of the user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be updated into **Azrael.join_dates** table").build()).queue();
+					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 					logger.error("The join date of user {} couldn't be updated into the table Azrael.join_dates for guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 				}
 			}
 			else if(insertJoinDateResult == -1) {
-				if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The server join date of the user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **Azrael.join_dates** table").build()).queue();
+				if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 				logger.error("The join date of user {} couldn't be inserted into the table Azrael.join_dates for guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
 			}
 			//retrieve current guild settings
@@ -84,8 +88,8 @@ public class GuildListener extends ListenerAdapter {
 					RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, guild_settings.getStartCurrency(), 0);
 				}
 				else {
-					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** couldn't be inserted into **RankingSystem.users** table").build()).queue();
-					logger.error("Failed to insert joined user into RankingSystem.users");
+					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_3).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
+					logger.error("Failed to insert joined user into RankingSystem.users in guild {}", e.getGuild().getId());
 					RankingSystem.SQLInsertActionLog("high", user_id, guild_id, "User wasn't inserted into user table", "This user couldn't be inserted into the user table. Please verify the name of this user and eventually insert it manually into the table!");
 				}
 			}
@@ -95,7 +99,7 @@ public class GuildListener extends ListenerAdapter {
 			muted = warnedUser.getMuted();
 			//print join message, if the user is not muted and if the printing of join messages is allowed
 			if(GuildIni.getJoinMessage(guild_id)) {
-				if(log_channel != null && muted == false) {e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(":warning: The user **" + user_name + "** with the ID Number **" + user_id + "** joined **" + e.getGuild().getName() + "**").build()).queue();}
+				if(log_channel != null && muted == false) {e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();}
 			}
 			
 			//retrieve the unmute time if available and if not, check if the user is marked as muted and if muted, reassign the mute role regardless
@@ -115,7 +119,7 @@ public class GuildListener extends ListenerAdapter {
 					if(mute_role != null)
 						e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
 					else if(log_channel != null)
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("Muted user couldn't receive the mute role on server join! Is a mute role registered?").build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_4).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 				}
 				else {
 					//throw an error and set the user to not muted and joined, if the permission is missing but is still muted
@@ -127,7 +131,7 @@ public class GuildListener extends ListenerAdapter {
 					else
 						logger.error("Mute end state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild_id);
 					if(log_channel != null)
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The joined user **"+user_name+"** with the id number **"+user_id+"** couldn't get muted because the MANAGE ROLES permission is mssing!").build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_PERMISSION_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)+Permission.MANAGE_ROLES.getName()).build()).queue();
 					logger.warn("MANAGE ROLES permission missing to mute a user in guild {}!", e.getGuild().getId());
 				}
 			}
@@ -164,7 +168,7 @@ public class GuildListener extends ListenerAdapter {
 								Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
 								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
 								var mute_time = (long)Azrael.SQLgetWarning(guild_id, Azrael.SQLgetData(user_id, guild_id).getWarningID()+1).getTimer();
-								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60), "");
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON)), (mute_time/1000/60), "");
 							}
 							//this is a perm mute
 							else if(rejoinAction.getInfo().equals("perm")) {
@@ -172,22 +176,22 @@ public class GuildListener extends ListenerAdapter {
 								var timestamp = new Timestamp(System.currentTimeMillis());
 								if(Azrael.SQLInsertData(e.getUser().getIdLong(), e.getGuild().getIdLong(), Azrael.SQLgetMaxWarning(e.getGuild().getIdLong()), 1, timestamp, timestamp, false, false) == 0) {
 									logger.error("The perm mute flag for user {} in guild {} couldn't be inserted into Azrael.bancollect", user_id, guild_id);
-									if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The perm mute flag couldn't be set in Azrael.bancollect!").queue();
+									if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_5).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 								}
 								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
 								var mute_time = (long)Azrael.SQLgetWarning(guild_id, Azrael.SQLgetData(user_id, guild_id).getWarningID()+1).getTimer();
-								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60), "");
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON)), (mute_time/1000/60), "");
 							}
 							//this is a time defined mute
 							else {
 								var mute_time = Long.parseLong(rejoinAction.getInfo());
 								Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 								Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
-								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : "No reason has been provided!"), (mute_time/1000/60), "");
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON)), (mute_time/1000/60), "");
 								if(Azrael.SQLgetData(user_id, guild_id).getWarningID() != 0) {
 									if(Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp, unmute_timestamp, true, true) == 0) {
 										logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, guild_id);
-										if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The unmute time couldn't be updated on Azrael.bancollect!").queue();
+										if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_6).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 									}
 									else {
 										Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
@@ -197,7 +201,7 @@ public class GuildListener extends ListenerAdapter {
 								else {
 									if(Azrael.SQLInsertData(user_id, guild_id, 1, 1, timestamp, unmute_timestamp, true, true) == 0) {
 										logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", user_id, guild_id);
-										if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect!").queue();
+										if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_7).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).queue();
 									}
 									else {
 										Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
@@ -207,11 +211,11 @@ public class GuildListener extends ListenerAdapter {
 							}
 						}
 						else if(log_channel != null) {
-							 e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("The joined user **"+user_name+"** with the id number **"+user_id+"** couldn't be muted for missing the MANAGE ROLES permission!").build()).queue();
+							 e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_PERMISSION_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)+Permission.MANAGE_ROLES.getName()).build()).queue();
 						}
 					}
 					else if(log_channel != null) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription("Mute reminder couldn't be applied on server join! Is a mute role registered?").build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_4).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)+Permission.MANAGE_ROLES.getName()).build()).queue();
 					}
 					//remove the completed join task
 					Hashes.removeRejoinTask(e.getGuild().getId()+"_"+e.getMember().getUser().getId());
@@ -220,15 +224,14 @@ public class GuildListener extends ListenerAdapter {
 				else if(rejoinAction.getType().equals("ban")) {
 					//send a private message before banning
 					e.getUser().openPrivateChannel().queue(channel -> {
-						channel.sendMessage("You have been banned from "+e.getGuild().getName()+". Thank you for your understanding.\n"
-								+ "On an important note, this is an automatic reply. You'll receive no reply in any way.\n"
-								+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? "Provided reason: "+rejoinAction.getReason() : "")).queue(success -> {
+						channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2)
+								+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+rejoinAction.getReason() : "")).queue(success -> {
 									Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
 									e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
 									Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
 									channel.close().queue();
 								}, error -> {
-									if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription("The banned user with the id number **"+e.getMember().getUser().getId()+"** has locked the direct private messaging!").build()).queue();
+									if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_DM_LOCKED).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 									Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
 									e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
 									Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
@@ -244,14 +247,14 @@ public class GuildListener extends ListenerAdapter {
 				//lookup if the user is using the same name as a registered staff member name
 				final var name = Azrael.SQLgetStaffNames(guild_id).parallelStream().filter(f -> lc_user_name.matches(f+"#[0-9]{4}")).findAny().orElse(null);
 				if(name != null) {
-					nick_assign.setColor(Color.RED).setTitle("Impersonation attempt found!").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
+					nick_assign.setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_STAFF_TITLE)).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
 					//verify if the bot has the permission to manage nicknames
 					if(e.getGuild().getSelfMember().hasPermission(Permission.NICKNAME_MANAGE)) {
 						//retrieve a random nickname and assign to the user
 						nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
 						Hashes.addTempCache("nickname_add_gu"+guild_id+"us"+user_id, new Cache(60000));
 						e.getGuild().modifyNickname(e.getMember(), nickname).queue();
-						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server and tried to impersonate a staff member. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
+						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.NAME_STAFF).replaceFirst("\\{\\}", user_name).replace("{}", nickname)).build()).queue();
 						logger.info("Impersonation attempt found from {} in guild {}", user_id, guild_id);
 						Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild_id, nickname);
 						//Run google service, if enabled
@@ -260,7 +263,7 @@ public class GuildListener extends ListenerAdapter {
 						}
 					}
 					else {
-						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server and tried to impersonate a staff member but no nickname could have been assigned becuase the MANAGE NICKNAMES permission is missing!").build()).queue();
+						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.NAME_STAFF_ERR).replaceFirst("\\{\\}", user_name)+Permission.NICKNAME_MANAGE.getName()).build()).queue();
 						logger.warn("Lacking MANAGE NICKNAME permission in guild {}", e.getGuild().getId());
 					}
 					//set flag to signal that the current name is not allowed
@@ -278,16 +281,16 @@ public class GuildListener extends ListenerAdapter {
 								nickname = Azrael.SQLgetRandomName(e.getGuild().getIdLong());
 								Hashes.addTempCache("nickname_add_gu"+guild_id+"us"+user_id, new Cache(60000));
 								e.getGuild().modifyNickname(e.getMember(), nickname).queue();
-								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. This nickname had been assigned to him/her: **"+nickname+"**").build()).queue();
+								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.NAME_ASSIGN).replaceFirst("\\{\\}", user_name).replace("{}", nickname)).build()).queue();
 								logger.info("Improper name found from {} in guild {}", user_id, guild_id);
 								Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild_id, nickname);
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), "Renamed due to the current name filter settings!", null, null, "RENAMED", null, null, null, e.getMember().getEffectiveName(), nickname, GoogleEvent.RENAME.id, log_channel);
+									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_REASON), null, null, "RENAMED", null, null, null, e.getMember().getEffectiveName(), nickname, GoogleEvent.RENAME.id, log_channel);
 								}
 							}
 							else {
-								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setColor(Color.RED).setDescription("**"+user_name+"** joined this server with an unproper name but no nickname could have been assigned because the MANAGE NICKNAMES permission is missing!").build()).queue();
+								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setColor(Color.RED).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.NAME_ASSIGN_ERR).replaceFirst("\\{\\}", user_name)+Permission.NICKNAME_MANAGE.getName()).build()).queue();
 								logger.warn("Lacking MANAGE NICKNAME permission in guild {}", e.getGuild().getId());
 							}
 							//set flag to signal that the current name is not allowed
@@ -298,25 +301,25 @@ public class GuildListener extends ListenerAdapter {
 							if(e.getGuild().getSelfMember().hasPermission(Permission.KICK_MEMBERS)) {
 								//send a private message and then kick the user
 								e.getMember().getUser().openPrivateChannel().queue(channel -> {
-									channel.sendMessage("You have been automatically kicked from "+e.getJDA().getGuildById(guild_id).getName()+" for having the word **"+word.getName().toUpperCase()+"** in your name!").queue(success -> {
-										e.getGuild().kick(e.getMember()).reason("User kicked for having "+word.getName().toUpperCase()+" inside the name").queue();
-										channel.close();
+									channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_DM).replaceFirst("\\{\\}", e.getGuild().getName()).replace("{}", word.getName().toUpperCase())).queue(success -> {
+										e.getGuild().kick(e.getMember()).reason(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase())).queue();
+										nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_TITLE));
+										if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_MESSAGE_1).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", word.getName().toUpperCase())).build()).queue();
 									}, error -> {
-										e.getGuild().kick(e.getMember()).reason("User kicked for having "+word.getName().toUpperCase()+" inside the name").queue();
-										channel.close();
+										e.getGuild().kick(e.getMember()).reason(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase())).queue();
+										nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_TITLE));
+										if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_MESSAGE_2).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", word.getName().toUpperCase())).build()).queue();
 									});
 								});
-								Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", "Kicked for having the word "+word.getName()+" inside the name!", 0, "");
-								nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle("User kicked for having a not allowed name!");
-								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name. The user has been kicked automatically from the server for having this word inside the name: **"+word.getName().toUpperCase()+"**").build()).queue();
+								Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), 0, "");
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), "User kicked for having "+word.getName().toUpperCase()+" inside the name!", null, null, "KICK", null, null, null, null, null, GoogleEvent.KICK.id, log_channel);
+									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), null, null, "KICK", null, null, null, null, null, GoogleEvent.KICK.id, log_channel);
 								}
 							}
 							else {
-								nick_assign.setColor(Color.RED).setTitle("User couldn't be kicked!");
-								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription("**"+user_name+"** joined this server with an unproper name that contains **"+word.getName().toUpperCase()+"** but couldn't get kicked because the permission KICK MEMBERS is missing!").build()).queue();
+								nick_assign.setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR));
+								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(nick_assign.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_PERMISSION_ERR).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", word.getName().toUpperCase())+Permission.KICK_MEMBERS.getName()).build()).queue();
 								logger.warn("Lacking KICK MEMBERS permission in guild {}", e.getGuild().getId());
 							}
 						}

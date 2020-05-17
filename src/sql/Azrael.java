@@ -521,7 +521,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT guild_id FROM guild WHERE guild_id= ?");
+			String sql = ("SELECT guild_id FROM guild WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
@@ -539,13 +539,58 @@ public class Azrael {
 		}
 	}
 	
+	public static String SQLgetLanguage(long _guild_id) {
+		logger.info("SQLgetLanguage launched. Passed params {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT language FROM guild WHERE guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return rs.getString(1);
+			}
+			return null;
+		} catch (SQLException e) {
+			logger.error("SQLgetLanguage Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateLanguage(Long _guild_id, String _language) {
+		logger.info("SQLUpdateLanguage launched. Passed params {}, {}", _guild_id, _language);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE guild SET language = ? WHERE guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _language);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateLanguage Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLInsertGuild(Long _guild_id, String _guild_name) {
 		logger.info("SQLInsertGuild launched. Passed params {}, {}", _guild_id, _guild_name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO guild VALUES (?, ?, 0, 0) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			String sql = ("INSERT INTO guild VALUES (?, ?, 0) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setString(2, _guild_name);
@@ -819,7 +864,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteData Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1186,6 +1231,7 @@ public class Azrael {
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
+			myConn.commit();
 		} catch (SQLException e) {
 			logger.error("SQLInsertChannels Exception", e);
 		} finally {
@@ -1266,7 +1312,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteAllChannelConfs Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1395,32 +1441,7 @@ public class Azrael {
 			return channels;
 		} catch (SQLException e) {
 			logger.error("SQLgetChannelTypes Exception", e);
-			return channels;
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static int SQLgetExecutionID(long _guild_id) {
-		logger.info("SQLgetExecutionID launched. Passed params {}", _guild_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT execution_id FROM guild WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			rs = stmt.executeQuery();
-			if(rs.next()) {
-				return rs.getInt(1);
-			}
-			return 0;
-		} catch (SQLException e) {
-			logger.error("SQLgetExecutionID Exception", e);
-			return 0;
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1448,26 +1469,6 @@ public class Azrael {
 			return false;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static int SQLUpdateCommand(long _guild_id, int _execution_id) {
-		logger.info("SQLUpdateCommand launched. Passed params {}, {}", _guild_id, _execution_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE guild SET execution_id = ? WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _execution_id);
-			stmt.setLong(2, _guild_id);
-			return stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLUpdateCommand Exception", e);
-			return 0;
-		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
@@ -1569,7 +1570,7 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			var sql = "";
 			if(!_lang.equals("all"))
-				sql = ("INSERT INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES(?, ?, ?)");
+				sql = ("INSERT IGNORE INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES(?, ?, ?)");
 			else {
 				sql = ("INSERT IGNORE INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES"
 						+ "(?, \"eng\", ?),"
@@ -1609,7 +1610,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertWordFilter Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1747,7 +1748,7 @@ public class Azrael {
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT INTO staff_name_filter (name, fk_guild_id) VALUES(?, ?)");
+			String sql2 = ("INSERT IGNORE INTO staff_name_filter (name, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql2);
 			for(String word : _words) {
 				stmt.setString(1, word.toLowerCase());
@@ -1804,7 +1805,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteChannel_Filter Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -2012,7 +2013,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO rss (url, fk_guild_id, format, type, videos, pictures, text) VALUES (?, ?, ?, ?, 1, 1, 1)");
+			String sql = ("INSERT IGNORE INTO rss (url, fk_guild_id, format, type, videos, pictures, text) VALUES (?, ?, ?, ?, 1, 1, 1)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _url);
 			stmt.setLong(2, _guild_id);
@@ -2024,7 +2025,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertRSS Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -2213,7 +2214,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertChildTweet Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -2234,7 +2235,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteChildTweet Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -2550,7 +2551,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM watchlist WHERE guild_id = ? && higher_privileges = ?");
+			String sql = ("SELECT * FROM watchlist WHERE fk_guild_id = ? && higher_privileges = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setBoolean(2, _highPrivileges);
@@ -3116,7 +3117,7 @@ public class Azrael {
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES(?, ?, ?)");
+			String sql2 = ("INSERT IGNORE INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES(?, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);
 			
 			for(String word : _words) {
@@ -3159,7 +3160,7 @@ public class Azrael {
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT INTO name_filter (word, kick, fk_guild_id) VALUES(?, ?, ?)");
+			String sql2 = ("INSERT IGNORE INTO name_filter (word, kick, fk_guild_id) VALUES(?, ?, ?)");
 			stmt = myConn.prepareStatement(sql2);
 			
 			for(String word : _words) {
@@ -3200,7 +3201,7 @@ public class Azrael {
 				stmt.setLong(1, _guild_id);
 			}
 			
-			String sql2 = ("INSERT INTO names (name, fk_guild_id) VALUES(?, ?)");
+			String sql2 = ("INSERT IGNORE INTO names (name, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql2);;
 			
 			for(String word : _words) {
@@ -3241,7 +3242,7 @@ public class Azrael {
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT INTO url_blacklist (url, fk_guild_id) VALUES(?, ?)");
+			String sql2 = ("INSERT IGNORE INTO url_blacklist (url, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql2);
 			for(String url : _urls) {
 				stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
@@ -3281,7 +3282,7 @@ public class Azrael {
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT INTO url_whitelist (url, fk_guild_id) VALUES(?, ?)");
+			String sql2 = ("INSERT IGNORE INTO url_whitelist (url, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql2);
 			for(String url : _urls) {
 				stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
@@ -3321,7 +3322,7 @@ public class Azrael {
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT INTO tweet_blacklist (username, fk_guild_id) VALUES(?, ?)");
+			String sql2 = ("INSERT IGNORE INTO tweet_blacklist (username, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql2);
 			for(String username : _usernames) {
 				stmt.setString(1, username);

@@ -1,10 +1,5 @@
 package commands;
 
-/**
- * The HeavyCensoring command can be either enabled or disabled
- * to make the overall filter more sensitive.
- */
-
 import java.awt.Color;
 
 import org.slf4j.Logger;
@@ -12,11 +7,20 @@ import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import threads.LowerHeavyCensoring;
+import util.STATIC;
+
+/**
+ * The HeavyCensoring command can be either enabled or disabled
+ * to make the overall filter more sensitive.
+ * @author xHelixStorm
+ *
+ */
 
 public class HeavyCensoring implements CommandPublic {
 	Logger logger = LoggerFactory.getLogger(HeavyCensoring.class);
@@ -39,9 +43,7 @@ public class HeavyCensoring implements CommandPublic {
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		//run help if no parameter has been added
 		if(args.length == 0) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.WHITE).setDescription("Either enable or disable this feature by writing enable or disable together with the command. If enabled, every channel where a filter language is enabled,"
-					+ " will be automatically censored, if the message contains only one letter, same subsequent messages or if the message doesn't contain any normal letter or digit. "
-					+ "Additionaly if the threshold surpases the 30 deleted messages, it will start muting everyone who will get a removed message by the heavy censoring! To reset the threshold, use the reset parameter together with the command!").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_HELP)).build()).queue();
 		}
 		//enter if a parameter has been passed
 		else if(args.length == 1) {
@@ -54,11 +56,11 @@ public class HeavyCensoring implements CommandPublic {
 					//only enable if heavy censoring is disabled or empty
 					if(heavyCensoring == null || !heavyCensoring) {
 						Hashes.addHeavyCensoring(e.getGuild().getIdLong(), true);
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.WHITE).setDescription("Heavy censoring has been enabled!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_ENABLED)).build()).queue();
 						new Thread(new LowerHeavyCensoring(e)).start();
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Heavy censoring is already enabled!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_IS_ENABLED)).build()).queue();
 					}
 				}
 				//disable the heavy censoring
@@ -67,13 +69,13 @@ public class HeavyCensoring implements CommandPublic {
 					if(heavyCensoring != null && heavyCensoring) {
 						//clear all heavy censoring related HashMaps and thread
 						Hashes.addHeavyCensoring(e.getGuild().getIdLong(), false);
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.WHITE).setDescription("Heavy censoring has been disabled!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_DISABLED)).build()).queue();
 						Hashes.removeCensoreMessage(e.getGuild().getIdLong());
 						Hashes.removeFilterThreshold(e.getGuild().getIdLong());
 						Hashes.getHeavyCensoringThread(e.getGuild().getIdLong()).interrupt();
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Heavy censoring is already disabled!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_IS_DISABLED)).build()).queue();
 					}
 				}
 				//reset the heavy censoring threshold
@@ -81,19 +83,19 @@ public class HeavyCensoring implements CommandPublic {
 					//only reset if the heavy censoring is enabled
 					if(heavyCensoring != null && heavyCensoring) {
 						Hashes.addFilterThreshold(e.getGuild().getIdLong(), "0");
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.WHITE).setDescription("Heavy censoring threshold reset completed!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_RESET)).build()).queue();
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Heavy censoring needs to be enabled to reset the threshould.\nNote that disabling and enabling again the heavycensoring has the same effect!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_RESET_ERR)).build()).queue();
 					}
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please use either enable or disable together with the command").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please use either enable or disable together with the command").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 		}
 	}
 

@@ -1,18 +1,20 @@
 package listeners;
 
-/**
- * This class gets executed when a user updates his avatar.
- * 
- * The updated avatar will be inserted into the Azrael.users
- * table.
- */
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.dv8tion.jda.api.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
+
+/**
+ * This class gets executed when a user updates his avatar.
+ * 
+ * The updated avatar will be inserted into the Azrael.users
+ * table.
+ * @author xHelixStorm
+ * 
+ */
 
 public class AvatarUpdateListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(AvatarUpdateListener.class);

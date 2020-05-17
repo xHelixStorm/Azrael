@@ -1,18 +1,19 @@
 package listeners;
 
-/**
- * This class gets executed when a new role gets created.
- * 
- * The newly created role will be inserted into the 
- * DiscordRoles.roles table.
- */
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.dv8tion.jda.api.events.role.RoleCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.DiscordRoles;
+
+/**
+ * This class gets executed when a new role gets created.
+ * 
+ * The newly created role will be inserted into the 
+ * DiscordRoles.roles table.
+ * @author xHelixStorm
+ */
 
 public class RoleCreateListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(RoleCreateListener.class);

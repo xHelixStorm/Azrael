@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 import enums.GoogleEvent;
+import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import google.GoogleUtils;
@@ -30,16 +31,17 @@ import net.dv8tion.jda.api.events.guild.GuildUnbanEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import sql.Azrael;
+import util.STATIC;
 
 public class UnbanListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(UnbanListener.class);
-	private final static EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getUnbanThumbnail()).setTitle("User unbanned!");
 	
 	@Override
 	public void onGuildUnban(GuildUnbanEvent e) {
 		new Thread(() -> {
-			String trigger_user_name = "NaN";
-			String reason = "No reason has been provided!";
+			final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
+			String trigger_user_name = NA;
+			String reason = STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON);
 			String append_message = "";
 			//retrieve reason and applier if it has been cached, else retrieve the user from the audit log
 			var cache = Hashes.getTempCache("unban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
@@ -65,7 +67,7 @@ public class UnbanListener extends ListenerAdapter {
 					}
 				}
 				else {
-					append_message = "\n**The user who unbaned this user couldn't be retrieved because the VIEW AUDIT LOGS permission is not enabled!**";
+					append_message = STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_INFO_ERR)+Permission.VIEW_AUDIT_LOGS.getName();
 					logger.warn("VIEW AUDIT LOGS permission is missing to display the user who unbanned a user in guild {}!", e.getGuild().getId());
 				}
 			}
@@ -79,12 +81,13 @@ public class UnbanListener extends ListenerAdapter {
 			//print unban message if a log channel has been registered
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			if(log_channel != null) {
-				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp+"] **" + user_name + "** with the ID number **" + user_id + "** has been unbanned!\nUnbanned by: "+trigger_user_name+"\nReason: "+reason+append_message).build()).queue();
+				EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getUnbanThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_TITLE));
+				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_MESSAGE).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", trigger_user_name)+reason+append_message).build()).queue();
 			}
 			//remove the affected user from the bancollect table to symbolize that all current warnings have been removed
-			if(Azrael.SQLDeleteData(user_id, guild_id) == 0) {
+			if(Azrael.SQLDeleteData(user_id, guild_id) == -1) {
 				logger.error("The user's ban of {} couldn't be cleared from Azrael.bancollect in guild {}", e.getUser().getId(), e.getGuild().getId());
-				if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. The unban couldn't be cleared in table Azrael.bancollect").queue();
+				if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_FLAG_ERR)).queue();
 			}
 			//log action
 			logger.debug("{} has been unbanned from guild {}", user_id, e.getGuild().getName());

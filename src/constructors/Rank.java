@@ -135,6 +135,11 @@ public class Rank {
 	
 	private Timestamp last_update;
 	
+	private int level_line;
+	private int rank_line;
+	private int profile_line;
+	private int icon_line;
+	
 	public void setNameLengthLimit_Level(int _nameLengthLimit_level) {
 		this.nameLengthLimit_level = _nameLengthLimit_level;
 	}
@@ -452,6 +457,18 @@ public class Rank {
 	}
 	public void setLastUpdate(Timestamp _last_update) {
 		this.last_update = _last_update;
+	}
+	public void setLevelLine(int _level_line) {
+		this.level_line = _level_line;
+	}
+	public void setRankLine(int _rank_line) {
+		this.rank_line = _rank_line;
+	}
+	public void setProfileLine(int _profile_line) {
+		this.profile_line = _profile_line;
+	}
+	public void setIconLine(int _icon_line) {
+		this.icon_line = _icon_line;
 	}
 	
 	public int getNameLengthLimit_Level() {
@@ -771,5 +788,17 @@ public class Rank {
 	}
 	public Timestamp getLastUpdate() {
 		return this.last_update;
+	}
+	public int getLevelLine() {
+		return this.level_line;
+	}
+	public int getRankLine() {
+		return this.rank_line;
+	}
+	public int getProfileLine() {
+		return this.profile_line;
+	}
+	public int getIconLine() {
+		return this.icon_line;
 	}
 }

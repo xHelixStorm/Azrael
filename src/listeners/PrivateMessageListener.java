@@ -1,13 +1,5 @@
 package listeners;
 
-/**
- * This class gets executed when a private message arrives
- * to the bot. 
- * 
- * Main task of this class is to guide the user through the
- * equip command.
- */
-
 import java.awt.Color;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -21,11 +13,23 @@ import commandsContainer.EquipExecution;
 import core.CommandHandler;
 import core.CommandParser;
 import core.Hashes;
+import enums.Translation;
 import fileManagement.FileSetting;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import util.STATIC;
+
+/**
+ * This class gets executed when a private message arrives
+ * to the Bot. 
+ * 
+ * Main task of this class is to guide the user through the
+ * equip command.
+ * @author xHelixStorm
+ * 
+ */
 
 public class PrivateMessageListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(PrivateMessageListener.class);
@@ -47,7 +51,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 			if(equip != null && equip.getExpiration() - System.currentTimeMillis() > 0) {
 				//interrupt the equip setup
 				if(e.getMessage().getContentRaw().equalsIgnoreCase("exit")) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Equip setup terminated!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EXIT)).build()).queue();
 					Hashes.clearTempCache("equip_us"+e.getAuthor());
 				}
 				//execute this block when no main parameter has been chosen yet
@@ -76,7 +80,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 						if(!e.getMessage().getContentRaw().matches("[^\\d]*"))
 							EquipExecution.selectAvailableGuilds(e, equip.getAdditionalInfo(), Integer.parseInt(e.getMessage().getContentRaw())-1);
 						else
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select one of the visible digits on the screen!").build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_NUMBER)).build()).queue();
 					}
 				}
 				else {
@@ -94,7 +98,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 						if(!e.getMessage().getContentRaw().matches("[^\\d]*"))
 							EquipExecution.slotSelection(e, equip.getAdditionalInfo(), Integer.parseInt(e.getMessage().getContentRaw()), "set");
 						else
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select one of the visible digits on the screen!").build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_NUMBER)).build()).queue();
 					}
 					//search for the typed weapon or skill in the inventory
 					else if(equip.getAdditionalInfo2().matches("^(set-)[1-4]$")) {
@@ -118,7 +122,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 								EquipExecution.selectItem(e, equip.getAdditionalInfo(), slot, Integer.parseInt(e.getMessage().getContentRaw())-1, weapons);
 							}
 							else 
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select one of the visible digits on the screen!").build()).queue();
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_NUMBER)).build()).queue();
 						}
 					}
 					//unequip a weapon or skill from a specific slot
@@ -126,7 +130,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 						if(!e.getMessage().getContentRaw().matches("[^\\d]"))
 							EquipExecution.slotSelection(e, equip.getAdditionalInfo(), Integer.parseInt(e.getMessage().getContentRaw()), "remove");
 						else
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select one of the visible digits on the screen!").build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_NUMBER)).build()).queue();
 					}
 				}
 			}

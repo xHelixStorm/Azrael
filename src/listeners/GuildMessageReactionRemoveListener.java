@@ -17,6 +17,16 @@ import sql.DiscordRoles;
 import util.STATIC;
 import sql.Azrael;
 
+/**
+ * This class gets executed when a reaction has been removed
+ * from a message. 
+ * 
+ * It is either used to let users removed roles by themselves
+ * through reactions.
+ * @author xHelixStorm
+ * 
+ */
+
 public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageReactionRemoveListener.class);
 	
@@ -100,20 +110,19 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 							else
 								logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());
 						}
-					}
-					
-					//check if a role has to be removed
-					long role_id = 0;
-					if(e.getReactionEmote().getName().replaceAll("[a-zA-Z0-9]*", "").length() != 0)
-						role_id = DiscordRoles.SQLgetReactionRole(e.getMessageIdLong(), e.getReactionEmote().getAsCodepoints());
-					else
-						role_id = DiscordRoles.SQLgetReactionRole(e.getMessageIdLong(), e.getReactionEmote().getName());
-					if(role_id != 0) {
-						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(role_id)).queue();
-						}
-						else {
-							printPermissionError(e);
+						//check if a role has to be removed
+						long role_id = 0;
+						if(e.getReactionEmote().getName().replaceAll("[a-zA-Z0-9]*", "").length() != 0)
+							role_id = DiscordRoles.SQLgetReactionRole(e.getMessageIdLong(), e.getReactionEmote().getAsCodepoints());
+						else
+							role_id = DiscordRoles.SQLgetReactionRole(e.getMessageIdLong(), e.getReactionEmote().getName());
+						if(role_id != 0) {
+							if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+								e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(role_id)).queue();
+							}
+							else {
+								printPermissionError(e);
+							}
 						}
 					}
 				}

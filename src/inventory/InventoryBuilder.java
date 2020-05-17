@@ -1,5 +1,6 @@
 package inventory;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -15,14 +16,17 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
 import constructors.InventoryContent;
+import enums.Translation;
 import fileManagement.IniFileReader;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import util.STATIC;
 
 public class InventoryBuilder {
 	private final static Logger logger = LoggerFactory.getLogger(InventoryBuilder.class);
 	
-	public static void DrawInventory(GuildMessageReceivedEvent _e, GuildMessageReactionAddEvent _e2, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, Guilds guild_settings) {
+	public static void DrawInventory(GuildMessageReceivedEvent e, GuildMessageReactionAddEvent e2, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, Guilds guild_settings) {
 		try {
 			int theme_id = guild_settings.getThemeID();
 			BufferedImage blank_inventory = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/inventory_blank.png"));
@@ -93,22 +97,28 @@ public class InventoryBuilder {
 				}
 			}
 			
-			if(_e != null)
-				ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png"));
+			if(e != null)
+				ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 			else
-				ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+_e2.getGuild().getId()+"us"+_e2.getMember().getUser().getId()+".png"));
-		} catch(IOException ioe){
-			logger.warn("Inventory tab not found", ioe);
+				ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+e2.getGuild().getId()+"us"+e2.getMember().getUser().getId()+".png"));
+		} catch(IOException ioe) {
+			if(e != null) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_DRAW_ERR)).build()).queue();
+			}
+			else {
+				e2.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e2.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e2.getMember(), Translation.INVENTORY_DRAW_ERR)).build()).queue();
+			}
+			logger.warn("Inventory couldn't be drawn. Last item {}", ioe);
 		}
 		
-		if(_e != null) {
-			File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png");
-			_e.getChannel().sendFile(upload, "inventory.png").complete();
+		if(e != null) {
+			File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
+			e.getChannel().sendFile(upload, "inventory.png").complete();
 			upload.delete();
 		}
 		else {
-			File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+_e2.getGuild().getId()+"us"+_e2.getMember().getUser().getId()+".png");
-			_e2.getChannel().sendFile(upload, "inventory.png").complete();
+			File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+e2.getGuild().getId()+"us"+e2.getMember().getUser().getId()+".png");
+			e2.getChannel().sendFile(upload, "inventory.png").complete();
 			upload.delete();
 		}
 	}

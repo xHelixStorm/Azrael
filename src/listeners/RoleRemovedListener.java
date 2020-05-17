@@ -1,14 +1,5 @@
 package listeners;
 
-/**
- * This class gets executed when a role is removed from a user.
- * 
- * The bot checks if a mute role has been manually removed or
- * or the timer finished. Depending on the situation, table 
- * operations will occur and the fitting message will be printed
- * for the moderators and administrators.
- */
-
 import java.awt.Color;
 import java.sql.Timestamp;
 
@@ -19,6 +10,7 @@ import constructors.Bancollect;
 import core.Hashes;
 import core.UserPrivs;
 import enums.GoogleEvent;
+import enums.Translation;
 import fileManagement.GuildIni;
 import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -31,11 +23,22 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import sql.DiscordRoles;
 import sql.RankingSystem;
+import util.STATIC;
 import sql.Azrael;
+
+/**
+ * This class gets executed when a role is removed from a user.
+ * 
+ * The Bot checks if a mute role has been manually removed or
+ * or the timer finished. Depending on the situation, table 
+ * operations will occur and the fitting message will be printed
+ * for the moderators and administrators.
+ * @author xHelixStorm
+ * 
+ */
 
 public class RoleRemovedListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(RoleRemovedListener.class);
-	private final static EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle("Mute role has been manually removed!");
 	
 	@Override
 	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent e) {
@@ -50,8 +53,9 @@ public class RoleRemovedListener extends ListenerAdapter {
 			//check that the user is not muted anymore either for normal or permanent mutes
 			if(!UserPrivs.isUserMuted(e.getGuild().getMember(e.getUser())) && (warnedUser.getUnmute() == null || (warnedUser.getUnmute().getTime() - System.currentTimeMillis()) > 0)  && warnedUser.getMuted()) {
 				//check that the bot is allowed to view the audit logs
-				String trigger_user_name = "NaN";
-				String trigger_effective_name = "NaN";
+				final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
+				String trigger_user_name = NA;
+				String trigger_effective_name = NA;
 				final boolean view_audit_log = e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS);
 				if(view_audit_log) {
 					//retrieve first audit log
@@ -78,7 +82,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 				if(warnedUser.getUserID() != 0) {
 					if(Azrael.SQLUpdateMuted(user_id, guild_id, false) == 0) {
 						logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
-						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred. The mute state couldn't be updated in table Azrael.bancollect").build()).queue();
+						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_FLAG_REMOVE)).build()).queue();
 					}
 				}
 				//check if the user had a ranking role assigned before
@@ -93,26 +97,27 @@ public class RoleRemovedListener extends ListenerAdapter {
 							e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
 						}
 						else {
-							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Permission missing!").setDescription("The MANAGE ROLES permission is required to assign back a ranking role!").build()).queue();
+							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_REASSIGN_ERR)+Permission.MANAGE_ROLES.getName()).build()).queue();
 							logger.warn("The MANAGE ROLES permission is missing to assign back the ranking role in guild {}", e.getGuild().getId());
 						}
 					}
 				}
 				//print message for removing the mute role manually
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-				if(log_channel != null) {e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+trigger_user_name+"** has manually removed the mute role from **"+member_name+"** with the ID number **"+user_id+"**!\n"
-					+ (!view_audit_log ? "**The user who removed the role couldn't be retrieved because the VIEW AUDIT LOGS permission is missing!**" : "")).build()).queue();}
+				EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MANUAL_REMOVE_TITLE));
+				if(log_channel != null) {e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MANUALLY_REMOVED).replaceFirst("\\{\\}", trigger_user_name).replaceFirst("\\{\\}", member_name).replace("{}", ""+user_id)
+					+ (!view_audit_log ? STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MANUALLY_REMOVE_PERM)+Permission.VIEW_AUDIT_LOGS.getName() : "")).build()).queue();}
 				logger.debug("{} got the mute role removed before the time expired in guild {}", e.getUser().getId(), e.getGuild().getId());
 				Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE_HALFWAY", user_id, guild_id, "Mute role removed manually");
 				//Run google service, if enabled
 				if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-					String role_id = "NaN";
-					String role_name = "NaN";
+					String role_id = NA;
+					String role_name = NA;
 					if(role != null) {
 						role_id = role.getId();
 						role_name = role.getName();
 					}
-					GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, member_name, e.getMember().getEffectiveName(), trigger_user_name, trigger_effective_name, "The mute has been removed manually", null, null, "MANUALLY_UNMUTED", null, role_id, role_name, null, null, GoogleEvent.UNMUTE_MANUAL.id, log_channel);
+					GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, member_name, e.getMember().getEffectiveName(), trigger_user_name, trigger_effective_name, STATIC.getTranslation2(e.getGuild(), Translation.ROLE_REMOVE_MANUALLY_REASON), null, null, "MANUALLY_UNMUTED", null, role_id, role_name, null, null, GoogleEvent.UNMUTE_MANUAL.id, log_channel);
 				}
 			}
 			//execute this block if the mute time has ended and the user doesn't have the mute role anymore
@@ -121,7 +126,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 				var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 				//update mute state
 				if(Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false) == 0) {
-					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred. The mute end state couldn't be updated in table Azrael.bancollect").build()).queue();
+					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_FLAG_REMOVE)).build()).queue();
 					logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
 				}
 				else {
@@ -130,8 +135,9 @@ public class RoleRemovedListener extends ListenerAdapter {
 				}
 				//Run google service, if enabled
 				if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-					String role_id = "NaN";
-					String role_name = "NaN";
+					final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
+					String role_id = NA;
+					String role_name = NA;
 					final var cache = Hashes.getTempCache("unmute_gu"+guild_id+"us"+user_id);
 					if(cache != null) {
 						//retrieve the assigned role, if any were assigned
@@ -144,7 +150,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 						}
 						Hashes.clearTempCache("unmute_gu"+guild_id+"us"+user_id);
 					}
-					GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), member_name, e.getMember().getEffectiveName(), "", "", "The mute has ended after the given time", null, null, "UNMUTED", null, role_id, role_name, null, null, GoogleEvent.UNMUTE.id, log_channel);
+					GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), member_name, e.getMember().getEffectiveName(), "", "", STATIC.getTranslation2(e.getGuild(), Translation.ROLE_REMOVE_ELAPSED_REASON), null, null, "UNMUTED", null, role_id, role_name, null, null, GoogleEvent.UNMUTE.id, log_channel);
 				}
 			}
 		}).start();

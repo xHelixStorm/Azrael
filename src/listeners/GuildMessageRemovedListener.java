@@ -1,15 +1,5 @@
 package listeners;
 
-/**
- * This class gets executed when a message has been removed.
- * 
- * For this bot, there are many ways to remove a message. for
- * example by the word or url filter, with H!user delete-messages
- * or manual message deletions. In this class all deleted messages
- * will get printed with the message that was deleted and with the 
- * user who deleted the message, depending on the delete type.
- */
-
 import java.awt.Color;
 import java.util.stream.Collectors;
 
@@ -18,16 +8,31 @@ import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import sql.Azrael;
 import sql.DiscordRoles;
+import util.STATIC;
+
+/**
+ * This class gets executed when a message has been removed.
+ * 
+ * For this bot, there are many ways to remove a message. for
+ * example by the word or url filter, with H!user delete-messages
+ * or manual message deletions. In this class all deleted messages
+ * will get printed with the message that was deleted and with the 
+ * user who deleted the message, depending on the delete type.
+ * @author xHelixStorm
+ * 
+ */
 
 public class GuildMessageRemovedListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageRemovedListener.class);
@@ -76,7 +81,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 										if(e.getChannel().getId().equals(entry.getOptionByName("channel_id").toString()) && (UserPrivs.isUserAdmin(e.getGuild().getMemberById(entry.getUser().getId())) || UserPrivs.isUserMod(e.getGuild().getMemberById(entry.getUser().getId())))) {
 											removed_from = entry.getTargetIdLong();
 											//be sure to avoid printing a message which got deleted from a bot or by a bot
-											if(!UserPrivs.isUserBot(e.getGuild().getMemberById(removed_from))) {
+											Member member = e.getGuild().getMemberById(removed_from);
+											if(!member.getUser().isBot() && !UserPrivs.isUserBot(member)) {
 												trigger_user_id = entry.getUser().getIdLong();
 												trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 												break;
@@ -103,8 +109,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 											message.setColor(Color.CYAN);
 											//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 											for(final var cachedMessage : removed_messages) {
-												message.setTitle(trigger_user_name+" has removed "+(cachedMessage.isEdit() ? "an **edited message**" : "a **message**")+" from #"+e.getChannel().getName()+"!");
-												final var printMessage = "["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage();
+												message.setTimestamp(cachedMessage.getTime()).setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setTitle((cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))+STATIC.getTranslation2(e.getGuild(), Translation.DELETE_REMOVED_FROM)+trigger_user_name).setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
+												final var printMessage = cachedMessage.getMessage();
 												e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 											}
 										}
@@ -122,8 +128,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 											message.setColor(Color.GRAY);
 											//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 											for(final var cachedMessage : removed_messages) {
-												message.setTitle("User has removed his own "+(cachedMessage.isEdit() ? "**edited message**" : "**message**")+" from #"+e.getChannel().getName()+"!");
-												final var printMessage = "["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage();
+												message.setTimestamp(cachedMessage.getTime()).setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.DELETE_SELF)+(cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))).setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
+												final var printMessage = cachedMessage.getMessage();
 												e.getGuild().getTextChannelById((del_channel != null ? del_channel.getChannel_ID() : tra_channel.getChannel_ID())).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 											}
 										}
@@ -138,8 +144,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 									message.setColor(Color.ORANGE);
 									//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 									for(final var cachedMessage : removed_messages) {
-										message.setTitle((cachedMessage.isEdit() ? "**Edited message**" : "**Message**")+" removed from #"+e.getChannel().getName()+"!");
-										final var printMessage = "["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage();
+										message.setTimestamp(cachedMessage.getTime()).setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setTitle((cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))).setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
+										final var printMessage = cachedMessage.getMessage();
 										e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 									}
 								}
@@ -152,7 +158,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 					}
 					else {
 						var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
-						if(tra_channel != null) e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Missing permission!").setDescription("Removed message detected. Message couldn't be displayed because VIEW AUDIT LOG permission is missing!").build()).queue();
+						if(tra_channel != null) e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.DELETE_PERMISSION_ERR)+Permission.VIEW_AUDIT_LOGS.getName()).build()).queue();
 						logger.warn("VIEW AUDIT LOG permission missing in guild {}!", e.getGuild().getId());
 					}
 					
@@ -162,8 +168,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 						message.setColor(Color.DARK_GRAY);
 						//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 						for(final var cachedMessage : removed_messages) {
-							message.setTitle("Logged deleted "+(cachedMessage.isEdit() ? "**edited message**" : "**message**")+" due to watching!");
-							final var printMessage = "["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]:\n"+cachedMessage.getMessage();
+							message.setTimestamp(cachedMessage.getTime()).setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.DELETE_WATCHED)+(cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))).setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
+							final var printMessage = cachedMessage.getMessage();
 							e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 						}
 					}

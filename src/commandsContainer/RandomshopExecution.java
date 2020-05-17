@@ -17,7 +17,7 @@ import constructors.WeaponAbbvs;
 import constructors.WeaponStats;
 import constructors.Weapons;
 import core.Hashes;
-import fileManagement.GuildIni;
+import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -25,18 +25,18 @@ import randomshop.RandomshopItemDrawer;
 import randomshop.RandomshopRewardDrawer;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
+import util.STATIC;
 
 public class RandomshopExecution {
 	private static final Logger logger = LoggerFactory.getLogger(RandomshopExecution.class);
 	
 	public static void runHelp(GuildMessageReceivedEvent e, List<WeaponAbbvs> abbreviations, List<String> categories) {
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle("Randomshop exclusives");
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		if(abbreviations.size() == 0 && categories.size() == 0) {
-			e.getChannel().sendMessage(message.setDescription("The randomshop is currently not available. Please retry later!").build()).queue();
+			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_NOT_AVAILABLE)).build()).queue();
 		}
 		else {
-			message.setDescription("Write either one weapon type or weapon category together with the command to start the random shop. For example **"+GuildIni.getCommandPrefix(e.getGuild().getIdLong())+"randomshop -play <weapon type/weapon category>**."
-					+ " Also make use of the -replay parameter to replay with the same weapon type or category. If you write a weapon category or weapon type without any parameters, you can view the selected content");
+			message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_HELP));
 			
 			if(abbreviations.size() > 0) {
 				//display all weapons
@@ -53,7 +53,7 @@ public class RandomshopExecution {
 						out2.append(abbv.getDescription()+"\n");
 					}
 				}
-				message.addField("Weapon Types", "_"+out1.toString()+"_", true);
+				message.addField(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_WEP_TYPES), "_"+out1.toString()+"_", true);
 				message.addField("", "_"+out2.toString()+"_", true);
 				message.addBlankField(false);
 			}
@@ -72,7 +72,7 @@ public class RandomshopExecution {
 						out2.append(category+"\n");
 					}
 				}
-				message.addField("Weapon Categories", "_"+out1.toString()+"_", true);
+				message.addField(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_WEP_CATEGORIES), "_"+out1.toString()+"_", true);
 				message.addField("", "_"+out2.toString()+"_", true);
 			}
 			
@@ -122,7 +122,7 @@ public class RandomshopExecution {
 								editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1), guild_settings.getThemeID());
 							}
 							else {
-								e.getChannel().sendMessage("Weapons for this weapon type have not been configured or does not exist!").queue();
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_WEP_TYPE_NA)).build()).queue();
 								logger.warn("Table weapon_shop_content is not configured for the weapon abbreviation {} in guild {}", abbv, e.getGuild().getId());
 							}
 						}
@@ -133,7 +133,7 @@ public class RandomshopExecution {
 								editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1), guild_settings.getThemeID());
 							}
 							else {
-								e.getChannel().sendMessage("Weapons for this weapon category have not been configured or does not exist!").queue();
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_WEP_CAT_NA)).build()).queue();
 								logger.warn("Table weapon_shop_content is not configured for the weapon category {} in guild {}", category, e.getGuild().getId());
 							}
 						}
@@ -144,23 +144,23 @@ public class RandomshopExecution {
 							RandomshopRewardDrawer.drawReward(e, RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(w -> w.getWeaponID() == weapon).findAny().orElse(null), user_details.getCurrency(), guild_settings);
 							Hashes.addTempCache("randomshop_play_"+e.getMember().getUser().getId(), new Cache(180000, input));
 						}
-						else if(weapon_id > 0){
-							EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle("Randomshop failed");
-							e.getChannel().sendMessage(message.setDescription("An internal error occurred while receiving a weapon from the Randomshop. Please contact an administrator").build()).queue();
+						else if(weapon_id > 0) {
+							EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							logger.error("The user {} couldn't receive the weapon with the weapon_id {} in guild {}", e.getMember().getUser().getId(), weapon_id, e.getGuild().getId());
 						}
 					}
 					else {
-						e.getChannel().sendMessage("No weapon stats available. Please contact an administrator to configure them!").queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.warn("Table weapon_stats is not configured for guild {}", e.getGuild().getName());
 					}
 				}
 				else {
-					e.getChannel().sendMessage("I'm sorry. you don't have enough currency to play another round. Your current currency amounts to: "+user_details.getCurrency()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_BALANCE_ERR)+user_details.getCurrency()).build()).queue();
 				}
 			}
 			else {
-				e.getChannel().sendMessage("No valid input has been passed. Randomshop interrupted!").queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
 	}
@@ -220,14 +220,14 @@ public class RandomshopExecution {
 				else {
 					//no items to display
 					if(e != null)
-						e.getChannel().sendMessage("No items to display could be retrieved!").queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_NO_ITEMS)).build()).queue();
 					else
-						e2.getChannel().sendMessage("No items to display could be retrieved!").queue();
+						e2.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e2.getMember(), Translation.RANDOMSHOP_NO_ITEMS)).build()).queue();
 					logger.warn("Randomshop content couldn't be displayed in guild {}", e.getGuild().getId());
 				}
 			}
 			else {
-				e.getChannel().sendMessage("No valid input has been passed. Randomshop interrupted!").queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
 	}

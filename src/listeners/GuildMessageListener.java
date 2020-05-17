@@ -1,16 +1,7 @@
 package listeners;
 
-/**
- * This class gets executed when a message is sent
- * 
- * This class contains various things such as the launcher for
- * regular, url and message censoring, applying reactions on 
- * images, the execution of commands and the following of commands
- * through various steps.
- */
-
 import java.awt.Color;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,7 +15,7 @@ import com.vdurmont.emoji.EmojiManager;
 import commandsContainer.FilterExecution;
 import commandsContainer.GoogleSpreadsheetsExecution;
 import commandsContainer.PurchaseExecution;
-import commandsContainer.RssExecution;
+import commandsContainer.SubscribeExecution;
 import commandsContainer.SetWarning;
 import commandsContainer.ShopExecution;
 import commandsContainer.UserExecution;
@@ -37,6 +28,7 @@ import core.CommandHandler;
 import core.CommandParser;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import filter.LanguageFilter;
@@ -50,6 +42,17 @@ import sql.RankingSystem;
 import sql.Azrael;
 import threads.RunQuiz;
 import util.STATIC;
+
+/**
+ * This class gets executed when a message is sent
+ * 
+ * This class contains various things such as the launcher for
+ * regular, url and message censoring, applying reactions on 
+ * images, the execution of commands and the following of commands
+ * through various steps.
+ * @author xHelixStorm
+ * 
+ */
 
 public class GuildMessageListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
@@ -106,7 +109,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(shop != null && shop.getExpiration() - System.currentTimeMillis() > 0) {
 						//verify if the user whishes to close the shop
 						if(message.equalsIgnoreCase("exit")) {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Thanks for the visit! See you again!").build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_TITLE_EXIT)).build()).queue();
 							Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 						}
 						//check if the user has decided for a specific category
@@ -276,34 +279,34 @@ public class GuildMessageListener extends ListenerAdapter {
 							//register a rss feed if selected
 							if(task.equals("register") && ((message.startsWith("http") && rss.getAdditionalInfo2().equals("1")) || (message.startsWith("#") && rss.getAdditionalInfo2().equals("2")))) {
 								Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-								RssExecution.registerFeed(e, message, Integer.parseInt(rss.getAdditionalInfo2()));
+								SubscribeExecution.registerFeed(e, message, Integer.parseInt(rss.getAdditionalInfo2()));
 							}
 							//remove a rss feed if selected
 							if(task.equals("remove") && message.replaceAll("[0-9]", "").length() == 0) {
-								RssExecution.removeFeed(e, Integer.parseInt(message)-1);
+								SubscribeExecution.removeFeed(e, Integer.parseInt(message)-1);
 							}
 							//format a rss feed if selected
 							else if(task.equals("format") && message.replaceAll("[0-9]", "").length() == 0) {
-								RssExecution.currentFormat(e, Integer.parseInt(message)-1, "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+								SubscribeExecution.currentFormat(e, Integer.parseInt(message)-1, "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 							}
 							//update the format of an rss feed if format has been selected the step before
 							else if(task.contains("updateformat")) {
 								Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-								RssExecution.updateFormat(e, Integer.parseInt(task.replaceAll("[^0-9]", "")), message);
+								SubscribeExecution.updateFormat(e, Integer.parseInt(task.replaceAll("[^0-9]", "")), message);
 							}
 							//do a test print of one selected feed
 							else if(task.equals("test") && message.replaceAll("[0-9]", "").length() == 0) {
-								RssExecution.runTest(e, Integer.parseInt(message)-1);
+								SubscribeExecution.runTest(e, Integer.parseInt(message)-1);
 							}
 							//change the options of a tweet
 							else if(task.equals("options") && message.replaceAll("[0-9]", "").length() == 0) {
-								RssExecution.changeOptions(e, Integer.parseInt(message)-1, "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+								SubscribeExecution.changeOptions(e, Integer.parseInt(message)-1, "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 							}
 							//update the hashtag options
 							else if(task.equals("options-page")) {
 								final String lowCaseMessage = message.toLowerCase();
 								if(lowCaseMessage.startsWith("enable") || lowCaseMessage.startsWith("disable") || lowCaseMessage.startsWith("add-child") || lowCaseMessage.startsWith("remove-child"))
-									RssExecution.updateOptions(e, Integer.parseInt(rss.getAdditionalInfo2()), "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+									SubscribeExecution.updateOptions(e, Integer.parseInt(rss.getAdditionalInfo2()), "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 							}
 						}
 						else {
@@ -325,7 +328,7 @@ public class GuildMessageListener extends ListenerAdapter {
 								log_channel.setChannel_ID(e.getChannel().getIdLong());
 							if(qui_channel == null)
 								qui_channel.setChannel_ID(e.getChannel().getIdLong());
-							e.getChannel().sendMessage("The quiz will run shortly in <#"+qui_channel.getChannel_ID()+">!").queue();
+							e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.QUIZ_START_SHORTLY).replace("{}", ""+qui_channel.getChannel_ID())).queue();
 							//execute independent Quiz Thread
 							new Thread(new RunQuiz(e, qui_channel.getChannel_ID(), log_channel.getChannel_ID(), Integer.parseInt(message))).start();
 							//remove the entry from cache after starting 
@@ -424,7 +427,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Google command aborted!").build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_EXIT)).build()).queue();
 							//remove the google command from cache
 							Hashes.clearTempCache(key);
 						}
@@ -468,20 +471,10 @@ public class GuildMessageListener extends ListenerAdapter {
 						if(user_details == null) {
 							//if no user details have been found, insert the user into the users table and into the user details table
 							if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
-								if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, guild_settings.getStartCurrency(), 0) > 0) {
-									var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-									if(log_channel != null) {
-										EmbedBuilder success = new EmbedBuilder().setColor(Color.GREEN).setTitle("Table insertion successful!");
-										e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(success.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** has been successfully inserted into all required ranking system table!").build()).queue();
-									}
-								}
+								RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, guild_settings.getStartCurrency(), 0);
 							}
-							else if(RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, guild_settings.getStartCurrency(), 0) > 0) {
-								var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-								if(log_channel != null) {
-									EmbedBuilder success = new EmbedBuilder().setColor(Color.GREEN).setTitle("Table insertion successful!");
-									e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(success.setDescription("The user **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+"** with the ID number **"+user_id+"** has been successfully inserted into all required ranking system table!").build()).queue();
-								}
+							else {
+								RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, guild_settings.getStartCurrency(), 0);
 							}
 						}
 						else {
@@ -542,7 +535,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					collectedMessage.setChannelName(e.getChannel().getName());
 					collectedMessage.setMessage(message+image_url.toString()+"\n");
 					collectedMessage.setMessageID(e.getMessageIdLong());
-					collectedMessage.setTime(LocalDateTime.now());
+					collectedMessage.setTime(ZonedDateTime.now());
 					collectedMessage.setIsEdit(false);
 					
 					if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "MESSAGE ["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
@@ -558,16 +551,17 @@ public class GuildMessageListener extends ListenerAdapter {
 				//if the watched member level equals 2, then print all written messages from that user in a separate channel
 				if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
 					var cachedMessage = sentMessage.get(0);
-					var printMessage = "["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+"]: "+cachedMessage.getMessage();
+					var printMessage = cachedMessage.getMessage();
 					e.getGuild().getTextChannelById(watchedMember.getWatchChannel()).sendMessage(new EmbedBuilder()
-						.setTitle("Logged written message due to watching!").setColor(Color.YELLOW)
+						.setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")")
+						.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_WATCH)).setColor(Color.WHITE)
 						.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 				}
 				//print an error if the cache log is not enabled
 				else if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage == null) {
 					e.getGuild().getTextChannelById(watchedMember.getWatchChannel()).sendMessage(new EmbedBuilder()
-						.setTitle("CacheLog disabled!").setColor(Color.RED)
-						.setDescription("Please enable the CacheLog to display messages! Message from "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" couldn't be displayed!").build()).queue();
+						.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED)
+						.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.MESSAGE_WATCH_ERR).replace("{}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator())).build()).queue();
 				}
 			}).start();
 		}

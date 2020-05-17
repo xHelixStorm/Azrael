@@ -1,94 +1,88 @@
 package commandsContainer;
 
 import java.awt.Color;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Cache;
 import core.Hashes;
+import enums.Translation;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
+import util.STATIC;
 
 public class SetWarning {
 	private static final Logger logger = LoggerFactory.getLogger(SetWarning.class);
-	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Define the max amount of mutes that are tolerated in this server!");;
 	
-	public static void runHelp(GuildMessageReceivedEvent _e) {
-		_e.getChannel().sendMessage(messageBuild.setDescription("Type a number from 1-5 to set the max allowed number of warnings, that occurs before a ban, for the mute system.\n\n_Note that this setting will override all previous user warnings, if the current warning of a user is higher than the one being set!_").build()).queue();
+	public static void runHelp(GuildMessageReceivedEvent e) {
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
+		e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_WARNING_HELP)).build()).queue();
 	}
 	
-	public static void runTask(GuildMessageReceivedEvent _e, String _message) {
+	public static void runTask(GuildMessageReceivedEvent e, String _message) {
 		int warning_value = 0;
-		try {
-			warning_value = Integer.parseInt(_message.replaceAll("[^0-9]", ""));
-		} catch(NumberFormatException nfe) {
-			//do nothing
+		if(_message.replaceAll("[0-9]*", "").length() == 0) {
+			warning_value = Integer.parseInt(_message);
 		}
 		
 		if(warning_value != 0 && warning_value <= 5) {
 			var editedRows = 0;
-			if(warning_value < Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong())) {
-				editedRows = Azrael.SQLLowerTotalWarning(_e.getGuild().getIdLong(), warning_value);
+			if(warning_value < Azrael.SQLgetMaxWarning(e.getGuild().getIdLong())) {
+				editedRows = Azrael.SQLLowerTotalWarning(e.getGuild().getIdLong(), warning_value);
 			}
 			else {
-				editedRows = Azrael.SQLInsertWarning(_e.getGuild().getIdLong(), warning_value);
+				editedRows = Azrael.SQLInsertWarning(e.getGuild().getIdLong(), warning_value);
 			}
 			
 			if(editedRows > 0) {
-				logger.debug("{} has edited the warning level in guild {}", _e.getMember().getUser().getId(), _e.getGuild().getId());
+				logger.debug("{} has edited the warning level in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
-				_e.getChannel().sendMessage(message.setDescription("The system has been set to warn "+warning_value+" time(s) before banning").build()).queue();
-				Hashes.addTempCache("warnings_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId(), new Cache(180000, "1"));
-				_e.getChannel().sendMessage(message.setDescription("To complete the warning setup, you'll be asked to enter the time in minutes for every single warning. You have a total time of 10 minutes for the final setup.\n\nPlease insert the time in minutes for warning 1.").build()).queueAfter(3, TimeUnit.SECONDS);
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_WARNING_1).replace("{}", ""+warning_value)).build()).queue();
+				Hashes.addTempCache("warnings_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "1"));
 			}
 			else {
-				logger.error("The warning level for the guild {} couldn't be edited on Azrael.warnings", _e.getGuild().getId());
-				_e.getChannel().sendMessage("An internal error occurred. The warning level couldn't be updated on Azrael.warnings").queue();
+				logger.error("The warning level for the guild {} couldn't be edited on Azrael.warnings", e.getGuild().getId());
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			}
 		}
 		else {
-			_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Please insert a valid warning value between 1-5").queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_WARNING_NOT_VALID)).build()).queue();
 		}
 	}
 	
-	public static void performUpdate(GuildMessageReceivedEvent _e, String _message, Cache cache, String key) {
+	public static void performUpdate(GuildMessageReceivedEvent e, String _message, Cache cache, String key) {
 		EmbedBuilder message = new EmbedBuilder();
-		if(_message.replaceAll("[0-9]*", "").equals("")) {
+		if(_message.replaceAll("[0-9]*", "").length() == 0) {
 			if(cache.getExpiration() - System.currentTimeMillis() > 0) {
-				var max_warning = Azrael.SQLgetMaxWarning(_e.getGuild().getIdLong());
+				var max_warning = Azrael.SQLgetMaxWarning(e.getGuild().getIdLong());
 				var value = Integer.parseInt(cache.getAdditionalInfo());
 				if(value < max_warning) {
-					if(Azrael.SQLUpdateMuteTimeOfWarning(_e.getGuild().getIdLong(), value, (Long.parseLong(_message)*60*1000)) > 0) {
+					if(Azrael.SQLUpdateMuteTimeOfWarning(e.getGuild().getIdLong(), value, (Long.parseLong(_message)*60*1000)) > 0) {
 						message.setColor(Color.BLUE);
-						_e.getChannel().sendMessage(message.setDescription("The mute time of warning "+value+" has been updated!").build()).queue();
-						_e.getChannel().sendMessage(message.setDescription("Please insert the mute time for warning "+(value+1)+"!").build()).queueAfter(1, TimeUnit.SECONDS);
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_WARNING_2).replace("{}", _message).replace("{}", ""+(value+1))).build()).queue();
 						cache.updateDescription(""+(value+1)).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
 					else {
-						logger.error("warning timer couldn't be updated in guild {}", _e.getGuild().getId());
-						_e.getChannel().sendMessage("An internal error occurred. The timer couldn't be inserted into Azrael.warnings. Please insert the time again").queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("warning timer {} couldn't be updated in guild {}", _message, e.getGuild().getId());
 					}
 				}
 				else if(value == max_warning) {
-					if(Azrael.SQLUpdateMuteTimeOfWarning(_e.getGuild().getIdLong(), value, (Long.parseLong(_message)*60*1000)) > 0) {
-						_e.getChannel().sendMessage("The warnings have been configured successfully!").queue();
-						logger.debug("Warnings have been configured");
-						Hashes.clearTempCache("warnings_gu"+_e.getGuild().getId()+"ch"+_e.getChannel().getId()+"us"+_e.getMember().getUser().getId());
+					if(Azrael.SQLUpdateMuteTimeOfWarning(e.getGuild().getIdLong(), value, (Long.parseLong(_message)*60*1000)) > 0) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_WARNINIG_ADDED)).build()).queue();
+						Hashes.clearTempCache(key);
 					}
 					else {
-						logger.error("warning timer couldn't be updated in guild {}", _e.getGuild().getId());
-						_e.getChannel().sendMessage("An internal error occurred. The timer couldn't be inserted into Azrael.warnings. Please insert the time again").queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("warning timer couldn't be updated in guild {}", e.getGuild().getId());
 					}
 				}
 			}
 			else {
-				message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Session Expired!");
-				_e.getChannel().sendMessage(message.setDescription("Session has expired! Please retype the command!").build()).queue();
 				Hashes.clearTempCache(key);
 			}
 		}

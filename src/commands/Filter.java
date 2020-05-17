@@ -1,11 +1,5 @@
 package commands;
 
-/**
- * The Filter command allows the user to edit various lists
- * for words, names and urls which are used to filter or 
- * assign names in different circumstances.
- */
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +8,14 @@ import core.UserPrivs;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+
+/**
+ * The Filter command allows the user to edit various lists
+ * for words, names and urls which are used to filter or 
+ * assign names in different circumstances.
+ * @author xHelixStorm
+ *
+ */
 
 public class Filter implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Filter.class);

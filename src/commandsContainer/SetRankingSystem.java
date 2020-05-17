@@ -1,19 +1,24 @@
 package commandsContainer;
 
+import java.awt.Color;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
 import core.Hashes;
+import enums.Translation;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 import threads.CollectUsers;
+import util.STATIC;
 
 public class SetRankingSystem {
 	private final static Logger logger = LoggerFactory.getLogger(SetRankingSystem.class);
 	
 	@SuppressWarnings("preview")
-	public static void runTask(GuildMessageReceivedEvent _e, String _input){
+	public static void runTask(GuildMessageReceivedEvent e, String _input){
 		boolean ranking_state = false;
 		boolean wrongInput = false;
 		String message;
@@ -21,45 +26,45 @@ public class SetRankingSystem {
 		switch(_input) {
 			case "enable" -> {
 				ranking_state = true;
-				message = "**Ranking system has been succesfully enabled!**";
+				message = STATIC.getTranslation(e.getMember(), Translation.SET_RANKING_ENABLE);
 			}
 			case "disable" -> {
 				ranking_state = false;
-				message = "**Ranking system has been succesfully disabled!**";
+				message = STATIC.getTranslation(e.getMember(), Translation.SET_RANKING_DISABLE);
 			}
 			default -> {
 				wrongInput = true;
-				message = "**"+_e.getMember().getAsMention()+" Something went wrong. Please recheck the syntax and try again!**";
+				message = STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND);
 			}
 		}
 		
-		if(wrongInput == false){
-			if(RankingSystem.SQLUpdateRankingSystem(_e.getGuild().getIdLong(), _e.getGuild().getName(), ranking_state) > 0) {
-				Guilds guild = RankingSystem.SQLgetGuild(_e.getGuild().getIdLong());
+		if(wrongInput == false) {
+			if(RankingSystem.SQLUpdateRankingSystem(e.getGuild().getIdLong(), e.getGuild().getName(), ranking_state) > 0) {
+				Guilds guild = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 				guild.setRankingState(ranking_state);
-				Hashes.addStatus(_e.getGuild().getIdLong(), guild);
-				logger.debug("{} has set the ranking system to {} in guild {}", _e.getMember().getUser().getId(), _input, _e.getGuild().getId());
-				_e.getChannel().sendMessage(message).queue();
+				Hashes.addStatus(e.getGuild().getIdLong(), guild);
+				logger.debug("{} has set the ranking system to {} in guild {}", e.getMember().getUser().getId(), _input, e.getGuild().getId());
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(message).build()).queue();
 				
 				if(ranking_state == true) {
-					if(RankingSystem.SQLgetRoles(_e.getGuild().getIdLong()).size() == 0) {
-						logger.warn("Roles from RankingSystem.roles couldn't be called and cached");
-						_e.getChannel().sendMessage("Warning! Roles from RankingSystem.roles couldn't be called and cached. Are any ranking roles registered?").queue();
+					if(RankingSystem.SQLgetRoles(e.getGuild().getIdLong()) == null) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Roles from RankingSystem.roles couldn't be called and cached in guild {}", e.getGuild().getId());
 					}
-					if(RankingSystem.SQLgetLevels(_e.getGuild().getIdLong(), guild.getThemeID()).size() == 0) {
-						logger.error("Levels from RankingSystem.level_list couldn't be called and cached");
-						_e.getChannel().sendMessage("An internal error occurred. Levels from RankingSystem.level_list couldn't be called and cached").queue();
+					if(RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild.getThemeID()).size() == 0) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Levels from RankingSystem.level_list couldn't be called and cached in guild {}", e.getGuild().getId());
 					}
-					new Thread(new CollectUsers(_e)).start();
+					new Thread(new CollectUsers(e)).start();
 				}
 			}
 			else {
-				logger.error("An internal error occurred on editing the RankingSystem.guilds table to alter the ranking state for guild {}", _e.getGuild().getName());
-				_e.getChannel().sendMessage("An internal error occurred. The ranking state couldn't be altered in the table RankingSystem.guilds").queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("An internal error occurred on editing the RankingSystem.guilds table to alter the ranking state for guild {}", e.getGuild().getId());
 			}
 		}
-		else{
-			_e.getChannel().sendMessage(message).queue();
+		else {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(message).build()).queue();
 		}
 	}
 }

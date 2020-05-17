@@ -10,10 +10,12 @@ import constructors.Guilds;
 import constructors.InventoryContent;
 import constructors.Weapons;
 import core.Hashes;
+import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
+import util.STATIC;
 
 public class PurchaseExecution {
 	private final static Logger logger = LoggerFactory.getLogger(PurchaseExecution.class);
@@ -36,17 +38,17 @@ public class PurchaseExecution {
 					user_details.setCurrency(new_currency);
 					Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 					logger.debug("{} has purchased {}", e.getMember().getUser().getId(), skin.getShopDescription());
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("You have successfully purchased **"+skin.getShopDescription()+"**").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASED).replace("{}", skin.getShopDescription())).build()).queue();
 					returnSkinMenu(e, guild_settings, type);
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("An internal error occurred and purchase has been interrupted. Please contact an administrator!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					RankingSystem.SQLInsertActionLog("critical", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "purchase interrupted", "An error occurred while purchasing "+skin.getShopDescription());
 					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" you currently don't have enough money to purchase this item/skin!").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_NOT_ENOUGH_CUR)).build()).queue();
 				returnSkinMenu(e, guild_settings, type);
 			}
 		}
@@ -65,17 +67,17 @@ public class PurchaseExecution {
 					user_details.setCurrency(new_currency);
 					Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 					logger.debug("{} has purchased {}", e.getMember().getUser().getId(), weapon.getDescription()+" "+weapon.getStatDescription());
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("You have successfully purchased **"+weapon.getDescription()+" "+weapon.getStatDescription()+"**").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASED).replace("{}", weapon.getDescription()+" "+weapon.getStatDescription())).build()).queue();
 					ShopExecution.displayShopWeapons(e, weapon.getCategoryDescription());
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("An internal error occurred and purchase has been interrupted. Please contact an administrator!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					RankingSystem.SQLInsertActionLog("critical", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "purchase interrupted", "An error occurred while purchasing "+weapon.getDescription()+" "+weapon.getStatDescription());
 					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" you don't have enough money to purchase this weapon!").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_NOT_ENOUGH_CUR)).build()).queue();
 				ShopExecution.displayShopWeapons(e, weapon.getCategoryDescription());
 			}
 		}
@@ -94,17 +96,17 @@ public class PurchaseExecution {
 					user_details.setCurrency(new_currency);
 					Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 					logger.debug("{} has purchased {}", e.getMember().getUser().getId(), skill.getDescription());
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("You have successfully purchased **"+skill.getDescription()+"**").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASED).replace("{}", skill.getDescription())).build()).queue();
 					ShopExecution.displaySkills(e, guild_settings);
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("An internal error occurred and purchase has been interrupted. Please contact an administrator!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					RankingSystem.SQLInsertActionLog("critical", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "purchase interrupted", "An error occurred while purchasing "+skill.getDescription());
 					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" you don't have enough money to purchase this skill!").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_NOT_ENOUGH_CUR)).build()).queue();
 				ShopExecution.displaySkills(e, guild_settings);
 			}
 		}
@@ -122,33 +124,33 @@ public class PurchaseExecution {
 				if(user_details.getLevelDescription().equals(skin.getShopDescription())) {
 					user_details.setLevelDescription(guild_settings.getLevelDescription());
 					if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID()) == 0) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized level up skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("The RankingSystem.users table couldn't be updated with the default level up skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				if(user_details.getRankDescription().equals(skin.getShopDescription())) {
 					user_details.setRankDescription(guild_settings.getRankDescription());
 					if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getRankID()) == 0) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized rank skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("The RankingSystem.users table couldn't be updated with the default rank skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				if(user_details.getProfileDescription().equals(skin.getShopDescription())) {
 					user_details.setProfileDescription(guild_settings.getProfileDescription());
 					if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getProfileID()) == 0) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized profile skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("The RankingSystem.users table couldn't be updated with the default profile skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				if(user_details.getIconDescription().equals(skin.getShopDescription())) {
 					user_details.setIconDescription(guild_settings.getIconDescription());
 					if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getIconID()) == 0) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("The currently being utilized icon skin couldn't be updated on the database. Please contact an administrator to correct it!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("The RankingSystem.users table couldn't be updated with the default icon skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Item has been sold succesfully").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_SOLD)).build()).queue();
 				returnSkinMenu(e, guild_settings, type);
 			}
 			else {

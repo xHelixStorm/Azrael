@@ -1,5 +1,6 @@
 package randomshop;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -15,14 +16,18 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
 import constructors.Weapons;
+import enums.Translation;
 import fileManagement.IniFileReader;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import util.STATIC;
 
 public class RandomshopItemDrawer {
 	private final static Logger logger = LoggerFactory.getLogger(RandomshopItemDrawer.class);
 	
 	public static void drawItems(GuildMessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<Weapons> weapons, int current_page, int last_page, Guilds guild_settings) {
+		String traceWeapon = null;
 		try {
 			var theme_id = guild_settings.getThemeID();
 			BufferedImage randomshop = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Randomshop/randomshop_blank.png"));
@@ -50,6 +55,7 @@ public class RandomshopItemDrawer {
 			var currentX = startX;
 			var currentY = startY;
 			for(var weapon : weapons) {
+				traceWeapon = weapon.getDescription();
 				counter++;
 				BufferedImage currentWeapon = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Weapons/"+weapon.getDescription()+".png"));
 				g.drawImage(currentWeapon, currentX+(sizeX/2)-(itemSizeX/2), currentY+(sizeY/2)-(itemSizeY/2), (itemSizeX != 0 ? itemSizeX : currentWeapon.getWidth()), (itemSizeY != 0 ? itemSizeY : currentWeapon.getHeight()), null);
@@ -73,7 +79,11 @@ public class RandomshopItemDrawer {
 				e2.getChannel().sendFile(file1, "randomshop.png").complete();
 			file1.delete();
 		} catch (IOException e1) {
-			logger.error("Randomshop Items couldn't be drawn", e1);
+			if(e != null)
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR)).build()).queue();
+			else
+				e2.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e2.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e2.getMember(), Translation.RANDOMSHOP_ERR)).build()).queue();
+			logger.error("Randomshop Items couldn't be drawn. Error for item {}", traceWeapon, e1);
 		}
 	}
 	

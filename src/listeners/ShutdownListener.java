@@ -1,12 +1,5 @@
 package listeners;
 
-/**
- * This class gets executed when the Bot has shutdown
- * 
- * Verify if that what was shutdown was a duplicate session
- * or a normal session and if it should be restarted.
- */
-
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -18,6 +11,15 @@ import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
 import util.STATIC;
+
+/**
+ * This class gets executed when the Bot has shutdown
+ * 
+ * Verify if that what was shutdown was a duplicate session
+ * or a normal session and if it should be restarted.
+ * @author xHelixStorm
+ * 
+ */
 
 public class ShutdownListener extends ListenerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(ShutdownListener.class);

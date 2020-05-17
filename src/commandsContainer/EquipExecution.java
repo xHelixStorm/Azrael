@@ -8,12 +8,20 @@ import constructors.Cache;
 import constructors.Rank;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
+import util.STATIC;
+
+/**
+ * Addition to the equip command
+ * @author xHelixStorm
+ *
+ */
 
 public class EquipExecution {
 	public static void findGuild(PrivateMessageReceivedEvent e, List<String> guilds, final String filter) {
@@ -21,16 +29,12 @@ public class EquipExecution {
 		if(foundGuilds != null) {
 			if(foundGuilds.size() == 1) {
 				if(UserPrivs.comparePrivilege(e.getJDA().getGuildById(foundGuilds.get(0)).getMemberById(e.getAuthor().getId()), GuildIni.getEquipLevel(Long.parseLong(foundGuilds.get(0))))) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.blue).setTitle("Equip command").setDescription("Write one of the following available options to equip a weapon and/or skill. You have 3 minutes to select an option or use 'exit' to terminate!\n\n"
-							+ "**show**\n"
-							+ "**set**\n"
-							+ "**remove**\n"
-							+ "**remove-all**").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)).build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, foundGuilds.get(0)));
 				}
 				else {
-					EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-					e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(GuildIni.getEquipLevel(Long.parseLong(foundGuilds.get(0))), e.getJDA().getGuildById(foundGuilds.get(0)))).build()).queue();
+					EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DENIED));
+					e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention() + STATIC.getTranslation3(e.getAuthor(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(GuildIni.getEquipLevel(Long.parseLong(foundGuilds.get(0))), e.getJDA().getGuildById(foundGuilds.get(0)).getMemberById(e.getAuthor().getIdLong()))).build()).queue();
 				}
 			}
 			else {
@@ -42,7 +46,7 @@ public class EquipExecution {
 						out.append("**"+i+": "+e.getJDA().getGuildById(guild_id)+" ("+e.getJDA().getGuildById(guild_id).getId()+")**\n");
 					}
 					else {
-						out.append("**"+i+": "+e.getJDA().getGuildById(guild_id)+" ("+e.getJDA().getGuildById(guild_id).getId()+") PERMISSION DENIED**\n");
+						out.append("**"+i+": "+e.getJDA().getGuildById(guild_id)+" ("+e.getJDA().getGuildById(guild_id).getId()+") "+STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_DENIED)+"**\n");
 					}
 					if(i != foundGuilds.size())
 						thisGuilds += guild_id+"-";
@@ -51,16 +55,16 @@ public class EquipExecution {
 					i++;
 				}
 				try {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Select the server by sending a digit of the server you wish to edit your equipment! You have 3 minutes to select a server or write 'exit' to terminate!\n\n"+out.toString()).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SERVER_SELECT)+out.toString()).build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, thisGuilds, "wait"));
 				} catch(IllegalArgumentException iae) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("I'm active in too many servers to display the server selection page. Please either write the server name or the server id to directly select the server!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SERVER_SELECT_2)).build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, thisGuilds, "err"));
 				}
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Server(s) couldn't be found. Please retry").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_NO_SERVER_FOUND)).build()).queue();
 			var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 			Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 		}
@@ -71,22 +75,18 @@ public class EquipExecution {
 		if(selection >= 0 && selection < guild_ids.length) {
 			var guild_id = guild_ids[selection];
 			if(UserPrivs.comparePrivilege(e.getJDA().getGuildById(guild_id).getMemberById(e.getAuthor().getId()), GuildIni.getEquipLevel(Long.parseLong(guild_id)))) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.blue).setTitle("Equip command").setDescription("Write one of the following available options to equip a weapon and/or skill. You have 3 minutes to select an option or use 'exit' to terminate!\n\n"
-						+ "**show**\n"
-						+ "**set**\n"
-						+ "**remove**\n"
-						+ "**remove-all**").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.blue).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)).build()).queue();
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id));
 			}
 			else {
-				EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-				e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention() + " **My apologies young padawan. You don't have enough privileges to run this command on this server! Please select another\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(GuildIni.getEquipLevel(Long.parseLong(guild_id)), e.getJDA().getGuildById(guild_id))).build()).queue();
+				EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DENIED));
+				e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention() + STATIC.getTranslation3(e.getAuthor(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(GuildIni.getEquipLevel(Long.parseLong(guild_id)), e.getJDA().getGuildById(guild_id).getMember(e.getAuthor()))).build()).queue();
 				var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select a channel with a digit between 1 and "+guild_ids.length).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_ERR)).build()).queue();
 			var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 			Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 		}
@@ -111,7 +111,7 @@ public class EquipExecution {
 				user_details.setWeapon1(0);
 				Hashes.addRanking(guild+"_"+e.getAuthor().getId(), user_details);
 			}
-			weapon1 = "empty";
+			weapon1 = STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EMPTY);
 		}
 		if(weapon2.equals("expired")) {
 			if(RankingSystemItems.SQLRemoveEquippedWeapon(e.getAuthor().getIdLong(), guild, 2) == 0) {
@@ -122,7 +122,7 @@ public class EquipExecution {
 				user_details.setWeapon2(0);
 				Hashes.addRanking(guild+"_"+e.getAuthor().getId(), user_details);
 			}
-			weapon2 = "empty";
+			weapon2 = STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EMPTY);
 		}
 		if(weapon3.equals("expired")) {
 			if(RankingSystemItems.SQLRemoveEquippedWeapon(e.getAuthor().getIdLong(), guild, 3) == 0) {
@@ -133,7 +133,7 @@ public class EquipExecution {
 				user_details.setWeapon3(0);
 				Hashes.addRanking(guild+"_"+e.getAuthor().getId(), user_details);
 			}
-			weapon3 = "empty";
+			weapon3 = STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EMPTY);
 		}
 		if(skill.equals("expired")) {
 			if(RankingSystemItems.SQLRemoveEquippedSkill(e.getAuthor().getIdLong(), guild) == 0) {
@@ -144,14 +144,15 @@ public class EquipExecution {
 				user_details.setSkill(0);
 				Hashes.addRanking(guild+"_"+e.getAuthor().getId(), user_details);
 			}
-			skill = "empty";
+			skill = STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EMPTY);
 		}
 		
-		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Type a digit from 1 to 4 to select a slot and then equip a weapon or skill. Once completed, use 'exit' to close the item equipment. For every action, you have 3 minutes until it'll get terminated automatically.\nCurrent equipment:\n\n"
-				+ "slot 1 : **"+weapon1+"**\n"
-				+ "slot 2: **"+weapon2+"**\n"
-				+ "slot 3: **"+weapon3+"**\n"
-				+ "skill   : **"+skill+"**").build()).queue();
+		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EQUIPMENT)
+				+ STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SLOT_1).replace("{}", weapon1)
+				+ STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SLOT_2).replace("{}", weapon2)
+				+ STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SLOT_3).replace("{}", weapon3)
+				+ STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SLOT_4).replace("{}", skill))
+				.build()).queue();
 		Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id, action));
 	}
 	
@@ -163,14 +164,14 @@ public class EquipExecution {
 				user_details.setWeapon2(0);
 				user_details.setWeapon3(0);
 				user_details.setSkill(0);
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Unequipment successfull").setDescription("Weapons and skill have been successfully unequipped!").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_UNEQUIP_ALL)).build()).queue();
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Unequip error!").setDescription("An internal error occurred. Items couldn't be unequipped!").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Equipment empty!").setDescription("There is nothing to unequip!").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_UNEQUIP_ALL_EMPTY)).build()).queue();
 		}
 	}
 	
@@ -180,10 +181,10 @@ public class EquipExecution {
 			if(action.equals("set")) {
 				switch(selection) {
 					case 1, 2, 3 -> {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Weapon slot "+selection+" selected!").setDescription("Now type the name of the weapon! If more options appear, select one with a digit!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_TITLE_SLOT).replace("{}", ""+selection)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_WEAPON)).build()).queue();
 					}
 					case 4 -> {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Skill slot selected!").setDescription("Now type the name of the skill! If more options appear, select one with a digit!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_TITLE_SKILL)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_SKILL)).build()).queue();
 					}
 				}
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id, "set-"+selection));
@@ -202,35 +203,35 @@ public class EquipExecution {
 					if(RankingSystemItems.SQLUnequipWeapon(e.getAuthor().getIdLong(), guild, selection) > 0) {
 						switch(selection) {
 							case 1 -> {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Unequip sucessfull!").setDescription("Weapon has been unequipped!").build()).queue();
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_WEP_UNEQUIPPED)).build()).queue();
 								user_details.setWeapon1(0);
 							}
 							case 2 -> {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Unequip sucessfull!").setDescription("Weapon has been unequipped!").build()).queue();
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_WEP_UNEQUIPPED)).build()).queue();
 								user_details.setWeapon2(0);
 							}
 							case 3 -> {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Unequip sucessfull!").setDescription("Weapon has been unequipped!").build()).queue();
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_WEP_UNEQUIPPED)).build()).queue();
 								user_details.setWeapon3(0);
 							}
 							case 4 -> {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Unequip sucessfull!").setDescription("Skill has been unequipped!").build()).queue();
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_UNEQUIPPED)).build()).queue();
 								user_details.setSkill(0);
 							}
 						}
 						equipmentItemScreen(e, guild_id, "remove");
 					}
 					else
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Update failed!").setDescription("An internal error occurred and the item couldn't be unequipped!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Empty slot!").setDescription("You don't have anything equipped on this slot already!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SLOT_EMPTY)).build()).queue();
 					equipmentItemScreen(e, guild_id, "remove");
 				}
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select a slot with a digit between 1 and 4").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_DIGIT)).build()).queue();
 			var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 			Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 		}
@@ -259,22 +260,22 @@ public class EquipExecution {
 							}
 							Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
 							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-							e.getChannel().sendMessage(embed.setDescription("Weapon equipped!").build()).queue();
+							e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EQUIPPED)).build()).queue();
 							equipmentItemScreen(e, guild_id, "set");
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Weapon couldn't be equipped. Please retry later again!").build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
 							Hashes.clearTempCache("equip_us"+e.getAuthor().getId());
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("You have already equipped this weapon type! Please choose a different weapon or write 'return' to return to the slot selection!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED)).build()).queue();
 						var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 						Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 					}
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("You have already equipped this weapon! Please choose a different weapon or write 'return' to return to the slot selection!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED_2)).build()).queue();
 					var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 				}
@@ -291,11 +292,11 @@ public class EquipExecution {
 					sb.append("**"+index+": "+weapon.getDescription()+" "+weapon.getStat()+"**\n");
 					index++;
 				}
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Now select a digit to select the weapon you mean to equip!\n\n"+sb.toString()).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_WEAPON_2)+sb.toString()).build()).queue();
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id, "set-"+selection+"_"+items));
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Nothing has been found. Please double check if you have this weapon in your inventory and try again or write 'return' to return to the slot selection!").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_WEP_NOT_FOUND)).build()).queue();
 				var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 			}
@@ -311,16 +312,16 @@ public class EquipExecution {
 						user_details.setSkill(skill.getItemId());
 						Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
 						EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-						e.getChannel().sendMessage(embed.setDescription("Skill equipped!").build()).queue();
+						e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_EQUIPPED)).build()).queue();
 						equipmentItemScreen(e, guild_id, "set");
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Weapon couldn't be equipped. Please retry later again!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
 						Hashes.clearTempCache("equip_us"+e.getAuthor().getId());
 					}
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("You have already equipped this skill! Please choose a different skill or write 'return' to return to the slot selection!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_ALREADY_EQUIPPED)).build()).queue();
 					var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 				}
@@ -337,11 +338,11 @@ public class EquipExecution {
 					sb.append("**"+index+": "+skill.getDescription()+"**\n");
 					index++;
 				}
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Now select a digit to select the skill you mean to equip!\n\n"+sb.toString()).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_SKILL_2)+sb.toString()).build()).queue();
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id, "set-"+selection+"_"+items));
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Nothing has been found. Please double check if you have this skill in your inventory and try again or write 'return' to return to the slot selection!").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_SKILL_NOT_FOUND)).build()).queue();
 				var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 			}
@@ -371,22 +372,22 @@ public class EquipExecution {
 								}
 								Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
 								EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-								e.getChannel().sendMessage(embed.setDescription("Weapon equipped!").build()).queue();
+								e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EQUIPPED)).build()).queue();
 								equipmentItemScreen(e, guild_id, "set");
 							}
 							else {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Weapon couldn't be equipped. Please retry later again!").build()).queue();
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
 								Hashes.clearTempCache("equip_us"+e.getAuthor().getId());
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("You have already equipped this weapon type! Please choose a different weapon or write 'return' to return to the slot selection!").build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED)).build()).queue();
 							var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 							Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("You have already equipped this weapon! Please choose a different weapon or write 'return' to return to the slot selection!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED_2)).build()).queue();
 						var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 						Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 					}
@@ -399,16 +400,16 @@ public class EquipExecution {
 							user_details.setSkill(skill_id);
 							Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
 							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-							e.getChannel().sendMessage(embed.setDescription("Skill equipped!").build()).queue();
+							e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_EQUIPPED)).build()).queue();
 							equipmentItemScreen(e, guild_id, "set");
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Skill couldn't be equipped. Please retry later again!").build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
 							Hashes.clearTempCache("equip_us"+e.getAuthor().getId());
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("You have already equipped this skill! Please choose a different weapon or write 'return' to return to the slot selection!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_ALREADY_EQUIPPED)).build()).queue();
 						var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 						Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 					}
@@ -416,7 +417,7 @@ public class EquipExecution {
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Please select a channel with a digit between 1 and "+items.length).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_DIGIT)).build()).queue();
 			var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 			Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 		}

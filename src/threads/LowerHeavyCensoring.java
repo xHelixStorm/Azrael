@@ -4,8 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
+import enums.Translation;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
+import util.STATIC;
 
 public class LowerHeavyCensoring implements Runnable {
 	private final static Logger logger = LoggerFactory.getLogger(LowerHeavyCensoring.class);
@@ -29,7 +31,7 @@ public class LowerHeavyCensoring implements Runnable {
 						Hashes.addFilterThreshold(e.getGuild().getIdLong(), ""+(--count));
 						if(count == 29) {
 							var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("The heavy censoring has terminated the mute everyone level!").queue();
+							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.HEAVY_CENSORING_SOFT)).queue();
 						}
 					}
 				}

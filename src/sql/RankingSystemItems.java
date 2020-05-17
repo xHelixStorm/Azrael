@@ -265,7 +265,7 @@ public class RankingSystemItems {
 				return categories;
 			} catch (SQLException e) {
 				logger.error("SQLgetWeaponCategories Exception", e);
-				return categories;
+				return null;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -425,7 +425,7 @@ public class RankingSystemItems {
 				return weapons;
 			} catch (SQLException e) {
 				logger.error("SQLgetWholeWeaponShop Exception", e);
-				return weapons;
+				return null;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -462,7 +462,7 @@ public class RankingSystemItems {
 				return skills;
 			} catch (SQLException e) {
 				logger.error("SQLgetSkills Exception", e);
-				return skills;
+				return null;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }

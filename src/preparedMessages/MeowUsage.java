@@ -2,14 +2,18 @@ package preparedMessages;
 
 import java.util.ArrayList;
 
+import enums.Translation;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import util.STATIC;
+
 public class MeowUsage {
 
 	private static StringBuilder readMessage = new StringBuilder();
 	private static ArrayList <String> textCollector = new ArrayList<>();
 
-	public static String getMeowInfos(){
-		textCollector.add("Write these paramenters together with the H!meow command to display a cat picture\n\n");
-		textCollector.add("meow emojis:\n");
+	public static String getMeowInfos(GuildMessageReceivedEvent e) {
+		textCollector.add(STATIC.getTranslation(e.getMember(), Translation.MEOW_HELP));
+		textCollector.add(STATIC.getTranslation(e.getMember(), Translation.MEOW_HELP_1));
 		textCollector.add("`meow`, `art`, `attention`, ");
 		textCollector.add("`baker`, `bicycle`, `birthday`, ");
 		textCollector.add("`blonde`, `blue`, `box`, ");
@@ -29,14 +33,14 @@ public class MeowUsage {
 		textCollector.add("`string`, `study`, `unicorn`, ");
 		textCollector.add("`tumblr`, `viking`, `winkyface`, ");
 		textCollector.add("`wool`, `workout`, `wrapped`\n\n");
-		textCollector.add("Cat emojis with food:\n");
+		textCollector.add(STATIC.getTranslation(e.getMember(), Translation.MEOW_HELP_2));
 		textCollector.add("`cake`, `chickenwings`, `cookies`, ");
 		textCollector.add("`cupcake`, `diet`, `donut`, ");
 		textCollector.add("`fishy`, `hotchocolate`, `icecream`, ");
 		textCollector.add("`mcmeow`, `noodles`, `nutella`, ");
 		textCollector.add("`onigiri`, `pizza`, `sushy`, ");
 		textCollector.add("`sweetmountain`, `toast`\n\n");
-		textCollector.add("Parameters for a random cat:\n");
+		textCollector.add(STATIC.getTranslation(e.getMember(), Translation.MEOW_HELP_3));
 		textCollector.add("`random-emoji`, `random-food`, `random-meow`");
 		
 		for(String text : textCollector){

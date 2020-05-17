@@ -13,6 +13,7 @@ import com.vdurmont.emoji.EmojiParser;
 
 import constructors.Channels;
 import constructors.RSS;
+import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -240,14 +241,14 @@ public class TwitterModel {
 			        }
 				}
 				else {
-					e.getChannel().sendMessage("No tweet could be found").queue();
+					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.TWITTER_NO_TWEET)).queue();
 				}
 			} catch (TwitterException e1) {
 				logger.error("Error on retrieving feed!", e1);
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error on Twitter login!").setDescription("Please set up the config.ini file after creating a Twitter Bot on https://apps.twitter.com before using this command!").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_LOGIN_TWITTER)).build()).queue();
 		}
 	}
 }

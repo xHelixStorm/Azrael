@@ -1,19 +1,26 @@
 package commands;
 
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 import util.STATIC;
 import sql.Azrael;
+
+/**
+ * Display the top 10 ranking players
+ * @author xHelixStorm
+ *
+ */
 
 public class Top implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Top.class);
@@ -43,69 +50,61 @@ public class Top implements CommandPublic {
 		int user_level = 0;
 		int i = 0;
 		int page = 0;
-		boolean runTopList = false;
 		
-		if(args.length == 0){
+		if(args.length == 0) {
 			page = 1;
-			runTopList = true;
 		}
-		else if(args.length > 1 && args[0].equalsIgnoreCase("-page")) {
-			try {
-				page = Integer.parseInt(args[1]);
-				if(page < 1){page = 1;}
-			} catch(NumberFormatException nfe) {
+		else if(args.length >= 1) {
+			if(args[0].replaceAll("[0-9]*", "").length() == 0)
+				page = Integer.parseInt(args[0]);
+			else
 				page = 1;
+		}
+					
+		var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+		if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
+			ArrayList<constructors.Rank> rankList = RankingSystem.SQLRanking(guild_id);
+			constructors.Rank ranking1 = rankList.parallelStream().filter(r -> r.getUser_ID() == member_id).findAny().orElse(null);
+			rank = ranking1.getRank();
+			user_experience = ranking1.getExperience();
+			user_level = ranking1.getLevel();
+			
+			//always display the last page if an unreasonable page has been provided
+			int index = (page-1)*10;
+			while(index >= rankList.size()) {
+				index -= 10;
+				page --;
 			}
-			runTopList = true;
-		}
-		else if(args[0].equalsIgnoreCase("-help")){
-			e.getChannel().sendMessage("```To use this command, type H!top to show the top 10 ranking in this server.\nTo display other pages use H!top -page x.\nNote that it can't display pages where 10 users aren't listed!```").queue();
-		}
-		else{
-			e.getChannel().sendMessage("Please type **H!top -help** to display the command usage!").queue();
-		}
-					
-		if(runTopList == true){
-			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
-			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
-				ArrayList<constructors.Rank> rankList = RankingSystem.SQLRanking(guild_id);
-				constructors.Rank ranking1 = rankList.parallelStream().filter(r -> r.getUser_ID() == member_id).findAny().orElse(null);
-				rank = ranking1.getRank();
-				user_experience = ranking1.getExperience();
-				user_level = ranking1.getLevel();
-				
-				try {
-					//try to get the last entry of the page. if entry doesn't exist jump to catch clause
-					rankList.get(((page-1)*10)+9);
-					
-					//display the top ten of the current page
-					for(int iterate = (page-1)*10; iterate < page*10; iterate++) {
-						constructors.Rank ranking = rankList.get(iterate);
-						i = i + 1;
-						try {
-							name = e.getGuild().getMemberById(ranking.getUser_ID()).getUser().getName();
-						} catch (NullPointerException | ConcurrentModificationException e1){
-							name = "'user has left the guild'";
-						}
-						level = ranking.getLevel();
-						experience = ranking.getExperience();				
-						if(i == 10){
-							message.append("["+ranking.getRank()+"]\t> #"+name+"\n\t\t\t Level: "+level+"\t Experience: "+experience+"\n");
-							e.getChannel().sendMessage("```CMake\nRanking | User\n\n"+message.toString()+"\n"
-									+ "-------------------------------------\n #Personal information\n"
-									+ " Rank: "+rank+"\t Level: "+user_level+"\t Experience: "+user_experience+"\n\n \t\t\t<Page "+page+">```").queue();
-						}
-						else{
-							message.append("["+ranking.getRank()+"] \t> #"+name+"\n\t\t\t Level: "+level+"\t Experience: "+experience+"\n");
-						}
+			
+			//display the top ten of the current page
+			for(int iterate = index; iterate < page*10; iterate++) {
+				if(iterate < rankList.size()) {
+					constructors.Rank ranking = rankList.get(iterate);
+					i = i + 1;
+					Member member = e.getGuild().getMemberById(ranking.getUser_ID());
+					if(member != null)
+						name = member.getUser().getName();
+					else
+						name = STATIC.getTranslation(e.getMember(), Translation.TOP_USER_LEFT);
+					level = ranking.getLevel();
+					experience = ranking.getExperience();				
+					if(i == 10 || i == rankList.size()) {
+						message.append("["+(ranking.getRank() < 10 ? "0"+ranking.getRank() : ranking.getRank())+"] \t> #"+name+"\n\t\t\t Level: "+level+"\t Experience: "+experience+"\n");
+						e.getChannel().sendMessage("```CMake\n"+STATIC.getTranslation(e.getMember(), Translation.TOP_TITLE)+"\n\n"+message.toString()+"\n"
+							+ "-------------------------------------\n #"+STATIC.getTranslation(e.getMember(), Translation.TOP_PERSONAL_INFO)+"\n"
+							+ " "+STATIC.getTranslation(e.getMember(), Translation.TOP_RANK)+rank+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_LEVEL)+user_level+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_EXPERIENCE)+user_experience+"\n\n"+STATIC.getTranslation(e.getMember(), Translation.TOP_PAGE)+page+"```").queue();
 					}
-				} catch(IndexOutOfBoundsException ioobe) {
-					e.getChannel().sendMessage("There aren't at least 10 people on this page and hence it can not be displayed!").queue();
+					else {
+						message.append("["+(ranking.getRank() < 10 ? "0"+ranking.getRank() : ranking.getRank())+"] \t> #"+name+"\n\t\t\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_LEVEL)+level+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_EXPERIENCE)+experience+"\n");
+					}
+				}
+				else {
+					break;
 				}
 			}
-			else{
-				e.getChannel().sendMessage("Apologies young padawan but I'm not allowed to execute this command in this channel. Please retry in "+STATIC.getChannels(bot_channels)).queue();
-			}
+		}
+		else{
+			e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.NOT_BOT_CHANNEL)+STATIC.getChannels(bot_channels)).queue();
 		}
 	}
 

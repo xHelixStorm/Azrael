@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Rank;
+import enums.Translation;
 import fileManagement.IniFileReader;
 import gif.GifDecoder;
 import gif.GifSequenceWriter;
@@ -34,6 +35,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.RankingSystem;
+import util.STATIC;
 
 public class RankingMethods extends ListenerAdapter {
 	//Class for drawing level ups, ranks and profiles basing on the user settings
@@ -126,16 +128,19 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			final File file1 = new File(IniFileReader.getTempDirectory()+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeLevel());
-			if(file1.length() > 8000000) {
-				e.getChannel().sendMessage("Request is being processed. Please wait...").queue(message -> {
+			if(file1.length() > 8000000 && e.getGuild().getBoostCount() < 15) {
+				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
 					try {
 						String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("level", "level_compressed")};
 						final var output = GifOptimizer.startGifOptimization(args);
 						if(output == null) {
 							file1.delete();
 							message.delete().queue();
-							final File file2 = new File(IniFileReader.getTempDirectory()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeProfile());
+							final File file2 = new File(IniFileReader.getTempDirectory()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeLevel());
 							e.getChannel().sendFile(file2, "level_up."+user_details.getFileTypeLevel()).queue(complete -> {
+								file2.delete();
+							}, error -> {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
 								file2.delete();
 							});;
 						}
@@ -143,7 +148,7 @@ public class RankingMethods extends ListenerAdapter {
 						logger.error("Compression error for file {}", user_details.getLevelDescription()+user_details.getFileTypeLevel(), e1);
 						file1.delete();
 						message.delete().queue();
-						e.getChannel().sendMessage(new EmbedBuilder().setTitle("Error!").setDescription("File couldn't be compressed! Command aborted!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
 					}
 				});
 			}
@@ -152,6 +157,7 @@ public class RankingMethods extends ListenerAdapter {
 				file1.delete();
 			}
 		} catch (IOException e1) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).build()).queue();
 			logger.error("RankUp couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
@@ -254,24 +260,27 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			final File file1 = new File(IniFileReader.getTempDirectory()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeRank());
-			if(file1.length() > 8000000) {
-				e.getChannel().sendMessage("Request is being processed. Please wait...").queue(message -> {
+			if(file1.length() > 8000000 && e.getGuild().getBoostCount() < 15) {
+				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
 					try {
 						String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("rank", "rank_compressed")};
 						final var output = GifOptimizer.startGifOptimization(args);
 						if(output == null) {
 							file1.delete();
 							message.delete().queue();
-							final File file2 = new File(IniFileReader.getTempDirectory()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeProfile());
+							final File file2 = new File(IniFileReader.getTempDirectory()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeRank());
 							e.getChannel().sendFile(file2, "rank."+user_details.getFileTypeLevel()).queue(complete -> {
 								file2.delete();
-							});;
+							}, error -> {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+								file2.delete();
+							});
 						}
 					} catch(IOException | DataFormatException e1) {
+						e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
 						logger.error("Compression error for file {}", user_details.getRankDescription()+user_details.getFileTypeRank(), e1);
 						file1.delete();
 						message.delete().queue();
-						e.getChannel().sendMessage(new EmbedBuilder().setTitle("Error!").setDescription("File couldn't be compressed! Command aborted!").build()).queue();
 					}
 				});
 			}
@@ -280,6 +289,7 @@ public class RankingMethods extends ListenerAdapter {
 				file1.delete();
 			}
 		} catch (IOException e1) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).build()).queue();
 			logger.error("Rank couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
@@ -477,8 +487,8 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			final File file1 = new File(IniFileReader.getTempDirectory()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeProfile());
-			if(file1.length() > 8000000) {
-				e.getChannel().sendMessage("Request is being processed. Please wait...").queue(message -> {
+			if(file1.length() > 8000000 && e.getGuild().getBoostCount() < 15) {
+				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
 					try {
 						String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("profile", "profile_compressed")};
 						final var output = GifOptimizer.startGifOptimization(args);
@@ -488,13 +498,16 @@ public class RankingMethods extends ListenerAdapter {
 							final File file2 = new File(IniFileReader.getTempDirectory()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+user_details.getFileTypeProfile());
 							e.getChannel().sendFile(file2, "profile."+user_details.getFileTypeLevel()).queue(complete -> {
 								file2.delete();
+							}, error -> {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+								file2.delete();
 							});;
 						}
 					} catch(IOException | DataFormatException e1) {
+						e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
 						logger.error("Compression error for file {}", user_details.getProfileDescription()+user_details.getFileTypeProfile(), e1);
 						file1.delete();
 						message.delete().queue();
-						e.getChannel().sendMessage(new EmbedBuilder().setTitle("Error!").setDescription("File couldn't be compressed! Command aborted!").build()).queue();
 					}
 				});
 			}
@@ -503,6 +516,7 @@ public class RankingMethods extends ListenerAdapter {
 				file1.delete();
 			}
 		} catch (IOException e1) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).build()).queue();
 			logger.error("Profile couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}

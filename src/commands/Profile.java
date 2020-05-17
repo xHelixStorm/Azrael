@@ -1,11 +1,5 @@
 package commands;
 
-/**
- * The Profile command prints the current profile of a user
- * depending on the selected skin. It's possible to display
- * the profile page of someone else by mentioning
- */
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -17,6 +11,7 @@ import constructors.Cache;
 import constructors.Guilds;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -25,6 +20,14 @@ import rankingSystem.RankingMethods;
 import sql.Azrael;
 import sql.RankingSystem;
 import util.STATIC;
+
+/**
+ * The Profile command prints the current profile of a user
+ * depending on the selected skin. It's possible to display
+ * the profile page of someone else by mentioning
+ * @author xHelixStorm
+ *
+ */
 
 public class Profile implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Profile.class);
@@ -50,7 +53,7 @@ public class Profile implements CommandPublic {
 		
 		//don't print the profile image, if a bot channel exists but the current channel isn't a bot channel
 		if(this_channel == null && bot_channels.size() > 0) {
-			e.getChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
+			e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.NOT_BOT_CHANNEL)+STATIC.getChannels(bot_channels)).queue();
 		}
 		else {
 			long user = 0;
@@ -137,24 +140,24 @@ public class Profile implements CommandPublic {
 							RankingMethods.getProfile(e, name, avatar, convertedExperience, rank, (int)currentExperience, (int)rankUpExperience, guild_settings.getThemeID(), user_details);
 						}
 						else {
-							EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
-							e.getChannel().sendMessage(error.setDescription("An error occured on use. Please contact an administrator or moderator!").build()).queue();
+							EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+							e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							RankingSystem.SQLInsertActionLog("critical", user_id, guild_id, "negative experience value", "The user has less experience points in proportion to his level: "+currentExperience);
-							logger.error("Negative experience valur for {} in guild {}", user_id, e.getGuild().getName());
+							logger.error("Negative experience value for {} in guild {}", user_id, e.getGuild().getName());
 						}
 					}
 					else {
-						EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle("An error occured!");
-						e.getChannel().sendMessage(error.setDescription("Default skins aren't defined. Please contact an administrator!").build()).queue();
+						EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
+						e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_DEFAULT_SKIN)).build()).queue();
 						logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 					}
 				}
 				else{
-					e.getChannel().sendMessage("This command is currently having a cooldown, please try again later").queue();
+					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.COOLDOWN)).queue();
 				}
 			}
 			else {
-				e.getChannel().sendMessage("**The ranking system is disabled. Please contact an administrator to enable the feature!**").queue();
+				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).queue();
 			}
 		}
 	}

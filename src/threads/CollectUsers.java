@@ -6,11 +6,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 import sql.RankingSystem;
+import util.STATIC;
 
 public class CollectUsers implements Runnable {
 	private final static Logger logger = LoggerFactory.getLogger(CollectUsers.class);
@@ -33,6 +35,6 @@ public class CollectUsers implements Runnable {
 			RankingSystem.SQLBulkInsertUserDetails(members, 0, 0, guild_settings.getStartCurrency(), 0);
 		}
 		logger.debug("{} has registered all users from the guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
-		e.getChannel().sendMessage(message.setDescription("User registration is complete!").build()).queue();
+		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_REGISTER_COMPLETE)).build()).queue();
 	}
 }

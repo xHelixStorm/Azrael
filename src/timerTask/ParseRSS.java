@@ -54,7 +54,7 @@ public class ParseRSS extends TimerTask{
 				}
 			}
 			else {
-				if(GuildIni.getRssCommand(guild_id)) {
+				if(GuildIni.getSubscribeCommand(guild_id)) {
 					Azrael.SQLgetRSSFeeds(guild_id);
 					Azrael.SQLgetChannels(guild_id);
 				}

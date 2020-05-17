@@ -10,6 +10,7 @@ import constructors.Cache;
 import constructors.Guilds;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import interfaces.CommandPublic;
@@ -18,6 +19,12 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 import sql.RankingSystem;
 import util.STATIC;
+
+/**
+ * Purchase items, skins and more from the shop
+ * @author xHelixStorm
+ *
+ */
 
 public class Shop implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Shop.class);
@@ -40,24 +47,16 @@ public class Shop implements CommandPublic {
 		if(guild_settings.getRankingState()) {
 			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Welcome, step in!").setThumbnail(IniFileReader.getShopThumbnail())
-						.setDescription("Welcome to my shop! Have a look around! Write out the section that you wish to take a closer look into and type 'exit' when you wish to leave!\n\n"
-								+ "**level ups\n"
-								+ "ranks\n"
-								+ "profiles\n"
-								+ "icons\n"
-								+ "items\n"
-								+ "weapons\n"
-								+ "skills**").build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.SHOP_TITLE)).setThumbnail(IniFileReader.getShopThumbnail())
+					.setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP)).build()).queue();
 				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
 			}
 			else{
-				e.getChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
-				logger.warn("Shop command used in a not bot channel");
+				e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.NOT_BOT_CHANNEL)+STATIC.getChannels(bot_channels)).queue();
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Ranking system isn't enabled! Please ask an administrator to enable it before executing!").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 		}
 	}
 

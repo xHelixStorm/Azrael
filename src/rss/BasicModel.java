@@ -13,10 +13,12 @@ import com.vdurmont.emoji.EmojiParser;
 
 import constructors.Channels;
 import constructors.RSS;
+import enums.Translation;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import util.STATIC;
 
 public class BasicModel {
 	private static final Logger logger = LoggerFactory.getLogger(BasicModel.class);
@@ -125,7 +127,7 @@ public class BasicModel {
 				e.getChannel().sendMessage(outMessage).queue();
 			}
 			else {
-				e.getChannel().sendMessage("No feed could be found").queue();
+				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RSS_NO_FEED)).queue();
 			}
 			in.close();
 		} catch (IOException e1) {

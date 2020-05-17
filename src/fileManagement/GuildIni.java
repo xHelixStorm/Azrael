@@ -89,7 +89,6 @@ public class GuildIni {
 		
 		//collect all Commands variables
 		commands.put("About", "false");
-		commands.put("Commands", "false");
 		commands.put("Daily", "false");
 		commands.put("Display", "false");
 		commands.put("Help", "false");
@@ -108,7 +107,7 @@ public class GuildIni {
 		commands.put("Filter", "false");
 		commands.put("Quiz", "false");
 		commands.put("RoleReaction", "false");
-		commands.put("Rss", "false");
+		commands.put("Subscribe", "false");
 		commands.put("Randomshop", "false");
 		commands.put("Patchnotes", "false");
 		commands.put("DoubleExperience", "false");
@@ -155,7 +154,6 @@ public class GuildIni {
 		commandLevels.put("SetPrivilege", "20");
 		commandLevels.put("SetChannelFilter", "20");
 		commandLevels.put("SetWarnings", "20");
-		commandLevels.put("SetCommands", "20");
 		commandLevels.put("SetRanking", "20");
 		commandLevels.put("SetMaxExperience", "20");
 		commandLevels.put("SetDefaultLevelSkin", "20");
@@ -199,7 +197,7 @@ public class GuildIni {
 		commandLevels.put("FilterTweetBlacklist", "20");
 		commandLevels.put("Quiz", "1");
 		commandLevels.put("RoleReaction", "1");
-		commandLevels.put("Rss", "1");
+		commandLevels.put("Subscribe", "1");
 		commandLevels.put("Randomshop", "1");
 		commandLevels.put("Patchnotes", "1");
 		commandLevels.put("DoubleExperience", "1");
@@ -546,14 +544,6 @@ public class GuildIni {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "About", int.class);
 	}
-	public static boolean getCommandsCommand(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("Commands", "Commands", boolean.class);
-	}
-	public static int getCommandsLevel(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "Commands", int.class);
-	}
 	public static int getCommandsAdminLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "CommandsAdmin", int.class);
@@ -713,10 +703,6 @@ public class GuildIni {
 	public static int getSetWarningsLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "SetWarnings", int.class);
-	}
-	public static int getSetCommandsLevel(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "SetCommands", int.class);
 	}
 	public static int getSetRankingLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
@@ -918,13 +904,13 @@ public class GuildIni {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "RoleReaction", int.class);
 	}
-	public static boolean getRssCommand(long guild_id) {
+	public static boolean getSubscribeCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("Commands", "Rss", boolean.class);
+		return ini.get("Commands", "Subscribe", boolean.class);
 	}
-	public static int getRssLevel(long guild_id) {
+	public static int getSubscribeLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "Rss", int.class);
+		return ini.get("CommandLevels", "Subscribe", int.class);
 	}
 	public static boolean getRandomshopCommand(long guild_id) {
 		Ini ini = readIni(guild_id);

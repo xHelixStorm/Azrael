@@ -1,6 +1,6 @@
 package constructors;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public class Messages {
 	private long user_id;
@@ -10,7 +10,7 @@ public class Messages {
 	private String channel_name;
 	private String message;
 	private long message_id;
-	private LocalDateTime time;
+	private ZonedDateTime time;
 	private boolean edit;
 	
 	public void setUserID(long _user_id) {
@@ -34,8 +34,8 @@ public class Messages {
 	public void setMessageID(long _message_id) {
 		this.message_id = _message_id;
 	}
-	public void setTime(LocalDateTime _time) {
-		this.time = _time;
+	public void setTime(ZonedDateTime _zonedDateTime) {
+		this.time = _zonedDateTime;
 	}
 	public void setIsEdit(boolean _edit) {
 		this.edit = _edit;
@@ -62,7 +62,7 @@ public class Messages {
 	public long getMessageID() {
 		return this.message_id;
 	}
-	public LocalDateTime getTime() {
+	public ZonedDateTime getTime() {
 		return this.time;
 	}
 	public boolean isEdit() {

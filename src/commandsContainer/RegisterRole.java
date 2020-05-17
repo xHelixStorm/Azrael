@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Roles;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,114 +18,116 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.DiscordRoles;
 import util.STATIC;
 
+/**
+ * Extension of the register command
+ * @author xHelixStorm
+ *
+ */
+
 public class RegisterRole {
 	private static final Logger logger = LoggerFactory.getLogger(RegisterRole.class);
-	private static EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
 	
-	public static void RegisterRoleHelper(GuildMessageReceivedEvent _e){
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register various roles to create a an Administrator to User hierarchy for the bot!");
+	public static void RegisterRoleHelper(GuildMessageReceivedEvent e){
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
 		StringBuilder strB = new StringBuilder();
-		String parseMessage = null;
 		
-		final String prefix = GuildIni.getCommandPrefix(_e.getGuild().getIdLong());
-		parseMessage = "Please write the command in this format:\n**"+prefix+"register -role <role_type> role-id**\n\nRole-ids can be displayed with the command **"+prefix+"display -roles**.\n"
-				+ "At the end of the command, the persistant parameter can be added to make a reaction role not removable with the rolereaction command.\n"
-				+ "Here are all available role_types:\n\n";
-		for(Roles categories : DiscordRoles.SQLgetCategories()){
-			strB.append("**"+categories.getCategory_ABV()+"** for the **"+categories.getCategory_Name()+"** role\n");
+		final var roles = DiscordRoles.SQLgetCategories();
+		if(roles != null) {
+			for(Roles categories : DiscordRoles.SQLgetCategories()){
+				strB.append("**"+categories.getCategory_ABV()+"** "+categories.getCategory_Name()+"\n");
+			}
+			if(strB.length() > 0) {
+				e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_HELP)+strB.toString()).build()).queue();
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_NO_TYPES)).build()).queue();
+			}
 		}
-		_e.getChannel().sendMessage(messageBuild.setDescription(parseMessage+strB.toString()).build()).queue();
+		else {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Role types couldn't be retrieved from DIscordRoles.roles_category for guild {}", e.getGuild().getId());
+		}
 	}
 	
-	public static void runCommandWithAdminFirst(GuildMessageReceivedEvent _e, long _guild_id, String [] _args, boolean adminPermission){
+	public static void runCommandWithAdminFirst(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission){
 		String category_abv = null;
 		String role;
 		String role_name;
 		long role_id;
 		
 		if(adminPermission) {
-			if(_args.length > 2 && _args[1].equalsIgnoreCase("adm")) {
+			if(_args.length == 3 && _args[1].equalsIgnoreCase("adm")) {
 				category_abv = "adm";
 				role = _args[2].replaceAll("[^0-9]*", "");
-				if(role.length() == 18) {
-					try {
-						role_id = Long.parseLong(role);
-						role_name = _e.getGuild().getRoleById(role_id).getName();
-						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, STATIC.getLevel(category_abv), role_name, category_abv, false) > 0) {
-							logger.debug("Administrator role registered {} for guild {}", role_id, _e.getGuild().getName());
-							_e.getChannel().sendMessage("**The primary Administrator role has been registered!**").queue();
-							Hashes.removeDiscordRoles(_e.getGuild().getIdLong());
-							DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong());
-						}
-						else {
-							logger.error("Role {} couldn't be registered into DiscordRoles.roles for the guild {}", role_id, _e.getGuild().getName());
-							_e.getChannel().sendMessage("An internal error occurred. Role "+role_id+" couldn't be registered into DiscordRoles.roles table").queue();
-						}
-					} catch(NullPointerException npe) {
-						_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();
+				if(e.getGuild().getRoleById(role) != null) {
+					role_id = Long.parseLong(role);
+					role_name = e.getGuild().getRoleById(role_id).getName();
+					if(DiscordRoles.SQLInsertRole(_guild_id, role_id, STATIC.getLevel(category_abv), role_name, category_abv, false) > 0) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_ADM_ADDED)).build()).queue();
+						logger.debug("Administrator role registered {} for guild {}", role_id, e.getGuild().getId());
+						Hashes.removeDiscordRoles(e.getGuild().getIdLong());
+						DiscordRoles.SQLgetRoles(e.getGuild().getIdLong());
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Role {} couldn't be registered into DiscordRoles.roles for the guild {}", role_id, e.getGuild().getId());
 					}
 				}
 			}
 			else{
-				_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Please start with assigning an administrator role or recheck the syntax!").queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_INVALID_PARAM)).build()).queue();
 			}
 		}
 		else {
-			_e.getChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
+			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_REQUIRED)).build()).queue();
 		}
 	}
 
-	public static void runCommand(GuildMessageReceivedEvent _e, long _guild_id, String [] _args, boolean adminPermission){
+	public static void runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission) {
 		String category_abv = null;
 		String role;
 		String role_name;
 		long role_id;
 		
-		if(UserPrivs.comparePrivilege(_e.getMember(), GuildIni.getRegisterRoleLevel(_e.getGuild().getIdLong())) || adminPermission) {
+		if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getRegisterRoleLevel(e.getGuild().getIdLong())) || adminPermission) {
 			Pattern pattern = Pattern.compile("(adm|mod|com|bot|mut|rea|boo)");
 			Matcher matcher = pattern.matcher(_args[1].toLowerCase());
-			if(_args.length > 2 && matcher.find()){
+			if(_args.length > 2 && matcher.find()) {
 				category_abv = matcher.group();
 				role = _args[2].replaceAll("[^0-9]*", "");
-				if(role.length() == 18){
-					try {
-						role_id = Long.parseLong(role);
-						role_name = _e.getGuild().getRoleById(role_id).getName();
-						var level = STATIC.getLevel(category_abv);
-						boolean persistant = false;
-						if(_args.length == 4 && _args[3].equals("persistant"))
-							persistant = true;
-						else if(_args.length >= 4) {
-							_e.getChannel().sendMessage("Parameter **"+_args[3]+"** doesn't exist!").queue();
-							return;
+				if(e.getGuild().getRoleById(role) != null) {
+					role_id = Long.parseLong(role);
+					role_name = e.getGuild().getRoleById(role_id).getName();
+					var level = STATIC.getLevel(category_abv);
+					boolean persistant = true;
+					if(category_abv.equals("rea"))
+						persistant = false;
+					if(DiscordRoles.SQLInsertRole(_guild_id, role_id, level, role_name, category_abv, persistant) > 0) {
+						logger.debug("{} has registered the role {} with the category {} in guild {}", e.getMember().getUser().getId(), role_name, category_abv, e.getGuild().getId());
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_ADDED)).build()).queue();
+						Hashes.removeDiscordRoles(e.getGuild().getIdLong());
+						if(category_abv.equals("rea")) {
+							Hashes.removeReactionRoles(e.getGuild().getIdLong());
 						}
-						if(DiscordRoles.SQLInsertRole(_guild_id, role_id, level, role_name, category_abv, persistant) > 0) {
-							logger.debug("{} has registered the role {} with the category {} in guild {}", _e.getMember().getUser().getId(), role_name, category_abv, _e.getGuild().getId());
-							_e.getChannel().sendMessage("**The role has been registered!**").queue();
-							Hashes.removeDiscordRoles(_e.getGuild().getIdLong());
-							if(category_abv.equals("rea")) {
-								Hashes.removeReactionRoles(_e.getGuild().getIdLong());
-							}
-							DiscordRoles.SQLgetRoles(_e.getGuild().getIdLong());
-						}
-						else {
-							logger.error("Role {} couldn't be registered into DiscordRoles.roles for the guild {}", role_id, _e.getGuild().getName());
-							_e.getChannel().sendMessage("An internal error occurred. Role "+role_id+" couldn't be registered into DiscordRoles.roles table").queue();
-						}
-					} catch(NullPointerException npe){
-						_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();
+						DiscordRoles.SQLgetRoles(e.getGuild().getIdLong());
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Role {} couldn't be registered into DiscordRoles.roles for the guild {}", role_id, e.getGuild().getId());
 					}
 				}
 				else{
-					_e.getChannel().sendMessage(_e.getMember().getAsMention()+" The role id has to be 18 digits long. Execution interrupted!").queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_ROLE_ID)).build()).queue();
 				}
 			}
 			else{
-				_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Something went wrong. Please recheck the syntax!").queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
 		else {
-			_e.getChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:").build()).queue();
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
+			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(GuildIni.getRegisterRoleLevel(_guild_id), e.getMember())).build()).queue();
 		}
 	}
 }

@@ -1,11 +1,5 @@
 package commands;
 
-/**
- * The Mute command allows the one who utilizes it to mute
- * multiple users from a server at the same time. A reason
- * can be applied in the end as well.
- */
-
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -15,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -23,6 +18,15 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 import sql.DiscordRoles;
+import util.STATIC;
+
+/**
+ * The Mute command allows the one who utilizes it to mute
+ * multiple users from a server at the same time. A reason
+ * can be applied in the end as well.
+ * @author xHelixStorm
+ *
+ */
 
 public class Mute implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Mute.class);
@@ -46,10 +50,12 @@ public class Mute implements CommandPublic {
 		if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 			//print the help message for this command
 			if(args.length == 0) {
-				e.getChannel().sendMessage("Write this command together with multiple user IDs or user names with discriminators to mute them at the same time. As last parameter, a reason can be applied as well!").queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MUTE_HELP)).build()).queue();
 			}
 			//mute all users that have passed in the parameters
 			else {
+				final String nameNotExists = STATIC.getTranslation(e.getMember(), Translation.MUTE_NAME_NOT_EXISTS);
+				final String idNotExists = STATIC.getTranslation(e.getMember(), Translation.MUTE_ID_NOT_EXISTS);
 				args = e.getMessage().getContentRaw().substring(GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length()+5).split(" ");
 				boolean userFound = false;
 				StringBuilder reason = new StringBuilder();
@@ -69,12 +75,12 @@ public class Mute implements CommandPublic {
 							userFound = true;
 						}
 						else {
-							e.getChannel().sendMessage("The user **"+argument+"** doesn't exist on this server!").queue();
+							e.getChannel().sendMessage(nameNotExists.replace("{}", argument)).queue();
 						}
 					}
 					//execute this block if a user id has been passed
-					else if(argument.matches("([0-9]{17,18}|<@[0-9]{17,18}>)")) {
-						Member member = e.getGuild().getMemberById(argument.replaceAll("[<@>]*", ""));
+					else if(argument.matches("([0-9]{17,18}|<(@|@!)[0-9]{17,18}>)")) {
+						Member member = e.getGuild().getMemberById(argument.replaceAll("[<@!>]*", ""));
 						//confirm that this member is still present in the server
 						if(member != null) {
 							//already inserted users shouldn't be muted twice
@@ -83,7 +89,7 @@ public class Mute implements CommandPublic {
 							userFound = true;
 						}
 						else {
-							e.getChannel().sendMessage("The user with the id number **"+argument+"** doesn't exist on this server!").queue();
+							e.getChannel().sendMessage(idNotExists.replace("{}", argument)).queue();
 						}
 					}
 					else if(userFound) {
@@ -92,7 +98,7 @@ public class Mute implements CommandPublic {
 					}
 					else {
 						//interrupt command. Start parameter isn't correct
-						e.getChannel().sendMessage("Please provide one or more existing usernames or user IDs and then a reason if desired!").queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.MUTE_ERR)).build()).queue();
 						break;
 					}
 				}
@@ -109,28 +115,29 @@ public class Mute implements CommandPublic {
 								//verify that this user isn't already muted
 								if(!UserPrivs.isUserMuted(member)) {
 									//mute this user
-									var applyReason = (reason.toString().length() > 0 ? reason.toString() : "No reason has been provided!");
+									var applyReason = (reason.toString().length() > 0 ? reason.toString() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON));
 									Azrael.SQLInsertHistory(member.getUser().getIdLong(), e.getGuild().getIdLong(), "mute", applyReason, 0, "");
 									Hashes.addTempCache("mute_time_gu"+e.getGuild().getId()+"us"+member.getUser().getId(), new Cache(e.getMember().getId(), applyReason));
 									e.getGuild().addRoleToMember(member, e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
 								}
 								else {
-									e.getChannel().sendMessage("The user "+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+" is already muted!").queue();
+									e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.ALREADY_MUTED).replace("{}", member.getUser().getName()+"#"+member.getUser().getDiscriminator())).queue();
 								}
 							}
 							else {
-								e.getChannel().sendMessage("The user "+member.getUser().getName()+"#"+member.getUser().getDiscriminator()+" has higher privileges than myself and hence couldn't be muted!").queue();
+								e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.LOW_PRIVILEGES).replace("{}", member.getUser().getName()+"#"+member.getUser().getDiscriminator())).queue();
 							}
 						}
 					}
 					else {
-						e.getChannel().sendMessage("No mute role is registered! Please register a mute role before using this command!").queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_MUTE_ROLE)).build()).queue();
 					}
 				}
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("This command can't be used without the MANAGE_ROLES permission! Please enable and then try again!").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+			logger.warn("MANAGE_ROLES permission required to mute users for guild {}", e.getGuild().getId());
 		}
 	}
 

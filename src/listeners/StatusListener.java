@@ -1,17 +1,19 @@
 package listeners;
 
-/**
- * This class gets executed when a user changed his status (e.g. offline to online)
- * 
- * This class will either count all available members or it will display a game message
- */
-
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.events.user.update.UserUpdateOnlineStatusEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
+/**
+ * This class gets executed when a user changed his status (e.g. offline to online)
+ * 
+ * This class will either count all available members or it will display a game message
+ * @author xHelixStorm
+ * 
+ */
 
 public class StatusListener extends ListenerAdapter{
 	

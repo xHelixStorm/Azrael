@@ -1,14 +1,5 @@
 package listeners;
 
-/**
- * This class gets executed when a reaction has been added
- * to a message. 
- * 
- * It is either used to let users assign roles to themselves
- * through reactions or to switch pages of the inventory
- * or randomshop.
- */
-
 import java.awt.Color;
 
 import org.slf4j.Logger;
@@ -20,6 +11,7 @@ import commandsContainer.RandomshopExecution;
 import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import inventory.InventoryBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -31,6 +23,17 @@ import sql.RankingSystem;
 import sql.RankingSystemItems;
 import util.STATIC;
 import sql.Azrael;
+
+/**
+ * This class gets executed when a reaction has been added
+ * to a message. 
+ * 
+ * It is either used to let users assign roles to themselves
+ * through reactions or to switch pages of the inventory
+ * or randomshop.
+ * @author xHelixStorm
+ * 
+ */
 
 public class GuildMessageReactionAddListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageReactionAddListener.class);
@@ -116,62 +119,62 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 							else
 								logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());
 						}
-					}
-					
-					//check if a role has to be assigned
-					long role_id = 0;
-					boolean customEmoji = false;
-					if(e.getReactionEmote().getName().replaceAll("[a-zA-Z0-9]*", "").length() != 0)
-						role_id = DiscordRoles.SQLgetReactionRole(e.getMessageIdLong(), e.getReactionEmote().getAsCodepoints());
-					else {
-						role_id = DiscordRoles.SQLgetReactionRole(e.getMessageIdLong(), e.getReactionEmote().getName());
-						customEmoji = true;
-					}
-					if(role_id != 0) {
-						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-							e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(role_id)).queue();
-						}
+						
+						//check if a role has to be assigned
+						long role_id = 0;
+						boolean customEmoji = false;
+						if(e.getReactionEmote().getName().replaceAll("[a-zA-Z0-9]*", "").length() != 0)
+							role_id = DiscordRoles.SQLgetReactionRole(e.getMessageIdLong(), e.getReactionEmote().getAsCodepoints());
 						else {
-							printPermissionError(e);
+							role_id = DiscordRoles.SQLgetReactionRole(e.getMessageIdLong(), e.getReactionEmote().getName());
+							customEmoji = true;
 						}
-					}
-					
-					//check if this reaction has to be added into a different message of the bot
-					var cache = Hashes.getTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getUserId()+"me"+e.getMessageId());
-					if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
-						String channel_id = cache.getAdditionalInfo();
-						String message_id = cache.getAdditionalInfo2();
-						final boolean isEmojiCustom = customEmoji;
-						//check that the permissions are correct
-						if(e.getGuild().getSelfMember().hasPermission(e.getGuild().getTextChannelById(channel_id), Permission.MESSAGE_HISTORY)) {
-							if(e.getGuild().getSelfMember().hasPermission(e.getGuild().getTextChannelById(channel_id), Permission.MESSAGE_ADD_REACTION)) {
-								e.getGuild().getTextChannelById(channel_id).retrieveMessageById(message_id).queue(message -> {
-									String reaction = null;
-									//unicode emojis
-									if(!isEmojiCustom) {
-										reaction = e.getReactionEmote().getAsCodepoints();
-										message.addReaction(reaction).queue();
-									}
-									//user emojis
-									else {
-										reaction = e.getReactionEmote().getName();
-										message.addReaction(e.getReactionEmote().getEmote()).queue();
-									}
-									//ask the user if it should be combined with a role
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Reaction added! Do you want to combine it with a role?").addField("YES", "", true).addField("NO", "", true).build()).queue();
-									Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "RA1", message_id, reaction));
-								});
+						if(role_id != 0) {
+							if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(role_id)).queue();
 							}
 							else {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Permission missing!").setDescription("MESSAGE_ADD_REACTION permission required to add a reaction!").build()).queue();
-								logger.error("MESSAGE_ADD_REACTION permission missing for channel {} in guild {} to add a reaction", channel_id, e.getGuild().getId());
-								Hashes.clearTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getUserId()+"me"+e.getMessageId());
+								printPermissionError(e);
 							}
 						}
-						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Permission missing!").setDescription("MESSAGE_HISTORY permission required to find the message!").build()).queue();
-							logger.error("MESSAGE_HISTORY permission missing for channel {} in guild {} to read the history", channel_id, e.getGuild().getId());
-							Hashes.clearTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getUserId()+"me"+e.getMessageId());
+						
+						//check if this reaction has to be added into a different message of the bot
+						var cache = Hashes.getTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getUserId()+"me"+e.getMessageId());
+						if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
+							String channel_id = cache.getAdditionalInfo();
+							String message_id = cache.getAdditionalInfo2();
+							final boolean isEmojiCustom = customEmoji;
+							//check that the permissions are correct
+							if(e.getGuild().getSelfMember().hasPermission(e.getGuild().getTextChannelById(channel_id), Permission.MESSAGE_HISTORY)) {
+								if(e.getGuild().getSelfMember().hasPermission(e.getGuild().getTextChannelById(channel_id), Permission.MESSAGE_ADD_REACTION)) {
+									e.getGuild().getTextChannelById(channel_id).retrieveMessageById(message_id).queue(message -> {
+										String reaction = null;
+										//unicode emojis
+										if(!isEmojiCustom) {
+											reaction = e.getReactionEmote().getAsCodepoints();
+											message.addReaction(reaction).queue();
+										}
+										//user emojis
+										else {
+											reaction = e.getReactionEmote().getName();
+											message.addReaction(e.getReactionEmote().getEmote()).queue();
+										}
+										//ask the user if it should be combined with a role
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REACTION_ADDED)).addField(STATIC.getTranslation(e.getMember(), Translation.REACTION_REPLY_YES), "", true).addField(STATIC.getTranslation(e.getMember(), Translation.REACTION_REPLY_NO), "", true).build()).queue();
+										Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "RA1", message_id, reaction));
+									});
+								}
+								else {
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MESSAGE_ADD_REACTION.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+									logger.error("MESSAGE_ADD_REACTION permission missing for channel {} in guild {} to add a reaction", channel_id, e.getGuild().getId());
+									Hashes.clearTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getUserId()+"me"+e.getMessageId());
+								}
+							}
+							else {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MESSAGE_HISTORY.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+								logger.error("MESSAGE_HISTORY permission missing for channel {} in guild {} to read the history", channel_id, e.getGuild().getId());
+								Hashes.clearTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getUserId()+"me"+e.getMessageId());
+							}
 						}
 					}
 				}
@@ -245,7 +248,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 	 */
 	private static void printPermissionError(GuildMessageReactionAddEvent e) {
 		final var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-		if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Permission missing!").setDescription("Reaction role couldn't be applied for user **"+e.getUser().getName()+"#"+e.getUser().getDiscriminator()+"** with the id number **"+e.getUser().getId()+"** because the MANAGE ROLES permission is missing!").build()).queue();
+		if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replace("{}", e.getUserId())+Permission.MANAGE_ROLES.getName()).build()).queue();
 		logger.warn("MANAGE ROLES permission missing to apply reaction roles in guild {}!", e.getGuild().getId());
 	}
 }

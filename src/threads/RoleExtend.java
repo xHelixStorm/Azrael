@@ -14,18 +14,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
+import enums.Translation;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import sql.RankingSystem;
+import util.STATIC;
 import sql.DiscordRoles;
 import sql.Azrael;
 
 public class RoleExtend implements Runnable {
 	private final static Logger logger = LoggerFactory.getLogger(RoleExtend.class);
-	private final static EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle("Warned users can't run away even after a reboot!");
 	
 	private Guild guild;
 	
@@ -70,7 +71,8 @@ public class RoleExtend implements Runnable {
 			//display the amount of users that are still muted
 			if(banHammerFound == true && log_channel != null) {
 				logger.debug("Found muted users on start up in guild {}", guild.getId());
-				guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(i+" users were found muted on start up. The mute timer is restarting from where it stopped!"+(GuildIni.getOverrideBan(guild.getIdLong()) ? "\nExcluded are users that have been muted permanently on this server!" : "")).build()).queue();
+				EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_TITLE));
+				guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(i+STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT)+(GuildIni.getOverrideBan(guild.getIdLong()) ? STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_EXCLUDED) : "")).build()).queue();
 			}
 		}
 	}

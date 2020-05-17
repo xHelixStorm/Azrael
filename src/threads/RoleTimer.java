@@ -19,6 +19,7 @@ import constructors.Cache;
 import constructors.Channels;
 import core.Hashes;
 import enums.GoogleEvent;
+import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import google.GoogleUtils;
@@ -32,8 +33,6 @@ import util.STATIC;
 
 public class RoleTimer extends ListenerAdapter implements Runnable {
 	private final static Logger logger = LoggerFactory.getLogger(RoleTimer.class);
-	private final static EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle("User muted!");
-	private final static EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN).setThumbnail(IniFileReader.getUnmuteThumbnail()).setTitle("User unmuted!");
 	
 	private GuildMemberRoleAddEvent e;
 	private long timer;
@@ -79,6 +78,8 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 	
 	@Override
 	public void run() {
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTED_TITLE));
+		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN).setThumbnail(IniFileReader.getUnmuteThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_UNMUTED));
 		//collect current thread and assign a name to make interruptions possible, if required
 		STATIC.addThread(Thread.currentThread(), "mute_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 		message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
@@ -93,10 +94,10 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 				//print a muted user message if a log channel has been registered
 				if(channel != null) {
 					if(warning_id == 0 && max_warning_id == 0) {
-						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been muted with a custom mute time and will be unmuted in **"+hour_add+and_add+minute_add+"**!\nMuted by: "+issuer+"\nReason: "+reason).build()).queue();
+						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_MESSAGE_1).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", hour_add+and_add+minute_add).replace("{}", issuer)+reason).build()).queue();
 					}
 					else {
-						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been muted and will be unmuted in **"+hour_add+and_add+minute_add+"**!\nMuted by: "+issuer+"\nReason: "+reason+"\nWarning **"+warning_id+"**/**"+max_warning_id+"**").build()).queue();
+						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_MESSAGE_1).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", hour_add+and_add+minute_add).replace("{}", issuer)+reason).build()).queue();
 					}
 				}
 				//put the thread to wait for a determined time
@@ -105,7 +106,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 				if(!Azrael.SQLisBanned(user_id, guild_id) && Azrael.SQLgetMuted(user_id, guild_id)) {
 					timestamp = new Timestamp(System.currentTimeMillis());
 					if(channel != null) {
-						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted").build()).queue();
+						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.UNMUTE_MESSAGE).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 					}
 					//if the user is still present on the server, remove the mute role and assign back a ranking role, if available
 					if(e.getGuild().getMember(e.getMember().getUser()) != null) {
@@ -117,7 +118,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							if(assignedRole != 0)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
 						}
 						else {
-							if(channel != null) e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setTitle("Permission required!").setDescription("The mute role couldn't be removed from **"+user_name+"** with the id number **"+user_id+"** because the permission MANAGE ROLES is missing").build()).queue();
+							if(channel != null) e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.UNMUTE_REMOVE_ERR)+Permission.MANAGE_ROLES).build()).queue();
 							logger.warn("MANAGE ROLES permission required to remove the mute role in guild {}", guild_id);
 						}
 					}
@@ -130,7 +131,8 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild_id, "Mute role removed");
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
-								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), "", "", "NaN", null, null, "UNMUTED", null, "NaN", "NaN", null, null, GoogleEvent.UNMUTE.id, channel);
+								final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
+								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), "", "", NA, null, null, "UNMUTED", null, NA, NA, null, null, GoogleEvent.UNMUTE.id, channel);
 							}
 						}
 						else
@@ -145,7 +147,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 					if(channel != null) {
 						timestamp = new Timestamp(System.currentTimeMillis());
 						Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp);
-						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription("["+timestamp.toString()+"] **"+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator() + "** with the ID Number **" + e.getMember().getUser().getId() + "** has been unmuted and the timer has been interrupted!").build()).queue();
+						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.UNMUTE_MESSAGE_2).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 					}
 					//if the user is still present on the server, remove the mute role and assign back a ranking role, if available
 					Role role = null;
@@ -157,18 +159,19 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							if(role != null)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
 						}
 						else {
-							if(channel != null) e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setTitle("Permission required!").setDescription("The mute role couldn't be removed from **"+user_name+"** with the id number **"+user_id+"** because the permission MANAGE ROLES is missing").build()).queue();
+							if(channel != null) e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.UNMUTE_REMOVE_ERR)+Permission.MANAGE_ROLES).build()).queue();
 							logger.warn("MANAGE ROLES permission required to remove the mute role in guild {}", guild_id);
 						}
 					}
 					Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild_id, "Mute role removed");
 					//Run google service, if enabled
 					if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+						final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
 						final var cache = Hashes.getTempCache("unmute_gu"+guild_id+"us"+user_id);
-						String reporter_name = "NaN";
-						String reporter_username = "Nan";
-						String role_id = "NaN";
-						String role_name = "NaN";
+						String reporter_name = NA;
+						String reporter_username = NA;
+						String role_id = NA;
+						String role_name = NA;
 						if(cache != null) {
 							final var reporter = e.getGuild().getMemberById(cache.getAdditionalInfo());
 							if(reporter != null) {
@@ -181,14 +184,14 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							role_id = role.getId();
 							role_name = role.getName();
 						}
-						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, "NaN", null, null, "UNMUTED", null, role_id, role_name, null, null, GoogleEvent.UNMUTE.id, channel);
+						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, NA, null, null, "UNMUTED", null, role_id, role_name, null, null, GoogleEvent.UNMUTE.id, channel);
 					}
 				}
 			}
 		}
 		//print message of the user being permanently muted
 		else if(channel != null) {
-			e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription("["+timestamp.toString()+"] **"+user_name+ "** with the ID Number **" + e.getMember().getUser().getId() + "** has been muted without any expiration until further actions!\n Muted by: "+issuer+"\nReason: "+reason).build()).queue();
+			e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_MESSAGE_3).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", issuer)+reason).build()).queue();
 		}
 		//task completed! Remove this thread from the array of currently running threads
 		STATIC.removeThread(Thread.currentThread());

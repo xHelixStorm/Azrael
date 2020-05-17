@@ -1,5 +1,6 @@
 package commands;
 
+import java.awt.Color;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -9,13 +10,21 @@ import commandsContainer.RandomshopExecution;
 import constructors.Guilds;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
 import util.STATIC;
+
+/**
+ * Win weapons through the randomshop with various stats
+ * @author xHelixStorm
+ *
+ */
 
 public class Randomshop implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Randomshop.class);
@@ -41,18 +50,18 @@ public class Randomshop implements CommandPublic {
 				//run help and collect all possible parameters
 				RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), false));
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase("-play")) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase("play")) {
 				//start a round
 				RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), false), bundleArguments(args, 1));
 			}
-			else if(args[0].equalsIgnoreCase("-replay")) {
+			else if(args[0].equalsIgnoreCase("replay")) {
 				//play another round if a match occurred within 3 minutes
 				var cache = Hashes.getTempCache("randomshop_play_"+e.getMember().getUser().getId());
 				if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
 					RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), false), cache.getAdditionalInfo());
 				}
 				else {
-					e.getChannel().sendMessage("You haven't played one round yet or the last time you played was over 10 minutes ago. Please rewrite the full command").queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_REPLAY_ERR)).build()).queue();
 					if(cache != null)
 						Hashes.clearTempCache("randomshop_play_"+e.getMember().getUser().getId());
 				}

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Roles;
+import enums.Translation;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -16,6 +17,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.DiscordRoles;
 import sql.RankingSystem;
+import util.STATIC;
 
 public class UserPrivs {
 	final static private Logger logger = LoggerFactory.getLogger(UserPrivs.class);
@@ -117,7 +119,8 @@ public class UserPrivs {
 	 * @return list of roles
 	 */
 	
-	public static String retrieveRequiredRoles(int requiredLevel, Guild guild) {
+	public static String retrieveRequiredRoles(int requiredLevel, Member member) {
+		Guild guild = member.getGuild();
 		StringBuilder out = new StringBuilder();
 		for(final var role : guild.getRoles()) {
 			var currentRole = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getRole_ID() == role.getIdLong()).findAny().orElse(null);
@@ -133,7 +136,7 @@ public class UserPrivs {
 				}
 			}
 		}
-		return (out.length() > 0 ? out.toString() : "No roles available!");
+		return (out.length() > 0 ? out.toString() : STATIC.getTranslation(member, Translation.NO_ROLES));
 	}
 	
 	/**
@@ -162,7 +165,7 @@ public class UserPrivs {
 							if(rankingRole != null) {
 								//send message with the required role before the command can be used
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail())
-									.setDescription(e.getMember().getAsMention() + " Higher privileges are required. You will be able to use this command when you reach level **"+role.getLevel()+"** with the role " + rankingRole.getAsMention()).build()).queue();
+									.setDescription(STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_RANKING).replace("{}", ""+role.getLevel()) + rankingRole.getAsMention()).build()).queue();
 								return false;
 							}
 						}
@@ -183,6 +186,6 @@ public class UserPrivs {
 		//verify first if a ranking role can use the command, else print message with all allowed roles
 		if(evaluateRequiredRole(requiredLevel, e))
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail())
-				.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(requiredLevel, e.getGuild())).build()).queue();
+				.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE)+UserPrivs.retrieveRequiredRoles(requiredLevel, e.getMember())).build()).queue();
 	}
 }

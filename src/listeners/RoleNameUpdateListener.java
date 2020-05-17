@@ -8,9 +8,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.DiscordRoles;
 
 /**
- * 
- * @author xHelixStorm
  * Update role name on table
+ * @author xHelixStorm
  *
  */
 

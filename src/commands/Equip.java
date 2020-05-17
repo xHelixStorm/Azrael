@@ -1,10 +1,5 @@
 package commands;
 
-/**
- * The Equip command will allow a user to equip weapons
- * and skills in private message. 
- */
-
 import java.awt.Color;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import interfaces.CommandPrivate;
@@ -24,6 +20,14 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import sql.RankingSystem;
+import util.STATIC;
+
+/**
+ * The Equip command will allow a user to equip weapons
+ * and skills in private message. 
+ * @author xHelixStorm
+ *
+ */
 
 public class Equip implements CommandPublic, CommandPrivate {
 	private final static Logger logger = LoggerFactory.getLogger(Equip.class);
@@ -40,7 +44,7 @@ public class Equip implements CommandPublic, CommandPrivate {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		//print message to write the command in private message
-		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getMember().getAsMention()+" My apologies young padawan, please try to use this command in a private message to me by just writing '!equip'!").build()).queue();
+		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EQUIP_WRONG_CHANNEL).replace("{}", e.getGuild().getSelfMember().getAsMention())).build()).queue();
 	}
 
 	@Override
@@ -66,16 +70,12 @@ public class Equip implements CommandPublic, CommandPrivate {
 				//check if the user is allowed to use this command
 				if(UserPrivs.comparePrivilege(e.getJDA().getGuildById(mutualGuilds.get(0).getId()).getMemberById(e.getAuthor().getId()), GuildIni.getEquipLevel(mutualGuilds.get(0).getIdLong()))) {
 					//directly make the selection screen appear (e.g. show, set, etc)
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle("Equip command").setDescription("Write one of the following available options to equip/unequip a weapon and/or skill. You have 3 minutes to select an option or use 'exit' to terminate!\n\n"
-							+ "**show**\n"
-							+ "**set**\n"
-							+ "**remove**\n"
-							+ "**remove-all**").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)).build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, mutualGuilds.get(0).getId()));
 				}
 				else {
-					EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-					e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(GuildIni.getEquipLevel(mutualGuilds.get(0).getIdLong()), mutualGuilds.get(0))).build()).queue();
+					EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DENIED));
+					e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention()+STATIC.getTranslation3(e.getAuthor(), Translation.HIGHER_PRIVILEGES_ROLE)+UserPrivs.retrieveRequiredRoles(GuildIni.getEquipLevel(mutualGuilds.get(0).getIdLong()), mutualGuilds.get(0).getMemberById(e.getAuthor().getIdLong()))).build()).queue();
 				}
 			}
 			//if multiple guilds have been found
@@ -89,7 +89,7 @@ public class Equip implements CommandPublic, CommandPrivate {
 						out.append("**"+i+": "+guild.getName()+" ("+guild.getId()+")**\n");
 					}
 					else {
-						out.append("**"+i+": "+guild.getName()+" ("+guild.getId()+") PERMISSION DENIED**\n");
+						out.append("**"+i+": "+guild.getName()+" ("+guild.getId()+") "+STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_DENIED)+"**\n");
 					}
 					if(i != mutualGuilds.size())
 						guilds += guild.getId()+"-";
@@ -97,19 +97,19 @@ public class Equip implements CommandPublic, CommandPrivate {
 						guilds += guild.getId();
 					i++;
 				}
-				final var printMessage = "Select the server by sending a digit of the server you wish to edit your equipment! You have 3 minutes to select a server or write 'exit' to terminate!\n\n"+out.toString();
+				final var printMessage = STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SERVER_SELECT)+out.toString();
 				if(printMessage.length() <= 2048) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(printMessage).build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guilds, "wait"));
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("I'm active in too many servers to display the server selection page. Please either write the server name or the server id to directly select the server!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SERVER_SELECT_2)).build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guilds, "err"));
 				}
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getAuthor().getAsMention()+" The ranking system is disabled on all servers. Please contact an administrator to enable the feature!").build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getAuthor().getAsMention()+STATIC.getTranslation3(e.getAuthor(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 		}
 	}
 

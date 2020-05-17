@@ -2,14 +2,18 @@ package preparedMessages;
 
 import java.util.ArrayList;
 
+import enums.Translation;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import util.STATIC;
+
 public class PugUsage {
 	
 	private static StringBuilder readMessage = new StringBuilder();
 	private static ArrayList <String> textCollector = new ArrayList<>();
 
-	public static String getPugInfos(){
-		textCollector.add("Write these paramenters together with the H!pug command to \ndisplay a pug picture\n\n");
-		textCollector.add("Pug emojis:\n");
+	public static String getPugInfos(GuildMessageReceivedEvent e) {
+		textCollector.add(STATIC.getTranslation(e.getMember(), Translation.PUG_HELP));
+		textCollector.add(STATIC.getTranslation(e.getMember(), Translation.PUG_HELP_1));
 		textCollector.add("`pug`, `greet`, `showoff`, ");
 		textCollector.add("`annoyed`, `wink`, `sleep`, ");
 		textCollector.add("`stress`, `stormtrooper`, `cry`, ");
@@ -21,7 +25,7 @@ public class PugUsage {
 		textCollector.add("`smile`, `snowman`, `twitch`, ");
 		textCollector.add("`wub`, `pockie`, `ramune`, ");
 		textCollector.add("`wizard`\n\n");
-		textCollector.add("Pug emojis dressed as food and drinks:\n");
+		textCollector.add(STATIC.getTranslation(e.getMember(), Translation.PUG_HELP_2));
 		textCollector.add("`taco`, `burrito`, `bread`, ");
 		textCollector.add("`donut`, `pizza`, `fries`, ");
 		textCollector.add("`potato`, `lollipop`, `salmon`, ");
@@ -35,20 +39,20 @@ public class PugUsage {
 		textCollector.add("`pancake`, `pootloops`, `ramen`, ");
 		textCollector.add("`smores`, `starbucks`, `takiyaki`, ");
 		textCollector.add("`takoyaki`, `toastie`\n\n");
-		textCollector.add("Pug emojis dressed as marvel characters:\n");
+		textCollector.add(STATIC.getTranslation(e.getMember(), Translation.PUG_HELP_3));
 		textCollector.add("`ironman`, `captainamerica`, `thor`, ");
 		textCollector.add("`batman`, `catwoman`, `loki`, ");
 		textCollector.add("`storm`, `wolverine`, `wonderwoman`, ");
 		textCollector.add("`spiderman`, `deadpool`, `flash`, ");
 		textCollector.add("`superman`, `star-lord`\n\n");
-		textCollector.add("Overwatch pugs:\n");
+		textCollector.add(STATIC.getTranslation(e.getMember(), Translation.PUG_HELP_4));
 		textCollector.add("`bastion`, `dva`, `genji`, ");
 		textCollector.add("`hanzo`, `lucio`, `mccree`, ");
 		textCollector.add("`mei`, `mercy`, `reaper`, ");
 		textCollector.add("`soldier76`, `symmetra`, `tracer`, ");
 		textCollector.add("`widowmaker`, `winston`, `zarya`, ");
 		textCollector.add("`zenyatta`\n\n");
-		textCollector.add("Parameters for a random pug:\n");
+		textCollector.add(STATIC.getTranslation(e.getMember(), Translation.PUG_HELP_5));
 		textCollector.add("`random-emoji`, `random-food`, `random-marvel`, ");
 		textCollector.add("`random-pug`, `random-overwatch`");
 		

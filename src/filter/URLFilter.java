@@ -33,8 +33,10 @@ import org.slf4j.LoggerFactory;
 import constructors.Channels;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
@@ -87,7 +89,7 @@ public class URLFilter implements Runnable{
 							//Whitelist check, if this url should be ignored
 							var whitelist = Azrael.SQLgetURLWhitelist(guild_id);
 							if(whitelist == null || whitelist.parallelStream().filter(f -> fqdn.contains(f)).findAny().orElse(null) == null) {
-								printMessage(e, e2, fqdn, fullBlacklist, buildReplyMessageLang(lang), allChannels);
+								printMessage(e, e2, fqdn, fullBlacklist, buildReplyMessageLang(e.getGuild()), allChannels);
 								break;
 							}
 						}
@@ -99,7 +101,7 @@ public class URLFilter implements Runnable{
 									//check the url with the whitelist and don't delete message if found
 									var whitelist = Azrael.SQLgetURLWhitelist(guild_id);
 									if(whitelist == null || whitelist.parallelStream().filter(f -> fqdn.contains(f)).findAny().orElse(null) == null) {
-										printMessage(e, e2, fqdn, fullBlacklist, buildReplyMessageLang(lang), allChannels);
+										printMessage(e, e2, fqdn, fullBlacklist, buildReplyMessageLang(e.getGuild()), allChannels);
 										break;
 									}
 								}
@@ -118,7 +120,7 @@ public class URLFilter implements Runnable{
 						//confront link with the blacklist table and delete if found
 						var blacklist = Azrael.SQLgetURLBlacklist(guild_id);
 						if(blacklist != null && blacklist.size() > 0 && blacklist.parallelStream().filter(f -> foundURL.contains(f)).findAny().orElse(null) != null) {
-							printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(lang), allChannels);
+							printMessage(e, e2, foundURL, fullBlacklist, buildReplyMessageLang(e.getGuild()), allChannels);
 							break;
 						}
 					}
@@ -159,35 +161,11 @@ public class URLFilter implements Runnable{
 		}
 	}
 	
-	@SuppressWarnings("preview")
-	private static String [] buildReplyMessageLang(List<String> lang) {
+	private static String [] buildReplyMessageLang(Guild guild) {
 		String [] output = new String[3];
-		if(lang.size() == 1) {
-			//defined messages for german, french and the rest in english
-			switch(lang.get(0)) {
-				case "ger" -> {
-					output[0] = " Die Nachricht wurde wegen eines nicht erlaubten URL entfernt!";
-					output[1] = " Dies ist deine zweite Warnung. Eine weitere entfernte Nachricht und du wirst auf diesem Server **stumm geschaltet**!";
-					output[2] = " Die Eingabe von URLs ist auf diesem Kanal nicht gestattet! URL entfernt!";
-				}
-				case "fre" -> {
-					output[0] = " Le message a été supprimé pour l'affichage d'une url non autorisée !";
-					output[1] = " C'est votre deuxième avertissement. Encore une fois et vous serez **mis sous silence** sur le serveur !";
-					output[2] = " La saisie d'URLs n'est pas autorisée sur ce chenal ! URL supprimée !";
-				}
-				default -> {
-					output[0] = " Message has been removed for posting a not allowed url!";
-					output[1] = " This has been the second warning. One more and you'll be **muted** from the server!";
-					output[2] = " The input of URLs is not allowed in this channel! URL removed!";
-				}
-			}
-		}
-		//always use english if multiple filter languages have been set for a channel or if no filter language has been set
-		else {
-			output[0] = " Message has been removed for posting a not allowed url!";
-			output[1] = " This has been the second warning. One more and you'll be **muted** from the server!";
-			output[2] = " The input of URLs is not allowed in this channel! URL removed!";
-		}
+		output[0] = STATIC.getTranslation2(guild, Translation.CENSOR_URL_WARN_1);
+		output[1] = STATIC.getTranslation2(guild, Translation.CENSOR_REMOVED_WARN_2);
+		output[2] = STATIC.getTranslation2(guild, Translation.CENSOR_URL_WARN_2);
 		return output;
 	}
 	
@@ -205,12 +183,12 @@ public class URLFilter implements Runnable{
 					e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder()
 						.setDescription(e.getMessage().getContentRaw())
 						.setColor(Color.ORANGE)
-						.setTitle("Message removed!")
-						.addField("NAME", e.getMember().getAsMention(), true)
-						.addField("USER ID", e.getMember().getUser().getId(), true)
-						.addField("CHANNEL", e.getChannel().getAsMention(), true)
-						.addField("TYPE", "URL", true)
-						.addField("FQDN", foundURL, true)
+						.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_TITLE))
+						.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_NAME), e.getMember().getAsMention(), true)
+						.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_USER_ID), e.getMember().getUser().getId(), true)
+						.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_CHANNEL), e.getChannel().getAsMention(), true)
+						.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_TYPE), STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_TYPE_NAME), true)
+						.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_FQDN), foundURL, true)
 						.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl())
 						.build()
 					).queue();
@@ -233,12 +211,12 @@ public class URLFilter implements Runnable{
 					e2.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder()
 						.setDescription(e2.getMessage().getContentRaw())
 						.setColor(Color.ORANGE)
-						.setTitle("Message removed!")
-						.addField("NAME", e2.getMember().getAsMention(), true)
-						.addField("USER ID", e2.getMember().getUser().getId(), true)
-						.addField("CHANNEL", e2.getChannel().getAsMention(), true)
-						.addField("TYPE", "URL", true)
-						.addField("FQDN", foundURL, true)
+						.setTitle(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_TITLE))
+						.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_NAME), e2.getMember().getAsMention(), true)
+						.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_USER_ID), e2.getMember().getUser().getId(), true)
+						.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_CHANNEL), e2.getChannel().getAsMention(), true)
+						.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_TYPE), STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_TYPE_NAME), true)
+						.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_FQDN), foundURL, true)
 						.setThumbnail(e2.getMember().getUser().getEffectiveAvatarUrl())
 						.build()
 					).queue();

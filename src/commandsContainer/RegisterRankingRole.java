@@ -7,86 +7,88 @@ import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
+import util.STATIC;
+
+/**
+ * Extension of the register command
+ * @author xHelixStorm
+ *
+ */
 
 public class RegisterRankingRole {
 	private final static Logger logger = LoggerFactory.getLogger(RegisterRankingRole.class);
 	
-	public static void RegisterRankingRoleHelper(GuildMessageReceivedEvent _e) {
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register roles for the ranking system!");
-		final String prefix = GuildIni.getCommandPrefix(_e.getGuild().getIdLong());
-		_e.getChannel().sendMessage(messageBuild.setDescription("To use this command, write the role_id right after the command and add the required level to unlock this role in this format:\n"
-				+ "**"+prefix+"register -ranking-role <role_id> <level>**\n\n To display all roles, type the command **"+prefix+"display -roles**. To remove all registered roles, type **"+prefix+"register -ranking-role -clear**").build()).queue();
+	public static void RegisterRankingRoleHelper(GuildMessageReceivedEvent e) {
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
+		e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_HELP)).build()).queue();
 	}
 	
-	public static void runCommand(GuildMessageReceivedEvent _e, long _guild_id, String [] _args, boolean adminPermission) {
-		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied");
-		long guild_id = _e.getGuild().getIdLong();
+	public static void runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission) {
+		long guild_id = e.getGuild().getIdLong();
 		long role_id = 0;
 		String role_name = "";
 		String level = "";
 		int level_requirement = 0;
 		
-		var commandLevel = GuildIni.getRegisterRankingRoleLevel(_e.getGuild().getIdLong());
-		if(UserPrivs.comparePrivilege(_e.getMember(), commandLevel) || adminPermission) {
-			try {
-				if(_args.length == 3) {
-					if(_args[1].length() == 18) {
-						role_id = Long.parseLong(_args[1]);
-						role_name = _e.getGuild().getRoleById(role_id).getName();
+		var commandLevel = GuildIni.getRegisterRankingRoleLevel(e.getGuild().getIdLong());
+		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+			if(_args.length == 3) {
+				if(e.getGuild().getTextChannelById(_args[1]) != null) {
+					role_id = Long.parseLong(_args[1]);
+					role_name = e.getGuild().getRoleById(role_id).getName();
+				}
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_ROLE_ID)).build()).queue();
+					return;
+				}
+				if(_args[2].length() == 3 && _args[2].replaceAll("[0-9]*", "").length() == 0) {
+					level = _args[2];
+					level_requirement = Integer.parseInt(level);
+				}
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_NO_LEVEL)).build()).queue();
+					return;
+				}
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+				return;
+			}
+			if(level_requirement < 1 || level_requirement > 10000) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_NO_LEVEL)).build()).queue();
+			}
+			else {
+				if(RankingSystem.SQLInsertRoles(role_id, role_name, level_requirement, guild_id) > 0) {
+					logger.debug("{} has registered the ranking role {} with the level requirement {} in the guild {}", e.getMember().getUser().getId(), role_name, level_requirement, e.getGuild().getId());
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_ADDED).replaceFirst("\\{\\}", role_name).replace("{}", ""+level_requirement)).build()).queue();
+					Hashes.removeRankingRoles(guild_id);
+					if(RankingSystem.SQLgetRoles(guild_id).size() > 0) {
+						if(RankingSystem.SQLgetLevels(guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID()).size() == 0) {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("Levels for the ranking system from RankingSystem.level_list couldn't be retrieved and cached for guild {}", e.getGuild().getId());
+						}
 					}
 					else {
-						_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();
-						return;
-					}
-					if(_args[2].length() <= 4 && _args[2].replaceAll("[0-9]", "").length() == 0) {
-						level = _args[2];
-						level_requirement = Integer.parseInt(level);
-					}
-					else {
-						_e.getChannel().sendMessage(_e.getMember().getUser().getAsMention()+" Please type a level between 1 and 9999!").queue();
-						return;
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Roles from RankingSystem.roles couldn't be called and cached for guild {}", e.getGuild().getId());
 					}
 				}
 				else {
-					_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Something went wrong. Please recheck the syntax!").queue();
-					return;
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("role id {} couldn't be inserted into the table RankingSystem.roles for the guild {}", role_id, e.getGuild().getId());
+					RankingSystem.SQLInsertActionLog("High", role_id, guild_id, "Role couldn't be registered as ranking role", "The role "+role_name+" couldn't be inserted into the RankingSystem.roles table");
 				}
-				if(level.length() < 1 || level.length() > 10000) {
-					_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Please type a level between 1 and 9999!").queue();
-				}
-				else{
-					if(RankingSystem.SQLInsertRoles(role_id, role_name, level_requirement, guild_id) > 0) {
-						logger.debug("{} has registered the ranking role {} with the level requirement {} in the guild {}", _e.getMember().getUser().getId(), role_name, level_requirement, _e.getGuild().getName());
-						_e.getChannel().sendMessage("**The role named "+role_name+" can now be unlocked by reaching level "+level_requirement+"**").queue();
-						Hashes.removeRankingRoles(guild_id);
-						if(RankingSystem.SQLgetRoles(guild_id).size() > 0) {
-							if(RankingSystem.SQLgetLevels(guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID()).size() == 0) {
-								logger.error("Levels for the ranking system from RankingSystem.level_list couldn't be retrieved and cached");
-								_e.getChannel().sendMessage("An internal error occurred. All levels for the ranking system couldn't be retrieved from the table RankingSystem.level_list").queue();
-							}
-						}
-						else {
-							logger.error("Roles from RankingSystem.roles couldn't be called and cached");
-							_e.getChannel().sendMessage("An internal error occurred. Roles from RankingSystem.roles couldn't be called and cached").queue();
-						}
-					}
-					else {
-						logger.error("role id {} couldn't be inserted into the table RankingSystem.roles for the guild {}", role_id, _e.getGuild().getName());
-						_e.getChannel().sendMessage("An internal error occurred. The role "+role_name+" with the role id "+role_id+" couldn't be inserted into RankingSystem.roles").queue();
-						RankingSystem.SQLInsertActionLog("High", role_id, guild_id, "Role couldn't be registered as ranking role", "The role "+role_name+" couldn't be inserted into the RankingSystem.roles table");
-					}
-				}
-			} catch(NullPointerException npe) {
-				_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Please type a valid role id!").queue();
 			}
 		}
 		else {
-			_e.getChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild())).build()).queue();
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
+			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
 	}
 }

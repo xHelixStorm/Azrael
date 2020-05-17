@@ -165,7 +165,7 @@ public class RankingSystem {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateUsersDefaultLevelSkin Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -208,7 +208,7 @@ public class RankingSystem {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateUsersDefaultRankSkin Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -251,7 +251,7 @@ public class RankingSystem {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateUsersDefaultProfileSkin Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -294,7 +294,7 @@ public class RankingSystem {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateUsersDefaulticonSkin Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -524,7 +524,7 @@ public class RankingSystem {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLclearRoles Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -551,7 +551,7 @@ public class RankingSystem {
 				return roles;
 			} catch (SQLException e) {
 				logger.error("SQLgetRoles Exception", e);
-				return roles;
+				return null;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -864,13 +864,14 @@ public class RankingSystem {
 					rankingSystem.setTextFontSize_Level(rs.getInt(16));
 					rankingSystem.setNameFontSize_Level(rs.getInt(17));
 					rankingSystem.setThemeID(rs.getInt(18));
+					rankingSystem.setLevelLine(rs.getInt(19));
 					rankList.add(rankingSystem);
 				}
 				Hashes.addRankListLevel(_guild_id, rankList);
 				return rankList;
 			} catch (SQLException e) {
 				logger.error("SQLgetRankingLevel Exception", e);
-				return rankList;
+				return null;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -924,6 +925,7 @@ public class RankingSystem {
 					rankingSystem.setTextFontSize_Rank(rs.getInt(27));
 					rankingSystem.setNameFontSize_Rank(rs.getInt(28));
 					rankingSystem.setThemeID(rs.getInt(29));
+					rankingSystem.setRankLine(rs.getInt(30));
 					rankList.add(rankingSystem);
 				}
 				Hashes.addRankListRank(_guild_id, rankList);
@@ -993,6 +995,7 @@ public class RankingSystem {
 					rankingSystem.setNameFontSize_Profile(rs.getInt(36));
 					rankingSystem.setDescriptionMode_Profile(rs.getInt(37));
 					rankingSystem.setThemeID(rs.getInt(38));
+					rankingSystem.setProfileLine(rs.getInt(39));
 					rankList.add(rankingSystem);
 				}
 				Hashes.addRankListProfile(_guild_id, rankList);
@@ -1028,6 +1031,7 @@ public class RankingSystem {
 					rankingSystem.setIconDescription(rs.getString(2));
 					rankingSystem.setFileTypeIcon(rs.getString(3));
 					rankingSystem.setThemeID(rs.getInt(4));
+					rankingSystem.setIconLine(rs.getInt(5));
 					rankList.add(rankingSystem);
 				}
 				Hashes.addRankListIcons(_guild_id, rankList);
@@ -1766,7 +1770,7 @@ public class RankingSystem {
 				return set_skin;
 			} catch (SQLException e) {
 				logger.error("SQLgetSkinshopContentAndType Exception", e);
-				return set_skin;
+				return null;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }

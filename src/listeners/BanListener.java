@@ -1,12 +1,5 @@
 package listeners;
 
-/**
- * This class gets launched when a user in the guild gets banned.
- * 
- * The banned user will be marked as banned on the database and will
- * print a message into the log channel, that a user has been banned.
- */
-
 import java.awt.Color;
 import java.sql.Timestamp;
 
@@ -17,6 +10,7 @@ import constructors.Bancollect;
 import constructors.Channels;
 import core.Hashes;
 import enums.GoogleEvent;
+import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import google.GoogleUtils;
@@ -30,6 +24,15 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import sql.Azrael;
 import util.STATIC;
+
+/**
+ * This class gets launched when a user in the guild gets banned.
+ * 
+ * The banned user will be marked as banned on the database and will
+ * print a message into the log channel, that a user has been banned.
+ * @author xHelixStorm
+ * 
+ */
 
 public class BanListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(BanListener.class);
@@ -49,8 +52,8 @@ public class BanListener extends ListenerAdapter {
 				STATIC.killThread("mute_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 			}
 			else {
-				logger.error("banned user {} couldn't be marked as banned on Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
-				if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. User couldn't be marked as banned in Azrael.bancollect").queue();
+				if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_ERR)).build()).queue();
+				logger.error("banned user {} couldn't be marked as banned on Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getId());
 			}
 		}
 		else{
@@ -60,8 +63,8 @@ public class BanListener extends ListenerAdapter {
 				STATIC.killThread("mute_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 			}
 			else {
-				logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
-				if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
+				if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_ERR)).build()).queue();
+				logger.error("banned user {} couldn't be inserted into Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
 			}
 		}
 		
@@ -81,25 +84,24 @@ public class BanListener extends ListenerAdapter {
 					var ban_issuer = member.getAsMention();
 					var ban_reason = cache.getAdditionalInfo2();
 					
-					EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User banned!");
+					EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
 					//retrieve max allowed warnings per guild and print a message depending on the applied warnings before ban
 					int max_warning_id = Azrael.SQLgetMaxWarning(guild_id);
-					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					if(user.getWarningID() == 0) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without any protocolled warnings!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_1).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replace("{}", ban_issuer)+ban_reason).build()).queue();
 					}
 					else if(user.getWarningID() < max_warning_id) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without enough protocolled warnings! Warnings: "+user.getWarningID()+"\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_2).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", ""+user.getWarningID()).replace("{}", ban_issuer)+ban_reason).build()).queue();
 					}
 					else if(user.getWarningID() == max_warning_id) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_3).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replace("{}", ban_issuer)+ban_reason).build()).queue();
 					}
 					//clear cache afterwards
 					Hashes.clearTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 					
 					//Run google service, if enabled
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), ban_reason, null, ""+user.getWarningID(), "BAN", null, null, null, null, null, GoogleEvent.BAN.id, log_channel);
+						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), ban_reason, null, ""+user.getWarningID(), "BAN", null, null, null, null, null, GoogleEvent.BAN.id, log_channel);
 					}
 				}
 				else {
@@ -109,8 +111,7 @@ public class BanListener extends ListenerAdapter {
 					}
 					else {
 						EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User banned!");
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+new Timestamp(System.currentTimeMillis())+"] **" + e.getUser().getAsMention() + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: NaN\nReason: No reason has been provided!\n"
-								+ "**Audit log permission required to display more details**").build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_4).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE)).replace("{}", STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON))).build()).queue();
 						logger.warn("VIEW AUDIT LOGS permission missing in guild {}!", e.getGuild().getId());
 					}
 				}
@@ -132,25 +133,24 @@ public class BanListener extends ListenerAdapter {
 					AuditLogEntry entry = entries.get(0);
 					//retrieve all details from the audit logs
 					ban_issuer = entry.getUser().getAsMention();
-					ban_reason = (entry.getReason() != null && entry.getReason().length() > 0 ? entry.getReason() : "No reason has been provided!");
+					ban_reason = (entry.getReason() != null && entry.getReason().length() > 0 ? entry.getReason() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON));
 				
-					EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User banned!");
+					EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
 					//retrieve max allowed warnings per guild and print a message depending on the applied warnings before ban
 					int max_warning_id = Azrael.SQLgetMaxWarning(guild_id);
-					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					if(user.getWarningID() == 0) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without any protocolled warnings!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_1).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replace("{}", ban_issuer)+ban_reason).build()).queue();
 					}
 					else if(user.getWarningID() < max_warning_id) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned without enough protocolled warnings! Warnings: "+user.getWarningID()+"\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_2).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", ""+user.getWarningID()).replace("{}", ban_issuer)+ban_reason).build()).queue();
 					}
 					else if(user.getWarningID() == max_warning_id) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription("["+timestamp+"] **" + e.getUser().getName()+"#"+e.getUser().getDiscriminator() + "** with the ID Number **" + user_id + "** has been banned!\nBanned by: "+ban_issuer+"\nReason: "+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_3).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replace("{}", ban_issuer)+ban_reason).build()).queue();
 					}
 					
 					//Run google service, if enabled
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), ban_reason, null, ""+user.getWarningID(), "BAN", null, null, null, null, null, GoogleEvent.BAN.id, log_channel);
+						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), ban_reason, null, ""+user.getWarningID(), "BAN", null, null, null, null, null, GoogleEvent.BAN.id, log_channel);
 					}
 				}
 				else {

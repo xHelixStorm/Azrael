@@ -15,8 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
+import enums.Translation;
 import fileManagement.IniFileReader;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import util.STATIC;
 
 public class DrawDaily {
 	private final static Logger logger = LoggerFactory.getLogger(DrawDaily.class);
@@ -53,8 +56,9 @@ public class DrawDaily {
 				g.drawString(_reward, getRightString(_reward, descriptionX, g),  descriptionY);
 			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"daily_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png"));
 			g.dispose();
-		} catch(IOException ioe){
-			logger.error("Error on daily reward drawing", ioe);
+		} catch(IOException ioe) {
+			_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(_e.getMember(), Translation.EMBED_TITLE_ERROR)+_reward).setDescription(STATIC.getTranslation(_e.getMember(), Translation.DAILY_ERROR_1)).build()).queue();
+			logger.error("Error on drawing the daily reward in guild {}", _e.getGuild().getId(), ioe);
 		}
 		File file1 = new File(IniFileReader.getTempDirectory()+"daily_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png");
 		_e.getChannel().sendFile(file1, "daily.png").complete();

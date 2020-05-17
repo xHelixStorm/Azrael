@@ -1,18 +1,7 @@
 package listeners;
 
-/**
- * this class gets executed when an already printed message
- * gets edited.
- * 
- * after a message has been edited, the new message will be 
- * compared with the filters if languages to filter have
- * been applied or url censoring for that channel has been
- * enabled. Additionally, the edited messages can be added
- * to the system cache and written to file
- */
-
 import java.awt.Color;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -20,6 +9,7 @@ import java.util.stream.Collectors;
 import constructors.Messages;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import filter.LanguageEditFilter;
@@ -29,6 +19,20 @@ import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
+import util.STATIC;
+
+/**
+ * this class gets executed when an already printed message
+ * gets edited.
+ * 
+ * after a message has been edited, the new message will be 
+ * compared with the filters if languages to filter have
+ * been applied or url censoring for that channel has been
+ * enabled. Additionally, the edited messages can be added
+ * to the system cache and written to file
+ * @author xHelixStorm
+ * 
+ */
 
 public class GuildMessageEditListener extends ListenerAdapter{
 	
@@ -79,13 +83,13 @@ public class GuildMessageEditListener extends ListenerAdapter{
 							destinationChannel = (edi_channel != null ? edi_channel.getChannel_ID() : tra_channel.getChannel_ID());
 						}
 						else {
-							final var printMessage = "["+LocalDateTime.now().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+e.getMessage().getContentRaw();
+							final var printMessage = e.getMessage().getContentRaw();
 							if(edi_channel != null) {
-								e.getGuild().getTextChannelById(edi_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setTitle("User has edited his message!")
+								e.getGuild().getTextChannelById(edi_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setAuthor(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE))
 									.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 							}
 							else {
-								e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setTitle("User has edited his message!")
+								e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setAuthor(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE))
 										.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 							}
 						}
@@ -94,7 +98,7 @@ public class GuildMessageEditListener extends ListenerAdapter{
 				
 				//check if the channel log and cache log is enabled and if one of the two or bot is/are enabled then write message to file or/and log to system cache
 				var log = GuildIni.getChannelAndCacheLog(e.getGuild().getIdLong());
-				if((log[0] || log[1]) && !UserPrivs.isUserBot(e.getMember())) {
+				if((log[0] || log[1]) && !e.getMember().getUser().isBot() && !UserPrivs.isUserBot(e.getMember())) {
 					StringBuilder image_url = new StringBuilder();
 					for(Attachment attch : e.getMessage().getAttachments()){
 						image_url.append((e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? "("+attch.getProxyUrl()+")" : "\n("+attch.getProxyUrl()+")");
@@ -107,7 +111,7 @@ public class GuildMessageEditListener extends ListenerAdapter{
 					collectedMessage.setChannelName(e.getChannel().getName());
 					collectedMessage.setMessage(e.getMessage().getContentRaw()+image_url.toString()+"\n");
 					collectedMessage.setMessageID(e.getMessageIdLong());
-					collectedMessage.setTime(LocalDateTime.now());
+					collectedMessage.setTime(ZonedDateTime.now());
 					collectedMessage.setIsEdit(true); // note: flag set to true for edited message
 					
 					if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "EDIT ["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
@@ -126,17 +130,17 @@ public class GuildMessageEditListener extends ListenerAdapter{
 						//print initial and second message, else print only the last message
 						if(messages.size() == 2) {
 							for(final var message : messages) {
-								final var printMessage = "["+message.getTime().toString()+" - "+message.getUserName()+" ("+message.getUserID()+")]:\n"+message.getMessage();
-								e.getGuild().getTextChannelById(destinationChannel).sendMessage(new EmbedBuilder().setTitle("Message history after edit. Message "+(++messageCounter))
+								final var printMessage = message.getMessage();
+								e.getGuild().getTextChannelById(destinationChannel).sendMessage(new EmbedBuilder().setAuthor(message.getUserName()+" ("+message.getUserID()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE_HISTORY)+(++messageCounter))
 									.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 							}
 						}
 						else {
 							int num = messages.size();
 							final var message = messages.get(num-1);
-							final var printMessage = "["+message.getTime().toString()+" - "+message.getUserName()+" ("+message.getUserID()+")]:\n"+message.getMessage();
-							e.getGuild().getTextChannelById(destinationChannel).sendMessage(new EmbedBuilder().setTitle("Message history after edit. Message "+num)
-									.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+							final var printMessage = message.getMessage();
+							e.getGuild().getTextChannelById(destinationChannel).sendMessage(new EmbedBuilder().setAuthor(message.getUserName()+" ("+message.getUserID()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE_HISTORY)+num)
+								.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 						}
 					}
 				}
@@ -148,14 +152,15 @@ public class GuildMessageEditListener extends ListenerAdapter{
 				if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
 					var cachedMessage = sentMessage.get(0);
 					e.getGuild().getTextChannelById(watchedMember.getWatchChannel()).sendMessage(new EmbedBuilder()
-						.setTitle("Logged edited message due to watching!").setColor(Color.YELLOW)
-						.setDescription("["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+"]: "+cachedMessage.getMessage()).build()).queue();
+						.setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")")
+						.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE_WATCH)).setColor(Color.WHITE)
+						.setDescription("["+cachedMessage.getUserName()+"]: "+cachedMessage.getMessage()).build()).queue();
 				}
 				//print an error if the cache log is not enabled
 				else if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage == null) {
 					e.getGuild().getTextChannelById(watchedMember.getWatchChannel()).sendMessage(new EmbedBuilder()
-						.setTitle("CacheLog disabled!").setColor(Color.RED)
-						.setDescription("Please enable the CacheLog to display messages! Message from "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" couldn't be displayed!").build()).queue();
+						.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED)
+						.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_WATCH_ERR).replace("{}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator())).build()).queue();
 				}
 			});
 		}).start();

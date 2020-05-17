@@ -1,21 +1,24 @@
 package commands;
 
-/**
- * The About command prints all current bot details
- */
-
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 import util.STATIC;
+
+/**
+ * The About command prints a summary Information of the Bot
+ * @author xHelixStorm
+ *
+ */
 
 public class About implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(About.class);
@@ -42,22 +45,19 @@ public class About implements CommandPublic {
 		
 		//if any bot channels are registered and if the current channel isn't a bot channel, then throw a message that this command can't be executed
 		if(this_channel == null && bot_channels.size() > 0) {
-			e.getChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
+			e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.NOT_BOT_CHANNEL)+STATIC.getChannels(bot_channels)).queue();
 		}
 		else {
 			//Build message and print it to the user
-			EmbedBuilder messageBuilder = new EmbedBuilder().setColor(0x00AE86).setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl()).setTitle("About Page!");
+			EmbedBuilder messageBuilder = new EmbedBuilder().setColor(0x00AE86).setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ABOUT));
 			messageBuilder.setAuthor("Azrael", e.getJDA().getSelfUser().getEffectiveAvatarUrl());
-			messageBuilder.setDescription("Here are all details about myself!");
-			messageBuilder.addField("BOT VERSION", STATIC.getVersion(), true);
-			messageBuilder.addField("DEVELOPER", "Java developer xHelixStorm", true);
+			messageBuilder.setDescription(STATIC.getTranslation(e.getMember(), Translation.ABOUT_DESCRIPTION));
+			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_1), STATIC.getVersion(), true);
+			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_2), "Heiliger#7143", true);
 			messageBuilder.addBlankField(false);
-			messageBuilder.addField("Functionalities", "- Self designed ranking system.\n"
-					+ "- Various bot settings for numerous moderation tools such as an automated mute system, bad-word filter, name filter and much more.\n"
-					+ "- Entertainment commands to display your current level, ranking gain dailies, purchase from an integrated shop, take a look at your inventory or simply bring up cute pictures of pugs or cats.\n\n"
-					+ "You can see all enabled commands under "+GuildIni.getCommandPrefix(guild_id)+"commands", false);
+			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_2), STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_3_DESC).replace("{}", GuildIni.getCommandPrefix(guild_id))+"\n\n", false);
 			messageBuilder.addBlankField(false);
-			messageBuilder.addField("SOURCE CODE", "[Check the latest updates of Azrael on GitHub!](https://github.com/xHelixStorm/Azrael)", false);
+			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_4), "["+STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_4_DESC)+"](https://github.com/xHelixStorm/Azrael)", false);
 			e.getChannel().sendMessage(messageBuilder.build()).queue();
 		}
 	}

@@ -1,13 +1,11 @@
 package commands;
 
-/**
- * The Inventory command allows the user to inspect all
- * purchased or acquired items/skins/weapons/skills
- */
-
 import java.awt.Color;
+import java.io.File;
 import java.util.stream.Collectors;
 
+import org.jpaste.exceptions.PasteException;
+import org.jpaste.pastebin.exceptions.LoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +14,7 @@ import constructors.Guilds;
 import constructors.InventoryContent;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import inventory.InventoryBuilder;
@@ -23,8 +22,16 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
+import util.Pastebin;
 import util.STATIC;
 import sql.Azrael;
+
+/**
+ * The Inventory command allows the user to inspect all
+ * purchased or acquired items/skins/weapons/skills
+ * @author xHelixStorm
+ *
+ */
 
 public class Inventory implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Inventory.class);
@@ -51,24 +58,23 @@ public class Inventory implements CommandPublic {
 			//if no bot channel has been registered, print in the current channel
 			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
 			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
-				final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-				//print the help message if the -help parameter has been used
-				if(args.length > 0 && args[0].equalsIgnoreCase("-help")) {
-					EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
-					e.getChannel().sendMessage(message.setDescription("- Type **-list** after the command to display the whole inventory as a list\n"
-							+ "- Type **-page** and then the page together with the command to directly select the page you wish to view\n"
-							+ "- Type the tab name to filter your inventory item by type. Available types are **items**, **weapons** and **skins**\n"
-							+ "- Type the sub tab after the tab name together with the command to further filter your inventory selection").build()).queue();
-				}
-				//print the inventory in text format
-				else if(args.length > 0 && args[0].equalsIgnoreCase("-list")) {
+				//print the inventory in text format, if the inventory image is not available
+				if(!new File("./files/RankingSystem/"+guild_settings.getThemeID()+"/Inventory/inventory_blank.png").exists()) {
 					StringBuilder out = new StringBuilder();
 					for(InventoryContent inventory : RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), guild_settings.getThemeID())){
 						out.append((inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+" "+inventory.getStat())+"\n");
 					}
 					if(out.length() == 0)
-						out.append("Inventory is empty!");
-					e.getChannel().sendMessage("```"+out+"```").queue();
+						out.append(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_EMPTY));
+					if(out.length() <= 2000)
+						e.getChannel().sendMessage("```"+out.toString()+"```").queue();
+					else {
+						try {
+							Pastebin.GuestPaste(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_NAME), out.toString());
+						} catch (IllegalStateException | LoginException | PasteException e1) {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR_2)).build()).queue();
+						}
+					}
 				}
 				//handle preparation to draw the inventory
 				else {
@@ -92,17 +98,6 @@ public class Inventory implements CommandPublic {
 					}
 					else
 						itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems, guild_settings.getThemeID());
-					//check if the user wishes to jump to a specific page directly
-					if(e.getMessage().getContentRaw().contains(prefix+"inventory -page ")){
-						try {
-							limit = Integer.parseInt(e.getMessage().getContentRaw().replaceAll("[^0-9]", ""))-1;
-							if(limit <= itemNumber){
-								limit*=maxItems;
-							}
-						} catch(NumberFormatException nfe){
-							limit = 0;
-						}
-					}
 					
 					//draw the inventory and assign a fitting tab image
 					//write to cache so that reactions can be added, if there are multiple pages
@@ -137,11 +132,11 @@ public class Inventory implements CommandPublic {
 				}
 			}
 			else{
-				e.getChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
+				e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.NOT_BOT_CHANNEL)+STATIC.getChannels(bot_channels)).queue();
 			}
 		}
 		else{
-			e.getChannel().sendMessage(e.getMember().getAsMention()+" you can't use any item or skin while the ranking system is disabled!").queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 		}
 	}
 

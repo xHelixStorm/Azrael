@@ -22,6 +22,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,8 @@ import constructors.Channels;
 import constructors.SpamDetection;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
+import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -37,6 +40,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -61,7 +65,11 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
-	private static final String VERSION = "6.20.423";
+	
+	private static final String VERSION = "7.21.424";
+	
+	private static final JSONObject en_lang = new JSONObject(FileSetting.readFile("./files/Languages/en_lang.json"));
+	
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
 	private static long ADMIN = 0;
@@ -80,6 +88,76 @@ public class STATIC {
 	
 	public static String getVersion() {
 		return VERSION;
+	}
+	
+	/**
+	 * Retrieve a translation for a message 
+	 * @param guild required server for looking up which language to use
+	 * @param section message to look up in a json file
+	 * @return
+	 */
+	
+	@SuppressWarnings("preview")
+	public static String getTranslation(Member member, Translation event) {
+		//retrieve language. In case non was found, search on the db and if it fails use default language
+		String lang = Hashes.getLanguage(member.getUser().getIdLong());
+		if(lang == null) {
+			lang = Hashes.getLanguage(member.getGuild().getIdLong());
+			if(lang == null) {
+				lang = Azrael.SQLgetLanguage(member.getGuild().getIdLong());
+				if(lang == null) {
+					lang = "en";
+					Hashes.setLanguage(member.getGuild().getIdLong(), lang);
+				}
+				else
+					Hashes.setLanguage(member.getGuild().getIdLong(), lang);
+			}
+		}
+		
+		return switch(lang) {
+			case "en" -> (String)en_lang.get(event.section());
+			default -> "Missing translation";
+		};
+	}
+	
+	@SuppressWarnings("preview")
+	public static String getTranslation2(Guild guild, Translation event) {
+		//retrieve language. In case non was found, search on the db and if it fails use default language
+		String lang = Hashes.getLanguage(guild.getIdLong());
+		if(lang == null) {
+			lang = Azrael.SQLgetLanguage(guild.getIdLong());
+			if(lang == null) {
+				lang = "en";
+				Hashes.setLanguage(guild.getIdLong(), lang);
+			}
+			else
+				Hashes.setLanguage(guild.getIdLong(), lang);
+		}
+		
+		return switch(lang) {
+			case "en" -> (String)en_lang.get(event.section());
+			default -> "Missing translation";
+		};
+	}
+	
+	@SuppressWarnings("preview")
+	public static String getTranslation3(User user, Translation event) {
+		//retrieve language. In case non was found, search on the db and if it fails use default language
+		String lang = Hashes.getLanguage(user.getIdLong());
+		if(lang == null) {
+			lang = Azrael.SQLgetLanguage(user.getIdLong());
+			if(lang == null) {
+				lang = "en";
+				Hashes.setLanguage(user.getIdLong(), lang);
+			}
+			else
+				Hashes.setLanguage(user.getIdLong(), lang);
+		}
+		
+		return switch(lang) {
+			case "en" -> (String)en_lang.get(event.section());
+			default -> "Missing translation";
+		};
 	}
 	
 	//default mysql url String to access the database. As parameters, the database name and ip address to the mysql server are required
@@ -266,12 +344,12 @@ public class STATIC {
 				}
 				else if(cache.getAdditionalInfo().equals("2")) {
 					if(guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-						Azrael.SQLInsertHistory(member.getUser().getIdLong(), guild.getIdLong(), "mute", "User muted after censoring 3 messages", 0, "");
+						Azrael.SQLInsertHistory(member.getUser().getIdLong(), guild.getIdLong(), "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON), 0, "");
 						guild.addRoleToMember(member, guild.getRoleById(muteRole.getRole_ID())).reason("User muted after censoring 3 messages").queue();
 					}
 					else {
 						final var log_channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-						if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Mute role couldn't be assigned after the third censoring warning because the MANAGE ROLES permission is missing!").build()).queue();
+						if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_ROLE_ADD_ERR)+Permission.MANAGE_ROLES).build()).queue();
 						logger.warn("MANAGE ROLES permission required to mute members for guild {}!", guild.getId());
 					}
 					Hashes.clearTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId());
@@ -288,14 +366,14 @@ public class STATIC {
 		var watchedUser = Azrael.SQLgetWatchlist(user_id, guild_id);
 		if(watchedUser != null) {
 			if(Azrael.SQLDeleteWatchlist(user_id, guild_id) > 0) {
-				e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(new EmbedBuilder().setColor(Color.YELLOW).setTitle("Watch lifted due to "+unwatchReason+"!")
-					.setDescription("The watch for the user "+e.getUser().getName()+"#"+e.getUser().getDiscriminator()+" has been removed due to a "+unwatchReason+"!").build()).queue();
+				e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_WATCH_LIFTED))
+					.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.WATCHING_LIFTED).replace("{}", e.getUser().getName()+"#"+e.getUser().getDiscriminator())+unwatchReason+"!").build()).queue();
 				Hashes.removeWatchlist(guild_id+"-"+user_id);
 				logger.debug("The user {} has been removed from the watchlist in guild {}", user_id, guild_id);
 			}
 			else {
-				e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!")
-					.setDescription("An internal error occurred. The user "+e.getUser().getName()+"#"+e.getUser().getDiscriminator()+" couldn't be removed from Azrael.watchlist!").build()).queue();
+				e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR))
+					.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.WATCHING_LIFTED_ERR).replace("{}", e.getUser().getName()+"#"+e.getUser().getDiscriminator())).build()).queue();
 				logger.error("An internal error occurred. The user {} couldn't be removed from the Azrael.watchlist table for guild {}", user_id, guild_id);
 			}
 		}
@@ -386,7 +464,7 @@ public class STATIC {
 		//verify if the current user is spamming
 		if(GuildIni.getSpamDetection(guild_id)) {
 			//User doesn't have to be an admin, moderator or bot user and they are only allowed to spam in a bot channel
-			if(!UserPrivs.isUserBot(e.getMember()) && !UserPrivs.isUserMod(e.getMember()) && !UserPrivs.isUserAdmin(e.getMember()) && Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null) == null) {
+			if(!e.getMember().getUser().isBot() && !UserPrivs.isUserBot(e.getMember()) && !UserPrivs.isUserMod(e.getMember()) && !UserPrivs.isUserAdmin(e.getMember()) && Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null) == null) {
 				final int messagesLimit = GuildIni.getMessagesLimit(e.getGuild().getIdLong());
 				final int messagesOverChannelsLimit = GuildIni.getMessageOverChannelsLimit(guild_id);
 				final var cache = Hashes.getTempCache("spamDetection_gu"+guild_id+"us"+user_id);
@@ -395,10 +473,10 @@ public class STATIC {
 						if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
 							final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 							if(mute != null) {
-								e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason("Muted due to spamming the same message!").queue();
+								e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
 								final int warning = Azrael.SQLgetWarning(user_id, guild_id);
 								final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
-								Azrael.SQLInsertHistory(user_id, guild_id, "mute", "Muted due to spamming the same message", penalty, "");
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
 								Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
 								return true;
 							}
@@ -435,17 +513,17 @@ public class STATIC {
 				if(messagesLimit != 0 && spamMessages.size() == messagesLimit) {
 					Hashes.removeSpamDetection(user_id+"_"+guild_id);
 					if(cache == null) {
-						e.getChannel().sendMessage(e.getMember().getAsMention()+" Spam attempt detected! Please avoid to spam or you'll be muted from the server!").queue();
+						e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
 						Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage));
 					}
 					else {
 						if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
 							final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 							if(mute != null) {
-								e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason("Muted due to spamming the same message!").queue();
+								e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
 								final int warning = Azrael.SQLgetWarning(user_id, guild_id);
 								final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
-								Azrael.SQLInsertHistory(user_id, guild_id, "mute", "Muted due to spamming the same message", penalty, "");
+								Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
 								Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
 								return true;
 							}
@@ -464,17 +542,17 @@ public class STATIC {
 					if(messagesOverChannelsLimit != 0 && channels.size() == messagesOverChannelsLimit) {
 						Hashes.removeSpamDetection(user_id+"_"+guild_id);
 						if(cache == null) {
-							e.getChannel().sendMessage(e.getMember().getAsMention()+" Spam attempt detected! Please avoid to spam or you'll be muted from the server!").queue();
+							e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
 							Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage));
 						}
 						else {
 							if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
 								final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 								if(mute != null) {
-									e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason("Muted due to spamming the same message!").queue();
+									e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
 									final int warning = Azrael.SQLgetWarning(user_id, guild_id);
 									final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
-									Azrael.SQLInsertHistory(user_id, guild_id, "mute", "Muted due to spamming the same message", penalty, "");
+									Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
 									Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
 									return true;
 								}

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Channels;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,43 +18,56 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import preparedMessages.ReactionMessage;
 import sql.Azrael;
+import util.STATIC;
+
+/**
+ * Extension of the register command
+ * @author xHelixStorm
+ *
+ */
 
 public class RegisterChannel {
 	private static final Logger logger = LoggerFactory.getLogger(RegisterChannel.class);
 	
-	public static void RegisterChannelHelper(GuildMessageReceivedEvent _e) {
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register text channels to give them unique functions!");
+	public static void RegisterChannelHelper(GuildMessageReceivedEvent e) {
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
 		StringBuilder strB = new StringBuilder();
-		String parseMessage = null;
 		
-		parseMessage = "Please write the command in this format:\n**"+GuildIni.getCommandPrefix(_e.getGuild().getIdLong())+"register -text-channel <channel-type> #channel-name/channel-id**\n\nHere are all available channel-types:\n\n";
-		for(Channels channels : Azrael.SQLgetChannelTypes()) {
-			strB.append("**"+channels.getChannel_Type()+"** for a **"+channels.getChannel_Type_Name()+"**\n");
+		final var channelTypes = Azrael.SQLgetChannelTypes();
+		if(channelTypes != null) {
+			for(Channels channels : channelTypes) {
+				strB.append("**"+channels.getChannel_Type()+"**: "+channels.getChannel_Type_Name()+"\n");
+			}
+			if(strB.length() > 0) {
+				e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_HELP)+strB.toString()).build()).queue();
+			}
+			if(strB.length() == 0)
+				e.getChannel().sendMessage(messageBuild.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_NO_TYPES)).build()).queue();
 		}
-		if(strB.length() == 0)
-			strB.append("<No available channel types found>");
-		_e.getChannel().sendMessage(messageBuild.setDescription(parseMessage+strB.toString()).build()).queue();
+		else {
+			e.getChannel().sendMessage(messageBuild.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Channel types from Azrael.channeltypes couldn't be retrieved in guild {}", e.getGuild().getId());
+		}
 	}
 	
-	public static void RegisterChannelHelperURL(GuildMessageReceivedEvent _e) {
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register text channels to enable or disable the url censoring!");
-		_e.getChannel().sendMessage(messageBuild.setDescription("Enable or disable the url censoring for one text-channel. By default, the url censoring is disabled on every channel. Please write the command in this format:\n**"+GuildIni.getCommandPrefix(_e.getGuild().getIdLong())+"register -text-channel-url #<text-channel-name> enable/disable**").build()).queue();
+	public static void RegisterChannelHelperURL(GuildMessageReceivedEvent e) {
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
+		e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_URL_HELP)).build()).queue();
 	}
 	
-	public static void RegisterChannelHelperTxt(GuildMessageReceivedEvent _e) {
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.WHITE).setThumbnail(IniFileReader.getSettingsThumbnail()).setTitle("Register text channels to enable or disable the text removal!");
-		_e.getChannel().sendMessage(messageBuild.setDescription("Enable or disable the text removal for one text-channel. By default, the text removal is disabled on every channel. Please write the command in this format:\n**"+GuildIni.getCommandPrefix(_e.getGuild().getIdLong())+"register -text-channel-txt #<text-channel-name> enable/disable**").build()).queue();
+	public static void RegisterChannelHelperTxt(GuildMessageReceivedEvent e) {
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
+		e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_TXT_HELP)).build()).queue();
 	}
 	
 	@SuppressWarnings("preview")
-	public static void runCommand(GuildMessageReceivedEvent _e, long _guild_id, String [] _args, boolean adminPermission) {
-		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
+	public static void runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission) {
 		String channel;
 		long channel_id;
 		String channel_type;
 		
-		final var commandLevel = GuildIni.getRegisterTextChannelLevel(_e.getGuild().getIdLong());
-		if(UserPrivs.comparePrivilege(_e.getMember(), commandLevel) || adminPermission) {
+		final var commandLevel = GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong());
+		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss|wat|del|edi)");
 			Matcher matcher = pattern.matcher(_args[1]);
 			if(_args.length > 2 && matcher.find()) {
@@ -87,118 +101,114 @@ public class RegisterChannel {
 					}
 					Hashes.removeChannels(_guild_id);
 					if(result > 0) {
-						logger.debug("{} has registered the channel {} as {} channel in guild {}", _e.getMember().getUser().getId(), channel_type, channel_type, _guild_id);
-						_e.getChannel().sendMessage("**The channel has been registered!**").queue();
+						logger.debug("{} has registered the channel {} as {} channel in guild {}", e.getMember().getUser().getId(), channel_type, channel_type, _guild_id);
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
 						if(channel_type.equals("rea")) {
 							//use the temp cache to append reactions after the bot sends a message
 							if(Azrael.SQLUpdateReaction(_guild_id, true) > 0) {
-								ReactionMessage.print(_e, channel_id);
+								ReactionMessage.print(e, channel_id);
 							}
 							else {
-								logger.error("Role reactions couldn't be set to enable for guild {}", _guild_id);
-								_e.getChannel().sendMessage("An internal error occurred. The reactions couldn't be marked as enabled in the table Azrael.commands").queue();
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+								logger.error("Role reactions couldn't be set to enable in Azrael.guild for guild {}", _guild_id);
 							}
 						}
 					}
 					else {
-						_e.getChannel().sendMessage("An internal error occurred. Text channel couldn't be registered!").queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("text channel {} couldn't be registered in guild {}", channel_id, _guild_id);
 					}
 				}
 			}
 			else{
-				_e.getChannel().sendMessage(_e.getMember().getAsMention()+" Something went wrong. Please recheck the syntax!").queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
 		else {
-			_e.getChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild())).build()).queue();
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
+			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
 	}
 	
-	public static void runCommandURL(GuildMessageReceivedEvent _e, long _guild_id, String [] args, boolean adminPermission) {
-		final var commandLevel = GuildIni.getRegisterTextChannelURLLevel(_e.getGuild().getIdLong());
-		if(UserPrivs.comparePrivilege(_e.getMember(), commandLevel) || adminPermission) {
-			try {
-				var channel_id = Long.parseLong(args[1].replaceAll("[<>#]", ""));
-				if(args.length > 2 && _e.getGuild().getTextChannelById(channel_id) != null) {
-					if(args[2].equalsIgnoreCase("enable") || args[2].equalsIgnoreCase("disable")) {
-						var url_censoring = (args[2].equalsIgnoreCase("enable") ? true : false);
-						if(Azrael.SQLInsertChannel_ConfURLCensoring(channel_id, _guild_id, url_censoring) > 0) {
-							Hashes.removeChannels(_guild_id);
-							logger.debug("{} has registered the channel {} for url censoring in the guild {}", _e.getMember().getUser().getId(), channel_id, _e.getGuild().getName());
-							_e.getChannel().sendMessage("**The channel has been registered!**").queue();
-						}
-						else {
-							logger.error("Azrael.channel_conf couldn't be updated for channel {} and guild {}", channel_id, _e.getGuild().getName());
-							_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Internal error!").setDescription("An internal error occurred! Azrael.channel_conf couldn't be updated!").build()).queue();
-						}
+	public static void runCommandURL(GuildMessageReceivedEvent e, long _guild_id, String [] args, boolean adminPermission) {
+		final var commandLevel = GuildIni.getRegisterTextChannelURLLevel(e.getGuild().getIdLong());
+		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+			var channel = args[1].replaceAll("[<>#]", "");
+			if(args.length > 2 && e.getGuild().getTextChannelById(channel) != null) {
+				var channel_id = Long.parseLong(channel);
+				if(args[2].equalsIgnoreCase("enable") || args[2].equalsIgnoreCase("disable")) {
+					var url_censoring = (args[2].equalsIgnoreCase("enable") ? true : false);
+					if(Azrael.SQLInsertChannel_ConfURLCensoring(channel_id, _guild_id, url_censoring) > 0) {
+						Hashes.removeChannels(_guild_id);
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
+						logger.debug("{} has registered the channel {} for url censoring in the guild {}", e.getMember().getUser().getId(), channel_id, e.getGuild().getId());
 					}
 					else {
-						_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Syntax error!").setDescription("Please use either enable or disable!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Azrael.channel_conf couldn't be updated for channel {} and guild {}", channel_id, e.getGuild().getId());
 					}
 				}
 				else {
-					_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Syntax error!").setDescription("Please insert a valid text channel!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 				}
-			} catch(NumberFormatException | NullPointerException exc) {
-				_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Syntax error!").setDescription("Please insert a valid text channel!").build()).queue();
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_TEXT_CHANNEL)).build()).queue();
 			}
 		}
 		else {
-			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-			_e.getChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild())).build()).queue();
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
 	}
 	
-	public static void runCommandTxt(GuildMessageReceivedEvent _e, long _guild_id, String [] args, boolean adminPermission) {
-		final var commandLevel = GuildIni.getRegisterTextChannelTXTLevel(_e.getGuild().getIdLong());
-		if(UserPrivs.comparePrivilege(_e.getMember(), commandLevel) || adminPermission) {
-			try {
-				var channel_id = Long.parseLong(args[1].replaceAll("[<>#]", ""));
-				if(args.length > 2 && _e.getGuild().getTextChannelById(channel_id) != null) {
-					if(args[2].equalsIgnoreCase("enable") || args[2].equalsIgnoreCase("disable")) {
-						var txt_removal = (args[2].equalsIgnoreCase("enable") ? true : false);
-						if(Azrael.SQLInsertChannel_ConfTXTCensoring(channel_id, _guild_id, txt_removal) > 0) {
-							Hashes.removeChannels(_guild_id);
-							logger.debug("{} has registered the channel {} for text removal in the guild {}", _e.getMember().getUser().getId(), channel_id, _e.getGuild().getName());
-							_e.getChannel().sendMessage("**The channel has been registered!**").queue();
-						}
-						else {
-							logger.error("Azrael.channel_conf couldn't be updated for channel {} and guild {}", channel_id, _e.getGuild().getName());
-							_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Internal error!").setDescription("An internal error occurred! Azrael.channel_conf couldn't be updated!").build()).queue();
-						}
+	public static void runCommandTxt(GuildMessageReceivedEvent e, long _guild_id, String [] args, boolean adminPermission) {
+		final var commandLevel = GuildIni.getRegisterTextChannelTXTLevel(e.getGuild().getIdLong());
+		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+			var channel = args[1].replaceAll("[<>#]", "");
+			if(args.length > 2 && e.getGuild().getTextChannelById(channel) != null) {
+				var channel_id = Long.parseLong(channel);
+				if(args[2].equalsIgnoreCase("enable") || args[2].equalsIgnoreCase("disable")) {
+					var txt_removal = (args[2].equalsIgnoreCase("enable") ? true : false);
+					if(Azrael.SQLInsertChannel_ConfTXTCensoring(channel_id, _guild_id, txt_removal) > 0) {
+						Hashes.removeChannels(_guild_id);
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
+						logger.debug("{} has registered the channel {} for text removal in the guild {}", e.getMember().getUser().getId(), channel_id, e.getGuild().getId());
 					}
 					else {
-						_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Syntax error!").setDescription("Please use either enable or disable!").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Azrael.channel_conf couldn't be updated for channel {} and guild {}", channel_id, e.getGuild().getId());
 					}
 				}
 				else {
-					_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Syntax error!").setDescription("Please insert a valid text channel!").build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 				}
-			} catch(NumberFormatException | NullPointerException exc) {
-				_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Syntax error!").setDescription("Please insert a valid text channel!").build()).queue();
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_TEXT_CHANNEL)).build()).queue();
 			}
 		}
 		else {
-			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-			_e.getChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild())).build()).queue();
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
 	}
 	
-	public static void runChannelsRegistration(GuildMessageReceivedEvent _e, long _guild_id, boolean adminPermission) {
-		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-		final var commandLevel = GuildIni.getRegisterTextChannelsLevel(_e.getGuild().getIdLong());
-		if(UserPrivs.comparePrivilege(_e.getMember(), commandLevel) || adminPermission) {
-			for(TextChannel tc : _e.getGuild().getTextChannels()) {
+	public static void runChannelsRegistration(GuildMessageReceivedEvent e, long _guild_id, boolean adminPermission) {
+		final var commandLevel = GuildIni.getRegisterTextChannelsLevel(e.getGuild().getIdLong());
+		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+			for(TextChannel tc : e.getGuild().getTextChannels()) {
 				if(Azrael.SQLInsertChannels(tc.getIdLong(), tc.getName()) == 0) {
-					logger.error("channel {} couldn't be registered", tc.getId());
-					_e.getChannel().sendMessage("An internal error occurred. Channel "+tc.getName()+" couldn't be inserted into Azrael.channels").queue();
+					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_ERR).replace("{}", tc.getName())).queue();
+					logger.error("channel {} couldn't be registered in guild {}", tc.getId(), e.getGuild().getId());
 				}
 			}
-			logger.debug("{} has registered all available channels on guild {}", _e.getMember().getUser().getId(), _e.getGuild().getName());
-			_e.getChannel().sendMessage("**All text channels have been registered!**").queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ALL_CHANNELS)).build()).queue();
+			logger.debug("{} has registered all available channels on guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 		}
 		else {
-			_e.getChannel().sendMessage(denied.setDescription(_e.getMember().getAsMention() + " **My apologies young padawan. Higher privileges are required. Here a cookie** :cookie:\nOne of these roles are required: "+UserPrivs.retrieveRequiredRoles(commandLevel, _e.getGuild())).build()).queue();
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
+			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
 	}
 }

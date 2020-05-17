@@ -1,11 +1,5 @@
 package commands;
 
-/**
- * The DoubleExperience command will allow a user to 
- * enable/disable the double experience state or to
- * let it enable or disable on its own
- */
-
 import java.awt.Color;
 import java.io.File;
 
@@ -15,12 +9,22 @@ import org.slf4j.LoggerFactory;
 import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 import sql.RankingSystem;
+import util.STATIC;
+
+/**
+ * The DoubleExperience command will allow a user to 
+ * enable/disable the double experience state or to
+ * let it enable or disable on its own
+ * @author xHelixStorm
+ *
+ */
 
 public class DoubleExperience implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(DoubleExperience.class);
@@ -46,17 +50,16 @@ public class DoubleExperience implements CommandPublic {
 		if(guild_settings != null && guild_settings.getRankingState()) {
 			//if no parameters have been provided, show the command details
 			if(args.length == 0) {
-				message.setColor(Color.BLUE).setTitle("Command details!");
-				e.getChannel().sendMessage(message.setDescription("Use this command to change the setting of the double experience event for this guild. These are the options: \n"
-						+ "**AUTO**: The double experience event will start and terminate automatically\n"
-						+ "**ON**: The double experience event will be enabled\n"
-						+ "**OFF**: The double experience event will be disabled\n\n"
-						+ "To display the current state of the double experience event, include the **-state** parameter to the command!").build()).queue();
+				message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS));
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_HELP)
+					+ STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_HELP_1)
+					+ STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_HELP_2)
+					+ STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_HELP_3))
+					.build()).queue();
 			}
 			//display the current state of the double experience (enabled/disabled/auto)
-			else if(args[0].equalsIgnoreCase("-state")) {
-				message.setColor(Color.BLUE).setTitle("Current double experience state!");
-				e.getChannel().sendMessage(message.setDescription("The double experience event is set to **"+GuildIni.getDoubleExperienceMode(e.getGuild().getIdLong())+"**").build()).queue();
+			else if(args[0].equalsIgnoreCase("state")) {
+				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_STATE).replace("{}", GuildIni.getDoubleExperienceMode(e.getGuild().getIdLong()))).build()).queue();
 			}
 			//change the state if either on, off or auto has been added as first parameter
 			else if(args[0].equalsIgnoreCase("on") || args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("auto")) {
@@ -64,8 +67,7 @@ public class DoubleExperience implements CommandPublic {
 				if(!GuildIni.getDoubleExperienceMode(e.getGuild().getIdLong()).equalsIgnoreCase(args[0])) {
 					//overwrite the option in the guild ini file
 					GuildIni.setDoubleExperienceMode(e.getGuild().getIdLong(), args[0].toLowerCase());
-					message.setColor(Color.BLUE).setTitle("Double Experience state change!");
-					e.getChannel().sendMessage(message.setDescription("The double experience state is now set to **"+args[0].toLowerCase()+"**").build()).queue();
+					e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_UPDATE).replace("{}", args[0].toUpperCase())).build()).queue();
 					//if it has been enabled, write it in cache and print the double experience message in the bot channel
 					if(args[0].equalsIgnoreCase("on")) {
 						Hashes.addTempCache("doubleExp_gu"+e.getGuild().getId(), new Cache("on"));
@@ -73,7 +75,7 @@ public class DoubleExperience implements CommandPublic {
 						var bot_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null);
 						if(bot_channel != null) {
 							e.getGuild().getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg").queue();
-							e.getGuild().getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\nThe double EXP weekend is here\nUse the chance to gain more experience points than usual to reach new heights. See you at the top!\nThe event has been activated manually. Use this chance while you can!```").queue();
+							e.getGuild().getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\n"+STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_MESSAGE)+"```").queue();
 						}
 					}
 					//if it has been disabled, disable it in cache as well
@@ -86,17 +88,16 @@ public class DoubleExperience implements CommandPublic {
 					}
 				}
 				else {
-					message.setColor(Color.RED).setTitle("Double experience state couldn't be updated!");
-					e.getChannel().sendMessage(message.setDescription("The double experience state is already set to **"+args[0]+"**. Hence the state wasn't changed!").build()).queue();
+					message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_ERROR).replace("{}", args[0].toUpperCase())).build()).queue();
 				}
 			}
 			else {
-				message.setColor(Color.RED).setTitle("Wrong parameter!");
-				e.getChannel().sendMessage(message.setDescription("Command error! Please review the command usage and then try again!").build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
 		else {
-			e.getChannel().sendMessage(message.setColor(Color.RED).setTitle("Ranking system is disabled!").setDescription("Please enable the ranking system before utilizing this command!").build()).queue();
+			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 		}
 	}
 

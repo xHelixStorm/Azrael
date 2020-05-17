@@ -1,14 +1,13 @@
 package commands;
 
-import java.awt.Color;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import enums.Translation;
 import fileManagement.IniFileReader;
 import interfaces.CommandPublic;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import util.STATIC;
 
 public class Reboot implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Reboot.class);
@@ -21,12 +20,8 @@ public class Reboot implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
-			e.getChannel().sendMessage("**Now rebooting!**").complete();
+			e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.REBOOT)).complete();
 			e.getJDA().shutdown();
-		}
-		else {
-			EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle("Access Denied!");
-			e.getChannel().sendMessage(message.setDescription(e.getMember().getAsMention() + " **My apologies young padawan. The highest instance privilege is required. Here a cookie** :cookie:").build()).queue();
 		}
 	}
 

@@ -5,6 +5,7 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.Hashes;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -20,7 +21,7 @@ import sql.Azrael;
  * 
  * On execution, the guild details will be inserted into all
  * tables and a guild ini file will be created if not available.
- * @author Giuseppe-Emanuele
+ * @author xHelixStorm
  *
  */
 
@@ -59,6 +60,8 @@ public class GuildJoinListener extends ListenerAdapter {
 			GuildIni.createIni(guild_id);
 		else
 			GuildIni.verifyIni(guild_id);
+		//set the default language for this server
+		Hashes.setLanguage(guild_id, "en");
 		//collect all users in the server
 		new Thread(new CollectUsersGuilds(null, e)).start();
 		Azrael.SQLInsertActionLog("GUILD_JOIN", e.getGuild().getIdLong(), e.getGuild().getIdLong(), guild_name);

@@ -90,6 +90,7 @@ public class Hashes {
     private static final ConcurrentHashMap<Long, String> filter_threshold = new ConcurrentHashMap<Long, String>();
     private static final ConcurrentHashMap<Long, Thread> heavyCensoringThread = new ConcurrentHashMap<Long, Thread>();
     private static final ConcurrentHashMap<String, SpamDetection> spamDetection = new ConcurrentHashMap<String, SpamDetection>();
+    private static final ConcurrentHashMap<Long, String> languages = new ConcurrentHashMap<Long, String>();
 	
 	public static void addMessagePool(long _message_id, ArrayList<Messages> _messages) {
 		message_pool.put(_message_id, _messages);
@@ -216,6 +217,9 @@ public class Hashes {
 	}
 	public static void addSpamMessage(String _key, SpamDetection _message) {
 		spamDetection.put(_key, _message);
+	}
+	public static void setLanguage(Long _key, String _lang) {
+		languages.put(_key, _lang);
 	}
 	
 	public static ArrayList<Messages> getMessagePool(long _message_id) {
@@ -355,6 +359,9 @@ public class Hashes {
 	}
 	public static SpamDetection getSpamDetection(String _key) {
 		return spamDetection.get(_key);
+	}
+	public static String getLanguage(long _key) {
+		return languages.get(_key);
 	}
 	
 	public static void removeMessagePool(long _message_id) {

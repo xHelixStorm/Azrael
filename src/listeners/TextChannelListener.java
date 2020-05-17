@@ -1,5 +1,15 @@
 package listeners;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import core.Hashes;
+import net.dv8tion.jda.api.events.channel.text.TextChannelCreateEvent;
+import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.channel.text.update.TextChannelUpdateNameEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import sql.Azrael;
+
 /**
  * This class executed when either a new text channel
  * gets created, the text channel name gets updated or
@@ -8,21 +18,8 @@ package listeners;
  * The affected text channel will be inserted/updated/
  * removed from all affected tables depending on the 
  * occurrence.
+ * @author xHelixStorm
  */
-
-import java.awt.Color;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import constructors.Channels;
-import core.Hashes;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.channel.text.TextChannelCreateEvent;
-import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
-import net.dv8tion.jda.api.events.channel.text.update.TextChannelUpdateNameEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import sql.Azrael;
 
 public class TextChannelListener extends ListenerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(TextChannelListener.class);
@@ -64,8 +61,6 @@ public class TextChannelListener extends ListenerAdapter {
 		}
 		else {
 			//throw an error, if channel couldn't be inserted/updated
-			Channels log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-			if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error!").setDescription("An internal error occurred! TextChannel "+e.getChannel().getName()+" couldn't be inserted or updated into Azrael.channels!").build()).queue();
 			logger.error("An internal error occurred! TextChannel {} couldn't be inserted or updated into Azrael.channels for guild {}", e.getChannel().getId(), e.getGuild().getId());
 		}
 	}

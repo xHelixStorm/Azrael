@@ -1,11 +1,5 @@
 package commands;
 
-/**
- * The Daily command sends the user a random defined reward
- * which can be retrieved once a day as long the ranking 
- * system is enabled
- */
-
 import java.awt.Color;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -24,6 +18,7 @@ import constructors.Dailies;
 import constructors.InventoryContent;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import inventory.DrawDaily;
@@ -32,6 +27,14 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 import sql.Azrael;
 import util.STATIC;
+
+/**
+ * The Daily command sends the user a random defined reward
+ * which can be retrieved once a day as long the ranking 
+ * system is enabled
+ * @author xHelixStorm
+ *
+ */
 
 public class Daily implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Daily.class);
@@ -115,6 +118,7 @@ public class Daily implements CommandPublic {
 						LocalDateTime tomorrowMidnight = LocalDateTime.of(today, midnight).plusDays(1);
 						Timestamp timestamp2 = Timestamp.valueOf(tomorrowMidnight);
 						var editedRows = 0;
+						var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 						//if it's a currency reward, add it directly to the total currency of the user and update the db
 						if(list.get(random).getType().equals("cur")) {
 							constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
@@ -148,20 +152,18 @@ public class Daily implements CommandPublic {
 						//if it's a special reward, send it in private message to the user and print it in the log channel at the same time
 						else if(list.get(random).getType().equals("cod")) {
 							//log the reward in bot channel and send a private message
-							var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 							e.getMember().getUser().openPrivateChannel().queue(channel -> {
-								channel.sendMessage("Congratulations. You have unlocked the following reward:\n"+cod_reward).queue(success -> {
+								channel.sendMessage(STATIC.getTranslation(e.getMember(), Translation.DAILY_REWARD)+cod_reward).queue(success -> {
+									if(log_channel != null) {
+										EmbedBuilder message = new EmbedBuilder().setColor(Color.getHSBColor(268, 81, 88)).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DAILY));
+										e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_REWARD_SENT).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId())+cod_reward).build()).queue();
+									}
 									channel.close().queue();
 								}, error -> {
-									if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription("The user with the id number **"+e.getMember().getUser().getId()+"** has locked the direct private messaging and couldn't receive the reward!").build()).queue();
+									if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_REWARD_NOT_SENT).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId())+cod_reward).build()).queue();
 									channel.close().queue();
 								});
 							});
-							
-							if(log_channel != null) {
-								EmbedBuilder message = new EmbedBuilder().setColor(Color.getHSBColor(268, 81, 88)).setTitle("Reward was sent to user!");
-								e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription("The user "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" has received a rare reward from the daily commands. This is the reward:\n"+cod_reward).build()).queue();
-							}
 							
 							//mark the code as used
 							editedRows = RankingSystem.SQLUpdateUsedOnReward(cod_reward, e.getGuild().getIdLong());
@@ -173,30 +175,31 @@ public class Daily implements CommandPublic {
 								RankingSystem.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily retrieved", list.get(random).getDescription());
 							}
 							else {
+								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_2)+e.getMember().getAsMention()).build()).queue();
 								logger.error("used dailies from {} couldn't be marked in RankingSystem.dailies_usage table", e.getMember().getUser().getId());
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily retrieval not marked", list.get(random).getDescription());
 							}
 						}
 						else {
-							e.getChannel().sendMessage("Internal error occurred! Daily item couldn't be inserted into your inventory. Please contact an administrator!").queue();
-							logger.warn("{} couldn't be inserted into inventory", list.get(random).getDescription());
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_3)).build()).queue();
+							logger.error("{} couldn't be inserted into inventory", list.get(random).getDescription());
 							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily item couldn't be inserted to inventory", "An insert error occurred for the following item "+list.get(random).getDescription());
 						}
 						list.clear();
 					}
 					else {
-						e.getChannel().sendMessage("No items are available inside the daily command currently!").queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_EMPTY)).build()).queue();
 					}
 				}
 				//notify the user that he can't use the daily command yet
 				else {
 					long hours = time_for_daily/1000/60/60;
 					long minutes = time_for_daily/1000/60%60;
-					e.getChannel().sendMessage("Wait, slow down! You can open your next daily in **"+hours+" hours and "+minutes+" minutes**!").queue();
+					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.DAILY_COOLDOWN).replaceFirst("\\{\\}", ""+hours).replace("{}", ""+minutes)).queue();
 				}
 			}
 			else {
-				e.getChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
+				e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.NOT_BOT_CHANNEL)+STATIC.getChannels(bot_channels)).queue();
 			}
 		}
 	}

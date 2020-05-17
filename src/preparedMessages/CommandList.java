@@ -1,16 +1,20 @@
 package preparedMessages;
 
+import enums.Translation;
 import fileManagement.GuildIni;
+import net.dv8tion.jda.api.entities.Member;
+import util.STATIC;
 
 public class CommandList {
 	
-	public static String getHelp(long guild_id, boolean permissionGranted) {
+	public static String getHelp(Member member, boolean permissionGranted, int type) {
+		long guild_id = member.getGuild().getIdLong();
 		StringBuilder textCollector = new StringBuilder();
 		boolean administration = false;
 		boolean entertainment = false;
 		boolean other = false;
 		
-		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getRssCommand(guild_id) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoringCommand(guild_id) || GuildIni.getMuteCommand(guild_id) || GuildIni.getGoogleCommand(guild_id) || GuildIni.getWriteCommand(guild_id) || GuildIni.getEditCommand(guild_id))) {
+		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getSubscribeCommand(guild_id) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoringCommand(guild_id) || GuildIni.getMuteCommand(guild_id) || GuildIni.getGoogleCommand(guild_id) || GuildIni.getWriteCommand(guild_id) || GuildIni.getEditCommand(guild_id))) {
 			administration = true;
 		}
 		
@@ -23,47 +27,44 @@ public class CommandList {
 		}
 		
 		final String prefix = GuildIni.getCommandPrefix(guild_id);
-		if(administration == true) {
-			textCollector.append("**_Administration:_**\n");
-			if(GuildIni.getRegisterCommand(guild_id))textCollector.append("**-"+prefix+"register**\nregister channel, role, ranking role or users with the database\n\n");
-			if(GuildIni.getSetCommand(guild_id))textCollector.append("**-"+prefix+"set**\nset set specific paramater to configure your bot and server\n\n");
-			if(GuildIni.getRemoveCommand(guild_id)) textCollector.append("**-"+prefix+"remove**\n remove a registered text channel, filter, role or ranking role from the database\n\n");
-			if(GuildIni.getUserCommand(guild_id))textCollector.append("**-"+prefix+"user**\nchoose between various actions that you can take against a user\n\n");
-			if(GuildIni.getFilterCommand(guild_id))textCollector.append("**-"+prefix+"filter**\ndecide to view, append or remove words/names from various filters or funky names\n\n");
-			if(GuildIni.getRoleReactionCommand(guild_id))textCollector.append("**-"+prefix+"roleReaction**\nenable / disable the role reaction and remove roles on disable\n\n");
-			if(GuildIni.getRssCommand(guild_id))textCollector.append("**-"+prefix+"rss**\ninsert rss feeds\n\n");
-			if(GuildIni.getDoubleExperienceCommand(guild_id))textCollector.append("**-"+prefix+"doubleExperience**\nenable, disable or set the double experience mode to auto\n\n");
-			if(GuildIni.getHeavyCensoringCommand(guild_id))textCollector.append("**-"+prefix+"heavycensoring**\nenable/disable the heavycensoring for cases when it will get hard to moderate\n\n");
-			if(GuildIni.getMuteCommand(guild_id))textCollector.append("**-"+prefix+"mute**\nto mute one or multiple users on the server. Optional with reason\n\n");
-			if(GuildIni.getGoogleCommand(guild_id))textCollector.append("**-"+prefix+"google**\nto configure integrations for specific actions with google services\n\n");
-			if(GuildIni.getWriteCommand(guild_id))textCollector.append("**-"+prefix+"write**\nto write a message as the bot\n\n");
-			if(GuildIni.getEditCommand(guild_id))textCollector.append("**-"+prefix+"edit**\nto update a message of the bot\n\n");
+		if(administration == true && type == 1) {
+			if(GuildIni.getRegisterCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_REGISTER).replace("{}", prefix));
+			if(GuildIni.getSetCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SET).replace("{}", prefix));
+			if(GuildIni.getRemoveCommand(guild_id)) 			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_REMOVE).replace("{}", prefix));
+			if(GuildIni.getUserCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_USER).replace("{}", prefix));
+			if(GuildIni.getFilterCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_FILTER).replace("{}", prefix));
+			if(GuildIni.getRoleReactionCommand(guild_id))		textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ROLE_REACTION).replace("{}", prefix));
+			if(GuildIni.getSubscribeCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SUBSCRIBE).replace("{}", prefix));
+			if(GuildIni.getDoubleExperienceCommand(guild_id))	textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DOUBLE_EXPERIENCE).replace("{}", prefix));
+			if(GuildIni.getHeavyCensoringCommand(guild_id))		textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_HEAVY_CENSORING).replace("{}", prefix));
+			if(GuildIni.getMuteCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_MUTE).replace("{}", prefix));
+			if(GuildIni.getGoogleCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_GOOGLE).replace("{}", prefix));
+			if(GuildIni.getWriteCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_WRITE).replace("{}", prefix));
+			if(GuildIni.getEditCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_EDIT).replace("{}", prefix));
 		}
-		if(entertainment == true) {
-			textCollector.append("**_Entertainment:_**\n");
-			if(GuildIni.getPugCommand(guild_id))textCollector.append("**-"+prefix+"pug**\nshows a pug picture. Use help as a parameter to get a list of all parameters\n\n");
-			if(GuildIni.getMeowCommand(guild_id))textCollector.append("**-"+prefix+"meow**\nshows a cat picture. Use help as a parameter to get a list of all parameters\n\n");
-			if(GuildIni.getRankCommand(guild_id))textCollector.append("**-"+prefix+"rank**\nshows the players actual rank\n\n");
-			if(GuildIni.getProfileCommand(guild_id))textCollector.append("**-"+prefix+"profile**\nshows the players actual rank with more informations\n\n");
-			if(GuildIni.getTopCommand(guild_id))textCollector.append("**-"+prefix+"top**\nshows the top 10 ranking\n\n");
-			if(GuildIni.getUseCommand(guild_id))textCollector.append("**-"+prefix+"use**\nto use an item from your inventory\n\n");
-			if(GuildIni.getShopCommand(guild_id))textCollector.append("**-"+prefix+"shop**\ndisplay the content in the shop and purchase\n\n");
-			if(GuildIni.getInventoryCommand(guild_id))textCollector.append("**-"+prefix+"inventory**\ndisplays the content inside your inventory\n\n");
-			if(GuildIni.getDailyCommand(guild_id))textCollector.append("**-"+prefix+"daily**\nto get a daily reward\n\n");
-			if(GuildIni.getQuizCommand(guild_id))textCollector.append("**-"+prefix+"quiz**\nto initialize a question and answer session with rewards\n\n");
-			if(GuildIni.getRandomshopCommand(guild_id))textCollector.append("**-"+prefix+"randomshop**\nto receive a random weapon from the randomshop\n\n");
-			if(GuildIni.getEquipCommand(guild_id))textCollector.append("**-"+prefix+"equip**\nto equip purchased weapons and skills. To use only in private message with the ! prefix\n\n");
+		if(entertainment == true && type == 2) {
+			if(GuildIni.getPugCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PUG).replace("{}", prefix));
+			if(GuildIni.getMeowCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_MEOW).replace("{}", prefix));
+			if(GuildIni.getRankCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_RANK).replace("{}", prefix));
+			if(GuildIni.getProfileCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PROFILE).replace("{}", prefix));
+			if(GuildIni.getTopCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_TOP).replace("{}", prefix));
+			if(GuildIni.getUseCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_USE).replace("{}", prefix));
+			if(GuildIni.getShopCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SHOP).replace("{}", prefix));
+			if(GuildIni.getInventoryCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_INVENTORY).replace("{}", prefix));
+			if(GuildIni.getDailyCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DAILY).replace("{}", prefix));
+			if(GuildIni.getQuizCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_QUIZ).replace("{}", prefix));
+			if(GuildIni.getRandomshopCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_RANDOMSHOP).replace("{}", prefix));
+			if(GuildIni.getEquipCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_EQUIP).replace("{}", prefix));
 		}
-		if(other == true) {
-			textCollector.append("**_Other:_**\n");
-			if(GuildIni.getAboutCommand(guild_id))textCollector.append("**-"+prefix+"about**\nshows all information regarding this Bot\n\n");
-			if(GuildIni.getHelpCommand(guild_id))textCollector.append("**-"+prefix+"help**\nshows a link to our tech thread on forum\n\n");
-			if(GuildIni.getDisplayCommand(guild_id))textCollector.append("**-"+prefix+"display**\nshows details of registered roles, rank level, channel filter, etc. (few parameters may be restricted)\n\n");
-			if(GuildIni.getPatchnotesCommand(guild_id))textCollector.append("**-"+prefix+"patchnotes**\nshows past published patchnotes of the game and game\n\n");
+		if(other == true && type == 3) {
+			if(GuildIni.getAboutCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ABOUT).replace("{}", prefix));
+			if(GuildIni.getHelpCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_HELP).replace("{}", prefix));
+			if(GuildIni.getDisplayCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DISPLAY).replace("{}", prefix));
+			if(GuildIni.getPatchnotesCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PATCHNOTES).replace("{}", prefix));
 		}
 		
 		if(administration == false && entertainment == false && other == false){
-			textCollector.append("All commands are disabled");
+			textCollector.append(STATIC.getTranslation(member, Translation.COMMANDS_DISABLED));
 		}
 		
 		

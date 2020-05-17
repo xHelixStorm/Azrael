@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 import enums.GoogleEvent;
+import enums.Translation;
 import fileManagement.GuildIni;
 import google.GoogleUtils;
 import net.dv8tion.jda.api.Permission;
@@ -23,6 +24,14 @@ import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
+import util.STATIC;
+
+/**
+ * This class will update the nickname table on name change
+ * and eventually log to google spreadsheets, if available
+ * @author xHelixStorm
+ *
+ */
 
 public class NicknameListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(NameListener.class);
@@ -57,8 +66,9 @@ public class NicknameListener extends ListenerAdapter {
 				}
 				//Run google service, if enabled
 				if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-					String reporter_name = "NaN";
-					String reporter_effectivename = "NaN";
+					final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
+					String reporter_name = NA;
+					String reporter_effectivename = NA;
 					if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
 						var roleLog = e.getGuild().retrieveAuditLogs();
 						//iterate through the log
