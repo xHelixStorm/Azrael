@@ -45,11 +45,11 @@ public class Remove implements CommandPublic {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS))
 				.setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_HELP)).build()).queue();
 		}
-		else if(args.length == 1 && args[0].equalsIgnoreCase("role")) {
+		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_ROLE_HELP)).build()).queue();
 		}
-		else if(args.length == 2 && args[0].equalsIgnoreCase("role")) {
-			if(args[1].equalsIgnoreCase("all")) {
+		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
+			if(args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))) {
 				final int result = DiscordRoles.SQLDeleteAllRoles(e.getGuild().getIdLong());
 				if(result > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_ROLES)).build()).queue();
@@ -88,11 +88,11 @@ public class Remove implements CommandPublic {
 				}
 			}
 		}
-		else if(args.length == 1 && args[0].equalsIgnoreCase("ranking-role")) {
+		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE))) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_RANKING_HELP)).build()).queue();
 		}
-		else if(args.length == 2 && args[0].equalsIgnoreCase("ranking-role")) {
-			if(args[1].equalsIgnoreCase("all")) {
+		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE))) {
+			if(args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))) {
 				final int result = RankingSystem.SQLclearRoles(e.getGuild().getIdLong());
 				if(result > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_RANKING_ROLES)).build()).queue();
@@ -130,11 +130,11 @@ public class Remove implements CommandPublic {
 				}
 			}
 		}
-		else if(args.length == 1 && args[0].equalsIgnoreCase("text-channel")) {
+		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL))) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_TXT_CHANNEL_HELP)).build()).queue();
 		}
-		else if(args.length == 2 && args[0].equalsIgnoreCase("text-channel")) {
-			if(args[1].equalsIgnoreCase("all")) {
+		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL))) {
+			if(args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))) {
 				final int result = Azrael.SQLDeleteAllChannelConfs(e.getGuild().getIdLong());
 				if(result > 0) {
 					for(var tc : e.getGuild().getTextChannels()) {
@@ -179,11 +179,11 @@ public class Remove implements CommandPublic {
 				}
 			}
 		}
-		else if(args.length == 1 && args[0].equalsIgnoreCase("channel-censor")) {
+		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL_CENSOR))) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CENSOR_HELP)).build()).queue();
 		}
-		else if(args.length == 2 && args[0].equalsIgnoreCase("channel-censor")) {
-			if(args[1].equalsIgnoreCase("all")) {
+		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL_CENSOR))) {
+			if(args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))) {
 				boolean deleted = false;
 				boolean error = false;
 				for(final var tc : e.getGuild().getTextChannels()) {

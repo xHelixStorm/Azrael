@@ -54,12 +54,12 @@ public class Edit implements CommandPublic {
 			}
 		}
 		else if(args.length == 3) {
-			if(args[2].equalsIgnoreCase("add-reaction") || args[2].equalsIgnoreCase("clear-reactions")) {
+			if(args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_REACTION)) || args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CLEAR_REACTIONS))) {
 				String channel_id = args[0].replaceAll("[<>#]", "");
 				String message_id = args[1];
 				String parameter = args[2].toLowerCase();
 				if(e.getGuild().getTextChannelById(channel_id) != null) {
-					Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, (parameter.equals("add-reaction") ? "RA" : "RC"), channel_id, message_id));
+					Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, (parameter.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_REACTION)) ? "RA" : "RC"), channel_id, message_id));
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NO_TEXT_CHANNEL)).build()).queue();

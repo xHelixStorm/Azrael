@@ -25,11 +25,11 @@ public class SetMaxExperience {
 	private final static Logger logger = LoggerFactory.getLogger(SetMaxExperience.class);
 	
 	public static void runTask(GuildMessageReceivedEvent e, String _input, Guilds guild_settings) {
-		Pattern pattern = Pattern.compile("(enable|disable)");
+		Pattern pattern = Pattern.compile("("+STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)+"|"+STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE)+")");
 		Matcher matcher = pattern.matcher(_input);
 		if(matcher.find()){
 			var editedRows = 0;
-			if(matcher.group().equals("enable")) {
+			if(matcher.group().equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))) {
 				guild_settings.setMaxExpEnabled(true);
 				editedRows = RankingSystem.SQLUpdateMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), e.getGuild().getIdLong());
 				if(editedRows > 0)
@@ -38,7 +38,7 @@ public class SetMaxExperience {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				}
 			}
-			else if(matcher.group().equals("disable")) {
+			else if(matcher.group().equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))) {
 				guild_settings.setMaxExpEnabled(false);
 				editedRows = RankingSystem.SQLUpdateMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), e.getGuild().getIdLong());
 				if(editedRows > 0)

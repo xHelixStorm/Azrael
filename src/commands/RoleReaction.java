@@ -42,7 +42,7 @@ public class RoleReaction implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		//after a channel has been registered for self role assignment, it can be disabled and enabled with this command
-		if(args.length > 0 && args[0].equalsIgnoreCase("enable")) {
+		if(args.length > 0 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))) {
 			if(Azrael.SQLgetCommandExecutionReaction(e.getGuild().getIdLong()) == true) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROLE_REACTION_ENABLED)).build()).queue();
 			}
@@ -58,7 +58,7 @@ public class RoleReaction implements CommandPublic {
 				}
 			}
 		}
-		else if(args.length > 0 && args[0].equalsIgnoreCase("disable")) {
+		else if(args.length > 0 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))) {
 			if(Azrael.SQLgetCommandExecutionReaction(e.getGuild().getIdLong()) == false) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROLE_REACTION_DISABLED)).build()).queue();
 			}

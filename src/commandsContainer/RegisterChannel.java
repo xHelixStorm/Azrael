@@ -136,8 +136,8 @@ public class RegisterChannel {
 			var channel = args[1].replaceAll("[<>#]", "");
 			if(args.length > 2 && e.getGuild().getTextChannelById(channel) != null) {
 				var channel_id = Long.parseLong(channel);
-				if(args[2].equalsIgnoreCase("enable") || args[2].equalsIgnoreCase("disable")) {
-					var url_censoring = (args[2].equalsIgnoreCase("enable") ? true : false);
+				if(args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)) || args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))) {
+					var url_censoring = (args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)) ? true : false);
 					if(Azrael.SQLInsertChannel_ConfURLCensoring(channel_id, _guild_id, url_censoring) > 0) {
 						Hashes.removeChannels(_guild_id);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
@@ -168,8 +168,8 @@ public class RegisterChannel {
 			var channel = args[1].replaceAll("[<>#]", "");
 			if(args.length > 2 && e.getGuild().getTextChannelById(channel) != null) {
 				var channel_id = Long.parseLong(channel);
-				if(args[2].equalsIgnoreCase("enable") || args[2].equalsIgnoreCase("disable")) {
-					var txt_removal = (args[2].equalsIgnoreCase("enable") ? true : false);
+				if(args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)) || args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))) {
+					var txt_removal = (args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)) ? true : false);
 					if(Azrael.SQLInsertChannel_ConfTXTCensoring(channel_id, _guild_id, txt_removal) > 0) {
 						Hashes.removeChannels(_guild_id);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();

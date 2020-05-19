@@ -80,9 +80,9 @@ public class Patchnotes implements CommandPublic {
 					if(args.length == 0)
 						e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_1)).build()).queue();
 					//execute if the parameter equals 'private' or 'public'
-					else if(args.length == 1 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public"))) {
+					else if(args.length == 1 && (args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC)))) {
 						ArrayList<Patchnote> display_notes = null;
-						if(args[0].equalsIgnoreCase("private"))
+						if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE)))
 							display_notes = priv_notes;
 						else
 							display_notes = publ_notes;
@@ -96,11 +96,11 @@ public class Patchnotes implements CommandPublic {
 						}
 					}
 					//print the specific patch note from the private or public category
-					else if(args.length == 2 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public"))) {
+					else if(args.length == 2 && (args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC)))) {
 						Patchnote note = null;
-						if(args[0].equalsIgnoreCase("private"))
+						if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE)))
 							note = priv_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
-						else if(args[0].equalsIgnoreCase("public"))
+						else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC)))
 							note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
 						if(note == null) {
 							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_FOUND)).build()).queue();
@@ -153,11 +153,11 @@ public class Patchnotes implements CommandPublic {
 					if(args.length == 0)
 						e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_2)).build()).queue();
 					//enter this block if either 'private', 'public' or 'game' has been written
-					else if(args.length == 1 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public") || args[0].equalsIgnoreCase("game"))) {
+					else if(args.length == 1 && (args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME)))) {
 						ArrayList<Patchnote> display_notes = null;
-						if(args[0].equalsIgnoreCase("private"))
+						if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE)))
 							display_notes = priv_notes;
-						else if(args[0].equalsIgnoreCase("public"))
+						else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC)))
 							display_notes = publ_notes;
 						else
 							display_notes = game_notes;
@@ -171,13 +171,13 @@ public class Patchnotes implements CommandPublic {
 						}
 					}
 					//display the selected parameter if 2 parameters have been used
-					else if(args.length == 2 && (args[0].equalsIgnoreCase("private") || args[0].equalsIgnoreCase("public") || args[0].equalsIgnoreCase("game"))) {
+					else if(args.length == 2 && (args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME)))) {
 						Patchnote note = null;
-						if(args[0].equalsIgnoreCase("private"))
+						if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE)))
 							note = priv_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
-						else if(args[0].equalsIgnoreCase("public"))
+						else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC)))
 							note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
-						else if(args[0].equalsIgnoreCase("game"))
+						else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME)))
 							note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
 						if(note == null) {
 							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_AVAILABLE)).build()).queue();
@@ -196,9 +196,9 @@ public class Patchnotes implements CommandPublic {
 					if(args.length == 0)
 						e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_2)).build()).queue();
 					//list all available patch notes, if either 'bot' or 'game' has been selected
-					else if(args.length == 1 && (args[0].equalsIgnoreCase("bot") || args[0].equalsIgnoreCase("game"))) {
+					else if(args.length == 1 && (args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_BOT)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME)))) {
 						ArrayList<Patchnote> display_notes = null;
-						if(args[0].equalsIgnoreCase("bot"))
+						if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_BOT)))
 							display_notes = publ_notes;
 						else
 							display_notes = game_notes;
@@ -212,11 +212,11 @@ public class Patchnotes implements CommandPublic {
 						}
 					}
 					//display the selected patch notes, if 2 parameters have been passed
-					else if(args.length == 2 && (args[0].equalsIgnoreCase("bot") || args[0].equalsIgnoreCase("game"))) {
+					else if(args.length == 2 && (args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_BOT)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME)))) {
 						Patchnote note = null;
-						if(args[0].equalsIgnoreCase("bot"))
+						if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_BOT)))
 							note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
-						else if(args[0].equalsIgnoreCase("game"))
+						else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME)))
 							note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
 						if(note == null) {
 							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_AVAILABLE)).build()).queue();

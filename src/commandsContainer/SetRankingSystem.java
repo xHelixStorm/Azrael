@@ -17,25 +17,22 @@ import util.STATIC;
 public class SetRankingSystem {
 	private final static Logger logger = LoggerFactory.getLogger(SetRankingSystem.class);
 	
-	@SuppressWarnings("preview")
 	public static void runTask(GuildMessageReceivedEvent e, String _input){
 		boolean ranking_state = false;
 		boolean wrongInput = false;
 		String message;
 		
-		switch(_input) {
-			case "enable" -> {
-				ranking_state = true;
-				message = STATIC.getTranslation(e.getMember(), Translation.SET_RANKING_ENABLE);
-			}
-			case "disable" -> {
-				ranking_state = false;
-				message = STATIC.getTranslation(e.getMember(), Translation.SET_RANKING_DISABLE);
-			}
-			default -> {
-				wrongInput = true;
-				message = STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND);
-			}
+		if(_input.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))) {
+			ranking_state = true;
+			message = STATIC.getTranslation(e.getMember(), Translation.SET_RANKING_ENABLE);
+		}
+		else if(_input.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))) {
+			ranking_state = false;
+			message = STATIC.getTranslation(e.getMember(), Translation.SET_RANKING_DISABLE);
+		}
+		else {
+			wrongInput = true;
+			message = STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND);
 		}
 		
 		if(wrongInput == false) {

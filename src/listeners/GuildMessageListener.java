@@ -108,31 +108,31 @@ public class GuildMessageListener extends ListenerAdapter {
 					final var shop = Hashes.getTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					if(shop != null && shop.getExpiration() - System.currentTimeMillis() > 0) {
 						//verify if the user whishes to close the shop
-						if(message.equalsIgnoreCase("exit")) {
+						if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_TITLE_EXIT)).build()).queue();
 							Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 						}
 						//check if the user has decided for a specific category
 						else if(shop.getAdditionalInfo().length() == 0) {
-							if(message.equalsIgnoreCase("level ups")) {
+							if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LEVEL_UPS))) {
 								ShopExecution.displayShop(e, "lev", guild_settings.getLevelDescription());
 							}
-							else if(message.equalsIgnoreCase("ranks")) {
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKS))) {
 								ShopExecution.displayShop(e, "ran", guild_settings.getRankDescription());
 							}
-							else if(message.equalsIgnoreCase("profiles")) {
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROFILES))) {
 								ShopExecution.displayShop(e, "pro", guild_settings.getProfileDescription());
 							}
-							else if(message.equalsIgnoreCase("icons")) {
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ICONS))) {
 								ShopExecution.displayShop(e, "ico", guild_settings.getIconDescription());
 							}
-							else if(message.equalsIgnoreCase("items")) {
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ITEMS))) {
 								ShopExecution.displayShop(e, "ite", "");
 							}
-							else if(message.equalsIgnoreCase("weapons")) {
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WEAPONS))) {
 								ShopExecution.displayWeaponCategories(e, guild_settings.getThemeID());
 							}
-							else if(message.equalsIgnoreCase("skills")) {
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SKILLS))) {
 								ShopExecution.displaySkills(e, guild_settings);
 							}
 						}
@@ -144,13 +144,13 @@ public class GuildMessageListener extends ListenerAdapter {
 						}
 						//verify if the user whishes to purchase, sell or return on the currently selected item
 						else if(shop.getAdditionalInfo().matches("(lev|ran|pro|ico|ite)") && (shop.getAdditionalInfo2().contains("%") || shop.getAdditionalInfo2().contains("$") || shop.getAdditionalInfo2().contains("#"))) {
-							if(message.equalsIgnoreCase("purchase") && shop.getAdditionalInfo2().contains("%")) {
+							if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PURCHASE)) && shop.getAdditionalInfo2().contains("%")) {
 								PurchaseExecution.purchase(e, shop.getAdditionalInfo(), shop.getAdditionalInfo2().replaceAll("%", ""), guild_settings);
 							}
-							else if(message.equalsIgnoreCase("sell") && shop.getAdditionalInfo2().contains("#")) {
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SELL)) && shop.getAdditionalInfo2().contains("#")) {
 								PurchaseExecution.sell(e, shop.getAdditionalInfo(), shop.getAdditionalInfo2().replaceAll("#", ""), guild_settings);
 							}
-							else if(message.equalsIgnoreCase("return")) {
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RETURN))) {
 								switch(shop.getAdditionalInfo()) {
 									case "lev" -> ShopExecution.displayShop(e, "lev", guild_settings.getLevelDescription());
 									case "ran" -> ShopExecution.displayShop(e, "ran", guild_settings.getRankDescription());
@@ -182,10 +182,10 @@ public class GuildMessageListener extends ListenerAdapter {
 						}
 						//check if a user wishes to purchase a weapon or return from the currently focused weapon
 						else if(shop.getAdditionalInfo().contains("wea-") && shop.getAdditionalInfo2().contains("%")) {
-							if(message.equalsIgnoreCase("purchase")) {
+							if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PURCHASE))) {
 								PurchaseExecution.purchase(e, "wep", shop.getAdditionalInfo2().replaceAll("%", ""), guild_settings);
 							}
-							else if(message.equalsIgnoreCase("return")) {
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RETURN))) {
 								ShopExecution.displayShopWeapons(e, shop.getAdditionalInfo().split("-")[1]);
 							}
 						}
@@ -198,10 +198,10 @@ public class GuildMessageListener extends ListenerAdapter {
 						}
 						//check if a user wishes to purchase a skill or return from the currently focused skill
 						else if(shop.getAdditionalInfo().equals("ski") && shop.getAdditionalInfo2().contains("%")) {
-							if(message.equalsIgnoreCase("purchase")) {
+							if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PURCHASE))) {
 								PurchaseExecution.purchase(e, "ski", shop.getAdditionalInfo2().replaceAll("%", ""), guild_settings);
 							}
-							else if(message.equalsIgnoreCase("return")) {
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RETURN))) {
 								ShopExecution.displaySkills(e, guild_settings);
 							}
 						}
@@ -275,7 +275,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(rss != null && !UserPrivs.isUserBot(e.getMember()) && rss.getExpiration() - System.currentTimeMillis() > 0) {
 						String task = rss.getAdditionalInfo();
 						//check if the user wishes to close the rss window
-						if(!message.equalsIgnoreCase("exit")) {
+						if(!message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
 							//register a rss feed if selected
 							if(task.equals("register") && ((message.startsWith("http") && rss.getAdditionalInfo2().equals("1")) || (message.startsWith("#") && rss.getAdditionalInfo2().equals("2")))) {
 								Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
@@ -305,13 +305,13 @@ public class GuildMessageListener extends ListenerAdapter {
 							//update the hashtag options
 							else if(task.equals("options-page")) {
 								final String lowCaseMessage = message.toLowerCase();
-								if(lowCaseMessage.startsWith("enable") || lowCaseMessage.startsWith("disable") || lowCaseMessage.startsWith("add-child") || lowCaseMessage.startsWith("remove-child"))
+								if(lowCaseMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)) || lowCaseMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE)) || lowCaseMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_CHILD)) || lowCaseMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_CHILD)))
 									SubscribeExecution.updateOptions(e, Integer.parseInt(rss.getAdditionalInfo2()), "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 							}
 						}
 						else {
 							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-							e.getChannel().sendMessage(embed.setDescription("Rss command cancelled").build()).queue();
+							e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_EXIT)).build()).queue();
 						}
 					}
 					
@@ -341,13 +341,13 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(runquiz != null) {
 						String content = runquiz.getAdditionalInfo();
 						//continue as long a question shouldn't be skipped or the quiz shouldn't be interrupted
-						if(!content.equals("skip-question") || !content.equals("interrupt-questions")) {
+						if(!content.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SKIP_QUESTION)) || !content.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
 							//verify that there is a registered quiz channel
 							var qui_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("qui")).findAny().orElse(null);
 							if(qui_channel != null && qui_channel.getChannel_ID() == e.getChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember())) {
 								//check if an administrator or moderator wishes to skip a question or interrupt all questions
 								if(UserPrivs.isUserAdmin(e.getMember()) || UserPrivs.isUserMod(e.getMember()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
-									if(message.equals("skip-question") || message.equals("interrupt-questions")) {
+									if(message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SKIP_QUESTION)) || message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
 										Hashes.addTempCache("quiztime"+e.getGuild().getId(), new Cache(0, message));
 									}
 								}
@@ -372,7 +372,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(google != null && google.getExpiration() - System.currentTimeMillis() > 0) {
 						final String key = "google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
 						final String lcMessage = message.toLowerCase();
-						if(!lcMessage.equals("exit")) {
+						if(!lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
 							//actions for google docs
 							if(google.getAdditionalInfo().equals("docs")) {
 								//TODO: add google docs logic
@@ -383,23 +383,23 @@ public class GuildMessageListener extends ListenerAdapter {
 								GoogleSpreadsheetsExecution.runTask(e, key);
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-selection")) {
-								if(lcMessage.startsWith("create"))
+								if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE)))
 									GoogleSpreadsheetsExecution.create(e, (lcMessage.length() > 7 ? message.substring(7) : null), key);
-								else if(lcMessage.startsWith("add"))
+								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD)))
 									GoogleSpreadsheetsExecution.add(e, (lcMessage.length() > 4 ? message.substring(4) : null), key);
-								else if(lcMessage.startsWith("remove"))
+								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE)))
 									GoogleSpreadsheetsExecution.remove(e, (lcMessage.length() > 7 ? message.substring(7) : null), key);
-								else if(lcMessage.equals("events"))
+								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_EVENTS)))
 									GoogleSpreadsheetsExecution.events(e, key);
-								else if(lcMessage.startsWith("sheet"))
+								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_SHEET)))
 									GoogleSpreadsheetsExecution.sheet(e, key);
-								else if(lcMessage.startsWith("map"))
+								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAP)))
 									GoogleSpreadsheetsExecution.map(e, key);
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-events") && lcMessage.matches("[\\d]*")) {
 								GoogleSpreadsheetsExecution.eventsFileSelection(e, Integer.parseInt(message)-1, key);
 							}
-							else if(google.getAdditionalInfo().equals("spreadsheets-events-update") && (lcMessage.startsWith("add ") || lcMessage.startsWith("remove "))) {
+							else if(google.getAdditionalInfo().equals("spreadsheets-events-update") && (lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD)) || lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE)))) {
 								GoogleSpreadsheetsExecution.eventsFileHandler(e, lcMessage, google.getAdditionalInfo2(), key);
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-sheet") && lcMessage.matches("[\\d]*")) {

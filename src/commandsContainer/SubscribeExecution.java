@@ -147,7 +147,7 @@ public class SubscribeExecution {
 		RSS tweet = tweets.get(feed);
 		final String lcMessage = e.getMessage().getContentRaw().toLowerCase();
 		boolean printMessage = false;
-		if(lcMessage.equalsIgnoreCase("enable pictures")) {
+		if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE_PICTURES))) {
 			if(Azrael.SQLUpdateRSSPictures(tweet.getURL(), e.getGuild().getIdLong(), true) > 0) {
 				logger.debug("Pictures enabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
@@ -159,7 +159,7 @@ public class SubscribeExecution {
 				Hashes.clearTempCache(key);
 			}
 		}
-		else if(lcMessage.equalsIgnoreCase("enable videos")) {
+		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE_VIDEOS))) {
 			if(Azrael.SQLUpdateRSSVideos(tweet.getURL(), e.getGuild().getIdLong(), true) > 0) {
 				logger.debug("Videos enabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
@@ -171,7 +171,7 @@ public class SubscribeExecution {
 				Hashes.clearTempCache(key);
 			}
 		}
-		else if(lcMessage.equalsIgnoreCase("enable text")) {
+		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE_TEXT))) {
 			if(Azrael.SQLUpdateRSSText(tweet.getURL(), e.getGuild().getIdLong(), true) > 0) {
 				logger.debug("Text enabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
@@ -183,7 +183,7 @@ public class SubscribeExecution {
 				Hashes.clearTempCache(key);
 			}
 		}
-		else if(lcMessage.equalsIgnoreCase("disable pictures")) {
+		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE_PICTURES))) {
 			if(Azrael.SQLUpdateRSSPictures(tweet.getURL(), e.getGuild().getIdLong(), false) > 0) {
 				logger.debug("Pictures disabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
@@ -195,7 +195,7 @@ public class SubscribeExecution {
 				Hashes.clearTempCache(key);
 			}
 		}
-		else if(lcMessage.equalsIgnoreCase("disable videos")) {
+		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE_VIDEOS))) {
 			if(Azrael.SQLUpdateRSSVideos(tweet.getURL(), e.getGuild().getIdLong(), false) > 0) {
 				logger.debug("Videos disabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
@@ -207,7 +207,7 @@ public class SubscribeExecution {
 				Hashes.clearTempCache(key);
 			}
 		}
-		else if(lcMessage.equalsIgnoreCase("disable text")) {
+		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE_TEXT))) {
 			if(Azrael.SQLUpdateRSSText(tweet.getURL(), e.getGuild().getIdLong(), false) > 0) {
 				logger.debug("Text disabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
@@ -219,8 +219,8 @@ public class SubscribeExecution {
 				Hashes.clearTempCache(key);
 			}
 		}
-		else if(lcMessage.startsWith("add-child") || lcMessage.startsWith("remove-child")) {
-			if(lcMessage.matches("add-child #[a-z0-9]{1,}[^\\s]*")) {
+		else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_CHILD)) || lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_CHILD))) {
+			if(lcMessage.matches(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_CHILD)+" #[a-z0-9]{1,}[^\\s]*")) {
 				printMessage = true;
 				final String hashtag = lcMessage.substring(10);
 				final int result = Azrael.SQLInsertChildTweet(tweet.getURL(), hashtag, e.getGuild().getIdLong()); 
@@ -235,7 +235,7 @@ public class SubscribeExecution {
 					logger.error("Child hashtags couldn't be added for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				}
 			}
-			else if(lcMessage.matches("remove-child #[a-z0-9]{1,}[^\\s]*")) {
+			else if(lcMessage.matches(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_CHILD)+" #[a-z0-9]{1,}[^\\s]*")) {
 				printMessage = true;
 				final String hashtag = lcMessage.substring(13);
 				final int result = Azrael.SQLDeleteChildTweet(tweet.getURL(), hashtag, e.getGuild().getIdLong());

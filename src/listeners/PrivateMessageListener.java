@@ -50,7 +50,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 			
 			if(equip != null && equip.getExpiration() - System.currentTimeMillis() > 0) {
 				//interrupt the equip setup
-				if(e.getMessage().getContentRaw().equalsIgnoreCase("exit")) {
+				if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_EXIT))) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EXIT)).build()).queue();
 					Hashes.clearTempCache("equip_us"+e.getAuthor());
 				}
@@ -59,19 +59,19 @@ public class PrivateMessageListener extends ListenerAdapter {
 					//run this block when a clear guild with enabled ranking system has been selected and found
 					if(equip.getAdditionalInfo().length() == 18) {
 						//show the current equipment
-						if(e.getMessage().getContentRaw().equalsIgnoreCase("show")) {
+						if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_SHOW))) {
 							
 						}
 						//equip weapons or skills
-						else if(e.getMessage().getContentRaw().equalsIgnoreCase("set")) {
+						else if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_SET))) {
 							EquipExecution.equipmentItemScreen(e, equip.getAdditionalInfo(), "set");
 						}
 						//remove an equipped weapon or skill
-						else if(e.getMessage().getContentRaw().equalsIgnoreCase("remove")) {
+						else if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_REMOVE))) {
 							EquipExecution.equipmentItemScreen(e, equip.getAdditionalInfo(), "remove");
 						}
 						//remove everything equipped
-						else if(e.getMessage().getContentRaw().equalsIgnoreCase("remove-all")) {
+						else if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_REMOVE_ALL))) {
 							EquipExecution.removeWholeEquipment(e, Long.parseLong(equip.getAdditionalInfo()));
 						}
 					}
@@ -102,7 +102,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 					}
 					//search for the typed weapon or skill in the inventory
 					else if(equip.getAdditionalInfo2().matches("^(set-)[1-4]$")) {
-						if(message.equalsIgnoreCase("return")) {
+						if(message.equalsIgnoreCase(STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_RETURN))) {
 							EquipExecution.equipmentItemScreen(e, equip.getAdditionalInfo(), "set");
 						}
 						else {
@@ -111,7 +111,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 					}
 					//equip selected weapon or skin
 					else if(equip.getAdditionalInfo2().matches("^(set-)[1-4](_)[\\d-]*$")) {
-						if(message.equalsIgnoreCase("return")) {
+						if(message.equalsIgnoreCase(STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_RETURN))) {
 							EquipExecution.equipmentItemScreen(e, equip.getAdditionalInfo(), "set");
 						}
 						else {

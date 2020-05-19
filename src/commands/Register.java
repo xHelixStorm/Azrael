@@ -45,7 +45,7 @@ public class Register implements CommandPublic {
 					e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_REQUIRED)).build()).queue();
 				}
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase("role")) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
 				if(adminPermission) {
 					RegisterRole.RegisterRoleHelper(e);
 				}
@@ -54,7 +54,7 @@ public class Register implements CommandPublic {
 					e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_REQUIRED)).build()).queue();
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase("role")) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
 				RegisterRole.runCommandWithAdminFirst(e, guild_id, args, adminPermission);
 			}
 			else {
@@ -65,7 +65,7 @@ public class Register implements CommandPublic {
 			if(args.length == 0) {
 				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_HELP_2)).build()).queue();
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase("role")) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
 				final var commandLevel = GuildIni.getRegisterRoleLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					RegisterRole.RegisterRoleHelper(e);
@@ -74,10 +74,10 @@ public class Register implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase("role")) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
 				RegisterRole.runCommand(e, guild_id, args, adminPermission);
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase("text-channel")) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL))) {
 				final var commandLevel = GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					RegisterChannel.RegisterChannelHelper(e);
@@ -86,10 +86,10 @@ public class Register implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase("text-channel")) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL))) {
 				RegisterChannel.runCommand(e, guild_id, args, adminPermission);
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase("text-channel-url")) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_URL))) {
 				final var commandLevel = GuildIni.getRegisterTextChannelURLLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					RegisterChannel.RegisterChannelHelperURL(e);
@@ -98,10 +98,10 @@ public class Register implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase("text-channel-url")) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_URL))) {
 				RegisterChannel.runCommandURL(e, guild_id, args, adminPermission);
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase("text-channel-txt")) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_TXT))) {
 				final var commandLevel = GuildIni.getRegisterTextChannelTXTLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					RegisterChannel.RegisterChannelHelperTxt(e);
@@ -110,13 +110,13 @@ public class Register implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase("text-channel-txt")) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_TXT))) {
 				RegisterChannel.runCommandTxt(e, guild_id, args, adminPermission);
 			}
-			else if(args[0].equalsIgnoreCase("text-channels")) {
+			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNELS))) {
 				RegisterChannel.runChannelsRegistration(e, guild_id, adminPermission);
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase("ranking-role")) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE))) {
 				final var commandLevel = GuildIni.getRegisterRankingRoleLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					RegisterRankingRole.RegisterRankingRoleHelper(e);
@@ -125,10 +125,10 @@ public class Register implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase("ranking-role")) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE))) {
 				RegisterRankingRole.runCommand(e, guild_id, args, adminPermission);
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase("users")) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_USERS))) {
 				final var commandLevel = GuildIni.getRegisterUsersLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					new Thread(new CollectUsers(e)).start();

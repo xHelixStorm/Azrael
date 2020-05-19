@@ -15,6 +15,13 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import util.STATIC;
 
+/**
+ * This command allows a user to submit a message as the Bot.
+ * To use by mentioning the text channel together with the command.
+ * @author xHelixStorm
+ *
+ */
+
 public class Write implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Write.class);
 

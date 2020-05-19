@@ -51,7 +51,7 @@ public class Use implements CommandPublic {
 				if(args.length == 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_HELP)).build()).queue();
 				}
-				else if(args[0].equalsIgnoreCase("default-level")) {
+				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL))) {
 					constructors.Rank rank = RankingSystem.SQLgetRankingLevel(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(guild_settings.getLevelDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 					user_details.setRankingLevel(rank.getRankingLevel());
 					user_details.setLevelDescription(rank.getLevelDescription());
@@ -87,7 +87,7 @@ public class Use implements CommandPublic {
 						logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 					}
 				}
-				else if(args[0].equalsIgnoreCase("default-rank")) {
+				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK))) {
 					constructors.Rank rank = RankingSystem.SQLgetRankingRank(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(guild_settings.getRankDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 					user_details.setRankingRank(rank.getRankingRank());
 					user_details.setRankDescription(rank.getRankDescription());
@@ -135,7 +135,7 @@ public class Use implements CommandPublic {
 						logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 					}
 				}
-				else if(args[0].equalsIgnoreCase("default-profile")) {
+				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE))) {
 					constructors.Rank rank = RankingSystem.SQLgetRankingProfile(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(guild_settings.getProfileDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 					user_details.setRankingProfile(rank.getRankingProfile());
 					user_details.setProfileDescription(rank.getProfileDescription());
@@ -189,7 +189,7 @@ public class Use implements CommandPublic {
 						logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
 					}
 				}
-				else if(args[0].equalsIgnoreCase("default-icons")) {
+				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICONS))) {
 					constructors.Rank rank = RankingSystem.SQLgetRankingIcons(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(guild_settings.getIconDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 					user_details.setRankingIcon(rank.getRankingIcon());
 					user_details.setIconDescription(rank.getIconDescription());

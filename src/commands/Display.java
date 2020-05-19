@@ -70,7 +70,7 @@ public class Display implements CommandPublic{
 			e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(out.toString()).build()).queue();
 		}
 		//display all roles
-		else if(args[0].equalsIgnoreCase("roles")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLES))) {
 			//verify that the current user is allowed to use this parameter
 			final var rolesLevel = GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), rolesLevel) || adminPermission) {
@@ -85,7 +85,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all registered roles
-		else if(args[0].equalsIgnoreCase("registered-roles")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_ROLES))) {
 			//verify that the current user is allowed to use this parameter
 			final var registeredRolesLevel = GuildIni.getDisplayRegisteredRolesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredRolesLevel) || adminPermission) {
@@ -104,7 +104,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all registered ranking roles
-		else if(args[0].equalsIgnoreCase("ranking-roles")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLES))) {
 			//verify that the current user is allowed to use this parameter
 			final var rankingRolesLevel = GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), rankingRolesLevel) || adminPermission) {
@@ -125,7 +125,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all text channels
-		else if(args[0].equalsIgnoreCase("text-channels")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNELS))) {
 			//verify that the current user is allowed to use this parameter
 			final var textChannelsLevel = GuildIni.getDisplayTextChannelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), textChannelsLevel) || adminPermission) {
@@ -140,7 +140,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all voice channels
-		else if(args[0].equalsIgnoreCase("voice-channels")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_VOICE_CHANNELS))) {
 			//verify that the current user is allowed to use this parameter
 			final var voiceChannelsLevel = GuildIni.getDisplayVoiceChannelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), voiceChannelsLevel) || adminPermission) {
@@ -155,7 +155,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all registered text channels
-		else if(args[0].equalsIgnoreCase("registered-channels")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_CHANNELS))) {
 			//verify that the current user is allowed to use this parameter
 			final var registeredChannelsLevel = GuildIni.getDisplayRegisteredChannelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredChannelsLevel) || adminPermission) {
@@ -183,7 +183,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all registered daily rewards
-		else if(args[0].equalsIgnoreCase("dailies")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILIES))) {
 			//verify that the current user is allowed to use this parameter
 			final var dailiesLevel = GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), dailiesLevel) || adminPermission) {
@@ -198,7 +198,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all users that are being watched
-		else if(args[0].equalsIgnoreCase("watched-users")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCHED_USERS))) {
 			//verify that the current user is allowed to use this parameter
 			final var watchedUsersLevel = GuildIni.getDisplayWatchedUsersLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), watchedUsersLevel) || adminPermission) {
@@ -221,7 +221,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all available commands with their permission level
-		else if(args[0].equalsIgnoreCase("permissions")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PERMISSIONS))) {
 			//verify that the current user is allowed to use this parameter
 			var commandsLevel = GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandsLevel) || adminPermission) {

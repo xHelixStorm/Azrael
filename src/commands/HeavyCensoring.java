@@ -48,11 +48,11 @@ public class HeavyCensoring implements CommandPublic {
 		//enter if a parameter has been passed
 		else if(args.length == 1) {
 			//enter this block if the parameter equals to 'enable', 'disable' or 'reset'
-			if(args[0].equalsIgnoreCase("enable") || args[0].equalsIgnoreCase("disable") || args[0].equalsIgnoreCase("reset")) {
+			if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RESET))) {
 				//retrieve the current heavy censoring state (e.g. enabled or disabled) in boolean
 				var heavyCensoring = Hashes.getHeavyCensoring(e.getGuild().getIdLong());
 				//enable the heavy censoring
-				if(args[0].equalsIgnoreCase("enable")) {
+				if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))) {
 					//only enable if heavy censoring is disabled or empty
 					if(heavyCensoring == null || !heavyCensoring) {
 						Hashes.addHeavyCensoring(e.getGuild().getIdLong(), true);
@@ -64,7 +64,7 @@ public class HeavyCensoring implements CommandPublic {
 					}
 				}
 				//disable the heavy censoring
-				else if(args[0].equalsIgnoreCase("disable")) {
+				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))) {
 					//only disable if heavy censoring is enabled
 					if(heavyCensoring != null && heavyCensoring) {
 						//clear all heavy censoring related HashMaps and thread

@@ -46,11 +46,11 @@ public class Subscribe implements CommandPublic {
 			message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_HELP)).build()).queue();
 		}
-		else if(args.length == 1 && args[0].equalsIgnoreCase("register")) {
+		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))) {
 			message.setColor(Color.BLUE);
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_REGISTER_HELP)).build()).queue();
 		}
-		else if(args.length > 1 && args[0].equalsIgnoreCase("register") && !args[1].matches("[^\\d]")) {
+		else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER)) && !args[1].matches("[^\\d]")) {
 			//select a rss model
 			var type = Integer.parseInt(args[1]);
 			if(type >= 1 && type <= 2) {
@@ -77,7 +77,7 @@ public class Subscribe implements CommandPublic {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_REGISTER_ERR)).build()).queue();
 			}
 		}
-		else if(args[0].equalsIgnoreCase("remove")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
 			for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
@@ -88,7 +88,7 @@ public class Subscribe implements CommandPublic {
 			if(out.length() > 0)
 				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "remove"));
 		}
-		else if(args[0].equalsIgnoreCase("format")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))) {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
 			for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
@@ -100,7 +100,7 @@ public class Subscribe implements CommandPublic {
 			if(out.length() > 0)
 				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "format"));
 		}
-		else if(args[0].equalsIgnoreCase("options")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_OPTIONS))) {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
 			for(RSS feed: Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong(), 2)) {
@@ -117,7 +117,7 @@ public class Subscribe implements CommandPublic {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_OPTIONS_ERR)).build()).queue();
 			}
 		}
-		else if(args[0].equalsIgnoreCase("test")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))) {
 			//test a feed
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
@@ -130,7 +130,7 @@ public class Subscribe implements CommandPublic {
 			if(out.length() > 0)
 				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "test"));
 		}
-		else if(args[0].equalsIgnoreCase("display")) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 			//display the registered feeds
 			int counter = 1;
 			StringBuilder out = new StringBuilder();

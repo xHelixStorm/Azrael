@@ -58,18 +58,18 @@ public class DoubleExperience implements CommandPublic {
 					.build()).queue();
 			}
 			//display the current state of the double experience (enabled/disabled/auto)
-			else if(args[0].equalsIgnoreCase("state")) {
+			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_STATE))) {
 				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_STATE).replace("{}", GuildIni.getDoubleExperienceMode(e.getGuild().getIdLong()))).build()).queue();
 			}
 			//change the state if either on, off or auto has been added as first parameter
-			else if(args[0].equalsIgnoreCase("on") || args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("auto")) {
+			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ON)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_OFF)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_AUTO))) {
 				//confirm that we don't change this option, if the option we are trying to put is already saved
-				if(!GuildIni.getDoubleExperienceMode(e.getGuild().getIdLong()).equalsIgnoreCase(args[0])) {
+				if(!GuildIni.getDoubleExperienceMode(e.getGuild().getIdLong()).equalsIgnoreCase(getValue(e, args[0]))) {
 					//overwrite the option in the guild ini file
-					GuildIni.setDoubleExperienceMode(e.getGuild().getIdLong(), args[0].toLowerCase());
+					GuildIni.setDoubleExperienceMode(e.getGuild().getIdLong(), getValue(e, args[0]));
 					e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_UPDATE).replace("{}", args[0].toUpperCase())).build()).queue();
 					//if it has been enabled, write it in cache and print the double experience message in the bot channel
-					if(args[0].equalsIgnoreCase("on")) {
+					if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ON))) {
 						Hashes.addTempCache("doubleExp_gu"+e.getGuild().getId(), new Cache("on"));
 						File doubleEvent = new File("./files/RankingSystem/"+guild_settings.getThemeID()+"/doubleweekend.jpg");
 						var bot_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null);
@@ -79,7 +79,7 @@ public class DoubleExperience implements CommandPublic {
 						}
 					}
 					//if it has been disabled, disable it in cache as well
-					else if(args[0].equalsIgnoreCase("off")) {
+					else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_OFF))) {
 						Hashes.addTempCache("doubleExp_gu"+e.getGuild().getId(), new Cache("off"));
 					}
 					//if it has been set to auto, remove the option from the cache
@@ -104,5 +104,14 @@ public class DoubleExperience implements CommandPublic {
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
 		logger.debug("{} has used DoubleExperience command in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
+	}
+	
+	private String getValue(GuildMessageReceivedEvent e, String argument) {
+		if(argument.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ON)))
+			return "on";
+		else if(argument.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_OFF)))
+			return "off";
+		else
+			return "auto";
 	}
 }

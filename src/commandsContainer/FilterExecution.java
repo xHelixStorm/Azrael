@@ -30,102 +30,100 @@ public class FilterExecution {
 		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_HELP)).build()).queue();
 	}
 	
-	@SuppressWarnings("preview")
 	public static void runTask(GuildMessageReceivedEvent e, String _message) {
 		String key = "filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		
-		switch(_message) {
-			case "word-filter" -> {
-				final var wordFilterLevel = GuildIni.getFilterWordFilterLevel(e.getGuild().getIdLong());
-				if(UserPrivs.comparePrivilege(e.getMember(), wordFilterLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-					message.setTitle("WORD-FILTER");
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
-					Hashes.addTempCache(key, new Cache(180000, "word-filter"));
-				}
-				else {
-					e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(wordFilterLevel, e.getMember())).build()).queue();
-				}
+		if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER))) {
+			final var wordFilterLevel = GuildIni.getFilterWordFilterLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), wordFilterLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+				message.setTitle("WORD-FILTER");
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "word-filter"));
 			}
-				
-			case "name-filter" -> {
-				final var nameFilterLevel = GuildIni.getFilterNameFilterLevel(e.getGuild().getIdLong());
-				if(UserPrivs.comparePrivilege(e.getMember(), nameFilterLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-					message.setTitle("NAME-FILTER");
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
-					Hashes.addTempCache(key, new Cache(180000, "name-filter"));
-				}
-				else {
-					e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(nameFilterLevel, e.getMember())).build()).queue();
-				}
+			else {
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(wordFilterLevel, e.getMember())).build()).queue();
 			}
-			case "name-kick" -> {
-				final var nameKickLevel = GuildIni.getFilterNameKickLevel(e.getGuild().getIdLong());
-				if(UserPrivs.comparePrivilege(e.getMember(), nameKickLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-					message.setTitle("NAME-KICK");
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
-					Hashes.addTempCache(key, new Cache(180000, "name-kick"));
-				}
-				else {
-					e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(nameKickLevel, e.getMember())).build()).queue();
-				}
+		}
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_FILTER))) {
+			final var nameFilterLevel = GuildIni.getFilterNameFilterLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), nameFilterLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+				message.setTitle("NAME-FILTER");
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "name-filter"));
 			}
-			case "funny-names" -> {
-				final var funnyNamesLevel = GuildIni.getFilterFunnyNamesLevel(e.getGuild().getIdLong());
-				if(UserPrivs.comparePrivilege(e.getMember(), funnyNamesLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-					message.setTitle("FUNNY-NAMES");
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
-					Hashes.addTempCache(key, new Cache(180000, "funny-names"));
-				}
-				else {
-					e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(funnyNamesLevel, e.getMember())).build()).queue();
-				}
+			else {
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(nameFilterLevel, e.getMember())).build()).queue();
 			}
-			case "staff-names" -> {
-				final var staffNamesLevel = GuildIni.getFilterStaffNamesLevel(e.getGuild().getIdLong());
-				if(UserPrivs.comparePrivilege(e.getMember(), staffNamesLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-					message.setTitle("STAFF-NAMES");
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
-					Hashes.addTempCache(key, new Cache(180000, "staff-names"));
-				}
-				else {
-					e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(staffNamesLevel, e.getMember())).build()).queue();
-				}
+		}
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_KICK))) {
+			final var nameKickLevel = GuildIni.getFilterNameKickLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), nameKickLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+				message.setTitle("NAME-KICK");
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "name-kick"));
 			}
-			case "url-blacklist" -> {
-				final var urlBlacklistLevel = GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong());
-				if(UserPrivs.comparePrivilege(e.getMember(), urlBlacklistLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-					message.setTitle("URL-BLACKLIST");
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
-					Hashes.addTempCache(key, new Cache(180000, "url-blacklist"));
-				}
-				else {
-					e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlBlacklistLevel, e.getMember())).build()).queue();
-				}
+			else {
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(nameKickLevel, e.getMember())).build()).queue();
 			}
-			case "url-whitelist" -> {
-				final var urlWhitelistLevel = GuildIni.getFilterURLWhitelistLevel(e.getGuild().getIdLong());
-				if(UserPrivs.comparePrivilege(e.getMember(), urlWhitelistLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-					message.setTitle("URL-WHITELIST");
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
-					Hashes.addTempCache(key, new Cache(180000, "url-whitelist"));
-				}
-				else {
-					e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlWhitelistLevel, e.getMember())).build()).queue();
-				}
+		}
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_FUNNY_NAMES))) {
+			final var funnyNamesLevel = GuildIni.getFilterFunnyNamesLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), funnyNamesLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+				message.setTitle("FUNNY-NAMES");
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "funny-names"));
 			}
-			case "tweet-blacklist" -> {
-				final var tweetBlacklistLevel = GuildIni.getFilterTweetBlacklistLevel(e.getGuild().getIdLong());
-				if(UserPrivs.comparePrivilege(e.getMember(), tweetBlacklistLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-					message.setTitle("TWEET-BLACKLIST");
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
-					Hashes.addTempCache(key, new Cache(180000, "tweet-blacklist"));
-				}
-				else {
-					e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(tweetBlacklistLevel, e.getMember())).build()).queue();
-				}
+			else {
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(funnyNamesLevel, e.getMember())).build()).queue();
 			}
-			default -> e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+		}
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_STAFF_NAMES))) {
+			final var staffNamesLevel = GuildIni.getFilterStaffNamesLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), staffNamesLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+				message.setTitle("STAFF-NAMES");
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "staff-names"));
+			}
+			else {
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(staffNamesLevel, e.getMember())).build()).queue();
+			}
+		}
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_URL_BLACKLIST))) {
+			final var urlBlacklistLevel = GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), urlBlacklistLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+				message.setTitle("URL-BLACKLIST");
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "url-blacklist"));
+			}
+			else {
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlBlacklistLevel, e.getMember())).build()).queue();
+			}
+		}
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_URL_WHITELIST))) {
+			final var urlWhitelistLevel = GuildIni.getFilterURLWhitelistLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), urlWhitelistLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+				message.setTitle("URL-WHITELIST");
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "url-whitelist"));
+			}
+			else {
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlWhitelistLevel, e.getMember())).build()).queue();
+			}
+		}
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_TWEET_BLACKLIST))) {
+			final var tweetBlacklistLevel = GuildIni.getFilterTweetBlacklistLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), tweetBlacklistLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+				message.setTitle("TWEET-BLACKLIST");
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "tweet-blacklist"));
+			}
+			else {
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(tweetBlacklistLevel, e.getMember())).build()).queue();
+			}
+		}
+		else {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 		}
 	}
 	
@@ -136,7 +134,7 @@ public class FilterExecution {
 		if(cache.getExpiration() - System.currentTimeMillis() > 0) {
 			switch(cache.getAdditionalInfo()) {
 				case "word-filter" -> {
-					if(_message.equalsIgnoreCase("display")) {
+					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
 						StringBuilder out = new StringBuilder();
 						for(String lang : Azrael.SQLgetFilterLanguages()) {
@@ -146,7 +144,7 @@ public class FilterExecution {
 						cache.updateDescription("display-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("insert")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						StringBuilder out = new StringBuilder();
 						for(String lang : Azrael.SQLgetFilterLanguages()) {
@@ -156,7 +154,7 @@ public class FilterExecution {
 						cache.updateDescription("insert-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("remove")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						StringBuilder out = new StringBuilder();
 						for(String lang : Azrael.SQLgetFilterLanguages()) {
@@ -166,7 +164,7 @@ public class FilterExecution {
 						cache.updateDescription("remove-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
 						StringBuilder out = new StringBuilder();
 						for(String lang : Azrael.SQLgetFilterLanguages()) {
@@ -176,7 +174,7 @@ public class FilterExecution {
 						cache.updateDescription("add-load-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
 						StringBuilder out = new StringBuilder();
 						for(String lang : Azrael.SQLgetFilterLanguages()) {
@@ -188,7 +186,7 @@ public class FilterExecution {
 					}
 				}
 				case "name-filter" -> {
-					if(_message.equalsIgnoreCase("display")) {
+					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						StringBuilder out = new StringBuilder();
 						for(var word : Azrael.SQLgetNameFilter(e.getGuild().getIdLong())) {
 							if(!word.getKick())
@@ -211,25 +209,25 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
-					else if(_message.equalsIgnoreCase("insert")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
 						message.setTitle("NAME-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
 						cache.updateDescription("insert-name-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("remove")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 						message.setTitle("NAME-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
 						cache.updateDescription("remove-name-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
 						message.setTitle("NAME-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN)).build()).queue();
 						cache.updateDescription("add-load-name-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
 						message.setTitle("NAME-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN)).build()).queue();
 						cache.updateDescription("load-name-filter").setExpiration(180000);
@@ -237,7 +235,7 @@ public class FilterExecution {
 					}
 				}
 				case "name-kick" -> {
-					if(_message.equalsIgnoreCase("display")) {
+					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						StringBuilder out = new StringBuilder();
 						for(var word : Azrael.SQLgetNameFilter(e.getGuild().getIdLong())) {
 							if(word.getKick())
@@ -260,25 +258,25 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
-					else if(_message.equalsIgnoreCase("insert")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
 						message.setTitle("NAME-KICK "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
 						cache.updateDescription("insert-name-kick").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("remove")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 						message.setTitle("NAME-KICK "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
 						cache.updateDescription("remove-name-kick").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
 						message.setTitle("NAME-KICK "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN)).build()).queue();
 						cache.updateDescription("add-load-name-kick").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
 						message.setTitle("NAME-KICK "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN)).build()).queue();
 						cache.updateDescription("load-name-kick").setExpiration(180000);
@@ -286,7 +284,7 @@ public class FilterExecution {
 					}
 				}
 				case "funny-names" -> {
-					if(_message.equalsIgnoreCase("display")) {
+					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						StringBuilder out = new StringBuilder();
 						for(String word : Azrael.SQLgetFunnyNames(e.getGuild().getIdLong())) {
 							out.append(word+"\n");
@@ -308,25 +306,25 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
-					else if(_message.equalsIgnoreCase("insert")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
 						message.setTitle("FUNNY-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
 						cache.updateDescription("insert-funny-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("remove")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 						message.setTitle("FUNNY-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
 						cache.updateDescription("remove-funny-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
 						message.setTitle("FUNNY-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN)).build()).queue();
 						cache.updateDescription("add-load-funny-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
 						message.setTitle("FUNNY-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN)).build()).queue();
 						cache.updateDescription("load-funny-names").setExpiration(180000);
@@ -334,7 +332,7 @@ public class FilterExecution {
 					}
 				}
 				case "staff-names" -> {
-					if(_message.equalsIgnoreCase("display")) {
+					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						StringBuilder out = new StringBuilder();
 						for(String word : Azrael.SQLgetStaffNames(e.getGuild().getIdLong())) {
 							out.append(word+"\n");
@@ -356,25 +354,25 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
-					else if(_message.equalsIgnoreCase("insert")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
 						message.setTitle("STAFF-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
 						cache.updateDescription("insert-staff-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("remove")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 						message.setTitle("STAFF-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
 						cache.updateDescription("remove-staff-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
 						message.setTitle("STAFF-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN)).build()).queue();
 						cache.updateDescription("add-load-staff-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
 						message.setTitle("STAFF-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN)).build()).queue();
 						cache.updateDescription("load-staff-names").setExpiration(180000);
@@ -382,7 +380,7 @@ public class FilterExecution {
 					}
 				}
 				case "url-blacklist" -> {
-					if(_message.equalsIgnoreCase("display")) {
+					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						StringBuilder out = new StringBuilder();
 						for(String word : Azrael.SQLgetURLBlacklist(e.getGuild().getIdLong())) {
 							out.append(word+"\n");
@@ -404,25 +402,25 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
-					else if(_message.equalsIgnoreCase("insert")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
 						message.setTitle("URL-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FQDN)).build()).queue();
 						cache.updateDescription("insert-url-blacklist").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("remove")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 						message.setTitle("URL-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FQDN)).build()).queue();
 						cache.updateDescription("remove-url-blacklist").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
 						message.setTitle("URL-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_FQDN)).build()).queue();
 						cache.updateDescription("add-load-url-blacklist").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
 						message.setTitle("URL-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_FQDN)).build()).queue();
 						cache.updateDescription("load-url-blacklist").setExpiration(180000);
@@ -430,7 +428,7 @@ public class FilterExecution {
 					}
 				}
 				case "url-whitelist" -> {
-					if(_message.equalsIgnoreCase("display")) {
+					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						StringBuilder out = new StringBuilder();
 						for(String word : Azrael.SQLgetURLWhitelist(e.getGuild().getIdLong())) {
 							out.append(word+"\n");
@@ -452,25 +450,25 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
-					else if(_message.equalsIgnoreCase("insert")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
 						message.setTitle("URL-WHITELIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FQDN)).build()).queue();
 						cache.updateDescription("insert-url-whitelist").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("remove")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 						message.setTitle("URL-WHITELIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FQDN)).build()).queue();
 						cache.updateDescription("remove-url-whitelist").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
 						message.setTitle("URL-WHITELIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_FQDN)).build()).queue();
 						cache.updateDescription("add-load-url-whitelist").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
 						message.setTitle("URL-WHITELIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_FQDN)).build()).queue();
 						cache.updateDescription("load-url-whitelist").setExpiration(180000);
@@ -478,7 +476,7 @@ public class FilterExecution {
 					}
 				}
 				case "tweet-blacklist" -> {
-					if(_message.equalsIgnoreCase("display")) {
+					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						StringBuilder out = new StringBuilder();
 						for(String word : Azrael.SQLgetTweetBlacklist(e.getGuild().getIdLong())) {
 							out.append(word+"\n");
@@ -500,25 +498,25 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 					}
-					else if(_message.equalsIgnoreCase("insert")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
 						message.setTitle("TWEET-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_USERNAME)).build()).queue();
 						cache.updateDescription("insert-tweet-blacklist").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("remove")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 						message.setTitle("TWEET-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_USERNAME)).build()).queue();
 						cache.updateDescription("remove-tweet-blacklist").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("add-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
 						message.setTitle("TWEET-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_USERNAME)).build()).queue();
 						cache.updateDescription("add-load-tweet-blacklist").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					else if(_message.equalsIgnoreCase("load-pastebin")) {
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
 						message.setTitle("TWEET-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_USERNAME)).build()).queue();
 						cache.updateDescription("load-tweet-blacklist").setExpiration(180000);
@@ -1062,7 +1060,6 @@ public class FilterExecution {
 				}
 				case "remove-tweet-blacklist" -> {
 					if(Azrael.SQLDeleteTweetBlacklist(_message, e.getGuild().getIdLong()) > 0) {
-						message.setTitle("Success!");
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE_NICK)).build()).queue();
 						Hashes.removeTweetBlacklist(e.getGuild().getIdLong());
 						logger.debug("{} has removed the username {} from the tweet-blacklist", e.getMember().getUser().getIdLong(), _message);
@@ -1122,8 +1119,8 @@ public class FilterExecution {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_NICK)).build()).queue();
 						}
 					} catch (MalformedURLException | RuntimeException e2) {
-						message.setColor(Color.RED).setTitle("Invalid pastebin link!");
-						e.getChannel().sendMessage(message.setDescription("Please provide a valid pastebin link from https://pastebin.com!").build()).queue();
+						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 						logger.error("Reading paste failed in guild {}!", e.getGuild().getId(), e2);
 					}
 					Hashes.clearTempCache(key);
@@ -1156,8 +1153,7 @@ public class FilterExecution {
 		}
 		if(out.length() > 0) {
 			try {
-				String paste_link = Pastebin.unlistedPaste(definitiveLang+" word filter", out.toString(), e.getGuild().getIdLong());
-				message.setTitle(definitiveLang+" word filter!");
+				String paste_link = Pastebin.unlistedPaste(definitiveLang, out.toString(), e.getGuild().getIdLong());
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST)+paste_link).build()).queue();
 				logger.debug("{} has called the {} word filter in guild {}", e.getMember().getUser().getIdLong(), lang, e.getGuild().getId(), e.getGuild().getId());
 			} catch (IllegalStateException | LoginException | PasteException e2) {

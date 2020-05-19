@@ -89,7 +89,7 @@ public class Top implements CommandPublic {
 					level = ranking.getLevel();
 					experience = ranking.getExperience();				
 					if(i == 10 || i == rankList.size()) {
-						message.append("["+(ranking.getRank() < 10 ? "0"+ranking.getRank() : ranking.getRank())+"] \t> #"+name+"\n\t\t\t Level: "+level+"\t Experience: "+experience+"\n");
+						message.append("["+(ranking.getRank() < 10 ? "0"+ranking.getRank() : ranking.getRank())+"] \t> #"+name+"\n\t\t\t Level: "+level+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_EXPERIENCE)+experience+"\n");
 						e.getChannel().sendMessage("```CMake\n"+STATIC.getTranslation(e.getMember(), Translation.TOP_TITLE)+"\n\n"+message.toString()+"\n"
 							+ "-------------------------------------\n #"+STATIC.getTranslation(e.getMember(), Translation.TOP_PERSONAL_INFO)+"\n"
 							+ " "+STATIC.getTranslation(e.getMember(), Translation.TOP_RANK)+rank+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_LEVEL)+user_level+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_EXPERIENCE)+user_experience+"\n\n"+STATIC.getTranslation(e.getMember(), Translation.TOP_PAGE)+page+"```").queue();

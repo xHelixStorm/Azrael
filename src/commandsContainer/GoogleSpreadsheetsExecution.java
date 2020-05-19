@@ -256,7 +256,7 @@ public class GoogleSpreadsheetsExecution {
 	public static void eventsFileHandler(GuildMessageReceivedEvent e, String userMessage, String file_id, final String key) {
 		boolean addEvents;
 		String [] events;
-		if(userMessage.startsWith("add")) {
+		if(userMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD))) {
 			userMessage = userMessage.substring(4);
 			events = userMessage.split(",");
 			addEvents = true;
@@ -434,7 +434,7 @@ public class GoogleSpreadsheetsExecution {
 			StringBuilder out = new StringBuilder();
 			for(int i = 0; i < setup.size(); i++) {
 				final GoogleAPISetup currentSetup = setup.get(i);
-				out.append("**"+(i+1)+": TITLE: "+currentSetup.getTitle()+"**\nURL:   "+GoogleUtils.buildFileURL(currentSetup.getFileID(), currentSetup.getApiID())+"\n\n");
+				out.append("**"+(i+1)+": "+currentSetup.getTitle()+"**\n"+GoogleUtils.buildFileURL(currentSetup.getFileID(), currentSetup.getApiID())+"\n\n");
 			}
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_MAP_HELP)+out.toString()).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-map"));

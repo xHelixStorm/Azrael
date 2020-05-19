@@ -54,15 +54,15 @@ public class Google implements CommandPublic {
 		}
 		else if(args.length == 1) {
 			//Write in cache to display options related to google docs
-			if(args[0].equalsIgnoreCase("docs")) {
+			if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DOCS))) {
 				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "docs"));
 			}
 			//Write in cache to display options related to google spreadsheets
-			else if(args[0].equalsIgnoreCase("spreadsheets")) {
+			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SPREADSHEETS))) {
 				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "spreadsheets"));
 			}
 			//Write in cache to display options related to google drive
-			else if(args[0].equalsIgnoreCase("drive")) {
+			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DRIVE))) {
 				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "drive"));
 			}
 			else {

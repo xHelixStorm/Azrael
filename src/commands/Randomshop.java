@@ -50,11 +50,11 @@ public class Randomshop implements CommandPublic {
 				//run help and collect all possible parameters
 				RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), false));
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase("play")) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PLAY))) {
 				//start a round
 				RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), false), bundleArguments(args, 1));
 			}
-			else if(args[0].equalsIgnoreCase("replay")) {
+			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REPLAY))) {
 				//play another round if a match occurred within 3 minutes
 				var cache = Hashes.getTempCache("randomshop_play_"+e.getMember().getUser().getId());
 				if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
@@ -76,7 +76,7 @@ public class Randomshop implements CommandPublic {
 			}
 		}
 		else {
-			e.getChannel().sendMessage(e.getMember().getAsMention()+" I'm not allowed to execute commands in this channel, please write it again in "+STATIC.getChannels(bot_channels)).queue();
+			e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.NOT_BOT_CHANNEL)+STATIC.getChannels(bot_channels)).queue();
 		}
 	}
 
