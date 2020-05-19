@@ -40,7 +40,7 @@ public class WriteEditExecution {
 					});
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MESSAGE_WRITE.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_WRITE.getName()).build()).queue();
 					Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
@@ -79,12 +79,12 @@ public class WriteEditExecution {
 						});
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MESSAGE_HISTORY.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_HISTORY.getName()).build()).queue();
 						Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					}
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MESSAGE_WRITE.getName()+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_WRITE.getName()).build()).queue();
 					Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
@@ -168,7 +168,7 @@ public class WriteEditExecution {
 				});
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MESSAGE_MANAGE+STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_MANAGE.getName()).build()).queue();
 				logger.error("MANAGE_MESSAGES permission required for channel {} in guild {} to remove reactions from a message", cache.getAdditionalInfo2(), e.getGuild().getId());
 			}
 		});
