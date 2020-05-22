@@ -16,11 +16,13 @@ import util.STATIC;
 
 public class CollectUsers implements Runnable {
 	private final static Logger logger = LoggerFactory.getLogger(CollectUsers.class);
-	private static EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle("Collection complete!");
-	GuildMessageReceivedEvent e;
+	private static EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN);
+	private GuildMessageReceivedEvent e;
+	private boolean suppressMessage;
 	
-	public CollectUsers(GuildMessageReceivedEvent _e){
+	public CollectUsers(GuildMessageReceivedEvent _e, boolean _suppressMessage) {
 		e = _e;
+		suppressMessage = _suppressMessage;
 	}
 
 	@Override
@@ -35,6 +37,7 @@ public class CollectUsers implements Runnable {
 			RankingSystem.SQLBulkInsertUserDetails(members, 0, 0, guild_settings.getStartCurrency(), 0);
 		}
 		logger.debug("{} has registered all users from the guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
-		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_REGISTER_COMPLETE)).build()).queue();
+		if(!suppressMessage)
+			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_REGISTER_COMPLETE)).build()).queue();
 	}
 }

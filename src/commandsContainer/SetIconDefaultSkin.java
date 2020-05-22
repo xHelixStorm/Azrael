@@ -26,7 +26,7 @@ public class SetIconDefaultSkin {
 					logger.debug("{} has set the default icon skin id to {} in guild {}", e.getMember().getUser().getId(), skin.getRankingIcon(), e.getGuild().getId());
 					Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 					if(RankingSystem.SQLUpdateUsersDefaultIconSkin(guild_settings.getIconID(), skin.getRankingIcon(), e.getGuild().getIdLong()) != -1) {
-						e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.SET_ICON_UPDATE)+skin.getIconDescription()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ICON_UPDATE)+skin.getIconDescription()).build()).queue();
 						logger.debug("The default icon skin has been updated for everyone who used the previous icon skin for guild {}", e.getGuild().getId());
 					}
 					else {

@@ -33,7 +33,7 @@ public class PugExecution {
 				e.getChannel().sendMessage(messageBuild.setDescription(PugUsage.getPugInfos(e)).build()).queue();
 			}
 			else {
-				Hashes.addTempCache("meowDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(30000));
+				Hashes.addTempCache("pugDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(30000));
 				File file;
 				
 				if(variable[0].equalsIgnoreCase("pug")) {

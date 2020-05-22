@@ -26,7 +26,7 @@ public class SetRankDefaultSkin {
 					logger.debug("{} has set the default rank skin id to {} in guild {}", e.getMember().getUser().getId(), skin.getRankingRank(), e.getGuild().getId());
 					Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 					if(RankingSystem.SQLUpdateUsersDefaultRankSkin(guild_settings.getRankID(), skin.getRankingRank(), e.getGuild().getIdLong()) != -1) {
-						e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.SET_RANK_UPDATE)+skin.getRankDescription()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANK_UPDATE)+skin.getRankDescription()).build()).queue();
 						logger.debug("The default rank skin has been updated for everyone who used the previous rank skin for guild {}", e.getGuild().getId());
 					}
 					else {

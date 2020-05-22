@@ -26,7 +26,7 @@ public class SetLevelDefaultSkin {
 					logger.debug("{} has set the default level skin id to {} in guild {}", e.getMember().getUser().getId(), skin.getRankingLevel(), e.getGuild().getId());
 					Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 					if(RankingSystem.SQLUpdateUsersDefaultLevelSkin(guild_settings.getLevelID(), skin.getRankingLevel(), e.getGuild().getIdLong()) != -1) {
-						e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_UPDATE)+skin.getLevelDescription()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_UPDATE)+skin.getLevelDescription()).build()).queue();
 						logger.debug("The default level skin has been updated for everyone who used the previous level skin for guild {}", e.getGuild().getId());
 					}
 					else {

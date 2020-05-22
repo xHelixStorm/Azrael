@@ -131,7 +131,7 @@ public class Register implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_USERS))) {
 				final var commandLevel = GuildIni.getRegisterUsersLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					new Thread(new CollectUsers(e)).start();
+					new Thread(new CollectUsers(e, false)).start();
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);

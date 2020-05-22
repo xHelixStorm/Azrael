@@ -149,8 +149,6 @@ public class FileSetting {
 		if(new File("files/Guilds/"+guild.getId()).mkdir()) {
 			if(!new File("files/Guilds/"+guild.getId()+"/reactionmessage.txt").exists())
 				createFile("files/Guilds/"+guild.getId()+"/reactionmessage.txt", "");
-			if(!new File("files/Guilds/"+guild.getId()+"/helpmessage.txt").exists())
-				createFile("files/Guilds/"+guild.getId()+"/helpmessage.txt", "");
 		}
 	}
 }

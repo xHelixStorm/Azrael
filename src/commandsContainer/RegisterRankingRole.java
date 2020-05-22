@@ -39,7 +39,7 @@ public class RegisterRankingRole {
 		var commandLevel = GuildIni.getRegisterRankingRoleLevel(e.getGuild().getIdLong());
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			if(_args.length == 3) {
-				if(e.getGuild().getTextChannelById(_args[1]) != null) {
+				if(e.getGuild().getRoleById(_args[1]) != null) {
 					role_id = Long.parseLong(_args[1]);
 					role_name = e.getGuild().getRoleById(role_id).getName();
 				}
@@ -47,7 +47,7 @@ public class RegisterRankingRole {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_ROLE_ID)).build()).queue();
 					return;
 				}
-				if(_args[2].length() == 3 && _args[2].replaceAll("[0-9]*", "").length() == 0) {
+				if(_args[2].replaceAll("[0-9]*", "").length() == 0) {
 					level = _args[2];
 					level_requirement = Integer.parseInt(level);
 				}

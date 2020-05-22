@@ -32,14 +32,16 @@ public class RegisterChannel {
 	public static void RegisterChannelHelper(GuildMessageReceivedEvent e) {
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
 		StringBuilder strB = new StringBuilder();
+		StringBuilder strB2 = new StringBuilder();
 		
 		final var channelTypes = Azrael.SQLgetChannelTypes();
 		if(channelTypes != null) {
 			for(Channels channels : channelTypes) {
-				strB.append("**"+channels.getChannel_Type()+"**: "+channels.getChannel_Type_Name()+"\n");
+				strB.append("**"+channels.getChannel_Type()+"**\n");
+				strB2.append(channels.getChannel_Type_Name()+"\n");
 			}
 			if(strB.length() > 0) {
-				e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_HELP)+strB.toString()).build()).queue();
+				e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_HELP)).addField("", strB.toString(), true).addField("", strB2.toString(), true).build()).queue();
 			}
 			if(strB.length() == 0)
 				e.getChannel().sendMessage(messageBuild.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_NO_TYPES)).build()).queue();

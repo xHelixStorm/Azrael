@@ -155,6 +155,8 @@ public class UserExecution {
 									message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_UNLOCKED_ROLE), "**"+STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)+"**", true);
 								}
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TOT_EXPERIENCE), "**"+user_details.getExperience()+"**", true);
+								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_BALANCE), "**"+user_details.getCurrency()+"**", true);
+								message.addBlankField(true);
 							}
 							StringBuilder out = new StringBuilder();
 							try {
@@ -619,14 +621,16 @@ public class UserExecution {
 						StringBuilder out = new StringBuilder();
 						for(var history : Azrael.SQLgetHistory(user_id, e.getGuild().getIdLong())) {
 							if(history.getType().equals("roleAdd"))
-								out.append("["+history.getTime()+"] **"+history.getType().toUpperCase()+"**\n*"+history.getInfo()+"* "+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_BY)+"**"+history.getReason()+"**\n\n");
+								out.append("["+history.getTime()+"] **"+history.getType().toUpperCase()+"**\n"+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_ROLE)+"**"+history.getInfo()+"**\n"+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_BY)+"**"+(history.getReason().length() > 0 ? history.getReason() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE))+"**\n\n");
 							else if(history.getType().equals("roleRemove"))
-								out.append("["+history.getTime()+"] **"+history.getType().toUpperCase()+"**\n*"+history.getInfo()+"* "+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_BY)+"**"+history.getReason()+"**\n\n");
+								out.append("["+history.getTime()+"] **"+history.getType().toUpperCase()+"**\n"+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_ROLE)+"**"+history.getInfo()+"**\n"+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_BY)+"**"+(history.getReason().length() > 0 ? history.getReason() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE))+"**\n\n");
 							else
-								out.append("["+history.getTime()+"] **"+history.getType().toUpperCase()+"** "+(history.getPenalty() != 0 ? history.getPenalty()+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_MINUTES) : "")+"\n"+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_BY)+"**"+history.getInfo()+"**\n"+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_REASON)+"**"+history.getReason()+"**\n\n");
+								out.append("["+history.getTime()+"] **"+history.getType().toUpperCase()+"** "+(history.getPenalty() != 0 ? STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_TIME)+"**"+history.getPenalty()+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_MINUTES)+"**" : "")+"\n"+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_BY)+"**"+(history.getInfo().length() > 0 ? history.getInfo() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE))+"**\n"+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_REASON)+"**"+history.getReason()+"**\n\n");
 						}
-						if(out.length() > 0)
+						if(out.length() > 0) {
+							//TODO: history length surpasses 2000 characters
 							e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_DISPLAY)).setDescription(out.toString()).build()).queue();
+						}
 						else
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_TITLE_EMPTY)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_EMPTY)).build()).queue();
 						Hashes.clearTempCache(key);
@@ -1315,7 +1319,7 @@ public class UserExecution {
 									e.getGuild().addRoleToMember(member, role).queue(success -> {
 										Azrael.SQLInsertHistory(user_id, e.getGuild().getIdLong(), "roleAdd", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), 0, role.getName());
 										Azrael.SQLInsertActionLog("MEMBER_ROLE_ADD", user_id, e.getGuild().getIdLong(), "Role add "+role.getName());
-										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_ASSIGN_ADD).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator()).replaceFirst("\\{\\}", member.getUser().getId()).replaceFirst("\\{\\}", role.getName()).replace("{}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator())).build());
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_ASSIGN_ADD).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator()).replaceFirst("\\{\\}", member.getUser().getId()).replaceFirst("\\{\\}", role.getName()).replace("{}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator())).build()).queue();
 										logger.debug("The user {} has received the role {} by the bot in guild {}", user_id, role_id, e.getGuild().getId());
 										Hashes.clearTempCache(key);
 									});
@@ -1362,7 +1366,7 @@ public class UserExecution {
 									e.getGuild().removeRoleFromMember(member, role).queue(success -> {
 										Azrael.SQLInsertHistory(user_id, e.getGuild().getIdLong(), "roleRemove", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), 0, role.getName());
 										Azrael.SQLInsertActionLog("MEMBER_ROLE_REMOVE", user_id, e.getGuild().getIdLong(), "Role Remove "+role.getName());
-										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REMOVE_RETRACT).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator()).replaceFirst("\\{\\}", member.getUser().getId()).replaceFirst("\\{\\}", role.getName()).replace("{}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator())).build());
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REMOVE_RETRACT).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator()).replaceFirst("\\{\\}", member.getUser().getId()).replaceFirst("\\{\\}", role.getName()).replace("{}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator())).build()).queue();
 										logger.debug("The user {} got the role {} retracted by the bot in guild {}", user_id, role_id, e.getGuild().getId());
 										Hashes.clearTempCache(key);
 									});

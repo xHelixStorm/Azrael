@@ -81,7 +81,7 @@ public class Subscribe implements CommandPublic {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
 			for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
-				out.append("*"+(counter++)+"*: "+feed.getURL()+"\n");
+				out.append((counter++)+": **"+feed.getURL()+"**\n");
 			}
 			message.setColor(Color.BLUE);
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_REMOVE_HELP)+(out.length() > 0 ? out.toString(): STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_NO_SUBSCRIPTIONS))).build()).queue();
@@ -92,7 +92,7 @@ public class Subscribe implements CommandPublic {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
 			for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
-				out.append("**Link "+counter+":** "+feed.getURL()+"\n");
+				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}
 			message.setColor(Color.BLUE);
@@ -104,7 +104,7 @@ public class Subscribe implements CommandPublic {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
 			for(RSS feed: Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong(), 2)) {
-				out.append("**Hashtag "+counter+":** "+feed.getURL()+"\n");
+				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}
 			if(out.length() > 0) {
@@ -122,7 +122,7 @@ public class Subscribe implements CommandPublic {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
 			for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
-				out.append("**Link "+counter+":** "+feed.getURL()+"\n");
+				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}
 			message.setColor(Color.BLUE);
@@ -135,7 +135,7 @@ public class Subscribe implements CommandPublic {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
 			for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
-				out.append("**Link "+counter+":** "+feed.getURL()+"\n");
+				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}
 			message.setColor(Color.BLUE);

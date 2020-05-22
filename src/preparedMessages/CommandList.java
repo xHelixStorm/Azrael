@@ -58,7 +58,6 @@ public class CommandList {
 		}
 		if(other == true && type == 3) {
 			if(GuildIni.getAboutCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ABOUT).replace("{}", prefix));
-			if(GuildIni.getHelpCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_HELP).replace("{}", prefix));
 			if(GuildIni.getDisplayCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DISPLAY).replace("{}", prefix));
 			if(GuildIni.getPatchnotesCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PATCHNOTES).replace("{}", prefix));
 		}

@@ -53,12 +53,12 @@ public class SetDailyItem {
 			if(i == 3)
 				item.append(args[i]);
 			else
-				item.append(" "+args[1]);
+				item.append(" "+args[i]);
 		}
 		
 		final String itemName = item.toString();
 		//check if this item has been already registered
-		if(_dailies.parallelStream().filter(f -> f.getDescription().equalsIgnoreCase(itemName)).findAny().orElse(null) == null) {
+		if(_dailies.parallelStream().filter(f -> f.getDescription().equalsIgnoreCase(itemName)).findAny().orElse(null) != null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_ALREADY_REGISTERED)).build()).queue();
 			return;
 		}

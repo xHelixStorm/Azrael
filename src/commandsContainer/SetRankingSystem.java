@@ -52,7 +52,7 @@ public class SetRankingSystem {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Levels from RankingSystem.level_list couldn't be called and cached in guild {}", e.getGuild().getId());
 					}
-					new Thread(new CollectUsers(e)).start();
+					new Thread(new CollectUsers(e, true)).start();
 				}
 			}
 			else {

@@ -30,14 +30,18 @@ public class RegisterRole {
 	public static void RegisterRoleHelper(GuildMessageReceivedEvent e){
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
 		StringBuilder strB = new StringBuilder();
+		StringBuilder strB2 = new StringBuilder();
 		
 		final var roles = DiscordRoles.SQLgetCategories();
 		if(roles != null) {
-			for(Roles categories : DiscordRoles.SQLgetCategories()){
-				strB.append("**"+categories.getCategory_ABV()+"** "+categories.getCategory_Name()+"\n");
+			for(Roles categories : DiscordRoles.SQLgetCategories()) {
+				if(!categories.getCategory_ABV().equals("def")) {
+					strB.append("**"+categories.getCategory_ABV()+"**\n");
+					strB2.append(categories.getCategory_Name()+"\n");
+				}
 			}
 			if(strB.length() > 0) {
-				e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_HELP)+strB.toString()).build()).queue();
+				e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_HELP)).addField("", strB.toString(), true).addField("", strB2.toString(), true).build()).queue();
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_NO_TYPES)).build()).queue();

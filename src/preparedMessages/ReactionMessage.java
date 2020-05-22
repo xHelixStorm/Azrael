@@ -68,7 +68,7 @@ public class ReactionMessage {
 				}
 			}
 		}
-		else {
+		else if(reactionRoles == null) {
 			logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());
 		}
 	}
