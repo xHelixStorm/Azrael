@@ -78,7 +78,7 @@ public class Patchnotes implements CommandPublic {
 				if(modRights) {
 					//check if a parameter has been passed, else notify the user
 					if(args.length == 0)
-						e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_1)).build()).queue();
+						e.getChannel().sendMessage(message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_1)).build()).queue();
 					//execute if the parameter equals 'private' or 'public'
 					else if(args.length == 1 && (args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC)))) {
 						ArrayList<Patchnote> display_notes = null;
@@ -151,7 +151,7 @@ public class Patchnotes implements CommandPublic {
 				if(modRights) {
 					//Without parameter, give the user a choice to which patch notes the user wishes to access
 					if(args.length == 0)
-						e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_2)).build()).queue();
+						e.getChannel().sendMessage(message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_2)).build()).queue();
 					//enter this block if either 'private', 'public' or 'game' has been written
 					else if(args.length == 1 && (args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME)))) {
 						ArrayList<Patchnote> display_notes = null;
@@ -194,7 +194,7 @@ public class Patchnotes implements CommandPublic {
 				else {
 					//if there's no parameter, give the user a choice to select between 'bot' for public patch notes and 'game' for game patch notes
 					if(args.length == 0)
-						e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_2)).build()).queue();
+						e.getChannel().sendMessage(message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_3)).build()).queue();
 					//list all available patch notes, if either 'bot' or 'game' has been selected
 					else if(args.length == 1 && (args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_BOT)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME)))) {
 						ArrayList<Patchnote> display_notes = null;
@@ -240,14 +240,16 @@ public class Patchnotes implements CommandPublic {
 
 	private void collectPatchNotes(GuildMessageReceivedEvent e, ArrayList<Patchnote> display_notes, EmbedBuilder message) {
 		StringBuilder out = new StringBuilder();
+		StringBuilder out2 = new StringBuilder();
 		//iterate through the patch notes and convert it into readable text list
 		for(Patchnote note : display_notes) {
-			out.append(note.getDate()+":\t **"+note.getTitle()+"**\n");
+			out.append(note.getDate()+"\n");
+			out2.append("**"+note.getTitle()+"**\n");
 		}
 		//print message
-		message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS));
-		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_HELP)
-				+ out.toString()).build()).queue();
+		message.setColor(Color.BLUE);
+		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_HELP))
+			.addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 	}
 	
 	private void printPatchNotes(GuildMessageReceivedEvent e, Patchnote note, EmbedBuilder message) {

@@ -111,10 +111,10 @@ public class ReadyListener extends ListenerAdapter {
 			Channels bot_channel = null;
 			//Retrieve all registered channels and throw warning, if no channel has been registered. If found, check for the log and bot channel
 			var channels = Azrael.SQLgetChannels(guild.getIdLong());
-			if(channels == null || channels.size() == 0) {
+			if(channels == null) {
 				logger.warn("Channel information from Azrael.channels couldn't be retrieved and cached for guild {}", guild.getId());
 			}
-			else {
+			else if(channels.size() > 0) {
 				log_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 				bot_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null);
 			}

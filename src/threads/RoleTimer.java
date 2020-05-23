@@ -147,7 +147,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 					if(channel != null) {
 						timestamp = new Timestamp(System.currentTimeMillis());
 						Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp);
-						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.UNMUTE_MESSAGE_2).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
+						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message2.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.UNMUTE_MESSAGE_2).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 					}
 					//if the user is still present on the server, remove the mute role and assign back a ranking role, if available
 					Role role = null;

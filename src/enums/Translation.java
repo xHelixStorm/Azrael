@@ -862,7 +862,7 @@ public enum Translation {
 	
 	DELETE_EDITED_MESSAGE		("delete_edited_message"),
 	DELETE_MESSAGE				("delete_message"),
-	DELETE_REMOVED_FROM			("delete_removed_from"),
+	DELETE_REMOVED_BY			("delete_removed_by"),
 	DELETE_SELF					("delete_self"),
 	DELETE_PERMISSION_ERR		("delete_permission_err"),
 	DELETE_WATCHED				("delete_watched"),

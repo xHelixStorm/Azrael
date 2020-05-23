@@ -99,7 +99,7 @@ public class GuildListener extends ListenerAdapter {
 			muted = warnedUser.getMuted();
 			//print join message, if the user is not muted and if the printing of join messages is allowed
 			if(GuildIni.getJoinMessage(guild_id)) {
-				if(log_channel != null && muted == false) {e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();}
+				if(log_channel != null && muted == false) {e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name)).build()).queue();}
 			}
 			
 			//retrieve the unmute time if available and if not, check if the user is marked as muted and if muted, reassign the mute role regardless

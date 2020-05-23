@@ -1411,7 +1411,7 @@ public class Azrael {
 				return channels;
 			} catch (SQLException e) {
 				logger.error("SQLgetChannels Exception", e);
-				return channels;
+				return null;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }

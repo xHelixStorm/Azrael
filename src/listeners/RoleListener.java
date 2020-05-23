@@ -117,7 +117,7 @@ public class RoleListener extends ListenerAdapter {
 					}
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					if(log_channel != null) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_2).replaceFirst("{}", user_name).replace("{}", ""+user_id)).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_2).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 					}
 					//remove all roles, except the mute role when the muted user has more than 1 assigned role
 					if(e.getMember().getRoles().size() > 1 && !removeRoles(e, mute_id) && log_channel != null)
@@ -262,20 +262,12 @@ public class RoleListener extends ListenerAdapter {
 													e.getGuild().ban(e.getMember(), 0).reason(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_REASON)).queue();
 													logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 													channel.close().queue();
-													//Run google service, if enabled
-													if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-														//TODO: add google functionality
-													}
 												}, error -> {
 													if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_DM_LOCKED)).build()).queue();
 													//ban the user
 													e.getGuild().ban(e.getMember(), 0).reason(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_REASON)).queue();
 													logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 													channel.close().queue();
-													//Run google service, if enabled
-													if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id)) {
-														
-													}
 												});
 									});
 								}

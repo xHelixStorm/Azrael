@@ -87,7 +87,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 												trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 												break;
 											}
-											else if(removed_from != e.getJDA().getSelfUser().getIdLong() && UserPrivs.isUserBot(e.getGuild().getMemberById(removed_from))) {
+											else if(removed_from != e.getJDA().getSelfUser().getIdLong() && UserPrivs.isUserBot(member)) {
 												suppress_deleted = true;
 												break;
 											}
@@ -109,8 +109,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 											message.setColor(Color.CYAN);
 											//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 											for(final var cachedMessage : removed_messages) {
-												message.setTimestamp(cachedMessage.getTime()).setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setTitle((cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))+STATIC.getTranslation2(e.getGuild(), Translation.DELETE_REMOVED_FROM)+trigger_user_name).setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
-												final var printMessage = cachedMessage.getMessage();
+												message.setTimestamp(cachedMessage.getTime()).setTitle(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
+												final var printMessage = (cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))+STATIC.getTranslation2(e.getGuild(), Translation.DELETE_REMOVED_BY)+trigger_user_name+"\n"+cachedMessage.getMessage();
 												e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 											}
 										}
@@ -128,8 +128,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 											message.setColor(Color.GRAY);
 											//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 											for(final var cachedMessage : removed_messages) {
-												message.setTimestamp(cachedMessage.getTime()).setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.DELETE_SELF)+(cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))).setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
-												final var printMessage = cachedMessage.getMessage();
+												message.setTimestamp(cachedMessage.getTime()).setTitle(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
+												final var printMessage = STATIC.getTranslation2(e.getGuild(), Translation.DELETE_SELF)+(cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))+"\n"+cachedMessage.getMessage();
 												e.getGuild().getTextChannelById((del_channel != null ? del_channel.getChannel_ID() : tra_channel.getChannel_ID())).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 											}
 										}
@@ -144,8 +144,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 									message.setColor(Color.ORANGE);
 									//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 									for(final var cachedMessage : removed_messages) {
-										message.setTimestamp(cachedMessage.getTime()).setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setTitle((cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))).setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
-										final var printMessage = cachedMessage.getMessage();
+										message.setTimestamp(cachedMessage.getTime()).setTitle(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
+										final var printMessage = (cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))+"\n"+cachedMessage.getMessage();
 										e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 									}
 								}
@@ -168,8 +168,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 						message.setColor(Color.DARK_GRAY);
 						//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
 						for(final var cachedMessage : removed_messages) {
-							message.setTimestamp(cachedMessage.getTime()).setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.DELETE_WATCHED)+(cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))).setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
-							final var printMessage = cachedMessage.getMessage();
+							message.setTimestamp(cachedMessage.getTime()).setTitle(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
+							final var printMessage = STATIC.getTranslation2(e.getGuild(), Translation.DELETE_WATCHED)+(cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))+"\n"+cachedMessage.getMessage();
 							e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 						}
 					}

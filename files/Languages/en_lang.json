@@ -822,7 +822,7 @@
 	"join_err_5":					"The user **{}** with the ID number **{}** couldn't receive the perm mute flag on server join!",
 	"join_err_6":					"The unmute timer of the user **{}** with the ID number **{}** couldn't be updated on server join!",
 	"join_err_7":					"The user **{}** with the ID number **{}** couldn't be flagged as muted!",
-	"join_message":					"The user **{}** with the ID number **{}** has joined the server!",
+	"join_message":					"**{}** has joined the server!",
 	"join_permission_err":			"The joined user **{}** with the ID number **{}** couldn't be muted because the following permission is required: ",
 	
 	"name_title":					"Not allowed name found!",
@@ -859,7 +859,7 @@
 	
 	"delete_edited_message":		"**Edited Message**! ",
 	"delete_message":				"**Message**! ",
-	"delete_removed_from":			"Removed from ",
+	"delete_removed_by":			"Removed by ",
 	"delete_self":					"User has removed the own ",
 	"delete_permission_err":		"Deleted message detected! More details couldn't be displayed because the following permission is required: ",
 	"delete_watched":				"Watched ",
