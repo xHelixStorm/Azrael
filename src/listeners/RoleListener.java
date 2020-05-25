@@ -231,7 +231,7 @@ public class RoleListener extends ListenerAdapter {
 							}
 							//send a private message
 							e.getUser().openPrivateChannel().queue(channel -> {
-								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM_2).replaceFirst("\\{\\}", e.getGuild().getName().replaceFirst("\\{\\}", hour_add+and_add+minute_add)).replace("{}", "**"+(warning_id+1)+"**/**"+max_warning+"**")
+								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM_2).replaceFirst("\\{\\}", e.getGuild().getName()).replaceFirst("\\{\\}", hour_add+and_add+minute_add).replace("{}", "**"+(warning_id+1)+"**/**"+max_warning+"**")
 										+ (GuildIni.getMuteSendReason(guild_id) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 											//success callback not required
 											channel.close().queue();

@@ -81,9 +81,9 @@ public class LanguageEditFilter implements Runnable {
 									break;
 								}
 							}
-							message.setTitle(name+" ("+e.getMember().getUser().getId()+")");
+							message.setTitle(name);
 							message.setFooter(channel + "("+e.getChannel().getId()+")").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
-							final String printMessage = STATIC.getTranslation(e.getMember(), Translation.CENSOR_TITLE_DETECTED).replaceFirst("\\{\\}", option.get()).replace("{}", filter)+"\n"+getMessage;
+							final String printMessage = STATIC.getTranslation(e.getMember(), Translation.CENSOR_TITLE_DETECTED).replaceFirst("\\{\\}", option.get()).replace("{}", filter)+"\n\n"+getMessage;
 							e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 						}
 						break;
@@ -158,8 +158,8 @@ public class LanguageEditFilter implements Runnable {
 			for(final Attachment attachment : attachments) {
 				out.append(attachment.getProxyUrl()+"\n");
 			}
-			EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.HEAVY_CENSORING_DELETED)).setFooter(channel+" ("+e.getChannel().getId()+")").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
-			final String printMessage = getMessage+"\n"+out.toString();
+			EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")").setFooter(channel+" ("+e.getChannel().getId()+")").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
+			final String printMessage = STATIC.getTranslation2(e.getGuild(), Translation.HEAVY_CENSORING_DELETED)+"\n\n"+getMessage+"\n"+out.toString();
 			e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 		}
 	}

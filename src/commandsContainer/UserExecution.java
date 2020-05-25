@@ -628,7 +628,7 @@ public class UserExecution {
 								out.append("["+history.getTime()+"] **"+history.getType().toUpperCase()+"** "+(history.getPenalty() != 0 ? STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_TIME)+"**"+history.getPenalty()+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_MINUTES)+"**" : "")+"\n"+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_BY)+"**"+(history.getInfo().length() > 0 ? history.getInfo() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE))+"**\n"+STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_REASON)+"**"+history.getReason()+"**\n\n");
 						}
 						if(out.length() > 0) {
-							e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_DISPLAY)).setDescription((out.length() <= 2048 ? out.toString() : out.toString().substring(0, 2040))+"...").build()).queue();
+							e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_DISPLAY)).setDescription((out.length() <= 2048 ? out.toString() : out.toString().substring(0, 2040)+"...")).build()).queue();
 						}
 						else
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_TITLE_EMPTY)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_EMPTY)).build()).queue();
