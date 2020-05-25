@@ -9,6 +9,7 @@ import core.Hashes;
 import core.UserPrivs;
 import enums.Translation;
 import fileManagement.GuildIni;
+import fileManagement.IniFileReader;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -56,7 +57,7 @@ public class HeavyCensoring implements CommandPublic {
 					//only enable if heavy censoring is disabled or empty
 					if(heavyCensoring == null || !heavyCensoring) {
 						Hashes.addHeavyCensoring(e.getGuild().getIdLong(), true);
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_ENABLED)).build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_ENABLED)).setThumbnail(IniFileReader.getHeavyThumbnail()).build()).queue();
 						new Thread(new LowerHeavyCensoring(e)).start();
 					}
 					else {
@@ -69,7 +70,7 @@ public class HeavyCensoring implements CommandPublic {
 					if(heavyCensoring != null && heavyCensoring) {
 						//clear all heavy censoring related HashMaps and thread
 						Hashes.addHeavyCensoring(e.getGuild().getIdLong(), false);
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_DISABLED)).build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_DISABLED)).setThumbnail(IniFileReader.getHeavyEndThumbnail()).build()).queue();
 						Hashes.removeCensoreMessage(e.getGuild().getIdLong());
 						Hashes.removeFilterThreshold(e.getGuild().getIdLong());
 						Hashes.getHeavyCensoringThread(e.getGuild().getIdLong()).interrupt();

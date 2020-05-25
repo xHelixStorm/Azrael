@@ -258,4 +258,12 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("Thumbnails", "FalseAlarm");
 	}
+	public static String getHeavyThumbnail() {
+		Ini ini = readConfig();
+		return ini.get("Thumbnails", "Heavy");
+	}
+	public static String getHeavyEndThumbnail() {
+		Ini ini = readConfig();
+		return ini.get("Thumbnail", "HeavyEnd");
+	}
 }
