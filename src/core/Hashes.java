@@ -19,7 +19,6 @@ import constructors.NameFilter;
 import constructors.Quizes;
 import constructors.RSS;
 import constructors.Rank;
-import constructors.RejoinTask;
 import constructors.Roles;
 import constructors.Skills;
 import constructors.Skins;
@@ -78,7 +77,6 @@ public class Hashes {
     private static final ConcurrentHashMap<String, String> commentedUsers = new ConcurrentHashMap<String, String>();
     private static final ConcurrentHashMap<String, Cache> tempCache = new ConcurrentHashMap<String, Cache>();
     private static final ConcurrentMap<Long, ArrayList<Skills>> skillShop = new ConcurrentHashMap<Long, ArrayList<Skills>>();
-    private static final ConcurrentMap<String, RejoinTask> rejoinTask = new ConcurrentHashMap<String, RejoinTask>();
     private static final Set<String> globalURLBlacklist = new HashSet<String>();
     private static final ConcurrentHashMap<Long, ArrayList<String>> urlBlacklist = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final ConcurrentHashMap<Long, ArrayList<String>> urlWhitelist = new ConcurrentHashMap<Long, ArrayList<String>>();
@@ -181,9 +179,6 @@ public class Hashes {
 	}
 	public static void addSkillShop(Long _key, ArrayList<Skills> skill) {
 		skillShop.put(_key, skill);
-	}
-	public static void addRejoinTask(String _key, RejoinTask task) {
-		rejoinTask.put(_key, task);
 	}
 	public static void addGlobalURLBlacklist(String _url) {
 		globalURLBlacklist.add(_url);
@@ -320,9 +315,6 @@ public class Hashes {
 	}
 	public static ArrayList<Skills> getSkillShop(Long _key) {
 		return skillShop.get(_key);
-	}
-	public static RejoinTask getRejoinTask(String _key) {
-		return rejoinTask.get(_key);
 	}
 	public static boolean findGlobalURLBlacklist(String _url) {
 		return globalURLBlacklist.contains(_url);
@@ -488,9 +480,6 @@ public class Hashes {
 	}
 	public static void clearSkillShop() {
 		skillShop.clear();
-	}
-	public static void removeRejoinTask(String _key) {
-		rejoinTask.remove(_key);
 	}
 	public static void removeURLBlacklist(Long _key) {
 		urlBlacklist.remove(_key);

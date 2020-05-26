@@ -22,6 +22,7 @@ import constructors.GoogleSheetColumn;
 import constructors.History;
 import constructors.NameFilter;
 import constructors.RSS;
+import constructors.RejoinTask;
 import constructors.User;
 import constructors.Warning;
 import constructors.Watchlist;
@@ -3060,6 +3061,76 @@ public class Azrael {
 			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLInsertReminder(long _user_id, long _guild_id, String _type, String _reason, String _reporter, String _time) {
+		logger.info("SQLInsertReminder launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _type, _reason, _reporter, _time);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("INSERT INTO reminder (fk_user_id, fk_guild_id, type, reason, reporter, time) VALUES(?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE type=VALUES(type), reason=VALUES(reason), reporter=VALUES(reporter), time=VALUES(time)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, _type);
+			stmt.setString(4, _reason);
+			stmt.setString(5, _reporter);
+			stmt.setString(6, _time);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertReminder Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static RejoinTask SQLgetRejoinTask(long _user_id, long _guild_id) {
+		logger.info("SQLgetRejoinTask launched. Params passed {}, {}", _user_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT * FROM reminder WHERE fk_user_id = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return new RejoinTask(rs.getLong(1), rs.getLong(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6));
+			}
+			return new RejoinTask(0, 0, "", "", "", "");
+		} catch (SQLException e) {
+			logger.error("SQLgetRejoinTask Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteRejoinTask(long _user_id, long _guild_id) {
+		logger.info("SQLDeleteRejoinTask launched. Passed params {}, {}", _user_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM reminder WHERE fk_user_id = ? AND fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteRejoinTask Exception", e);
+			return 0;
+		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}

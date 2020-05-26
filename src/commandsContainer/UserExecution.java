@@ -18,7 +18,6 @@ import constructors.Channels;
 import constructors.Guilds;
 import constructors.Messages;
 import constructors.Rank;
-import constructors.RejoinTask;
 import constructors.User;
 import constructors.Watchlist;
 import core.Hashes;
@@ -1048,7 +1047,7 @@ public class UserExecution {
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("mute-delay")) {
 				if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_YES))) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REMINDER_SET)).build()).queue();
-					Hashes.addRejoinTask(e.getGuild().getId()+"_"+user_id, new RejoinTask(user_id, e.getGuild().getIdLong(), cache.getAdditionalInfo3(), e.getMember().getUser().getId(), "mute", cache.getAdditionalInfo2()));
+					Azrael.SQLInsertReminder(user_id, e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), e.getMember().getUser().getId(), cache.getAdditionalInfo3());
 					Hashes.clearTempCache(key);
 				}
 				else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {
@@ -1171,7 +1170,7 @@ public class UserExecution {
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban-delay")) {
 				if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_YES))) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REMINDER_SET)).build()).queue();
-					Hashes.addRejoinTask(e.getGuild().getId()+"_"+user_id, new RejoinTask(user_id, e.getGuild().getIdLong(), "", e.getMember().getId(), "ban", cache.getAdditionalInfo2()));
+					Azrael.SQLInsertReminder(user_id, e.getGuild().getIdLong(), "ban", cache.getAdditionalInfo2(), e.getMember().getUser().getId(), "");
 					Hashes.clearTempCache(key);
 				}
 				else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {

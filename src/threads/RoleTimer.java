@@ -97,7 +97,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_MESSAGE_1).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", hour_add+and_add+minute_add).replace("{}", issuer)+reason).build()).queue();
 					}
 					else {
-						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_MESSAGE_1).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", hour_add+and_add+minute_add).replace("{}", issuer)+reason).build()).queue();
+						e.getGuild().getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_MESSAGE_2).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", hour_add+and_add+minute_add).replace("{}", issuer)+reason).build()).queue();
 					}
 				}
 				//put the thread to wait for a determined time

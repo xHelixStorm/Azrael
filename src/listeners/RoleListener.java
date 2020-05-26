@@ -256,7 +256,7 @@ public class RoleListener extends ListenerAdapter {
 								if(e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
 									//send a private message to the user
 									e.getUser().openPrivateChannel().queue(channel -> {
-										channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_DM)
+										channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_DM).replace("{}", e.getGuild().getName())
 												+ (GuildIni.getBanSendReason(guild_id) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 													//ban the user
 													e.getGuild().ban(e.getMember(), 0).reason(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_REASON)).queue();

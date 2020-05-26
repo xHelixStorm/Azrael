@@ -3,36 +3,36 @@ package constructors;
 public class RejoinTask {
 	private long user_id;
 	private long guild_id;
-	private String info;
-	private String info2;
 	private String type;
 	private String reason;
+	private String reporter;
+	private String time;
 	
-	public RejoinTask(long _user_id, long _guild_id, String _info, String _info2, String _type, String _reason) {
+	public RejoinTask(long _user_id, long _guild_id, String _type, String _reason, String _reporter, String _time) {
 		this.user_id = _user_id;
 		this.guild_id = _guild_id;
-		this.info = _info;
-		this.info2 = _info2;
 		this.type = _type;
 		this.reason = _reason;
+		this.reporter = _reporter;
+		this.time = _time;
 	}
 	
 	public long getUserID() {
-		return user_id;
+		return this.user_id;
 	}
 	public long getGuildID() {
-		return guild_id;
-	}
-	public String getInfo() {
-		return info;
-	}
-	public String getInfo2() {
-		return info2;
+		return this.guild_id;
 	}
 	public String getType() {
-		return type;
+		return this.type;
 	}
 	public String getReason() {
-		return reason;
+		return this.reason;
+	}
+	public String getReporter() {
+		return this.reporter;
+	}
+	public String getTime() {
+		return this.time;
 	}
 }

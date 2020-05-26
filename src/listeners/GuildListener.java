@@ -154,8 +154,8 @@ public class GuildListener extends ListenerAdapter {
 			}
 			
 			//check for residual tasks like mute or ban on server join
-			var rejoinAction = Hashes.getRejoinTask(e.getGuild().getId()+"_"+e.getMember().getUser().getId());
-			if(rejoinAction != null) {
+			var rejoinAction = Azrael.SQLgetRejoinTask(user_id, guild_id);
+			if(rejoinAction != null && rejoinAction.getUserID() != 0) {
 				//mute the newly joined user depending if it was a regular or time defined mute
 				if(rejoinAction.getType().equals("mute")) {
 					//look up for a mute role
@@ -164,15 +164,15 @@ public class GuildListener extends ListenerAdapter {
 						//check if the bot has the manage roles permission before continuing
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 							//this is a regular mute
-							if(rejoinAction.getInfo().length() == 0) {
-								Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
+							if(rejoinAction.getTime().length() == 0) {
+								Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(rejoinAction.getReporter(), rejoinAction.getReason()));
 								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
 								var mute_time = (long)Azrael.SQLgetWarning(guild_id, Azrael.SQLgetData(user_id, guild_id).getWarningID()+1).getTimer();
 								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON)), (mute_time/1000/60), "");
 							}
 							//this is a perm mute
-							else if(rejoinAction.getInfo().equals("perm")) {
-								Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
+							else if(rejoinAction.getTime().equals("perm")) {
+								Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(rejoinAction.getReporter(), rejoinAction.getReason()));
 								var timestamp = new Timestamp(System.currentTimeMillis());
 								if(Azrael.SQLInsertData(e.getUser().getIdLong(), e.getGuild().getIdLong(), Azrael.SQLgetMaxWarning(e.getGuild().getIdLong()), 1, timestamp, timestamp, false, false) == 0) {
 									logger.error("The perm mute flag for user {} in guild {} couldn't be inserted into Azrael.bancollect", user_id, guild_id);
@@ -184,7 +184,7 @@ public class GuildListener extends ListenerAdapter {
 							}
 							//this is a time defined mute
 							else {
-								var mute_time = Long.parseLong(rejoinAction.getInfo());
+								var mute_time = Long.parseLong(rejoinAction.getTime());
 								Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 								Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
 								Azrael.SQLInsertHistory(user_id, guild_id, "mute", (rejoinAction.getReason().length() > 0 ? rejoinAction.getReason() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON)), (mute_time/1000/60), "");
@@ -194,7 +194,7 @@ public class GuildListener extends ListenerAdapter {
 										if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_6).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 									}
 									else {
-										Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
+										Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getReporter(), rejoinAction.getReason()));
 										e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
 									}
 								}
@@ -204,7 +204,7 @@ public class GuildListener extends ListenerAdapter {
 										if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_7).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).queue();
 									}
 									else {
-										Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getInfo2(), rejoinAction.getReason()));
+										Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getReporter(), rejoinAction.getReason()));
 										e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
 									}
 								}
@@ -218,30 +218,39 @@ public class GuildListener extends ListenerAdapter {
 						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_4).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)+Permission.MANAGE_ROLES.getName()).build()).queue();
 					}
 					//remove the completed join task
-					Hashes.removeRejoinTask(e.getGuild().getId()+"_"+e.getMember().getUser().getId());
+					if(Azrael.SQLDeleteRejoinTask(user_id, guild_id) == 0) {
+						//TODO: throw error if it's null
+					}
 				}
 				//ban a joined user
 				else if(rejoinAction.getType().equals("ban")) {
 					//send a private message before banning
 					e.getUser().openPrivateChannel().queue(channel -> {
-						channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2)
+						channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2).replace("{}", e.getGuild().getName())
 								+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+rejoinAction.getReason() : "")).queue(success -> {
-									Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
+									Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getReporter(), rejoinAction.getReason()));
 									e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
 									Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
 									channel.close().queue();
 								}, error -> {
 									if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_DM_LOCKED).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
-									Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getInfo2(), rejoinAction.getReason()));
+									Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getReporter(), rejoinAction.getReason()));
 									e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
 									Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
 									channel.close().queue();
 								});
 					});
-					Hashes.removeRejoinTask(e.getGuild().getId()+"_"+e.getMember().getUser().getId());
+					if(Azrael.SQLDeleteRejoinTask(user_id, guild_id) == 0) {
+						//TODO: throw error if it's null
+					}
 				}
 			}
 			else {
+				//throw rejoin task error here, if it's null
+				if(rejoinAction == null) {
+					//TODO: add error message if null
+				}
+				
 				String nickname = null;
 				String lc_user_name = user_name.toLowerCase();
 				//lookup if the user is using the same name as a registered staff member name
