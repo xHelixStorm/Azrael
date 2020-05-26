@@ -636,7 +636,7 @@
 	"user_found_3":					"**delete-messages**: Delete up to 100 messages.\n",
 	"user_found_4":					"**warning**: Update the current warning.\n",
 	"user_found_5":					"**mute**: Mute a user.\n",
-	"user_found_6":					"**unmute** Unmute a user by stopping the timer.",
+	"user_found_6":					"**unmute** Unmute a user by stopping the timer.\n",
 	"user_found_7":					"**ban**: To ban the user.\n",
 	"user_found_8":					"**unban**: To unban the user.\n",
 	"user_found_9":					"**kick**: To kick the user.\n",

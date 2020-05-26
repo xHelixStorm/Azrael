@@ -36,7 +36,11 @@ public class User implements CommandPublic {
 			UserExecution.getHelp(e);
 		}
 		else if(args.length > 0) {
-			UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]*", ""), args[0]);
+			StringBuilder arguments = new StringBuilder();
+			for(int i = 0; i < args.length; i++) {
+				arguments.append(args[i]+" ");
+			}
+			UserExecution.runTask(e, e.getMessage().getContentRaw().replaceAll("[^0-9]*", ""), arguments.toString().trim());
 		}
 	}
 

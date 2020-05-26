@@ -145,7 +145,7 @@ public class UserExecution {
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_WATCH_LEVEL), "**"+watchedUser.getLevel()+"**", true);
 							message.addBlankField(false);
 							Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
-							if(guild_settings.getRankingState() == true) {
+							if(guild_settings.getRankingState() == true && user_details != null) {
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_LEVEL), "**"+user_details.getLevel()+"**/**"+guild_settings.getMaxLevel()+"**", true);
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_EXPERIENCE), "**"+user_details.getCurrentExperience()+"**/**"+user_details.getRankUpExperience()+"**", true);
 								if(user_details.getCurrentRole() != 0) {
