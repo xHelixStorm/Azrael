@@ -212,7 +212,11 @@ public class Use implements CommandPublic {
 					}
 				}
 				else {
-					String input = args[0];
+					StringBuilder out = new StringBuilder();
+					for(int i = 0; i < args.length; i++) {
+						out.append(args[i]+" ");
+					}
+					String input = out.toString().trim();
 					constructors.Inventory inventory = RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input, guild_settings.getThemeID());
 					if(inventory != null && inventory.getItemID() != 0 && inventory.getStatus().equals("perm")) {
 						if(inventory.getSkinType().equals("lev")) {

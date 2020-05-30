@@ -234,10 +234,6 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Denied");
 	}
-	public static String getLeaveThumbnail() {
-		Ini ini = readConfig();
-		return ini.get("Thumbnails", "Leave");
-	}
 	public static String getUnbanThumbnail() {
 		Ini ini = readConfig();
 		return ini.get("Thumbnails", "Unban");
@@ -264,6 +260,6 @@ public class IniFileReader {
 	}
 	public static String getHeavyEndThumbnail() {
 		Ini ini = readConfig();
-		return ini.get("Thumbnail", "HeavyEnd");
+		return ini.get("Thumbnails", "HeavyEnd");
 	}
 }

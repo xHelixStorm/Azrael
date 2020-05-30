@@ -102,13 +102,13 @@ public class GuildLeaveListener extends ListenerAdapter {
 							
 							//print message if a user has left the guild while being muted
 							else if(warnedUser.getMuted() && warnedUser.getBanID() == 1) {
-								EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getLeaveThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_TITLE));
+								EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_TITLE));
 								e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_MESSAGE_1).replace("{}", user_name)).build()).queue();
 								Azrael.SQLUpdateGuildLeft(user_id, guild_id, true);
 							}
 							//if leave messages are enabled, print a message that the user has left the server
 							else if(GuildIni.getLeaveMessage(guild_id) && warnedUser.getBanID() == 1) {
-								EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getLeaveThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_TITLE));
+								EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_TITLE));
 								e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_MESSAGE_2).replace("{}", user_name)).build()).queue();
 							}
 						});
@@ -116,13 +116,13 @@ public class GuildLeaveListener extends ListenerAdapter {
 					else {
 						//print message if a user has left the guild while being muted
 						if(warnedUser.getMuted() && warnedUser.getBanID() == 1) {
-							EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getLeaveThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_TITLE));
+							EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_TITLE));
 							e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_MESSAGE_1).replace("{}", user_name)).build()).queue();
 							Azrael.SQLUpdateGuildLeft(user_id, guild_id, true);
 						}
 						//if leave messages are enabled, print a message that the user has left the server
 						else if(GuildIni.getLeaveMessage(guild_id) && warnedUser.getBanID() == 1) {
-							EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getLeaveThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_TITLE));
+							EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_TITLE));
 							e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_MESSAGE_2).replace("{}", user_name)).build()).queue();
 						}
 					}

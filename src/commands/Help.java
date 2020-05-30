@@ -55,9 +55,16 @@ public class Help implements CommandPublic {
 		}
 		//print commands list
 		else {
-			e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.COMMAND_HEADER_1)).setDescription(CommandList.getHelp(e.getMember(), (UserPrivs.isUserAdmin(e.getMember()) || UserPrivs.isUserMod(e.getMember()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())), 1)).build()).queue();
-			e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.COMMAND_HEADER_2)).setDescription(CommandList.getHelp(e.getMember(), (UserPrivs.isUserAdmin(e.getMember()) || UserPrivs.isUserMod(e.getMember()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())), 2)).build()).queue();
-			e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.COMMAND_HEADER_3)).setDescription(CommandList.getHelp(e.getMember(), (UserPrivs.isUserAdmin(e.getMember()) || UserPrivs.isUserMod(e.getMember()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())), 3)).build()).queue();
+			final boolean admin = (UserPrivs.isUserAdmin(e.getMember()) || UserPrivs.isUserMod(e.getMember()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong()));
+			String out = CommandList.getHelp(e.getMember(), admin, 1);
+			if(out.length() > 0)
+				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.COMMAND_HEADER_1)).setDescription(out).build()).queue();
+			out = CommandList.getHelp(e.getMember(), admin, 2);
+			if(out.length() > 0)
+				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.COMMAND_HEADER_2)).setDescription(out).build()).queue();
+			out = CommandList.getHelp(e.getMember(), admin, 3);
+			if(out.length() > 0)
+				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.COMMAND_HEADER_3)).setDescription(out).build()).queue();
 		}
 	}
 
