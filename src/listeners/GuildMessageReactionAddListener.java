@@ -122,7 +122,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 						
 						//check if a role has to be assigned
 						long role_id = 0;
-						if(e.getReactionEmote().getName().replaceAll("[a-zA-Z0-9]*", "").length() != 0)
+						if(e.getReactionEmote().isEmoji())
 							role_id = DiscordRoles.SQLgetReactionRole(e.getMessageIdLong(), e.getReactionEmote().getAsCodepoints());
 						else {
 							role_id = DiscordRoles.SQLgetReactionRole(e.getMessageIdLong(), e.getReactionEmote().getName());
@@ -144,7 +144,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 					String channel_id = cache.getAdditionalInfo();
 					String message_id = cache.getAdditionalInfo2();
 					boolean isEmojiCustom = false;
-					if(e.getReactionEmote().getName().replaceAll("[a-zA-Z0-9]*", "").length() == 0)
+					if(!e.getReactionEmote().isEmoji())
 						isEmojiCustom = true;
 					final boolean customEmoji = isEmojiCustom;
 					//check that the permissions are correct

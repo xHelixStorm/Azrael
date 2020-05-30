@@ -112,7 +112,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 						}
 						//check if a role has to be removed
 						long role_id = 0;
-						if(e.getReactionEmote().getName().replaceAll("[a-zA-Z0-9]*", "").length() != 0)
+						if(e.getReactionEmote().isEmoji())
 							role_id = DiscordRoles.SQLgetReactionRole(e.getMessageIdLong(), e.getReactionEmote().getAsCodepoints());
 						else
 							role_id = DiscordRoles.SQLgetReactionRole(e.getMessageIdLong(), e.getReactionEmote().getName());
