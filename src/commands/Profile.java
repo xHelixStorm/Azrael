@@ -15,6 +15,7 @@ import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import rankingSystem.RankingMethods;
 import sql.Azrael;
@@ -60,13 +61,10 @@ public class Profile implements CommandPublic {
 			//check if the user has mentioned a different member and if yes, display the mentioned member's profile
 			if(args.length > 0) {
 				String id = args[0];
-				try {
-					id = id.replaceAll("[^0-9]", "");
-					user = id.length() > 0 ? Long.parseLong(id) : 0;
-					e.getGuild().getMemberById(user).getUser();
-				} catch(Exception exc) {
+				id = id.replaceAll("[^0-9]", "");
+				user = id.length() > 0 ? Long.parseLong(id) : 0;
+				if(e.getGuild().getMemberById(user) == null)
 					user = e.getMember().getUser().getIdLong();
-				}
 			}
 			else {
 				user = e.getMember().getUser().getIdLong();
@@ -106,50 +104,58 @@ public class Profile implements CommandPublic {
 					float experienceCounter;
 					int convertedExperience;
 					
-					String name = e.getGuild().getMemberById(user_id).getEffectiveName();
-					String avatar = e.getGuild().getMemberById(user_id).getUser().getEffectiveAvatarUrl();
+					Member member = e.getGuild().getMemberById(user_id);
+					String name = member.getEffectiveName();
+					String avatar = member.getUser().getEffectiveAvatarUrl();
 					float currentExperience = user_details.getCurrentExperience();
 					float rankUpExperience = user_details.getRankUpExperience();
 					
-					//verify that the profile and icon default skins are defined, else throw error
-					if(user_details.getRankingProfile() != 0 && user_details.getRankingIcon() != 0) {
-						//set a static experience value if the current level is the same as the max level
-						if(user_details.getLevel() == guild_settings.getMaxLevel()) {
-							currentExperience = 999999; rankUpExperience = 999999;
-						}
-						
-						//calculate the current experience percentage
-						experienceCounter = (currentExperience / rankUpExperience)*100;
-						convertedExperience = (int) experienceCounter;
-						if(convertedExperience > 100) {
-							convertedExperience = 100;
-						}
-						
-						//collect the current ranking on the server
-						ArrayList<constructors.Rank> rankList = RankingSystem.SQLRanking(guild_id);
-						if(rankList.size() > 0) {
-							final var ranking = rankList.parallelStream().filter(f -> f.getUser_ID() == user_id).findAny().orElse(null);
-							if(ranking != null)
-								rank = ranking.getRank();
-							else
-								rank = 0;
-						}
-						
-						//print the profile page, if the current experience isn't in the negative area
-						if(currentExperience >= 0) {
+					//set a static experience value if the current level is the same as the max level
+					if(user_details.getLevel() == guild_settings.getMaxLevel()) {
+						currentExperience = 999999; rankUpExperience = 999999;
+					}
+					
+					//calculate the current experience percentage
+					experienceCounter = (currentExperience / rankUpExperience)*100;
+					convertedExperience = (int) experienceCounter;
+					if(convertedExperience > 100) {
+						convertedExperience = 100;
+					}
+					
+					//collect the current ranking on the server
+					ArrayList<constructors.Rank> rankList = RankingSystem.SQLRanking(guild_id);
+					if(rankList.size() > 0) {
+						final var ranking = rankList.parallelStream().filter(f -> f.getUser_ID() == user_id).findAny().orElse(null);
+						if(ranking != null)
+							rank = ranking.getRank();
+						else
+							rank = 0;
+					}
+					
+					//print the profile page, if the current experience isn't in the negative area
+					if(currentExperience >= 0) {
+						if(user_details.getRankingProfile() > 0 && user_details.getRankingIcon() > 0)
 							RankingMethods.getProfile(e, name, avatar, convertedExperience, rank, (int)currentExperience, (int)rankUpExperience, guild_settings.getThemeID(), user_details);
-						}
 						else {
-							EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-							e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							RankingSystem.SQLInsertActionLog("critical", user_id, guild_id, "negative experience value", "The user has less experience points in proportion to his level: "+currentExperience);
-							logger.error("Negative experience value for {} in guild {}", user_id, e.getGuild().getName());
+							EmbedBuilder message = new EmbedBuilder();
+							if(user_details.getRankingRank() > 0 && user_details.getRankingIcon() == 0)
+								message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_NO_ICONS));
+							e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PROFILE_TITLE))
+								.setColor(Color.MAGENTA).setAuthor(name, avatar, avatar)
+								.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_LEVEL), "**"+user_details.getLevel()+"**", true)
+								.addField(STATIC.getTranslation(e.getMember(), Translation.RANK_RANK), "**"+rank+"**", true)
+								.addBlankField(true)
+								.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_EXPERIENCE), "**"+(long)currentExperience+"/"+(long)rankUpExperience+"**", true)
+								.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TOT_EXPERIENCE), "**"+user_details.getExperience()+"**", true)
+								.addBlankField(true)
+								.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_BALANCE), "**"+user_details.getCurrency()+"**", false).build()).queue();
 						}
 					}
 					else {
-						EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
-						e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_DEFAULT_SKIN)).build()).queue();
-						logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
+						EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+						e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						RankingSystem.SQLInsertActionLog("critical", user_id, guild_id, "negative experience value", "The user has less experience points in proportion to his level: "+currentExperience);
+						logger.error("Negative experience value for {} in guild {}", user_id, e.getGuild().getName());
 					}
 				}
 				else{

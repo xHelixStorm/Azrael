@@ -52,7 +52,7 @@ public class Use implements CommandPublic {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_HELP)).build()).queue();
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL))) {
-					constructors.Rank rank = RankingSystem.SQLgetRankingLevel(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(guild_settings.getLevelDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
+					constructors.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(guild_settings.getLevelDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 					user_details.setRankingLevel(rank.getRankingLevel());
 					user_details.setLevelDescription(rank.getLevelDescription());
 					user_details.setFileTypeLevel(rank.getFileTypeLevel());
@@ -88,7 +88,7 @@ public class Use implements CommandPublic {
 					}
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK))) {
-					constructors.Rank rank = RankingSystem.SQLgetRankingRank(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(guild_settings.getRankDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
+					constructors.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(guild_settings.getRankDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 					user_details.setRankingRank(rank.getRankingRank());
 					user_details.setRankDescription(rank.getRankDescription());
 					user_details.setFileTypeRank(rank.getFileTypeRank());
@@ -136,7 +136,7 @@ public class Use implements CommandPublic {
 					}
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE))) {
-					constructors.Rank rank = RankingSystem.SQLgetRankingProfile(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(guild_settings.getProfileDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
+					constructors.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(guild_settings.getProfileDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 					user_details.setRankingProfile(rank.getRankingProfile());
 					user_details.setProfileDescription(rank.getProfileDescription());
 					user_details.setFileTypeProfile(rank.getFileTypeProfile());
@@ -190,7 +190,7 @@ public class Use implements CommandPublic {
 					}
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICONS))) {
-					constructors.Rank rank = RankingSystem.SQLgetRankingIcons(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(guild_settings.getIconDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
+					constructors.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(guild_settings.getIconDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
 					user_details.setRankingIcon(rank.getRankingIcon());
 					user_details.setIconDescription(rank.getIconDescription());
 					user_details.setFileTypeIcon(rank.getFileTypeIcon());
@@ -221,7 +221,7 @@ public class Use implements CommandPublic {
 					if(inventory != null && inventory.getItemID() != 0 && inventory.getStatus().equals("perm")) {
 						if(inventory.getSkinType().equals("lev")) {
 							final String filter = input;
-							constructors.Rank rank = RankingSystem.SQLgetRankingLevel(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+							constructors.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 							user_details.setRankingLevel(rank.getRankingLevel());
 							user_details.setLevelDescription(rank.getLevelDescription());
 							user_details.setFileTypeLevel(rank.getFileTypeLevel());
@@ -251,7 +251,7 @@ public class Use implements CommandPublic {
 						}
 						else if(inventory.getSkinType().equals("ran")) {
 							final String filter = input;
-							constructors.Rank rank = RankingSystem.SQLgetRankingRank(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+							constructors.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 							user_details.setRankingRank(rank.getRankingRank());
 							user_details.setRankDescription(rank.getRankDescription());
 							user_details.setFileTypeRank(rank.getFileTypeRank());
@@ -292,7 +292,7 @@ public class Use implements CommandPublic {
 						}
 						else if(inventory.getSkinType().equals("pro")) {
 							final String filter = input;
-							constructors.Rank rank = RankingSystem.SQLgetRankingProfile(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+							constructors.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 							user_details.setRankingProfile(rank.getRankingProfile());
 							user_details.setProfileDescription(rank.getProfileDescription());
 							user_details.setFileTypeProfile(rank.getFileTypeProfile());
@@ -342,7 +342,7 @@ public class Use implements CommandPublic {
 						}
 						else if(inventory.getSkinType().equals("ico")) {
 							final String filter = input;
-							constructors.Rank rank = RankingSystem.SQLgetRankingIcons(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+							constructors.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 							user_details.setRankingIcon(rank.getRankingIcon());
 							user_details.setIconDescription(rank.getIconDescription());
 							user_details.setFileTypeIcon(rank.getFileTypeIcon());

@@ -19,7 +19,7 @@ public class SetIconDefaultSkin {
 	private final static Logger logger = LoggerFactory.getLogger(SetLevelDefaultSkin.class);
 	
 	public static void runTask(GuildMessageReceivedEvent e, int _default_skin, int _last_theme, List<Rank> skins) {
-		if(_default_skin > 0 && _default_skin <= _last_theme) {
+		if(_default_skin >= 0 && _default_skin <= _last_theme) {
 			var skin = skins.parallelStream().filter(f -> f.getIconLine() == _default_skin).findAny().orElse(null);
 			if(skin != null) {
 				if(RankingSystem.SQLUpdateIconDefaultSkin(e.getGuild().getIdLong(), e.getGuild().getName(), skin.getRankingIcon()) > 0) {

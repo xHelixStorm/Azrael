@@ -257,14 +257,14 @@ public class RankingThreadExecution {
 			if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0) {
 				RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Level Up", "User reached level "+user_details.getLevel());
 				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
-				if(user_details.getRankingLevel() != 0 && user_details.getRankingIcon() != 0) {
+				if(user_details.getRankingLevel() > 0 && user_details.getRankingIcon() > 0) {
 					//Upload level up image
 					RankingMethods.getRankUp(e, guild_settings.getThemeID(), user_details, rankIcon);
 				}
 				else {
-					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DEFAULT_SKINS_ERR)).build()).queue();
-					logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getId());
+					e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.LEVEL_TITLE)).setColor(Color.MAGENTA)
+						.setAuthor(e.getMember().getEffectiveName(), e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getUser().getEffectiveAvatarUrl())
+						.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_MESSAGE).replace("{}", ""+user_details.getLevel())).build()).queue();
 				}
 			}
 			else {

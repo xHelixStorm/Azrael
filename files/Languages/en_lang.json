@@ -418,12 +418,17 @@
 	"patchnotes_choice_3":			"Please choose between *bot* and *game* patch notes!",
 	"patchnotes_latest_title":		"Here the latest patchnotes!",
 	
-	"profile_default_skin":			"Please define a default skin for the profile command and then try again!",
+	"profile_title":				"Profile Page!",
+	"profile_no_icons":				"_No default level skin provided to upload the profile page image!_",
 	"profile_err":					"An internal error occurred! Profile couldn't be displayed! Please contact an administrator!",
 	
-	"rank_default_skin":			"Please define a default skin for the rank command and then try again!",
-	"rank_err":						"An internal error occurred! Profile couldn't be displayed! Please contact an administrator!",
+	"rank_title":					"Rank Page!",
+	"rank_rank":					"RANK",
+	"rank_no_icons":				"_No default level skin provided to upload the rank page image!_",
+	"rank_err":						"An internal error occurred! Rank page couldn't be displayed! Please contact an administrator!",
 	
+	"level_title":					"Level Up!",
+	"level_message":				"Congratulations for the level up! New level **{}**",
 	"level_err":					"An internal error occurred! Level Up message couldn't be displayed! Please contact an administrator!",
 	
 	"quiz_help":					"Have the best Discord Quiz experience by registering questions! The following parameters are available.\n\n- **register-rewards**:\nRegister a list of rewards.\n- **register-questions**:\nRegister questions, answers and hints.\n- **clear**:\nClear all registered questions and rewards.\n- **run**:\nLaunch the Quiz.\n",

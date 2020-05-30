@@ -50,7 +50,7 @@ public class About implements CommandPublic {
 		else {
 			//Build message and print it to the user
 			EmbedBuilder messageBuilder = new EmbedBuilder().setColor(0x00AE86).setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ABOUT));
-			messageBuilder.setAuthor("Azrael", e.getJDA().getSelfUser().getEffectiveAvatarUrl());
+			messageBuilder.setAuthor(e.getGuild().getSelfMember().getEffectiveName());
 			messageBuilder.setDescription(STATIC.getTranslation(e.getMember(), Translation.ABOUT_DESCRIPTION));
 			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_1), STATIC.getVersion(), true);
 			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_2), "Heiliger#7143", true);

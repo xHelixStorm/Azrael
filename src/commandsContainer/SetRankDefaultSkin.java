@@ -19,7 +19,7 @@ public class SetRankDefaultSkin {
 	private final static Logger logger = LoggerFactory.getLogger(SetRankDefaultSkin.class);
 	
 	public static void runTask(GuildMessageReceivedEvent e, int _default_skin, int _last_theme, List<Rank> skins) {
-		if(_default_skin > 0 && _default_skin <= _last_theme) {
+		if(_default_skin >= 0 && _default_skin <= _last_theme) {
 			final var skin = skins.parallelStream().filter(f -> f.getRankLine() == _default_skin).findAny().orElse(null);
 			if(skin != null) {
 				if(RankingSystem.SQLUpdateRankDefaultSkin(e.getGuild().getIdLong(), e.getGuild().getName(), skin.getRankingRank()) > 0) {

@@ -421,12 +421,17 @@ public enum Translation {
 	PATCHNOTES_CHOICE_3			("patchnotes_choice_3"),
 	PATCHNOTES_LATEST_TITLE		("patchnotes_latest_title"),
 	
-	PROFILE_DEFAULT_SKIN		("profile_default_skin"),
+	PROFILE_TITLE				("profile_title"),
+	PROFILE_NO_ICONS			("profile_no_icons"),
 	PROFILE_ERR					("profile_err"),
 	
-	RANK_DEFAULT_SKIN			("rank_default_skin"),
+	RANK_TITLE					("rank_title"),
+	RANK_RANK					("rank_rank"),
+	RANK_NO_ICONS				("rank_no_icons"),
 	RANK_ERR					("rank_err"),
 	
+	LEVEL_TITLE					("level_title"),
+	LEVEL_MESSAGE				("level_message"),
 	LEVEL_ERR					("level_err"),
 	
 	QUIZ_HELP					("quiz_help"),

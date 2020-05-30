@@ -60,10 +60,6 @@ public class Hashes {
     private static final ConcurrentMap<Long, Long> reaction_message = new ConcurrentHashMap<Long, Long>();
     private static final ConcurrentMap<Integer, Quizes> quiz = new ConcurrentHashMap<Integer, Quizes>();
     private static final ConcurrentMap<Member, Integer> quiz_winners = new ConcurrentHashMap<Member, Integer>();
-    private static final ConcurrentMap<Long, ArrayList<Rank>> rankListLevel = new ConcurrentHashMap<Long, ArrayList<Rank>>();
-    private static final ConcurrentMap<Long, ArrayList<Rank>> rankListRank = new ConcurrentHashMap<Long, ArrayList<Rank>>();
-    private static final ConcurrentMap<Long, ArrayList<Rank>> rankListProfile = new ConcurrentHashMap<Long, ArrayList<Rank>>();
-    private static final ConcurrentMap<Long, ArrayList<Rank>> rankListIcons = new ConcurrentHashMap<Long, ArrayList<Rank>>();
     private static final ConcurrentMap<Long, ArrayList<Skins>> shopContent = new ConcurrentHashMap<Long, ArrayList<Skins>>();
     private static final ConcurrentMap<Long, ArrayList<Dailies>> daily_items = new ConcurrentHashMap<Long, ArrayList<Dailies>>();
     private static final ConcurrentMap<Long, ArrayList<Roles>> discordRoles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
@@ -128,18 +124,6 @@ public class Hashes {
 	}
 	public static void addQuizWinners(Member _key, Integer _threshold) {
 		quiz_winners.put(_key, _threshold);
-	}
-	public static void addRankListLevel(Long _key, ArrayList<Rank> _rankList) {
-		rankListLevel.put(_key, _rankList);
-	}
-	public static void addRankListRank(Long _key, ArrayList<Rank> _rankList) {
-		rankListRank.put(_key, _rankList);
-	}
-	public static void addRankListProfile(Long _key, ArrayList<Rank> _rankList) {
-		rankListProfile.put(_key, _rankList);
-	}
-	public static void addRankListIcons(Long _key, ArrayList<Rank> _rankList) {
-		rankListIcons.put(_key, _rankList);
 	}
 	public static void addShopContent(Long _key, ArrayList<Skins> _skin_content) {
 		shopContent.put(_key, _skin_content);
@@ -265,18 +249,6 @@ public class Hashes {
 	public static Integer getQuizWinners(Member _key) {
 		return quiz_winners.get(_key);
 	}
-	public static ArrayList<Rank> getRankListLevel(Long _key) {
-		return rankListLevel.get(_key);
-	}
-	public static ArrayList<Rank> getRankListRank(Long _key) {
-		return rankListRank.get(_key);
-	}
-	public static ArrayList<Rank> getRankListProfile(Long _key) {
-		return rankListProfile.get(_key);
-	}
-	public static ArrayList<Rank> getRankListIcons(Long _key) {
-		return rankListIcons.get(_key);
-	}
 	public static ArrayList<Skins> getShopContent(Long _key) {
 		return shopContent.get(_key);
 	}
@@ -397,30 +369,6 @@ public class Hashes {
 	}
 	public static void clearQuizWinners() {
 		quiz_winners.clear();
-	}
-	public static void removeRankListLevel(long _key) {
-		rankListLevel.remove(_key);
-	}
-	public static void removeRankListRank(long _key) {
-		rankListRank.remove(_key);
-	}
-	public static void removeRankListProfile(long _key) {
-		rankListProfile.remove(_key);
-	}
-	public static void removeRankListIcons(long _key) {
-		rankListIcons.remove(_key);
-	}
-	public static void clearRankListLevel() {
-		rankListLevel.clear();
-	}
-	public static void clearRankListRank() {
-		rankListRank.clear();
-	}
-	public static void clearRankListProfile() {
-		rankListProfile.clear();
-	}
-	public static void clearRankListIcons() {
-		rankListIcons.clear();
 	}
 	public static void clearShopContent() {
 		shopContent.clear();
