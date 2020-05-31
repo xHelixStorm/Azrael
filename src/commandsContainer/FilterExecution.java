@@ -526,78 +526,76 @@ public class FilterExecution {
 				case "display-word-filter" -> callFilterLangContent(e, message, key, _message.toLowerCase());
 				case "insert-word-filter" -> {
 					var langInsert = _message.toLowerCase();
-					if(langInsert.equalsIgnoreCase("english") || langInsert.equalsIgnoreCase("german") || langInsert.equalsIgnoreCase("french") || langInsert.equalsIgnoreCase("turkish") || langInsert.equalsIgnoreCase("russian") || 
-							langInsert.equalsIgnoreCase("spanish") || langInsert.equalsIgnoreCase("portuguese") || langInsert.equalsIgnoreCase("italian") || langInsert.equalsIgnoreCase("all")) {
-						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT)+" "+langInsert.toUpperCase());
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
-						cache.updateDescription(langInsert+"-insert-word-filter").setExpiration(180000);
-						Hashes.addTempCache(key, cache);
+					final var langs = Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember()));
+					if(langs != null && langs.size() > 0) {
+						if(langs.parallelStream().filter(f -> f.split("-")[1].equalsIgnoreCase(langInsert)).findAny().orElse(null) != null) {
+							message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT)+" "+langInsert.toUpperCase());
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
+							cache.updateDescription("lang-insert-word-filter").updateDescription2(langInsert).setExpiration(180000);
+							Hashes.addTempCache(key, cache);
+						}
+					}
+					else {
+						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Languages couldn't be retrieved from Azrael.languages_translation in guild {}", e.getGuild().getId());
+						Hashes.clearTempCache(key);
 					}
 				}
-				case "english-insert-word-filter" 		-> insertLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "german-insert-word-filter" 		-> insertLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "french-insert-word-filter" 		-> insertLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "turkish-insert-word-filter" 		-> insertLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "russian-insert-word-filter" 		-> insertLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "spanish-insert-word-filter" 		-> insertLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "portuguese-insert-word-filter" 	-> insertLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "italian-insert-word-filter" 		-> insertLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "all-insert-word-filter" 			-> insertLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "lang-insert-word-filter" -> insertLangWord(e, message, key, cache.getAdditionalInfo2(), _message);
 				case "remove-word-filter" -> {
 					var langRemove = _message.toLowerCase();
-					if(langRemove.equalsIgnoreCase("english") || langRemove.equalsIgnoreCase("german") || langRemove.equalsIgnoreCase("french") || langRemove.equalsIgnoreCase("turkish") || langRemove.equalsIgnoreCase("russian") || 
-							langRemove.equalsIgnoreCase("spanish") || langRemove.equalsIgnoreCase("portuguese") || langRemove.equalsIgnoreCase("italian") || langRemove.equalsIgnoreCase("all")) {
-						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE)+" "+langRemove.toUpperCase());
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
-						cache.updateDescription(langRemove+"-remove-word-filter").setExpiration(180000);
-						Hashes.addTempCache(key, cache);
+					final var langs = Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember()));
+					if(langs != null && langs.size() > 0) {
+						if(langs.parallelStream().filter(f -> f.split("-")[1].equalsIgnoreCase(langRemove)).findAny().orElse(null) != null) {
+							message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE)+" "+langRemove.toUpperCase());
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
+							cache.updateDescription("lang-remove-word-filter").updateDescription2(langRemove).setExpiration(180000);
+							Hashes.addTempCache(key, cache);
+						}
+					}
+					else {
+						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Languages couldn't be retrieved from Azrael.languages_translation in guild {}", e.getGuild().getId());
+						Hashes.clearTempCache(key);
 					}
 				}
-				case "english-remove-word-filter" 		-> removeLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "german-remove-word-filter" 		-> removeLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "french-remove-word-filter" 		-> removeLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "turkish-remove-word-filter" 		-> removeLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "russian-remove-word-filter" 		-> removeLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "spanish-remove-word-filter" 		-> removeLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "portuguese-remove-word-filter" 	-> removeLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "italian-remove-word-filter" 		-> removeLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
-				case "all-remove-word-filter" 			-> removeLangWord(e, message, key, cache.getAdditionalInfo().split("-")[0], _message);
+				case "lang-remove-word-filter" -> removeLangWord(e, message, key, cache.getAdditionalInfo2(), _message);
 				case "add-load-word-filter" -> {
 					var addLangLoad = _message.toLowerCase();
-					if(addLangLoad.equalsIgnoreCase("english") || addLangLoad.equalsIgnoreCase("german") || addLangLoad.equalsIgnoreCase("french") || addLangLoad.equalsIgnoreCase("turkish") || addLangLoad.equalsIgnoreCase("russian") || 
-							addLangLoad.equalsIgnoreCase("spanish") || addLangLoad.equalsIgnoreCase("portuguese") || addLangLoad.equalsIgnoreCase("italian")) {
-						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN)+" "+addLangLoad.toUpperCase());
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN)).build()).queue();
-						cache.updateDescription(addLangLoad+"-add-load-word-filter").setExpiration(180000);
-						Hashes.addTempCache(key, cache);
+					final var langs = Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember()));
+					if(langs != null && langs.size() > 0) {
+						if(langs.parallelStream().filter(f -> f.split("-")[1].equalsIgnoreCase(addLangLoad)).findAny().orElse(null) != null) {
+							message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN)+" "+addLangLoad.toUpperCase());
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN)).build()).queue();
+							cache.updateDescription("lang-add-load-word-filter").updateDescription2(addLangLoad).setExpiration(180000);
+							Hashes.addTempCache(key, cache);
+						}
+					}
+					else {
+						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Languages couldn't be retrieved from Azrael.languages_translation in guild {}", e.getGuild().getId());
+						Hashes.clearTempCache(key);
 					}
 				}
-				case "english-add-load-word-filter" 	-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "german-add-load-word-filter" 		-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "french-add-load-word-filter" 		-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "turkish-add-load-word-filter" 	-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "russian-add-load-word-filter" 	-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "spanish-add-load-word-filter" 	-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "portuguese-add-load-word-filter" 	-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
-				case "italian-add-load-word-filter" 	-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, false);
+				case "lang-add-load-word-filter" -> loadLangWords(e, message, key, cache.getAdditionalInfo2(), _message, false);
 				case "load-word-filter" -> {
 					var langLoad = _message.toLowerCase();
-					if(langLoad.equalsIgnoreCase("english") || langLoad.equalsIgnoreCase("german") || langLoad.equalsIgnoreCase("french") || langLoad.equalsIgnoreCase("turkish") || langLoad.equalsIgnoreCase("russian") || 
-							langLoad.equalsIgnoreCase("spanish") || langLoad.equalsIgnoreCase("portuguese") || langLoad.equalsIgnoreCase("italian")) {
-						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN)+" "+langLoad.toUpperCase());
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN)).build()).queue();
-						cache.updateDescription(langLoad+"-load-word-filter").setExpiration(180000);
-						Hashes.addTempCache(key, cache);
+					final var langs = Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember()));
+					if(langs != null && langs.size() > 0) {
+						if(langs.parallelStream().filter(f -> f.split("-")[1].equalsIgnoreCase(langLoad)).findAny().orElse(null) != null) {
+							message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN)+" "+langLoad.toUpperCase());
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN)).build()).queue();
+							cache.updateDescription("lang-load-word-filter").updateDescription2(langLoad).setExpiration(180000);
+							Hashes.addTempCache(key, cache);
+						}
+					}
+					else {
+						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Languages couldn't be retrieved from Azrael.languages_translation in guild {}", e.getGuild().getId());
+						Hashes.clearTempCache(key);
 					}
 				}
-				case "english-load-word-filter" 		-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "german-load-word-filter" 			-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "french-load-word-filter" 			-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "turkish-load-word-filter" 		-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "russian-load-word-filter" 		-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "spanish-load-word-filter" 		-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "portuguese-load-word-filter" 		-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
-				case "italian-load-word-filter" 		-> loadLangWords(e, message, key, cache.getAdditionalInfo().split("-")[0], _message, true);
+				case "lang-load-word-filter" -> loadLangWords(e, message, key, cache.getAdditionalInfo2(), _message, true);
 				case "insert-name-filter" -> {
 					if(Azrael.SQLInsertNameFilter(_message, false, e.getMember().getIdLong()) > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT)).build()).queue();

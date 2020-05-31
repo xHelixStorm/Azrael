@@ -68,7 +68,7 @@ public class STATIC {
 	
 	private static final String VERSION = "7.21.433";
 	
-	private static final JSONObject en_lang = new JSONObject(FileSetting.readFile("./files/Languages/en_lang.json"));
+	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
@@ -100,13 +100,13 @@ public class STATIC {
 	@SuppressWarnings("preview")
 	public static String getTranslation(Member member, Translation event) {
 		//retrieve language. In case non was found, search on the db and if it fails use default language
-		String lang = Hashes.getLanguage(member.getUser().getIdLong());
+		String lang = Azrael.SQLgetUserLang(member.getUser().getIdLong());
 		if(lang == null) {
 			lang = Hashes.getLanguage(member.getGuild().getIdLong());
 			if(lang == null) {
 				lang = Azrael.SQLgetLanguage(member.getGuild().getIdLong());
 				if(lang == null) {
-					lang = "en";
+					lang = "eng";
 					Hashes.setLanguage(member.getGuild().getIdLong(), lang);
 				}
 				else
@@ -115,8 +115,13 @@ public class STATIC {
 		}
 		
 		return switch(lang) {
-			case "en" -> (String)en_lang.get(event.section());
-			default -> "Missing translation";
+			case "eng" -> {
+				if(eng_lang.has(event.section()))
+					return (String)eng_lang.get(event.section());
+				else
+					return "Message "+event.section()+" not found!";
+			}
+			default -> "Missing translation!";
 		};
 	}
 	
@@ -127,7 +132,7 @@ public class STATIC {
 		if(lang == null) {
 			lang = Azrael.SQLgetLanguage(guild.getIdLong());
 			if(lang == null) {
-				lang = "en";
+				lang = "eng";
 				Hashes.setLanguage(guild.getIdLong(), lang);
 			}
 			else
@@ -135,19 +140,24 @@ public class STATIC {
 		}
 		
 		return switch(lang) {
-			case "en" -> (String)en_lang.get(event.section());
-			default -> "Missing translation";
+			case "eng" -> {
+				if(eng_lang.has(event.section()))
+					return (String)eng_lang.get(event.section());
+				else
+					return "Message "+event.section()+" not found!";
+			}
+			default -> "Missing translation!";
 		};
 	}
 	
 	@SuppressWarnings("preview")
 	public static String getTranslation3(User user, Translation event) {
 		//retrieve language. In case non was found, search on the db and if it fails use default language
-		String lang = Hashes.getLanguage(user.getIdLong());
+		String lang = Azrael.SQLgetUserLang(user.getIdLong());
 		if(lang == null) {
 			lang = Azrael.SQLgetLanguage(user.getIdLong());
 			if(lang == null) {
-				lang = "en";
+				lang = "eng";
 				Hashes.setLanguage(user.getIdLong(), lang);
 			}
 			else
@@ -155,9 +165,38 @@ public class STATIC {
 		}
 		
 		return switch(lang) {
-			case "en" -> (String)en_lang.get(event.section());
-			default -> "Missing translation";
+			case "eng" -> {
+				if(eng_lang.has(event.section()))
+					return (String)eng_lang.get(event.section());
+				else
+					return "Message "+event.section()+" not found!";
+			}
+			default -> "Missing translation!";
 		};
+	}
+	
+	public static String getLanguage(Member member) {
+		String lang = Azrael.SQLgetUserLang(member.getUser().getIdLong());
+		if(lang == null) {
+			lang = "eng";
+			Hashes.setLanguage(member.getUser().getIdLong(), lang);
+		}
+		return lang;
+	}
+	
+	public static String getLanguage2(Guild guild) {
+		String lang = Hashes.getLanguage(guild.getIdLong());
+		if(lang == null) {
+			lang = Azrael.SQLgetLanguage(guild.getIdLong());
+			if(lang == null) {
+				lang = "eng";
+				Hashes.setLanguage(guild.getIdLong(), lang);
+			}
+			else {
+				Hashes.setLanguage(guild.getIdLong(), lang);
+			}
+		}
+		return lang;
 	}
 	
 	//default mysql url String to access the database. As parameters, the database name and ip address to the mysql server are required

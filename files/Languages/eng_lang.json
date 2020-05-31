@@ -526,7 +526,7 @@
 	"set_permission":				"Change the permission level of a role between 0 (lowest) to 100 (highest)! Write a numerical role ID as second parameter and the numerical permission level as third parameter!",
 	"set_permission_added":			"The permission level has been updated successfully for this role!",
 	"set_permission_no_level":		"Please provide a numerical permission level between 0 and 100 as third parameter!",
-	"set_censor":					"Set one or few self chosen censor languages on a text channel! Mention a text channel or write the channel ID as second parameter and the censor language abbreviations as third parameter. If multiple languages are required, divide the language abbreviations with a comma. These are all the available languages:\n\n*all*: All Languages\n*eng*: English\n*ger*: German\n*fre*: French\n*tur*: Turkish\n*rus*: Russian\n*spa*: Spanish\n*por*: Portuguese\n*ita*: Italian",
+	"set_censor":					"Set one or few self chosen censor languages on a text channel! Mention a text channel or write the channel ID as second parameter and the censor language abbreviations as third parameter. If multiple languages are required, divide the language abbreviations with a comma. These are all the available languages:\n\n",
 	"set_censor_valid_lang":		"Please provide at least one supported language!",
 	"set_censor_err":				"Censoring language **{}** couldn't be saved for the provided text channel!",
 	"set_censor_added":				"Censoring languages have been saved for the provided text channel!",

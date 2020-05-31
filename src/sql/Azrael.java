@@ -276,17 +276,18 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertUser(long _user_id, String _name, String _avatar) {
-		logger.info("SQLInsertUser launched. Passed params {}, {}, {}", _user_id, _name, _avatar);
+	public static int SQLInsertUser(long _user_id, String _name, String _lang, String _avatar) {
+		logger.info("SQLInsertUser launched. Passed params {}, {}, {}, {}", _user_id, _name, _lang, _avatar);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO users (user_id, name, avatar_url) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
+			String sql = ("INSERT INTO users (user_id, name, lang, avatar_url) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _name);
-			stmt.setString(3, _avatar);
+			stmt.setString(3, _lang);
+			stmt.setString(4, _avatar);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertUser Exception", e);
@@ -304,12 +305,13 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip, "&rewriteBatchedStatements=true"), username, password);
 			myConn.setAutoCommit(false); 
-			String sql = ("INSERT INTO users (user_id, name, avatar_url) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
+			String sql = ("INSERT INTO users (user_id, name, lang, avatar_url) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
 			stmt = myConn.prepareStatement(sql);
 			for(Member member : members) {
 				stmt.setLong(1, member.getUser().getIdLong());
 				stmt.setString(2, member.getUser().getName()+"#"+member.getUser().getDiscriminator());
-				stmt.setString(3, member.getUser().getEffectiveAvatarUrl());
+				stmt.setString(3, STATIC.getLanguage2(member.getGuild()));
+				stmt.setString(4, member.getUser().getEffectiveAvatarUrl());
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
@@ -513,6 +515,35 @@ public class Azrael {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
+	}
+	
+	public static String SQLgetUserLang(long _user_id) {
+		if(Hashes.getLanguage(_user_id) == null) {
+			logger.info("SQLgetUserLang launched. Passed params {}", _user_id);
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				String sql = ("SELECT lang FROM users WHERE user_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _user_id);
+				rs = stmt.executeQuery();
+				if(rs.next()) {
+					String lang = rs.getString(1);
+					Hashes.setLanguage(_user_id, lang);
+					return rs.getString(1);
+				}
+				return null;
+			} catch (SQLException e) {
+				logger.error("SQLgetUserLang Exception", e);
+				return null;
+			} finally {
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		return Hashes.getLanguage(_user_id);
 	}
 	
 	public static long SQLgetGuild(long _guild_id) {
@@ -3131,6 +3162,32 @@ public class Azrael {
 			logger.error("SQLDeleteRejoinTask Exception", e);
 			return 0;
 		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<String> SQLgetLanguages(String _lang) {
+		logger.info("SQLgetLanguages launched. Params passed {}", _lang);
+		ArrayList<String> langs = new ArrayList<String>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT lang, translation FROM languages_translation WHERE lang2 = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _lang);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				langs.add(rs.getString(1)+"-"+rs.getString(2));
+			}
+			return langs;
+		} catch (SQLException e) {
+			logger.error("SQLgetLanguages Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}

@@ -26,6 +26,7 @@ import fileManagement.IniFileReader;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import sql.Azrael;
 import sql.RankingSystem;
 import util.STATIC;
 
@@ -76,7 +77,21 @@ public class Set implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL_CENSOR))) {
 				commandLevel = GuildIni.getSetChannelFilterLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_CENSOR)).build()).queue();
+					final var langs = Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember()));
+					if(langs != null && langs.size() > 0) {
+						StringBuilder out = new StringBuilder();
+						StringBuilder out2 = new StringBuilder();
+						for(final var lang : langs) {
+							final String [] split = lang.split("-");
+							out.append("**"+split[0]+"**\n");
+							out2.append("*"+split[1]+"*\n");
+						}
+						e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_CENSOR)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Languages couldn't be retrieved from Azrael.languages_translation in guild {}", e.getGuild().getId());
+					}
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
