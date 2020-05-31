@@ -50,7 +50,7 @@ public class Remove implements CommandPublic {
 		}
 		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
 			if(args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))) {
-				final int result = DiscordRoles.SQLDeleteAllRoles(e.getGuild().getIdLong());
+				final int result = DiscordRoles.SQLUpdateAllRoles(e.getGuild().getIdLong());
 				if(result > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_ROLES)).build()).queue();
 					Hashes.removeDiscordRoles(e.getGuild().getIdLong());
@@ -69,7 +69,7 @@ public class Remove implements CommandPublic {
 				if(!args[1].matches("[^\\d]*")) {
 					long role = Long.parseLong(args[1]);
 					if(e.getGuild().getRoleById(role) != null) {
-						if(DiscordRoles.SQLDeleteRole(role, e.getGuild().getIdLong()) > 0) {
+						if(DiscordRoles.SQLUpdateRole(role, e.getGuild().getIdLong()) > 0) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_ROLE)).build()).queue();
 							Hashes.removeDiscordRoles(e.getGuild().getIdLong());
 							Hashes.removeReactionRoles(e.getGuild().getIdLong());

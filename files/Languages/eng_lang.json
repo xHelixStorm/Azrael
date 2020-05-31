@@ -827,6 +827,8 @@
 	"join_err_5":					"The user **{}** with the ID number **{}** couldn't receive the perm mute flag on server join!",
 	"join_err_6":					"The unmute timer of the user **{}** with the ID number **{}** couldn't be updated on server join!",
 	"join_err_7":					"The user **{}** with the ID number **{}** couldn't be flagged as muted!",
+	"join_err_8":					"Rejoin Task couldn't be removed for the user **{}** with the ID number **{}**!",
+	"join_err_9":					"Rejoin Tasks couldn't be verified for the user **{}** with the ID number **{}**!",
 	"join_message":					"**{}** has joined the server!",
 	"join_permission_err":			"The joined user **{}** with the ID number **{}** couldn't be muted because the following permission is required: ",
 	

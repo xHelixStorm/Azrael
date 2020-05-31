@@ -219,7 +219,8 @@ public class GuildListener extends ListenerAdapter {
 					}
 					//remove the completed join task
 					if(Azrael.SQLDeleteRejoinTask(user_id, guild_id) == 0) {
-						//TODO: throw error if it's null
+						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_8).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
+						logger.error("Rejoin task couldn't be removed from table Azrael.reminder for user {} in guild {}", user_id, guild_id);
 					}
 				}
 				//ban a joined user
@@ -241,14 +242,16 @@ public class GuildListener extends ListenerAdapter {
 								});
 					});
 					if(Azrael.SQLDeleteRejoinTask(user_id, guild_id) == 0) {
-						//TODO: throw error if it's null
+						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_8).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
+						logger.error("Rejoin task couldn't be removed from table Azrael.reminder for user {} in guild {}", user_id, guild_id);
 					}
 				}
 			}
 			else {
 				//throw rejoin task error here, if it's null
 				if(rejoinAction == null) {
-					//TODO: add error message if null
+					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_9).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
+					logger.error("Rejoin tasks couldn't be verified for the user {} in guild {} from table Azrael.reminder", user_id, guild_id);
 				}
 				
 				String nickname = null;

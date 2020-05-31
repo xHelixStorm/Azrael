@@ -830,6 +830,8 @@ public enum Translation {
 	JOIN_ERR_5					("join_err_5"),
 	JOIN_ERR_6					("join_err_6"),
 	JOIN_ERR_7					("join_err_7"),
+	JOIN_ERR_8					("join_err_8"),
+	JOIN_ERR_9					("join_err_9"),
 	JOIN_MESSAGE				("join_message"),
 	JOIN_PERMISSION_ERR			("join_permission_err"),
 	

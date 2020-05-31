@@ -25,39 +25,38 @@ public class BasicModel {
 
 	public static void ModelParse(BufferedReader in, ReadyEvent e, RSS rss, long guild_id, Channels rss_channel) throws IOException {
 		String format = rss.getFormat();
-		boolean itemTagFound = false;
 		String title = "";
 		String description = "";
 		String pubDate = "";
 		String link = "";
 		
 		String line;
+		StringBuilder collection = new StringBuilder();
 		while((line = in.readLine()) != null) {
-			if(line.startsWith("<item>"))
-				itemTagFound = true;
-			else if(line.endsWith("</item>"))
-				break;
-			if(itemTagFound == true) {
-				if(line.contains("<title>") && line.contains("</title>")) {
-					int firstPos = line.indexOf("<title>");
-					int lastPos = line.indexOf("</title>");
-					title = line.substring(firstPos, lastPos).replaceAll("(<title>|</title>)", "");
-				}
-				if(line.contains("<description>") && line.contains("</description>")) {
-					int firstPos = line.indexOf("<description>");
-					int lastPos = line.indexOf("</description>");
-					description = line.substring(firstPos, lastPos).replaceAll("(<description>|</descrption>)", "");
-				}
-				if(line.contains("<pubDate>") && line.contains("</pubDate>")) {
-					int firstPos = line.indexOf("<pubDate>");
-					int lastPos = line.indexOf("</pubDate>");
-					pubDate = line.substring(firstPos, lastPos).replaceAll("(<pubDate>|</pubDate>)", "");
-				}
-				if(line.contains("<link>") && line.contains("</link>")) {
-					int firstPos = line.indexOf("<link>");
-					int lastPos = line.indexOf("</link>");
-					link = line.substring(firstPos, lastPos).replaceAll("(<link>|</link>)", "");
-				}
+			collection.append(line);
+		}
+		String code = collection.toString();
+		if(code.contains("<item>")) {
+			code = code.substring(code.indexOf("<item>"), code.indexOf("</item>")).replaceAll("(<item>|</item>)", "");
+			if(code.contains("<title>") && code.contains("</title>")) {
+				int firstPos = code.indexOf("<title>");
+				int lastPos = code.indexOf("</title>");
+				title = code.substring(firstPos, lastPos).replaceAll("(<title>|</title>)", "");
+			}
+			if(code.contains("<description>") && code.contains("</description>")) {
+				int firstPos = code.indexOf("<description>");
+				int lastPos = code.indexOf("</description>");
+				description = code.substring(firstPos, lastPos).replaceAll("(<description>|</descrption>)", "");
+			}
+			if(code.contains("<pubDate>") && code.contains("</pubDate>")) {
+				int firstPos = code.indexOf("<pubDate>");
+				int lastPos = code.indexOf("</pubDate>");
+				pubDate = code.substring(firstPos, lastPos).replaceAll("(<pubDate>|</pubDate>)", "");
+			}
+			if(code.contains("<link>") && code.contains("</link>")) {
+				int firstPos = code.indexOf("<link>");
+				int lastPos = code.indexOf("</link>");
+				link = code.substring(firstPos, lastPos).replaceAll("(<link>|</link>)", "");
 			}
 		}
 		if(title.length() > 0 || description.length() > 0 || pubDate.length() > 0 || link.length() > 0) {
@@ -82,39 +81,38 @@ public class BasicModel {
 			URL rssUrl = new URL(rss.getURL());
 			BufferedReader in = new BufferedReader(new InputStreamReader(rssUrl.openStream()));
 			
-			boolean itemTagFound = false;
 			String title = "";
 			String description = "";
 			String pubDate = "";
 			String link = "";
 			
 			String line;
+			StringBuilder content = new StringBuilder();
 			while((line = in.readLine()) != null) {
-				if(line.startsWith("<item>"))
-					itemTagFound = true;
-				else if(line.endsWith("</item>"))
-					break;
-				if(itemTagFound == true) {
-					if(line.contains("<title>") && line.contains("</title>")) {
-						int firstPos = line.indexOf("<title>");
-						int lastPos = line.indexOf("</title>");
-						title = line.substring(firstPos, lastPos).replaceAll("(<title>|</title>)", "");
-					}
-					if(line.contains("<description>") && line.contains("</description>")) {
-						int firstPos = line.indexOf("<description>");
-						int lastPos = line.indexOf("</description>");
-						description = line.substring(firstPos, lastPos).replaceAll("(<description>|</descrption>)", "");
-					}
-					if(line.contains("<pubDate>") && line.contains("</pubDate>")) {
-						int firstPos = line.indexOf("<pubDate>");
-						int lastPos = line.indexOf("</pubDate>");
-						pubDate = line.substring(firstPos, lastPos).replaceAll("(<pubDate>|</pubDate>)", "");
-					}
-					if(line.contains("<link>") && line.contains("</link>")) {
-						int firstPos = line.indexOf("<link>");
-						int lastPos = line.indexOf("</link>");
-						link = line.substring(firstPos, lastPos).replaceAll("(<link>|</link>)", "");
-					}
+				content.append(line);
+			}
+			String code = content.toString();
+			if(code.contains("<item>")) {
+				code = code.substring(code.indexOf("<item>"), code.indexOf("</item>")).replaceAll("(<item>|</item>)", "");
+				if(code.contains("<title>") && code.contains("</title>")) {
+					int firstPos = code.indexOf("<title>");
+					int lastPos = code.indexOf("</title>");
+					title = code.substring(firstPos, lastPos).replaceAll("(<title>|</title>)", "");
+				}
+				if(code.contains("<description>") && code.contains("</description>")) {
+					int firstPos = code.indexOf("<description>");
+					int lastPos = code.indexOf("</description>");
+					description = code.substring(firstPos, lastPos).replaceAll("(<description>|</descrption>)", "");
+				}
+				if(code.contains("<pubDate>") && code.contains("</pubDate>")) {
+					int firstPos = code.indexOf("<pubDate>");
+					int lastPos = code.indexOf("</pubDate>");
+					pubDate = code.substring(firstPos, lastPos).replaceAll("(<pubDate>|</pubDate>)", "");
+				}
+				if(code.contains("<link>") && code.contains("</link>")) {
+					int firstPos = code.indexOf("<link>");
+					int lastPos = code.indexOf("</link>");
+					link = code.substring(firstPos, lastPos).replaceAll("(<link>|</link>)", "");
 				}
 			}
 			if(title.length() > 0 || description.length() > 0 || pubDate.length() > 0 || link.length() > 0) {

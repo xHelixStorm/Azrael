@@ -133,18 +133,18 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static int SQLDeleteAllRoles(long _guild_id) {
-		logger.info("SQLDeleteAllRoles launched. Passed params {}", _guild_id);
+	public static int SQLUpdateAllRoles(long _guild_id) {
+		logger.info("SQLUpdateAllRoles launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
-			String sql = ("DELETE FROM roles WHERE fk_guild_id = ?");
+			String sql = ("UPDATE roles SET level = 0, persistant = 0, fk_category_abv = 'def' WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLDeleteAllRoles Exception", e);
+			logger.error("SQLUpdateAllRoles Exception", e);
 			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -311,6 +311,26 @@ public class DiscordRoles {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteRole Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateRole(long _role_id, long _guild_id) {
+		logger.info("SQLUpdateRole launched. Passed params {}, {}", _role_id, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
+			String sql = ("UPDATE roles SET level = 0, persistant = 0, fk_category_abv = 'def' WHERE role_id = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _role_id);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateRole Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
