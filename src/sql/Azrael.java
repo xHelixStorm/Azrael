@@ -453,7 +453,7 @@ public class Azrael {
 			stmt.setString(1, _user_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				return new User(rs.getLong(1), rs.getString(2), rs.getString(3));
+				return new User(rs.getLong(1), rs.getString(2), rs.getString(4));
 			}
 			return null;
 		} catch (SQLException e) {
