@@ -867,7 +867,7 @@
 	"delete_edited_message":		"**Edited Message**! ",
 	"delete_message":				"**Message**! ",
 	"delete_removed_by":			"Removed by ",
-	"delete_self":					"User has removed the own ",
+	"delete_self":					"User has removed their own ",
 	"delete_permission_err":		"Deleted message detected! More details couldn't be displayed because the following permission is required: ",
 	"delete_watched":				"Watched ",
 	"delete_rank_role_err":			"Registered ranking role couldn't be removed! Please contact an administrator!",
