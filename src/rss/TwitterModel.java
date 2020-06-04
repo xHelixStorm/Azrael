@@ -188,7 +188,7 @@ public class TwitterModel {
 		                	final String outMessage = EmojiParser.parseToUnicode(out);
 		                	MessageHistory history = new MessageHistory(e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()));
 							List<Message> msg = history.retrievePast(30).complete();
-							Message historyMessage = msg.parallelStream().filter(f -> f.getContentRaw().contains(outMessage)).findAny().orElse(null);
+							Message historyMessage = msg.parallelStream().filter(f -> f.getContentRaw().replaceAll("[^a-zA-Z]", "").contains(outMessage.replaceAll("[^a-zA-Z]", ""))).findAny().orElse(null);
 							
 							if(historyMessage == null)
 								e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
