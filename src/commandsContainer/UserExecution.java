@@ -951,7 +951,7 @@ public class UserExecution {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 						var mute_role_id = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 						if(mute_role_id != null) {
-							Hashes.addTempCache("mute_time_gu"+e.getGuild().getId()+"us"+user_id, new Cache(e.getMember().getUser().getId(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
+							Hashes.addTempCache("mute_time_gu"+e.getGuild().getId()+"us"+user_id, new Cache(e.getMember().getUser().getId(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON))));
 							if(permMute) {
 								var timestamp = new Timestamp(System.currentTimeMillis());
 								if(Azrael.SQLInsertData(member.getUser().getIdLong(), e.getGuild().getIdLong(), Azrael.SQLgetMaxWarning(e.getGuild().getIdLong()), 1, timestamp, timestamp, false, false) == 0) {
@@ -1009,7 +1009,7 @@ public class UserExecution {
 						Timestamp unmute_timestamp = new Timestamp(System.currentTimeMillis()+mute_time);
 						var mute_role_id = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 						if(mute_role_id != null) {
-							Hashes.addTempCache("mute_time_gu"+e.getGuild().getId()+"us"+user_id, new Cache(""+mute_time, e.getMember().getUser().getId(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : "No reason has been provided!")));
+							Hashes.addTempCache("mute_time_gu"+e.getGuild().getId()+"us"+user_id, new Cache(""+mute_time, e.getMember().getUser().getId(), (cache.getAdditionalInfo2().length() > 0 ? cache.getAdditionalInfo2() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON))));
 							if(Azrael.SQLgetData(user_id, e.getGuild().getIdLong()).getWarningID() != 0) {
 								if(Azrael.SQLUpdateUnmute(user_id, e.getGuild().getIdLong(), timestamp, unmute_timestamp, true, true) == 0) {
 									e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -1835,7 +1835,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							if(!GuildIni.getCacheLog(e.getGuild().getIdLong()))
+							if(GuildIni.getCacheLog(e.getGuild().getIdLong()))
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_NOTHING)).build()).queue();
 							else
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_NOTHING_2)).build()).queue();
@@ -1847,7 +1847,7 @@ public class UserExecution {
 					}
 				}
 				else {
-					if(!GuildIni.getCacheLog(e.getGuild().getIdLong()))
+					if(GuildIni.getCacheLog(e.getGuild().getIdLong()))
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_NOTHING)).build()).queue();
 					else
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_NOTHING_2)).build()).queue();

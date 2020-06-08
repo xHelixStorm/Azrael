@@ -176,13 +176,13 @@ public class RoleListener extends ListenerAdapter {
 						//calculate the mute time in a user friendly, visible form
 						long hours = (mute_time/1000/60/60);
 						long minutes = (mute_time/1000/60%60);
-						String hour_add = hours != 0 ? hours+" hours" : "";
-						String minute_add = minutes != 0 ? minutes+" minutes" : "";
-						String and_add = minutes != 0 && hours != 0 ? " and " : "";
+						String hour_add = hours != 0 ? hours+STATIC.getTranslation2(e.getGuild(), Translation.ROLE_HOURS) : "";
+						String minute_add = minutes != 0 ? minutes+STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MINUTES) : "";
+						String and_add = minutes != 0 && hours != 0 ? STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AND) : "";
 						
 						//send a private message to the user
 						e.getUser().openPrivateChannel().queue(channel -> {
-							channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM).replaceFirst("\\{\\}", e.getGuild().getName().replace("{}", hour_add+and_add+minute_add))
+							channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM).replaceFirst("\\{\\}", e.getGuild().getName()).replace("{}", hour_add+and_add+minute_add)
 									+ (GuildIni.getMuteSendReason(guild_id) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 										//success callback not required
 										channel.close().queue();
