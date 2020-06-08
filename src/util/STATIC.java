@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -66,7 +67,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.21.437";
+	private static final String VERSION = "7.21.438";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	
@@ -419,7 +420,7 @@ public class STATIC {
 	}
 	
 	//method to trust all certificates and to retrieve the html code from a webpage
-	public static BufferedReader retrieveWebPageCode(String link) throws IOException {
+	public static BufferedReader retrieveWebPageCode(String link) throws SocketTimeoutException, IOException {
  
         try {
         	// Create a trust manager that does not validate certificate chains

@@ -1,4 +1,5 @@
 package timerTask;
+import java.net.SocketTimeoutException;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,8 +44,10 @@ public class ParseRSS extends TimerTask{
 									BasicModel.ModelParse(STATIC.retrieveWebPageCode(rss.getURL()), e, rss, guild_id, rss_channel);
 								else if(rss.getType() == 2)
 									TwitterModel.ModelParse(e, rss, guild_id, rss_channel);
+							} catch(SocketTimeoutException e1){
+								logger.warn("Timeout on subscription {}", rss.getURL());
 							} catch (Exception e1) {
-								logger.error("Error on retrieving feed", e1);
+								logger.error("Error on retrieving subscription {}", rss.getURL(), e1);
 							}
 						}).start();
 					}
