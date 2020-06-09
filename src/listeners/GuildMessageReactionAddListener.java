@@ -5,6 +5,7 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
 import commandsContainer.RandomshopExecution;
@@ -135,6 +136,18 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 								printPermissionError(e);
 							}
 						}
+					}
+				}
+				
+				//check if it's a vote channel and allow only one reaction
+				final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
+				final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
+				if(thisChannel != null && thisChannel.getChannel_Type() != null && thisChannel.getChannel_Type().equals("vot")) {
+					if(e.getReactionEmote().isEmoji()) {
+						if(EmojiManager.getForAlias(":thumbsup:").getUnicode().equals(e.getReactionEmote().getName()))
+							e.getChannel().removeReactionById(e.getMessageIdLong(), EmojiManager.getForAlias(":thumbsdown:").getUnicode(), e.getUser()).queue();
+						else if(EmojiManager.getForAlias(":thumbsdown:").getUnicode().equals(e.getReactionEmote().getName()))
+							e.getChannel().removeReactionById(e.getMessageIdLong(), EmojiManager.getForAlias(":thumbsup:").getUnicode(), e.getUser()).queue();
 					}
 				}
 				
