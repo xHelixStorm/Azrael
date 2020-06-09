@@ -717,7 +717,7 @@
 	"user_mute_order_2":			"Permanent mute order has been issued!",
 	"user_mute_numeric":			"Please type a numerical value together with a time unit m, h or d!",
 	"user_unmute_run":				"Action issued to interrupt the mute! Please note that warnings don't get reverted while applying a custom mute time!",
-	"user_unmute_run_2":			"Action issues to interrupt the mute! Reverting the applied warning!",
+	"user_unmute_run_2":			"Action issued to interrupt the mute! Reverting the applied warning!",
 	"user_unmute_not_muted":		"This user is not muted! Please apply this action to unmute a muted user!",
 	"user_unmute_infinite":			"The user **{}** with the ID number **{}** has been unmuted and is no longer permanently muted!",
 	"user_unmute_is_banned":		"This user is banned! Unmute action aborted!",
