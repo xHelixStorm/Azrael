@@ -67,7 +67,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.21.438";
+	private static final String VERSION = "7.21.439";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	
@@ -91,6 +91,19 @@ public class STATIC {
 		return VERSION;
 	}
 	
+	@SuppressWarnings("preview")
+	private static String getMessage(String lang, Translation event) {
+		return switch(lang) {
+		case "eng" -> {
+			if(eng_lang.has(event.section()))
+				return (String)eng_lang.get(event.section());
+			else
+				return "Message "+event.section()+" not found!";
+		}
+		default -> "Missing translation!";
+	};
+	}
+	
 	/**
 	 * Retrieve a translation for a message 
 	 * @param guild required server for looking up which language to use
@@ -98,7 +111,6 @@ public class STATIC {
 	 * @return
 	 */
 	
-	@SuppressWarnings("preview")
 	public static String getTranslation(Member member, Translation event) {
 		//retrieve language. In case non was found, search on the db and if it fails use default language
 		String lang = Azrael.SQLgetUserLang(member.getUser().getIdLong());
@@ -115,18 +127,9 @@ public class STATIC {
 			}
 		}
 		
-		return switch(lang) {
-			case "eng" -> {
-				if(eng_lang.has(event.section()))
-					return (String)eng_lang.get(event.section());
-				else
-					return "Message "+event.section()+" not found!";
-			}
-			default -> "Missing translation!";
-		};
+		return getMessage(lang, event);
 	}
 	
-	@SuppressWarnings("preview")
 	public static String getTranslation2(Guild guild, Translation event) {
 		//retrieve language. In case non was found, search on the db and if it fails use default language
 		String lang = Hashes.getLanguage(guild.getIdLong());
@@ -140,18 +143,9 @@ public class STATIC {
 				Hashes.setLanguage(guild.getIdLong(), lang);
 		}
 		
-		return switch(lang) {
-			case "eng" -> {
-				if(eng_lang.has(event.section()))
-					return (String)eng_lang.get(event.section());
-				else
-					return "Message "+event.section()+" not found!";
-			}
-			default -> "Missing translation!";
-		};
+		return getMessage(lang, event);
 	}
 	
-	@SuppressWarnings("preview")
 	public static String getTranslation3(User user, Translation event) {
 		//retrieve language. In case non was found, search on the db and if it fails use default language
 		String lang = Azrael.SQLgetUserLang(user.getIdLong());
@@ -165,15 +159,7 @@ public class STATIC {
 				Hashes.setLanguage(user.getIdLong(), lang);
 		}
 		
-		return switch(lang) {
-			case "eng" -> {
-				if(eng_lang.has(event.section()))
-					return (String)eng_lang.get(event.section());
-				else
-					return "Message "+event.section()+" not found!";
-			}
-			default -> "Missing translation!";
-		};
+		return getMessage(lang, event);
 	}
 	
 	public static String getLanguage(Member member) {
