@@ -242,6 +242,12 @@ public class GuildMessageListener extends ListenerAdapter {
 						Hashes.clearTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 					}
 					
+					//include vote up and vote down reactions, if it's a vote channel
+					if(currentChannel.getChannel_Type() != null && currentChannel.getChannel_Type().equals("vot")) {
+						e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsup:").getUnicode()).queue();
+						e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsdown:").getUnicode()).queue();
+					}
+					
 					//check if the randomshop command has been used
 					final var randomshop_bot = Hashes.getTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 					if(randomshop_bot != null && UserPrivs.isUserBot(e.getMember()) && randomshop_bot.getExpiration() - System.currentTimeMillis() > 0) {

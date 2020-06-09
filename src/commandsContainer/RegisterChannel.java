@@ -70,7 +70,7 @@ public class RegisterChannel {
 		
 		final var commandLevel = GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong());
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss|wat|del|edi)");
+			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss|wat|del|edi|vot)");
 			Matcher matcher = pattern.matcher(_args[1]);
 			if(_args.length > 2 && matcher.find()) {
 				channel_type = matcher.group();
@@ -84,7 +84,7 @@ public class RegisterChannel {
 							Azrael.SQLDeleteChannel_Filter(channel_id);
 							result = Azrael.SQLInsertChannel_Filter(channel_id, channel_type);
 							if(result == 0)
-								logger.error("New channel filter {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
+								logger.error("New channel type {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
 						}
 						case "bot", "mus" -> {
 							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
@@ -94,11 +94,11 @@ public class RegisterChannel {
 								logger.error("New channel filter all couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_id, _guild_id);
 							
 						}
-						case "log", "tra", "rea", "qui", "rss", "wat", "del", "edi" -> {
+						case "log", "tra", "rea", "qui", "rss", "wat", "del", "edi", "vot" -> {
 							Azrael.SQLDeleteChannelType(channel_type, _guild_id);
 							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
 							if(result == 0)
-								logger.error("New channel filter {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
+								logger.error("New channel type {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
 						}
 					}
 					Hashes.removeChannels(_guild_id);
