@@ -1,6 +1,9 @@
 package listeners;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,12 +11,17 @@ import org.slf4j.LoggerFactory;
 import com.vdurmont.emoji.EmojiParser;
 
 import core.UserPrivs;
+import enums.GoogleDD;
+import enums.GoogleEvent;
+import enums.Translation;
 import fileManagement.GuildIni;
+import google.GoogleSheets;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.DiscordRoles;
+import threads.DelayedVoteUpdate;
 import util.STATIC;
 import sql.Azrael;
 
@@ -122,6 +130,73 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 							}
 							else {
 								printPermissionError(e);
+							}
+						}
+					}
+				}
+				
+				//Run google service, if enabled
+				if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+					//check if it's a vote channel
+					final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
+					final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals("vot")).findAny().orElse(null);
+					if(thisChannel != null) {
+						final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id);
+						if(sheet != null && !sheet[0].equals("empty")) {
+							final String file_id = sheet[0];
+							final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
+							
+							try {
+								final var response = GoogleSheets.readWholeSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, row_start);
+								int currentRow = 0;
+								for(var row : response.getValues()) {
+									currentRow++;
+									if(row.parallelStream().filter(f -> {
+										String cell = (String)f;
+										if(cell.equals(e.getMessageId()))
+											return true;
+										else
+											return false;
+										}).findAny().orElse(null) != null) {
+										//retrieve the saved mapping for the vote event
+										final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id);
+										if(columns != null && columns.size() > 0) {
+											//find out where the up_vote and down_vote columns are and mark them
+											int columnUpVote = 0;
+											int columnDownVote = 0;
+											for(final var column : columns) {
+												if(column.getItem() == GoogleDD.UP_VOTE)
+													columnUpVote = column.getColumn();
+												else if(column.getItem() == GoogleDD.DOWN_VOTE)
+													columnDownVote = column.getColumn();
+											}
+											if(columnUpVote != 0 || columnDownVote != 0) {
+												//build update array
+												ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+												int columnCount = 0;
+												for(final var column : row) {
+													columnCount ++;
+													if(columnCount == columnUpVote)
+														values.add(Arrays.asList("<upVote>"));
+													else if(columnCount == columnDownVote)
+														values.add(Arrays.asList("<downVote>"));
+													else
+														values.add(Arrays.asList(column));
+												}
+												//execute Runnable
+												if(!STATIC.threadExists("vote"+e.getMessageId())) {
+													new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote)).start();
+												}
+											}
+										}
+										//interrupt the row search
+										break;
+									}
+								}
+							} catch (Exception e1) {
+								logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
+								final var log_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null); 
+								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
 							}
 						}
 					}

@@ -8,8 +8,10 @@ import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 import core.UserPrivs;
+import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.GuildIni;
+import google.GoogleSheets;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
@@ -171,6 +173,43 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 							message.setTimestamp(cachedMessage.getTime()).setTitle(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
 							final var printMessage = STATIC.getTranslation2(e.getGuild(), Translation.DELETE_WATCHED)+(cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))+"\n\n"+cachedMessage.getMessage();
 							e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+						}
+					}
+				}
+			}
+			//Run google service if enabled
+			if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+				if(Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals("vot")).findAny().orElse(null) != null) {
+					final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id);
+					if(sheet != null && !sheet[0].equals("empty")) {
+						final String file_id = sheet[0];
+						final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
+						try {
+							final var service = GoogleSheets.getSheetsClientService();
+							final var response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
+							int currentRow = 0;
+							for(var row : response.getValues()) {
+								currentRow++;
+								if(row.parallelStream().filter(f -> {
+									String cell = (String)f;
+									if(cell.equals(e.getMessageId()))
+										return true;
+									else
+										return false;
+									}).findAny().orElse(null) != null) {
+									STATIC.killThread("vote"+e.getMessageId());
+									final var file = GoogleSheets.getSpreadsheet(service, file_id);
+									final var retrievedSheet = file.getSheets().parallelStream().filter(f -> f.getProperties().getTitle().equals(row_start)).findAny().orElse(null);
+									if(retrievedSheet != null) {
+										GoogleSheets.deleteRowOnSpreadsheet(service, file_id, currentRow, retrievedSheet.getProperties().getSheetId());
+									}
+									break;
+								}
+							}
+						} catch (Exception e1) {
+							logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
+							final var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null); 
+							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
 						}
 					}
 				}

@@ -1,6 +1,9 @@
 package listeners;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +15,11 @@ import commandsContainer.RandomshopExecution;
 import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
+import enums.GoogleDD;
+import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.GuildIni;
+import google.GoogleSheets;
 import inventory.InventoryBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -22,6 +28,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.DiscordRoles;
 import sql.RankingSystem;
 import sql.RankingSystemItems;
+import threads.DelayedVoteUpdate;
 import util.STATIC;
 import sql.Azrael;
 
@@ -38,6 +45,9 @@ import sql.Azrael;
 
 public class GuildMessageReactionAddListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageReactionAddListener.class);
+	
+	private final String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
+	private final String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
 	
 	@Override
 	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent e) {
@@ -136,18 +146,6 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 								printPermissionError(e);
 							}
 						}
-					}
-				}
-				
-				//check if it's a vote channel and allow only one reaction
-				final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
-				final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
-				if(thisChannel != null && thisChannel.getChannel_Type() != null && thisChannel.getChannel_Type().equals("vot")) {
-					if(e.getReactionEmote().isEmoji()) {
-						if(EmojiManager.getForAlias(":thumbsup:").getUnicode().equals(e.getReactionEmote().getName()))
-							e.getChannel().removeReactionById(e.getMessageIdLong(), EmojiManager.getForAlias(":thumbsdown:").getUnicode(), e.getUser()).queue();
-						else if(EmojiManager.getForAlias(":thumbsdown:").getUnicode().equals(e.getReactionEmote().getName()))
-							e.getChannel().removeReactionById(e.getMessageIdLong(), EmojiManager.getForAlias(":thumbsup:").getUnicode(), e.getUser()).queue();
 					}
 				}
 				
@@ -250,6 +248,85 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 						e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 						RandomshopExecution.inspectItems(null, e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), theme), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme, false), input, current_page);
+					}
+				}
+				
+				//check if it's a vote channel and allow only one reaction
+				final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
+				final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
+				if(thisChannel != null && thisChannel.getChannel_Type() != null && thisChannel.getChannel_Type().equals("vot")) {
+					if(e.getReactionEmote().isEmoji()) {
+						boolean runSpreadsheet = false;
+						if(thumbsup.equals(e.getReactionEmote().getName())) {
+							e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsdown, e.getUser()).queue();
+							runSpreadsheet = true;
+						}
+						else if(thumbsdown.equals(e.getReactionEmote().getName())) {
+							e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsup, e.getUser()).queue();
+							runSpreadsheet = true;
+						}
+						
+						//Run google service, if enabled
+						if(runSpreadsheet && GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+							final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id);
+							if(sheet != null && !sheet[0].equals("empty")) {
+								final String file_id = sheet[0];
+								final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
+								
+								try {
+									final var response = GoogleSheets.readWholeSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, row_start);
+									int currentRow = 0;
+									for(var row : response.getValues()) {
+										currentRow++;
+										if(row.parallelStream().filter(f -> {
+											String cell = (String)f;
+											if(cell.equals(e.getMessageId()))
+												return true;
+											else
+												return false;
+											}).findAny().orElse(null) != null) {
+											//retrieve the saved mapping for the vote event
+											final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id);
+											if(columns != null && columns.size() > 0) {
+												//find out where the up_vote and down_vote columns are and mark them
+												int columnUpVote = 0;
+												int columnDownVote = 0;
+												for(final var column : columns) {
+													if(column.getItem() == GoogleDD.UP_VOTE)
+														columnUpVote = column.getColumn();
+													else if(column.getItem() == GoogleDD.DOWN_VOTE)
+														columnDownVote = column.getColumn();
+												}
+												if(columnUpVote != 0 || columnDownVote != 0) {
+													//build update array
+													ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+													int columnCount = 0;
+													for(final var column : row) {
+														columnCount ++;
+														if(columnCount == columnUpVote)
+															values.add(Arrays.asList("<upVote>"));
+														else if(columnCount == columnDownVote)
+															values.add(Arrays.asList("<downVote>"));
+														else
+															values.add(Arrays.asList(column));
+													}
+													//execute Runnable
+													if(!STATIC.threadExists("vote"+e.getMessageId())) {
+														new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote)).start();
+													}
+												}
+											}
+											//interrupt the row search
+											break;
+										}
+									}
+								} catch (Exception e1) {
+									logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
+									final var log_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null); 
+									if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
+								}
+							}
+						}
 					}
 				}
 			}

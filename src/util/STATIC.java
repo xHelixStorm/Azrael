@@ -67,7 +67,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.21.440";
+	private static final String VERSION = "7.21.441";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	
@@ -301,6 +301,14 @@ public class STATIC {
 	//remove a thread from the array. Either gets called from the method killThread or after the thread in question terminates on its own
 	public static void removeThread(final Thread thread) {
 		threads.remove(thread);
+	}
+	
+	//check if the thread exists
+	public static boolean threadExists(final String name) {
+		if(threads.parallelStream().filter(f -> f.getName().equals(name)).findAny().orElse(null) != null)
+			return true;
+		else
+			return false;
 	}
 	
 	//collect a timer into the concurrent array

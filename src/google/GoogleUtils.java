@@ -91,7 +91,7 @@ public class GoogleUtils {
 	}
 	
 	@SuppressWarnings({ "preview" })
-	public static void handleSpreadsheetRequest(Guild guild, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, int event_id, Channels log_channel) {
+	public static void handleSpreadsheetRequest(Guild guild, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, long message_id, String message, int up_vote, int down_vote, int event_id, Channels log_channel) {
 		//Retrieve the file id and row start for this event
 		final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, event_id);
 		//If nothing has been found, don't try to write into the spreadsheet
@@ -212,17 +212,36 @@ public class GoogleUtils {
 								default -> {}
 							}
 						}
+						case VOTE -> {
+							switch(item) {
+								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+								case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
+								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+								case MESSAGE_ID -> 			values.add(Arrays.asList(item.valueFormatter(message_id, column.getFormatter())));
+								case MESSAGE ->				values.add(Arrays.asList(item.valueFormatter(message, column.getFormatter())));
+								case UP_VOTE -> 			values.add(Arrays.asList(item.valueFormatter(up_vote, column.getFormatter())));
+								case DOWN_VOTE -> 			values.add(Arrays.asList(item.valueFormatter(down_vote, column.getFormatter())));
+								default -> {}
+							}
+						}
 						default -> {}
 					}
 				}
-				try {
-					GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
-				} catch (IOException e1) {
-					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)).setDescription(e1.getMessage()).build()).queue();
-					logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
-				} catch (Exception e1) {
-					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)).setDescription(e1.getMessage()).build()).queue();
-					logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+				if(values.size() > 0) {
+					try {
+						GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
+					} catch (IOException e1) {
+						if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)).setDescription(e1.getMessage()).build()).queue();
+						logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+					} catch (Exception e1) {
+						if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)).setDescription(e1.getMessage()).build()).queue();
+						logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+					}
 				}
 			}
 			else if(columns.size() == 0) {

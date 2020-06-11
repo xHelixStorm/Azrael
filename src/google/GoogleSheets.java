@@ -1,14 +1,21 @@
 package google;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
+import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
+import com.google.api.services.sheets.v4.model.DimensionRange;
+import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
+import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 public class GoogleSheets {
@@ -70,6 +77,23 @@ public class GoogleSheets {
 	}
 	
 	/**
+	 * Retrieve all rows on a sheet
+	 * @param service Sheets client service
+	 * @param file_id ID of the file on google drive
+	 * @param sheet Sheet to retrieve the rows from
+	 * @return ValueRange object with all entries
+	 * @throws IOException
+	 */
+	
+	public static ValueRange readWholeSpreadsheet(final Sheets service, final String file_id, final String sheet) throws IOException {
+		ValueRange reponse = service.spreadsheets().values()
+			.get(file_id, sheet)
+			.execute();
+		
+		return reponse;
+	}
+	
+	/**
 	 * Append raw data into the spreadsheet table
 	 * @param service Sheets client service
 	 * @param file_id ID of the file on google drive
@@ -87,5 +111,37 @@ public class GoogleSheets {
 			.setInsertDataOption("INSERT_ROWS")
 			.execute();
 		return result.getUpdates().getUpdatedRows();
+	}
+	
+	/**
+	 * Update row in the spreadsheet table
+	 * @param service
+	 * @param file_id
+	 * @param list
+	 * @param rowStart
+	 * @return
+	 * @throws IOException
+	 */
+	
+	public static int overwriteRowOnSpreadsheet(final Sheets service, final String file_id, final List<List<Object>> list, final String rowStart) throws IOException {
+		ValueRange values = new ValueRange().setValues(list).setMajorDimension("COLUMNS");
+		UpdateValuesResponse result = service.spreadsheets().values()
+			.update(file_id, rowStart, values)
+			.setValueInputOption("RAW")
+			.execute();
+		return result.size();
+	}
+	
+	public static int deleteRowOnSpreadsheet(final Sheets service, final String file_id, final int rowStart, final int sheet_id) throws IOException {
+		BatchUpdateSpreadsheetResponse result = service.spreadsheets().batchUpdate(file_id, new BatchUpdateSpreadsheetRequest()
+			.setRequests(Arrays.asList(new Request()
+					.setDeleteDimension(new DeleteDimensionRequest()
+							.setRange(new DimensionRange()
+									.setDimension("ROWS")
+									.setSheetId(sheet_id)
+									.setStartIndex(rowStart-1)
+									.setEndIndex(rowStart))))))
+			.execute();
+		return result.size();
 	}
 }

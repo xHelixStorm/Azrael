@@ -9,16 +9,19 @@ import enums.GoogleDD;
 public class GoogleSheetColumn {
 	private GoogleDD item;
 	private String formatter;
+	private int column;
 	
 	/**
 	 * Default constructor
 	 * @param _event_id
 	 * @param _formatter
+	 * @param _column
 	 */
 	
-	public GoogleSheetColumn(int _item_id, String _formatter) {
+	public GoogleSheetColumn(int _item_id, String _formatter, int _column) {
 		this.item = GoogleDD.valueOfId(_item_id);
 		this.formatter = _formatter;
+		this.column = _column;
 	}
 	
 	/**
@@ -37,5 +40,14 @@ public class GoogleSheetColumn {
 	
 	public String getFormatter() {
 		return this.formatter;
+	}
+	
+	/**
+	 * Retrieve the current column
+	 * @return
+	 */
+	
+	public int getColumn() {
+		return this.column;
 	}
 }

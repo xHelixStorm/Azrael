@@ -271,7 +271,7 @@ public class GuildListener extends ListenerAdapter {
 						Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild_id, nickname);
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), "Impersonating a staff member!", null, null, "RENAMED", null, null, null, e.getMember().getEffectiveName(), nickname, GoogleEvent.RENAME.id, log_channel);
+							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), "Impersonating a staff member!", null, null, "RENAMED", null, null, null, e.getMember().getEffectiveName(), nickname, 0, null, 0, 0, GoogleEvent.RENAME.id, log_channel);
 						}
 					}
 					else {
@@ -298,7 +298,7 @@ public class GuildListener extends ListenerAdapter {
 								Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild_id, nickname);
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_REASON), null, null, "RENAMED", null, null, null, e.getMember().getEffectiveName(), nickname, GoogleEvent.RENAME.id, log_channel);
+									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_REASON), null, null, "RENAMED", null, null, null, e.getMember().getEffectiveName(), nickname, 0, null, 0, 0, GoogleEvent.RENAME.id, log_channel);
 								}
 							}
 							else {
@@ -326,7 +326,7 @@ public class GuildListener extends ListenerAdapter {
 								Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), 0, "");
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), null, null, "KICK", null, null, null, null, null, GoogleEvent.KICK.id, log_channel);
+									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), null, null, "KICK", null, null, null, null, null, 0, null, 0, 0, GoogleEvent.KICK.id, log_channel);
 								}
 							}
 							else {

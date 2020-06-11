@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -28,12 +29,15 @@ import core.CommandHandler;
 import core.CommandParser;
 import core.Hashes;
 import core.UserPrivs;
+import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import filter.LanguageFilter;
 import filter.URLFilter;
+import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -244,8 +248,20 @@ public class GuildMessageListener extends ListenerAdapter {
 					
 					//include vote up and vote down reactions, if it's a vote channel
 					if(currentChannel.getChannel_Type() != null && currentChannel.getChannel_Type().equals("vot")) {
-						e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsup:").getUnicode()).queue();
-						e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsdown:").getUnicode()).queue();
+						final var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
+							e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsup:").getUnicode()).queue();
+							e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsdown:").getUnicode()).queue();
+							
+							//Run google service, if enabled
+							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "VOTE", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), 0, 0, GoogleEvent.VOTE.id, log_channel);
+							}
+						}
+						else {
+							logger.error("MESSAGE_ADD_REACTION permission missing for votes in guild {}", e.getGuild().getId());
+							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_ADD_REACTION.getName())+e.getChannel().getName()).build()).queue();
+						}
 					}
 					
 					//check if the randomshop command has been used

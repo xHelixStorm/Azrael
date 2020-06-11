@@ -3047,13 +3047,13 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT fk_dd_id, format FROM google_spreadsheet_mapping WHERE fk_file_id = ? AND fk_event_id = ?");
+			String sql = ("SELECT fk_dd_id, format, column_number FROM google_spreadsheet_mapping WHERE fk_file_id = ? AND fk_event_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _file_id);
 			stmt.setInt(2, _event_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				items.add(new GoogleSheetColumn(rs.getInt(1), rs.getString(2)));
+				items.add(new GoogleSheetColumn(rs.getInt(1), rs.getString(2), rs.getInt(3)));
 			}
 			return items;
 		} catch (SQLException e) {

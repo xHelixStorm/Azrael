@@ -97,7 +97,7 @@ public class RoleListener extends ListenerAdapter {
 								reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
 								reporter_username = reporter.getEffectiveName();
 							}
-							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, GoogleEvent.MUTE_READD.id, log_channel);
+							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE_READD.id, log_channel);
 						}
 					}
 					else {
@@ -135,7 +135,7 @@ public class RoleListener extends ListenerAdapter {
 							reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
 							reporter_username = reporter.getEffectiveName();
 						}
-						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, GoogleEvent.MUTE_READD.id, log_channel);
+						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE_READD.id, log_channel);
 					}
 				}
 				//enter in this block, if the user has been already muted but rejoined the server before the time elapsed
@@ -197,7 +197,7 @@ public class RoleListener extends ListenerAdapter {
 						
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), new Timestamp(time), user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", new Timestamp(time+mute_time), null, null, null, null, GoogleEvent.MUTE.id, log_channel);
+							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), new Timestamp(time), user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", new Timestamp(time+mute_time), null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE.id, log_channel);
 						}
 					}
 					//execute this block if a regular mute has been applied
@@ -246,7 +246,7 @@ public class RoleListener extends ListenerAdapter {
 							
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, GoogleEvent.MUTE.id, log_channel);
+								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE.id, log_channel);
 							}
 						}
 						//ban or perm mute if the current warning exceeded the max allowed warning
@@ -298,7 +298,7 @@ public class RoleListener extends ListenerAdapter {
 								
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, "PERMANENT", ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, GoogleEvent.MUTE.id, log_channel);
+									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, "PERMANENT", ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE.id, log_channel);
 								}
 							}
 						}

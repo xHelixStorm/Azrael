@@ -380,7 +380,7 @@
 	"google_sheet_events_removed":	"Event(s) have been removed from the file!",
 	"google_sheet_start_help":		"The following spreadsheets are linked! Please select a spreadsheet to edit the starting point through the shown number:\n\n",
 	"google_sheet_event_select":	"Now please select an event by typing the name of the event! These are the events that can be chosen: ",
-	"google_sheet_start_set":		"Now please submit the starting point (e.g. 'A1')! If there are multiple sheets, please write the name of the sheet and then the starting point (e.g. 'Sheet1!A1')!",
+	"google_sheet_start_set":		"Now please submit the starting point by writing it together with the name of the sheet (e.g. 'Sheet1!A1')!",
 	"google_sheet_start_updated":	"The starting point has been saved for this spreadsheet and event!",
 	"google_sheet_map_help":		"The following spreadsheets are linked! Please select a spreadsheet to map the columns with a data dictionary item through the shown number:\n\n",
 	"google_sheet_map_add":			"Now please submit a list of data items, divided by a comma in the exact order that it has to write into the spreadsheet sheet! Few data dictionary items can be additionally formated by separating item and format by '+'.\nExample input: 'timestamp+dd-MM-yyyy,user_id,nickname+UPPER_CASE,name'.\n\nThese are the available data dictionary items for this event: ",
