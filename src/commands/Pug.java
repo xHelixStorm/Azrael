@@ -49,7 +49,7 @@ public class Pug implements CommandPublic {
 		//check if any bot channel is registered, else print the image anyway
 		if((bot_channels.size() > 0 && this_channel != null) || bot_channels.size() == 0) {
 			try {
-				PugExecution.Execute(e, args, path, this_channel.getChannel_ID());
+				PugExecution.Execute(e, args, path, (bot_channels.size() > 0 ? this_channel.getChannel_ID() : e.getChannel().getIdLong()));
 			} catch (IOException e1) {
 				logger.error("Selected pug picture couldn't be found", e1);
 			}

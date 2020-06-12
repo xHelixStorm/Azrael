@@ -49,7 +49,7 @@ public class Meow implements CommandPublic {
 		//check if any bot channel is registered, else print the image anyway
 		if((bot_channels.size() > 0 && this_channel != null) || bot_channels.size() == 0) {
 			try {
-				MeowExecution.Execute(e, args, path, this_channel.getChannel_ID());
+				MeowExecution.Execute(e, args, path, (bot_channels.size() > 0 ? this_channel.getChannel_ID() : e.getChannel().getIdLong()));
 			} catch (IOException e1) {
 				logger.error("Selected meow picture {} couldn't be found", args[1], e1);
 			}
