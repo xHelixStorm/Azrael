@@ -247,7 +247,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					
 					//include vote up and vote down reactions, if it's a vote channel
-					if(currentChannel.getChannel_Type() != null && currentChannel.getChannel_Type().equals("vot")) {
+					if(currentChannel != null && currentChannel.getChannel_Type() != null && currentChannel.getChannel_Type().equals("vot")) {
 						final var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
 							e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsup:").getUnicode()).queue();
