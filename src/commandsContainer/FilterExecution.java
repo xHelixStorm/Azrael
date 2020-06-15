@@ -89,7 +89,7 @@ public class FilterExecution {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(staffNamesLevel, e.getMember())).build()).queue();
 			}
 		}
-		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_URL_BLACKLIST))) {
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_URLS))) {
 			final var urlBlacklistLevel = GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), urlBlacklistLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				message.setTitle("URL-BLACKLIST");
@@ -100,7 +100,7 @@ public class FilterExecution {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlBlacklistLevel, e.getMember())).build()).queue();
 			}
 		}
-		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_URL_WHITELIST))) {
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALLOWED_URLS))) {
 			final var urlWhitelistLevel = GuildIni.getFilterURLWhitelistLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), urlWhitelistLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				message.setTitle("URL-WHITELIST");
@@ -111,7 +111,7 @@ public class FilterExecution {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlWhitelistLevel, e.getMember())).build()).queue();
 			}
 		}
-		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_TWEET_BLACKLIST))) {
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_TWEETS))) {
 			final var tweetBlacklistLevel = GuildIni.getFilterTweetBlacklistLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), tweetBlacklistLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				message.setTitle("TWEET-BLACKLIST");
