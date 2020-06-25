@@ -866,6 +866,7 @@
 	
 	"delete_edited_message":		"**Edited Message**! ",
 	"delete_message":				"**Message**! ",
+	"delete_tweet":					"Tweet",
 	"delete_removed_by":			"Removed by ",
 	"delete_self":					"User has removed their own ",
 	"delete_permission_err":		"Deleted message detected! More details couldn't be displayed because the following permission is required: ",

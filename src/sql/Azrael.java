@@ -3193,6 +3193,107 @@ public class Azrael {
 		}
 	}
 	
+	public static int SQLInsertTweetLog(long _message_id, long _tweet_id) {
+		logger.info("SQLInsertTweetLog launched. Passed params {}, {}", _message_id, _tweet_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("INSERT INTO tweet_log (message_id, tweet_id) VALUES(?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _message_id);
+			stmt.setLong(2, _tweet_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertTweetLog Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateTweetLogDeleted(long _message_id) {
+		logger.info("SQLUpdateTweetLogDeleted launched. Passed params {}", _message_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE tweet_log SET deleted = 1 WHERE message_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _message_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateTweetLogDeleted Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLIsTweetDeleted(long _tweet_id) {
+		logger.info("SQLIsTweetDeleted launched. Params passed {}", _tweet_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT deleted FROM tweet_log WHERE tweet_id = ? AND deleted = 1");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _tweet_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				return true;
+			}
+			return false;
+		} catch (SQLException e) {
+			logger.error("SQLIsTweetDeleted Exception", e);
+			return false;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateTweetTimestamp(long _tweet_id) {
+		logger.info("SQLUpdateTweetLogDeleted launched. Passed params {}", _tweet_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE tweet_log SET timestamp = SYSDATE() WHERE tweet_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _tweet_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateTweetLogDeleted Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteTweetLog() {
+		logger.info("SQLDeleteTweetLog launched. No params passed");
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM tweet_log WHERE DATE_ADD(timestamp, INTERVAL 7 DAY) <= SYSDATE()");
+			stmt = myConn.prepareStatement(sql);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteTweetLog Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	//Transactions
 	@SuppressWarnings("resource")
 	public static int SQLLowerTotalWarning(long _guild_id, int _warning_id) {

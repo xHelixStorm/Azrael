@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,10 +66,11 @@ public class BasicModel {
 			out = out.replaceAll("&#039;", "'");
 			final String outMessage = EmojiParser.parseToUnicode(out);
 			MessageHistory history = new MessageHistory(e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()));
-			List<Message> msg = history.retrievePast(30).complete();
-			Message historyMessage = msg.parallelStream().filter(f -> f.getContentRaw().equals(outMessage)).findAny().orElse(null);
-			if(historyMessage == null)
-				e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
+			history.retrievePast(100).queue(historyList -> {
+				Message historyMessage = historyList.parallelStream().filter(f -> f.getContentRaw().equals(outMessage)).findAny().orElse(null);
+				if(historyMessage == null)
+					e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
+			});
 		}
 		in.close();
 	}

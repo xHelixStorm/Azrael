@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
+import sql.Azrael;
 import util.STATIC;
 
 /**
@@ -40,6 +41,9 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearThemes();
 		
 		logger.debug("Temporary Hashes have been cleared!");
+		
+		//clear any outdated tweet logs
+		Azrael.SQLDeleteTweetLog();
 	}
 	
 	public static void runTask(){

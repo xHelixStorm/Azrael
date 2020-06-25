@@ -49,7 +49,8 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 			if(GuildIni.getCacheLog(e.getGuild().getIdLong())) {
 				//retrieve current message id, the message as a whole that got deleted and delete the message from cache
 				long message_id = e.getMessageIdLong();
-				var removed_messages = Hashes.getMessagePool(message_id);
+				final var removed_messages = Hashes.getMessagePool(message_id);
+				final var firstMessage = removed_messages.get(0);
 				Hashes.removeMessagePool(message_id);
 				
 				//be sure that the removed message has been cached, else it won't make sense to display a message which the bot doesn't know about
@@ -58,10 +59,10 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 					//verify that the bot has permission to view the audit log, else throw an error
 					if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
 						//be sure that the message didn't get removed by a language filter, if yes ignore the message
-						var cache = Hashes.getTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+removed_messages.get(0).getUserID());
+						var cache = Hashes.getTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+firstMessage.getUserID());
 						if(cache == null) {
 							//be sure that the message didn't get removed from a channel where text input is not allowed
-							cache = Hashes.getTempCache("message-removed_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+removed_messages.get(0).getUserID());
+							cache = Hashes.getTempCache("message-removed_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+firstMessage.getUserID());
 							if(cache == null) {
 								long trigger_user_id = 0;
 								String trigger_user_name = "";
@@ -74,7 +75,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 								for (AuditLogEntry entry : logs)
 								{
 									//only execute if the current action log hasn't been read before and that the user id of the removed message is the same from the audit log
-									if(!Hashes.containsActionlog(entry.getId()+entry.getOptionByName("count")) && removed_messages.get(0).getUserID() == entry.getTargetIdLong()) {
+									if(!Hashes.containsActionlog(entry.getId()+entry.getOptionByName("count")) && (firstMessage.getUserID() == entry.getTargetIdLong() || firstMessage.getUserID() == 0)) {
 										//add action log a read and allow a message to be printed afterwards
 										Hashes.addActionlog(entry.getId()+entry.getOptionByName("count"));
 										send_message = true;
@@ -84,12 +85,12 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 											removed_from = entry.getTargetIdLong();
 											//be sure to avoid printing a message which got deleted from a bot or by a bot
 											Member member = e.getGuild().getMemberById(removed_from);
-											if(!member.getUser().isBot() && !UserPrivs.isUserBot(member)) {
+											if((member != null && !member.getUser().isBot() && !UserPrivs.isUserBot(member)) || firstMessage.getUserID()  == 0) {
 												trigger_user_id = entry.getUser().getIdLong();
 												trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 												break;
 											}
-											else if(removed_from != e.getJDA().getSelfUser().getIdLong() && UserPrivs.isUserBot(member)) {
+											else if(removed_from != e.getJDA().getSelfUser().getIdLong() && member != null && UserPrivs.isUserBot(member)) {
 												suppress_deleted = true;
 												break;
 											}
@@ -102,9 +103,9 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 								}
 								
 								//print any deleted message which got removed by an admin or moderator
-								if(send_message == true && removed_from != 0 && trigger_user_id != removed_from) {
+								if(firstMessage.getUserID() != 0 && send_message == true && removed_from != 0 && trigger_user_id != removed_from) {
 									//confirm that we have a message to print and a user who deleted the message
-									if(removed_messages.get(0).getMessage().length() > 0 && trigger_user_id > 0) {
+									if(firstMessage.getMessage().length() > 0 && trigger_user_id > 0) {
 										//retrieve the trash channel to print the removed message
 										var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 										if(tra_channel != null) {
@@ -118,10 +119,28 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 										}
 									}
 								}
+								//print removed tweet messages which were removed by an admin or moderator
+								if(firstMessage.getUserID() == 0) {
+									//confirm that we have a message to print and a user who deleted the message
+									if(firstMessage.getMessage().length() > 0 && trigger_user_id > 0) {
+										//retrieve the trash channel to print the removed message
+										var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
+										if(tra_channel != null) {
+											message.setColor(Color.CYAN);
+											//print the message
+											message.setTimestamp(firstMessage.getTime()).setTitle(firstMessage.getUserName()).setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
+											final var printMessage = STATIC.getTranslation2(e.getGuild(), Translation.DELETE_TWEET)+STATIC.getTranslation2(e.getGuild(), Translation.DELETE_REMOVED_BY)+trigger_user_name+"\n\n"+firstMessage.getMessage();
+											e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue(m -> {
+												//mark tweet as deleted
+												Azrael.SQLUpdateTweetLogDeleted(message_id);
+											});
+										}
+									}
+								}
 								//if enabled, display all deleted messages which weren't deleted by someone else but from the same user and still isn't a bot
-								else if(GuildIni.getSelfDeletedMessage(e.getGuild().getIdLong()) && !suppress_deleted && !UserPrivs.isUserBot(e.getGuild().getMemberById(removed_messages.get(0).getUserID()))) {
+								else if(GuildIni.getSelfDeletedMessage(e.getGuild().getIdLong()) && firstMessage.getUserID() != 0 && !suppress_deleted && !UserPrivs.isUserBot(e.getGuild().getMemberById(firstMessage.getUserID()))) {
 									//confirm that we have a message to print
-									if(removed_messages.get(0).getMessage().length() > 0) {
+									if(firstMessage.getMessage().length() > 0) {
 										//look up for a registered trash and delete channel. If a delete channel has been found, this channel should be used instead of the trash channel
 										var traAndDel_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("tra") || f.getChannel_Type().equals("del"))).collect(Collectors.toList());
 										var tra_channel = traAndDel_channel.parallelStream().filter(f -> f.getChannel_Type().equals("tra")).findAny().orElse(null);
@@ -139,7 +158,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 								}
 							}
 							//log messages which were removed from a channel that doesn't allow text input as long there is a message to print
-							else if(removed_messages.get(0).getMessage().length() > 0) {
+							else if(firstMessage.getMessage().length() > 0) {
 								//retrieve the trash channel to print the removed message
 								var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 								if(tra_channel != null) {
@@ -151,11 +170,11 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 										e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 									}
 								}
-								Hashes.clearTempCache("message-removed_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+removed_messages.get(0).getUserID());
+								Hashes.clearTempCache("message-removed_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+firstMessage.getUserID());
 							}
 						}
 						else {
-							Hashes.clearTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+removed_messages.get(0).getUserID());
+							Hashes.clearTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+firstMessage.getUserID());
 						}
 					}
 					else {
@@ -165,7 +184,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 					}
 					
 					//Log additional removed messages from users that are being watched with watch level 1
-					var watchedUser = Azrael.SQLgetWatchlist(removed_messages.get(0).getUserID(), e.getGuild().getIdLong());
+					var watchedUser = Azrael.SQLgetWatchlist(firstMessage.getUserID(), e.getGuild().getIdLong());
 					if(watchedUser != null && watchedUser.getLevel() == 1) {
 						message.setColor(Color.DARK_GRAY);
 						//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
