@@ -106,6 +106,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 								if(firstMessage.getUserID() != 0 && send_message == true && removed_from != 0 && trigger_user_id != removed_from) {
 									//confirm that we have a message to print and a user who deleted the message
 									if(firstMessage.getMessage().length() > 0 && trigger_user_id > 0) {
+										suppress_deleted = true;
 										//retrieve the trash channel to print the removed message
 										var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 										if(tra_channel != null) {
@@ -120,9 +121,10 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 									}
 								}
 								//print removed tweet messages which were removed by an admin or moderator
-								if(firstMessage.getUserID() == 0) {
+								else if(firstMessage.getUserID() == 0) {
 									//confirm that we have a message to print and a user who deleted the message
 									if(firstMessage.getMessage().length() > 0 && trigger_user_id > 0) {
+										suppress_deleted = true;
 										//retrieve the trash channel to print the removed message
 										var tra_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 										if(tra_channel != null) {
