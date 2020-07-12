@@ -267,10 +267,6 @@ public class Display implements CommandPublic{
 				out.append("Set giveaway items subcommand: "+GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Set privilege level sucommand: "+GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Shop command: "+GuildIni.getShopLevel(e.getGuild().getIdLong())+"\n");
-				//print the first half
-				e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
-				out.setLength(0);
-				//collect the second half
 				out.append("Top command: "+GuildIni.getTopLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Use command: "+GuildIni.getUseLevel(e.getGuild().getIdLong())+"\n");
 				out.append("User command: "+GuildIni.getUserLevel(e.getGuild().getIdLong())+"\n");
@@ -281,6 +277,10 @@ public class Display implements CommandPublic{
 				out.append("User mute subcommand: "+GuildIni.getUserMuteLevel(e.getGuild().getIdLong())+"\n");
 				out.append("User unmute subcommand: "+GuildIni.getUserUnmuteLevel(e.getGuild().getIdLong())+"\n");
 				out.append("User ban subcommand: "+GuildIni.getUserBanLevel(e.getGuild().getIdLong())+"\n");
+				//print the first half
+				e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
+				out.setLength(0);
+				//collect the second half
 				out.append("User unban subcommand: "+GuildIni.getUserUnbanLevel(e.getGuild().getIdLong())+"\n");
 				out.append("User kick subcommand: "+GuildIni.getUserKickLevel(e.getGuild().getIdLong())+"\n");
 				out.append("User history subcommand: "+GuildIni.getUserHistoryLevel(e.getGuild().getIdLong())+"\n");
@@ -314,7 +314,18 @@ public class Display implements CommandPublic{
 				out.append("Mute command: "+GuildIni.getMuteLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Google command: "+GuildIni.getGoogleLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Write command: "+GuildIni.getWriteLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Edit command: "+GuildIni.getEditLevel(e.getGuild().getIdLong()));
+				out.append("Matchmaking command: "+GuildIni.getMatchmakingLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Join command: "+GuildIni.getJoinLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Leave command: "+GuildIni.getLeaveLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Clan command: "+GuildIni.getClanLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Queue command: "+GuildIni.getQueueLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Cw command: "+GuildIni.getCwLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Room command: "+GuildIni.getRoomLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Close rooms room subcommand: "+GuildIni.getRoomCloseLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Set winners room subcommand command: "+GuildIni.getRoomWinnerLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Reopen rooms room subcommand: "+GuildIni.getRoomReopenLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Stats command: "+GuildIni.getStatsLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Leaderboard command: "+GuildIni.getLeaderboardLevel(e.getGuild().getIdLong()));
 				//print second part
 				e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
 			}

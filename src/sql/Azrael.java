@@ -622,7 +622,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO guild VALUES (?, ?, 0) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			String sql = ("INSERT INTO guild (guild_id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setString(2, _guild_name);

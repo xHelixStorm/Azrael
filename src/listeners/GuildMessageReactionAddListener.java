@@ -13,6 +13,7 @@ import com.vdurmont.emoji.EmojiParser;
 
 import commandsContainer.RandomshopExecution;
 import constructors.Cache;
+import constructors.Clan;
 import core.Hashes;
 import core.UserPrivs;
 import enums.GoogleDD;
@@ -194,9 +195,11 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 				//check if either the arrow left or arrow right reaction has been used
 				if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") || EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:")) {
 					//inventory reactions
-					var inventory = Hashes.getTempCache("inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId());
+					final var inventory = Hashes.getTempCache("inventory_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId());
 					//randomshop reactions
-					var randomshop = Hashes.getTempCache("randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId());
+					final var randomshop = Hashes.getTempCache("randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId());
+					//clan reactions
+					final var clan = Hashes.getTempCache("clan_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId());
 					
 					//execute if it's an inventory reaction
 					if(inventory != null) {
@@ -248,6 +251,45 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 						e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
 						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 						RandomshopExecution.inspectItems(null, e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), theme), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme, false), input, current_page);
+					}
+					//execute if it's a clan reaction
+					else if(clan != null) {
+						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY)) {
+							@SuppressWarnings("unchecked")
+							final var clans = (ArrayList<Clan>) clan.getObject();
+							int currentPage = Integer.parseInt(clan.getAdditionalInfo());
+							int totPages = clans.size()/10;
+							if(clans.size() % 10 > 0)
+								totPages++;
+							//either return to the previous page or go to the next page and reprint the available clans
+							if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") && currentPage != 1)
+								currentPage--;
+							else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && currentPage != totPages)
+								currentPage++;
+							final int page = currentPage;
+							final int lastPage = totPages;
+							e.getChannel().retrieveMessageById(e.getMessageId()).queue(m -> {
+								m.delete().queue();
+								int count = 0;
+								StringBuilder out = new StringBuilder();
+								for(int i = (page-1)*10; i < clans.size(); i++) {
+									final var curClan = clans.get(i);
+									out.append("**"+curClan.getName()+"** ("+curClan.getMembers()+")\n");
+									if(count == 9) break;
+									count++;
+								}
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setAuthor(STATIC.getTranslation(e.getMember(), Translation.TOP_PAGE)+page+"/"+lastPage).setTitle(STATIC.getTranslation(e.getMember(), Translation.CLAN_TITLE)).setDescription(out.toString()).build()).queue(m2 -> {
+									m2.addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).queue();
+									m2.addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).queue();
+									Hashes.addTempCache("clan_gu"+e.getGuild().getId()+"me"+m2.getId()+"us"+e.getMember().getUser().getId(), clan.updateDescription(""+page).setExpiration(180000));
+									Hashes.addTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getId(), new Cache(180000));
+								});
+							});
+						}
+						else {
+							final var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_HISTORY.getName())+e.getChannel().getName()).build()).queue();
+						}
 					}
 				}
 				

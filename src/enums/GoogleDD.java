@@ -33,7 +33,10 @@ public enum GoogleDD {
 	MESSAGE_ID			(19, "MESSAGE_ID", 0),
 	MESSAGE				(20, "MESSAGE", 0),
 	UP_VOTE				(21, "UP_VOTE", 0),
-	DOWN_VOTE			(22, "DOWN_VOTE", 0);
+	DOWN_VOTE			(22, "DOWN_VOTE", 0),
+	PING				(23, "PING", 0),
+	MEMBER_COUNT		(24, "MEMBER_COUNT", 0),
+	GUILDS_COUNT		(25, "GUILDS_COUNT", 0);
 	
 	/**
 	 * Maps defined here to retrieve enum either by id or value

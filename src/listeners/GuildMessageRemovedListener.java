@@ -50,12 +50,12 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 				//retrieve current message id, the message as a whole that got deleted and delete the message from cache
 				long message_id = e.getMessageIdLong();
 				final var removed_messages = Hashes.getMessagePool(message_id);
-				final var firstMessage = removed_messages.get(0);
-				Hashes.removeMessagePool(message_id);
 				
 				//be sure that the removed message has been cached, else it won't make sense to display a message which the bot doesn't know about
 				//reason can be that either the message is too old or all messages that occurred before a reboot aren't known
 				if(removed_messages != null) {
+					final var firstMessage = removed_messages.get(0);
+					Hashes.removeMessagePool(message_id);
 					//verify that the bot has permission to view the audit log, else throw an error
 					if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
 						//be sure that the message didn't get removed by a language filter, if yes ignore the message

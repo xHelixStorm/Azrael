@@ -67,7 +67,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.21.446";
+	private static final String VERSION = "7.22.447";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	
@@ -83,6 +83,7 @@ public class STATIC {
 	private static String GAMEMESSAGE = "";
 	private static String FILELOGGER = "";
 	private static String TEMP = "";
+	private static int PORT = 0;
 	private static TwitterFactory twitterFactory = null;
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
@@ -276,6 +277,12 @@ public class STATIC {
 	}
 	public static String getTemp() {
 		return TEMP;
+	}
+	public static void setPort(int _port) {
+		PORT = _port;
+	}
+	public static int getPort() {
+		return PORT;
 	}
 	
 	//collect a running thread (for example a user mute due to the Thread.sleep) to concurrent array and assign a name to it

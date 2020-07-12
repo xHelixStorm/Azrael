@@ -20,6 +20,7 @@ public class GuildIni {
 		LinkedHashMap<String, String> messages = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> patch = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> muteKickBan = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> competitive = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> pastebin = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> reactions = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> commands = new LinkedHashMap<String, String>();
@@ -68,6 +69,11 @@ public class GuildIni {
 		fileContent.put("Mute", muteKickBan);
 		fileContent.put("Kick", muteKickBan);
 		fileContent.put("Ban", muteKickBan);
+		
+		//collect all Competitive variables
+		competitive.put("Team1", "");
+		competitive.put("Team2", "");
+		fileContent.put("Competitive", competitive);
 		
 		//collect all Pastebin variables
 		pastebin.put("Username", "");
@@ -118,6 +124,15 @@ public class GuildIni {
 		commands.put("Google", "false");
 		commands.put("Write", "false");
 		commands.put("Edit", "false");
+		commands.put("Matchmaking", "false");
+		commands.put("Join", "false");
+		commands.put("Clan", "false");
+		commands.put("Leave", "false");
+		commands.put("Queue", "false");
+		commands.put("Cw", "false");
+		commands.put("Room", "false");
+		commands.put("Stats", "false");
+		commands.put("Leaderboard", "false");
 		fileContent.put("Commands", commands);
 		
 		//collect all CommandLevels variables
@@ -162,6 +177,10 @@ public class GuildIni {
 		commandLevels.put("SetDefaultIconSkin", "20");
 		commandLevels.put("SetDailyItem", "20");
 		commandLevels.put("SetGiveawayItems", "20");
+		commandLevels.put("SetCompServer", "20");
+		commandLevels.put("SetMatchmakingMembers", "20");
+		commandLevels.put("SetMaxClanMembers", "20");
+		commandLevels.put("SetMaps", "20");
 		commandLevels.put("Shop", "1");
 		commandLevels.put("Top", "1");
 		commandLevels.put("Use", "1");
@@ -208,6 +227,18 @@ public class GuildIni {
 		commandLevels.put("Google", "20");
 		commandLevels.put("Write", "20");
 		commandLevels.put("Edit", "20");
+		commandLevels.put("Matchmaking", "1");
+		commandLevels.put("Join", "1");
+		commandLevels.put("Clan", "1");
+		commandLevels.put("Leave", "1");
+		commandLevels.put("Queue", "1");
+		commandLevels.put("Cw", "1");
+		commandLevels.put("Room", "1");
+		commandLevels.put("RoomClose", "1");
+		commandLevels.put("RoomWinner", "1");
+		commandLevels.put("RoomReopen", "1");
+		commandLevels.put("Stats", "1");
+		commandLevels.put("Leaderboard", "1");
 		fileContent.put("CommandLevels", commandLevels);
 	}
 	
@@ -502,6 +533,15 @@ public class GuildIni {
 		return ini.get("Ban", "SendReason", boolean.class);
 	}
 	
+	public static String getCompetitiveTeam1(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Competitive", "Team1");
+	}
+	public static String getCompetitiveTeam2(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Competitive", "Team2");
+	}
+	
 	public static String[] getPastebinCredentials(long guild_id) {
 		Ini ini = readIni(guild_id);
 		Ini.Section pastebin = ini.get("Pastebin");
@@ -735,6 +775,22 @@ public class GuildIni {
 	public static int getSetGiveawayItemsLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "SetGiveawayItems", int.class);
+	}
+	public static int getSetCompServerLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "SetCompServer", int.class);
+	}
+	public static int getSetMaxClanMembersLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "SetMaxClanMembers", int.class);
+	}
+	public static int getSetMatchmakingMembersLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "SetMatchmakingMembers", int.class);
+	}
+	public static int getSetMapsLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "SetMaps", int.class);
 	}
 	public static boolean getShopCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
@@ -974,7 +1030,7 @@ public class GuildIni {
 	}
 	public static int getGoogleLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandsLevels", "Google", int.class);
+		return ini.get("CommandLevels", "Google", int.class);
 	}
 	public static boolean getWriteCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
@@ -982,7 +1038,7 @@ public class GuildIni {
 	}
 	public static int getWriteLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandsLevels", "Write", int.class);
+		return ini.get("CommandLevels", "Write", int.class);
 	}
 	public static boolean getEditCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
@@ -990,6 +1046,90 @@ public class GuildIni {
 	}
 	public static int getEditLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
-		return ini.get("CommandsLevels", "Edit", int.class);
+		return ini.get("CommandLevels", "Edit", int.class);
+	}
+	public static boolean getMatchmakingCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Matchmaking", boolean.class);
+	}
+	public static int getMatchmakingLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Matchmaking", int.class);
+	}
+	public static boolean getJoinCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Join", boolean.class);
+	}
+	public static int getJoinLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Join", int.class);
+	}
+	public static boolean getClanCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Clan", boolean.class);
+	}
+	public static int getClanLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Clan", int.class);
+	}
+	public static boolean getLeaveCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Leave", boolean.class);
+	}
+	public static int getLeaveLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Leave", int.class);
+	}
+	public static boolean getQueueCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Queue", boolean.class);
+	}
+	public static int getQueueLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Queue", int.class);
+	}
+	public static boolean getCwCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Cw", boolean.class);
+	}
+	public static int getCwLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Cw", int.class);
+	}
+	public static boolean getRoomCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Room", boolean.class);
+	}
+	public static int getRoomLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Room", int.class);
+	}
+	public static int getRoomCloseLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "RoomClose", int.class);
+	}
+	public static int getRoomWinnerLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "RoomWinner", int.class);
+	}
+	public static int getRoomReopenLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "RoomReopen", int.class);
+	}
+	public static boolean getStatsCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Stats", boolean.class);
+	}
+	public static int getStatsLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Stats", int.class);
+	}
+	public static boolean getLeaderboardCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Leaderboard", boolean.class);
+	}
+	public static int getLeaderboardLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Leaderboard", int.class);
 	}
 }

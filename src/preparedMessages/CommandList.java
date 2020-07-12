@@ -18,7 +18,7 @@ public class CommandList {
 			administration = true;
 		}
 		
-		if(GuildIni.getEquipCommand(guild_id) || GuildIni.getPugCommand(guild_id) || GuildIni.getMeowCommand(guild_id) || GuildIni.getRankCommand(guild_id) || GuildIni.getProfileCommand(guild_id) || GuildIni.getTopCommand(guild_id) || GuildIni.getUseCommand(guild_id) || GuildIni.getShopCommand(guild_id) || GuildIni.getInventoryCommand(guild_id) || GuildIni.getDailyCommand(guild_id) || GuildIni.getQuizCommand(guild_id) || GuildIni.getRandomshopCommand(guild_id) || GuildIni.getEquipCommand(guild_id)) {
+		if(GuildIni.getEquipCommand(guild_id) || GuildIni.getPugCommand(guild_id) || GuildIni.getMeowCommand(guild_id) || GuildIni.getRankCommand(guild_id) || GuildIni.getProfileCommand(guild_id) || GuildIni.getTopCommand(guild_id) || GuildIni.getUseCommand(guild_id) || GuildIni.getShopCommand(guild_id) || GuildIni.getInventoryCommand(guild_id) || GuildIni.getDailyCommand(guild_id) || GuildIni.getQuizCommand(guild_id) || GuildIni.getRandomshopCommand(guild_id) || GuildIni.getEquipCommand(guild_id) || GuildIni.getMatchmakingCommand(guild_id) || GuildIni.getJoinCommand(guild_id) || GuildIni.getLeaveCommand(guild_id) || GuildIni.getClanCommand(guild_id) || GuildIni.getQueueCommand(guild_id) || GuildIni.getCwCommand(guild_id) || GuildIni.getRoomCommand(guild_id) || GuildIni.getStatsCommand(guild_id) || GuildIni.getLeaderboardCommand(guild_id)) {
 			entertainment = true;
 		}
 		
@@ -55,6 +55,15 @@ public class CommandList {
 			if(GuildIni.getQuizCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_QUIZ).replace("{}", prefix));
 			if(GuildIni.getRandomshopCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_RANDOMSHOP).replace("{}", prefix));
 			if(GuildIni.getEquipCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_EQUIP).replace("{}", prefix));
+			if(GuildIni.getMatchmakingCommand(guild_id))		textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_MATCHMAKING).replace("{}", prefix));
+			if(GuildIni.getJoinCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_JOIN).replace("{}", prefix));
+			if(GuildIni.getLeaveCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_LEAVE).replace("{}", prefix));
+			if(GuildIni.getClanCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_CLAN).replace("{}", prefix));
+			if(GuildIni.getQueueCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_QUEUE).replace("{}", prefix));
+			if(GuildIni.getCwCommand(guild_id))					textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_CW).replace("{}", prefix));
+			if(GuildIni.getRoomCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ROOM).replace("{}", prefix));
+			if(GuildIni.getStatsCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_STATS).replace("{}", prefix));
+			if(GuildIni.getLeaderboardCommand(guild_id))		textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_LEADERBOARD).replace("{}", prefix));
 		}
 		if(other == true && type == 3) {
 			if(GuildIni.getAboutCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ABOUT).replace("{}", prefix));

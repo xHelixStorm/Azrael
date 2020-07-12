@@ -270,4 +270,80 @@ public class GoogleUtils {
 			logger.warn("Spreadsheet couldn't be found in guild {}", guild.getId());
 		}
 	}
+	
+	@SuppressWarnings("preview")
+	public static boolean handleSpreadsheetRequest(Guild guild, String user_id, Timestamp timestamp, String name, String action, long ping, long member_count, long guilds_count, int event_id, Channels log_channel) {
+		//Retrieve the file id and row start for this event
+		final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, event_id);
+		//If nothing has been found, don't try to write into the spreadsheet
+		if(array != null && array[0].equals("empty"))
+			return false;
+		final String file_id = array[0];
+		final String sheetRowStart = array[1];
+		if(file_id != null && file_id.length() > 0 && sheetRowStart != null && !sheetRowStart.isBlank()) {
+			//retrieve the saved mapping for the current event
+			final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, event_id);
+			if(columns != null && columns.size() > 0) {
+				final var EVENT = GoogleEvent.valueOfId(event_id);
+				//format rows to write
+				ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+				for(final var column : columns) {
+					GoogleDD item = column.getItem();
+					switch(EVENT) {
+						case EXPORT -> {
+							switch(item) {
+								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+								case PING ->				values.add(Arrays.asList(item.valueFormatter(ping, column.getFormatter())));
+								case MEMBER_COUNT ->		values.add(Arrays.asList(item.valueFormatter(member_count, column.getFormatter())));
+								case GUILDS_COUNT ->		values.add(Arrays.asList(item.valueFormatter(guilds_count, column.getFormatter())));
+								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+								default -> {}
+							}
+						}
+						default -> {}
+					}
+				}
+				if(values.size() > 0) {
+					try {
+						GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
+						return true;
+					} catch (IOException e1) {
+						if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)).setDescription(e1.getMessage()).build()).queue();
+						logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+					} catch (Exception e1) {
+						if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)).setDescription(e1.getMessage()).build()).queue();
+						logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+					}
+				}
+			}
+			else if(columns.size() == 0) {
+				if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)).setDescription(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_MAPPING)).build()).queue();
+				logger.warn("Mute spreadsheet {} is not mapped in guild {}", file_id, guild.getId());
+			}
+			else {
+				if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(guild, Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("Mapping couldn't be retrieved from Azrael.google_spreadsheet_mapping for file id {} in guild ", file_id, guild.getId());
+			}
+		}
+		else if(sheetRowStart == null) {
+			if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(guild, Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Spreadsheet starting point couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
+		}
+		else if(sheetRowStart.isBlank()) {
+			if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)).setDescription(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_START_POINT)).build()).queue();
+			logger.warn("Spreadsheet starting point couldn't be found in guild {}", guild.getId());
+		}
+		else if(file_id == null) {
+			if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(guild, Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Spreadsheet couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
+		}
+		else {
+			if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)).setDescription(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_FOUND)).build()).queue();
+			logger.warn("Spreadsheet couldn't be found in guild {}", guild.getId());
+		}
+		return false;
+	}
 }

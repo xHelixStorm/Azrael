@@ -112,6 +112,10 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("Bot", "LinuxScreen", boolean.class);
 	}
+	public static int getWebserverPort() {
+		Ini ini = readConfig();
+		return ini.get("Bot", "WebserverPort", int.class);
+	}
 	
 	public static String getPastebinDeveloperKey() {
 		Ini ini = readConfig();

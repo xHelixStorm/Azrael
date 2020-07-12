@@ -13,9 +13,12 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiManager;
 
+import commandsContainer.ClanExecution;
 import commandsContainer.FilterExecution;
 import commandsContainer.GoogleSpreadsheetsExecution;
+import commandsContainer.JoinExecution;
 import commandsContainer.PurchaseExecution;
+import commandsContainer.RoomExecution;
 import commandsContainer.SubscribeExecution;
 import commandsContainer.SetWarning;
 import commandsContainer.ShopExecution;
@@ -44,6 +47,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import rankingSystem.RankingThreadExecution;
 import sql.RankingSystem;
 import sql.Azrael;
+import sql.Competitive;
 import threads.RunQuiz;
 import util.STATIC;
 
@@ -83,7 +87,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					//execute commands
 					if(e.getMessage().getContentRaw().startsWith(GuildIni.getCommandPrefix(e.getGuild().getIdLong())) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
 						var prefixLength = GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length();
-						if(!CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength).toLowerCase(), e, null))) {
+						if(!CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength), e, null))) {
 							logger.warn("Command {} doesn't exist!", e.getMessage().getContentRaw());
 						}
 					}
@@ -481,6 +485,128 @@ public class GuildMessageListener extends ListenerAdapter {
 						else if(writeEdit.getAdditionalInfo().equals("RC")) {
 							WriteEditExecution.runClearReactions(e, writeEdit);
 						}
+					}
+					
+					final var userProfile = Hashes.getTempCache("userProfile_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+					if(userProfile != null && !message.startsWith(GuildIni.getCommandPrefix(guild_id)) && userProfile.getExpiration() - System.currentTimeMillis() > 0) {
+						if(userProfile.getAdditionalInfo().equals("name")) {
+							JoinExecution.registerName(e, userProfile);
+						}
+						else if(userProfile.getAdditionalInfo().equals("server")) {
+							JoinExecution.registerServer(e, userProfile);
+						}
+					}
+					
+					final var clan = Hashes.getTempCache("clan_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+					if(clan != null && !e.getMember().getUser().isBot() && clan.getExpiration() - System.currentTimeMillis() > 0) {
+						String [] args = message.split(" ");
+						if(clan.getAdditionalInfo().length() == 0) {
+							//user isn't inside a clan
+							if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SEARCH))) {
+								ClanExecution.search(e, args, clan);
+							}
+							else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_APPLY))) {
+								ClanExecution.apply(e, args, clan);
+							}
+							else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE))) {
+								ClanExecution.create(e, args, clan);
+							}
+						}
+						else {
+							//user is inside a clan
+							final int memberLevel = Competitive.SQLgetClanMemberLevel(user_id, guild_id);
+							if(memberLevel == 1) {
+								//commands for a regular member
+								if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SEARCH))) {
+									ClanExecution.search(e, args, clan);
+								}
+								if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MEMBERS))) {
+									ClanExecution.members(e, clan);
+								}
+								else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LEAVE))) {
+									ClanExecution.leave(e, args, clan);
+								}
+							}
+							else if(memberLevel == 2) {
+								//commands for a staff member
+								if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SEARCH))) {
+									ClanExecution.search(e, args, clan);
+								}
+								if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MEMBERS))) {
+									ClanExecution.members(e, clan);
+								}
+								else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LEAVE))) {
+									ClanExecution.leave(e, args, clan);
+								}
+								else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_KICK))) {
+									ClanExecution.kick(e, args, memberLevel, clan);
+								}
+								else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INVITE))) {
+									ClanExecution.invite(e, args, clan);
+								}
+							}
+							else if(memberLevel == 3) {
+								//commands for the owner
+								if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SEARCH))) {
+									ClanExecution.search(e, args, clan);
+								}
+								if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MEMBERS))) {
+									ClanExecution.members(e, clan);
+								}
+								else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_KICK))) {
+									ClanExecution.kick(e, args, memberLevel, clan);
+								}
+								else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INVITE))) {
+									ClanExecution.invite(e, args, clan);
+								}
+								else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROMOTE))) {
+									ClanExecution.promote(e, args, clan);
+								}
+								else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ICON))) {
+									ClanExecution.icon(e, args, clan);
+								}
+								else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DELEGATE))) {
+									ClanExecution.delegate(e, args, clan);
+								}
+								else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISBAND))) {
+									ClanExecution.disband(e, clan);
+								}
+							}
+						}
+					}
+					else if(clan != null && userProfile.getExpiration() - System.currentTimeMillis() < 0) {
+						Hashes.clearTempCache("clan_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+					}
+					
+					final var room = Hashes.getTempCache("room_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+					if(room != null && room.getExpiration()-System.currentTimeMillis() > 0) {
+						String [] args = e.getMessage().getContentRaw().split(" ");
+						switch(room.getAdditionalInfo()) {
+							case "1" -> {
+								if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CLOSE))) {
+									RoomExecution.runClose(e, Integer.parseInt(room.getAdditionalInfo2()));
+								}
+							}
+							case "2" -> {
+								if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CLOSE))) {
+									RoomExecution.runClose(e, Integer.parseInt(room.getAdditionalInfo2()));
+								}
+								else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WINNER))) {
+									RoomExecution.runWinnerHelp(e, room);
+								}
+								else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WINNER))) {
+									RoomExecution.runWinner(e, args, room, (room.getAdditionalInfo3().equals("1") ? true : false));
+								}
+							}
+							case "3" -> {
+								if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REOPEN))) {
+									RoomExecution.runReopen(e, Integer.parseInt(room.getAdditionalInfo2()), room, (room.getAdditionalInfo3().equals("1") ? true : false));
+								}
+							}
+						}
+					}
+					else {
+						Hashes.clearTempCache("room_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 					}
 				});
 				

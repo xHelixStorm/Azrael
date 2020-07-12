@@ -31,6 +31,7 @@ import sql.DiscordRoles;
 import sql.Patchnotes;
 import threads.CollectUsersGuilds;
 import threads.RoleExtend;
+import threads.Webserver;
 import timerTask.ClearCommentedUser;
 import timerTask.ClearHashes;
 import timerTask.ParseRSS;
@@ -231,5 +232,7 @@ public class ReadyListener extends ListenerAdapter {
 			ClearCommentedUser.runTask(timeout);
 		
 		executor.shutdown();
+		
+		new Thread(new Webserver(e)).start();
 	}
 }

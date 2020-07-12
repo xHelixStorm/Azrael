@@ -12,6 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commands.About;
+import commands.Changemap;
+import commands.Clan;
+import commands.Cw;
 import commands.Help;
 import commands.Daily;
 import commands.Display;
@@ -22,11 +25,17 @@ import commands.Filter;
 import commands.Google;
 import commands.HeavyCensoring;
 import commands.Inventory;
+import commands.Join;
+import commands.Leaderboard;
+import commands.Leave;
+import commands.Matchmaking;
 import commands.Meow;
 import commands.Mute;
 import commands.Patchnotes;
+import commands.Pick;
 import commands.Profile;
 import commands.Pug;
+import commands.Queue;
 import commands.Quiz;
 import commands.Randomshop;
 import commands.Rank;
@@ -34,10 +43,12 @@ import commands.Reboot;
 import commands.Register;
 import commands.Remove;
 import commands.RoleReaction;
+import commands.Room;
 import commands.Subscribe;
 import commands.Set;
 import commands.Shop;
 import commands.ShutDown;
+import commands.Stats;
 import commands.Top;
 import commands.Use;
 import commands.User;
@@ -56,6 +67,7 @@ import listeners.GuildMessageRemovedListener;
 import listeners.NameListener;
 import listeners.NicknameListener;
 import listeners.PrivateMessageListener;
+import listeners.PrivateMessageReactionAddListener;
 import listeners.ReadyListener;
 import listeners.ReconnectedListener;
 import listeners.ResumedListener;
@@ -100,7 +112,8 @@ public class Main {
 						+ "countmembers:<BOOLEAN> (true/false parameter to either enable or disable the count of all active members as playing status)\n"
 						+ "filelogger:<BOOLEAN> (true/false parameter to print all messages to the console if off or to file if on)\n"
 						+ "gamemessage:<STRING> (Message to display as playing status. Separate blank spaces with '-')\n"
-						+ "temp:<STRING> (Path for the temp directory)");
+						+ "temp:<STRING> (Path for the temp directory)\n"
+						+ "port:<NUMERIC> (port number for the webservice)");
 				System.exit(0);
 			}
 			else {
@@ -136,10 +149,14 @@ public class Main {
 						}
 						if(currentArgument.startsWith("temp:"))
 							STATIC.setTemp(argument.split(":")[1].trim());
+						if(currentArgument.startsWith("port:"))
+							STATIC.setPort(Integer.parseInt(argument.split(":")[1].trim()));
 					}
 				}
 			}
 		}
+		if(STATIC.getToken().length() == 0)
+			STATIC.setToken(IniFileReader.getToken());
 		
 		if(IniFileReader.getFileLogger()) {
 			PrintStream out;
@@ -154,7 +171,7 @@ public class Main {
 			}
 		}
 		
-		String token = (STATIC.getToken().length() > 0 ? STATIC.getToken() : IniFileReader.getToken());
+		String token = STATIC.getToken();
 		builder = new JDABuilder(AccountType.BOT);
 		builder.setToken(token);
 		builder.setAutoReconnect(true);
@@ -205,6 +222,17 @@ public class Main {
 		CommandHandler.commandsPublic.put("google", new Google());
 		CommandHandler.commandsPublic.put("write", new Write());
 		CommandHandler.commandsPublic.put("edit", new Edit());
+		CommandHandler.commandsPublic.put("matchmaking", new Matchmaking());
+		CommandHandler.commandsPublic.put("join", new Join());
+		CommandHandler.commandsPublic.put("clan", new Clan());
+		CommandHandler.commandsPublic.put("leave", new Leave());
+		CommandHandler.commandsPublic.put("queue", new Queue());
+		CommandHandler.commandsPublic.put("changemap", new Changemap());
+		CommandHandler.commandsPublic.put("pick", new Pick());
+		CommandHandler.commandsPublic.put("cw", new Cw());
+		CommandHandler.commandsPublic.put("room", new Room());
+		CommandHandler.commandsPublic.put("stats", new Stats());
+		CommandHandler.commandsPublic.put("leaderboard", new Leaderboard());
 	}
 	
 	public static void addPrivateCommands() {
@@ -236,7 +264,8 @@ public class Main {
 			new ResumedListener(),
 			new RoleCreateListener(),
 			new TextChannelListener(),
-			new RoleNameUpdateListener()
+			new RoleNameUpdateListener(),
+			new PrivateMessageReactionAddListener()
 		);
 	}
 }

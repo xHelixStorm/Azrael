@@ -8,10 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commandsContainer.SetChannelFilter;
+import commandsContainer.SetCompServer;
 import commandsContainer.SetDailyItem;
 import commandsContainer.SetGiveawayItems;
 import commandsContainer.SetIconDefaultSkin;
 import commandsContainer.SetLevelDefaultSkin;
+import commandsContainer.SetMaps;
+import commandsContainer.SetMatchmakingMembers;
+import commandsContainer.SetMaxClanMembers;
 import commandsContainer.SetMaxExperience;
 import commandsContainer.SetPrivilegeLevel;
 import commandsContainer.SetProfileDefaultSkin;
@@ -411,6 +415,66 @@ public class Set implements CommandPublic {
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					//TODO: rework the command to replace the current saved list
 					SetGiveawayItems.runTask(e, args[1]);
+				}
+				else {
+					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
+				}
+			}
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_COMP_SERVER))) {
+				commandLevel = GuildIni.getSetCompServerLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+					SetCompServer.runHelp(e);
+				}
+			}
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_COMP_SERVER))) {
+				commandLevel = GuildIni.getSetCompServerLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+					SetCompServer.runTask(e, args);
+				}
+				else {
+					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
+				}
+			}
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_CLAN_MEMBERS))) {
+				commandLevel = GuildIni.getSetMaxClanMembersLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+					SetMaxClanMembers.runHelp(e);
+				}
+			}
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_CLAN_MEMBERS))) {
+				commandLevel = GuildIni.getSetMaxClanMembersLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+					SetMaxClanMembers.runTask(e, args);
+				}
+				else {
+					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
+				}
+			}
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MATCHMAKING_MEMBERS))) {
+				commandLevel = GuildIni.getSetMatchmakingMembersLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+					SetMatchmakingMembers.runHelp(e);
+				}
+			}
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MATCHMAKING_MEMBERS))) {
+				commandLevel = GuildIni.getSetMatchmakingMembersLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+					SetMatchmakingMembers.runTask(e, args);
+				}
+				else {
+					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
+				}
+			}
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAPS))) {
+				commandLevel = GuildIni.getSetMapsLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+					SetMaps.runHelp(e);
+				}
+			}
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAPS))) {
+				commandLevel = GuildIni.getSetMapsLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+					SetMaps.runTask(e, args);
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
