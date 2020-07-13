@@ -101,7 +101,7 @@ public class GoogleUtils {
 		final String sheetRowStart = array[1];
 		if(file_id != null && file_id.length() > 0 && sheetRowStart != null && !sheetRowStart.isBlank()) {
 			//retrieve the saved mapping for the current event
-			final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, event_id);
+			final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, event_id, guild.getIdLong());
 			if(columns != null && columns.size() > 0) {
 				final var EVENT = GoogleEvent.valueOfId(event_id);
 				//format rows to write
@@ -282,7 +282,7 @@ public class GoogleUtils {
 		final String sheetRowStart = array[1];
 		if(file_id != null && file_id.length() > 0 && sheetRowStart != null && !sheetRowStart.isBlank()) {
 			//retrieve the saved mapping for the current event
-			final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, event_id);
+			final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, event_id, guild.getIdLong());
 			if(columns != null && columns.size() > 0) {
 				final var EVENT = GoogleEvent.valueOfId(event_id);
 				//format rows to write
@@ -300,6 +300,8 @@ public class GoogleUtils {
 								case GUILDS_COUNT ->		values.add(Arrays.asList(item.valueFormatter(guilds_count, column.getFormatter())));
 								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
 								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
 								default -> {}
 							}
 						}

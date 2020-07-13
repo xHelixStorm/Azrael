@@ -152,9 +152,9 @@ public class GoogleSpreadsheetsExecution {
 				}
 				
 				if(!err) {
-					Azrael.SQLDeleteGoogleSpreadsheetSheet(spreadsheet.getSpreadsheetId());
-					Azrael.SQLDeleteGoogleSpreadsheetMapping(spreadsheet.getSpreadsheetId());
-					Azrael.SQLDeleteGoogleFileToEvent(spreadsheet.getSpreadsheetId());
+					Azrael.SQLDeleteGoogleSpreadsheetSheet(spreadsheet.getSpreadsheetId(), e.getGuild().getIdLong());
+					Azrael.SQLDeleteGoogleSpreadsheetMapping(spreadsheet.getSpreadsheetId(), e.getGuild().getIdLong());
+					Azrael.SQLDeleteGoogleFileToEvent(spreadsheet.getSpreadsheetId(), e.getGuild().getIdLong());
 					if(Azrael.SQLDeleteGoogleAPISetup(spreadsheet.getSpreadsheetId(), e.getGuild().getIdLong()) > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_REMOVED)).build()).queue();
 						logger.debug("Link of the spreadsheet with the file id {} has been severed from the bot in guild {}", file_id, e.getGuild().getIdLong());
@@ -228,7 +228,7 @@ public class GoogleSpreadsheetsExecution {
 						out.append(", `"+event.getEvent()+"`");
 				}
 				
-				final var registeredEvents = Azrael.SQLgetGoogleLinkedEvents(file.getFileID());
+				final var registeredEvents = Azrael.SQLgetGoogleLinkedEvents(file.getFileID(), e.getGuild().getIdLong());
 				StringBuilder out2 = new StringBuilder();
 				int count = 0;
 				for(final int event_id : registeredEvents) {
@@ -279,18 +279,18 @@ public class GoogleSpreadsheetsExecution {
 		}
 		if(handleEvents.size() > 0) {
 			if(addEvents) {
-				if(Azrael.SQLBatchInsertGoogleFileToEventLink(file_id, handleEvents)) {
+				if(Azrael.SQLBatchInsertGoogleFileToEventLink(file_id, e.getGuild().getIdLong(), handleEvents)) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_EVENTS_ADDED)).build()).queue();
 					logger.debug("Events added for file_id {} in guild {}", file_id, e.getGuild().getId());
 					Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 				}
 			}
 			else {
-				if(Azrael.SQLBatchDeleteGoogleSpreadsheetSheet(file_id, handleEvents)) {
+				if(Azrael.SQLBatchDeleteGoogleSpreadsheetSheet(file_id, e.getGuild().getIdLong(), handleEvents)) {
 					logger.debug("Events removed from Azrael.google_spreadsheetsheet for file_id {} in guild {}", file_id, e.getGuild().getId());
-					if(Azrael.SQLBatchDeleteGoogleSpreadsheetMapping(file_id, handleEvents)) {
+					if(Azrael.SQLBatchDeleteGoogleSpreadsheetMapping(file_id, e.getGuild().getIdLong(), handleEvents)) {
 						logger.debug("Events removed from Azrael.google_spreadsheet_mapping for file_id {} in guild {}", file_id, e.getGuild().getId());
-						if(Azrael.SQLBatchDeleteGoogleFileToEvent(file_id, handleEvents)) {
+						if(Azrael.SQLBatchDeleteGoogleFileToEvent(file_id, e.getGuild().getIdLong(), handleEvents)) {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_EVENTS_REMOVED)).build()).queue();
 							logger.debug("Events removed from Azrael.google_file_to_event for file_id {} in guild {}", file_id, e.getGuild().getId());
 							Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
@@ -350,7 +350,7 @@ public class GoogleSpreadsheetsExecution {
 		}
 		else if(selection >= 0 && selection < setup.size()) {
 			final var file = setup.get(selection);
-			final var events = Azrael.SQLgetGoogleLinkedEvents(file.getFileID());
+			final var events = Azrael.SQLgetGoogleLinkedEvents(file.getFileID(), e.getGuild().getIdLong());
 			if(events == null) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file.getFileID());
@@ -367,7 +367,7 @@ public class GoogleSpreadsheetsExecution {
 						out.append(",`"+GoogleEvent.valueOfId(event).value+"`");
 					count++;
 				}
-				final var sheets = Azrael.SQLgetGoogleSpreadsheetSheets(file.getFileID());
+				final var sheets = Azrael.SQLgetGoogleSpreadsheetSheets(file.getFileID(), e.getGuild().getIdLong());
 				StringBuilder out2 = new StringBuilder();
 				int i = 0;
 				for(final var sheet : sheets) {
@@ -391,7 +391,7 @@ public class GoogleSpreadsheetsExecution {
 	}
 	
 	public static void sheetEvents(GuildMessageReceivedEvent e, String file_id, String event, final String key) {
-		final var events = Azrael.SQLgetGoogleLinkedEvents(file_id);
+		final var events = Azrael.SQLgetGoogleLinkedEvents(file_id, e.getGuild().getIdLong());
 		if(events == null || events.size() == 0) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file_id);
@@ -408,7 +408,7 @@ public class GoogleSpreadsheetsExecution {
 	
 	public static void sheetUpdate(GuildMessageReceivedEvent e, String file_id, String event, String startingPoint, final String key) {
 		if(startingPoint.matches("[a-zA-Z0-9\\[\\]\\s]{1,}[a-zA-Z\\[\\]]{1}[!]{1}[A-Z]{1,3}[1-9]{1}[0-9]*")) {
-			if(Azrael.SQLInsertGoogleSpreadsheetSheet(file_id, GoogleEvent.valueOfEvent(event).id, startingPoint) > 0) {
+			if(Azrael.SQLInsertGoogleSpreadsheetSheet(file_id, GoogleEvent.valueOfEvent(event).id, startingPoint, e.getGuild().getIdLong()) > 0) {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_START_UPDATED)).build()).queue();
 				logger.debug("Google spreadsheet starting point updated for guild {}, spreadsheet {}, event {} with value {}", e.getGuild().getId(), file_id, event, startingPoint);
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
@@ -455,7 +455,7 @@ public class GoogleSpreadsheetsExecution {
 		}
 		else if(selection >= 0 && selection < setup.size()) {
 			final var file = setup.get(selection);
-			final var events = Azrael.SQLgetGoogleLinkedEvents(file.getFileID());
+			final var events = Azrael.SQLgetGoogleLinkedEvents(file.getFileID(), e.getGuild().getIdLong());
 			if(events == null) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file.getFileID());
@@ -482,7 +482,7 @@ public class GoogleSpreadsheetsExecution {
 	}
 	
 	public static void mapEvents(GuildMessageReceivedEvent e, String file_id, String event, final String key) {
-		final var events = Azrael.SQLgetGoogleLinkedEvents(file_id);
+		final var events = Azrael.SQLgetGoogleLinkedEvents(file_id, e.getGuild().getIdLong());
 		if(events == null || events.size() == 0) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file_id);
@@ -549,7 +549,7 @@ public class GoogleSpreadsheetsExecution {
 		}
 		else if(item_ids.size() > 0) {
 			if(Azrael.SQLDeleteGoogleSpreadsheetMapping(file_id, event) != -1) {
-				int [] result = Azrael.SQLBatchInsertGoogleSpreadsheetMapping(file_id, event, item_ids, item_formats);
+				int [] result = Azrael.SQLBatchInsertGoogleSpreadsheetMapping(file_id, event, e.getGuild().getIdLong(), item_ids, item_formats);
 				if(result[0] > 0) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_DD_ADDED)).build()).queue();
 					Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));

@@ -328,7 +328,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 												return false;
 											}).findAny().orElse(null) != null) {
 											//retrieve the saved mapping for the vote event
-											final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id);
+											final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id, e.getGuild().getIdLong());
 											if(columns != null && columns.size() > 0) {
 												//find out where the up_vote and down_vote columns are and mark them
 												int columnUpVote = 0;

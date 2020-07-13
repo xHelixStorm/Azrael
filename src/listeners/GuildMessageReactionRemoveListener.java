@@ -159,7 +159,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 											return false;
 										}).findAny().orElse(null) != null) {
 										//retrieve the saved mapping for the vote event
-										final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id);
+										final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id, e.getGuild().getIdLong());
 										if(columns != null && columns.size() > 0) {
 											//find out where the up_vote and down_vote columns are and mark them
 											int columnUpVote = 0;
@@ -211,7 +211,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 	 */
 	private static void printPermissionError(GuildMessageReactionRemoveEvent e) {
 		final var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-		if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Permission missing!").setDescription("Reaction role couldn't be applied for user **"+e.getUser().getName()+"#"+e.getUser().getDiscriminator()+"** with the id number **"+e.getUser().getId()+"** because the MANAGE ROLES permission is missing!").build()).queue();
+		if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replace("{}", e.getUserId())+Permission.MANAGE_ROLES.getName()).build()).queue();
 		logger.warn("MANAGE ROLES permission missing to remove reaction roles in guild {}!", e.getGuild().getId());
 	}
 }
