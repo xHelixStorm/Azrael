@@ -36,7 +36,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("SELECT message1, message2, date FROM priv_notes WHERE version_number LIKE ?");
+			String sql = ("SELECT message1, message2, date FROM priv_notes WHERE version_number = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
@@ -65,7 +65,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("SELECT message1, message2, date FROM publ_notes WHERE version_number LIKE ?");
+			String sql = ("SELECT message1, message2, date FROM publ_notes WHERE version_number = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
@@ -113,7 +113,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("SELECT * FROM published WHERE fk_version_number LIKE ? AND fk_guild_id = ?");
+			String sql = ("SELECT * FROM published WHERE fk_version_number = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
 			stmt.setLong(2, _guild_id);

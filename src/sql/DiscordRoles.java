@@ -221,7 +221,7 @@ public class DiscordRoles {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
-				String sql = ("SELECT * FROM all_roles WHERE guild_id = ? AND category_abv LIKE \"rea\"");
+				String sql = ("SELECT * FROM all_roles WHERE guild_id = ? AND category_abv = \"rea\"");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
@@ -366,7 +366,7 @@ public class DiscordRoles {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
-			String sql = ("SELECT role_id FROM reactions WHERE message_id = ? and emoji LIKE ?");
+			String sql = ("SELECT role_id FROM reactions WHERE message_id = ? and emoji = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _message_id);
 			stmt.setString(2, _emoji);

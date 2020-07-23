@@ -145,7 +145,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT COUNT(*) FROM action_log WHERE target_id = ? && guild_id = ? && event LIKE ?");
+			String sql = ("SELECT COUNT(*) FROM action_log WHERE target_id = ? && guild_id = ? && event = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
 			stmt.setLong(2, _guild_id);
@@ -173,7 +173,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT description FROM action_log WHERE target_id = ? && (guild_id = ? || guild_id = 0) && (event LIKE ? || event LIKE ?) GROUP BY description");
+			String sql = ("SELECT description FROM action_log WHERE target_id = ? && (guild_id = ? || guild_id = 0) && (event = ? || event = ?) GROUP BY description");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
 			stmt.setLong(2, _guild_id);
@@ -202,7 +202,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT description FROM action_log WHERE target_id = ? && guild_id = ? && event LIKE ? GROUP BY description");
+			String sql = ("SELECT description FROM action_log WHERE target_id = ? && guild_id = ? && event = ? GROUP BY description");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
 			stmt.setLong(2, _guild_id);
@@ -229,7 +229,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT description, timestamp FROM action_log WHERE target_id = ? && guild_id = ? && (event LIKE \"MEMBER_KICK\" || event LIKE \"MEMBER_BAN_ADD\" || event LIKE \"MEMBER_BAN_REMOVE\" || event LIKE \"MEMBER_MUTE_ADD\" || event LIKE \"MEMBER_ROLE_ADD\" || event LIKE \"MEMBER_ROLE_REMOVE\") ORDER BY timestamp desc LIMIT 30");
+			String sql = ("SELECT description, timestamp FROM action_log WHERE target_id = ? && guild_id = ? && (event = \"MEMBER_KICK\" || event = \"MEMBER_BAN_ADD\" || event = \"MEMBER_BAN_REMOVE\" || event = \"MEMBER_MUTE_ADD\" || event = \"MEMBER_ROLE_ADD\" || event = \"MEMBER_ROLE_REMOVE\") ORDER BY timestamp desc LIMIT 30");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
 			stmt.setLong(2, _guild_id);
@@ -256,7 +256,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT timestamp, description FROM action_log WHERE target_id = ? && guild_id = ? && event LIKE ? ORDER BY timestamp desc LIMIT 30");
+			String sql = ("SELECT timestamp, description FROM action_log WHERE target_id = ? && guild_id = ? && event = ? ORDER BY timestamp desc LIMIT 30");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
 			stmt.setLong(2, _guild_id);
@@ -424,7 +424,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT user_id, name FROM users WHERE name LIKE ?");
+			String sql = ("SELECT user_id, name FROM users WHERE name = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _name);
 			rs = stmt.executeQuery();
@@ -1572,7 +1572,7 @@ public class Azrael {
 					stmt.setLong(1, _guild_id);
 				}
 				else{
-					sql = ("SELECT word FROM filter WHERE fk_lang_abbrv LIKE ? && fk_guild_id = ?");
+					sql = ("SELECT word FROM filter WHERE fk_lang_abbrv = ? && fk_guild_id = ?");
 					stmt = myConn.prepareStatement(sql);
 					stmt.setString(1, _filter_lang);
 					stmt.setLong(2, _guild_id);
@@ -1655,7 +1655,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM filter WHERE word LIKE ? && fk_guild_id = ?");
+			String sql = ("DELETE FROM filter WHERE word = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
@@ -1676,7 +1676,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM filter WHERE word LIKE ? "+(!_lang.equals("all") ? "&& fk_lang_abbrv LIKE ? " : "")+"&& fk_guild_id = ?");
+			String sql = ("DELETE FROM filter WHERE word = ? "+(!_lang.equals("all") ? "&& fk_lang_abbrv = ? " : "")+"&& fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			if(!_lang.equals("all")) {
@@ -1751,7 +1751,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM staff_name_filter WHERE name LIKE ? && fk_guild_id = ?");
+			String sql = ("DELETE FROM staff_name_filter WHERE name = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word.toLowerCase());
 			stmt.setLong(2, _guild_id);
@@ -1900,7 +1900,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM names WHERE name LIKE ? && fk_guild_id = ?");
+			String sql = ("DELETE FROM names WHERE name = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
@@ -1971,7 +1971,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM name_filter WHERE word LIKE ? && fk_guild_id = ? && kick = ?");
+			String sql = ("DELETE FROM name_filter WHERE word = ? && fk_guild_id = ? && kick = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _word);
 			stmt.setLong(2, _guild_id);
@@ -2020,7 +2020,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv NOT LIKE \"all\"");
+				String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv NOT = \"all\"");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -2370,7 +2370,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM url_blacklist WHERE url LIKE ? && fk_guild_id = ?");
+			String sql = ("DELETE FROM url_blacklist WHERE url = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 			stmt.setLong(2, _guild_id);
@@ -2439,7 +2439,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM url_whitelist WHERE url LIKE ? && fk_guild_id = ?");
+			String sql = ("DELETE FROM url_whitelist WHERE url = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 			stmt.setLong(2, _guild_id);
@@ -2508,7 +2508,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM tweet_blacklist WHERE username LIKE ? && fk_guild_id = ?");
+			String sql = ("DELETE FROM tweet_blacklist WHERE username = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, (_username.startsWith("@") ? _username : "@"+_username));
 			stmt.setLong(2, _guild_id);
@@ -3351,7 +3351,7 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
-				String sql = ("DELETE FROM filter WHERE fk_lang_abbrv LIKE ? && fk_guild_id = ?");
+				String sql = ("DELETE FROM filter WHERE fk_lang_abbrv = ? && fk_guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setString(1, _lang);
 				stmt.setLong(2, _guild_id);

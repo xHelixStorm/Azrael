@@ -1169,7 +1169,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("DELETE FROM inventory WHERE fk_status LIKE \"limit\" AND expires-CURRENT_TIMESTAMP <= 0");
+			String sql = ("DELETE FROM inventory WHERE fk_status = \"limit\" AND expires-CURRENT_TIMESTAMP <= 0");
 			stmt = myConn.prepareStatement(sql);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -1242,7 +1242,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT COUNT(*) FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_user_id = ? && inventory.fk_guild_id = ? && inventory.fk_theme_id = ? && fk_skin NOT LIKE ?");
+			String sql = ("SELECT COUNT(*) FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_user_id = ? && inventory.fk_guild_id = ? && inventory.fk_theme_id = ? && fk_skin NOT = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -1799,7 +1799,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT item_id, skin, status FROM inventory_items WHERE user_id = ? AND description LIKE ? AND status LIKE \"perm\" AND guild_id = ? AND theme_id = ? AND enabled = 1");
+			String sql = ("SELECT item_id, skin, status FROM inventory_items WHERE user_id = ? AND description = ? AND status = \"perm\" AND guild_id = ? AND theme_id = ? AND enabled = 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _description);
@@ -1827,7 +1827,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT number FROM inventory_items WHERE user_id = ? AND description LIKE ? AND status LIKE ? AND guild_id = ? AND theme_id = ?");
+			String sql = ("SELECT number FROM inventory_items WHERE user_id = ? AND description = ? AND status = ? AND guild_id = ? AND theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _description);
@@ -1991,7 +1991,7 @@ public class RankingSystem {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = "";
 			if(!_category.equalsIgnoreCase("skill")) {
-				sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? AND weapon_id IS NOT NULL AND name LIKE ? ORDER BY position desc LIMIT ?, ?");
+				sql = ("SELECT * FROM inventory_list WHERE user_id = ? AND guild_id = ? AND theme_id = ? AND weapon_id IS NOT NULL AND name = ? ORDER BY position desc LIMIT ?, ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setString(4, _category);
 				stmt.setInt(5, _limit);
@@ -2264,7 +2264,7 @@ public class RankingSystem {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("UPDATE inventory SET number = ? WHERE fk_user_id = ? AND fk_status LIKE \"perm\" AND fk_item_id = ? AND fk_guild_id = ? AND fk_theme_id = ?");
+			String sql = ("UPDATE inventory SET number = ? WHERE fk_user_id = ? AND fk_status = \"perm\" AND fk_item_id = ? AND fk_guild_id = ? AND fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _number-1);
 			stmt.setLong(2, _user_id);
@@ -2307,7 +2307,7 @@ public class RankingSystem {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("DELETE FROM inventory WHERE fk_user_id = ? AND fk_status LIKE \"perm\" AND fk_item_id = ? AND fk_guild_id = ? AND fk_theme_id = ?");
+			String sql = ("DELETE FROM inventory WHERE fk_user_id = ? AND fk_status = \"perm\" AND fk_item_id = ? AND fk_guild_id = ? AND fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
@@ -2349,7 +2349,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT DISTINCT description FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_status LIKE \"limit\" AND EXISTS (SELECT description FROM daily_items WHERE fk_type LIKE \"exp\" AND daily_items.fk_theme_id = ?) AND fk_user_id = ? AND fk_guild_id = ? AND inventory.fk_theme_id = ? AND enabled = 1");
+			String sql = ("SELECT DISTINCT description FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_theme_id = shop_content.fk_theme_id WHERE fk_status = \"limit\" AND EXISTS (SELECT description FROM daily_items WHERE fk_type = \"exp\" AND daily_items.fk_theme_id = ?) AND fk_user_id = ? AND fk_guild_id = ? AND inventory.fk_theme_id = ? AND enabled = 1");
 			var description = "0";
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _theme_id);

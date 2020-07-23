@@ -195,7 +195,7 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT weapon_id FROM weapon_shop_content WHERE fk_theme_id = ? AND weapon_abbv LIKE ? AND weapon_stat = ? ORDER BY RAND() LIMIT 1");
+			String sql = ("SELECT weapon_id FROM weapon_shop_content WHERE fk_theme_id = ? AND weapon_abbv = ? AND weapon_stat = ? ORDER BY RAND() LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _theme_id);
 			stmt.setString(2, _abbv);
@@ -222,7 +222,7 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT weapon_id FROM weapon_shop_content INNER JOIN weapon_category ON fk_category_id = category_id AND weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id WHERE weapon_shop_content.fk_theme_id = ? AND name LIKE ?  AND weapon_stat = ? ORDER BY RAND() LIMIT 1");
+			String sql = ("SELECT weapon_id FROM weapon_shop_content INNER JOIN weapon_category ON fk_category_id = category_id AND weapon_shop_content.fk_theme_id = weapon_category.fk_theme_id WHERE weapon_shop_content.fk_theme_id = ? AND name = ?  AND weapon_stat = ? ORDER BY RAND() LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _theme_id);
 			stmt.setString(2, _category);
@@ -579,7 +579,7 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT w.weapon_id, w.description, s.stat, w.weapon_abbv FROM inventory i INNER JOIN weapon_shop_content w ON i.fk_weapon_id = w.weapon_id INNER JOIN weapon_stats s ON w.weapon_stat = s.stat_id WHERE i.fk_user_id = ? && i.fk_guild_id = ? && w.description LIKE ?");
+			String sql = ("SELECT w.weapon_id, w.description, s.stat, w.weapon_abbv FROM inventory i INNER JOIN weapon_shop_content w ON i.fk_weapon_id = w.weapon_id INNER JOIN weapon_stats s ON w.weapon_stat = s.stat_id WHERE i.fk_user_id = ? && i.fk_guild_id = ? && w.description = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -612,7 +612,7 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT i.fk_skill_id, s.description FROM inventory i INNER JOIN skill_shop_content s ON i.fk_skill_id = s.skill_id WHERE i.fk_user_id = ? && i.fk_guild_id = ? && s.description LIKE ?");
+			String sql = ("SELECT i.fk_skill_id, s.description FROM inventory i INNER JOIN skill_shop_content s ON i.fk_skill_id = s.skill_id WHERE i.fk_user_id = ? && i.fk_guild_id = ? && s.description = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
