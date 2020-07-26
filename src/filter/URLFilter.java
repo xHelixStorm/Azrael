@@ -30,12 +30,14 @@ import javax.net.ssl.SSLHandshakeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.Cache;
 import constructors.Channels;
 import core.Hashes;
 import core.UserPrivs;
 import enums.Translation;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -172,59 +174,80 @@ public class URLFilter implements Runnable{
 	private static void printMessage(GuildMessageReceivedEvent e, GuildMessageUpdateEvent e2, String foundURL, boolean defaultBlacklist, String [] output, List<Channels> allChannels) {
 		//for sent messages
 		if(e != null) {
-			//delete message which contains the url
-			e.getMessage().delete().reason("Not allowed URL found!").queue(success -> {
-				//if the overall blacklist is enabled, print the message that urls are not allowed, else keep count of the removed messages and warn the user
-				if(defaultBlacklist) {e.getChannel().sendMessage(e.getMember().getAsMention()+output[2]).queue();}
-				else {STATIC.handleRemovedMessages(e, e2, output);}
-				//retrieve the trash channel to print the removed message. If not available, don't print any message
-				final Channels tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
-				if(tra_channel != null) {
-					e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder()
-						.setDescription(e.getMessage().getContentRaw())
-						.setColor(Color.ORANGE)
-						.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_TITLE))
-						.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_NAME), e.getMember().getAsMention(), true)
-						.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_USER_ID), e.getMember().getUser().getId(), true)
-						.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_CHANNEL), e.getChannel().getAsMention(), true)
-						.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_TYPE), STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_TYPE_NAME), true)
-						.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_FQDN), foundURL, true)
-						.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl())
-						.build()
-					).queue();
-				}
-			}, error -> {
-				//when the message already has been removed, usually by another bot
-				logger.warn("Message containing a url has been already deleted! URL: {}", foundURL);
-			});
+			//check if Bot has the manage messages permission
+			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_MANAGE)) {
+				Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
+				//delete message which contains the url
+				e.getMessage().delete().queue(success -> {
+					//if the overall blacklist is enabled, print the message that urls are not allowed, else keep count of the removed messages and warn the user
+					if(defaultBlacklist) {e.getChannel().sendMessage(e.getMember().getAsMention()+output[2]).queue();}
+					else {STATIC.handleRemovedMessages(e, e2, output);}
+					//retrieve the trash channel to print the removed message. If not available, don't print any message
+					final Channels tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
+					if(tra_channel != null) {
+						e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder()
+							.setDescription(e.getMessage().getContentRaw())
+							.setColor(Color.ORANGE)
+							.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_TITLE))
+							.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_USER_ID), e.getMember().getUser().getId(), true)
+							.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_NAME), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), true)
+							.addBlankField(true)
+							.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_CHANNEL), e.getChannel().getAsMention(), true)
+							.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_TYPE), STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_TYPE_NAME), true)
+							.addField(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_URL_FQDN), foundURL, true)
+							.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl())
+							.build()
+						).queue();
+					}
+				}, error -> {
+					//when the message already has been removed, usually by another bot
+					logger.debug("Message containing a url has been already deleted! URL: {}", foundURL);
+					Hashes.clearTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+				});
+			}
+			else {
+				final var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+				if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_MANAGE.getName())+e.getChannel().getAsMention()).build()).queue();
+				logger.error("MESSAGE MANAGE permission missing to remove a message in channel {} and guild {}", e.getChannel().getId(), e.getGuild().getId());
+			}
 		}
 		//for edited messages
 		else {
-			//delete message which contains the url
-			e2.getMessage().delete().reason("Not allowed URL found!").queue(success -> {
-				//if the overall blacklist is enabled, print the message that urls are not allowed, else keep count of the removed messages and warn the user
-				if(defaultBlacklist) {e2.getChannel().sendMessage(e2.getMember().getAsMention()+output[2]).queue();}
-				else {STATIC.handleRemovedMessages(e, e2, output);}
-				//retrieve the trash channel to print the removed message. If not available, don't print any message
-				final Channels tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
-				if(tra_channel != null) {
-					e2.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder()
-						.setDescription(e2.getMessage().getContentRaw())
-						.setColor(Color.ORANGE)
-						.setTitle(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_TITLE))
-						.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_NAME), e2.getMember().getAsMention(), true)
-						.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_USER_ID), e2.getMember().getUser().getId(), true)
-						.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_CHANNEL), e2.getChannel().getAsMention(), true)
-						.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_TYPE), STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_TYPE_NAME), true)
-						.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_FQDN), foundURL, true)
-						.setThumbnail(e2.getMember().getUser().getEffectiveAvatarUrl())
-						.build()
-					).queue();
-				}
-			}, error -> {
-				//when the message already has been removed, usually by another bot
-				logger.trace("Message containing a url has been already deleted! URL: {}", foundURL);
-			});
+			if(e2.getGuild().getSelfMember().hasPermission(e2.getChannel(), Permission.MESSAGE_MANAGE)) {
+				Hashes.addTempCache("message-removed-filter_gu"+e2.getGuild().getId()+"ch"+e2.getChannel().getId()+"us"+e2.getMember().getUser().getId(), new Cache(180000));
+				//delete message which contains the url
+				e2.getMessage().delete().queue(success -> {
+					//if the overall blacklist is enabled, print the message that urls are not allowed, else keep count of the removed messages and warn the user
+					if(defaultBlacklist) {e2.getChannel().sendMessage(e2.getMember().getAsMention()+output[2]).queue();}
+					else {STATIC.handleRemovedMessages(e, e2, output);}
+					//retrieve the trash channel to print the removed message. If not available, don't print any message
+					final Channels tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
+					if(tra_channel != null) {
+						e2.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder()
+							.setDescription(e2.getMessage().getContentRaw())
+							.setColor(Color.ORANGE)
+							.setTitle(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_TITLE))
+							.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_USER_ID), e2.getMember().getUser().getId(), true)
+							.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_NAME), e2.getMember().getUser().getName()+"#"+e2.getMember().getUser().getDiscriminator(), true)
+							.addBlankField(true)
+							.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_CHANNEL), e2.getChannel().getAsMention(), true)
+							.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_TYPE), STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_TYPE_NAME), true)
+							.addField(STATIC.getTranslation2(e2.getGuild(), Translation.CENSOR_URL_FQDN), foundURL, true)
+							.setThumbnail(e2.getMember().getUser().getEffectiveAvatarUrl())
+							.build()
+						).queue();
+					}
+				}, error -> {
+					//when the message already has been removed, usually by another bot
+					logger.debug("Message containing a url has been already deleted! URL: {}", foundURL);
+					Hashes.clearTempCache("message-removed-filter_gu"+e2.getGuild().getId()+"ch"+e2.getChannel().getId()+"us"+e2.getMember().getUser().getId());
+				});
+			}
+			else {
+				final var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+				if(log_channel != null) e2.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e2.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e2.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_MANAGE.getName())+e2.getChannel().getAsMention()).build()).queue();
+				logger.error("MESSAGE MANAGE permission missing to remove a message in channel {} and guild {}", e2.getChannel().getId(), e2.getGuild().getId());
+			}
 		}
 	}
 }

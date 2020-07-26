@@ -53,6 +53,9 @@ public class ReadyListener extends ListenerAdapter {
 	
 	@Override
 	public void onReady(ReadyEvent e) {
+		//Save the time when the Bot successfully booted up
+		STATIC.initializeBootTime();
+		
 		//create the temp directory and verify if multiple sessions are running. If yes, terminate this session
 		FileSetting.createTemp(e);
 		if(new File(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr").exists() && FileSetting.readFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr").contains("1")) {

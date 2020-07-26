@@ -10,6 +10,9 @@ import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -67,9 +70,11 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.22.449";
+	private static final String VERSION = "7.22.450";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
+	
+	private static OffsetDateTime bootTime = null;
 	
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
@@ -193,6 +198,13 @@ public class STATIC {
 	}
 	public static String getDatabaseURL(final String _dbName, final String _ip, String _param) {
 		return "jdbc:mysql://"+_ip+"/"+_dbName+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="+IniFileReader.getTimezone()+_param;
+	}
+	
+	public static void initializeBootTime() {
+		bootTime = OffsetDateTime.of(LocalDateTime.now(), ZoneOffset.of("Z"));
+	}
+	public static OffsetDateTime getBootTime() {
+		return bootTime;
 	}
 	
 	public static void setToken(String _token) {
