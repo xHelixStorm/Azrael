@@ -2020,7 +2020,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv NOT = \"all\"");
+				String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv  != \"all\"");
 				stmt = myConn.prepareStatement(sql);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
