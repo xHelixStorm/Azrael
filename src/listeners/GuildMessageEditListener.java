@@ -52,7 +52,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 	public void onGuildMessageUpdate(GuildMessageUpdateEvent e) {
 		new Thread(() -> {
 			long channel_id = e.getChannel().getIdLong();
-			var allChannels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
+			final var allChannels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
 			//execute only one thread at the same time
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			//check if the edited message has been already checked, in case if it's the same message like before an edit
@@ -176,7 +176,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 				}
 				
 				//Run google service, if enabled
-				if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+				if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong()) && allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("vot")).findAny().orElse(null) != null) {
 					final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id);
 					if(sheet != null && !sheet[0].equals("empty")) {
 						final String file_id = sheet[0];
