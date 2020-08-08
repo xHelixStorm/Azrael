@@ -142,7 +142,6 @@ public class Join implements CommandPublic {
 	}
 
 	
-	@SuppressWarnings("preview")
 	public static void joinMatchmaking(GuildMessageReceivedEvent e, String [] args) {
 		//join an existing matchmaking room
 		final var this_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
@@ -240,7 +239,6 @@ public class Join implements CommandPublic {
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	private static void queueFull(GuildMessageReceivedEvent e, Room room, int roomLimit) {
 		final var queue = Competitive.SQLgetMatchmakingMembers(e.getGuild().getIdLong(), room.getRoomID());
 		if(queue != null && queue.size() > 0) {

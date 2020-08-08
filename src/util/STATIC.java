@@ -97,14 +97,13 @@ public class STATIC {
 		return VERSION;
 	}
 	
-	@SuppressWarnings("preview")
 	private static String getMessage(String lang, Translation event) {
 		return switch(lang) {
 		case "eng" -> {
 			if(eng_lang.has(event.section()))
-				return (String)eng_lang.get(event.section());
+				yield (String)eng_lang.get(event.section());
 			else
-				return "Message "+event.section()+" not found!";
+				yield "Message "+event.section()+" not found!";
 		}
 		default -> "Missing translation!";
 	};
@@ -363,7 +362,6 @@ public class STATIC {
 	}
 	
 	//define the default privilege level for different role types. Used during role registrations. 0 is lowest and 100 is highest privilege
-	@SuppressWarnings("preview")
 	public static int getLevel(String category) {
 		return switch(category) {
 			case "adm" -> 100;
@@ -492,7 +490,6 @@ public class STATIC {
 		return twitterFactory;
 	}
 	
-	@SuppressWarnings("preview")
 	public static int returnEmote(String reactionName) {
 		return switch(reactionName) {
 			case "one" 	 -> 0;

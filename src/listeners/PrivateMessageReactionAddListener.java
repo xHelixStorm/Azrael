@@ -21,7 +21,6 @@ public class PrivateMessageReactionAddListener extends ListenerAdapter {
 	private final String accept = EmojiManager.getForAlias(":white_check_mark:").getUnicode();
 	private final String deny = EmojiManager.getForAlias(":x:").getUnicode();
 	
-	@SuppressWarnings("preview")
 	@Override
 	public void onPrivateMessageReactionAdd(PrivateMessageReactionAddEvent e) {
 		if(!e.getUser().isBot()) {

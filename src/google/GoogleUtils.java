@@ -51,7 +51,6 @@ public class GoogleUtils {
 	 * @throws Exception File error / other errors
 	 */
 	
-	@SuppressWarnings({ "preview" })
 	public static Credential getCredentials(final NetHttpTransport httpTransport, final String type) throws Exception {
 		//use the fitting scopes
 		List<String> scopes;
@@ -81,7 +80,6 @@ public class GoogleUtils {
 	 * @return
 	 */
 	
-	@SuppressWarnings("preview")
 	public static String buildFileURL(String file_id, int api_id) {
 		return switch(api_id) {
 			case 1 -> "https://docs.google.com/document/d/"+file_id;
@@ -90,7 +88,6 @@ public class GoogleUtils {
 		};
 	}
 	
-	@SuppressWarnings({ "preview" })
 	public static void handleSpreadsheetRequest(Guild guild, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, long message_id, String message, int up_vote, int down_vote, int event_id, Channels log_channel) {
 		//Retrieve the file id and row start for this event
 		final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, event_id);
@@ -271,7 +268,6 @@ public class GoogleUtils {
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	public static boolean handleSpreadsheetRequest(Guild guild, String user_id, Timestamp timestamp, String name, String action, long ping, long member_count, long guilds_count, int event_id, Channels log_channel) {
 		//Retrieve the file id and row start for this event
 		final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, event_id);

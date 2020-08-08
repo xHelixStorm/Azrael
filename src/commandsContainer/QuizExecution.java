@@ -91,7 +91,6 @@ public class QuizExecution {
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	public static void registerQuestions(GuildMessageReceivedEvent e, String _link, boolean _readFile) {
 		//check if it is a link that was inserted and if yes call readPublicPasteLink and then
 		//split the returned String in an array. Or if it's being registered from a file, the file should be checked

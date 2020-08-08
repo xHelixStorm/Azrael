@@ -23,7 +23,6 @@ import util.STATIC;
 public class SetChannelFilter {
 	private final static Logger logger = LoggerFactory.getLogger(SetChannelFilter.class);
 	
-	@SuppressWarnings("preview")
 	public static void runTask(GuildMessageReceivedEvent e, String [] _input) {
 		int i = 0;
 		ArrayList<String> filter_lang = new ArrayList<String>();

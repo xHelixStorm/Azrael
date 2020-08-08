@@ -17,7 +17,6 @@ import sql.Azrael;
 import util.STATIC;
 
 public class HandlerPOST {
-	@SuppressWarnings("preview")
 	public static void handleRequest(ReadyEvent e, PrintWriter out, JSONObject json) {
 		if(validateJSON(out, json)) {
 			final String type = json.getString("type");

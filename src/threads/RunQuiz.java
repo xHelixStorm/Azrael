@@ -134,7 +134,6 @@ public class RunQuiz implements Runnable{
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	private String replyList(GuildMessageReceivedEvent e, int digit) {
 		return switch(digit) {
 			case 1  -> STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_REPLY_1);

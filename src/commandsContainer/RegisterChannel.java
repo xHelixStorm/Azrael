@@ -62,7 +62,6 @@ public class RegisterChannel {
 		e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_TXT_HELP)).build()).queue();
 	}
 	
-	@SuppressWarnings("preview")
 	public static void runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission) {
 		String channel;
 		long channel_id;

@@ -32,7 +32,6 @@ public class Clan implements CommandPublic {
 		return false;
 	}
 
-	@SuppressWarnings("preview")
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		if(Join.profilePage(e, true)) {

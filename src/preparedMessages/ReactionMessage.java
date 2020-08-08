@@ -73,7 +73,6 @@ public class ReactionMessage {
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	private static String getReaction(int counter) {
 		return switch(counter) {
 			case 0  -> ":one:";

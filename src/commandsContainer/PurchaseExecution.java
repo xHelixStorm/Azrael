@@ -159,7 +159,6 @@ public class PurchaseExecution {
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	private static void returnSkinMenu(GuildMessageReceivedEvent e, Guilds guild_settings, final String type) {
 		switch(type) {
 			case "lev" -> ShopExecution.displayShop(e, "lev", guild_settings.getLevelDescription());

@@ -127,7 +127,6 @@ public class FilterExecution {
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	public static void performAction(GuildMessageReceivedEvent e, String _message, Cache cache) {
 		String key = "filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
@@ -1130,7 +1129,6 @@ public class FilterExecution {
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	private static void callFilterLangContent(GuildMessageReceivedEvent e, EmbedBuilder message, final String key, final String lang) {
 		var langAbbreviation = "";
 		var definitiveLang = "";

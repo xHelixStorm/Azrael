@@ -65,7 +65,6 @@ import util.STATIC;
 public class GuildMessageListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
 	
-	@SuppressWarnings({ "preview", "null" })
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		if(e.getMember() != null) {
@@ -350,13 +349,19 @@ public class GuildMessageListener extends ListenerAdapter {
 							var channels = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log") || f.getChannel_Type().equals("qui")).collect(Collectors.toList());
 							var log_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
 							var qui_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals("qui")).findAny().orElse(null);
-							if(log_channel == null)
-								log_channel.setChannel_ID(e.getChannel().getIdLong());
-							if(qui_channel == null)
-								qui_channel.setChannel_ID(e.getChannel().getIdLong());
-							e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.QUIZ_START_SHORTLY).replace("{}", ""+qui_channel.getChannel_ID())).queue();
+							long logChannel = 0;
+							long quiChannel = 0;
+							if(log_channel != null)
+								logChannel = log_channel.getChannel_ID();
+							else
+								logChannel = e.getChannel().getIdLong();
+							if(qui_channel != null)
+								quiChannel = qui_channel.getChannel_ID();
+							else
+								quiChannel = e.getChannel().getIdLong();
+							e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.QUIZ_START_SHORTLY).replace("{}", ""+quiChannel)).queue();
 							//execute independent Quiz Thread
-							new Thread(new RunQuiz(e, qui_channel.getChannel_ID(), log_channel.getChannel_ID(), Integer.parseInt(message))).start();
+							new Thread(new RunQuiz(e, quiChannel, logChannel, Integer.parseInt(message))).start();
 							//remove the entry from cache after starting 
 							Hashes.clearTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 						}

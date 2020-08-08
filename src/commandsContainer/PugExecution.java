@@ -20,7 +20,6 @@ import util.STATIC;
  */
 
 public class PugExecution {
-	@SuppressWarnings("preview")
 	public static void Execute(GuildMessageReceivedEvent e, String [] _variable, String _path, long channel_id) throws IOException{
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail(IniFileReader.getPugThumbnail());
 		var variable = _variable;

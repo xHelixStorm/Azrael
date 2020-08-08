@@ -1040,7 +1040,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	public static int SQLInsertWarning(long _guild_id, int _warning_id) {
 		logger.info("SQLInsertWarning launched. Passed params {}, {}", _guild_id, _warning_id);
 		Connection myConn = null;

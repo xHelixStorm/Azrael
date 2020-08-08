@@ -175,7 +175,6 @@ public class EquipExecution {
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	public static void slotSelection(PrivateMessageReceivedEvent e, final String guild_id, final int selection, String action) {
 		if(selection > 0 && selection <= 4) {
 			if(action.equals("set")) {
@@ -237,7 +236,6 @@ public class EquipExecution {
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	public static void searchInventory(PrivateMessageReceivedEvent e, final String guild_id, final int selection, final String item) {
 		var guild = Long.parseLong(guild_id);
 		if(selection >= 1 && selection <= 3) {
@@ -349,7 +347,6 @@ public class EquipExecution {
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	public static void selectItem(PrivateMessageReceivedEvent e, final String guild_id, final int slot, final int selection, final String [] items) {
 		if(selection >= 0 && selection < items.length) {
 			var guild = Long.parseLong(guild_id);

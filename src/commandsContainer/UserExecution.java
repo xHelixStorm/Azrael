@@ -105,7 +105,6 @@ public class UserExecution {
 		}
 	}
 	
-	@SuppressWarnings("preview")
 	public static void performAction(GuildMessageReceivedEvent e, String _message, Cache cache, ArrayList<Channels> _allChannels) {
 		var key = "user_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail());

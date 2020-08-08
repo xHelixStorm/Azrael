@@ -100,7 +100,6 @@ public enum GoogleDD {
 	 * @return
 	 */
 	
-	@SuppressWarnings("preview")
 	public String valueFormatter(Object _value, String _format) {
 		String formattedValue = null;
 		
