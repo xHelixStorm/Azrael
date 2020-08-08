@@ -52,7 +52,7 @@ public class Azrael {
 	
 	public static synchronized void SQLInsertActionLog(String _event, long _target_id, long _guild_id, String _description) {
 		if(IniFileReader.getActionLog()) {
-			logger.info("SQLInsertActionLog launched. Passed params {}, {}, {}, {}", _event, _target_id, _guild_id, _description);
+			logger.trace("SQLInsertActionLog launched. Passed params {}, {}, {}, {}", _event, _target_id, _guild_id, _description);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			try {
@@ -75,7 +75,7 @@ public class Azrael {
 	}
 	
 	public static void SQLInsertHistory(long _user_id, long _guild_id, String _type, String _reason, long _penalty, String _info) {
-		logger.info("SQLInsertHistory launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _type, _reason, _penalty, _info);
+		logger.trace("SQLInsertHistory launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _type, _reason, _penalty, _info);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -104,7 +104,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<History> SQLgetHistory(long _user_id, long _guild_id) {
-		logger.info("SQLgetHistory launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLgetHistory launched. Passed params {}, {}", _user_id, _guild_id);
 		ArrayList<History> history = new ArrayList<History>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -139,7 +139,7 @@ public class Azrael {
 	}
 	
 	public static int SQLgetSingleActionEventCount(String _event, long _target_id, long _guild_id) {
-		logger.info("SQLgetSingleActionEventCount launched. Passed params {}, {}, {}", _event, _target_id, _guild_id);
+		logger.trace("SQLgetSingleActionEventCount launched. Passed params {}, {}, {}", _event, _target_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -166,7 +166,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetDoubleActionEventDescriptions(String _event, String _event2, long _target_id, long _guild_id) {
-		logger.info("SQLgetDoubleActionEventDescriptions launched. Passed params {}, {}, {}, {}", _event, _event2, _target_id, _guild_id);
+		logger.trace("SQLgetDoubleActionEventDescriptions launched. Passed params {}, {}, {}, {}", _event, _event2, _target_id, _guild_id);
 		ArrayList<String> descriptions = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -195,7 +195,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetSingleActionEventDescriptions(String _event, long _target_id, long _guild_id) {
-		logger.info("SQLgetSingleActionEventDescriptions launched. Passed params {}, {}, {}", _event, _target_id, _guild_id);
+		logger.trace("SQLgetSingleActionEventDescriptions launched. Passed params {}, {}, {}", _event, _target_id, _guild_id);
 		ArrayList<String> descriptions = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -222,7 +222,7 @@ public class Azrael {
 		}
 	}
 	public static ArrayList<String> SQLgetCriticalActionEvents(long _target_id, long _guild_id) {
-		logger.info("SQLgetCriticalActionEvents launched. Passed params {}, {}", _target_id, _guild_id);
+		logger.trace("SQLgetCriticalActionEvents launched. Passed params {}, {}", _target_id, _guild_id);
 		ArrayList<String> descriptions = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -249,7 +249,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetSingleActionEventDescriptionsOrdered(String _event, long _target_id, long _guild_id) {
-		logger.info("SQLgetSingleActionEventDescriptions launched. Passed params {}, {}, {}", _event, _target_id, _guild_id);
+		logger.trace("SQLgetSingleActionEventDescriptions launched. Passed params {}, {}, {}", _event, _target_id, _guild_id);
 		ArrayList<String> descriptions = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -277,7 +277,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertUser(long _user_id, String _name, String _lang, String _avatar) {
-		logger.info("SQLInsertUser launched. Passed params {}, {}, {}, {}", _user_id, _name, _lang, _avatar);
+		logger.trace("SQLInsertUser launched. Passed params {}, {}, {}, {}", _user_id, _name, _lang, _avatar);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -299,7 +299,7 @@ public class Azrael {
 	}
 	
 	public static void SQLBulkInsertUsers(List<Member> members) {
-		logger.info("SQLBulkInsertUsers launched. Passed member list params");
+		logger.trace("SQLBulkInsertUsers launched. Passed member list params");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -325,7 +325,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateAvatar(long _user_id, String _avatar) {
-		logger.info("SQLUpdateAvatar launched. Passed params {}, {}", _user_id, _avatar);
+		logger.trace("SQLUpdateAvatar launched. Passed params {}, {}", _user_id, _avatar);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -345,7 +345,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertJoinDate(long _user_id, long _guild_id, String _join_date) {
-		logger.info("SQLInsertJoinDate launched. Passed params {}, {}, {}", _user_id, _guild_id, _join_date);
+		logger.trace("SQLInsertJoinDate launched. Passed params {}, {}, {}", _user_id, _guild_id, _join_date);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -369,7 +369,7 @@ public class Azrael {
 	}
 	
 	public static void SQLBulkInsertJoinDates(List<Member> members) {
-		logger.info("SQLBulkInsertJoinDates launched. Passed member list params");
+		logger.trace("SQLBulkInsertJoinDates launched. Passed member list params");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -397,7 +397,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateJoinDate(long _user_id, long _guild_id, String _join_date) {
-		logger.info("SQLUpdateJoinDate launched. Passed params {}, {}, {}", _user_id, _guild_id, _join_date);
+		logger.trace("SQLUpdateJoinDate launched. Passed params {}, {}, {}", _user_id, _guild_id, _join_date);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -418,7 +418,7 @@ public class Azrael {
 	}
 	
 	public static User SQLgetUser(String _name) {
-		logger.info("SqlgetUser launched. Passed params {}", _name);
+		logger.trace("SqlgetUser launched. Passed params {}", _name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -442,7 +442,7 @@ public class Azrael {
 	}
 	
 	public static User SQLgetUserThroughID(String _user_id) {
-		logger.info("SQLgetUserThroughID launched. Passed params {}", _user_id);
+		logger.trace("SQLgetUserThroughID launched. Passed params {}", _user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -466,7 +466,7 @@ public class Azrael {
 	}
 	
 	public static User SQLgetJoinDatesFromUser(long _user_id, long _guild_id, User _user) {
-		logger.info("SQLgetJoinDatesFromUser launched. Passed params {}, {}, User object", _user_id, _guild_id);
+		logger.trace("SQLgetJoinDatesFromUser launched. Passed params {}, {}, User object", _user_id, _guild_id);
 		String originalJoinDate = "N/A";
 		String newestJoinDate = "N/A";
 		Connection myConn = null;
@@ -498,7 +498,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateUser(Long _user_id, String _name) {
-		logger.info("SQLUpdateUser launched. Passed params {}, {}", _user_id, _name);
+		logger.trace("SQLUpdateUser launched. Passed params {}, {}", _user_id, _name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -519,7 +519,7 @@ public class Azrael {
 	
 	public static String SQLgetUserLang(long _user_id) {
 		if(Hashes.getLanguage(_user_id) == null) {
-			logger.info("SQLgetUserLang launched. Passed params {}", _user_id);
+			logger.trace("SQLgetUserLang launched. Passed params {}", _user_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -547,7 +547,7 @@ public class Azrael {
 	}
 	
 	public static long SQLgetGuild(long _guild_id) {
-		logger.info("SQLgetGuild launched. Passed params {}", _guild_id);
+		logger.trace("SQLgetGuild launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -572,7 +572,7 @@ public class Azrael {
 	}
 	
 	public static String SQLgetLanguage(long _guild_id) {
-		logger.info("SQLgetLanguage launched. Passed params {}", _guild_id);
+		logger.trace("SQLgetLanguage launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -597,7 +597,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateLanguage(Long _guild_id, String _language) {
-		logger.info("SQLUpdateLanguage launched. Passed params {}, {}", _guild_id, _language);
+		logger.trace("SQLUpdateLanguage launched. Passed params {}, {}", _guild_id, _language);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -617,7 +617,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertGuild(Long _guild_id, String _guild_name) {
-		logger.info("SQLInsertGuild launched. Passed params {}, {}", _guild_id, _guild_name);
+		logger.trace("SQLInsertGuild launched. Passed params {}, {}", _guild_id, _guild_name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -637,7 +637,7 @@ public class Azrael {
 	}
 	
 	public static String SQLgetNickname(Long _user_id, Long _guild_id) {
-		logger.info("SQLgetNickname launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLgetNickname launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -663,7 +663,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertNickname(Long _user_id, Long _guild_id, String _nickname) {
-		logger.info("SQLInsertNickname launched. Passed params {}, {}, {}", _user_id, _guild_id, _nickname);
+		logger.trace("SQLInsertNickname launched. Passed params {}, {}, {}", _user_id, _guild_id, _nickname);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -684,7 +684,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateNickname(Long _user_id, Long _guild_id, String _nickname) {
-		logger.info("SQLUpdateNickname launched. Passed params {}, {}", _user_id, _guild_id, _nickname);
+		logger.trace("SQLUpdateNickname launched. Passed params {}, {}", _user_id, _guild_id, _nickname);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -705,7 +705,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteNickname(Long _user_id, Long _guild_id) {
-		logger.info("SQLDeleteNickname launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLDeleteNickname launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -725,7 +725,7 @@ public class Azrael {
 	}
 	
 	public static Bancollect SQLgetData(Long _user_id, Long _guild_id) {
-		logger.info("SQLgetData launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLgetData launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -751,7 +751,7 @@ public class Azrael {
 	}
 	
 	public static boolean SQLgetMuted(long _user_id, long _guild_id) {
-		logger.info("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -777,7 +777,7 @@ public class Azrael {
 	}
 	
 	public static boolean SQLgetCustomMuted(long _user_id, long _guild_id) {
-		logger.info("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -803,7 +803,7 @@ public class Azrael {
 	}
 	
 	public static boolean SQLisBanned(long _user_id, long _guild_id) {
-		logger.info("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -832,7 +832,7 @@ public class Azrael {
 	}
 	
 	public static int SQLgetWarning(long _user_id, long _guild_id) {
-		logger.info("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLgetMuted launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -858,7 +858,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertData(long _user_id, long _guild_id, int _warning_id, int _ban_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted, boolean _custom_time) {
-		logger.info("SQLInsertData launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _warning_id, _ban_id, _timestamp, _unmute, _muted, _custom_time);
+		logger.trace("SQLInsertData launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _warning_id, _ban_id, _timestamp, _unmute, _muted, _custom_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -884,7 +884,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteData(long _user_id, long _guild_id) {
-		logger.info("SQLDeleteData launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLDeleteData launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -904,7 +904,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateMuted(long _user_id, long _guild_id, boolean _muted) {
-		logger.info("SQLUpdateMuted launched. Passed params {}, {}, {}", _user_id, _guild_id, _muted);
+		logger.trace("SQLUpdateMuted launched. Passed params {}, {}, {}", _user_id, _guild_id, _muted);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -925,7 +925,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateMutedAndCustomMuted(long _user_id, long _guild_id, boolean _muted, boolean _custom_time) {
-		logger.info("SQLUpdateMutedAndCustomMuted launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _muted, _custom_time);
+		logger.trace("SQLUpdateMutedAndCustomMuted launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _muted, _custom_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -947,7 +947,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateMutedOnEnd(long _user_id, long _guild_id, boolean _muted, boolean _custom_time) {
-		logger.info("SQLUpdateMutedOnEnd launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _muted, _custom_time);
+		logger.trace("SQLUpdateMutedOnEnd launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _muted, _custom_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -969,7 +969,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateGuildLeft(long _user_id, long _guild_id, boolean _guildLeft) {
-		logger.info("SQLUpdateGuildLeft launched. Passed params {}, {}, {}", _user_id, _guild_id, _guildLeft);
+		logger.trace("SQLUpdateGuildLeft launched. Passed params {}, {}, {}", _user_id, _guild_id, _guildLeft);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -990,7 +990,7 @@ public class Azrael {
 	}
 	
 	public static Warning SQLgetWarning(long _guild_id, int _warning_id) {
-		logger.info("SQLgetWarning launched. Passed params {}, {}", _guild_id, _warning_id);
+		logger.trace("SQLgetWarning launched. Passed params {}, {}", _guild_id, _warning_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1016,7 +1016,7 @@ public class Azrael {
 	}
 	
 	public static int SQLgetMaxWarning(long _guild_id) {
-		logger.info("SQLgetMaxWarning launched. Passed params {}", _guild_id);
+		logger.trace("SQLgetMaxWarning launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1041,7 +1041,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertWarning(long _guild_id, int _warning_id) {
-		logger.info("SQLInsertWarning launched. Passed params {}, {}", _guild_id, _warning_id);
+		logger.trace("SQLInsertWarning launched. Passed params {}, {}", _guild_id, _warning_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1120,7 +1120,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateWarning(long _user_id, long _guild_id, int _warning_id) {
-		logger.info("SQLUpdateWarning launched. Passed params {}, {}", _user_id, _guild_id, _warning_id);
+		logger.trace("SQLUpdateWarning launched. Passed params {}, {}", _user_id, _guild_id, _warning_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1141,7 +1141,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateMuteTimeOfWarning(long _guild_id, int _warning_id, long _mute_time) {
-		logger.info("SQLUpdateTimeOfWarning launched. Passed params {}, {}, {}", _guild_id, _warning_id, _mute_time);
+		logger.trace("SQLUpdateTimeOfWarning launched. Passed params {}, {}, {}", _guild_id, _warning_id, _mute_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1162,7 +1162,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateUnmute(Long _user_id, Long _guild_id, Timestamp _timestamp, Timestamp _unmute, boolean _muted, boolean _custom_time) {
-		logger.info("SQLUpdateUnmute launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _timestamp, _unmute, _muted, _custom_time);
+		logger.trace("SQLUpdateUnmute launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _timestamp, _unmute, _muted, _custom_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1186,7 +1186,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateUnmute(Long _user_id, Long _guild_id, Timestamp _unmute) {
-		logger.info("SQLUpdateUnmute launched. Passed params {}, {}, {}", _user_id, _guild_id, _unmute);
+		logger.trace("SQLUpdateUnmute launched. Passed params {}, {}, {}", _user_id, _guild_id, _unmute);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1207,7 +1207,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateBan(Long _user_id, Long _guild_id, Integer _ban_id) {
-		logger.info("SQLUpdateban launched. Passed params {}, {}, {}", _user_id, _guild_id, _ban_id);
+		logger.trace("SQLUpdateban launched. Passed params {}, {}, {}", _user_id, _guild_id, _ban_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1228,7 +1228,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertChannels(long _channel_id, String _channel_name) {
-		logger.info("SQLInsertChannels launched. Passed params {}, {}", _channel_id, _channel_name);
+		logger.trace("SQLInsertChannels launched. Passed params {}, {}", _channel_id, _channel_name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1248,7 +1248,7 @@ public class Azrael {
 	}
 	
 	public static void SQLBulkInsertChannels(List<TextChannel> _textChannels) {
-		logger.info("SQLBulkInsertChannels launched. Array param passed");
+		logger.trace("SQLBulkInsertChannels launched. Array param passed");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1272,7 +1272,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteChannels(long _channel_id) {
-		logger.info("SQLDeleteChannels launched. Passed params {}", _channel_id);
+		logger.trace("SQLDeleteChannels launched. Passed params {}", _channel_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1291,7 +1291,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertChannel_Conf(long _channel_id, long _guild_id, String _channel_type) {
-		logger.info("SQLInsertChannel launched. Passed params {}, {}, {}, {}", _channel_id, _guild_id, _channel_type);
+		logger.trace("SQLInsertChannel launched. Passed params {}, {}, {}, {}", _channel_id, _guild_id, _channel_type);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1312,7 +1312,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteChannelConf(long _channel_id, long _guild_id) {
-		logger.info("SQLDeleteChannelConf launched. Passed params {}, {}", _channel_id, _guild_id);
+		logger.trace("SQLDeleteChannelConf launched. Passed params {}, {}", _channel_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1332,7 +1332,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteAllChannelConfs(long _guild_id) {
-		logger.info("SQLDeleteAllChannelConfs launched. Passed params {}", _guild_id);
+		logger.trace("SQLDeleteAllChannelConfs launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1351,7 +1351,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertChannel_ConfURLCensoring(long _channel_id, long _guild_id, boolean _url_censoring) {
-		logger.info("SQLInsertChannel_ConfURLCensoring launched. Passed params {}, {}, {}, {}", _channel_id, _guild_id, _url_censoring);
+		logger.trace("SQLInsertChannel_ConfURLCensoring launched. Passed params {}, {}, {}, {}", _channel_id, _guild_id, _url_censoring);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1372,7 +1372,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertChannel_ConfTXTCensoring(long _channel_id, long _guild_id, boolean _txt_removal) {
-		logger.info("SQLInsertChannel_ConfTXTCensoring launched. Passed params {}, {}, {}, {}", _channel_id, _guild_id, _txt_removal);
+		logger.trace("SQLInsertChannel_ConfTXTCensoring launched. Passed params {}, {}, {}, {}", _channel_id, _guild_id, _txt_removal);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1393,7 +1393,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteChannelType(String _channel_type, long _guild_id) {
-		logger.info("SQLDeleteChannelType launched. Passed params {}, {}", _channel_type, _guild_id);
+		logger.trace("SQLDeleteChannelType launched. Passed params {}, {}", _channel_type, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1414,7 +1414,7 @@ public class Azrael {
 	
 	public static synchronized ArrayList<Channels> SQLgetChannels(long _guild_id) {
 		if(Hashes.getChannels(_guild_id) == null) {
-			logger.info("SQLgetChannels launched. Passed params {}", _guild_id);
+			logger.trace("SQLgetChannels launched. Passed params {}", _guild_id);
 			ArrayList<Channels> channels = new ArrayList<Channels>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1453,7 +1453,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<Channels> SQLgetChannelTypes() {
-		logger.info("SQLgetChannelTypes launched. No params");
+		logger.trace("SQLgetChannelTypes launched. No params");
 		ArrayList<Channels> channels = new ArrayList<Channels>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -1481,7 +1481,7 @@ public class Azrael {
 	}
 	
 	public static boolean SQLgetCommandExecutionReaction(long _guild_id) {
-		logger.info("SQLgetCommandExecutionReaction launched. Passed params {}", _guild_id);
+		logger.trace("SQLgetCommandExecutionReaction launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1506,7 +1506,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateReaction(long _guild_id, boolean _reactions) {
-		logger.info("SQLUpdateReaction launched. Passed params {}, {}", _guild_id, _reactions);
+		logger.trace("SQLUpdateReaction launched. Passed params {}, {}", _guild_id, _reactions);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1527,7 +1527,7 @@ public class Azrael {
 	
 	public synchronized static ArrayList<String> SQLgetChannel_Filter(long _channel_id) {
 		if(Hashes.getFilterLang(_channel_id) == null) {
-			logger.info("SQLgetChannel_Filter launched. Passed params {}", _channel_id);
+			logger.trace("SQLgetChannel_Filter launched. Passed params {}", _channel_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -1557,7 +1557,7 @@ public class Azrael {
 	
 	public synchronized static ArrayList<String> SQLgetFilter(String _filter_lang, long _guild_id) {
 		if(Hashes.getQuerryResult(_filter_lang+"_"+_guild_id) == null) {
-			logger.info("SQLgetFilter launched. Passed params {}, {}", _filter_lang, _guild_id);
+			logger.trace("SQLgetFilter launched. Passed params {}, {}", _filter_lang, _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -1594,7 +1594,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertWordFilter(String _lang, String _word, long _guild_id) {
-		logger.info("SQLInsertWordFilter launched. Passed params {}, {}, {}", _lang, _word, _guild_id);
+		logger.trace("SQLInsertWordFilter launched. Passed params {}, {}, {}", _lang, _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1649,7 +1649,7 @@ public class Azrael {
 	}
 	
 	public static boolean SQLDeleteWordFilterAllLang(String _word, long _guild_id) {
-		logger.info("SQLDeleteWordFilter launched. Passed params {}, {}", _word, _guild_id);
+		logger.trace("SQLDeleteWordFilter launched. Passed params {}, {}", _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1670,7 +1670,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteWordFilter(String _lang, String _word, long _guild_id) {
-		logger.info("SQLDeleteWordFilter launched. Passed params {}, {}, {}", _lang, _word, _guild_id);
+		logger.trace("SQLDeleteWordFilter launched. Passed params {}, {}, {}", _lang, _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1687,7 +1687,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteWordFilter Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1696,7 +1696,7 @@ public class Azrael {
 	
 	public synchronized static ArrayList<String> SQLgetStaffNames(long _guild_id) {
 		if(Hashes.getQuerryResult("staff-names_"+_guild_id) == null) {
-			logger.info("SQLgetStaffNames launched. Passed params {}", _guild_id);
+			logger.trace("SQLgetStaffNames launched. Passed params {}", _guild_id);
 			ArrayList<String> staff_names = new ArrayList<String>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1725,7 +1725,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertStaffName(String _word, long _guild_id) {
-		logger.info("SQLInsertStaffName launched. Passed params {}, {}", _word, _guild_id);
+		logger.trace("SQLInsertStaffName launched. Passed params {}, {}", _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1737,7 +1737,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertStaffName Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1745,7 +1745,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteStaffNames(String _word, long _guild_id) {
-		logger.info("SQLDeleteStaffNames launched. Passed params {}, {}", _word, _guild_id);
+		logger.trace("SQLDeleteStaffNames launched. Passed params {}, {}", _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1757,7 +1757,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteStaffNames Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1766,7 +1766,7 @@ public class Azrael {
 	
 	@SuppressWarnings("resource")
 	public static int SQLReplaceStaffNames(String [] _words, long _guild_id, boolean delete) {
-		logger.info("SQLBatchInsertStaffNames launched. Passed params array, {}, {}", _guild_id, delete);
+		logger.trace("SQLBatchInsertStaffNames launched. Passed params array, {}, {}", _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1805,7 +1805,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertChannel_Filter(long _channel_id, String _filter_lang) {
-		logger.info("SQLInsertChannel_Filter launched. Passed params {}, {}", _channel_id, _filter_lang);
+		logger.trace("SQLInsertChannel_Filter launched. Passed params {}, {}", _channel_id, _filter_lang);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1825,7 +1825,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteChannel_Filter(long _channel_id) {
-		logger.info("SQLDeleteChannel_Filter launched. Passed params {}", _channel_id);
+		logger.trace("SQLDeleteChannel_Filter launched. Passed params {}", _channel_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1846,7 +1846,7 @@ public class Azrael {
 	public static ArrayList<String> SQLgetFunnyNames(long _guild_id) {
 		if(Hashes.getQuerryResult("funny-names_"+_guild_id) == null) {
 			ArrayList<String> names = new ArrayList<String>();
-			logger.info("SQLgetFunnyNames launched. Passed params {}", _guild_id);
+			logger.trace("SQLgetFunnyNames launched. Passed params {}", _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -1874,7 +1874,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertFunnyNames(String _word, long _guild_id) {
-		logger.info("SQLInsertFunnnynames launched. Passed params {}, {}", _word, _guild_id);
+		logger.trace("SQLInsertFunnnynames launched. Passed params {}, {}", _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1886,7 +1886,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertFunnyNamesException", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1894,7 +1894,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteFunnyNames(String _word, long _guild_id) {
-		logger.info("SQLDeleteFunnyNames launched. Passed params {}, {}", _word, _guild_id);
+		logger.trace("SQLDeleteFunnyNames launched. Passed params {}, {}", _word, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1906,7 +1906,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteFunnyNames Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1915,7 +1915,7 @@ public class Azrael {
 	
 	public static ArrayList<NameFilter> SQLgetNameFilter(long _guild_id) {
 		if(Hashes.getNameFilter(_guild_id) == null) {
-			logger.info("SQLgetNameFilter launched. Passed params {}", _guild_id);
+			logger.trace("SQLgetNameFilter launched. Passed params {}", _guild_id);
 			ArrayList<NameFilter> names = new ArrayList<NameFilter>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1944,7 +1944,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertNameFilter(String _word, boolean _kick, long _guild_id) {
-		logger.info("SQLInsertNameFilter launched. Passed params {}, {}, {}", _word, _kick, _guild_id);
+		logger.trace("SQLInsertNameFilter launched. Passed params {}, {}, {}", _word, _kick, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1957,7 +1957,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertNameFilter Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1965,7 +1965,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteNameFilter(String _word, boolean _kick, long _guild_id) {
-		logger.info("SQLDeleteNameFilter launched. Passed params {}, {}, {}", _word, _kick, _guild_id);
+		logger.trace("SQLDeleteNameFilter launched. Passed params {}, {}, {}", _word, _kick, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1978,7 +1978,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteNameFilter Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1986,7 +1986,7 @@ public class Azrael {
 	}
 	
 	public static String SQLgetRandomName(long _guild_id) {
-		logger.info("SQLgetRandomName launched. Passed params {}", _guild_id);
+		logger.trace("SQLgetRandomName launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2012,7 +2012,7 @@ public class Azrael {
 	
 	public static ArrayList<String> SQLgetFilterLanguages() {
 		if(Hashes.getFilterLang(0) == null) {
-			logger.info("SQLgetFilterLanguages launched. No params passed");
+			logger.trace("SQLgetFilterLanguages launched. No params passed");
 			ArrayList<String> filter_lang = new ArrayList<String>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -2039,7 +2039,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertRSS(String _url, long _guild_id, int _type) {
-		logger.info("SQLInsertRSS launched. Params passed {}, {}, {}", _url, _guild_id, _type);
+		logger.trace("SQLInsertRSS launched. Params passed {}, {}, {}", _url, _guild_id, _type);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2064,7 +2064,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetSubTweets(long _guild_id, String _tweet) {
-		logger.info("SQLgetSubTweets launched. Params passed {}, {}", _guild_id, _tweet);
+		logger.trace("SQLgetSubTweets launched. Params passed {}, {}", _guild_id, _tweet);
 		ArrayList<String> tweets = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2090,14 +2090,14 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<RSS> SQLgetRSSFeeds(long _guild_id) {
+	public static ArrayList<RSS> SQLgetSubscriptions(long _guild_id) {
 		if(Hashes.getFeed(_guild_id) == null) {
-			logger.info("SQLgetRSSFeeds launched. Params passed {}", _guild_id);
-			ArrayList<RSS> feeds = new ArrayList<RSS>();
+			logger.trace("SQLgetSubscriptions launched. Params passed {}", _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
+				ArrayList<RSS> feeds = new ArrayList<RSS>();
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 				String sql = ("SELECT url, format, type, videos, pictures, text FROM rss WHERE fk_guild_id = ? ORDER BY timestamp asc");
 				stmt = myConn.prepareStatement(sql);
@@ -2119,8 +2119,8 @@ public class Azrael {
 				Hashes.addFeeds(_guild_id, feeds);
 				return feeds;
 			} catch (SQLException e) {
-				logger.error("SQLgetRSSFeeds Exception", e);
-				return feeds;
+				logger.error("SQLgetSubscriptions Exception", e);
+				return null;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2130,8 +2130,8 @@ public class Azrael {
 		return Hashes.getFeed(_guild_id);
 	}
 	
-	public static ArrayList<RSS> SQLgetRSSFeeds(long _guild_id, int _type) {
-		logger.info("SQLgetRSSFeeds launched. Params passed {}, {}", _guild_id, _type);
+	public static ArrayList<RSS> SQLgetSubscriptions(long _guild_id, int _type) {
+		logger.trace("SQLgetSubscriptions launched. Params passed {}, {}", _guild_id, _type);
 		ArrayList<RSS> feeds = new ArrayList<RSS>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2159,7 +2159,7 @@ public class Azrael {
 			Hashes.addFeeds(_guild_id, feeds);
 			return feeds;
 		} catch (SQLException e) {
-			logger.error("SQLgetRSSFeeds Exception", e);
+			logger.error("SQLgetSubscriptions Exception", e);
 			return feeds;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -2169,7 +2169,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateRSSPictures(String _url, long _guild_id, boolean _option) {
-		logger.info("SQLUpdateRSSPictures launched. Params passed {}, {}, {}", _url, _guild_id, _option);
+		logger.trace("SQLUpdateRSSPictures launched. Params passed {}, {}, {}", _url, _guild_id, _option);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2190,7 +2190,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateRSSVideos(String _url, long _guild_id, boolean _option) {
-		logger.info("SQLUpdateRSSVideos launched. Params passed {}, {}, {}", _url, _guild_id, _option);
+		logger.trace("SQLUpdateRSSVideos launched. Params passed {}, {}, {}", _url, _guild_id, _option);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2211,7 +2211,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateRSSText(String _url, long _guild_id, boolean _option) {
-		logger.info("SQLUpdateRSSText launched. Params passed {}, {}, {}", _url, _guild_id, _option);
+		logger.trace("SQLUpdateRSSText launched. Params passed {}, {}, {}", _url, _guild_id, _option);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2232,7 +2232,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertChildTweet(String _urlParent, String _urlChild, long _guild_id) {
-		logger.info("SQLInsertChildTweet launched. Params passed {}, {}, {}", _urlParent, _urlChild, _guild_id);
+		logger.trace("SQLInsertChildTweet launched. Params passed {}, {}, {}", _urlParent, _urlChild, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2253,7 +2253,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteChildTweet(String _urlParent, String _urlChild, long _guild_id) {
-		logger.info("SQLDeleteChildTweet launched. Params passed {}, {}, {}", _urlParent, _urlChild, _guild_id);
+		logger.trace("SQLDeleteChildTweet launched. Params passed {}, {}, {}", _urlParent, _urlChild, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2274,7 +2274,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteRSSFeed(String _url, long _guild_id) {
-		logger.info("SQLDeleteRSSFeed launched. Params passed {}, {}", _url, _guild_id);
+		logger.trace("SQLDeleteRSSFeed launched. Params passed {}, {}", _url, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2294,7 +2294,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateRSSFormat(String _url, long _guild_id, String _format) {
-		logger.info("SQLUpdateRSSFormat launched. Params passed {}, {}, {}", _url, _guild_id, _format);
+		logger.trace("SQLUpdateRSSFormat launched. Params passed {}, {}, {}", _url, _guild_id, _format);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2316,7 +2316,7 @@ public class Azrael {
 	
 	public static synchronized ArrayList<String> SQLgetURLBlacklist(long _guild_id) {
 		if(Hashes.getURLBlacklist(_guild_id) == null) {
-			logger.info("SQLgetURLBlacklist launched. Passed params {}", _guild_id);
+			logger.trace("SQLgetURLBlacklist launched. Passed params {}", _guild_id);
 			ArrayList<String> urls = new ArrayList<String>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -2344,7 +2344,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertURLBlacklist(String _url, long _guild_id) {
-		logger.info("SQLInsertURLBlacklist launched. Passed params {}, {}", _url, _guild_id);
+		logger.trace("SQLInsertURLBlacklist launched. Passed params {}, {}", _url, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2356,7 +2356,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertURLBlacklist Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -2364,7 +2364,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteURLBlacklist(String _url, long _guild_id) {
-		logger.info("SQLDeleteURLBlacklist launched. Passed params {}, {}", _url, _guild_id);
+		logger.trace("SQLDeleteURLBlacklist launched. Passed params {}, {}", _url, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2376,7 +2376,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteURLBlacklist Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -2385,7 +2385,7 @@ public class Azrael {
 	
 	public static synchronized ArrayList<String> SQLgetURLWhitelist(long _guild_id) {
 		if(Hashes.getURLWhitelist(_guild_id) == null) {
-			logger.info("SQLgetURLWhitelist launched. Passed params {}", _guild_id);
+			logger.trace("SQLgetURLWhitelist launched. Passed params {}", _guild_id);
 			ArrayList<String> urls = new ArrayList<String>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -2413,7 +2413,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertURLWhitelist(String _url, long _guild_id) {
-		logger.info("SQLInsertURLWhitelist launched. Passed params {}, {}", _url, _guild_id);
+		logger.trace("SQLInsertURLWhitelist launched. Passed params {}, {}", _url, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2425,7 +2425,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertURLWhitelist Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -2433,7 +2433,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteURLWhitelist(String _url, long _guild_id) {
-		logger.info("SQLDeleteURLWhitelist launched. Passed params {}, {}", _url, _guild_id);
+		logger.trace("SQLDeleteURLWhitelist launched. Passed params {}, {}", _url, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2445,7 +2445,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteURLWhitelist Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -2454,7 +2454,7 @@ public class Azrael {
 	
 	public static synchronized ArrayList<String> SQLgetTweetBlacklist(long _guild_id) {
 		if(Hashes.getTweetBlacklist(_guild_id) == null) {
-			logger.info("SQLgetTweetBlacklist launched. Passed params {}", _guild_id);
+			logger.trace("SQLgetTweetBlacklist launched. Passed params {}", _guild_id);
 			ArrayList<String> urls = new ArrayList<String>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -2482,7 +2482,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertTweetBlacklist(String _username, long _guild_id) {
-		logger.info("SQLInsertTweetBlacklist launched. Passed params {}, {}", _username, _guild_id);
+		logger.trace("SQLInsertTweetBlacklist launched. Passed params {}, {}", _username, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2494,7 +2494,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertTweetBlacklist Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -2502,7 +2502,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteTweetBlacklist(String _username, long _guild_id) {
-		logger.info("SQLDeleteTweetBlacklist launched. Passed params {}, {}", _username, _guild_id);
+		logger.trace("SQLDeleteTweetBlacklist launched. Passed params {}, {}", _username, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2514,7 +2514,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteTweetBlacklist Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -2523,7 +2523,7 @@ public class Azrael {
 	
 	public static synchronized Watchlist SQLgetWatchlist(long _user_id, long _guild_id) {
 		if(Hashes.getWatchlist(_guild_id+"-"+_user_id) == null) {
-			logger.info("SQLgetWatchlist launched. Params passed {}, {}", _user_id, _guild_id);
+			logger.trace("SQLgetWatchlist launched. Params passed {}, {}", _user_id, _guild_id);
 			Watchlist watchlist = null;
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -2553,7 +2553,7 @@ public class Azrael {
 	}
 	
 	public static synchronized void SQLgetWholeWatchlist() {
-		logger.info("SQLgetWholeWatchlist launched. No params have been passed!");
+		logger.trace("SQLgetWholeWatchlist launched. No params have been passed!");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2575,7 +2575,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetWholeWatchlist(long _guild_id, boolean _highPrivileges) {
-		logger.info("SQLgetWholeWatchlist launched. Params passed {}, {}", _guild_id, _highPrivileges);
+		logger.trace("SQLgetWholeWatchlist launched. Params passed {}, {}", _guild_id, _highPrivileges);
 		ArrayList<String> watchlist = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2602,7 +2602,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertWatchlist(long _user_id, long _guild_id, int _level, long _watchChannel, boolean _higherPrivileges) {
-		logger.info("SQLInsertWatchlist launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _level, _watchChannel, _higherPrivileges);
+		logger.trace("SQLInsertWatchlist launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _level, _watchChannel, _higherPrivileges);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2625,7 +2625,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteWatchlist(long _user_id, long _guild_id) {
-		logger.info("SQLDeleteWatchlist launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLDeleteWatchlist launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2645,7 +2645,7 @@ public class Azrael {
 	}
 	
 	public static List<GoogleAPISetup> SQLgetGoogleAPISetupOnGuildAndAPI(long _guild_id, int _api_id) {
-		logger.info("SQLgetGoogleAPISetupOnGuild launched. Params passed {}, {}", _guild_id, _api_id);
+		logger.trace("SQLgetGoogleAPISetupOnGuild launched. Params passed {}, {}", _guild_id, _api_id);
 		ArrayList<GoogleAPISetup> setup = new ArrayList<GoogleAPISetup>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2672,7 +2672,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertGoogleAPISetup(String _file_id, long _guild_id, String _title, int _api_id) {
-		logger.info("SQLInsertGoogleAPISetup launched. Passed params {}, {}, {}, {}", _file_id, _guild_id, _title, _api_id);
+		logger.trace("SQLInsertGoogleAPISetup launched. Passed params {}, {}, {}, {}", _file_id, _guild_id, _title, _api_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2694,7 +2694,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteGoogleAPISetup(String _file_id, long _guild_id) {
-		logger.info("SQLDeleteGoogleAPISetup launched. Passed params {}, {}, {}, {}", _file_id, _guild_id);
+		logger.trace("SQLDeleteGoogleAPISetup launched. Passed params {}, {}, {}, {}", _file_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2714,7 +2714,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<Integer> SQLgetGoogleLinkedEvents(String _file_id, long _guild_id) {
-		logger.info("SQLgetGoogleLinkedEvents launched. Params passed {}, {}", _file_id, _guild_id);
+		logger.trace("SQLgetGoogleLinkedEvents launched. Params passed {}, {}", _file_id, _guild_id);
 		ArrayList<Integer> events = new ArrayList<Integer>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2741,7 +2741,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<GoogleEvents> SQLgetGoogleEventsSupportSpreadsheet() {
-		logger.info("SQLgetGoogleEventsSupportSpreadsheet launched. No params passed");
+		logger.trace("SQLgetGoogleEventsSupportSpreadsheet launched. No params passed");
 		ArrayList<GoogleEvents> events = new ArrayList<GoogleEvents>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2766,7 +2766,7 @@ public class Azrael {
 	}
 	
 	public static boolean SQLBatchInsertGoogleFileToEventLink(String _file_id, long _guild_id, List<Integer> _events) {
-		logger.info("SQLBatchInsertGoogleFileToEventLink launched. Passed params {}, {}, array", _file_id, _guild_id);
+		logger.trace("SQLBatchInsertGoogleFileToEventLink launched. Passed params {}, {}, array", _file_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2791,7 +2791,7 @@ public class Azrael {
 	}
 	
 	public static boolean SQLBatchDeleteGoogleSpreadsheetSheet(String _file_id, long _guild_id, List<Integer> _events) {
-		logger.info("SQLBatchDeleteGoogleSpreadsheetSheet launched. Passed params {}, {}, array", _file_id, _guild_id);
+		logger.trace("SQLBatchDeleteGoogleSpreadsheetSheet launched. Passed params {}, {}, array", _file_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2816,7 +2816,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertGoogleSpreadsheetSheet(String _file_id, int _event_id, String _row_start, long _guild_id) {
-		logger.info("SQLInsertGoogleSpreadsheetSheet launched. Passed params {}, {}, {}, {}", _file_id, _event_id, _row_start, _guild_id);
+		logger.trace("SQLInsertGoogleSpreadsheetSheet launched. Passed params {}, {}, {}, {}", _file_id, _event_id, _row_start, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2838,7 +2838,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<GoogleSheet> SQLgetGoogleSpreadsheetSheets(String _file_id, long _guild_id) {
-		logger.info("SQLgetGoogleSpreadsheetSheets launched. Params passed {}, {}", _file_id, _guild_id);
+		logger.trace("SQLgetGoogleSpreadsheetSheets launched. Params passed {}, {}", _file_id, _guild_id);
 		ArrayList<GoogleSheet> sheets = new ArrayList<GoogleSheet>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2865,7 +2865,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteGoogleSpreadsheetSheet(String _file_id, long _guild_id) {
-		logger.info("SQLDeleteGoogleSpreadsheetSheet launched. Passed params {}, {}", _file_id, _guild_id);
+		logger.trace("SQLDeleteGoogleSpreadsheetSheet launched. Passed params {}, {}", _file_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2885,7 +2885,7 @@ public class Azrael {
 	}
 	
 	public static boolean SQLBatchDeleteGoogleSpreadsheetMapping(String _file_id, long _guild_id, List<Integer> _events) {
-		logger.info("SQLBatchDeleteGoogleSpreadsheetMapping launched. Passed params {}, {} array", _file_id, _guild_id);
+		logger.trace("SQLBatchDeleteGoogleSpreadsheetMapping launched. Passed params {}, {} array", _file_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2910,7 +2910,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteGoogleSpreadsheetMapping(String _file_id, long _guild_id) {
-		logger.info("SQLDeleteGoogleSpreadsheetMapping launched. Passed params {}, {}", _file_id, _guild_id);
+		logger.trace("SQLDeleteGoogleSpreadsheetMapping launched. Passed params {}, {}", _file_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2930,7 +2930,7 @@ public class Azrael {
 	}
 	
 	public static boolean SQLBatchDeleteGoogleFileToEvent(String _file_id, long _guild_id, List<Integer> _events) {
-		logger.info("SQLBatchDeleteGoogleFileToEvent launched. Passed params {}, {}, array", _file_id);
+		logger.trace("SQLBatchDeleteGoogleFileToEvent launched. Passed params {}, {}, array", _file_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2955,7 +2955,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteGoogleFileToEvent(String _file_id, long _guild_id) {
-		logger.info("SQLDeleteGoogleFileToEvent launched. Passed params {}, {}", _file_id, _guild_id);
+		logger.trace("SQLDeleteGoogleFileToEvent launched. Passed params {}, {}", _file_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2974,7 +2974,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetGoogleEventsToDD(int _api_id, int _event_id) {
-		logger.info("SQLgetGoogleEventsToDD launched. Params passed {}, {}", _api_id, _event_id);
+		logger.trace("SQLgetGoogleEventsToDD launched. Params passed {}, {}", _api_id, _event_id);
 		ArrayList<String> items = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -3001,7 +3001,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteGoogleSpreadsheetMapping(String _file_id, int _event_id, long _guild_id) {
-		logger.info("SQLDeleteGoogleSpreadsheetMapping launched. Passed params {}, {}, {}", _file_id, _event_id, _guild_id);
+		logger.trace("SQLDeleteGoogleSpreadsheetMapping launched. Passed params {}, {}, {}", _file_id, _event_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3022,7 +3022,7 @@ public class Azrael {
 	}
 	
 	public static int [] SQLBatchInsertGoogleSpreadsheetMapping(String _file_id, int _event_id, long _guild_id, List<Integer> _dd_items, List<String> _dd_formats) {
-		logger.info("SQLBatchInsertGoogleSpreadsheetMapping launched. Passed params {}, {}, {}, array1, array2, array3", _file_id, _event_id, _guild_id);
+		logger.trace("SQLBatchInsertGoogleSpreadsheetMapping launched. Passed params {}, {}, {}, array1, array2, array3", _file_id, _event_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3050,7 +3050,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<GoogleSheetColumn> SQLgetGoogleSpreadsheetMapping(String _file_id, int _event_id, long _guild_id) {
-		logger.info("SQLgetGoogleSpreadsheetMapping launched. Params passed {}, {}, {}", _file_id, _event_id, _guild_id);
+		logger.trace("SQLgetGoogleSpreadsheetMapping launched. Params passed {}, {}, {}", _file_id, _event_id, _guild_id);
 		ArrayList<GoogleSheetColumn> items = new ArrayList<GoogleSheetColumn>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -3078,7 +3078,7 @@ public class Azrael {
 	}
 	
 	public static String [] SQLgetGoogleFilesAndEvent(long _guild_id, int _api_id, int _event_id) {
-		logger.info("SQLgetGoogleFilesAndEvent launched. Params passed {}, {}, {}", _guild_id, _api_id, _event_id);
+		logger.trace("SQLgetGoogleFilesAndEvent launched. Params passed {}, {}, {}", _guild_id, _api_id, _event_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -3109,7 +3109,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertReminder(long _user_id, long _guild_id, String _type, String _reason, String _reporter, String _time) {
-		logger.info("SQLInsertReminder launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _type, _reason, _reporter, _time);
+		logger.trace("SQLInsertReminder launched. Passed params {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _type, _reason, _reporter, _time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3133,7 +3133,7 @@ public class Azrael {
 	}
 	
 	public static RejoinTask SQLgetRejoinTask(long _user_id, long _guild_id) {
-		logger.info("SQLgetRejoinTask launched. Params passed {}, {}", _user_id, _guild_id);
+		logger.trace("SQLgetRejoinTask launched. Params passed {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -3159,7 +3159,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteRejoinTask(long _user_id, long _guild_id) {
-		logger.info("SQLDeleteRejoinTask launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLDeleteRejoinTask launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3179,7 +3179,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetLanguages(String _lang) {
-		logger.info("SQLgetLanguages launched. Params passed {}", _lang);
+		logger.trace("SQLgetLanguages launched. Params passed {}", _lang);
 		ArrayList<String> langs = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -3205,7 +3205,7 @@ public class Azrael {
 	}
 	
 	public static int SQLInsertTweetLog(long _message_id, long _tweet_id) {
-		logger.info("SQLInsertTweetLog launched. Passed params {}, {}", _message_id, _tweet_id);
+		logger.trace("SQLInsertTweetLog launched. Passed params {}, {}", _message_id, _tweet_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3225,7 +3225,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateTweetLogDeleted(long _message_id) {
-		logger.info("SQLUpdateTweetLogDeleted launched. Passed params {}", _message_id);
+		logger.trace("SQLUpdateTweetLogDeleted launched. Passed params {}", _message_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3244,7 +3244,7 @@ public class Azrael {
 	}
 	
 	public static boolean SQLIsTweetDeleted(long _tweet_id) {
-		logger.info("SQLIsTweetDeleted launched. Params passed {}", _tweet_id);
+		logger.trace("SQLIsTweetDeleted launched. Params passed {}", _tweet_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -3269,7 +3269,7 @@ public class Azrael {
 	}
 	
 	public static int SQLUpdateTweetTimestamp(long _tweet_id) {
-		logger.info("SQLUpdateTweetLogDeleted launched. Passed params {}", _tweet_id);
+		logger.trace("SQLUpdateTweetLogDeleted launched. Passed params {}", _tweet_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3288,7 +3288,7 @@ public class Azrael {
 	}
 	
 	public static int SQLDeleteTweetLog() {
-		logger.info("SQLDeleteTweetLog launched. No params passed");
+		logger.trace("SQLDeleteTweetLog launched. No params passed");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3308,7 +3308,7 @@ public class Azrael {
 	//Transactions
 	@SuppressWarnings("resource")
 	public static int SQLLowerTotalWarning(long _guild_id, int _warning_id) {
-		logger.info("SQLLowerTotalWarning launched. Passed params {}, {}", _guild_id, _warning_id);
+		logger.trace("SQLLowerTotalWarning launched. Passed params {}, {}", _guild_id, _warning_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3343,7 +3343,7 @@ public class Azrael {
 	
 	@SuppressWarnings("resource")
 	public static int SQLReplaceWordFilter(String _lang, String [] _words, long _guild_id, boolean delete) {
-		logger.info("SQLReplaceWordFilter launched. Passed params {}, array, {}, {}", _lang, _guild_id, delete);
+		logger.trace("SQLReplaceWordFilter launched. Passed params {}, array, {}, {}", _lang, _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3386,7 +3386,7 @@ public class Azrael {
 	
 	@SuppressWarnings("resource")
 	public static int SQLReplaceNameFilter(String [] _words, boolean _kick, long _guild_id, boolean delete) {
-		logger.info("SQLReplaceNameFilter launched. Passed params array, {}, {}, {}", _kick, _guild_id, delete);
+		logger.trace("SQLReplaceNameFilter launched. Passed params array, {}, {}, {}", _kick, _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3429,7 +3429,7 @@ public class Azrael {
 	
 	@SuppressWarnings("resource")
 	public static int SQLReplaceFunnyNames(String [] _words, long _guild_id, boolean delete) {
-		logger.info("SQLReplaceFunnyNames launched. Passed params array, {}, {}", _guild_id, delete);
+		logger.trace("SQLReplaceFunnyNames launched. Passed params array, {}, {}", _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3469,7 +3469,7 @@ public class Azrael {
 	
 	@SuppressWarnings("resource")
 	public static int SQLReplaceURLBlacklist(String [] _urls, long _guild_id, boolean delete) {
-		logger.info("SQLReplaceURLBlacklist launched. Passed params array, {}, {}", _guild_id, delete);
+		logger.trace("SQLReplaceURLBlacklist launched. Passed params array, {}, {}", _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3509,7 +3509,7 @@ public class Azrael {
 	
 	@SuppressWarnings("resource")
 	public static int SQLReplaceURLWhitelist(String [] _urls, long _guild_id, boolean delete) {
-		logger.info("SQLReplaceURLWhitelist launched. Passed params array, {}, {}", _guild_id, delete);
+		logger.trace("SQLReplaceURLWhitelist launched. Passed params array, {}, {}", _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3549,7 +3549,7 @@ public class Azrael {
 	
 	@SuppressWarnings("resource")
 	public static int SQLReplaceTweetBlacklist(String [] _usernames, long _guild_id, boolean delete) {
-		logger.info("SQLReplaceTweetBlacklist launched. Passed params array, {}, {}", _guild_id, delete);
+		logger.trace("SQLReplaceTweetBlacklist launched. Passed params array, {}, {}", _guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {

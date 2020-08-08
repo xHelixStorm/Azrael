@@ -102,7 +102,7 @@ public class HeavyCensoring implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("The HeavyCensoring command has been used from {}", e.getMember().getUser().getId());
+		logger.trace("The HeavyCensoring command has been used from {}", e.getMember().getUser().getId());
 	}
 
 }

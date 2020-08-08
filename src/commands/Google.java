@@ -78,7 +78,7 @@ public class Google implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used Google command in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
+		logger.trace("{} has used Google command in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
 	}
 
 }

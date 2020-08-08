@@ -385,7 +385,10 @@
 	"filter_rollback_err":			"A critical error occurred! The content for the selected list has been altered but changes couldn't be reverted on error!",
 	"filter_no_url":				"Please submit a Pastebin URL!",
 	"filter_no_nick":				"Please submit a Pastebin URL with usernames which start with *@*!",
-	"filter_invalid_char":			"An invalid character has been used! Please remove it and then try again!",
+	"filter_name_remove_err":		"The word or name doesn't exist!",
+	"filter_url_remove_err":		"The url doesn't exist!",
+	"filter_tweet_remove_err":		"The Twitter user doesn't exist!",
+	"filter_word_remove_err":		"The word doesn't exist!",
 	
 	"google_help":				 	"Combine available Bot events with Google APIs and create an interface for data exportation, every time that specific event has fired! In some cases, write and edit permissions are required for the email *{}*. For example when private documents have to be edited!\nThese APIs are currently available as parameters:\n\n- **docs**:\nInterface with google docs.\n- **spreadsheets**:\nInterface with google spreadsheets.\n- **drive**:\nInterface with google drive.",
 	"google_api_not_available":	 	"API doesn't exist, is not available or was written wrong! Please try again!",

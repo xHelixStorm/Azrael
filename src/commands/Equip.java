@@ -115,7 +115,7 @@ public class Equip implements CommandPublic, CommandPrivate {
 
 	@Override
 	public void executed(boolean success, PrivateMessageReceivedEvent e) {
-		logger.debug("{} has used Equip command in private message", e.getAuthor().getId());
+		logger.trace("{} has used Equip command in private message", e.getAuthor().getId());
 	}
 
 }

@@ -80,7 +80,7 @@ public class Subscribe implements CommandPublic {
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
-			for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
+			for(RSS feed : Azrael.SQLgetSubscriptions(e.getGuild().getIdLong())) {
 				out.append((counter++)+": **"+feed.getURL()+"**\n");
 			}
 			message.setColor(Color.BLUE);
@@ -91,7 +91,7 @@ public class Subscribe implements CommandPublic {
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))) {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
-			for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
+			for(RSS feed : Azrael.SQLgetSubscriptions(e.getGuild().getIdLong())) {
 				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}
@@ -103,7 +103,7 @@ public class Subscribe implements CommandPublic {
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_OPTIONS))) {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
-			for(RSS feed: Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong(), 2)) {
+			for(RSS feed: Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 2)) {
 				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}
@@ -121,7 +121,7 @@ public class Subscribe implements CommandPublic {
 			//test a feed
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
-			for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
+			for(RSS feed : Azrael.SQLgetSubscriptions(e.getGuild().getIdLong())) {
 				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}
@@ -134,7 +134,7 @@ public class Subscribe implements CommandPublic {
 			//display the registered feeds
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
-			for(RSS feed : Azrael.SQLgetRSSFeeds(e.getGuild().getIdLong())) {
+			for(RSS feed : Azrael.SQLgetSubscriptions(e.getGuild().getIdLong())) {
 				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}
@@ -148,6 +148,6 @@ public class Subscribe implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("The user {} has used the Rss command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+		logger.trace("The user {} has used the Rss command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 }

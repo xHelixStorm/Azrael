@@ -20,9 +20,9 @@ import core.Hashes;
 import enums.Translation;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
-import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 import twitter4j.MediaEntity;
@@ -38,7 +38,7 @@ import util.STATIC;
 public class TwitterModel {
 	private static final Logger logger = LoggerFactory.getLogger(TwitterModel.class);
 	
-	public static void ModelParse(ReadyEvent e, RSS rss, long guild_id, Channels rss_channel) throws TwitterException {
+	public static void ModelParse(Guild guild, RSS rss, Channels rss_channel) throws TwitterException {
 		STATIC.loginTwitter();
 		TwitterFactory tf = STATIC.getTwitterFactory();
 		if(tf != null) {
@@ -76,13 +76,13 @@ public class TwitterModel {
 		        			if(!tweetFound)
 		        				tweetProhibited = true;
 		        		}
-		        		if(Azrael.SQLgetTweetBlacklist(guild_id).parallelStream().filter(f -> username.equals(f)).findAny().orElse(null) != null)
+		        		if(Azrael.SQLgetTweetBlacklist(guild.getIdLong()).parallelStream().filter(f -> username.equals(f)).findAny().orElse(null) != null)
 		        			tweetProhibited = true;
 		        		
 		        		if(!tweetProhibited) {
 		        			final String compareMessage = message.toLowerCase();
 		        			find: for(var filter : Azrael.SQLgetChannel_Filter(rss_channel.getChannel_ID())) {
-		        				Optional<String> option = Azrael.SQLgetFilter(filter, guild_id).parallelStream()
+		        				Optional<String> option = Azrael.SQLgetFilter(filter, guild.getIdLong()).parallelStream()
 										.filter(word -> compareMessage.equals(word) || compareMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || compareMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || compareMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || compareMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || compareMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || compareMessage.contains(" "+word+" "))
 										.findAny();
 								if(option.isPresent()) {
@@ -192,17 +192,17 @@ public class TwitterModel {
 								out = out.replace("{fullName}", fullName);
 								out = out.replace("{username}", username);
 			                	final String outMessage = EmojiParser.parseToUnicode(out);
-			                	MessageHistory history = new MessageHistory(e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()));
+			                	MessageHistory history = new MessageHistory(guild.getTextChannelById(rss_channel.getChannel_ID()));
 								history.retrievePast(100).queue(historyList -> {
 									Message historyMessage = historyList.parallelStream().filter(f -> f.getContentRaw().replaceAll("[^a-zA-Z]", "").contains(outMessage.replaceAll("[^a-zA-Z]", ""))).findAny().orElse(null);
 									if(historyMessage == null)
-										e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue(m -> {
+										guild.getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue(m -> {
 											Azrael.SQLInsertTweetLog(m.getIdLong(), tweet.getId());
-											if(GuildIni.getCacheLog(guild_id)) {
+											if(GuildIni.getCacheLog(guild.getIdLong())) {
 												Messages collectedMessage = new Messages();
 												collectedMessage.setUserID(0);
 												collectedMessage.setUsername(fullName + " ("+username+")");
-												collectedMessage.setGuildID(guild_id);
+												collectedMessage.setGuildID(guild.getIdLong());
 												collectedMessage.setChannelID(rss_channel.getChannel_ID());
 												collectedMessage.setChannelName(rss_channel.getChannel_Name());
 												collectedMessage.setMessage(outMessage);

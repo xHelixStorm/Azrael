@@ -39,7 +39,7 @@ public class Competitive {
 	
 	//comp_servers
 	public static int SQLInsertCompServer(long _guild_id, String _server) {
-		logger.info("SQLInsertCompServer launched. Passed params {}, {}", _guild_id, _server);
+		logger.trace("SQLInsertCompServer launched. Passed params {}, {}", _guild_id, _server);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -59,7 +59,7 @@ public class Competitive {
 	}
 	
 	public static int SQLRemoveCompServer(long _guild_id, String _server) {
-		logger.info("SQLRemoveCompServer launched. Passed params {}, {}", _guild_id, _server);
+		logger.trace("SQLRemoveCompServer launched. Passed params {}, {}", _guild_id, _server);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -79,7 +79,7 @@ public class Competitive {
 	}
 	
 	public static ArrayList<String> SQLgetCompServers(long _guild_id) {
-		logger.info("SQLgetCompServers launched. Passed params {}, {}", _guild_id);
+		logger.trace("SQLgetCompServers launched. Passed params {}, {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -106,7 +106,7 @@ public class Competitive {
 	
 	//user_stats
 	public static int SQLUserStatExists(long _guild_id, long _user_id) {
-		logger.info("SQLUserStatExists launched. Passed params {}, {}", _guild_id, _user_id);
+		logger.trace("SQLUserStatExists launched. Passed params {}, {}", _guild_id, _user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -132,7 +132,7 @@ public class Competitive {
 	}
 	
 	public static String SQLgetServerFromUserStat(long _guild_id, long _user_id) {
-		logger.info("SQLUserStatExists launched. Passed params {}, {}", _guild_id, _user_id);
+		logger.trace("SQLUserStatExists launched. Passed params {}, {}", _guild_id, _user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -158,7 +158,7 @@ public class Competitive {
 	}
 	
 	public static UserStats SQLgetUserStats(long _guild_id, long _user_id) {
-		logger.info("SQLUserStatExists launched. Passed params {}, {}", _guild_id, _user_id);
+		logger.trace("SQLUserStatExists launched. Passed params {}, {}", _guild_id, _user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -193,7 +193,7 @@ public class Competitive {
 	}
 	
 	public static ArrayList<String> SQLgetRanking(long _guild_id) {
-		logger.info("SQLgetRanking launched. Passed params {}", _guild_id);
+		logger.trace("SQLgetRanking launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -219,7 +219,7 @@ public class Competitive {
 	}
 	
 	public static ArrayList<String> SQLgetRankingTop10(long _guild_id) {
-		logger.info("SQLgetRankingTop10 launched. Passed params {}", _guild_id);
+		logger.trace("SQLgetRankingTop10 launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -245,7 +245,7 @@ public class Competitive {
 	}
 	
 	public static int SQLisNameTaken(long _guild_id, String _name) {
-		logger.info("SQLisNameTaken launched. Passed params {}, {}, {}", _guild_id, _name);
+		logger.trace("SQLisNameTaken launched. Passed params {}, {}, {}", _guild_id, _name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -271,7 +271,7 @@ public class Competitive {
 	}
 	
 	public static int SQLInsertUserStat(long _guild_id, long _user_id, String _name) {
-		logger.info("SQLInsertUserStat launched. Passed params {}, {}, {}", _guild_id, _user_id, _name);
+		logger.trace("SQLInsertUserStat launched. Passed params {}, {}, {}", _guild_id, _user_id, _name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -292,7 +292,7 @@ public class Competitive {
 	}
 	
 	public static void SQLUpdateServerFromUserStats(long _guild_id, String _server) {
-		logger.info("SQLUpdateServerFromUserStats launched. Passed params {}, {}", _guild_id, _server);
+		logger.trace("SQLUpdateServerFromUserStats launched. Passed params {}, {}", _guild_id, _server);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -311,7 +311,7 @@ public class Competitive {
 	}
 	
 	public static int SQLUpdateSelectedServerInUserStats(long _guild_id, long _user_id, String _server) {
-		logger.info("SQLUpdateSelectedServerInUserStats launched. Passed params {}, {}, {}", _guild_id, _user_id, _server);
+		logger.trace("SQLUpdateSelectedServerInUserStats launched. Passed params {}, {}, {}", _guild_id, _user_id, _server);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -332,7 +332,7 @@ public class Competitive {
 	}
 	
 	public static int SQLUpdateNameInUserStats(long _guild_id, long _user_id, String _newName) {
-		logger.info("SQLUpdateNameInUserStats launched. Passed params {}, {}, {}", _guild_id, _user_id, _newName);
+		logger.trace("SQLUpdateNameInUserStats launched. Passed params {}, {}, {}", _guild_id, _user_id, _newName);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -353,7 +353,7 @@ public class Competitive {
 	}
 	
 	public static String SQLgetUsernameFromUserStats(long _guild_id, long _user_id) {
-		logger.info("SQLgetUsernameFromUserStats launched. Passed params {}, {}", _guild_id, _user_id);
+		logger.trace("SQLgetUsernameFromUserStats launched. Passed params {}, {}", _guild_id, _user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -380,7 +380,7 @@ public class Competitive {
 	
 	//guild
 	public static int SQLgetMaxClanMembers(long _guild_id) {
-		logger.info("SQLgetMaxClanMembers launched. Passed params {}", _guild_id);
+		logger.trace("SQLgetMaxClanMembers launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -405,7 +405,7 @@ public class Competitive {
 	}
 	
 	public static int SQLUpdateMaxClanMembers(long _guild_id, int _members) {
-		logger.info("SQLUpdateMaxClanMembers launched. Passed params {}, {}", _guild_id, _members);
+		logger.trace("SQLUpdateMaxClanMembers launched. Passed params {}, {}", _guild_id, _members);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -425,7 +425,7 @@ public class Competitive {
 	}
 	
 	public static int SQLgetMatchmakingMembers(long _guild_id) {
-		logger.info("SQLgetMatchmakingMembers launched. Passed params {}", _guild_id);
+		logger.trace("SQLgetMatchmakingMembers launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -450,7 +450,7 @@ public class Competitive {
 	}
 	
 	public static int SQLUpdateMatchmakingMembers(long _guild_id, int _members) {
-		logger.info("SQLUpdateMatchmakingMembers launched. Passed params {}, {}", _guild_id, _members);
+		logger.trace("SQLUpdateMatchmakingMembers launched. Passed params {}, {}", _guild_id, _members);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -471,7 +471,7 @@ public class Competitive {
 	
 	//clan_members
 	public static int SQLgetClanMemberLevel(long _user_id, long _guild_id) {
-		logger.info("SQLgetClanMemberLevel launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLgetClanMemberLevel launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -497,7 +497,7 @@ public class Competitive {
 	}
 	
 	public static int SQLUpdateClanMemberLevel(long _guild_id, long _user_id, int _clan_id, int _level) {
-		logger.info("SQLUpdateClanMemberLevel launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _level);
+		logger.trace("SQLUpdateClanMemberLevel launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _level);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -519,7 +519,7 @@ public class Competitive {
 	}
 	
 	public static ArrayList<Long> SQLgetClanManagement(long _guild_id, int _clan_id) {
-		logger.info("SQLgetClanManagement launched. Passed params {}, {}", _guild_id, _clan_id);
+		logger.trace("SQLgetClanManagement launched. Passed params {}, {}", _guild_id, _clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -547,7 +547,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLInsertClanMember(long _guild_id, long _user_id, int _clan_id) {
-		logger.info("SQLInsertClanMember launched. Passed params {}, {}", _guild_id, _user_id, _clan_id);
+		logger.trace("SQLInsertClanMember launched. Passed params {}, {}", _guild_id, _user_id, _clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -593,7 +593,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLRemoveClanMember(long _guild_id, long _user_id, int _clan_id) {
-		logger.info("SQLRemoveClanMember launched. Passed params {}, {}, {}", _guild_id, _user_id, _clan_id);
+		logger.trace("SQLRemoveClanMember launched. Passed params {}, {}, {}", _guild_id, _user_id, _clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -638,7 +638,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLDelegateOwnership(long _guild_id, long _user_id_target, long _user_id_self, int _clan_id) {
-		logger.info("SQLDelegateOwnership launched. Passed params {}, {}, {}, {}", _guild_id, _user_id_target, _user_id_self, _clan_id);
+		logger.trace("SQLDelegateOwnership launched. Passed params {}, {}, {}, {}", _guild_id, _user_id_target, _user_id_self, _clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -676,7 +676,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLDisbandClan(long _guild_id, long _user_id, int _clan_id) {
-		logger.info("SQLDisbandClan launched. Passed params {}, {}, {}", _guild_id, _user_id, _clan_id);
+		logger.trace("SQLDisbandClan launched. Passed params {}, {}, {}", _guild_id, _user_id, _clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -722,7 +722,7 @@ public class Competitive {
 	//clans
 	@SuppressWarnings("resource")
 	public static int SQLCreateClan(long _guild_id, long _user_id, String _name) {
-		logger.info("SQLCreateClan launched. Passed params {}, {}, {}", _guild_id, _user_id, _name);
+		logger.trace("SQLCreateClan launched. Passed params {}, {}, {}", _guild_id, _user_id, _name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -777,7 +777,7 @@ public class Competitive {
 	}
 	
 	public static ArrayList<Clan> SQLgetClans(long _guild_id) {
-		logger.info("SQLgetClans launched. Passed params {}", _guild_id);
+		logger.trace("SQLgetClans launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -812,7 +812,7 @@ public class Competitive {
 	}
 	
 	public static int SQLgetClanID(long _guild_id, String _name) {
-		logger.info("SQLgetClanID launched. Passed params {}, {}", _guild_id, _name);
+		logger.trace("SQLgetClanID launched. Passed params {}, {}", _guild_id, _name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -838,7 +838,7 @@ public class Competitive {
 	}
 	
 	public static int SQLgetClanMemberNumber(long _guild_id, int _clan_id) {
-		logger.info("SQLgetClanMemberNumber launched. Passed params {}, {}", _guild_id, _clan_id);
+		logger.trace("SQLgetClanMemberNumber launched. Passed params {}, {}", _guild_id, _clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -864,7 +864,7 @@ public class Competitive {
 	}
 	
 	public static String SQLgetClanName(long _guild_id, int _clan_id) {
-		logger.info("SQLgetClanName launched. Passed params {}, {}", _guild_id, _clan_id);
+		logger.trace("SQLgetClanName launched. Passed params {}, {}", _guild_id, _clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -890,7 +890,7 @@ public class Competitive {
 	}
 	
 	public static int SQLUpdateClanMark(long _guild_id, int _clan_id, String _url) {
-		logger.info("SQLUpdateClanMark launched. Passed params {}, {}, {}", _guild_id, _clan_id, _url);
+		logger.trace("SQLUpdateClanMark launched. Passed params {}, {}, {}", _guild_id, _clan_id, _url);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -912,7 +912,7 @@ public class Competitive {
 	
 	//clan_reservations
 	public static int SQLInsertClanReservation(long _guild_id, long _user_id, int _clan_id, int _type, long _channel_id) {
-		logger.info("SQLInsertClanReservation launched. Passed params {}, {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _type, _channel_id);
+		logger.trace("SQLInsertClanReservation launched. Passed params {}, {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _type, _channel_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -935,7 +935,7 @@ public class Competitive {
 	}
 	
 	public static int SQLgetClanReservationType(long _guild_id, long _user_id, int _clan_id, boolean _done) {
-		logger.info("SQLgetClanReservationType launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _done);
+		logger.trace("SQLgetClanReservationType launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _done);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -963,7 +963,7 @@ public class Competitive {
 	}
 	
 	public static int SQLgetClanReservationAction(long _guild_id, long _user_id, int _clan_id, boolean _done) {
-		logger.info("SQLgetClanReservationType launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _done);
+		logger.trace("SQLgetClanReservationType launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _done);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -991,7 +991,7 @@ public class Competitive {
 	}
 	
 	public static ClanReservation SQLgetClanReservation(long _guild_id, int _clan_id, int _type, boolean _done) {
-		logger.info("SQLgetClanReservation launched. Passed params {}, {}, {}, {}", _guild_id, _clan_id, _type, _done);
+		logger.trace("SQLgetClanReservation launched. Passed params {}, {}, {}, {}", _guild_id, _clan_id, _type, _done);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1028,7 +1028,7 @@ public class Competitive {
 	}
 	
 	public static ClanReservation SQLgetClanReservation(long _guild_id, long _user_id, int _clan_id) {
-		logger.info("SQLgetClanReservation launched. Passed params {}, {}, {}, {}, {}", _guild_id, _user_id, _clan_id);
+		logger.trace("SQLgetClanReservation launched. Passed params {}, {}, {}, {}, {}", _guild_id, _user_id, _clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1064,7 +1064,7 @@ public class Competitive {
 	}
 	
 	public static int SQLUpdateClanReservationAction(long _guild_id, long _user_id, int _clan_id, int _type, int _action) {
-		logger.info("SQLInsertClanReservation launched. Passed params {}, {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _type, _action);
+		logger.trace("SQLInsertClanReservation launched. Passed params {}, {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _type, _action);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1088,7 +1088,7 @@ public class Competitive {
 	
 	//matchmaking_rooms
 	public static Room SQLgetMatchmakingRoom(long _guild_id, int _type, int _status) {
-		logger.info("SQLgetMatchmakingRoom launched. Passed params {}, {}, {}", _guild_id, _type, _status);
+		logger.trace("SQLgetMatchmakingRoom launched. Passed params {}, {}, {}", _guild_id, _type, _status);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1128,7 +1128,7 @@ public class Competitive {
 	}
 	
 	public static Room SQLgetMatchmakingRoom(long _guild_id, int _room_id) {
-		logger.info("SQLgetMatchmakingRoom launched. Passed params {}, {}", _guild_id, _room_id);
+		logger.trace("SQLgetMatchmakingRoom launched. Passed params {}, {}", _guild_id, _room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1167,7 +1167,7 @@ public class Competitive {
 	}
 	
 	public static Room SQLgetMatchmakingRoom(long _guild_id, int _clan_id, int _type, int _status) {
-		logger.info("SQLgetMatchmakingRoom launched. Passed params {}, {}, {}, {}", _guild_id, _clan_id, _type, _status);
+		logger.trace("SQLgetMatchmakingRoom launched. Passed params {}, {}, {}, {}", _guild_id, _clan_id, _type, _status);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1209,7 +1209,7 @@ public class Competitive {
 	}
 	
 	public static ArrayList<Room> SQLgetOngoingMatchmakingRooms(long _guild_id) {
-		logger.info("SQLgetOngoingMatchmakingRooms launched. Passed params {}", _guild_id);
+		logger.trace("SQLgetOngoingMatchmakingRooms launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1248,7 +1248,7 @@ public class Competitive {
 	}
 	
 	public static int SQLisClanMatchmakingRoomOngoing(long _guild_id, int _type, int _clan_id) {
-		logger.info("SQLisClanMatchmakingRoomOngoing launched. Passed params {}, {}, {}", _guild_id, _type, _clan_id);
+		logger.trace("SQLisClanMatchmakingRoomOngoing launched. Passed params {}, {}, {}", _guild_id, _type, _clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1277,7 +1277,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLCreateMatchmakingRoom(long _guild_id, long _user_id, int _type, int _map) {
-		logger.info("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _type, _map);
+		logger.trace("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _type, _map);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1334,7 +1334,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLCreateClanMatchmakingRoom(long _guild_id, int _type, int _map, int _clan_id_1, int _clan_id_2) {
-		logger.info("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}, {}", _guild_id, _type, _map, _clan_id_1, _clan_id_2);
+		logger.trace("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}, {}", _guild_id, _type, _map, _clan_id_1, _clan_id_2);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1385,7 +1385,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLDeleteMatchmakingRoom(long _guild_id, int _room_id) {
-		logger.info("SQLDeleteMatchmakingRoom launched. Passed params {}, {}", _guild_id, _room_id);
+		logger.trace("SQLDeleteMatchmakingRoom launched. Passed params {}, {}", _guild_id, _room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1422,7 +1422,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLJoinRoom(long _guild_id, long _user_id, int _room_id) {
-		logger.info("SQLJoinRoom launched. Passed params {}, {}, {}", _guild_id, _user_id, _room_id);
+		logger.trace("SQLJoinRoom launched. Passed params {}, {}, {}", _guild_id, _user_id, _room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1460,7 +1460,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLJoinRoom(long _guild_id, long _user_id, int _room_id, int _team) {
-		logger.info("SQLJoinRoom launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _room_id, _team);
+		logger.trace("SQLJoinRoom launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _room_id, _team);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1499,7 +1499,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLUpdateTeams(long _guild_id, int _room_id, Member [] _team1, Member [] _team2) {
-		logger.info("SQLUpdateTeams launched. Passed params {}, {} and arrays", _guild_id, _room_id);
+		logger.trace("SQLUpdateTeams launched. Passed params {}, {} and arrays", _guild_id, _room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1559,7 +1559,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLUpdateTeams(long _guild_id, int _room_id, long _user_id_1, long _user_id_2) {
-		logger.info("SQLUpdateTeams launched. Passed params {}, {}, {}, {}", _guild_id, _room_id, _user_id_1, _user_id_2);
+		logger.trace("SQLUpdateTeams launched. Passed params {}, {}, {}, {}", _guild_id, _room_id, _user_id_1, _user_id_2);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1605,7 +1605,7 @@ public class Competitive {
 	}
 	
 	public static int SQLUpdateRoomMessageID(long _guild_id, int _room_id, long _channel_id, long _message_id) {
-		logger.info("SQLUpdateRoomMessageID launched. Passed params {}, {}, {}, {}", _guild_id, _room_id, _channel_id, _message_id);
+		logger.trace("SQLUpdateRoomMessageID launched. Passed params {}, {}, {}, {}", _guild_id, _room_id, _channel_id, _message_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1627,7 +1627,7 @@ public class Competitive {
 	}
 	
 	public static int SQLUpdateMatchmakingRoomMap(long _guild_id, int _room_id, int _map_id) {
-		logger.info("SQLUpdateMatchmakingRoomMap launched. Passed params {}, {}, {}", _guild_id, _room_id, _map_id);
+		logger.trace("SQLUpdateMatchmakingRoomMap launched. Passed params {}, {}, {}", _guild_id, _room_id, _map_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1648,7 +1648,7 @@ public class Competitive {
 	}
 	
 	public static int SQLUpdateMatchmakingRoomStatus(long _guild_id, int _room_id, int _status) {
-		logger.info("SQLUpdateMatchmakingRoomStatus launched. Passed params {}, {}, {}", _guild_id, _room_id, _status);
+		logger.trace("SQLUpdateMatchmakingRoomStatus launched. Passed params {}, {}, {}", _guild_id, _room_id, _status);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1670,7 +1670,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLsetWinner(long _guild_id, int _room_id, int _team, boolean _clans) {
-		logger.info("SQLsetWinner launched. Passed params {}, {}, {}, {}", _guild_id, _room_id, _team, _clans);
+		logger.trace("SQLsetWinner launched. Passed params {}, {}, {}, {}", _guild_id, _room_id, _team, _clans);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1782,7 +1782,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLrevertWinner(long _guild_id, int _room_id, int _team, boolean _clans) {
-		logger.info("SQLrevertWinner launched. Passed params {}, {}, {}, {}", _guild_id, _room_id, _team, _clans);
+		logger.trace("SQLrevertWinner launched. Passed params {}, {}, {}, {}", _guild_id, _room_id, _team, _clans);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1881,7 +1881,7 @@ public class Competitive {
 	//matchmaking_members
 	@SuppressWarnings("resource")
 	public static int SQLPickMember(long _guild_id, int _room_id, long _user_id, long _leader_id, int _team) {
-		logger.info("SQLPickMember launched. Passed params {}, {}, {}, {}, {}", _guild_id, _room_id, _user_id, _leader_id, _team);
+		logger.trace("SQLPickMember launched. Passed params {}, {}, {}, {}, {}", _guild_id, _room_id, _user_id, _leader_id, _team);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1931,7 +1931,7 @@ public class Competitive {
 	//comp_maps
 	@SuppressWarnings("resource")
 	public static int SQLInsertMap(long _guild_id, String _mapName, String _url) {
-		logger.info("SQLInsertMap launched. Passed params {}, {}, {}", _guild_id, _mapName, _url);
+		logger.trace("SQLInsertMap launched. Passed params {}, {}, {}", _guild_id, _mapName, _url);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1990,7 +1990,7 @@ public class Competitive {
 	}
 	
 	public static CompMap SQLgetRandomMap(long _guild_id) {
-		logger.info("SQLgetRandomMap launched. Passed params {}, {}", _guild_id);
+		logger.trace("SQLgetRandomMap launched. Passed params {}, {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2019,7 +2019,7 @@ public class Competitive {
 	}
 	
 	public static CompMap SQLgetMap(int _map_id) {
-		logger.info("SQLgetMap launched. Passed params {}", _map_id);
+		logger.trace("SQLgetMap launched. Passed params {}", _map_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2048,7 +2048,7 @@ public class Competitive {
 	}
 	
 	public static CompMap SQLgetMap(long _guild_id, String _map) {
-		logger.info("SQLgetMap launched. Passed params {}", _guild_id, _map);
+		logger.trace("SQLgetMap launched. Passed params {}", _guild_id, _map);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2079,7 +2079,7 @@ public class Competitive {
 	
 	//Joins
 	public static ClanMember SQLgetClanDetails(long _user_id, long _guild_id) {
-		logger.info("SQLgetClanDetails launched. Passed params {}, {}", _user_id, _guild_id);
+		logger.trace("SQLgetClanDetails launched. Passed params {}, {}", _user_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2120,7 +2120,7 @@ public class Competitive {
 	}
 	
 	public static ClanMember SQLgetClanDetailsByName(String _name, long _guild_id) {
-		logger.info("SQLgetClanDetailsByName launched. Passed params {}, {}", _name, _guild_id);
+		logger.trace("SQLgetClanDetailsByName launched. Passed params {}, {}", _name, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2161,7 +2161,7 @@ public class Competitive {
 	}
 	
 	public static ArrayList<ClanMember> SQLgetClanMembers(long _guild_id, int _clan_id) {
-		logger.info("SQLgetClanMembers launched. Passed params {}, {}", _guild_id, _clan_id);
+		logger.trace("SQLgetClanMembers launched. Passed params {}, {}", _guild_id, _clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2203,7 +2203,7 @@ public class Competitive {
 	}
 	
 	public static ArrayList<ClanMember> SQLgetClanMembersStaff(long _guild_id, int _clan_id) {
-		logger.info("SQLgetClanMembersStaff launched. Passed params {}, {}", _guild_id, _clan_id);
+		logger.trace("SQLgetClanMembersStaff launched. Passed params {}, {}", _guild_id, _clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2245,7 +2245,7 @@ public class Competitive {
 	}
 	
 	public static int SQLisUserInRoom(long _guild_id, long _user_id) {
-		logger.info("SQLisUserInRoom launched. Passed params {}, {}", _guild_id, _user_id);
+		logger.trace("SQLisUserInRoom launched. Passed params {}, {}", _guild_id, _user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2272,7 +2272,7 @@ public class Competitive {
 	
 	@SuppressWarnings("resource")
 	public static int SQLLeaveRoom(long _guild_id, long _user_id, int _room_id) {
-		logger.info("SQLLeaveRoom launched. Passed params {}, {}, {}", _guild_id, _user_id, _room_id);
+		logger.trace("SQLLeaveRoom launched. Passed params {}, {}, {}", _guild_id, _user_id, _room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2308,7 +2308,7 @@ public class Competitive {
 	}
 	
 	public static ArrayList<Member> SQLgetMatchmakingMembers(long _guild_id, int _room_id) {
-		logger.info("SQLgetMatchmakingMembers launched. Passed params {}, {}", _guild_id, _room_id);
+		logger.trace("SQLgetMatchmakingMembers launched. Passed params {}, {}", _guild_id, _room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2344,7 +2344,7 @@ public class Competitive {
 	}
 	
 	public static Member SQLRetrievePicker(long _guild_id, int _room_id, int _status) {
-		logger.info("SQLRetrievePicker launched. Passed params {}, {}, {}", _guild_id, _room_id, _status);
+		logger.trace("SQLRetrievePicker launched. Passed params {}, {}, {}", _guild_id, _room_id, _status);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2380,7 +2380,7 @@ public class Competitive {
 	}
 	
 	public static Member SQLRetrieveMember(long _guild_id, int _room_id, int _status, long _user_id) {
-		logger.info("SQLRetrieveMember launched. Passed params {}, {}, {}, {}, {}", _guild_id, _room_id, _status, _user_id);
+		logger.trace("SQLRetrieveMember launched. Passed params {}, {}, {}, {}, {}", _guild_id, _room_id, _status, _user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2417,7 +2417,7 @@ public class Competitive {
 	}
 	
 	public static Member SQLRetrieveMember(long _guild_id, int _room_id, int _status, String _username) {
-		logger.info("SQLRetrieveMember launched. Passed params {}, {}, {}, {}, {}", _guild_id, _room_id, _status, _username);
+		logger.trace("SQLRetrieveMember launched. Passed params {}, {}, {}, {}, {}", _guild_id, _room_id, _status, _username);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;

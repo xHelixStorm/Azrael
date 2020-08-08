@@ -596,7 +596,7 @@ public class FilterExecution {
 				}
 				case "lang-load-word-filter" -> loadLangWords(e, message, key, cache.getAdditionalInfo2(), _message, true);
 				case "insert-name-filter" -> {
-					if(Azrael.SQLInsertNameFilter(_message, false, e.getMember().getIdLong()) > 0) {
+					if(Azrael.SQLInsertNameFilter(_message, false, e.getGuild().getIdLong()) >= 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT)).build()).queue();
 						Hashes.removeNameFilter(e.getGuild().getIdLong());
 						logger.debug("{} has inserted the word {} into the name filter", e.getMember().getUser().getIdLong(), _message);
@@ -609,10 +609,15 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 				}
 				case "remove-name-filter" -> {
-					if(Azrael.SQLDeleteNameFilter(_message, false, e.getGuild().getIdLong()) > 0) {
+					final var result = Azrael.SQLDeleteNameFilter(_message, false, e.getGuild().getIdLong()); 
+					if(result > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE)).build()).queue();
 						Hashes.removeNameFilter(e.getGuild().getIdLong());
 						logger.debug("{} has removed the word {} from the name filter", e.getMember().getUser().getIdLong(), _message);
+					}
+					else if(result == 0) {
+						message.setColor(Color.RED);
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NAME_REMOVE_ERR)).build()).queue();
 					}
 					else {
 						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
@@ -662,7 +667,7 @@ public class FilterExecution {
 					}
 				}
 				case "insert-name-kick" -> {
-					if(Azrael.SQLInsertNameFilter(_message, true, e.getGuild().getIdLong()) > 0) {
+					if(Azrael.SQLInsertNameFilter(_message, true, e.getGuild().getIdLong()) >= 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT)).build()).queue();
 						Hashes.removeNameFilter(e.getGuild().getIdLong());
 						logger.debug("{} has inserted the word {} into name-kick in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
@@ -675,10 +680,15 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 				}
 				case "remove-name-kick" -> {
-					if(Azrael.SQLDeleteNameFilter(_message, true, e.getGuild().getIdLong()) > 0) {
+					final var result = Azrael.SQLDeleteNameFilter(_message, true, e.getGuild().getIdLong()); 
+					if(result > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE)).build()).queue();
 						Hashes.removeNameFilter(e.getGuild().getIdLong());
 						logger.debug("{} has removed the word {} from name-kick in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+					}
+					else if(result == 0) {
+						message.setColor(Color.RED);
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NAME_REMOVE_ERR)).build()).queue();
 					}
 					else {
 						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
@@ -729,7 +739,7 @@ public class FilterExecution {
 					}
 				}
 				case "insert-funny-names" -> {
-					if(Azrael.SQLInsertFunnyNames(_message, e.getGuild().getIdLong()) > 0) {
+					if(Azrael.SQLInsertFunnyNames(_message, e.getGuild().getIdLong()) >= 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT)).build()).queue();
 						Hashes.removeQuerryResult("funny-names_"+e.getGuild().getId());
 						logger.debug("{} has inserted the word {} into the funny names in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
@@ -742,10 +752,15 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 				}
 				case "remove-funny-names" -> {
-					if(Azrael.SQLDeleteFunnyNames(_message, e.getGuild().getIdLong()) > 0) {
+					final var result = Azrael.SQLDeleteFunnyNames(_message, e.getGuild().getIdLong()); 
+					if(result > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE)).build()).queue();
 						Hashes.removeQuerryResult("funny-names_"+e.getGuild().getId());
 						logger.debug("{} has removed the word {} from the funny names in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+					}
+					else if(result == 0) {
+						message.setColor(Color.RED);
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NAME_REMOVE_ERR)).build()).queue();
 					}
 					else {
 						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
@@ -795,7 +810,7 @@ public class FilterExecution {
 					}
 				}
 				case "insert-staff-names" -> {
-					if(Azrael.SQLInsertStaffName(_message, e.getGuild().getIdLong()) > 0) {
+					if(Azrael.SQLInsertStaffName(_message, e.getGuild().getIdLong()) >= 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT)).build()).queue();
 						Hashes.removeQuerryResult("staff-names_"+e.getGuild().getId());
 						logger.debug("{} has inserted the word {} into the staff names in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
@@ -808,11 +823,16 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 				}
 				case "remove-staff-names" -> {
-					if(Azrael.SQLDeleteStaffNames(_message, e.getGuild().getIdLong()) > 0) {
+					final var result = Azrael.SQLDeleteStaffNames(_message, e.getGuild().getIdLong());
+					if(result > 0) {
 						message.setTitle("Success!");
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE)).build()).queue();
 						Hashes.removeQuerryResult("staff-names_"+e.getGuild().getId());
 						logger.debug("{} has removed the word {} from the staff names in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+					}
+					else if(result == 0) {
+						message.setColor(Color.RED);
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NAME_REMOVE_ERR)).build()).queue();
 					}
 					else {
 						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
@@ -864,7 +884,7 @@ public class FilterExecution {
 				}
 				case "insert-url-blacklist" -> {
 					if((_message.startsWith("http://") || _message.startsWith("https://")) && !_message.matches("[\\s]")) {
-						if(Azrael.SQLInsertURLBlacklist(_message, e.getGuild().getIdLong()) > 0) {
+						if(Azrael.SQLInsertURLBlacklist(_message, e.getGuild().getIdLong()) >= 0) {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT_URL)).build()).queue();
 							Hashes.removeURLBlacklist(e.getGuild().getIdLong());
 							logger.debug("{} has inserted the url {} into the url-blacklist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
@@ -884,10 +904,15 @@ public class FilterExecution {
 					}
 				}
 				case "remove-url-blacklist" -> {
-					if(Azrael.SQLDeleteURLBlacklist(_message, e.getGuild().getIdLong()) > 0) {
+					final var result = Azrael.SQLDeleteURLBlacklist(_message, e.getGuild().getIdLong());
+					if(result > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE_URL)).build()).queue();
 						Hashes.removeURLBlacklist(e.getGuild().getIdLong());
 						logger.debug("{} has removed the url {} from the url blacklist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+					}
+					else if(result == 0) {
+						message.setColor(Color.RED);
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_URL_REMOVE_ERR)).build()).queue();
 					}
 					else {
 						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
@@ -954,7 +979,7 @@ public class FilterExecution {
 				}
 				case "insert-url-whitelist" -> {
 					if((_message.startsWith("http://") || _message.startsWith("https://")) && !_message.matches("[\\s]")) {
-						if(Azrael.SQLInsertURLWhitelist(_message, e.getGuild().getIdLong()) > 0) {
+						if(Azrael.SQLInsertURLWhitelist(_message, e.getGuild().getIdLong()) >= 0) {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT_URL)).build()).queue();
 							Hashes.removeURLBlacklist(e.getGuild().getIdLong());
 							logger.debug("{} has inserted the url {} into the url-whitelist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
@@ -974,10 +999,15 @@ public class FilterExecution {
 					}
 				}
 				case "remove-url-whitelist" -> {
-					if(Azrael.SQLDeleteURLWhitelist(_message, e.getGuild().getIdLong()) > 0) {
+					final var result = Azrael.SQLDeleteURLWhitelist(_message, e.getGuild().getIdLong());
+					if(result > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE_URL)).build()).queue();
 						Hashes.removeURLBlacklist(e.getGuild().getIdLong());
 						logger.debug("{} has removed the url {} from the url whitelist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+					}
+					else if(result == 0) {
+						message.setColor(Color.RED);
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_URL_REMOVE_ERR)).build()).queue();
 					}
 					else {
 						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
@@ -1043,7 +1073,7 @@ public class FilterExecution {
 					}
 				}
 				case "insert-tweet-blacklist" -> {
-					if(Azrael.SQLInsertTweetBlacklist(_message, e.getGuild().getIdLong()) > 0) {
+					if(Azrael.SQLInsertTweetBlacklist(_message, e.getGuild().getIdLong()) >= 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT_NICK)).build()).queue();
 						Hashes.removeTweetBlacklist(e.getGuild().getIdLong());
 						logger.debug("{} has inserted the username {} into the tweet-blacklist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
@@ -1056,10 +1086,15 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 				}
 				case "remove-tweet-blacklist" -> {
-					if(Azrael.SQLDeleteTweetBlacklist(_message, e.getGuild().getIdLong()) > 0) {
+					final var result = Azrael.SQLDeleteTweetBlacklist(_message, e.getGuild().getIdLong());
+					if(result > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE_NICK)).build()).queue();
 						Hashes.removeTweetBlacklist(e.getGuild().getIdLong());
 						logger.debug("{} has removed the username {} from the tweet-blacklist", e.getMember().getUser().getIdLong(), _message);
+					}
+					else if(result == 0) {
+						message.setColor(Color.RED);
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_TWEET_REMOVE_ERR)).build()).queue();
 					}
 					else {
 						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
@@ -1166,32 +1201,31 @@ public class FilterExecution {
 	}
 	
 	private static void insertLangWord(GuildMessageReceivedEvent e, EmbedBuilder message, final String key, final String lang, String word) {
-		if(!word.matches("[\\w\\d\\s\\@-]*[^\\w\\d\\s\\@\\-]{1,}[\\w\\d\\s\\@-]*")) {
-			if(Azrael.SQLInsertWordFilter(lang.substring(0, 3), word, e.getGuild().getIdLong()) >= 0) {
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT)).build()).queue();
-				clearHash(e, lang, true);
-				Hashes.removeQuerryResult("all_"+e.getGuild().getId());
-				logger.debug("{} has inserted the word {} into the {} word filter in guild {}", e.getMember().getUser().getIdLong(), word, lang, e.getGuild().getId());
-			}
-			else {
-				message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Word couldn't be inserted into Azrael.filter for guild {}", e.getGuild().getName());
-			}
+		if(Azrael.SQLInsertWordFilter(lang.substring(0, 3), word, e.getGuild().getIdLong()) >= 0) {
+			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT)).build()).queue();
+			clearHash(e, lang, true);
+			Hashes.removeQuerryResult("all_"+e.getGuild().getId());
+			logger.debug("{} has inserted the word {} into the {} word filter in guild {}", e.getMember().getUser().getIdLong(), word, lang, e.getGuild().getId());
 		}
 		else {
-			message.setColor(Color.RED);
-			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_INVALID_CHAR)).build()).queue();
+			message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Word couldn't be inserted into Azrael.filter for guild {}", e.getGuild().getName());
 		}
 		Hashes.clearTempCache(key);
 	}
 	
 	private static void removeLangWord(GuildMessageReceivedEvent e, EmbedBuilder message, final String key, final String lang, String word) {
-		if(Azrael.SQLDeleteWordFilter(lang.substring(0, 3), word, e.getGuild().getIdLong()) > 0) {
+		final var result = Azrael.SQLDeleteWordFilter(lang.substring(0, 3), word, e.getGuild().getIdLong());
+		if(result > 0) {
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE)).build()).queue();
 			clearHash(e, lang, true);
 			Hashes.removeQuerryResult("all_"+e.getGuild().getId());
 			logger.debug("{} has removed the word {} from the english word filter in guild {}", e.getMember().getUser().getIdLong(), word, e.getGuild().getId());
+		}
+		else if(result == 0) {
+			message.setColor(Color.RED);
+			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WORD_REMOVE_ERR)).build()).queue();
 		}
 		else {
 			message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
@@ -1207,47 +1241,34 @@ public class FilterExecution {
 			String[] words;
 			try {
 				words = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
-				var interrupt = false;
-				for(final var word : words) {
-					if(word.toLowerCase().matches("[\\w\\d\\s\\@-]*[^\\w\\d\\s\\@\\-]{1,}[\\w\\d\\s\\@-]*")) {
-						interrupt = true;
-					}
-					break;
+				var querryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, e.getGuild().getIdLong(), replace);
+				if(querryResult == 0) {
+					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN)).build()).queue();
+					clearHash(e, lang, false);
+					Hashes.removeQuerryResult("all_"+e.getGuild().getId());
+					logger.debug("{} has inserted words from a file into the {} word filter in guild {}", e.getMember().getUser().getIdLong(), lang, e.getGuild().getId());
 				}
-				if(!interrupt) {
-					var querryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, e.getGuild().getIdLong(), replace);
-					if(querryResult == 0) {
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN)).build()).queue();
-						clearHash(e, lang, false);
-						Hashes.removeQuerryResult("all_"+e.getGuild().getId());
-						logger.debug("{} has inserted words from a file into the {} word filter in guild {}", e.getMember().getUser().getIdLong(), lang, e.getGuild().getId());
-					}
-					else if(querryResult == 1) {
-						//throw error for failing the db replacement
-						message.setColor(Color.RED);
-						var duplicates = checkDuplicates(words);
-						if(duplicates == null || duplicates.size() == 0) {
-							e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.warn("The {} filter couldn't be updated in guild {}", lang, e.getGuild().getId());
-						}
-						else {
-							StringBuilder out = new StringBuilder();
-							for(var word : duplicates) {
-								out.append("**"+word+"**\n");
-							}
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
-						}
+				else if(querryResult == 1) {
+					//throw error for failing the db replacement
+					message.setColor(Color.RED);
+					var duplicates = checkDuplicates(words);
+					if(duplicates == null || duplicates.size() == 0) {
+						e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.warn("The {} filter couldn't be updated in guild {}", lang, e.getGuild().getId());
 					}
 					else {
-						//throw error for failing the rollback
-						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
-						logger.error("Update on filter table couldn't be rolled back on error. Affected language is {} for guild {}", lang, e.getGuild().getId());
+						StringBuilder out = new StringBuilder();
+						for(var word : duplicates) {
+							out.append("**"+word+"**\n");
+						}
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
 					}
 				}
 				else {
-					message.setColor(Color.RED);
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_INVALID_CHAR)).build()).queue();
+					//throw error for failing the rollback
+					message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
+					logger.error("Update on filter table couldn't be rolled back on error. Affected language is {} for guild {}", lang, e.getGuild().getId());
 				}
 			} catch (MalformedURLException | RuntimeException e2) {
 				message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));

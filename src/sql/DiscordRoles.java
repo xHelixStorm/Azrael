@@ -33,7 +33,7 @@ public class DiscordRoles {
 	}
 	
 	public static long SQLgetGuild(long _guild_id) {
-		logger.info("SQLgetGuild launched. Passed params {}", _guild_id);
+		logger.trace("SQLgetGuild launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -58,7 +58,7 @@ public class DiscordRoles {
 	}
 	
 	public static int SQLInsertGuild(long _guild_id, String _guild_name) {
-		logger.info("SQLInsertGuild launched. Passed params {}, {}", _guild_id, _guild_name);
+		logger.trace("SQLInsertGuild launched. Passed params {}, {}", _guild_id, _guild_name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -78,7 +78,7 @@ public class DiscordRoles {
 	}
 	
 	public static int SQLInsertRole(long _guild_id, long _role_id, int _level, String _role_name, String _category_abv, boolean _persistant) {
-		logger.info("SQLInsertRole launched. Passed params {}, {}, {}, {}, {}, {}", _guild_id, _role_id, _level, _role_name, _category_abv, _persistant);
+		logger.trace("SQLInsertRole launched. Passed params {}, {}, {}, {}, {}, {}", _guild_id, _role_id, _level, _role_name, _category_abv, _persistant);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -102,7 +102,7 @@ public class DiscordRoles {
 	}
 	
 	public static int[] SQLInsertRoles(long _guild_id, List<Role> roles) {
-		logger.info("SQLInsertRoles launched. Passed params {}, roles array", _guild_id);
+		logger.trace("SQLInsertRoles launched. Passed params {}, roles array", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -134,7 +134,7 @@ public class DiscordRoles {
 	}
 	
 	public static int SQLUpdateAllRoles(long _guild_id) {
-		logger.info("SQLUpdateAllRoles launched. Passed params {}", _guild_id);
+		logger.trace("SQLUpdateAllRoles launched. Passed params {}", _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -153,7 +153,7 @@ public class DiscordRoles {
 	}
 	
 	public static int SQLUpdateLevel(long _guild_id, long _role_id, int _level) {
-		logger.info("SQLInsertRole launched. Passed params {}, {}, {}", _guild_id, _role_id, _level);
+		logger.trace("SQLInsertRole launched. Passed params {}, {}, {}", _guild_id, _role_id, _level);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -176,7 +176,7 @@ public class DiscordRoles {
 	
 	public static ArrayList<Roles> SQLgetRoles(long _guild_id) {
 		if(Hashes.getDiscordRole(_guild_id) == null) {
-			logger.info("SQLgetRoles launched. Passed params {}", _guild_id);
+			logger.trace("SQLgetRoles launched. Passed params {}", _guild_id);
 			ArrayList<Roles> roles = new ArrayList<Roles>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -214,7 +214,7 @@ public class DiscordRoles {
 	
 	public static ArrayList<Roles> SQLgetReactionRoles(long _guild_id) {
 		if(Hashes.getReactionRoles(_guild_id) == null) {
-			logger.info("SQLgetReactionRoles launched. Passed params {}", _guild_id);
+			logger.trace("SQLgetReactionRoles launched. Passed params {}", _guild_id);
 			ArrayList<Roles> reactionRoles = new ArrayList<Roles>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -250,7 +250,7 @@ public class DiscordRoles {
 	}
 	
 	public static int SQLUpdateRoleName(long _guild_id, long _role_id, String _name) {
-		logger.info("SQLUpdateRoleName launched. Passed params {}, {}, {}", _guild_id, _role_id, _name);
+		logger.trace("SQLUpdateRoleName launched. Passed params {}, {}, {}", _guild_id, _role_id, _name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -271,7 +271,7 @@ public class DiscordRoles {
 	}
 	
 	public static ArrayList<Roles> SQLgetCategories() {
-		logger.info("SQLgetCategories launched. No params passed");
+		logger.trace("SQLgetCategories launched. No params passed");
 		ArrayList<Roles> roles = new ArrayList<Roles>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -299,7 +299,7 @@ public class DiscordRoles {
 	}
 	
 	public static int SQLDeleteRole(long _role_id, long _guild_id) {
-		logger.info("SQLDeleteRole launched. Passed params {}, {}", _role_id, _guild_id);
+		logger.trace("SQLDeleteRole launched. Passed params {}, {}", _role_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -319,7 +319,7 @@ public class DiscordRoles {
 	}
 	
 	public static int SQLUpdateRole(long _role_id, long _guild_id) {
-		logger.info("SQLUpdateRole launched. Passed params {}, {}", _role_id, _guild_id);
+		logger.trace("SQLUpdateRole launched. Passed params {}, {}", _role_id, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -339,7 +339,7 @@ public class DiscordRoles {
 	}
 	
 	public static int SQLInsertReaction(long _message_id, String _emoji, long _role_id) {
-		logger.info("SQLInsertReaction launched. Passed params {}, {}, {}", _message_id, _emoji, _role_id);
+		logger.trace("SQLInsertReaction launched. Passed params {}, {}, {}", _message_id, _emoji, _role_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -360,7 +360,7 @@ public class DiscordRoles {
 	}
 	
 	public static long SQLgetReactionRole(long _message_id, String _emoji) {
-		logger.info("SQLgetReactionRole launched. Passed params {}", _message_id, _emoji);
+		logger.trace("SQLgetReactionRole launched. Passed params {}", _message_id, _emoji);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -386,7 +386,7 @@ public class DiscordRoles {
 	}
 	
 	public static int SQLDeleteReactions(long _message_id) {
-		logger.info("SQLDeleteReactions launched. Passed params {}", _message_id);
+		logger.trace("SQLDeleteReactions launched. Passed params {}", _message_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {

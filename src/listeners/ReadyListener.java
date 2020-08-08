@@ -34,7 +34,7 @@ import threads.RoleExtend;
 import threads.Webserver;
 import timerTask.ClearCommentedUser;
 import timerTask.ClearHashes;
-import timerTask.ParseRSS;
+import timerTask.ParseSubscription;
 import timerTask.VerifyMutedMembers;
 import util.STATIC;
 
@@ -143,8 +143,7 @@ public class ReadyListener extends ListenerAdapter {
 				logger.warn("Roles from RankingSystem.roles couldn't be called and cached in guild {}", guild.getId());
 			}
 			//retrieve all registered rss feeds and start the timer to make these display on the server
-			Azrael.SQLgetRSSFeeds(guild.getIdLong());
-			ParseRSS.runTask(e, guild.getIdLong());
+			ParseSubscription.runTask(e.getJDA(), guild.getIdLong());
 			
 			//print bot is now operational message for the current server
 			if(log_channel != null){e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("Bot is now operational!").queue();}

@@ -147,7 +147,7 @@ public class Room implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used Room command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+		logger.trace("{} has used Room command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 
 }

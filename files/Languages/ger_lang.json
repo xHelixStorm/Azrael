@@ -385,7 +385,10 @@
 	"filter_rollback_err":			"Ein kritischer Fehler ist aufgetreten! Der Inhalt für die ausgewählte Liste wurde geändert, aber die Änderungen konnten aufgrund eines Fehlers nicht rückgängig gemacht werden!",
 	"filter_no_url":				"Bitte reichen Sie eine Pastebin-URL ein!",
 	"filter_no_nick":				"Bitte reichen Sie eine Pastebin-URL mit Benutzernamen ein, die mit *@* beginnen!",
-	"filter_invalid_char":			"Es wurde ein ungültiges Zeichen verwendet! Bitte entfernen Sie es und versuchen Sie es dann erneut!",
+	"filter_name_remove_err":		"Dieses Wort oder Name existiert nicht!",
+	"filter_url_remove_err":		"Diese URL exisitert nicht!",
+	"filter_tweet_remove_err":		"Dieser Twitter Benutzername existiert nicht!",
+	"filter_word_remove_err":		"Dieses Wort exisitert nicht!",
 	
 	"google_help":				 	"Kombinieren Sie verfügbare Bot-Ereignisse mit Google APIs und erstellen Sie eine Schnittstelle für den Datenexport, jedes Mal, wenn ein bestimmtes Ereignis ausgelöst wurde! In einigen Fällen sind Schreib- und Bearbeitungsberechtigungen für diese E-Mail erforderlich *{}*. Zum Beispiel, wenn private Dokumente bearbeitet werden müssen!\n Diese APIs sind derzeit als Parameter verfügbar:\n\n- **dokumente**:\nSchnittstelle mit google docs.\n- **spreadsheets**:\nSchnittstelle google spreadsheets.\n- **drive**:\nSchnittstelle mit google drive.",
 	"google_api_not_available":	 	"API existiert nicht, ist nicht verfügbar oder wurde falsch geschrieben! Bitte versuchen Sie es erneut!",

@@ -143,7 +143,7 @@ public class Mute implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("The Mute command has been used from user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+		logger.trace("The Mute command has been used from user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 
 }

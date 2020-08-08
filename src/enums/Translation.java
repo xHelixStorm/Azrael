@@ -387,7 +387,10 @@ public enum Translation {
 	FILTER_ROLLBACK_ERR			("filter_rollback_err"),
 	FILTER_NO_URL				("filter_no_url"),
 	FILTER_NO_NICK				("filter_no_nick"),
-	FILTER_INVALID_CHAR			("filter_invalid_char"),
+	FILTER_NAME_REMOVE_ERR		("filter_name_remove_err"),
+	FILTER_URL_REMOVE_ERR		("filter_url_remove_err"),
+	FILTER_TWEET_REMOVE_ERR		("filter_tweet_remove_err"),
+	FILTER_WORD_REMOVE_ERR		("filter_word_remove_err"),
 	
 	GOOGlE_HELP					("google_help"),
 	GOOGLE_API_NOT_AVAILABLE	("google_api_not_available"),

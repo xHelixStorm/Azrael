@@ -222,7 +222,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					
 					//check if the inventory command has been used and if yes, append reactions when there are multiple pages to jump into
 					final var inventory_bot = Hashes.getTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-					if(inventory_bot != null && UserPrivs.isUserBot(e.getMember()) && inventory_bot.getExpiration() - System.currentTimeMillis() > 0) {
+					if(inventory_bot != null && e.getGuild().getSelfMember().getIdLong() == e.getMember().getUser().getIdLong() && inventory_bot.getExpiration() - System.currentTimeMillis() > 0) {
 						//get details of the inventory
 						String cache_content = inventory_bot.getAdditionalInfo();
 						String [] array = cache_content.split("_");
@@ -250,7 +250,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					
 					//include vote up and vote down reactions, if it's a vote channel
-					if(currentChannel != null && currentChannel.getChannel_Type() != null && currentChannel.getChannel_Type().equals("vot")) {
+					if(currentChannel != null && currentChannel.getChannel_Type() != null && currentChannel.getChannel_Type().equals("vot") && e.getGuild().getSelfMember().getIdLong() != e.getMember().getUser().getIdLong()) {
 						final var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
 							e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsup:").getUnicode()).queue();
@@ -269,7 +269,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					
 					//check if the randomshop command has been used
 					final var randomshop_bot = Hashes.getTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-					if(randomshop_bot != null && UserPrivs.isUserBot(e.getMember()) && randomshop_bot.getExpiration() - System.currentTimeMillis() > 0) {
+					if(randomshop_bot != null && e.getGuild().getSelfMember().getIdLong() == e.getMember().getUser().getIdLong() && randomshop_bot.getExpiration() - System.currentTimeMillis() > 0) {
 						//get details of the inventory
 						String cache_content = randomshop_bot.getAdditionalInfo();
 						String [] array = cache_content.split("_");
@@ -297,7 +297,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					
 					//check if the rss command has been used
 					final var rss = Hashes.getTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-					if(rss != null && !UserPrivs.isUserBot(e.getMember()) && rss.getExpiration() - System.currentTimeMillis() > 0) {
+					if(rss != null && !e.getMember().getUser().isBot() && !UserPrivs.isUserBot(e.getMember()) && rss.getExpiration() - System.currentTimeMillis() > 0) {
 						String task = rss.getAdditionalInfo();
 						//check if the user wishes to close the rss window
 						if(!message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
@@ -307,11 +307,11 @@ public class GuildMessageListener extends ListenerAdapter {
 								SubscribeExecution.registerFeed(e, message, Integer.parseInt(rss.getAdditionalInfo2()));
 							}
 							//remove a rss feed if selected
-							if(task.equals("remove") && message.replaceAll("[0-9]", "").length() == 0) {
+							if(task.equals("remove") && message.replaceAll("[0-9]*", "").length() == 0) {
 								SubscribeExecution.removeFeed(e, Integer.parseInt(message)-1);
 							}
 							//format a rss feed if selected
-							else if(task.equals("format") && message.replaceAll("[0-9]", "").length() == 0) {
+							else if(task.equals("format") && message.replaceAll("[0-9]*", "").length() == 0) {
 								SubscribeExecution.currentFormat(e, Integer.parseInt(message)-1, "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 							}
 							//update the format of an rss feed if format has been selected the step before
@@ -320,11 +320,11 @@ public class GuildMessageListener extends ListenerAdapter {
 								SubscribeExecution.updateFormat(e, Integer.parseInt(task.replaceAll("[^0-9]", "")), message);
 							}
 							//do a test print of one selected feed
-							else if(task.equals("test") && message.replaceAll("[0-9]", "").length() == 0) {
+							else if(task.equals("test") && message.replaceAll("[0-9]*", "").length() == 0) {
 								SubscribeExecution.runTest(e, Integer.parseInt(message)-1);
 							}
 							//change the options of a tweet
-							else if(task.equals("options") && message.replaceAll("[0-9]", "").length() == 0) {
+							else if(task.equals("options") && message.replaceAll("[0-9]*", "").length() == 0) {
 								SubscribeExecution.changeOptions(e, Integer.parseInt(message)-1, "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 							}
 							//update the hashtag options
@@ -375,7 +375,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						if(!content.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SKIP_QUESTION)) || !content.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
 							//verify that there is a registered quiz channel
 							var qui_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("qui")).findAny().orElse(null);
-							if(qui_channel != null && qui_channel.getChannel_ID() == e.getChannel().getIdLong() && !UserPrivs.isUserBot(e.getMember())) {
+							if(qui_channel != null && qui_channel.getChannel_ID() == e.getChannel().getIdLong() && !e.getMember().getUser().isBot() && !UserPrivs.isUserBot(e.getMember())) {
 								//check if an administrator or moderator wishes to skip a question or interrupt all questions
 								if(UserPrivs.isUserAdmin(e.getMember()) || UserPrivs.isUserMod(e.getMember()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
 									if(message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SKIP_QUESTION)) || message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_INTERRUPT_QUESTIONS))) {

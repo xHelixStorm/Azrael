@@ -103,7 +103,7 @@ public class DoubleExperience implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used DoubleExperience command in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
+		logger.trace("{} has used DoubleExperience command in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
 	}
 	
 	private String getValue(GuildMessageReceivedEvent e, String argument) {

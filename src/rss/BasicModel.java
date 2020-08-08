@@ -13,16 +13,16 @@ import com.vdurmont.emoji.EmojiParser;
 import constructors.Channels;
 import constructors.RSS;
 import enums.Translation;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
-import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import util.STATIC;
 
 public class BasicModel {
 	private static final Logger logger = LoggerFactory.getLogger(BasicModel.class);
 
-	public static void ModelParse(BufferedReader in, ReadyEvent e, RSS rss, long guild_id, Channels rss_channel) throws IOException {
+	public static void ModelParse(BufferedReader in, Guild guild, RSS rss, Channels rss_channel) throws IOException {
 		String format = rss.getFormat();
 		String title = "";
 		String description = "";
@@ -65,11 +65,11 @@ public class BasicModel {
 			out = out.replace("{link}", link);
 			out = out.replaceAll("&#039;", "'");
 			final String outMessage = EmojiParser.parseToUnicode(out);
-			MessageHistory history = new MessageHistory(e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()));
+			MessageHistory history = new MessageHistory(guild.getTextChannelById(rss_channel.getChannel_ID()));
 			history.retrievePast(100).queue(historyList -> {
 				Message historyMessage = historyList.parallelStream().filter(f -> f.getContentRaw().equals(outMessage)).findAny().orElse(null);
 				if(historyMessage == null)
-					e.getJDA().getGuildById(guild_id).getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
+					guild.getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
 			});
 		}
 		in.close();

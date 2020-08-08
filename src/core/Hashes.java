@@ -261,6 +261,13 @@ public class Hashes {
 	public static ArrayList<RSS> getFeed(Long _key) {
 		return feeds.get(_key);
 	}
+	public static int getFeedsSize(Long _key) {
+		ArrayList<RSS> feedList = feeds.get(_key);
+		if(feedList == null)
+			return 0;
+		else
+			return feedList.size();
+	}
 	public static ArrayList<Weapons> getWeaponShopContent(Long _key) {
 		return weaponShopContent.get(_key);
 	}

@@ -33,8 +33,10 @@ public class VerifyMutedMembers extends TimerTask {
 	@Override
 	public void run() {
 		try {
-			if(delay)
+			if(delay) {
 				Thread.sleep(600000);
+				delay = false;
+			}
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}

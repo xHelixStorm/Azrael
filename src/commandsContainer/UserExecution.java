@@ -1078,20 +1078,20 @@ public class UserExecution {
 								if(warning_id == max_warning_id) {
 									channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM).replace("{}", e.getGuild().getName())
 										+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
-											e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_ORDER)).build()).queue();
+											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_ORDER)).build()).queue();
 											e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(reason).queue();
 										}, err -> {
-											e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_ORDER)).build()).queue();
+											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_ORDER)).build()).queue();
 											e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(reason).queue();
 										});
 								}
 								else {
 									channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2).replace("{}", e.getGuild().getName())
 										+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
-											e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_ORDER)).build()).queue();
+											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_ORDER)).build()).queue();
 											e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(reason).queue();
 										}, err -> {
-											e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_ORDER)).build()).queue();
+											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_ORDER)).build()).queue();
 											e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(reason).queue();
 										});
 								}
@@ -1131,20 +1131,20 @@ public class UserExecution {
 							if(warning_id == max_warning_id) {
 								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM).replace("{}", e.getGuild().getName())
 									+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
-										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_ORDER)).build()).queue();
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_ORDER)).build()).queue();
 										e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
 									}, err -> {
-										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_ORDER)).build()).queue();
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_ORDER)).build()).queue();
 										e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
 									});
 							}
 							else {
 								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2).replace("{}", e.getGuild().getName())
 									+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
-										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_ORDER)).build()).queue();
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_ORDER)).build()).queue();
 										e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
 									}, err -> {
-										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_ORDER)).build()).queue();
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_ORDER)).build()).queue();
 										e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
 									});
 							}

@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.RankingSystem;
 import threads.CollectUsersGuilds;
+import timerTask.ParseSubscription;
 import sql.DiscordRoles;
 import sql.Patchnotes;
 import sql.Azrael;
@@ -60,6 +61,10 @@ public class GuildJoinListener extends ListenerAdapter {
 			GuildIni.createIni(guild_id);
 		else
 			GuildIni.verifyIni(guild_id);
+		
+		//run server specific timers
+		ParseSubscription.runTask(e.getJDA(), guild_id);
+		
 		//set the default language for this server
 		Hashes.setLanguage(guild_id, "en");
 		//collect all users in the server

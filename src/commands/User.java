@@ -46,6 +46,6 @@ public class User implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used User command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+		logger.trace("{} has used User command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 }

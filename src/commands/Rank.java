@@ -170,6 +170,6 @@ public class Rank implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used Rank command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+		logger.trace("{} has used Rank command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 }

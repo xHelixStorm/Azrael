@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import preparedMessages.ReactionMessage;
 import sql.Azrael;
+import timerTask.ParseSubscription;
 import util.STATIC;
 
 /**
@@ -112,6 +113,9 @@ public class RegisterChannel {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 								logger.error("Role reactions couldn't be set to enable in Azrael.guild for guild {}", _guild_id);
 							}
+						}
+						else if(channel_type.equals("rss") && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong())) {
+							ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
 						}
 					}
 					else {
