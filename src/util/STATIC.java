@@ -73,6 +73,8 @@ public class STATIC {
 	private static final String VERSION = "7.23.457";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
+	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
+	private static final JSONObject spa_lang = new JSONObject(FileSetting.readFile("./files/Languages/spa_lang.json"));
 	
 	private static OffsetDateTime bootTime = null;
 	
@@ -102,6 +104,18 @@ public class STATIC {
 		case "eng" -> {
 			if(eng_lang.has(event.section()))
 				yield (String)eng_lang.get(event.section());
+			else
+				yield "Message "+event.section()+" not found!";
+		}
+		case "ger" -> {
+			if(ger_lang.has(event.section()))
+				yield (String)ger_lang.get(event.section());
+			else
+				yield "Message "+event.section()+" not found!";
+		}
+		case "spa" -> {
+			if(spa_lang.has(event.section()))
+				yield (String)spa_lang.getString(event.section());
 			else
 				yield "Message "+event.section()+" not found!";
 		}

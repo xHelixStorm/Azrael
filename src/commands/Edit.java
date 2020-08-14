@@ -5,6 +5,7 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import commandsContainer.WriteEditExecution;
 import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
@@ -12,6 +13,7 @@ import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import util.STATIC;
 
@@ -45,9 +47,9 @@ public class Edit implements CommandPublic {
 		}
 		else if (args.length == 2) {
 			String channel_id = args[0].replaceAll("[<>#]", "");
-			String message_id = args[1];
+			String message_id = args[1].replaceAll("[^0-9]*", "");
 			if(e.getGuild().getTextChannelById(channel_id) != null) {
-				Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "E", channel_id, message_id));
+				checkMessage(e, channel_id, message_id, "", false);
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NO_TEXT_CHANNEL)).build()).queue();
@@ -56,10 +58,10 @@ public class Edit implements CommandPublic {
 		else if(args.length == 3) {
 			if(args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_REACTION)) || args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CLEAR_REACTIONS))) {
 				String channel_id = args[0].replaceAll("[<>#]", "");
-				String message_id = args[1];
+				String message_id = args[1].replaceAll("[^0-9]*", "");
 				String parameter = args[2].toLowerCase();
 				if(e.getGuild().getTextChannelById(channel_id) != null) {
-					Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, (parameter.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_REACTION)) ? "RA" : "RC"), channel_id, message_id));
+					checkMessage(e, channel_id, message_id, parameter, true);
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NO_TEXT_CHANNEL)).build()).queue();
@@ -79,4 +81,25 @@ public class Edit implements CommandPublic {
 		logger.trace("{} has used Edit command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 
+	private static void checkMessage(GuildMessageReceivedEvent e, String channel_id, String message_id, String parameter, final boolean reaction) {
+		if(message_id.length() == 17 || message_id.length() == 18) {
+			if(e.getGuild().getSelfMember().hasPermission(e.getGuild().getTextChannelById(channel_id), Permission.MESSAGE_HISTORY)) {
+				e.getGuild().getTextChannelById(channel_id).retrieveMessageById(message_id).queue(m -> {
+					if(!reaction)
+						Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "E", channel_id, message_id));
+					else
+						Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, (parameter.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_REACTION)) ? "RA" : "RC"), channel_id, message_id));
+					WriteEditExecution.editHelp(e, Hashes.getTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId()));
+				}, err -> {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NOT_EXISTS)).build()).queue();
+				});
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_HISTORY.getName()).build()).queue();
+			}
+		}
+		else {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_INVALID_MESSAGE)).build()).queue();
+		}
+	}
 }

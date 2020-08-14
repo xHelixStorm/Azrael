@@ -472,9 +472,6 @@ public class GuildMessageListener extends ListenerAdapter {
 						else if(writeEdit.getAdditionalInfo().equals("WE")) {
 							WriteEditExecution.runWrite(e, writeEdit, message);
 						}
-						else if(writeEdit.getAdditionalInfo().equals("E")) {
-							WriteEditExecution.editHelp(e, writeEdit);
-						}
 						else if(writeEdit.getAdditionalInfo().equals("EE")) {
 							WriteEditExecution.runEdit(e, writeEdit, message);
 						}

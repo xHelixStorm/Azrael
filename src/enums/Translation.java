@@ -315,6 +315,7 @@ public enum Translation {
 	EDIT_UPDATE					("edit_update"),
 	EDIT_UPDATED				("edit_updated"),
 	EDIT_NOT_EXISTS				("edit_not_exists"),
+	EDIT_INVALID_MESSAGE		("edit_invalid_message"),
 	EDIT_REACTION_ADD_HELP		("edit_reaction_add_help"),
 	EDIT_SELECT_ROLE			("edit_select_role"),
 	EDIT_NO_ROLES				("edit_no_roles"),
