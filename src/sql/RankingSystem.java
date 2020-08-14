@@ -1444,6 +1444,26 @@ public class RankingSystem {
 		}
 	}
 	
+	public static int SQLUpdateRewardExpiration(long _guild_id, Timestamp _timestamp) {
+		logger.trace("SQLUpdateRewardExpiration launched. Passed params {}, {}", _guild_id, _timestamp);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			String sql = ("UPDATE giveaway SET expires = ? WHERE used = 0 && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setTimestamp(1, _timestamp);
+			stmt.setLong(2, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateRewardExpiration Exception", e);
+			return -1;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	//themes
 	public static boolean SQLgetThemes() {
 		logger.trace("SQLgetThemes launched. No params has been passed");

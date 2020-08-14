@@ -140,27 +140,6 @@ public class Set implements CommandPublic {
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING))) {
 				commandLevel = GuildIni.getSetRankingLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					/*var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-					if(guild_settings.getThemeID() == 0) {
-						e.getChannel().sendMessage(messageBuild.setDescription("Before enabling the ranking system, please set a theme ID!").build()).queue();
-						return;
-					}
-					if(guild_settings.getLevelID() == 0) {
-						e.getChannel().sendMessage(messageBuild.setDescription("Before enabling the ranking system, please set a default level skin!").build()).queue();
-						return;
-					}
-					if(guild_settings.getRankID() == 0) {
-						e.getChannel().sendMessage(messageBuild.setDescription("Before enabling the ranking system, please set a default rank skin!").build()).queue();
-						return;
-					}
-					if(guild_settings.getProfileID() == 0) {
-						e.getChannel().sendMessage(messageBuild.setDescription("Before enabling the ranking system, please set a default profile skin!").build()).queue();
-						return;
-					}
-					if(guild_settings.getIconID() == 0) {
-						e.getChannel().sendMessage(messageBuild.setDescription("Before enabling the ranking system, please set a default icon skin!").build()).queue();
-						return;
-					}*/
 					SetRankingSystem.runTask(e, args[1]);
 				}
 				else {
@@ -413,7 +392,6 @@ public class Set implements CommandPublic {
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIVEAWAY_ITEMS))) {
 				commandLevel = GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					//TODO: rework the command to replace the current saved list
 					SetGiveawayItems.runTask(e, args[1]);
 				}
 				else {

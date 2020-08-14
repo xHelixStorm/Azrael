@@ -145,6 +145,7 @@ public enum Translation {
 	PARAM_REOPEN				("param_reopen"),
 	PARAM_RENAME				("param_rename"),
 	PARAM_SERVER				("param_server"),
+	PARAM_EXTEND				("param_extend"),
 	
 	LANG_ENG					("lang_eng"),
 	LANG_GER					("lang_ger"),
@@ -596,6 +597,8 @@ public enum Translation {
 	SET_DAILY_ADDED				("set_daily_added"),
 	SET_GIVEAWAY				("set_giveaway"),
 	SET_GIVEAWAY_ADDED			("set_giveaway_added"),
+	SET_GIVEAWAY_EXTENDED		("set_giveaway_extended"),
+	SET_GIVEAWAY_EXTEND_ERR		("set_giveaway_extend_err"),
 	SET_WARNING_HELP			("set_warning_help"),
 	SET_WARNING_NOT_VALID		("set_warning_not_valid"),
 	SET_WARNING_1				("set_warning_1"),

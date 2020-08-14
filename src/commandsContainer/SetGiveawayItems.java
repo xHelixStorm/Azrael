@@ -25,19 +25,30 @@ import util.STATIC;
  */
 
 public class SetGiveawayItems {
-	public static void runTask(GuildMessageReceivedEvent e, String _link) {
-		Logger logger = LoggerFactory.getLogger(SetGiveawayItems.class);
-		
+	private final static Logger logger = LoggerFactory.getLogger(SetGiveawayItems.class);
+	
+	public static void runTask(GuildMessageReceivedEvent e, String param) {
+		//verify if a parameter has been passed
+		if(param.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXTEND))) {
+			//calculate the next beginning of the month
+			Timestamp timestamp = calculateMonth();
+			final int result = RankingSystem.SQLUpdateRewardExpiration(e.getGuild().getIdLong(), timestamp);
+			if(result > 0) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_GIVEAWAY_EXTENDED)).build()).queue();
+			}
+			else if(result == 0) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_GIVEAWAY_EXTEND_ERR)).build()).queue();
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			}
+		}
 		//verify pastebin link and save the content into array
-		if(_link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _link.startsWith("http")) {
+		else if(param.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && param.startsWith("http")) {
 			try {
-				String [] rewards = Pastebin.readPublicPasteLink(_link).split("[\\r\\n]+");
+				String [] rewards = Pastebin.readPublicPasteLink(param).split("[\\r\\n]+");
 				//calculate the next beginning of the month
-				LocalTime midnight = LocalTime.MIDNIGHT;
-				LocalDate today = LocalDate.now();
-				LocalDate beginningOfMonth = today.with(TemporalAdjusters.lastDayOfMonth()).plusDays(1);
-				LocalDateTime beginningOfMonthMidnight = LocalDateTime.of(beginningOfMonth, midnight);
-				Timestamp timestamp = Timestamp.valueOf(beginningOfMonthMidnight);
+				Timestamp timestamp = calculateMonth();
 				
 				//insert rewards into table and return error with true or false
 				boolean err = RankingSystem.SQLBulkInsertGiveawayRewards(rewards, timestamp, e.getGuild().getIdLong());
@@ -61,5 +72,14 @@ public class SetGiveawayItems {
 			EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
 			e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 		}
+	}
+	
+	private static Timestamp calculateMonth() {
+		//calculate the next beginning of the month
+		LocalTime midnight = LocalTime.MIDNIGHT;
+		LocalDate today = LocalDate.now();
+		LocalDate beginningOfMonth = today.with(TemporalAdjusters.lastDayOfMonth()).plusDays(1);
+		LocalDateTime beginningOfMonthMidnight = LocalDateTime.of(beginningOfMonth, midnight);
+		return Timestamp.valueOf(beginningOfMonthMidnight);
 	}
 }
