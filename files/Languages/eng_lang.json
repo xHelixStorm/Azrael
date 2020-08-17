@@ -642,6 +642,7 @@
 	
 	"shutdown":						"**Shutting down now! See you soon!**",
 	"shutdown_prep":				"Shutdown sequence initiated!",
+	"shutdown_soon":				"The Bot will shut down shortly!",
 	
 	"subscribe_help":				"Use this command to subscribe RSS pages or Twitter hashtags that will be displayed into a dedicated channel! These are all the available parameters:\n\n- **register**:\nSubscribe a RSS Feed or a Twitter Hashtag!\n- **format**:\nDefine the display options for your RSS Feeds and Twitter Hashtags!\n- **options**:\nDefine additional options for Twitter Hashtags!\n- **remove**:\nRemove a registered RSS feed or Twitter Hashtag!\n- **test**:\nTest a registered RSS Feed or Twitter Hashtag!\n- **display**:\nShow a list of registered RSS Feeds and Twitter Hashtags!",
 	"subscribe_register_help":		"Do you wish to add a RSS Feed or a Twitter Hashtag?\nWrite either 1 to register a RSS Feed or 2 to register a Twitter Hashtag as second parameter!",

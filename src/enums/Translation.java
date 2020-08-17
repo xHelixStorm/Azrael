@@ -644,6 +644,7 @@ public enum Translation {
 	
 	SHUTDOWN					("shutdown"),
 	SHUTDOWN_PREP				("shutdown_prep"),
+	SHUTDOWN_SOON				("shutdown_soon"),
 	
 	SUBSCRIBE_HELP				("subscribe_help"),
 	SUBSCRIBE_REGISTER_HELP		("subscribe_register_help"),

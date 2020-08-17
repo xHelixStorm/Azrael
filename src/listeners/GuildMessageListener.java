@@ -671,7 +671,7 @@ public class GuildMessageListener extends ListenerAdapter {
 				}
 				//check if the channel log and cache log is enabled and if one of the two or bot is/are enabled then write message to file or/and log to system cache
 				var log = GuildIni.getChannelAndCacheLog(guild_id);
-				if((log[0] || log[1]) && !UserPrivs.isUserBot(e.getMember())) {
+				if((log[0] || log[1]) && !e.getMember().getUser().isBot() && !UserPrivs.isUserBot(e.getMember())) {
 					StringBuilder image_url = new StringBuilder();
 					for(Attachment attch : e.getMessage().getAttachments()) {
 						image_url.append((e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? "("+attch.getProxyUrl()+")" : "\n("+attch.getProxyUrl()+")");

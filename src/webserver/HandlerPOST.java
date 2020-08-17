@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 
 import org.json.JSONObject;
 
+import commands.ShutDown;
 import enums.Channel;
 import enums.GoogleEvent;
 import enums.Translation;
@@ -14,7 +15,6 @@ import fileManagement.IniFileReader;
 import google.GoogleUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.ReadyEvent;
-import sql.Azrael;
 import util.STATIC;
 
 public class HandlerPOST {
@@ -50,6 +50,12 @@ public class HandlerPOST {
 		if(!type.equals("shutdown") && !type.equals("google")) {
 			WebserviceUtils.return502(out, "Invalid Type.");
 			return false;
+		}
+		if(type.equals("shutdown")) {
+			if(json.has("message") && !(json.get("message") instanceof String)) {
+				WebserviceUtils.return502(out, "Shutdown message needs to be a string.");
+				return false;
+			}
 		}
 		if(type.equals("google")) {
 			if(!json.has("action")) {
@@ -114,7 +120,13 @@ public class HandlerPOST {
 	private static void shutdown(ReadyEvent e, PrintWriter out, JSONObject json) {
 		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
 		for(final var guild : e.getJDA().getGuilds()) {
-			STATIC.writeToRemoteChannel(guild, null, STATIC.getTranslation2(guild, Translation.SHUTDOWN), Channel.LOG.getType());
+			if(json.has("message")) {
+				STATIC.writeToRemoteChannel(guild, null, json.getString("message"), Channel.LOG.getType());
+			}
+			else {
+				STATIC.writeToRemoteChannel(guild, null, STATIC.getTranslation2(guild, Translation.SHUTDOWN_SOON), Channel.LOG.getType());
+			}
+			ShutDown.saveCache(guild);
 		}
 		WebserviceUtils.return200(out, "Bot shutdown");
 		e.getJDA().shutdown();
