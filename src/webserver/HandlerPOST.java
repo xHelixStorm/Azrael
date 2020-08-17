@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 
 import org.json.JSONObject;
 
+import enums.Channel;
 import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.FileSetting;
@@ -113,10 +114,7 @@ public class HandlerPOST {
 	private static void shutdown(ReadyEvent e, PrintWriter out, JSONObject json) {
 		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
 		for(final var guild : e.getJDA().getGuilds()) {
-			final var log_channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-			if(log_channel != null) {
-				guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(STATIC.getTranslation2(guild, Translation.SHUTDOWN)).queue();
-			}
+			STATIC.writeToRemoteChannel(guild, null, STATIC.getTranslation2(guild, Translation.SHUTDOWN), Channel.LOG.getType());
 		}
 		WebserviceUtils.return200(out, "Bot shutdown");
 		e.getJDA().shutdown();

@@ -22,6 +22,7 @@ import constructors.User;
 import constructors.Watchlist;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Channel;
 import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.GuildIni;
@@ -1397,8 +1398,8 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("watch")) {
 				if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUserUseWatchChannelLevel(e.getGuild().getIdLong())) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
-					var trash_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
-					var watch_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("wat")).findAny().orElse(null);
+					var trash_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.TRA.getType())).findAny().orElse(null);
+					var watch_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.WAT.getType())).findAny().orElse(null);
 					if(trash_channel != null || watch_channel != null) {
 						long watchChannel = 0;
 						var higherPrivileges = false;
@@ -1445,7 +1446,7 @@ public class UserExecution {
 					}
 				}
 				else {
-					var trash_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
+					var trash_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.TRA.getType())).findAny().orElse(null);
 					if(trash_channel != null) {
 						switch(_message) {
 							case "1" -> {

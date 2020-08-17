@@ -21,6 +21,7 @@ import constructors.Member;
 import constructors.Room;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
@@ -63,7 +64,7 @@ public class Join implements CommandPublic {
 		final var all_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
 		
 		if(clanCheck) {
-			var clan_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("co3")).collect(Collectors.toList());
+			var clan_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.CO3.getType())).collect(Collectors.toList());
 			var this_channel = clan_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 			if(this_channel == null && clan_channels.size() > 0) {
 				e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.WRONG_CHANNEL)+STATIC.getChannels(clan_channels)).queue();
@@ -71,8 +72,8 @@ public class Join implements CommandPublic {
 			}
 		}
 		
-		var bot_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
-		var com_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("co1") || f.getChannel_Type().equals("co2"))).collect(Collectors.toList());
+		var bot_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
+		var com_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.CO1.getType()) || f.getChannel_Type().equals(Channel.CO2.getType()))).collect(Collectors.toList());
 		var this_bot_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		var this_com_channel = com_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		
@@ -145,7 +146,7 @@ public class Join implements CommandPublic {
 	public static void joinMatchmaking(GuildMessageReceivedEvent e, String [] args) {
 		//join an existing matchmaking room
 		final var this_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
-		if(this_channel != null && (this_channel.getChannel_Type().equals("co1") || this_channel.getChannel_Type().equals("co2"))) {
+		if(this_channel != null && (this_channel.getChannel_Type().equals(Channel.CO1.getType()) || this_channel.getChannel_Type().equals(Channel.CO2.getType()))) {
 			final String channelType = this_channel.getChannel_Type();
 			switch(channelType) {
 				case "co1" -> {

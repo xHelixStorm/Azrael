@@ -18,6 +18,7 @@ import constructors.Dailies;
 import constructors.InventoryContent;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
@@ -60,7 +61,7 @@ public class Daily implements CommandPublic {
 			//set timeout
 			Hashes.addTempCache("dailyDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(3000));
 			//retrieve all bot channels
-			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 			//execute block only if no bot channel is registered or if the current channel is a bot channel
 			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
 				long time_for_daily = 0;
@@ -118,7 +119,6 @@ public class Daily implements CommandPublic {
 						LocalDateTime tomorrowMidnight = LocalDateTime.of(today, midnight).plusDays(1);
 						Timestamp timestamp2 = Timestamp.valueOf(tomorrowMidnight);
 						var editedRows = 0;
-						var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 						//if it's a currency reward, add it directly to the total currency of the user and update the db
 						if(list.get(random).getType().equals("cur")) {
 							constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
@@ -154,13 +154,11 @@ public class Daily implements CommandPublic {
 							//log the reward in bot channel and send a private message
 							e.getMember().getUser().openPrivateChannel().queue(channel -> {
 								channel.sendMessage(STATIC.getTranslation(e.getMember(), Translation.DAILY_REWARD)+cod_reward).queue(success -> {
-									if(log_channel != null) {
-										EmbedBuilder message = new EmbedBuilder().setColor(Color.getHSBColor(268, 81, 88)).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DAILY));
-										e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_REWARD_SENT).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId())+cod_reward).build()).queue();
-									}
+									EmbedBuilder message = new EmbedBuilder().setColor(Color.getHSBColor(268, 81, 88)).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DAILY));
+									STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation(e.getMember(), Translation.DAILY_REWARD_SENT).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId())+cod_reward, Channel.LOG.getType());
 									channel.close().queue();
 								}, error -> {
-									if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_REWARD_NOT_SENT).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId())+cod_reward).build()).queue();
+									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation(e.getMember(), Translation.DAILY_REWARD_NOT_SENT).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId())+cod_reward, Channel.LOG.getType());
 									channel.close().queue();
 								});
 							});
@@ -175,7 +173,7 @@ public class Daily implements CommandPublic {
 								RankingSystem.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily retrieved", list.get(random).getDescription());
 							}
 							else {
-								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_2)+e.getMember().getAsMention()).build()).queue();
+								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_2)+e.getMember().getAsMention(), Channel.LOG.getType());
 								logger.error("used dailies from {} couldn't be marked in RankingSystem.dailies_usage table", e.getMember().getUser().getId());
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily retrieval not marked", list.get(random).getDescription());
 							}

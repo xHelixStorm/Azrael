@@ -10,6 +10,7 @@ import com.vdurmont.emoji.EmojiManager;
 
 import constructors.ClanMember;
 import core.UserPrivs;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
@@ -40,8 +41,8 @@ public class Cw implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		final var all_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
-		var bot_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
-		var com_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("co3")).collect(Collectors.toList());
+		var bot_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
+		var com_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.CO3.getType())).collect(Collectors.toList());
 		var this_bot_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		var this_com_channel = com_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		

@@ -49,7 +49,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 					//verify that the custom server reactions is enabled
 					if(Azrael.SQLgetCommandExecutionReaction(e.getGuild().getIdLong())) {
 						//check for any registered reaction channel and execute logic only if it happened in that channel
-						var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rea")).findAny().orElse(null);
+						var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.REA.getType())).findAny().orElse(null);
 						if(rea_channel != null && rea_channel.getChannel_ID() == e.getChannel().getIdLong()) {
 							//retrieve all reaction roles which will be assigned to a user when reacted
 							var reactionRoles = DiscordRoles.SQLgetReactionRoles(e.getGuild().getIdLong());
@@ -140,7 +140,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 				if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
 					//check if it's a vote channel
 					final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
-					final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals("vot")).findAny().orElse(null);
+					final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.VOT.getType())).findAny().orElse(null);
 					if(thisChannel != null) {
 						final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id);
 						if(sheet != null && !sheet[0].equals("empty")) {

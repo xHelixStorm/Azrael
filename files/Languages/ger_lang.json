@@ -475,6 +475,7 @@
 	"quiz_clear":					"Die Fragen und Belohnungen wurden entfernt!",
 	"quiz_no_q_and_a":				"Bitte registrieren Sie Fragen und Antworten, bevor Sie das Quiz starten!",
 	"quiz_no_rewards":				"Bitte registrieren Sie die Belohnungen, bevor Sie das Quiz starten!",
+	"quiz_missing_permission":		"Der Quiz Kanal benötigt die Berechtigung MESSAGE_WRITE um Nachrichten zu schreiben! Bitte stellen Sie den Textkanal richtig ein um den Quiz zu starten!",
 	"quiz_run_help":				"Bitte wählen Sie einen der verfügbaren Modi aus, um das Quiz zu starten:\n*1*: keine Einschränkungen\n*2*: Benutzer müssen 3 Fragen warten, nachdem sie die richtige Antwort eingegeben haben.\n*3*: Jeder Teilnehmer kann nur einmal gewinnen.",
 	"quiz_no_qa_rewards":			"Bitte registrieren Sie Fragen, Antworten und Belohnungen, bevor Sie das Quiz starten!",
 	"quiz_rewards_registered":		"Alle Belohnungen wurden erfolgreich registriert!",

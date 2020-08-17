@@ -9,10 +9,13 @@ import org.slf4j.LoggerFactory;
 import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 import sql.RankingSystem;
@@ -72,10 +75,13 @@ public class DoubleExperience implements CommandPublic {
 					if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ON))) {
 						Hashes.addTempCache("doubleExp_gu"+e.getGuild().getId(), new Cache("on"));
 						File doubleEvent = new File("./files/RankingSystem/"+guild_settings.getThemeID()+"/doubleweekend.jpg");
-						var bot_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null);
+						var bot_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).findAny().orElse(null);
 						if(bot_channel != null) {
-							e.getGuild().getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg").queue();
-							e.getGuild().getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\n"+STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_MESSAGE)+"```").queue();
+							final TextChannel textChannel = e.getGuild().getTextChannelById(bot_channel.getChannel_ID());
+							if(textChannel != null && e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)) {
+								textChannel.sendFile(doubleEvent, "doubleweekend.jpg").queue();
+								textChannel.sendMessage("```css\n"+STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_MESSAGE)+"```").queue();
+							}
 						}
 					}
 					//if it has been disabled, disable it in cache as well

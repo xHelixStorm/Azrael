@@ -11,11 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Cache;
 import core.Hashes;
+import enums.Channel;
 import enums.Translation;
 import enums.Weekday;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.ResumedEvent;
@@ -48,11 +51,14 @@ public class DoubleExperienceStart extends TimerTask {
 			for(Guild g : event.getJDA().getGuilds()) {
 				guild_id = g.getIdLong();
 				if(RankingSystem.SQLgetGuild(guild_id).getRankingState() || GuildIni.getDoubleExperienceMode(guild_id).equals("auto")) {
-					var bot_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null);
+					var bot_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).findAny().orElse(null);
 					if(bot_channel != null) {
-						File doubleEvent = new File("./files/RankingSystem/"+RankingSystem.SQLgetGuild(guild_id).getThemeID()+"/doubleweekend.jpg");
-						event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg").queue();
-						event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\n"+STATIC.getTranslation2(g, Translation.DOUBLE_EXPERIENCE_AUTO)+"```").queue();
+						final TextChannel textChannel = g.getTextChannelById(bot_channel.getChannel_ID());
+						if(textChannel != null && g.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)) {
+							File doubleEvent = new File("./files/RankingSystem/"+RankingSystem.SQLgetGuild(guild_id).getThemeID()+"/doubleweekend.jpg");
+							event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg").queue();
+							event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\n"+STATIC.getTranslation2(g, Translation.DOUBLE_EXPERIENCE_AUTO)+"```").queue();
+						}
 						logger.debug("Double experience started for guild {}!", guild_id);
 					}
 				}

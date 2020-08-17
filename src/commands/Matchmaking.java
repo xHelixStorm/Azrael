@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.UserPrivs;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
@@ -35,7 +36,7 @@ public class Matchmaking implements CommandPublic {
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		if(Join.profilePage(e, false)) {
 			final var this_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
-			if(this_channel != null && (this_channel.getChannel_Type().equals("co1") || this_channel.getChannel_Type().equals("co2"))) {
+			if(this_channel != null && (this_channel.getChannel_Type().equals(Channel.CO1.getType()) || this_channel.getChannel_Type().equals(Channel.CO2.getType()))) {
 				final String channelType = this_channel.getChannel_Type();
 				switch(channelType) {
 					case "co1" -> {

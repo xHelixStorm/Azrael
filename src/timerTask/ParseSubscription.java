@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 
 import constructors.RSS;
+import enums.Channel;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import rss.BasicModel;
@@ -44,7 +45,7 @@ public class ParseSubscription extends TimerTask{
 					this.cancel();
 					return;
 				}
-				var rss_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rss")).findAny().orElse(null);
+				var rss_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.RSS.getType())).findAny().orElse(null);
 				if(rss_channel != null) {
 					if(feeds.size() > 0) {
 						logger.info("Fetching subscriptions for guild {}", guild.getName());

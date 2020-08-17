@@ -477,6 +477,7 @@ public enum Translation {
 	QUIZ_CLEAR					("quiz_clear"),
 	QUIZ_NO_Q_AND_A				("quiz_no_q_and_a"),
 	QUIZ_NO_REWARDS				("quiz_no_rewards"),
+	QUIZ_MISSING_PERMISSION		("quiz_missing_permission"),
 	QUIZ_RUN_HELP				("quiz_run_help"),
 	QUIZ_NO_QA_REWARDS			("quiz_no_qa_rewards"),
 	QUIZ_REWARDS_REGISTERED		("quiz_rewards_registered"),

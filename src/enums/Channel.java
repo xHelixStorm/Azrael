@@ -7,7 +7,14 @@ public enum Channel {
 	DEL	("del"),
 	BOT	("bot"),
 	DEF	("def"),
-	QUI	("qui");
+	QUI	("qui"),
+	CO1	("co1"),
+	CO2	("co2"),
+	CO3	("co3"),
+	REA	("rea"),
+	WAT	("wat"),
+	VOT	("vot"),
+	RSS	("rss");
 	
 	private String type;
 	

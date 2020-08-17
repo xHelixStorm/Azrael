@@ -10,11 +10,14 @@ import commandsContainer.QuizExecution;
 import constructors.Cache;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 import util.STATIC;
@@ -86,11 +89,19 @@ public class Quiz implements CommandPublic {
 						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_REWARDS)).build()).queue();
 					}
 					else {
+						final var qui_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.QUI.getType())).findAny().orElse(null);
 						//confirm that a quiz channel exists and then print the message to choose a mode
-						if(Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("qui")).findAny().orElse(null) != null) {
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_RUN_HELP)).build()).queue();
-							//write to cache to remind the bot that we're waiting for input
-							Hashes.addTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, e.getMember().getUser().getId()));
+						if(qui_channel != null) {
+							//verify that the permissions are set
+							final TextChannel textChannel = e.getGuild().getTextChannelById(qui_channel.getChannel_ID());
+							if(textChannel != null && e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE)) {
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_RUN_HELP)).build()).queue();
+								//write to cache to remind the bot that we're waiting for input
+								Hashes.addTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, e.getMember().getUser().getId()));
+							}
+							else {
+								e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_MISSING_PERMISSION)).build()).queue();
+							}
 						}
 						else {
 							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NOT_QUIZ_CHANNEL)).build()).queue();

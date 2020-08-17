@@ -251,7 +251,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					
 					//include vote up and vote down reactions, if it's a vote channel
-					if(currentChannel != null && currentChannel.getChannel_Type() != null && currentChannel.getChannel_Type().equals("vot") && e.getGuild().getSelfMember().getIdLong() != e.getMember().getUser().getIdLong()) {
+					if(currentChannel != null && currentChannel.getChannel_Type() != null && currentChannel.getChannel_Type().equals(Channel.VOT.getType()) && e.getGuild().getSelfMember().getIdLong() != e.getMember().getUser().getIdLong()) {
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
 							e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsup:").getUnicode()).queue();
 							e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsdown:").getUnicode()).queue();
@@ -346,7 +346,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						String content = quiz.getAdditionalInfo();
 						if(e.getMember().getUser().getId().equals(content) && (message.equals("1") || message.equals("2") || message.equals("3"))) {
 							//run the quiz in a thread. // retrieve the log channel and quiz channel at the same time and pass them over to the new Thread
-							var channels = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log") || f.getChannel_Type().equals("qui")).collect(Collectors.toList());
+							var channels = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.LOG.getType()) || f.getChannel_Type().equals(Channel.QUI.getType())).collect(Collectors.toList());
 							var log_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals(Channel.LOG.getType())).findAny().orElse(null);
 							var qui_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals(Channel.QUI.getType())).findAny().orElse(null);
 							long logChannel = 0;

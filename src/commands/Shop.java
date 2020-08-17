@@ -10,6 +10,7 @@ import constructors.Cache;
 import constructors.Guilds;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
@@ -45,7 +46,7 @@ public class Shop implements CommandPublic {
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 		if(guild_settings.getRankingState()) {
-			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.SHOP_TITLE)).setThumbnail(IniFileReader.getShopThumbnail())
 					.setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP)).build()).queue();

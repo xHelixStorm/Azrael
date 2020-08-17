@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Patchnote;
 import core.UserPrivs;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
@@ -44,8 +45,8 @@ public class Patchnotes implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		//retrieve all channels where patchnotes can be printed
-		var allowed_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("bot") || f.getChannel_Type().equals("log"))).collect(Collectors.toList());
-		var bot_channels = allowed_channels.parallelStream().filter(f -> f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+		var allowed_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.BOT.getType()) || f.getChannel_Type().equals(Channel.LOG.getType()))).collect(Collectors.toList());
+		var bot_channels = allowed_channels.parallelStream().filter(f -> f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 		var this_channel = allowed_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		//throw error if it was printed in a channel which is not a bot channel or log channel
 		//if no bot channel is registered, print anyway

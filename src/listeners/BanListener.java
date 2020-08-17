@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Bancollect;
 import constructors.Channels;
 import core.Hashes;
+import enums.Channel;
 import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.GuildIni;
@@ -44,7 +45,7 @@ public class BanListener extends ListenerAdapter {
 		long guild_id = e.getGuild().getIdLong();
 		
 		var user = Azrael.SQLgetData(user_id, guild_id);
-		var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
+		var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.LOG.getType())).findAny().orElse(null);
 		
 		//either update user as banned or if not available, insert directly as banned
 		if(user.getBanID() == 1 && user.getWarningID() > 0) {

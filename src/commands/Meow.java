@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import commandsContainer.MeowExecution;
 import core.UserPrivs;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
@@ -43,7 +44,7 @@ public class Meow implements CommandPublic {
 		final String path = "./files/Cat/";				
 		
 		//retrieve all bot channels
-		var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).collect(Collectors.toList());
+		var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 		var this_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		
 		//check if any bot channel is registered, else print the image anyway

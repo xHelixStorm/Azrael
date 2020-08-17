@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import core.Hashes;
 import core.UserPrivs;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
@@ -49,7 +50,7 @@ public class RoleReaction implements CommandPublic {
 			else {
 				if(Azrael.SQLUpdateReaction(e.getGuild().getIdLong(), true) > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROLE_REACTION_ENABLE)).build()).queue();
-					var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rea")).findAny().orElse(null);
+					var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.REA.getType())).findAny().orElse(null);
 					if(rea_channel != null) ReactionMessage.print(e, rea_channel.getChannel_ID());
 				}
 				else {
@@ -64,7 +65,7 @@ public class RoleReaction implements CommandPublic {
 			}
 			else {
 				if(Azrael.SQLUpdateReaction(e.getGuild().getIdLong(), false) > 0) {
-					var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rea")).findAny().orElse(null);
+					var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.REA.getType())).findAny().orElse(null);
 					if(rea_channel != null && Hashes.getReactionMessage(e.getGuild().getIdLong()) != null) {
 						e.getGuild().getTextChannelById(rea_channel.getChannel_ID()).deleteMessageById(Hashes.getReactionMessage(e.getGuild().getIdLong())).queue();
 					}

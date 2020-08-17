@@ -61,7 +61,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 					//verify that the custom server reactions is enabled
 					if(Azrael.SQLgetCommandExecutionReaction(e.getGuild().getIdLong())) {
 						//check for any registered reaction channel and execute logic only if it happened in that channel
-						var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("rea")).findAny().orElse(null);
+						var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.REA.getType())).findAny().orElse(null);
 						if(rea_channel != null && rea_channel.getChannel_ID() == e.getChannel().getIdLong()) {
 							//retrieve all reaction roles which will be assigned to a user when reacted
 							var reactionRoles = DiscordRoles.SQLgetReactionRoles(e.getGuild().getIdLong());
@@ -296,7 +296,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 				//check if it's a vote channel and allow only one reaction
 				final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
 				final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
-				if(thisChannel != null && thisChannel.getChannel_Type() != null && thisChannel.getChannel_Type().equals("vot")) {
+				if(thisChannel != null && thisChannel.getChannel_Type() != null && thisChannel.getChannel_Type().equals(Channel.VOT.getType())) {
 					if(e.getReactionEmote().isEmoji()) {
 						boolean runSpreadsheet = false;
 						if(thumbsup.equals(e.getReactionEmote().getName())) {

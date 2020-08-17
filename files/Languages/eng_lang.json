@@ -476,6 +476,7 @@
 	"quiz_no_q_and_a":				"Please register questions and answers before launching the Quiz!",
 	"quiz_no_rewards":				"Please register rewards before launching the Quiz!",
 	"quiz_run_help":				"Please select one of the available modes to start the Quiz:\n*1*: no restrictions\n*2*: users have to wait 3 questions after submitting the right answer.\n*3*: Every participant can win only once.",
+	"quiz_missing_permission":		"The quiz channel doesn't have the required MESSAGE_WRITE permission to write! Please configure the text channel before starting the quiz!",
 	"quiz_no_qa_rewards":			"Please register questions, answers and rewards before launching the Quiz!",
 	"quiz_rewards_registered":		"All rewards have been registered successfully!",
 	"quiz_only_rewards":			"Please don't try to register questions with this parameter! Please register only rewards!",

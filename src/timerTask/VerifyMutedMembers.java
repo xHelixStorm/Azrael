@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import enums.Channel;
 import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -55,11 +56,7 @@ public class VerifyMutedMembers extends TimerTask {
 				}
 				var channels = Azrael.SQLgetChannels(guild.getIdLong());
 				if(channels != null && channels.size() > 0 && count > 0) {
-					var log_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-					if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(
-							new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_UNMUTED))
-							.setDescription(count+STATIC.getTranslation2(guild, Translation.UNMUTE_LIMBO)).build()
-					).queue();
+					STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_UNMUTED)), count+STATIC.getTranslation2(guild, Translation.UNMUTE_LIMBO), Channel.LOG.getType());
 				}
 			}
 		}
