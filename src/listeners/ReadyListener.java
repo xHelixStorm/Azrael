@@ -2,15 +2,22 @@ package listeners;
 
 import java.awt.Color;
 import java.io.File;
+import java.nio.file.Files;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Cache;
 import constructors.Guilds;
+import constructors.Messages;
 import constructors.Patchnote;
 import core.Hashes;
 import enums.Channel;
@@ -56,9 +63,10 @@ public class ReadyListener extends ListenerAdapter {
 		//Save the time when the Bot successfully booted up
 		STATIC.initializeBootTime();
 		
+		final String tempDirectory = IniFileReader.getTempDirectory();
 		//create the temp directory and verify if multiple sessions are running. If yes, terminate this session
 		FileSetting.createTemp(e);
-		if(new File(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr").exists() && FileSetting.readFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr").contains("1")) {
+		if(new File(tempDirectory+STATIC.getSessionName()+"running.azr").exists() && FileSetting.readFile(tempDirectory+STATIC.getSessionName()+"running.azr").contains("1")) {
 			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "2");
 			e.getJDA().shutdownNow();
 			return;
@@ -139,9 +147,6 @@ public class ReadyListener extends ListenerAdapter {
 			//retrieve all registered rss feeds and start the timer to make these display on the server
 			ParseSubscription.runTask(e.getJDA(), guild.getIdLong());
 			
-			//print bot is now operational message for the current server
-			STATIC.writeToRemoteChannel(guild, null, "Bot is now operational!", Channel.LOG.getType());
-			
 			//print public and private patch notes, if available for the current version of the bot
 			Patchnote priv_notes = null;
 			Patchnote publ_notes = null;
@@ -181,8 +186,59 @@ public class ReadyListener extends ListenerAdapter {
 			if(!doubleExp.equals("auto"))
 				Hashes.addTempCache("doubleExp_gu"+guild.getId(), new Cache(0, doubleExp));
 			
-			//initialize Message pool cache
-			Hashes.initializeGuildMessagePool(guild.getIdLong(), 1000);
+			//initialize Message pool cache and load saved messages, if available
+			Hashes.initializeGuildMessagePool(guild.getIdLong(), 10000);
+			if(GuildIni.getCacheLog(guild.getIdLong())) {
+				if(new File(tempDirectory+"message_pool"+guild.getId()+".json").exists()) {
+					JSONObject json = null;
+					try {
+						json = new JSONObject(FileSetting.readFile(tempDirectory+"message_pool"+guild.getId()+".json"));
+					} catch(JSONException e1) {
+						logger.error("Error in retrieving message pool from guild {}", guild.getId(), e1);
+					}
+					if(json != null) {
+						final JSONObject messages = json;
+						final var message_pool = Hashes.getWholeMessagePool(guild.getIdLong());
+						json.keySet().forEach(k -> {
+							Object el = messages.get(k);
+							if(el instanceof JSONArray) {
+								((JSONArray) el).forEach(item -> {
+									if(item instanceof JSONObject) {
+										final long message_id = ((JSONObject) item).getLong("message_id");
+										final long channel_id = ((JSONObject) item).getLong("channel_id");
+										final String channel_name = ((JSONObject) item).getString("channel_name");
+										final long user_id = ((JSONObject) item).getLong("user_id");
+										final String username = ((JSONObject) item).getString("username");
+										final JSONArray history = ((JSONObject) item).getJSONArray("history");
+										ArrayList<Messages> savedMessages = new ArrayList<Messages>();
+										history.forEach(h -> {
+											if(h instanceof JSONObject) {
+												final boolean edit = ((JSONObject) h).getBoolean("edit");
+												final ZonedDateTime date = ZonedDateTime.parse(((JSONObject) h).getString("date"));
+												final String message = ((JSONObject) h).getString("message");
+												
+												Messages currentMessage = new Messages();
+												currentMessage.setMessageID(message_id);
+												currentMessage.setChannelID(channel_id);
+												currentMessage.setChannelName(channel_name);
+												currentMessage.setUserID(user_id);
+												currentMessage.setUsername(username);
+												currentMessage.setIsEdit(edit);
+												currentMessage.setTime(date);
+												currentMessage.setMessage(message);
+												savedMessages.add(currentMessage);
+											}
+										});
+										message_pool.put(message_id, savedMessages);
+									}
+								});
+							}
+						});
+						Hashes.setWholeMessagePool(guild.getIdLong(), message_pool);
+						FileSetting.deleteFile(tempDirectory+"message_pool"+guild.getId()+".json");
+					}
+				}
+			}
 		}
 		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		
@@ -191,6 +247,8 @@ public class ReadyListener extends ListenerAdapter {
 		executor.execute(() -> { Azrael.SQLgetWholeWatchlist(); });
 		executor.execute(new CollectUsersGuilds(e, null));
 		e.getJDA().getGuilds().parallelStream().forEach(g -> {
+			//print bot is now operational message in all servers
+			STATIC.writeToRemoteChannel(g, null, "Bot is now operational!", Channel.LOG.getType());
 			executor.execute(new RoleExtend(g));
 			Azrael.SQLBulkInsertChannels(g.getTextChannels());
 		});

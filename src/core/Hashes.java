@@ -103,6 +103,9 @@ public class Hashes {
 		message_pool.put(_message_id, _messages);
 		guild_message_pool.put(_key, message_pool);
 	}
+	public static void setWholeMessagePool(final long _key, LinkedHashMap<Long, ArrayList<Messages>> messages) {
+		guild_message_pool.put(_key, messages);
+	}
 	public static void addFilterLang(long _channel_id, ArrayList<String> _filter_lang) {
 		filter_lang.put(_channel_id, _filter_lang);
 	}

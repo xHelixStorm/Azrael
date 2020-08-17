@@ -643,6 +643,7 @@ public enum Translation {
 	SHOP_TITLE_EXIT				("shop_title_exit"),
 	
 	SHUTDOWN					("shutdown"),
+	SHUTDOWN_PREP				("shutdown_prep"),
 	
 	SUBSCRIBE_HELP				("subscribe_help"),
 	SUBSCRIBE_REGISTER_HELP		("subscribe_register_help"),
