@@ -119,6 +119,7 @@ public class HandlerPOST {
 	
 	private static void shutdown(ReadyEvent e, PrintWriter out, JSONObject json) {
 		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
+		WebserviceUtils.return200(out, "Bot shutdown");
 		for(final var guild : e.getJDA().getGuilds()) {
 			if(json.has("message")) {
 				STATIC.writeToRemoteChannel(guild, null, json.getString("message"), Channel.LOG.getType());
@@ -128,7 +129,6 @@ public class HandlerPOST {
 			}
 			ShutDown.saveCache(guild);
 		}
-		WebserviceUtils.return200(out, "Bot shutdown");
 		e.getJDA().shutdown();
 	}
 }
