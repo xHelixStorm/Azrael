@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -35,6 +36,7 @@ import constructors.Channels;
 import constructors.SpamDetection;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
@@ -70,7 +72,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.23.459";
+	private static final String VERSION = "7.23.461";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -394,17 +396,20 @@ public class STATIC {
 		logger.debug("Message removed from {} in guild {}", member.getUser().getId(), guild.getId());
 		var muteRole = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 		if(muteRole == null) {
-			channel.sendMessage(member.getAsMention()+" "+output[0]).queue();
+			if(guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE))
+				channel.sendMessage(member.getAsMention()+" "+output[0]).queue();
 		}
 		else {
 			var cache = Hashes.getTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId());
 			if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
-				channel.sendMessage(member.getAsMention()+" "+output[0]).queue();
+				if(guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE))
+					channel.sendMessage(member.getAsMention()+" "+output[0]).queue();
 				Hashes.addTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId(), new Cache(300000, "1"));
 			}
 			else if(cache != null) {
 				if(cache.getAdditionalInfo().equals("1")) {
-					channel.sendMessage(member.getAsMention()+" "+output[1]).queue();
+					if(guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE))
+						channel.sendMessage(member.getAsMention()+" "+output[1]).queue();
 					Hashes.addTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId(), new Cache(300000, "2"));
 				}
 				else if(cache.getAdditionalInfo().equals("2")) {
@@ -413,8 +418,7 @@ public class STATIC {
 						guild.addRoleToMember(member, guild.getRoleById(muteRole.getRole_ID())).reason("User muted after censoring 3 messages").queue();
 					}
 					else {
-						final var log_channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-						if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_ROLE_ADD_ERR)+Permission.MANAGE_ROLES).build()).queue();
+						writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_ROLE_ADD_ERR)+Permission.MANAGE_ROLES, Channel.LOG.getType());
 						logger.warn("MANAGE ROLES permission required to mute members for guild {}!", guild.getId());
 					}
 					Hashes.clearTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId());
@@ -520,93 +524,66 @@ public class STATIC {
 	}
 	
 	public static boolean spamDetected(GuildMessageReceivedEvent e) {
-		final long user_id = e.getMember().getUser().getIdLong();
-		final long guild_id = e.getGuild().getIdLong();
-		final long channel_id = e.getChannel().getIdLong();
-		final String message = e.getMessage().getContentRaw();
-		
-		//verify if the current user is spamming
-		if(GuildIni.getSpamDetection(guild_id)) {
-			//User doesn't have to be an admin, moderator or bot user and they are only allowed to spam in a bot channel
-			if(!e.getMember().getUser().isBot() && !UserPrivs.isUserBot(e.getMember()) && !UserPrivs.isUserMod(e.getMember()) && !UserPrivs.isUserAdmin(e.getMember()) && Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null) == null) {
-				final int messagesLimit = GuildIni.getMessagesLimit(e.getGuild().getIdLong());
-				final int messagesOverChannelsLimit = GuildIni.getMessageOverChannelsLimit(guild_id);
-				final var cache = Hashes.getTempCache("spamDetection_gu"+guild_id+"us"+user_id);
-				if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
-					if(cache.getAdditionalInfo().equalsIgnoreCase(message)) {
-						if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
-							final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
-							if(mute != null) {
-								e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
-								final int warning = Azrael.SQLgetWarning(user_id, guild_id);
-								final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
-								Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
+		if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+			final long user_id = e.getMember().getUser().getIdLong();
+			final long guild_id = e.getGuild().getIdLong();
+			final long channel_id = e.getChannel().getIdLong();
+			final String message = e.getMessage().getContentRaw();
+			
+			//verify if the current user is spamming
+			if(GuildIni.getSpamDetection(guild_id)) {
+				//User doesn't have to be an admin, moderator or bot user and they are only allowed to spam in a bot channel
+				if(!e.getMember().getUser().isBot() && !UserPrivs.isUserBot(e.getMember()) && !UserPrivs.isUserMod(e.getMember()) && !UserPrivs.isUserAdmin(e.getMember()) && Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null) == null) {
+					final int messagesLimit = GuildIni.getMessagesLimit(e.getGuild().getIdLong());
+					final int messagesOverChannelsLimit = GuildIni.getMessageOverChannelsLimit(guild_id);
+					final var cache = Hashes.getTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+					if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
+						if(cache.getAdditionalInfo().equalsIgnoreCase(message)) {
+							if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
+								final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+								if(mute != null) {
+									e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
+									final int warning = Azrael.SQLgetWarning(user_id, guild_id);
+									final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
+									Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
+									Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+									return true;
+								}
+							}
+							else {
 								Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
-								return true;
 							}
 						}
+					}
+					else if(cache != null && cache.getExpiration() - System.currentTimeMillis() <= 0)
+						Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+					
+					//collect messages
+					final String lcMessage = message.toLowerCase();
+					var spamMessages = Hashes.getSpamDetection(user_id+"_"+guild_id);
+					if(spamMessages == null) {
+						spamMessages = new SpamDetection(GuildIni.getMessageExpires(guild_id));
+						spamMessages.put(lcMessage, channel_id);
+					}
+					else if(!spamMessages.isExpired()) {
+						if(spamMessages.getMessages().get(0).getMessage().equalsIgnoreCase(lcMessage))
+							spamMessages.put(lcMessage, channel_id);
 						else {
-							Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+							spamMessages.clear();
+							spamMessages.put(lcMessage, channel_id);
 						}
 					}
-				}
-				else if(cache != null && cache.getExpiration() - System.currentTimeMillis() <= 0)
-					Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
-				
-				//collect messages
-				final String lcMessage = message.toLowerCase();
-				var spamMessages = Hashes.getSpamDetection(user_id+"_"+guild_id);
-				if(spamMessages == null) {
-					spamMessages = new SpamDetection(GuildIni.getMessageExpires(guild_id));
-					spamMessages.put(lcMessage, channel_id);
-				}
-				else if(!spamMessages.isExpired()) {
-					if(spamMessages.getMessages().get(0).getMessage().equalsIgnoreCase(lcMessage))
-						spamMessages.put(lcMessage, channel_id);
 					else {
 						spamMessages.clear();
 						spamMessages.put(lcMessage, channel_id);
 					}
-				}
-				else {
-					spamMessages.clear();
-					spamMessages.put(lcMessage, channel_id);
-				}
-				
-				//warn the user if the messages limit has been hit or directly mute if the user starts to spam a different message
-				if(messagesLimit != 0 && spamMessages.size() == messagesLimit) {
-					Hashes.removeSpamDetection(user_id+"_"+guild_id);
-					if(cache == null) {
-						e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
-						Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage));
-					}
-					else {
-						if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
-							final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
-							if(mute != null) {
-								e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
-								final int warning = Azrael.SQLgetWarning(user_id, guild_id);
-								final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
-								Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
-								Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
-								return true;
-							}
-						}
-						else {
-							Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
-						}
-					}
-				}
-				else {
-					Set<Long> channels = new HashSet<Long>();
-					for(final var spamMessage : spamMessages.getMessages()) {
-						if(!channels.contains(spamMessage.getChannelID()))
-							channels.add(spamMessage.getChannelID());
-					}
-					if(messagesOverChannelsLimit != 0 && channels.size() == messagesOverChannelsLimit) {
+					
+					//warn the user if the messages limit has been hit or directly mute if the user starts to spam a different message
+					if(messagesLimit != 0 && spamMessages.size() == messagesLimit) {
 						Hashes.removeSpamDetection(user_id+"_"+guild_id);
 						if(cache == null) {
-							e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_WRITE))
+								e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
 							Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage));
 						}
 						else {
@@ -626,8 +603,82 @@ public class STATIC {
 							}
 						}
 					}
-					else if(messagesLimit != 0 || messagesOverChannelsLimit != 0)
-						Hashes.addSpamMessage(user_id+"_"+guild_id, spamMessages);
+					else {
+						Set<Long> channels = new HashSet<Long>();
+						for(final var spamMessage : spamMessages.getMessages()) {
+							if(!channels.contains(spamMessage.getChannelID()))
+								channels.add(spamMessage.getChannelID());
+						}
+						if(messagesOverChannelsLimit != 0 && channels.size() == messagesOverChannelsLimit) {
+							Hashes.removeSpamDetection(user_id+"_"+guild_id);
+							if(cache == null) {
+								if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_WRITE))
+									e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
+								Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage));
+							}
+							else {
+								if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
+									final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+									if(mute != null) {
+										e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
+										final int warning = Azrael.SQLgetWarning(user_id, guild_id);
+										final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
+										Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
+										Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+										return true;
+									}
+								}
+								else {
+									Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+								}
+							}
+						}
+						else if(messagesLimit != 0 || messagesOverChannelsLimit != 0)
+							Hashes.addSpamMessage(user_id+"_"+guild_id, spamMessages);
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	public static boolean writeToRemoteChannel(final Guild guild, final EmbedBuilder embed, final String message, final String channelType) {
+		final var channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(channelType)).findAny().orElse(null);
+		if(channel != null) {
+			final TextChannel textChannel = guild.getTextChannelById(channel.getChannel_ID());
+			if(textChannel != null) {
+				if(embed != null && guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)) {
+					textChannel.sendMessage(embed.setDescription(message).build()).queue();
+					return true;
+				}
+				else if(embed == null && guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE)) {
+					textChannel.sendMessage(message).queue();
+				}
+				else {
+					logger.warn("MESSAGE_WRITE or MESSAGE_EMBED_LINKS permission missing to send a message in channel {}", textChannel.getId());
+				}
+			}
+		}
+		return false;
+	}
+	
+	public static boolean writeToRemoteChannel(final Guild guild, final EmbedBuilder embed, final String message, final String channelType, final String channelType2) {
+		final var channels = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals(channelType) || f.getChannel_Type().equals(channelType2))).collect(Collectors.toList());
+		var channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(channelType)).findAny().orElse(null);
+		if(channel == null)
+			channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(channelType2)).findAny().orElse(null);
+		if(channel != null) {
+			final TextChannel textChannel = guild.getTextChannelById(channel.getChannel_ID());
+			if(textChannel != null) {
+				if(embed != null && guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)) {
+					textChannel.sendMessage(embed.setDescription(message).build()).queue();
+					return true;
+				}
+				else if(embed == null && guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE)) {
+					textChannel.sendMessage(message).queue();
+				}
+				else {
+					logger.warn("MESSAGE_WRITE or MESSAGE_EMBED_LINKS permission missing to send a message in channel {}", textChannel.getId());
 				}
 			}
 		}

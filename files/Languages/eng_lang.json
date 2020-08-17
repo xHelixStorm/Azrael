@@ -947,6 +947,7 @@
 	"role_retracted_title":			"Mute role retracted!",
 	"role_mute_removed":			"The mute role has been set on a user with higher privileges! Role removed!",
 	"role_mute_remove_err":			"The mute role couldn't be retracted because the following permission is missing: ",
+	"role_flag_set":				"An internal error occurred! The mute flag couldn't be set!",
 	"role_flag_remove":				"An internal error occurred! The mute flag couldn't be removed!",
 	"role_reassign_err":			"Ranking roles can't be assigned because the following permission is required: ",
 	"role_manual_remove_title":		"Mute role has been manually removed!",

@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
+import enums.Channel;
 import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.GuildIni;
@@ -73,21 +74,18 @@ public class UnbanListener extends ListenerAdapter {
 			}
 			
 			//retrieve log channel
-			var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 			long user_id = e.getUser().getIdLong();
 			long guild_id = e.getGuild().getIdLong();
 			String user_name = e.getUser().getName()+"#"+e.getUser().getDiscriminator();
 			
 			//print unban message if a log channel has been registered
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			if(log_channel != null) {
-				EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getUnbanThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_TITLE));
-				e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_MESSAGE).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", trigger_user_name)+reason+append_message).build()).queue();
-			}
+			EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getUnbanThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_TITLE));
+			STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_MESSAGE).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", trigger_user_name)+reason+append_message, Channel.LOG.getType());
 			//remove the affected user from the bancollect table to symbolize that all current warnings have been removed
 			if(Azrael.SQLDeleteData(user_id, guild_id) == -1) {
+				STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_FLAG_ERR), Channel.LOG.getType());
 				logger.error("The user's ban of {} couldn't be cleared from Azrael.bancollect in guild {}", e.getUser().getId(), e.getGuild().getId());
-				if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_FLAG_ERR)).queue();
 			}
 			//log action
 			logger.debug("{} has been unbanned from guild {}", user_id, e.getGuild().getName());
@@ -95,7 +93,7 @@ public class UnbanListener extends ListenerAdapter {
 			
 			//Run google service, if enabled
 			if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-				GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), reason, null, null, "UNBAN", null, null, null, null, null, 0, null, 0, 0, GoogleEvent.UNBAN.id, log_channel);
+				GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), reason, null, null, "UNBAN", null, null, null, null, null, 0, null, 0, 0, GoogleEvent.UNBAN.id);
 			}
 		}).start();
 	}

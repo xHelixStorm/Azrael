@@ -393,7 +393,7 @@ public class UserExecution {
 														role_id = role.getId();
 														role_name = role.getName();
 													}
-													GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id, Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null));
+													GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id);
 												}
 											}
 											else {
@@ -410,7 +410,7 @@ public class UserExecution {
 												final String NA = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
 												var user = Azrael.SQLgetUserThroughID(""+user_id);
 												String username = (user != null ? user.getUserName() : NA);
-												GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), username, username.replaceAll("#[0-9]{4}$", ""), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, null, null, "UNMUTED", null, "", "", null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id, Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null));
+												GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), username, username.replaceAll("#[0-9]{4}$", ""), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, null, null, "UNMUTED", null, "", "", null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id);
 											}
 										}
 									}
@@ -1778,7 +1778,7 @@ public class UserExecution {
 				return;
 			}
 			else {
-				List<ArrayList<Messages>> messages = Hashes.getWholeMessagePool().values().parallelStream().filter(f -> f.get(0).getUserID() == user_id && f.get(0).getGuildID() == e.getGuild().getIdLong()).collect(Collectors.toList());
+				List<ArrayList<Messages>> messages = Hashes.getWholeMessagePool(e.getGuild().getIdLong()).values().parallelStream().filter(f -> f.get(0).getUserID() == user_id && f.get(0).getGuildID() == e.getGuild().getIdLong()).collect(Collectors.toList());
 				if(messages.size() > 0) {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE)) {
 						int hash_counter = 0;
@@ -1794,7 +1794,7 @@ public class UserExecution {
 									for(final var cachedMessage: messages.get(i)) {
 										collected_messages.append((cachedMessage.isEdit() ? "EDIT" : "MESSAGE")+" ["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]: "+cachedMessage.getMessage());
 									}
-									Hashes.removeMessagePool(currentMessage.getMessageID());
+									Hashes.removeMessagePool(e.getGuild().getIdLong(), currentMessage.getMessageID());
 									m.delete().queue();
 									if(i == 0 || hash_counter == value) {
 										break;
@@ -1811,7 +1811,7 @@ public class UserExecution {
 								}
 							}
 							else {
-								Hashes.removeMessagePool(currentMessage.getMessageID());
+								Hashes.removeMessagePool(e.getGuild().getIdLong(), currentMessage.getMessageID());
 								hash_counter--;
 							}
 						}

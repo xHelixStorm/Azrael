@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -42,8 +43,6 @@ public class RoleExtend implements Runnable {
 		if(mute_role_object != null) {
 			Role mute_role = guild.getRoleById(mute_role_object.getRole_ID());
 			boolean banHammerFound = false;
-			//get the log channel for the current server
-			var log_channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 			int i = 0;
 			
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild.getIdLong());
@@ -64,15 +63,15 @@ public class RoleExtend implements Runnable {
 						assignedRole = RankingSystem.SQLgetAssignedRole(member.getUser().getIdLong(), guild.getIdLong());
 					banHammerFound = true;
 					//run thread to restart the timer
-					new Thread(new MuteRestart(member, guild, member.getUser().getName()+"#"+member.getUser().getDiscriminator(), log_channel, mute_role, unmute, assignedRole, rankingState)).start();
+					new Thread(new MuteRestart(member, guild, member.getUser().getName()+"#"+member.getUser().getDiscriminator(), mute_role, unmute, assignedRole, rankingState)).start();
 					i++;
 				}
 			}
 			//display the amount of users that are still muted
-			if(banHammerFound == true && log_channel != null) {
+			if(banHammerFound == true) {
 				logger.debug("Found muted users on start up in guild {}", guild.getId());
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_TITLE));
-				guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(i+STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT)+(GuildIni.getOverrideBan(guild.getIdLong()) ? STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_EXCLUDED) : "")).build()).queue();
+				STATIC.writeToRemoteChannel(guild, message, i+STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT)+(GuildIni.getOverrideBan(guild.getIdLong()) ? STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_EXCLUDED) : ""), Channel.LOG.getType());
 			}
 		}
 	}

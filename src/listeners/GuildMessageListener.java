@@ -32,6 +32,7 @@ import core.CommandHandler;
 import core.CommandParser;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Channel;
 import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.FileSetting;
@@ -251,19 +252,18 @@ public class GuildMessageListener extends ListenerAdapter {
 					
 					//include vote up and vote down reactions, if it's a vote channel
 					if(currentChannel != null && currentChannel.getChannel_Type() != null && currentChannel.getChannel_Type().equals("vot") && e.getGuild().getSelfMember().getIdLong() != e.getMember().getUser().getIdLong()) {
-						final var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
 							e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsup:").getUnicode()).queue();
 							e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsdown:").getUnicode()).queue();
 							
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "VOTE", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), 0, 0, GoogleEvent.VOTE.id, log_channel);
+								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "VOTE", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), 0, 0, GoogleEvent.VOTE.id);
 							}
 						}
 						else {
 							logger.error("MESSAGE_ADD_REACTION permission missing for votes in guild {}", e.getGuild().getId());
-							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_ADD_REACTION.getName())+e.getChannel().getName()).build()).queue();
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_ADD_REACTION.getName())+e.getChannel().getName(), Channel.LOG.getType());
 						}
 					}
 					
@@ -347,8 +347,8 @@ public class GuildMessageListener extends ListenerAdapter {
 						if(e.getMember().getUser().getId().equals(content) && (message.equals("1") || message.equals("2") || message.equals("3"))) {
 							//run the quiz in a thread. // retrieve the log channel and quiz channel at the same time and pass them over to the new Thread
 							var channels = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log") || f.getChannel_Type().equals("qui")).collect(Collectors.toList());
-							var log_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals("log")).findAny().orElse(null);
-							var qui_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals("qui")).findAny().orElse(null);
+							var log_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals(Channel.LOG.getType())).findAny().orElse(null);
+							var qui_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals(Channel.QUI.getType())).findAny().orElse(null);
 							long logChannel = 0;
 							long quiChannel = 0;
 							if(log_channel != null)
@@ -374,7 +374,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						//continue as long a question shouldn't be skipped or the quiz shouldn't be interrupted
 						if(!content.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SKIP_QUESTION)) || !content.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
 							//verify that there is a registered quiz channel
-							var qui_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("qui")).findAny().orElse(null);
+							var qui_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.QUI.getType())).findAny().orElse(null);
 							if(qui_channel != null && qui_channel.getChannel_ID() == e.getChannel().getIdLong() && !e.getMember().getUser().isBot() && !UserPrivs.isUserBot(e.getMember())) {
 								//check if an administrator or moderator wishes to skip a question or interrupt all questions
 								if(UserPrivs.isUserAdmin(e.getMember()) || UserPrivs.isUserMod(e.getMember()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
@@ -628,9 +628,8 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 						}
 						else {
-							//retrieve all bots and quiz channels to exclude users from gaining experience points in these channels. also keep bots away from gaining experience points
-							var channels = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("bot") || f.getChannel_Type().equals("qui"))).collect(Collectors.toList());
-							if(!e.getMember().getUser().isBot() && channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) == null) {
+							//exclude bot and quiz channels for experience gain
+							if(!e.getMember().getUser().isBot() && (currentChannel.getChannel_Type() == null || (currentChannel.getChannel_Type() != null && !currentChannel.getChannel_Type().equals(Channel.BOT.getType()) && !currentChannel.getChannel_Type().equals(Channel.QUI.getType())))) {
 								int roleAssignLevel = 0;
 								long role_id = 0;
 								//check if there's a ranking role to unlock when the user reaches the next level
@@ -692,12 +691,12 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(log[1]) {
 						ArrayList<Messages> cacheMessage = new ArrayList<Messages>();
 						cacheMessage.add(collectedMessage);
-						Hashes.addMessagePool(e.getMessageIdLong(), cacheMessage);
+						Hashes.addMessagePool(e.getGuild().getIdLong(), e.getMessageIdLong(), cacheMessage);
 					}
 				}
 				//check if the current user is being watched and that the cache log is enabled
 				var watchedMember = Azrael.SQLgetWatchlist(user_id, guild_id);
-				var sentMessage = Hashes.getMessagePool(e.getMessageIdLong());
+				var sentMessage = Hashes.getMessagePool(e.getGuild().getIdLong(), e.getMessageIdLong());
 				//if the watched member level equals 2, then print all written messages from that user in a separate channel
 				if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
 					var cachedMessage = sentMessage.get(0);

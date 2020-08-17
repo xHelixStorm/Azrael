@@ -19,6 +19,7 @@ import constructors.Rank;
 import constructors.Warning;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Channel;
 import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.GuildIni;
@@ -51,7 +52,6 @@ public class RoleListener extends ListenerAdapter {
 			if(UserPrivs.isUserMuted(e.getMember())) {
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTED_TITLE));
 				//retrieve log channel, mute role and current warnings
-				var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 				var mute_id = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null).getRole_ID();
 				Bancollect warnedUser = Azrael.SQLgetData(user_id, guild_id);
 				var permMute = false;
@@ -74,17 +74,15 @@ public class RoleListener extends ListenerAdapter {
 					Hashes.clearTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 					//set mute status to true
 					if(Azrael.SQLUpdateMuted(user_id, guild_id, true) == 0) {
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_7).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 						logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
-						if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_7).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
 					}
 					//remove all roles, except the mute role when the muted user has more than 1 assigned role
-					if(e.getMember().getRoles().size() > 1 && !removeRoles(e, mute_id) && log_channel != null)
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation2(e.getGuild(), Translation.ROLE_ROLES_REMOVE_ERR)).build()).queue();
+					if(e.getMember().getRoles().size() > 1 && !removeRoles(e, mute_id))
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), Permission.MANAGE_ROLES.getName()+STATIC.getTranslation2(e.getGuild(), Translation.ROLE_ROLES_REMOVE_ERR), Channel.LOG.getType());
 					if(!warnedUser.getGuildLeft()) {
 						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-						if(log_channel != null) {
-							e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_1).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
-						}
+						STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_1).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 						Azrael.SQLInsertActionLog("MEMBER_PERM_MUTE_READD", user_id, guild_id, "Permanent Mute role reassigned");
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
 							Object [] object = getReporterFromAuditLog(e);
@@ -97,14 +95,12 @@ public class RoleListener extends ListenerAdapter {
 								reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
 								reporter_username = reporter.getEffectiveName();
 							}
-							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE_READD.id, log_channel);
+							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE_READD.id);
 						}
 					}
 					else {
 						Azrael.SQLUpdateGuildLeft(user_id, guild_id, false);
-						if(log_channel != null) {
-							e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_3).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
-						}
+						STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_3).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 					}
 				}
 				//enter if a mute timer has been defined but the user itself is not yet marked as muted on the table (e.g. manually removing and adding the mute role)
@@ -112,16 +108,14 @@ public class RoleListener extends ListenerAdapter {
 					Hashes.clearTempCache("mute_time_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 					//set mute status to true
 					if(Azrael.SQLUpdateMuted(user_id, guild_id, true) == 0) {
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_7), Channel.LOG.getType());
 						logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
-						if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_7)).build()).queue();
 					}
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-					if(log_channel != null) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_2).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
-					}
+					STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_2).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 					//remove all roles, except the mute role when the muted user has more than 1 assigned role
-					if(e.getMember().getRoles().size() > 1 && !removeRoles(e, mute_id) && log_channel != null)
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation2(e.getGuild(), Translation.ROLE_ROLES_REMOVE_ERR)).build()).queue();
+					if(e.getMember().getRoles().size() > 1 && !removeRoles(e, mute_id))
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), Permission.MANAGE_ROLES.getName()+STATIC.getTranslation2(e.getGuild(), Translation.ROLE_ROLES_REMOVE_ERR), Channel.LOG.getType());
 					Azrael.SQLInsertActionLog("MEMBER_MUTE_READD", user_id, guild_id, "Mute role reassigned");
 					//Run google service, if enabled
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
@@ -135,16 +129,14 @@ public class RoleListener extends ListenerAdapter {
 							reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
 							reporter_username = reporter.getEffectiveName();
 						}
-						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE_READD.id, log_channel);
+						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE_READD.id);
 					}
 				}
 				//enter in this block, if the user has been already muted but rejoined the server before the time elapsed
 				else if(unmute_time - System.currentTimeMillis() > 0 && warnedUser.getMuted() && warnedUser.getGuildLeft()) {
 					//mark the user as has rejoined the server
 					Azrael.SQLUpdateGuildLeft(user_id, guild_id, false);
-					if(log_channel != null) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_4).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
-					}
+					STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_4).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 				}
 				//for manual mutes without command and which isn't permanent and for users that can be interacted with
 				else if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
@@ -152,8 +144,8 @@ public class RoleListener extends ListenerAdapter {
 					long from_user = (long)object[0];
 					
 					//remove all roles, except the mute role when the muted user has more than 1 assigned role
-					if(e.getMember().getRoles().size() > 1 && !removeRoles(e, mute_id) && log_channel != null)
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(Permission.MANAGE_ROLES.getName()+STATIC.getTranslation2(e.getGuild(), Translation.ROLE_ROLES_REMOVE_ERR)).build()).queue();
+					if(e.getMember().getRoles().size() > 1 && !removeRoles(e, mute_id))
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), Permission.MANAGE_ROLES.getName()+STATIC.getTranslation2(e.getGuild(), Translation.ROLE_ROLES_REMOVE_ERR), Channel.LOG.getType());
 					
 					long time = System.currentTimeMillis();
 					int warning_id = warnedUser.getWarningID();
@@ -187,17 +179,17 @@ public class RoleListener extends ListenerAdapter {
 										//success callback not required
 										channel.close().queue();
 									}, error -> {
-										if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_DM_LOCKED)).build()).queue();
+										STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_DM_LOCKED), Channel.LOG.getType());
 										channel.close().queue();
 									});
 						});
 						//unmute after a specific amount of time
-						new Thread(new RoleTimer(e, mute_time, log_channel, mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0, issuer, reason)).start();
+						new Thread(new RoleTimer(e, mute_time, mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0, issuer, reason)).start();
 						logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getId());
 						
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), new Timestamp(time), user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", new Timestamp(time+mute_time), null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE.id, log_channel);
+							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), new Timestamp(time), user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", new Timestamp(time+mute_time), null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE.id);
 						}
 					}
 					//execute this block if a regular mute has been applied
@@ -226,8 +218,8 @@ public class RoleListener extends ListenerAdapter {
 						if((warning_id+1) <= max_warning) {
 							//mark the user as muted with a set time
 							if(Azrael.SQLInsertData(user_id, guild_id, (warning_id+1), 1, timestamp, unmute_timestamp, true, false) == 0) {
+								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_FLAG_SET), Channel.LOG.getType());
 								logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
-								if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
 							}
 							//send a private message
 							e.getUser().openPrivateChannel().queue(channel -> {
@@ -236,17 +228,17 @@ public class RoleListener extends ListenerAdapter {
 											//success callback not required
 											channel.close().queue();
 										}, error -> {
-											if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_DM_LOCKED)).build()).queue();
+											STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_DM_LOCKED), Channel.LOG.getType());
 											channel.close().queue();
 										});
 							});
 							//run RoleTimer for automatic unmute
-							new Thread(new RoleTimer(e, mute_time, log_channel, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning, issuer, reason)).start();
+							new Thread(new RoleTimer(e, mute_time, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning, issuer, reason)).start();
 							logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getId());
 							
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE.id, log_channel);
+								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE.id);
 							}
 						}
 						//ban or perm mute if the current warning exceeded the max allowed warning
@@ -263,7 +255,7 @@ public class RoleListener extends ListenerAdapter {
 													logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 													channel.close().queue();
 												}, error -> {
-													if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_DM_LOCKED)).build()).queue();
+													STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_DM_LOCKED), Channel.LOG.getType());
 													//ban the user
 													e.getGuild().ban(e.getMember(), 0).reason(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_REASON)).queue();
 													logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
@@ -272,15 +264,15 @@ public class RoleListener extends ListenerAdapter {
 									});
 								}
 								else {
-									if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_PERMISSION_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)+Permission.BAN_MEMBERS.getName()).build()).queue();
+									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_PERMISSION_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)+Permission.BAN_MEMBERS.getName(), Channel.LOG.getType());
 									logger.warn("BAN MEMBERS permission missing to ban a user in guild {}!", e.getGuild().getId());
 								}
 							}
 							else {
 								//mark the user as permanently muted
 								if(Azrael.SQLInsertData(user_id, guild_id, warning_id, 1, timestamp, null, true, false) == 0) {
+									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_FLAG_SET), Channel.LOG.getType());
 									logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
-									if(log_channel != null)e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage("An internal error occurred. Muted user couldn't be inserted into Azrael.bancollect").queue();
 								}
 								//send a private message
 								e.getUser().openPrivateChannel().queue(channel -> {
@@ -289,16 +281,16 @@ public class RoleListener extends ListenerAdapter {
 												//no callback required
 												channel.close().queue();
 											}, error -> {
-												if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_DM_LOCKED)).build()).queue();
+												STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_DM_LOCKED), Channel.LOG.getType());
 												channel.close().queue();
 											});
 								});
 								//execute RoleTimer
-								new Thread(new RoleTimer(e, log_channel, mute_id, issuer, reason)).start();
+								new Thread(new RoleTimer(e, mute_id, issuer, reason)).start();
 								
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, "PERMANENT", ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE.id, log_channel);
+									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, "PERMANENT", ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, 0, null, 0, 0, GoogleEvent.MUTE.id);
 								}
 							}
 						}
@@ -313,11 +305,11 @@ public class RoleListener extends ListenerAdapter {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 						//remove the mute role and send a message
 						e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
-						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_RETRACTED_TITLE)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_REMOVED)).build()).queue();
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_RETRACTED_TITLE)), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_REMOVED), Channel.LOG.getType());
 						logger.warn("{} received a mute role that has been instantly removed in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 					else {
-						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_REMOVE_ERR)+Permission.MANAGE_ROLES.getName()).build()).queue();
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_REMOVE_ERR)+Permission.MANAGE_ROLES.getName(), Channel.LOG.getType());
 						logger.warn("MANAGE ROLES permission missing to retract the mute role in guild {}!", e.getGuild().getId());
 					}
 				}

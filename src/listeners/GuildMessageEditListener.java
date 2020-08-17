@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +16,7 @@ import com.vdurmont.emoji.EmojiManager;
 import constructors.Messages;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Channel;
 import enums.GoogleDD;
 import enums.GoogleEvent;
 import enums.Translation;
@@ -56,7 +56,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 			//execute only one thread at the same time
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			//check if the edited message has been already checked, in case if it's the same message like before an edit
-			var messages = Hashes.getMessagePool(e.getMessageIdLong());
+			var messages = Hashes.getMessagePool(e.getGuild().getIdLong(), e.getMessageIdLong());
 			var sameMessage = false;
 			if(messages != null) {
 				if(messages.parallelStream().filter(f -> f.getMessage().equalsIgnoreCase(e.getMessage().getContentRaw())).findAny().orElse(null) != null)
@@ -80,31 +80,18 @@ public class GuildMessageEditListener extends ListenerAdapter {
 			}
 			
 			executor.execute(() -> {
-				long destinationChannel = 0;
 				boolean printEditHistory = false;
 				//check if edited messages should be collected and printed in a channel
 				if(GuildIni.getEditedMessage(e.getGuild().getIdLong())) {
-					//retrieve any registered trash and edit channels but use the edit channel if it exists and print the message
-					var traAndEdiChannels = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals("tra") || f.getChannel_Type().equals("edi"))).collect(Collectors.toList());
-					var tra_channel = traAndEdiChannels.parallelStream().filter(f -> f.getChannel_Type().equals("tra")).findAny().orElse(null);
-					var edi_channel = traAndEdiChannels.parallelStream().filter(f -> f.getChannel_Type().equals("edi")).findAny().orElse(null);
-					if(tra_channel != null || edi_channel != null) {
-						//verify if the message history has to be printed and not just the edited message
-						if(GuildIni.getEditedMessageHistory(e.getGuild().getIdLong())) {
-							printEditHistory = true;
-							destinationChannel = (edi_channel != null ? edi_channel.getChannel_ID() : tra_channel.getChannel_ID());
-						}
-						else {
-							final var printMessage = e.getMessage().getContentRaw();
-							if(edi_channel != null) {
-								e.getGuild().getTextChannelById(edi_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setAuthor(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE))
-									.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
-							}
-							else {
-								e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setAuthor(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE))
-										.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
-							}
-						}
+					//verify if the message history has to be printed and not just the edited message
+					if(GuildIni.getEditedMessageHistory(e.getGuild().getIdLong())) {
+						printEditHistory = true;
+					}
+					//print the edited message either in an edit or trash channel
+					else {
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setAuthor(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE))
+							, (e.getMessage().getContentRaw().length() <= 2048 ? e.getMessage().getContentRaw() : e.getMessage().getContentRaw().substring(0, 2040)+"...")
+							, Channel.EDI.getType(), Channel.TRA.getType());
 					}
 				}
 				
@@ -130,36 +117,40 @@ public class GuildMessageEditListener extends ListenerAdapter {
 					if(log[1]) {
 						if(messages != null) {
 							messages.add(collectedMessage);
-							Hashes.addMessagePool(e.getMessageIdLong(), messages);
+							Hashes.addMessagePool(e.getGuild().getIdLong(), e.getMessageIdLong(), messages);
 						}
 					}
 				}
 				
 				//if true, print the message history on message edit
-				if(printEditHistory && destinationChannel != 0) {
+				if(printEditHistory) {
 					var messageCounter = 0;
 					if(messages != null) {
 						//print initial and second message, else print only the last message
 						if(messages.size() == 2) {
 							for(final var message : messages) {
 								final var printMessage = message.getMessage();
-								e.getGuild().getTextChannelById(destinationChannel).sendMessage(new EmbedBuilder().setAuthor(message.getUserName()+" ("+message.getUserID()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE_HISTORY)+(++messageCounter))
-									.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+								boolean result = STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setAuthor(message.getUserName()+" ("+message.getUserID()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE_HISTORY)+(++messageCounter))
+										, (printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")
+										, Channel.EDI.getType(), Channel.TRA.getType());
+								if(!result)
+									break;
 							}
 						}
 						else {
 							int num = messages.size();
 							final var message = messages.get(num-1);
 							final var printMessage = message.getMessage();
-							e.getGuild().getTextChannelById(destinationChannel).sendMessage(new EmbedBuilder().setAuthor(message.getUserName()+" ("+message.getUserID()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE_HISTORY)+num)
-								.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setAuthor(message.getUserName()+" ("+message.getUserID()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE_HISTORY)+num)
+									, (printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")
+									, Channel.EDI.getType(), Channel.TRA.getType());
 						}
 					}
 				}
 				
 				//check if the current user is being watched and that the cache log is enabled
 				var watchedMember = Azrael.SQLgetWatchlist(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
-				var sentMessage = Hashes.getMessagePool(e.getMessageIdLong());
+				var sentMessage = Hashes.getMessagePool(e.getGuild().getIdLong(), e.getMessageIdLong());
 				//if the watched member level equals 2, then print all written messages from that user in a separate channel
 				if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
 					var cachedMessage = sentMessage.get(0);
@@ -245,9 +236,8 @@ public class GuildMessageEditListener extends ListenerAdapter {
 								}
 							}
 						} catch (Exception e1) {
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
 							logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
-							final var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null); 
-							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
 						}
 					}
 				}

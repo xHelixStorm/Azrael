@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.vdurmont.emoji.EmojiParser;
 
 import core.UserPrivs;
+import enums.Channel;
 import enums.GoogleDD;
 import enums.GoogleEvent;
 import enums.Translation;
@@ -194,9 +195,8 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 									}
 								}
 							} catch (Exception e1) {
+								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
 								logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
-								final var log_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null); 
-								if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
 							}
 						}
 					}
@@ -210,8 +210,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 	 * @param e
 	 */
 	private static void printPermissionError(GuildMessageReactionRemoveEvent e) {
-		final var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-		if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replace("{}", e.getUserId())+Permission.MANAGE_ROLES.getName()).build()).queue();
+		STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName(), Channel.LOG.getType());
 		logger.warn("MANAGE ROLES permission missing to remove reaction roles in guild {}!", e.getGuild().getId());
 	}
 }

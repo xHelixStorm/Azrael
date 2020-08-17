@@ -211,7 +211,7 @@ public class TwitterModel {
 												collectedMessage.setIsEdit(false);
 												ArrayList<Messages> cacheMessage = new ArrayList<Messages>();
 												cacheMessage.add(collectedMessage);
-												Hashes.addMessagePool(m.getIdLong(), cacheMessage);
+												Hashes.addMessagePool(guild.getIdLong(), m.getIdLong(), cacheMessage);
 											}
 										});
 								});

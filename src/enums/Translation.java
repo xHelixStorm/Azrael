@@ -949,6 +949,7 @@ public enum Translation {
 	ROLE_RETRACTED_TITLE		("role_retracted_title"),
 	ROLE_MUTE_REMOVED			("role_mute_removed"),
 	ROLE_MUTE_REMOVE_ERR		("role_mute_remove_err"),
+	ROLE_FLAG_SET				("role_flag_set"),
 	ROLE_FLAG_REMOVE			("role_flag_remove"),
 	ROLE_REASSIGN_ERR			("role_reassign_err"),
 	ROLE_MANUAL_REMOVE_TITLE	("role_manual_remove_title"),

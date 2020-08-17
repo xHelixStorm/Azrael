@@ -11,8 +11,8 @@ import java.sql.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import constructors.Channels;
 import core.Hashes;
+import enums.Channel;
 import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.GuildIni;
@@ -32,17 +32,15 @@ public class MuteRestart implements Runnable {
 	private Member member;
 	private Guild guild;
 	private String user_name;
-	private Channels channel;
 	private Role mute_role;
 	private long unmute;
 	private long assignedRole;
 	private boolean ranking_state;
 	
-	public MuteRestart(Member _member, Guild _guild, String _user_name, Channels _channel, Role _mute_role, long _unmute, long _assignedRole, boolean _ranking_state) {
+	public MuteRestart(Member _member, Guild _guild, String _user_name, Role _mute_role, long _unmute, long _assignedRole, boolean _ranking_state) {
 		this.member = _member;
 		this.guild = _guild;
 		this.user_name = _user_name;
-		this.channel = _channel;
 		this.mute_role = _mute_role;
 		this.unmute = _unmute;
 		this.assignedRole = _assignedRole;
@@ -58,11 +56,12 @@ public class MuteRestart implements Runnable {
 		try {
 			//put the thread to wait for a determined time
 			Thread.sleep(unmute);
+			
 			//check if the user has been banned during the wait and if not, check if he's still muted. If muted, print message that the mute has been lifted
 			if(!Azrael.SQLisBanned(user_id, guild.getIdLong())) {
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-				if(channel != null && Azrael.SQLgetMuted(user_id, guild.getIdLong()) == true) {
-					guild.getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(guild, Translation.UNMUTE_MESSAGE).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
+				if(Azrael.SQLgetMuted(user_id, guild.getIdLong())) {
+					STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.UNMUTE_MESSAGE).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 				}
 				//if the user is still present on the server, remove the mute role and assign back a ranking role, if available
 				member = guild.getMemberById(user_id);
@@ -73,7 +72,7 @@ public class MuteRestart implements Runnable {
 						if(assignedRole != 0 && ranking_state == true){guild.addRoleToMember(member, guild.getRoleById(assignedRole)).queue();}
 					}
 					else {
-						if(channel != null) guild.getTextChannelById(channel.getChannel_ID()).sendMessage(message.setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(guild, Translation.UNMUTE_REMOVE_ERR)+Permission.MANAGE_ROLES).build()).queue();
+						STATIC.writeToRemoteChannel(guild, message.setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.UNMUTE_REMOVE_ERR)+Permission.MANAGE_ROLES, Channel.LOG.getType());
 						logger.warn("MANAGE ROLES permission required to remove the mute role in guild {}", guild.getId());
 					}
 				}
@@ -86,7 +85,7 @@ public class MuteRestart implements Runnable {
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
 							final String NA = STATIC.getTranslation2(guild, Translation.NOT_AVAILABLE);
-							GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, timestamp, user_name, effectiveName, "", "", NA, null, null, "UNMUTED", null, NA, NA, null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id, channel);
+							GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, timestamp, user_name, effectiveName, "", "", NA, null, null, "UNMUTED", null, NA, NA, null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id);
 						}
 					}
 					else
@@ -98,11 +97,9 @@ public class MuteRestart implements Runnable {
 			logger.info("The mute of {} ing guild {} has been interrupted!", user_id, guild.getId());
 			//verify that the user is not banned and still labeled as muted before printing a message and before updating the unmute time
 			if(!Azrael.SQLisBanned(user_id, guild.getIdLong())) {
-				if(channel != null) {
-					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-					Azrael.SQLUpdateUnmute(user_id, guild.getIdLong(), timestamp);
-					guild.getTextChannelById(channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(guild, Translation.UNMUTE_MESSAGE_2).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)).build()).queue();
-				}
+				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+				Azrael.SQLUpdateUnmute(user_id, guild.getIdLong(), timestamp);
+				STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.UNMUTE_MESSAGE_2).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 				//if the user is still present on the server, remove the mute role and assign back a ranking role, if available
 				Role role = null;
 				member = guild.getMemberById(user_id);
@@ -114,7 +111,7 @@ public class MuteRestart implements Runnable {
 						if(role != null && ranking_state == true) guild.addRoleToMember(member, guild.getRoleById(assignedRole)).queue();
 					}
 					else {
-						if(channel != null) guild.getTextChannelById(channel.getChannel_ID()).sendMessage(message.setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(guild, Translation.UNMUTE_REMOVE_ERR)).build()).queue();
+						STATIC.writeToRemoteChannel(guild, message.setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.UNMUTE_REMOVE_ERR), Channel.LOG.getType());
 						logger.warn("MANAGE ROLES permission required to remove the mute role in guild {}", guild.getId());
 					}
 				}
@@ -139,7 +136,7 @@ public class MuteRestart implements Runnable {
 						role_id = role.getId();
 						role_name = role.getName();
 					}
-					GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, effectiveName, reporter_name, reporter_username, NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id, channel);
+					GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, effectiveName, reporter_name, reporter_username, NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id);
 				}
 			}
 		}

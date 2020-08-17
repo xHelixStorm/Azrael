@@ -30,7 +30,7 @@ import constructors.Weapons;
 import net.dv8tion.jda.api.entities.Member;
 
 public class Hashes {
-	private static final int max_message_pool_size = 100000;
+	/*private static final int max_message_pool_size = 100000;
 	private static final LinkedHashMap<Long, ArrayList<Messages>> message_pool = new LinkedHashMap<Long, ArrayList<Messages>>() {
 		private static final long serialVersionUID = 7505333508062985903L;
 		@Override
@@ -38,7 +38,7 @@ public class Hashes {
         protected boolean removeEldestEntry(final Map.Entry eldest) {
             return size() > max_message_pool_size;
         }
-    };
+    };*/
     private static final int max_ranking_pool_size = 500;
     private static final LinkedHashMap<String, Rank> ranking = new LinkedHashMap<String, Rank>() {
 		private static final long serialVersionUID = 7054847678737381845L;
@@ -49,6 +49,7 @@ public class Hashes {
     	}
     };
     
+    private final static ConcurrentMap<Long, LinkedHashMap<Long, ArrayList<Messages>>> guild_message_pool = new ConcurrentHashMap<Long, LinkedHashMap<Long, ArrayList<Messages>>>();
     private static final ConcurrentMap<String, ArrayList<String>> querry_result = new ConcurrentHashMap<String, ArrayList<String>>();
     private static final ConcurrentMap<Long, ArrayList<NameFilter>> name_filter = new ConcurrentHashMap<Long, ArrayList<NameFilter>>();
     private static final ConcurrentMap<Long, ArrayList<String>> filter_lang = new ConcurrentHashMap<Long, ArrayList<String>>();
@@ -86,8 +87,21 @@ public class Hashes {
     private static final ConcurrentHashMap<String, SpamDetection> spamDetection = new ConcurrentHashMap<String, SpamDetection>();
     private static final ConcurrentHashMap<Long, String> languages = new ConcurrentHashMap<Long, String>();
 	
-	public static void addMessagePool(long _message_id, ArrayList<Messages> _messages) {
+    
+    public static void initializeGuildMessagePool(Long _key, final int max_message_pool_size) {
+    	LinkedHashMap<Long, ArrayList<Messages>> message_pool = new LinkedHashMap<Long, ArrayList<Messages>>() {
+			private static final long serialVersionUID = 1770564696361163460L;
+			@SuppressWarnings("rawtypes")
+            protected boolean removeEldestEntry(final Map.Entry eldest) {
+                return size() > max_message_pool_size;
+            }
+    	};
+    	guild_message_pool.put(_key, message_pool);
+    }
+	public static void addMessagePool(final long _key, long _message_id, ArrayList<Messages> _messages) {
+		final var message_pool = guild_message_pool.get(_key);
 		message_pool.put(_message_id, _messages);
+		guild_message_pool.put(_key, message_pool);
 	}
 	public static void addFilterLang(long _channel_id, ArrayList<String> _filter_lang) {
 		filter_lang.put(_channel_id, _filter_lang);
@@ -201,14 +215,15 @@ public class Hashes {
 		languages.put(_key, _lang);
 	}
 	
-	public static ArrayList<Messages> getMessagePool(long _message_id) {
+	public static ArrayList<Messages> getMessagePool(long _key, long _message_id) {
+		final var message_pool = guild_message_pool.get(_key);
 		return message_pool.get(_message_id);
 	}
 	public static ArrayList<String> getFilterLang(long _channel_id) {
 		return filter_lang.get(_channel_id);
 	}
-	public static LinkedHashMap<Long, ArrayList<Messages>> getWholeMessagePool() {
-		return message_pool;
+	public static LinkedHashMap<Long, ArrayList<Messages>> getWholeMessagePool(long _key) {
+		return guild_message_pool.get(_key);
 	}
 	public static ArrayList<String> getQuerryResult(String _key) {
 		return querry_result.get(_key);
@@ -335,8 +350,10 @@ public class Hashes {
 		return languages.get(_key);
 	}
 	
-	public static void removeMessagePool(long _message_id) {
+	public static void removeMessagePool(final long _key, long _message_id) {
+		final var message_pool = guild_message_pool.get(_key);
 		message_pool.remove(_message_id);
+		guild_message_pool.put(_key, message_pool);
 	}
 	public static void removeFilterLang(long _key) {
 		filter_lang.remove(_key);

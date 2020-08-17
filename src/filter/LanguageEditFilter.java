@@ -14,9 +14,12 @@ import constructors.Cache;
 import constructors.Channels;
 import core.Hashes;
 import core.UserPrivs;
+import enums.Channel;
 import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import sql.Azrael;
 import sql.DiscordRoles;
@@ -72,19 +75,22 @@ public class LanguageEditFilter implements Runnable {
 						STATIC.handleRemovedMessages(null, e, output);
 						var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
 						if(tra_channel != null) {
-							Matcher matcher = Pattern.compile("[\\w\\d]*").matcher(getMessage);
-							while(matcher.find()) {
-								var word = matcher.group();
-								var convertedWord = CharacterReplacer.replace(word);
-								if(convertedWord.equalsIgnoreCase(option.get())) {
-									getMessage = getMessage.replace(word, "**__"+word+"__**");
-									break;
+							final TextChannel textChannel = e.getGuild().getTextChannelById(tra_channel.getChannel_ID());
+							if(textChannel != null && e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)) {
+								Matcher matcher = Pattern.compile("[\\w\\d]*").matcher(getMessage);
+								while(matcher.find()) {
+									var word = matcher.group();
+									var convertedWord = CharacterReplacer.replace(word);
+									if(convertedWord.equalsIgnoreCase(option.get())) {
+										getMessage = getMessage.replace(word, "**__"+word+"__**");
+										break;
+									}
 								}
+								message.setTitle(name);
+								message.setFooter(channel + "("+e.getChannel().getId()+")").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
+								final String printMessage = STATIC.getTranslation(e.getMember(), Translation.CENSOR_TITLE_DETECTED).replaceFirst("\\{\\}", option.get()).replace("{}", filter)+"\n\n"+getMessage;
+								textChannel.sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 							}
-							message.setTitle(name);
-							message.setFooter(channel + "("+e.getChannel().getId()+")").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
-							final String printMessage = STATIC.getTranslation(e.getMember(), Translation.CENSOR_TITLE_DETECTED).replaceFirst("\\{\\}", option.get()).replace("{}", filter)+"\n\n"+getMessage;
-							e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 						}
 						break;
 					}
@@ -124,8 +130,7 @@ public class LanguageEditFilter implements Runnable {
 								if(threshold != null) {
 									var count = Integer.parseInt(threshold);
 									if(++count == 30) {
-										var log_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-										if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_HARD)).queue();
+										STATIC.writeToRemoteChannel(e.getGuild(), null, STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_HARD), Channel.LOG.getType());
 									}
 									if(count >= 30) {
 										var mute_role = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
@@ -152,15 +157,12 @@ public class LanguageEditFilter implements Runnable {
 	private static void deleteHeavyCensoringMessage(GuildMessageUpdateEvent e, List<Channels> allChannels, String name, String channel, String getMessage, List<Attachment> attachments) {
 		Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
 		e.getMessage().delete().reason("Message removed due to heavy censoring!").queue();
-		var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("tra")).findAny().orElse(null);
-		if(tra_channel != null) {
-			StringBuilder out = new StringBuilder();
-			for(final Attachment attachment : attachments) {
-				out.append(attachment.getProxyUrl()+"\n");
-			}
-			EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")").setFooter(channel+" ("+e.getChannel().getId()+")").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
-			final String printMessage = STATIC.getTranslation2(e.getGuild(), Translation.HEAVY_CENSORING_DELETED)+"\n\n"+getMessage+"\n"+out.toString();
-			e.getGuild().getTextChannelById(tra_channel.getChannel_ID()).sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+		StringBuilder out = new StringBuilder();
+		for(final Attachment attachment : attachments) {
+			out.append(attachment.getProxyUrl()+"\n");
 		}
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")").setFooter(channel+" ("+e.getChannel().getId()+")").setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
+		final String printMessage = STATIC.getTranslation2(e.getGuild(), Translation.HEAVY_CENSORING_DELETED)+"\n\n"+getMessage+"\n"+out.toString();
+		STATIC.writeToRemoteChannel(e.getGuild(), message, (printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"..."), Channel.TRA.getType());
 	}
 }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Cache;
 import core.Hashes;
+import enums.Channel;
 import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.GuildIni;
@@ -63,8 +64,6 @@ public class NameListener extends ListenerAdapter {
 					if(name != null) {
 						//verify that the user has lower permissions than the bot
 						if(guild.getSelfMember().canInteract(member)) {
-							//retrieve log channel
-							var log_channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 							//verify if the bot has the permission to manage nicknames
 							if(guild.getSelfMember().hasPermission(Permission.NICKNAME_MANAGE)) {
 								//retrieve a random nickname and assign to the user
@@ -73,15 +72,15 @@ public class NameListener extends ListenerAdapter {
 								Hashes.addTempCache("nickname_add_gu"+guild.getId()+"us"+user_id, new Cache(60000));
 								updateNickname(member, nickname);
 								message.setColor(Color.RED).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation2(guild, Translation.NAME_STAFF_TITLE));
-								if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(guild, Translation.NAME_STAFF_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", nickname)).build()).queue();
+								STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.NAME_STAFF_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", nickname), Channel.LOG.getType());
 								Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild.getIdLong(), newname);
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
-									GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_STAFF_IMPERSONATION), null, null, "RENAMED", null, null, null, oldname, newname, 0, null, 0, 0, GoogleEvent.RENAME.id, log_channel);
+									GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_STAFF_IMPERSONATION), null, null, "RENAMED", null, null, null, oldname, newname, 0, null, 0, 0, GoogleEvent.RENAME.id);
 								}
 							}
 							else {
-								if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation2(guild, Translation.NAME_STAFF_ERR_2)+Permission.NICKNAME_MANAGE.getName()).build()).queue();
+								STATIC.writeToRemoteChannel(guild, message.setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.NAME_STAFF_ERR_2)+Permission.NICKNAME_MANAGE.getName(), Channel.LOG.getType());
 								logger.warn("Lacking MANAGE NICKNAME permission in guild {}", guild.getId());
 							}
 							staff_name = true;
@@ -93,8 +92,6 @@ public class NameListener extends ListenerAdapter {
 						//look up the name filter for not allowed words
 						final var word = Azrael.SQLgetNameFilter(guild.getIdLong()).parallelStream().filter(f -> nameCheck.contains(f.getName())).findAny().orElse(null);
 						if(word != null) {
-							//retrieve the log channel
-							var log_channel = Azrael.SQLgetChannels(guild.getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
 							//verify that the user has lower permissions than the bot
 							if(guild.getSelfMember().canInteract(member)) {
 								if(!word.getKick()) {
@@ -106,15 +103,15 @@ public class NameListener extends ListenerAdapter {
 										Hashes.addTempCache("nickname_add_gu"+guild.getId()+"us"+user_id, new Cache(60000));
 										updateNickname(member, nickname);
 										message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(guild, Translation.NAME_TITLE));
-										if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(guild, Translation.NAME_ASSIGN_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", nickname)).build()).queue();
+										STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.NAME_ASSIGN_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", nickname), Channel.LOG.getType());
 										Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild.getIdLong(), newname);
 										//Run google service, if enabled
 										if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
-											GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_REASON), null, null, "RENAMED", null, null, null, oldname, newname, 0, null, 0, 0, GoogleEvent.RENAME.id, log_channel);
+											GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_REASON), null, null, "RENAMED", null, null, null, oldname, newname, 0, null, 0, 0, GoogleEvent.RENAME.id);
 										}
 									}
 									else {
-										if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED).setDescription(STATIC.getTranslation2(guild, Translation.NAME_ASSIGN_ERR_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replace("{}", newname)+Permission.NICKNAME_MANAGE.getName()).build()).queue();
+										STATIC.writeToRemoteChannel(guild, message.setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED), STATIC.getTranslation2(guild, Translation.NAME_ASSIGN_ERR_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replace("{}", newname)+Permission.NICKNAME_MANAGE.getName(), Channel.LOG.getType());
 										logger.warn("Lacking MANAGE NICKNAME permission in guild {}", guild.getId());
 									}
 								}
@@ -127,22 +124,22 @@ public class NameListener extends ListenerAdapter {
 											channel.sendMessage(STATIC.getTranslation2(guild, Translation.NAME_KICK_DM).replaceFirst("\\{\\}", guild.getName()).replace("{}", word.getName().toUpperCase())).queue(success -> {
 												guild.kick(member).reason(STATIC.getTranslation2(guild, Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase())).queue();
 												message.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(guild, Translation.NAME_KICK_TITLE));
-												if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(guild, Translation.NAME_KICK_MESSAGE_3).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", word.getName().toUpperCase())).build()).queue();
+												STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.NAME_KICK_MESSAGE_3).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", word.getName().toUpperCase()), Channel.LOG.getType());
 											}, error -> {
 												guild.kick(member).reason(STATIC.getTranslation2(guild, Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase())).queue();
 												message.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(guild, Translation.NAME_KICK_TITLE));
-												if(log_channel != null) e.getJDA().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(guild, Translation.NAME_KICK_MESSAGE_4).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", word.getName().toUpperCase())).build()).queue();
+												STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.NAME_KICK_MESSAGE_4).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", word.getName().toUpperCase()), Channel.LOG.getType());
 											});
 										});
 										Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild.getIdLong(), "kick", STATIC.getTranslation2(guild, Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), 0, "");
 										//Run google service, if enabled
 										if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
-											GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), member.getEffectiveName(), guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), null, null, "KICK", null, null, null, null, null, 0, null, 0, 0, GoogleEvent.KICK.id, log_channel);
+											GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), member.getEffectiveName(), guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), null, null, "KICK", null, null, null, null, null, 0, null, 0, 0, GoogleEvent.KICK.id);
 										}
 									}
 									else {
 										message.setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS));
-										if(log_channel != null) guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setDescription(STATIC.getTranslation2(guild, Translation.NAME_KICK_PERMISSION_ERR_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", word.getName().toUpperCase())+Permission.KICK_MEMBERS.getName()).build()).queue();
+										STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.NAME_KICK_PERMISSION_ERR_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", word.getName().toUpperCase())+Permission.KICK_MEMBERS.getName(), Channel.LOG.getType());
 										logger.warn("Lacking KICK MEMBERS permission in guild {}", guild.getId());
 									}
 								}

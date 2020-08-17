@@ -15,7 +15,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
  * 
  */
 
-public class StatusListener extends ListenerAdapter{
+public class StatusListener extends ListenerAdapter {
+	private static String oldActivity = null;
 	
 	public void onUserUpdateOnlineStatus(UserUpdateOnlineStatusEvent e) {
 		new Thread(() -> {
@@ -26,8 +27,10 @@ public class StatusListener extends ListenerAdapter{
 			else {
 				//set the game message if provided
 				final String message = IniFileReader.getGameMessage();
-				if(message != null && message.length() > 0)
+				if(message != null && message.length() > 0 && !message.equals(oldActivity)) {
+					oldActivity = message;
 					e.getJDA().getPresence().setActivity(Activity.of(ActivityType.DEFAULT, IniFileReader.getGameMessage()));
+				}
 			}
 		}).start();
 	}

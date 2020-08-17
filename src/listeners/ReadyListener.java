@@ -10,10 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Cache;
-import constructors.Channels;
 import constructors.Guilds;
 import constructors.Patchnote;
 import core.Hashes;
+import enums.Channel;
 import enums.Translation;
 import enums.Weekday;
 import fileManagement.FileSetting;
@@ -111,16 +111,10 @@ public class ReadyListener extends ListenerAdapter {
 					logger.error("Patchnotes.guilds is empty and couldn't be filled! for guild {}", guild.getId());
 				}
 			}
-			Channels log_channel = null;
-			Channels bot_channel = null;
 			//Retrieve all registered channels and throw warning, if no channel has been registered. If found, check for the log and bot channel
 			var channels = Azrael.SQLgetChannels(guild.getIdLong());
 			if(channels == null) {
 				logger.warn("Channel information from Azrael.channels couldn't be retrieved and cached for guild {}", guild.getId());
-			}
-			else if(channels.size() > 0) {
-				log_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-				bot_channel = channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("bot")).findAny().orElse(null);
 			}
 			//retrieve all registered discord roles, if empty insert the roles into the database and throw an error if this fails as well
 			if(DiscordRoles.SQLgetRoles(guild.getIdLong()).size() == 0) {
@@ -146,7 +140,7 @@ public class ReadyListener extends ListenerAdapter {
 			ParseSubscription.runTask(e.getJDA(), guild.getIdLong());
 			
 			//print bot is now operational message for the current server
-			if(log_channel != null){e.getJDA().getGuildById(guild.getId()).getTextChannelById(log_channel.getChannel_ID()).sendMessage("Bot is now operational!").queue();}
+			STATIC.writeToRemoteChannel(guild, null, "Bot is now operational!", Channel.LOG.getType());
 			
 			//print public and private patch notes, if available for the current version of the bot
 			Patchnote priv_notes = null;
@@ -161,30 +155,19 @@ public class ReadyListener extends ListenerAdapter {
 			var published = false;
 			if(priv_notes != null && GuildIni.getPrivatePatchNotes(guild.getIdLong())) {
 				EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle(STATIC.getTranslation2(guild, Translation.PATCHNOTES_LATEST_TITLE));
-				if(log_channel != null) {
-					guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(
-							messageBuild.setDescription("Bot patch notes version **"+STATIC.getVersion()+"** "+priv_notes.getDate()+"\n"+priv_notes.getMessage1())
-							.build()).queue();
-					if(priv_notes.getMessage2() != null && priv_notes.getMessage2().length() > 0) {
-						guild.getTextChannelById(log_channel.getChannel_ID()).sendMessage(
-								messageBuild.setDescription(priv_notes.getMessage2())
-								.build()).queue();
-					}
+				final var result = STATIC.writeToRemoteChannel(guild, messageBuild, "Bot patch notes version **"+STATIC.getVersion()+"** "+priv_notes.getDate()+"\n"+priv_notes.getMessage1(), Channel.LOG.getType());
+				if(result) {
+					if(priv_notes.getMessage2() != null && priv_notes.getMessage2().length() > 0)
+						STATIC.writeToRemoteChannel(guild, messageBuild, priv_notes.getMessage2(), Channel.LOG.getType());
 					published = true;
 				}
 			}
 			//retrieve public patch notes
 			if(publ_notes != null && GuildIni.getPublicPatchNotes(guild.getIdLong())) {
 				EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle(STATIC.getTranslation2(guild, Translation.PATCHNOTES_LATEST_TITLE));
-				if(bot_channel != null) {
-					guild.getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
-							messageBuild.setDescription("Bot patch notes version **"+STATIC.getVersion()+"** "+publ_notes.getDate()+"\n"+publ_notes.getMessage1())
-							.build()).queue();
-					if(publ_notes.getMessage2() != null && publ_notes.getMessage2().length() > 0) {
-						guild.getTextChannelById(bot_channel.getChannel_ID()).sendMessage(
-								messageBuild.setDescription(publ_notes.getMessage2())
-								.build()).queue();
-					}
+				final var result = STATIC.writeToRemoteChannel(guild, messageBuild, "Bot patch notes version **"+STATIC.getVersion()+"** "+publ_notes.getDate()+"\n"+publ_notes.getMessage1(), Channel.BOT.getType());
+				if(result) {
+					STATIC.writeToRemoteChannel(guild, messageBuild, publ_notes.getMessage2(), Channel.BOT.getType());
 					published = true;
 				}
 			}
@@ -197,6 +180,9 @@ public class ReadyListener extends ListenerAdapter {
 			var doubleExp = GuildIni.getDoubleExperienceMode(guild.getIdLong());
 			if(!doubleExp.equals("auto"))
 				Hashes.addTempCache("doubleExp_gu"+guild.getId(), new Cache(0, doubleExp));
+			
+			//initialize Message pool cache
+			Hashes.initializeGuildMessagePool(guild.getIdLong(), 1000);
 		}
 		Azrael.SQLInsertActionLog("BOT_BOOT", e.getJDA().getSelfUser().getIdLong(), 0, "Launched");
 		

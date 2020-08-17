@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
+import enums.Channel;
 import enums.Translation;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import sql.Azrael;
 import util.STATIC;
 
 public class LowerHeavyCensoring implements Runnable {
@@ -19,7 +19,7 @@ public class LowerHeavyCensoring implements Runnable {
 
 	@Override
 	public void run() {
-		logger.debug("lowerHeavyCensoring thread started in guild {}", e.getGuild().getId());
+		logger.debug("LowerHeavyCensoring thread started in guild {}", e.getGuild().getId());
 		Hashes.addHeavyCensoringThread(e.getGuild().getIdLong(), Thread.currentThread());
 		try {
 			Thread.sleep(60000);
@@ -30,8 +30,7 @@ public class LowerHeavyCensoring implements Runnable {
 					if(count > 0) {
 						Hashes.addFilterThreshold(e.getGuild().getIdLong(), ""+(--count));
 						if(count == 29) {
-							var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-							if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.HEAVY_CENSORING_SOFT)).queue();
+							STATIC.writeToRemoteChannel(e.getGuild(), null, STATIC.getTranslation2(e.getGuild(), Translation.HEAVY_CENSORING_SOFT), Channel.LOG.getType());
 						}
 					}
 				}

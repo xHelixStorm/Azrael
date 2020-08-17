@@ -6,11 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.Hashes;
+import enums.Channel;
 import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import sql.Azrael;
 import sql.DiscordRoles;
 import sql.RankingSystem;
 import util.STATIC;
@@ -47,16 +47,14 @@ public class RoleDeleteListener extends ListenerAdapter {
 				if(RankingSystem.SQLUpdateCurrentRole(e.getGuild().getIdLong(), 0) > 0) {
 					//then delete role from table
 					if(RankingSystem.SQLremoveSingleRole(e.getRole().getIdLong(), e.getGuild().getIdLong()) == 0) {
-						EmbedBuilder message = new EmbedBuilder();
-						var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-						if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.DELETE_RANK_ROLE_ERR)).build()).queue();
+						EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR));
+						STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.DELETE_RANK_ROLE_ERR), Channel.LOG.getType());
 						logger.error("Role {} couldn't be removed from RankingSystem.roles table in guild {}", e.getRole().getId(), e.getGuild().getId());
 					}
 				}
 				else {
-					EmbedBuilder message = new EmbedBuilder();
-					var log_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals("log")).findAny().orElse(null);
-					if(log_channel != null) e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.DELETE_RANK_ROLE_ERR)).build()).queue();
+					EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR));
+					STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.DELETE_RANK_ROLE_ERR), Channel.LOG.getType());
 					logger.error("The role {} couldn't be set to 0 in RankingSystem.user_details upon role delete in guild {}", e.getRole().getId(), e.getGuild().getId());
 				}
 			}
