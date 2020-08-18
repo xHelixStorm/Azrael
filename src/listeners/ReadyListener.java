@@ -247,7 +247,8 @@ public class ReadyListener extends ListenerAdapter {
 		executor.execute(new CollectUsersGuilds(e, null));
 		e.getJDA().getGuilds().parallelStream().forEach(g -> {
 			//print bot is now operational message in all servers
-			STATIC.writeToRemoteChannel(g, null, "Bot is now operational!", Channel.LOG.getType());
+			if(GuildIni.getNotifications(g.getIdLong()))
+				STATIC.writeToRemoteChannel(g, null, "Bot is now operational!", Channel.LOG.getType());
 			executor.execute(new RoleExtend(g));
 			Azrael.SQLBulkInsertChannels(g.getTextChannels());
 		});

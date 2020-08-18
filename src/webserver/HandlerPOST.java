@@ -121,11 +121,13 @@ public class HandlerPOST {
 		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
 		WebserviceUtils.return200(out, "Bot shutdown");
 		for(final var guild : e.getJDA().getGuilds()) {
-			if(json.has("message")) {
-				STATIC.writeToRemoteChannel(guild, null, json.getString("message"), Channel.LOG.getType());
-			}
-			else {
-				STATIC.writeToRemoteChannel(guild, null, STATIC.getTranslation2(guild, Translation.SHUTDOWN_SOON), Channel.LOG.getType());
+			if(GuildIni.getNotifications(guild.getIdLong())) {
+				if(json.has("message")) {
+					STATIC.writeToRemoteChannel(guild, null, json.getString("message"), Channel.LOG.getType());
+				}
+				else {
+					STATIC.writeToRemoteChannel(guild, null, STATIC.getTranslation2(guild, Translation.SHUTDOWN_SOON), Channel.LOG.getType());
+				}
 			}
 			ShutDown.saveCache(guild);
 		}

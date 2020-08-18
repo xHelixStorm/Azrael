@@ -40,6 +40,7 @@ public class GuildIni {
 		general.put("SelfDeletedMessage", "false");
 		general.put("EditedMessage", "false");
 		general.put("EditedMessageHistory", "false");
+		general.put("Notifications", "false");
 		fileContent.put("General", general);
 		
 		//collect all Google variables
@@ -428,6 +429,10 @@ public class GuildIni {
 	public static boolean getEditedMessageHistory(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "EditedMessageHistory", boolean.class);
+	}
+	public static boolean getNotifications(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "Notifications", boolean.class);
 	}
 	
 	public static boolean getGoogleFunctionalitiesEnabled(long guild_id) {
