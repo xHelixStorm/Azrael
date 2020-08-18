@@ -455,6 +455,8 @@
 	"patchnotes_choice_2":			"Bitte wählen Sie zwischen *öffentlich*, *privat* und *spiel* Patch-Notizen!",
 	"patchnotes_choice_3":			"Bitte wählen Sie zwischen *bot* und *spiel* Patch-Notizen!",
 	"patchnotes_latest_title":		"Hier die neuersten Patch-Notizen!",
+	"patchnotes_title":				"TITEL",
+	"patchnotes_date":				"DATUM",
 	
 	"profile_title":				"Profil Seite!",
 	"profile_no_icons":				"_Es wird kein Standard-Level-Bild zum Hochladen des Bildes der Profilseite bereitgestellt!_",

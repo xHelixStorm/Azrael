@@ -455,6 +455,8 @@
 	"patchnotes_choice_2":			"Por favor, elige entre notas del parche *public*, *private* y *game*",
 	"patchnotes_choice_3":			"¡Por favor elige entre notas del parche *bot* y *game*!",
 	"patchnotes_latest_title":		"¡Aquí las últimas notas de parche!",
+	"patchnotes_title":				"TÍTULO",
+	"patchnotes_date":				"FECHA",
 	
 	"profile_title":				"Profile Page!",
 	"profile_default_skin":			"Por favor, define un aspecto predeterminado para el comando de perfil y luego inténtalo de nuevo!",

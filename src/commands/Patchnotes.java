@@ -45,12 +45,18 @@ public class Patchnotes implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		//retrieve all channels where patchnotes can be printed
-		var allowed_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.BOT.getType()) || f.getChannel_Type().equals(Channel.LOG.getType()))).collect(Collectors.toList());
-		var bot_channels = allowed_channels.parallelStream().filter(f -> f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
-		var this_channel = allowed_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
+		var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
+		var this_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
+		
+		var modRights = false;
+		//is user mod?
+		if(UserPrivs.isUserMod(e.getMember()) || UserPrivs.isUserAdmin(e.getMember()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+			modRights = true;
+		}
+		
 		//throw error if it was printed in a channel which is not a bot channel or log channel
 		//if no bot channel is registered, print anyway
-		if(this_channel == null && allowed_channels.size() > 0) {
+		if(this_channel == null && bot_channels.size() > 0 && !modRights) {
 			e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.NOT_BOT_CHANNEL)+STATIC.getChannels(bot_channels)).queue();
 		}
 		else {
@@ -58,11 +64,7 @@ public class Patchnotes implements CommandPublic {
 			ArrayList<Patchnote> priv_notes = null;
 			ArrayList<Patchnote> publ_notes = null;
 			ArrayList<Patchnote> game_notes = null;
-			var modRights = false;
-			//retrieve patchnotes
-			if(UserPrivs.isUserMod(e.getMember()) || UserPrivs.isUserAdmin(e.getMember()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-				modRights = true;
-			}
+			
 			//if the user is a mod, retrieve also private patch notes
 			if(modRights)
 				priv_notes = sql.Patchnotes.SQLgetPrivatePatchnotesArray();
@@ -244,13 +246,14 @@ public class Patchnotes implements CommandPublic {
 		StringBuilder out2 = new StringBuilder();
 		//iterate through the patch notes and convert it into readable text list
 		for(Patchnote note : display_notes) {
-			out.append(note.getDate()+"\n");
-			out2.append("**"+note.getTitle()+"**\n");
+			out.append("**"+note.getTitle()+"**\n");
+			out2.append(note.getDate()+"\n");
 		}
 		//print message
 		message.setColor(Color.BLUE);
 		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_HELP))
-			.addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
+			.addField(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_TITLE), out.toString(), true)
+			.addField(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_DATE), out2.toString(), true).build()).queue();
 	}
 	
 	private void printPatchNotes(GuildMessageReceivedEvent e, Patchnote note, EmbedBuilder message) {

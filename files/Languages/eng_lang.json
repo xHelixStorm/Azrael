@@ -455,6 +455,8 @@
 	"patchnotes_choice_2":			"Please choose between *public*, *private* and *game* patch notes!",
 	"patchnotes_choice_3":			"Please choose between *bot* and *game* patch notes!",
 	"patchnotes_latest_title":		"Here the latest patch notes!",
+	"patchnotes_title":				"TITLE",
+	"patchnotes_date":				"DATE",
 	
 	"profile_title":				"Profile Page!",
 	"profile_no_icons":				"_No default level skin provided to upload the profile page image!_",

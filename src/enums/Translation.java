@@ -457,6 +457,8 @@ public enum Translation {
 	PATCHNOTES_CHOICE_2			("patchnotes_choice_2"),
 	PATCHNOTES_CHOICE_3			("patchnotes_choice_3"),
 	PATCHNOTES_LATEST_TITLE		("patchnotes_latest_title"),
+	PATCHNOTES_TITLE			("patchnotes_title"),
+	PATCHNOTES_DATE				("patchnotes_date"),
 	
 	PROFILE_TITLE				("profile_title"),
 	PROFILE_NO_ICONS			("profile_no_icons"),
