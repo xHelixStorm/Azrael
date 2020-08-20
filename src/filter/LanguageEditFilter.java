@@ -51,7 +51,7 @@ public class LanguageEditFilter implements Runnable {
 			
 			String getMessage = e.getMessage().getContentRaw();
 			String channel = e.getChannel().getName();
-			String thisMessage = CharacterReplacer.replace(getMessage).trim();
+			String thisMessage = CharacterReplacer.replace(getMessage, filter_lang).trim();
 			String name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")";
 			
 			final var parseMessage = thisMessage.toLowerCase();
@@ -80,7 +80,7 @@ public class LanguageEditFilter implements Runnable {
 								Matcher matcher = Pattern.compile("[\\w\\d]*").matcher(getMessage);
 								while(matcher.find()) {
 									var word = matcher.group();
-									var convertedWord = CharacterReplacer.replace(word);
+									var convertedWord = CharacterReplacer.replace(word, filter_lang);
 									if(convertedWord.equalsIgnoreCase(option.get())) {
 										getMessage = getMessage.replace(word, "**__"+word+"__**");
 										break;

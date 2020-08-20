@@ -42,12 +42,16 @@ public class ShutDown implements CommandPublic {
 			for(final Guild guild : e.getJDA().getGuilds()) {
 				saveCache(guild);
 			}
-			if(notifications)
+			if(notifications) {
 				e.getChannel().sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.SHUTDOWN)).queue(m -> {
+					e.getJDA().shutdown();
+				}, err -> {
+					e.getJDA().shutdown();
+				});
+			}
+			else {
 				e.getJDA().shutdown();
-			}, err -> {
-				e.getJDA().shutdown();
-			});
+			}
 		}
 	}
 
