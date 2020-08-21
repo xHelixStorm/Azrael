@@ -108,8 +108,9 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 							//write into cache for RoleRemovedListener to use for any google API operation
 							if(assignedRole != 0)Hashes.addTempCache("unmute_gu"+guild_id+"us"+user_id, new Cache(60000, "", ""+assignedRole));
-							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
-							if(assignedRole != 0)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
+							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue(r -> {
+								if(assignedRole != 0)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
+							});
 						}
 						else {
 							STATIC.writeToRemoteChannel(e.getGuild(), message.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.UNMUTE_REMOVE_ERR)+Permission.MANAGE_ROLES, Channel.LOG.getType());
@@ -146,9 +147,10 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 					if(e.getGuild().getMember(e.getMember().getUser()) != null) {
 						//verify that the user has the manage roles permission before removing the mute role
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-							if(assignedRole != 0)role = e.getGuild().getRoleById(assignedRole);
-							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
-							if(role != null)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
+							if(assignedRole != 0) role = e.getGuild().getRoleById(assignedRole);
+							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue(r -> {
+								if(assignedRole != 0)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
+							});
 						}
 						else {
 							STATIC.writeToRemoteChannel(e.getGuild(), message.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.UNMUTE_REMOVE_ERR)+Permission.MANAGE_ROLES, Channel.LOG.getType());

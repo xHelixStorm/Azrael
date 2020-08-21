@@ -68,8 +68,9 @@ public class MuteRestart implements Runnable {
 				if(member != null) {
 					//verify that the user has the manage roles permission before removing the mute role
 					if(guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-						guild.removeRoleFromMember(member, mute_role).queue();
-						if(assignedRole != 0 && ranking_state == true){guild.addRoleToMember(member, guild.getRoleById(assignedRole)).queue();}
+						guild.removeRoleFromMember(member, mute_role).queue(r -> {
+							if(assignedRole != 0 && ranking_state == true){guild.addRoleToMember(member, guild.getRoleById(assignedRole)).queue();}
+						});
 					}
 					else {
 						STATIC.writeToRemoteChannel(guild, message.setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.UNMUTE_REMOVE_ERR)+Permission.MANAGE_ROLES, Channel.LOG.getType());
@@ -107,8 +108,9 @@ public class MuteRestart implements Runnable {
 					//verify that the user has the manage roles permission before removing the mute role
 					if(guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 						if(assignedRole != 0) role = guild.getRoleById(assignedRole);
-						guild.removeRoleFromMember(member, mute_role).queue();
-						if(role != null && ranking_state == true) guild.addRoleToMember(member, guild.getRoleById(assignedRole)).queue();
+						guild.removeRoleFromMember(member, mute_role).queue(r -> {
+							if(assignedRole != 0 && ranking_state == true) guild.addRoleToMember(member, guild.getRoleById(assignedRole)).queue();
+						});
 					}
 					else {
 						STATIC.writeToRemoteChannel(guild, message.setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.UNMUTE_REMOVE_ERR), Channel.LOG.getType());
