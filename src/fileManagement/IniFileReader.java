@@ -116,6 +116,10 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("Bot", "WebserverPort", int.class);
 	}
+	public static String getWebURL() {
+		Ini ini = readConfig();
+		return ini.get("Bot", "WebUrl");
+	}
 	
 	public static String getPastebinDeveloperKey() {
 		Ini ini = readConfig();
@@ -205,6 +209,18 @@ public class IniFileReader {
 	public static String getSQLIP4() {
 		Ini ini = readConfig();
 		return ini.get("Patchnotes", "IP");
+	}
+	public static String getSQLWebIP() {
+		Ini ini = readConfig();
+		return ini.get("Azrael", "IP");
+	}
+	public static String getSQLWebUsername() {
+		Ini ini = readConfig();
+		return ini.get("Azrael", "Username");
+	}
+	public static String getSQLWebPassword() {
+		Ini ini = readConfig();
+		return ini.get("Azrael", "Password");
 	}
 	public static String getSQLUsername4() {
 		Ini ini = readConfig();

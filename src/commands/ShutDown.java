@@ -36,22 +36,15 @@ public class ShutDown implements CommandPublic {
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		if(e.getMember().getUser().getIdLong() == IniFileReader.getAdmin()) {
 			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
-			final boolean notifications = GuildIni.getNotifications(e.getGuild().getIdLong());
-			if(notifications)
-				e.getChannel().sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.SHUTDOWN_PREP)).queue();
+			e.getChannel().sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.SHUTDOWN_PREP)).queue();
 			for(final Guild guild : e.getJDA().getGuilds()) {
 				saveCache(guild);
 			}
-			if(notifications) {
-				e.getChannel().sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.SHUTDOWN)).queue(m -> {
-					e.getJDA().shutdown();
-				}, err -> {
-					e.getJDA().shutdown();
-				});
-			}
-			else {
+			e.getChannel().sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.SHUTDOWN)).queue(m -> {
 				e.getJDA().shutdown();
-			}
+			}, err -> {
+				e.getJDA().shutdown();
+			});
 		}
 	}
 

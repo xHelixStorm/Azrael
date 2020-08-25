@@ -1182,7 +1182,11 @@ public enum Translation {
 	LEADERBOARD_ERR_2			("leaderboard_err_2"),
 	LEADERBOARD_TITLE			("leaderboard_title"),
 	LEADERBOARD_ELO				("leaderboard_elo"),
-	LEADERBOARD_RANK			("leaderboard_rank");
+	LEADERBOARD_RANK			("leaderboard_rank"),
+	
+	WEB_WRONG_CHANNEL			("web_wrong_channel"),
+	WEB_REDIRECT				("web_redirect"),
+	WEB_REDIRECT_ERR			("web_redirect_err");
 	
 	private String value;
 	

@@ -28,6 +28,9 @@ public class HandlerPOST {
 				case "google" -> {
 					google(e, out, json);
 				}
+				case "webLogin" -> {
+					webLogin(e, out, json);
+				}
 			}
 		}
 	}
@@ -47,7 +50,7 @@ public class HandlerPOST {
 			return false;
 		}
 		final String type = (String)json.get("type");
-		if(!type.equals("shutdown") && !type.equals("google")) {
+		if(!type.equals("shutdown") && !type.equals("google") && !type.equals("webLogin")) {
 			WebserviceUtils.return502(out, "Invalid Type.");
 			return false;
 		}
@@ -77,6 +80,21 @@ public class HandlerPOST {
 					WebserviceUtils.return502(out, "Invalid guild_id. Not 18 digits long.");
 					return false;
 				}
+			}
+		}
+		if(type.equals("webLogin")) {
+			if(!json.has("user_id")) {
+				WebserviceUtils.return502(out, "User ID required to request the web login.");
+				return false;
+			}
+			final String user_id = (String) json.get("user_id");
+			if(user_id.replaceAll("[0-9]*", "").length() != 0) {
+				WebserviceUtils.return502(out, "User id is not numeric.");
+				return false;
+			}
+			else if(user_id.length() != 17 && user_id.length() != 18) {
+				WebserviceUtils.return502(out, "The user id needs to be either 17 or 18 digits long.");
+				return false;
 			}
 		}
 		
@@ -132,5 +150,9 @@ public class HandlerPOST {
 			ShutDown.saveCache(guild);
 		}
 		e.getJDA().shutdown();
+	}
+	
+	private static void webLogin(ReadyEvent e, PrintWriter out, JSONObject json) {
+		WebserviceUtils.return404(out, "Service is currently unavailable.");
 	}
 }

@@ -52,6 +52,7 @@ import commands.Stats;
 import commands.Top;
 import commands.Use;
 import commands.User;
+import commands.Web;
 import commands.Write;
 import fileManagement.IniFileReader;
 import listeners.AvatarUpdateListener;
@@ -233,10 +234,12 @@ public class Main {
 		CommandHandler.commandsPublic.put("room", new Room());
 		CommandHandler.commandsPublic.put("stats", new Stats());
 		CommandHandler.commandsPublic.put("leaderboard", new Leaderboard());
+		CommandHandler.commandsPublic.put("web", new Web());
 	}
 	
 	public static void addPrivateCommands() {
 		CommandHandler.commandsPrivate.put("!equip", new Equip());
+		CommandHandler.commandsPrivate.put("!web", new Web());
 	}
 	
 	public static void addListeners() {
