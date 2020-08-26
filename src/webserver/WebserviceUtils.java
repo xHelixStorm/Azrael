@@ -52,14 +52,14 @@ public class WebserviceUtils {
 		return out;
 	}
 	
-	public static PrintWriter return404(PrintWriter out, String message) {
+	public static PrintWriter return404(PrintWriter out, String message, boolean json) {
 		// we send HTTP Headers with data to client
 		out.println("HTTP/1.1 404 Not Found");
 		out.println("Server: Azrael Bot by xHelixStorm");
 		out.println("Date: " + new Date());
-		out.println("Content-type: " + "text/plain");
+		out.println("Content-type: " + (json ? "application/json" : "text/plain"));
 		out.println(); // blank line between headers and content, very important !
-		out.println(message);
+		out.println((json ? "{\"code\":404,\"message\":\""+message+"\"}" : message));
 		out.flush(); // flush character output stream buffer
 		return out;
 	}

@@ -52,7 +52,7 @@ public class Webserver implements Runnable {
 							while(in.ready()) {
 								payload.append((char)in.read());
 							}
-							if(payload.toString().contains("Content-Type: application/json")) {
+							if(payload.toString().contains("Content-Type:") && payload.toString().contains("application/json")) {
 								String passedJson = null;
 								if(payload.toString().contains("{")) {
 									int index = payload.toString().indexOf("{");

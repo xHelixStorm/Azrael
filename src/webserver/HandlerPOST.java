@@ -153,6 +153,6 @@ public class HandlerPOST {
 	}
 	
 	private static void webLogin(ReadyEvent e, PrintWriter out, JSONObject json) {
-		WebserviceUtils.return404(out, "Service is currently unavailable.");
+		WebserviceUtils.return404(out, "User not found!", true);
 	}
 }
