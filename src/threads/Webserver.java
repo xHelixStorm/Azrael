@@ -64,26 +64,26 @@ public class Webserver implements Runnable {
 									HandlerPOST.handleRequest(e, out, json);
 								}
 								else {
-									WebserviceUtils.return400(out, "JSON format int content required");
+									WebserviceUtils.return400(out, "JSON format int content required", false);
 								}
 							}
 							else {
-								WebserviceUtils.return502(out, "Content Type application/json required.");
+								WebserviceUtils.return502(out, "Content Type application/json required.", false);
 							}
 						}
 						else {
-							WebserviceUtils.return501(out, "POST request method required");
+							WebserviceUtils.return501(out, "POST request method required", false);
 						}
 					}
 				} catch(IOException e) {
 					logger.error("Webservice error", e);
-					WebserviceUtils.return500(out, "Unknown Error: "+e);
+					WebserviceUtils.return500(out, "Unknown Error: "+e, false);
 				} catch(JSONException e) {
 					logger.error("Webservice json error", e);
-					WebserviceUtils.return502(out, "JSON Error: "+e);
+					WebserviceUtils.return502(out, "JSON Error: "+e, false);
 				} catch(Exception e) {
 					logger.error("Webservice error", e);
-					WebserviceUtils.return500(out, "Unkown Error: "+e);
+					WebserviceUtils.return500(out, "Unkown Error: "+e, false);
 				} finally {
 					in.close();
 					out.close();

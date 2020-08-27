@@ -16,38 +16,38 @@ public class WebserviceUtils {
 		
 	}
 	
-	public static PrintWriter return200(PrintWriter out, String message) {
+	public static PrintWriter return200(PrintWriter out, String message, boolean json) {
 		// we send HTTP Headers with data to client
 		out.println("HTTP/1.1 200 OK");
 		out.println("Server: Azrael Bot by xHelixStorm");
 		out.println("Date: " + new Date());
-		out.println("Content-type: " + "text/plain");
+		out.println("Content-type: " + (json ? "application/json" : "text/plain"));
 		out.println(); // blank line between headers and content, very important !
-		out.println(message);
+		out.println((json ? "{\"code\":200,\"message\":\""+message+"\"}" : message));
 		out.flush(); // flush character output stream buffer
 		return out;
 	}
 	
-	public static PrintWriter return201(PrintWriter out, String message) {
+	public static PrintWriter return201(PrintWriter out, String message, boolean json) {
 		// we send HTTP Headers with data to client
 		out.println("HTTP/1.1 201 Created");
 		out.println("Server: Azrael Bot by xHelixStorm");
 		out.println("Date: " + new Date());
-		out.println("Content-type: " + "text/plain");
+		out.println("Content-type: " + (json ? "application/json" : "text/plain"));
 		out.println(); // blank line between headers and content, very important !
-		out.println(message);
+		out.println((json ? "{\"code\":201,\"message\":\""+message+"\"}" : message));
 		out.flush(); // flush character output stream buffer
 		return out;
 	}
 	
-	public static PrintWriter return400(PrintWriter out, String message) {
+	public static PrintWriter return400(PrintWriter out, String message, boolean json) {
 		// we send HTTP Headers with data to client
 		out.println("HTTP/1.1 400 Bad Request");
 		out.println("Server: Azrael Bot by xHelixStorm");
 		out.println("Date: " + new Date());
-		out.println("Content-type: " + "text/plain");
+		out.println("Content-type: " + (json ? "application/json" : "text/plain"));
 		out.println(); // blank line between headers and content, very important !
-		out.println(message);
+		out.println((json ? "{\"code\":400,\"message\":\""+message+"\"}" : message));
 		out.flush(); // flush character output stream buffer
 		return out;
 	}
@@ -64,38 +64,38 @@ public class WebserviceUtils {
 		return out;
 	}
 	
-	public static PrintWriter return500(PrintWriter out, String message) {
+	public static PrintWriter return500(PrintWriter out, String message, boolean json) {
 		// we send HTTP Headers with data to client
 		out.println("HTTP/1.1 500 Internal Server Error");
 		out.println("Server: Azrael Bot by xHelixStorm");
 		out.println("Date: " + new Date());
-		out.println("Content-type: " + "text/plain");
+		out.println("Content-type: " + (json ? "application/json" : "text/plain"));
 		out.println(); // blank line between headers and content, very important !
-		out.println(message);
+		out.println((json ? "{\"code\":500,\"message\":\""+message+"\"}" : message));
 		out.flush(); // flush character output stream buffer
 		return out;
 	}
 
-	public static PrintWriter return501(PrintWriter out, String message) {
+	public static PrintWriter return501(PrintWriter out, String message, boolean json) {
 		// we send HTTP Headers with data to client
 		out.println("HTTP/1.1 501 Not Implemented");
 		out.println("Server: Azrael Bot by xHelixStorm");
 		out.println("Date: " + new Date());
-		out.println("Content-type: " + "text/plain");
+		out.println("Content-type: " + (json ? "application/json" : "text/plain"));
 		out.println(); // blank line between headers and content, very important !
-		out.println(message);
+		out.println((json ? "{\"code\":501,\"message\":\""+message+"\"}" : message));
 		out.flush(); // flush character output stream buffer
 		return out;
 	}
 	
-	public static PrintWriter return502(PrintWriter out, String message) {
+	public static PrintWriter return502(PrintWriter out, String message, boolean json) {
 		// we send HTTP Headers with data to client
 		out.println("HTTP/1.1 502 Bad Gateway");
 		out.println("Server: Azrael Bot by xHelixStorm");
 		out.println("Date: " + new Date());
-		out.println("Content-type: " + "text/plain");
+		out.println("Content-type: " + (json ? "application/json" : "text/plain"));
 		out.println(); // blank line between headers and content, very important !
-		out.println(message);
+		out.println((json ? "{\"code\":502,\"message\":\""+message+"\"}" : message));
 		out.flush(); // flush character output stream buffer
 		return out;
 	}

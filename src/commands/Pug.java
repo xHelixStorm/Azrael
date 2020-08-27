@@ -44,7 +44,7 @@ public class Pug implements CommandPublic {
 		String path = "./files/Pug/";
 		
 		//retrieve all bot channels
-		var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT)).collect(Collectors.toList());
+		var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 		var this_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		
 		//check if any bot channel is registered, else print the image anyway

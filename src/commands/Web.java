@@ -44,7 +44,7 @@ public class Web implements CommandPublic, CommandPrivate {
 		final String URL = IniFileReader.getWebURL();
 		if(URL != null && URL.length() > 0) {
 			//Insert or update login table and redirect user to the website
-			final int result = AzraelWeb.SQLInsertLoginInfo(e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator(), e.getAuthor().getIdLong(), e.getAuthor().getEffectiveAvatarUrl(), 1);
+			final int result = AzraelWeb.SQLInsertLoginInfo(e.getAuthor().getIdLong(), 1);
 			if(result > 0) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.WEB_REDIRECT)+URL+ENDPOINT+e.getAuthor().getId()).build()).queue();
 			}
