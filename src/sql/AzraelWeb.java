@@ -33,7 +33,7 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
-			String sql = ("INSERT INTO login (user_id, address, event, info) VALUES (?, ?, ?, ?)");
+			String sql = ("INSERT INTO action_log (user_id, address, event, info) VALUES (?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _address);
@@ -75,10 +75,11 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
-			String sql = ("INSERT INTO login (user_id, type, _key) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE code=VALUES(code)");
+			String sql = ("INSERT INTO login (user_id, type, code) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE code=VALUES(code)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _type);
+			stmt.setString(3, _code);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertLoginInfo Exception", e);
@@ -89,19 +90,27 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		}
 	}
 	
-	public static int SQLCodeUsageLog(long _user_id, String _address) {
+	@SuppressWarnings("resource")
+	public static void SQLCodeUsageLog(long _user_id, String _address) {
 		logger.trace("SQLCodeUsageLog launched. Passed params {}", _user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
-			String sql = ("INSERT INTO code_usage_log (user_id, address, count) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE count=VALUES(count+1)");
+			String sql = ("UPDATE code_usage_log SET count = (count+1) WHERE user_id = ? AND address = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
-			return stmt.executeUpdate();
+			stmt.setString(2, _address);
+			final int result = stmt.executeUpdate();
+			if(result == 0) {
+				sql = ("INSERT INTO code_usage_log (user_id, address, count) VALUES (?, ?, 1)");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _user_id);
+				stmt.setString(2, _address);
+				stmt.executeUpdate();
+			}
 		} catch (SQLException e) {
 			logger.error("SQLCodeUsageLog Exception", e);
-			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }

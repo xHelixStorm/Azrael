@@ -173,32 +173,51 @@ public class HandlerPOST {
 	private static void webLogin(ReadyEvent e, PrintWriter out, JSONObject json) {
 		final long user_id = json.getLong("user_id");
 		final String address = json.getString("ip");
-		Guild guild = e.getJDA().getGuilds().parallelStream().filter(g -> g.getMemberById(user_id) != null).findAny().orElse(null);
-		if(guild != null) {
-			Member member = guild.getMemberById(user_id);
-			if(member != null) {
-				final String key = RandomStringUtils.random(6, true, true);
-				member.getUser().openPrivateChannel().queue(channel -> {
-					channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Use this key to login into the Azrael Website. If you didn't request the login, please contact an administrator!\n**"+key+"**").build()).queue(m -> {
-						if(AzraelWeb.SQLInsertLoginInfo(user_id, 2, key) > 0) {
-							WebserviceUtils.return200(out, "Login key sent!", true);
+		if(e.getJDA().getSelfUser().getIdLong() != user_id) {
+			Guild guild = e.getJDA().getGuilds().parallelStream().filter(g -> g.getMemberById(user_id) != null).findAny().orElse(null);
+			if(guild != null) {
+				Member member = guild.getMemberById(user_id);
+				if(member != null) {
+					if(!member.getUser().isBot()) {
+						final String key = RandomStringUtils.random(6, true, true).toUpperCase();
+						final String displayCode = key.substring(0, 2)+"-"+key.substring(2, 4)+"-"+key.substring(4);
+						final var channel = member.getUser().openPrivateChannel().complete();
+						try {
+							channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_CODE).replace("{}", displayCode)).build()).queue();
+							if(AzraelWeb.SQLInsertLoginInfo(user_id, 2, key) > 0) {
+								WebserviceUtils.return200(out, "Login key sent!", true);
+								AzraelWeb.SQLCodeUsageLog(user_id, address);
+								AzraelWeb.SQLInsertActionLog(user_id, address, "CODE_GENERATED", key);
+							}
+							else {
+								WebserviceUtils.return500(out, "An unnexpected error occurred! Please try again later!", true);
+							}
+						} catch(Exception exc) {
+							WebserviceUtils.return500(out, "Direct messages are locked for this user!", true);
 							AzraelWeb.SQLCodeUsageLog(user_id, address);
-							AzraelWeb.SQLInsertActionLog(user_id, address, "CODE_GENERATED", key);
+							AzraelWeb.SQLInsertActionLog(user_id, address, "CODE_GENERATION_ATTEMPT", "Destination user has locked direct messages.");
 						}
-						else {
-							WebserviceUtils.return500(out, "An unnexpected error occurred! Please try again later!", true);
-						}
-					}, err -> {
-						WebserviceUtils.return500(out, "Direct messages are locked for this user!", true);
-					});
-				});
+					}
+					else {
+						WebserviceUtils.return502(out, "Authentication through other Bots not possible!", true);
+						AzraelWeb.SQLCodeUsageLog(user_id, address);
+						AzraelWeb.SQLInsertActionLog(user_id, address, "CODE_GENERATION_ATTEMPT", "Attempted to message a Bot.");
+					}
+				}
+				else {
+					WebserviceUtils.return404(out, "User not found!", true);
+					AzraelWeb.SQLInsertActionLog(user_id, address, "CODE_GENERATION_ATTEMPT", "User not found.");
+				}
 			}
 			else {
 				WebserviceUtils.return404(out, "User not found!", true);
+				AzraelWeb.SQLInsertActionLog(user_id, address, "CODE_GENERATION_ATTEMPT", "User not found.");
 			}
 		}
 		else {
-			WebserviceUtils.return404(out, "User not found!", true);
+			WebserviceUtils.return502(out, "Please insert your discord name and not the one of the Bot!", true);
+			AzraelWeb.SQLCodeUsageLog(user_id, address);
+			AzraelWeb.SQLInsertActionLog(user_id, address, "CODE_GENERATION_ATTEMPT", "Attempted to message the main Bot.");
 		}
 	}
 }

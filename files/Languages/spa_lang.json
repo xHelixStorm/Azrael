@@ -1184,5 +1184,6 @@
 	
 	"web_wrong_channel":			"Please write *!web* in a direct message to {}!",
 	"web_redirect":					"Please follow this link to complete the authentication process and access the website within 3 minutes!\n",
-	"web_redirect_err":				"Setup incomplete! Please contact an administrator!"
+	"web_redirect_err":				"Setup incomplete! Please contact an administrator!",
+	"web_code":						"Use this key to login into the Azrael Website. The key is valid for 5 minutes. If you didn't request the login, please contact an administrator!\n**{}**"
 }

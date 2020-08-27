@@ -1186,7 +1186,8 @@ public enum Translation {
 	
 	WEB_WRONG_CHANNEL			("web_wrong_channel"),
 	WEB_REDIRECT				("web_redirect"),
-	WEB_REDIRECT_ERR			("web_redirect_err");
+	WEB_REDIRECT_ERR			("web_redirect_err"),
+	WEB_CODE					("web_code");
 	
 	private String value;
 	
