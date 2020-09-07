@@ -53,17 +53,22 @@ public class ParseSubscription extends TimerTask{
 						for(RSS rss : feeds) {
 							new Thread(() -> {
 								long channel_id;
+								String channel_name;
 								TextChannel textChannel = guild.getTextChannelById(rss.getChannelID()); 
-								if(textChannel != null)
-									channel_id = rss.getChannelID();
-								else
+								if(textChannel != null) {
+									channel_id = textChannel.getIdLong();
+									channel_name = textChannel.getName();
+								}
+								else {
 									channel_id = rss_channel.getChannel_ID();
+									channel_name = rss_channel.getChannel_Name();
+								}
 								try {
 									logger.trace("Retrieving subscription for {} in guild {}", rss.getURL(), e.getGuildById(guild_id).getName());
 									if(rss.getType() == 1)
 										BasicModel.ModelParse(STATIC.retrieveWebPageCode(rss.getURL()), guild, rss, channel_id);
 									else if(rss.getType() == 2)
-										TwitterModel.ModelParse(guild, rss, channel_id, textChannel.getName());
+										TwitterModel.ModelParse(guild, rss, channel_id, channel_name);
 								} catch(SocketTimeoutException e1){
 									logger.warn("Timeout on subscription {}", rss.getURL());
 								} catch (Exception e1) {
