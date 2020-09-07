@@ -85,11 +85,16 @@ public class Edit implements CommandPublic {
 		if(message_id.length() == 17 || message_id.length() == 18) {
 			if(e.getGuild().getSelfMember().hasPermission(e.getGuild().getTextChannelById(channel_id), Permission.MESSAGE_HISTORY)) {
 				e.getGuild().getTextChannelById(channel_id).retrieveMessageById(message_id).queue(m -> {
-					if(!reaction)
+					if(!reaction) {
 						Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "E", channel_id, message_id));
-					else
-						Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, (parameter.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_REACTION)) ? "RA" : "RC"), channel_id, message_id));
-					WriteEditExecution.editHelp(e, Hashes.getTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId()));
+						WriteEditExecution.editHelp(e, Hashes.getTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId()));
+					}
+					else {
+						final String addReaction = STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_REACTION);
+						Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, (parameter.equals(addReaction) ? "RA" : "RC"), channel_id, message_id));
+						if(parameter.equals(addReaction)) WriteEditExecution.reactionAddHelp(e, Hashes.getTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId()));
+						else WriteEditExecution.runClearReactions(e, Hashes.getTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId()));
+					}
 				}, err -> {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NOT_EXISTS)).build()).queue();
 				});
