@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiParser;
 
-import constructors.Channels;
 import constructors.RSS;
 import enums.Translation;
 import net.dv8tion.jda.api.entities.Guild;
@@ -22,7 +21,7 @@ import util.STATIC;
 public class BasicModel {
 	private static final Logger logger = LoggerFactory.getLogger(BasicModel.class);
 
-	public static void ModelParse(BufferedReader in, Guild guild, RSS rss, Channels rss_channel) throws IOException {
+	public static void ModelParse(BufferedReader in, Guild guild, RSS rss, long rss_channel) throws IOException {
 		String format = rss.getFormat();
 		String title = "";
 		String description = "";
@@ -65,11 +64,11 @@ public class BasicModel {
 			out = out.replace("{link}", link);
 			out = out.replaceAll("&#039;", "'");
 			final String outMessage = EmojiParser.parseToUnicode(out);
-			MessageHistory history = new MessageHistory(guild.getTextChannelById(rss_channel.getChannel_ID()));
+			MessageHistory history = new MessageHistory(guild.getTextChannelById(rss_channel));
 			history.retrievePast(100).queue(historyList -> {
 				Message historyMessage = historyList.parallelStream().filter(f -> f.getContentRaw().equals(outMessage)).findAny().orElse(null);
 				if(historyMessage == null)
-					guild.getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue();
+					guild.getTextChannelById(rss_channel).sendMessage(outMessage).queue();
 			});
 		}
 		in.close();

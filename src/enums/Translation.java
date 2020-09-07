@@ -146,6 +146,7 @@ public enum Translation {
 	PARAM_RENAME				("param_rename"),
 	PARAM_SERVER				("param_server"),
 	PARAM_EXTEND				("param_extend"),
+	PARAM_CHANNEL				("param_channel"),
 	
 	LANG_ENG					("lang_eng"),
 	LANG_GER					("lang_ger"),
@@ -659,6 +660,8 @@ public enum Translation {
 	SUBSCRIBE_FORMAT_HELP		("subscribe_format_help"),
 	SUBSCRIBE_OPTIONS_HELP		("subscribe_options_help"),
 	SUBSCRIBE_OPTIONS_ERR		("subscribe_options_err"),
+	SUBSCRIBE_CHANNEL_HELP		("subscribe_channel_help"),
+	SUBSCRIBE_CHANNEL_ERR		("subscribe_channel_err"),
 	SUBSCRIBE_TEST_HELP			("subscribe_test_help"),
 	SUBSCRIBE_DISPLAY_HELP		("subscribe_display_help"),
 	SUBSCRIBE_RSS_ADDED			("subscribe_rss_added"),
@@ -677,6 +680,9 @@ public enum Translation {
 	SUBSCRIBE_OPTIONS_6			("subscribe_options_6"),
 	SUBSCRIBE_OPTION_BOUND		("subscribe_option_bound"),
 	SUBSCRIBE_OPTION_NOT_BOUND	("subscribe_option_not_bound"),
+	SUBSCRIBE_CHANNEL_ADD		("subscribe_channel_add"),
+	SUBSCRIBE_CHANNEL_ERR_2		("subscribe_channel_err_2"),
+	SUBSCRIBE_CHANNEL_ADDED		("subscribe_channel_added"),
 	SUBSCRIBE_EXIT				("subscribe_exit"),
 	
 	TOP_USER_LEFT				("top_user_left"),

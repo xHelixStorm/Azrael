@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiParser;
 
-import constructors.Channels;
 import constructors.Messages;
 import constructors.RSS;
 import core.Hashes;
@@ -38,7 +37,7 @@ import util.STATIC;
 public class TwitterModel {
 	private static final Logger logger = LoggerFactory.getLogger(TwitterModel.class);
 	
-	public static void ModelParse(Guild guild, RSS rss, Channels rss_channel) throws TwitterException {
+	public static void ModelParse(Guild guild, RSS rss, long rss_channel, String rss_channel_name) throws TwitterException {
 		STATIC.loginTwitter();
 		TwitterFactory tf = STATIC.getTwitterFactory();
 		if(tf != null) {
@@ -81,7 +80,7 @@ public class TwitterModel {
 		        		
 		        		if(!tweetProhibited) {
 		        			final String compareMessage = message.toLowerCase();
-		        			find: for(var filter : Azrael.SQLgetChannel_Filter(rss_channel.getChannel_ID())) {
+		        			find: for(var filter : Azrael.SQLgetChannel_Filter(rss_channel)) {
 		        				Optional<String> option = Azrael.SQLgetFilter(filter, guild.getIdLong()).parallelStream()
 										.filter(word -> compareMessage.equals(word) || compareMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"(?!\\w\\d\\s)") || compareMessage.matches("[!\"$%&�/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "(?!\\w\\d\\s)") || compareMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*\\s" + word + "[!\"$%&/()=?.@#^*+\\-={};':,<>]") || compareMessage.matches(word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || compareMessage.matches("[!\"$%&/()=?.@#^*+\\-={};':,<>]"+word+"\\s[!\"$%&/()=?.@#^*+\\-={};':,<>\\w\\d\\s]*") || compareMessage.contains(" "+word+" "))
 										.findAny();
@@ -192,19 +191,19 @@ public class TwitterModel {
 								out = out.replace("{fullName}", fullName);
 								out = out.replace("{username}", username);
 			                	final String outMessage = EmojiParser.parseToUnicode(out);
-			                	MessageHistory history = new MessageHistory(guild.getTextChannelById(rss_channel.getChannel_ID()));
+			                	MessageHistory history = new MessageHistory(guild.getTextChannelById(rss_channel));
 								history.retrievePast(100).queue(historyList -> {
 									Message historyMessage = historyList.parallelStream().filter(f -> f.getContentRaw().replaceAll("[^a-zA-Z]", "").contains(outMessage.replaceAll("[^a-zA-Z]", ""))).findAny().orElse(null);
 									if(historyMessage == null)
-										guild.getTextChannelById(rss_channel.getChannel_ID()).sendMessage(outMessage).queue(m -> {
+										guild.getTextChannelById(rss_channel).sendMessage(outMessage).queue(m -> {
 											Azrael.SQLInsertTweetLog(m.getIdLong(), tweet.getId());
 											if(GuildIni.getCacheLog(guild.getIdLong())) {
 												Messages collectedMessage = new Messages();
 												collectedMessage.setUserID(0);
 												collectedMessage.setUsername(fullName + " ("+username+")");
 												collectedMessage.setGuildID(guild.getIdLong());
-												collectedMessage.setChannelID(rss_channel.getChannel_ID());
-												collectedMessage.setChannelName(rss_channel.getChannel_Name());
+												collectedMessage.setChannelID(rss_channel);
+												collectedMessage.setChannelName(rss_channel_name);
 												collectedMessage.setMessage(outMessage);
 												collectedMessage.setMessageID(m.getIdLong());
 												collectedMessage.setTime(ZonedDateTime.now());

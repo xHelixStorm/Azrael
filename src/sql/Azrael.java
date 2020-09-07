@@ -2099,7 +2099,7 @@ public class Azrael {
 			try {
 				ArrayList<RSS> feeds = new ArrayList<RSS>();
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT url, format, type, videos, pictures, text FROM rss WHERE fk_guild_id = ? ORDER BY timestamp asc");
+				String sql = ("SELECT url, format, type, videos, pictures, text, channel_id FROM rss WHERE fk_guild_id = ? ORDER BY timestamp asc");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				rs = stmt.executeQuery();
@@ -2112,6 +2112,7 @@ public class Azrael {
 							rs.getBoolean(4),
 							rs.getBoolean(5),
 							rs.getBoolean(6),
+							rs.getLong(7),
 							SQLgetSubTweets(_guild_id, rs.getString(1))
 						)
 					);
@@ -2138,7 +2139,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT url, format, type, videos, pictures, text FROM rss WHERE fk_guild_id = ? AND type = ? ORDER BY timestamp asc");
+			String sql = ("SELECT url, format, type, videos, pictures, text, channel_id FROM rss WHERE fk_guild_id = ? AND type = ? ORDER BY timestamp asc");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _type);
@@ -2152,6 +2153,7 @@ public class Azrael {
 						rs.getBoolean(4),
 						rs.getBoolean(5),
 						rs.getBoolean(6),
+						rs.getLong(7),
 						SQLgetSubTweets(_guild_id, rs.getString(1))
 					)
 				);
@@ -2307,6 +2309,27 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateRSSFormat Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateRSSChannel(String _url, long _guild_id, long _channel_id) {
+		logger.trace("SQLUpdateRSSChannel launched. Params passed {}, {}, {}", _url, _guild_id, _channel_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE rss SET channel_id = ? WHERE url = ? && fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _channel_id);
+			stmt.setString(2, _url);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateRSSChannel Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

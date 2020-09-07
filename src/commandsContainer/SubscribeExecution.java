@@ -13,6 +13,7 @@ import constructors.RSS;
 import core.Hashes;
 import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import rss.BasicModel;
 import rss.TwitterModel;
@@ -274,6 +275,42 @@ public class SubscribeExecution {
 					+ STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_OPTIONS_4).replace("{}", (tweet.getText() ? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_IS_ENABLED) : STATIC.getTranslation(e.getMember(), Translation.DISPLAY_IS_NOT_ENABLED)))
 					+ STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_OPTIONS_5).replace("{}", (out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)))
 					+ STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_OPTIONS_6)).build()).queue();
+		}
+	}
+	
+	public static void setChannel(GuildMessageReceivedEvent e, int feed, String key) {
+		EmbedBuilder message = new EmbedBuilder();
+		ArrayList<RSS> subscriptions = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong());
+		if(subscriptions.size() >= feed+1) {
+			Hashes.addTempCache(key, new Cache(180000, "set-channel", ""+feed));
+			e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_ADD)).build()).queue();
+		}
+	}
+	
+	public static void updateAlternativeChannel(GuildMessageReceivedEvent e, int feed, String key) {
+		EmbedBuilder message = new EmbedBuilder();
+		String channel_id = e.getMessage().getContentRaw().replaceAll("[<>#]*", "");
+		if(channel_id.replaceAll("[0-9]*", "").length() == 0) {
+			TextChannel textChannel = e.getGuild().getTextChannelById(e.getMessage().getContentRaw().replaceAll("[<>#]*", ""));
+			if(textChannel != null) {
+				ArrayList<RSS> subscriptions = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong());
+				RSS subscription = subscriptions.get(feed);
+				final var result = Azrael.SQLUpdateRSSChannel(subscription.getURL(), e.getGuild().getIdLong(), textChannel.getIdLong());
+				if(result > 0) {
+					e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_ADDED)).build()).queue();
+					Hashes.clearTempCache(key);
+				}
+				else {
+					e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					Hashes.clearTempCache(key);
+				}
+			}
+			else {
+				e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_ERR_2)).build()).queue();
+			}
+		}
+		else {
+			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_ERR_2)).build()).queue();
 		}
 	}
 	

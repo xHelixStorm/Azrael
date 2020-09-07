@@ -117,6 +117,23 @@ public class Subscribe implements CommandPublic {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_OPTIONS_ERR)).build()).queue();
 			}
 		}
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))) {
+			int counter = 1;
+			StringBuilder out = new StringBuilder();
+			for(RSS feed: Azrael.SQLgetSubscriptions(e.getGuild().getIdLong())) {
+				out.append(counter+": **"+feed.getURL()+"**\n");
+				counter++;
+			}
+			if(out.length() > 0) {
+				message.setColor(Color.BLUE);
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_HELP)+out.toString()).build()).queue();
+				Hashes.addTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, "channel"));
+			}
+			else {
+				message.setColor(Color.RED);
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_ERR)).build()).queue();
+			}
+		}
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))) {
 			//test a feed
 			int counter = 1;

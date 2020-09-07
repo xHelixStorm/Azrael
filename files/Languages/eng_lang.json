@@ -144,6 +144,7 @@
 	"param_rename":					"rename",
 	"param_server":					"server",
 	"param_extend":					"extend",
+	"param_channel":				"channel",
 
 	"lang_eng":						"English",
 	"lang_ger":						"German",
@@ -646,7 +647,7 @@
 	"shutdown_prep":				"Shutdown sequence initiated!",
 	"shutdown_soon":				"The Bot will shut down shortly!",
 	
-	"subscribe_help":				"Use this command to subscribe RSS pages or Twitter hashtags that will be displayed into a dedicated channel! These are all the available parameters:\n\n- **register**:\nSubscribe a RSS Feed or a Twitter Hashtag!\n- **format**:\nDefine the display options for your RSS Feeds and Twitter Hashtags!\n- **options**:\nDefine additional options for Twitter Hashtags!\n- **remove**:\nRemove a registered RSS feed or Twitter Hashtag!\n- **test**:\nTest a registered RSS Feed or Twitter Hashtag!\n- **display**:\nShow a list of registered RSS Feeds and Twitter Hashtags!",
+	"subscribe_help":				"Use this command to subscribe RSS pages or Twitter hashtags that will be displayed into a dedicated channel! These are all the available parameters:\n\n- **register**:\nSubscribe a RSS Feed or a Twitter Hashtag!\n- **format**:\nDefine the display options for your RSS Feeds and Twitter Hashtags!\n- **options**:\nDefine additional options for Twitter Hashtags!\n- **channel**:\nUse a specific channel beside the default one!\n- **remove**:\nRemove a registered RSS feed or Twitter Hashtag!\n- **test**:\nTest a registered RSS Feed or Twitter Hashtag!\n- **display**:\nShow a list of registered RSS Feeds and Twitter Hashtags!",
 	"subscribe_register_help":		"Do you wish to add a RSS Feed or a Twitter Hashtag?\nWrite either 1 to register a RSS Feed or 2 to register a Twitter Hashtag as second parameter!",
 	"subscribe_register_rss":		"Now please apply a RSS URL!",
 	"subscribe_register_hashtag":	"Now please apply a Twitter Hashtag!",
@@ -657,6 +658,8 @@
 	"subscribe_format_help":		"Format a registered RSS Feed or Twitter Hashtag by selecting it with a number which is displayed below:\n\n",
 	"subscribe_options_help":		"Further format a Twitter Hashtag by selecting it with a number which is displayed below:\n\n",
 	"subscribe_options_err":		"No subscribed Twitter Hashtags found!",
+	"subscribe_channel_help":		"Define a different text channel besides the default one to display subscriptions in a separate channel. Select the subscription by writing one of the displayed numbers below:\n\n",
+	"subscribe_channel_err":		"Currently no subscriptions are available!",
 	"subscribe_test_help":			"Test a registered RSS Feed or Twitter Hashtag by selecting it with a number which is displayed below:\n\n",
 	"subscribe_display_help":		"Here a list with all registered RSS Feeds and Twitter Hashtags:\n\n",
 	"subscribe_rss_added":			"RSS feed has been registered!",
@@ -675,6 +678,9 @@
 	"subscribe_options_6":			"Type *enable/disable pictures/videos/text* to either enable or disable one of these options!\nAlso, type *add-child/remove-child #<hashtag>* to combine a hashtag with another hashtag or to remove the binding.\nOnce complete, type *exit* to complete the set up.",
 	"subscribe_option_bound":		"Child Hashtag is already bound to ",
 	"subscribe_option_not_bound":	"Child Hashtag is already not bound to ",
+	"subscribe_channel_add":		"Now mention an existing text channel or write a text channel id!",
+	"subscribe_channel_err_2":		"Text channel doesn't exist!",
+	"subscribe_channel_added":		"Text channel has been set!",
 	"subscribe_exit":				"Subscribe command interrupted!",
 	
 	"top_user_left":				"<User has left the server>",

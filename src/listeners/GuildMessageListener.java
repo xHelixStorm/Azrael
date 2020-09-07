@@ -333,6 +333,14 @@ public class GuildMessageListener extends ListenerAdapter {
 								if(lowCaseMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)) || lowCaseMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE)) || lowCaseMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_CHILD)) || lowCaseMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_CHILD)))
 									SubscribeExecution.updateOptions(e, Integer.parseInt(rss.getAdditionalInfo2()), "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 							}
+							//set a text channel besides the default one
+							else if(task.equals("channel") && message.replaceAll("[0-9]*", "").length() == 0) {
+								SubscribeExecution.setChannel(e, Integer.parseInt(message)-1, "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+							}
+							//register the alternative text channel
+							else if(task.equals("set-channel")) {
+								SubscribeExecution.updateAlternativeChannel(e, Integer.parseInt(rss.getAdditionalInfo2()), "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+							}
 						}
 						else {
 							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);

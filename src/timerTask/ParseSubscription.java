@@ -14,6 +14,7 @@ import constructors.RSS;
 import enums.Channel;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
 import rss.BasicModel;
 import rss.TwitterModel;
 import sql.Azrael;
@@ -51,12 +52,18 @@ public class ParseSubscription extends TimerTask{
 						logger.info("Fetching subscriptions for guild {}", guild.getName());
 						for(RSS rss : feeds) {
 							new Thread(() -> {
+								long channel_id;
+								TextChannel textChannel = guild.getTextChannelById(rss.getChannelID()); 
+								if(textChannel != null)
+									channel_id = rss.getChannelID();
+								else
+									channel_id = rss_channel.getChannel_ID();
 								try {
 									logger.trace("Retrieving subscription for {} in guild {}", rss.getURL(), e.getGuildById(guild_id).getName());
 									if(rss.getType() == 1)
-										BasicModel.ModelParse(STATIC.retrieveWebPageCode(rss.getURL()), guild, rss, rss_channel);
+										BasicModel.ModelParse(STATIC.retrieveWebPageCode(rss.getURL()), guild, rss, channel_id);
 									else if(rss.getType() == 2)
-										TwitterModel.ModelParse(guild, rss, rss_channel);
+										TwitterModel.ModelParse(guild, rss, channel_id, textChannel.getName());
 								} catch(SocketTimeoutException e1){
 									logger.warn("Timeout on subscription {}", rss.getURL());
 								} catch (Exception e1) {

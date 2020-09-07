@@ -144,6 +144,7 @@
 	"param_rename":					"umbenennen",
 	"param_server":					"server",
 	"param_extend":					"verlängern",
+	"param_channel":				"kanal",
 
 	"lang_eng":						"Englisch",
 	"lang_ger":						"Deutsch",
@@ -646,7 +647,7 @@
 	"shutdown_prep":				"Abschaltsequenz eingeleitet!",
 	"shutdown_soon":				"Der Bot fährt in kurze herunter!",
 	
-	"subscribe_help":				"Verwenden Sie diesen Befehl, um RSS-Seiten oder Twitter-Hashtags zu abonnieren, die in einem speziellen Kanal angezeigt werden! Dies sind alle verfügbaren Parameter:\n\n- **registrieren**:\nAbonnieren Sie einen RSS-Feed oder einen Twitter-Hashtag!\n- **formattieren**:\nDefinieren Sie die Anzeigeoptionen für Ihre RSS-Feeds und Twitter-Hashtags!\n- **optionen**:\nDefinieren Sie zusätzliche Optionen für Twitter-Hashtags!\n- **entfernen**:\nEntfernen Sie einen registrierten RSS-Feed oder Twitter-Hashtag!\n- **testen**:\nTesten Sie einen registrierten RSS-Feed oder Twitter-Hashtag!\n- **anzeigen**:\nEine Liste der registrierten RSS-Feeds und Twitter-Hashtags anzeigen!",
+	"subscribe_help":				"Verwenden Sie diesen Befehl, um RSS-Seiten oder Twitter-Hashtags zu abonnieren, die in einem speziellen Kanal angezeigt werden! Dies sind alle verfügbaren Parameter:\n\n- **registrieren**:\nAbonnieren Sie einen RSS-Feed oder einen Twitter-Hashtag!\n- **formattieren**:\nDefinieren Sie die Anzeigeoptionen für Ihre RSS-Feeds und Twitter-Hashtags!\n- **optionen**:\nDefinieren Sie zusätzliche Optionen für Twitter-Hashtags!\n- **kanal**:\nEinen bestimmten Kanal neben den Haupt-Textkanal benutzen!\n- **entfernen**:\nEntfernen Sie einen registrierten RSS-Feed oder Twitter-Hashtag!\n- **testen**:\nTesten Sie einen registrierten RSS-Feed oder Twitter-Hashtag!\n- **anzeigen**:\nEine Liste der registrierten RSS-Feeds und Twitter-Hashtags anzeigen!",
 	"subscribe_register_help":		"Möchten Sie einen RSS-Feed oder einen Twitter-Hashtag hinzufügen?\nSchreiben Sie entweder 1, um einen RSS-Feed zu registrieren oder 2, um einen Twitter-Hashtag als zweiten Parameter zu registrieren!",
 	"subscribe_register_rss":		"Verwenden Sie jetzt bitte eine RSS-URL!",
 	"subscribe_register_hashtag":	"Verwenden Sie jetzt bitte einen Twitter-Hashtag!",
@@ -657,6 +658,8 @@
 	"subscribe_format_help":		"Formatieren Sie einen registrierten RSS-Feed oder Twitter-Hashtag, indem Sie ihn mit einer Zahl auswählen, die unten angezeigt wird:\n\n",
 	"subscribe_options_help":		"Formatieren Sie einen Twitter-Hashtag weiter, indem Sie ihn mit einer Zahl auswählen, die unten angezeigt wird:\n\n",
 	"subscribe_options_err":		"Keine abonnierten Twitter-Hashtags gefunden!",
+	"subscribe_channel_help":		"Definieren Sie einen anderen Textkanal als den Standardkanal, um Abonnements in einem separaten Kanal anzuzeigen. Wählen Sie das Abonnement aus, indem Sie eine der unten angezeigten Nummern eingeben:\n\n",
+	"subscribe_channel_err":		"Derzeit sind keine Abonnements verfügbar!",
 	"subscribe_test_help":			"Testen Sie einen registrierten RSS-Feed oder Twitter-Hashtag, indem Sie ihn mit einer Nummer auswählen, die unten angezeigt wird:\n\n",
 	"subscribe_display_help":		"Hier eine Liste mit allen registrierten RSS-Feeds und Twitter-Hashtags:\n\n",
 	"subscribe_rss_added":			"RSS-Feed wurde registriert!",
@@ -675,6 +678,9 @@
 	"subscribe_options_6":			"Geben Sie *aktivieren/deaktivieren bilder/videos/text* ein, um eine dieser Optionen entweder zu aktivieren oder zu deaktivieren!\nGeben Sie außerdem *kind-hinzufügen/kind-entfernen #<hashtag>* ein, um einen Hashtag mit einem anderen Hashtag zu kombinieren oder um die Bindung zu entfernen.\nSobald fertig, geben Sie *verlassen* ein, um die Einrichtung abzuschließen.",
 	"subscribe_option_bound":		"Kind Hashtag ist bereits gebunden an ",
 	"subscribe_option_not_bound":	"Kind Hashtag ist bereits nicht gebunden an ",
+	"subscribe_channel_add":		"Erwähnen Sie jetzt einen bestehenden Textkanal oder schreiben Sie eine Textkanal-ID!",
+	"subscribe_channel_err_2":		"Textkanal existiert nicht!",
+	"subscribe_channel_added":		"Textkanal ist gesetzt!",
 	"subscribe_exit":				"Abonnieren-Befehl unterbrochen!",
 	
 	"top_user_left":				"<Benutzer hat den Server verlassen>",
