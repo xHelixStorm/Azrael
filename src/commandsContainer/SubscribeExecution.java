@@ -298,6 +298,7 @@ public class SubscribeExecution {
 				final var result = Azrael.SQLUpdateRSSChannel(subscription.getURL(), e.getGuild().getIdLong(), textChannel.getIdLong());
 				if(result > 0) {
 					e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_ADDED)).build()).queue();
+					Hashes.removeFeeds(e.getGuild().getIdLong());
 					Hashes.clearTempCache(key);
 				}
 				else {
