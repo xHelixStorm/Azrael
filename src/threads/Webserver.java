@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -92,6 +93,16 @@ public class Webserver implements Runnable {
 			}
 		} catch (IOException e) {
 			logger.error("Webservice error", e);
+		} finally {
+			//reattempt reconnection in 10 seconds
+			try {
+				logger.debug("Reattempting webservice connection in 10 seconds!");
+				Thread.sleep(TimeUnit.SECONDS.toMillis(10));
+				logger.debug("Restarting webservice!");
+				new Thread(this).start();
+			} catch (InterruptedException e) {
+				logger.error("", e);
+			}
 		}
 	}
 }
