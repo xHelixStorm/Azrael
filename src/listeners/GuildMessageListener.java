@@ -637,7 +637,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						}
 						else {
 							//exclude bot and quiz channels for experience gain
-							if(!e.getMember().getUser().isBot() && (currentChannel.getChannel_Type() == null || (currentChannel.getChannel_Type() != null && !currentChannel.getChannel_Type().equals(Channel.BOT.getType()) && !currentChannel.getChannel_Type().equals(Channel.QUI.getType())))) {
+							if(!e.getMember().getUser().isBot() && (currentChannel == null || currentChannel.getChannel_Type() == null || (currentChannel.getChannel_Type() != null && !currentChannel.getChannel_Type().equals(Channel.BOT.getType()) && !currentChannel.getChannel_Type().equals(Channel.QUI.getType())))) {
 								int roleAssignLevel = 0;
 								long role_id = 0;
 								//check if there's a ranking role to unlock when the user reaches the next level
