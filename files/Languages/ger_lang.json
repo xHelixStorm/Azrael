@@ -272,6 +272,7 @@
 	"daily_error_3":			 	"Ein interner Fehler ist aufgetreten! Ihre tägliche Belohnung konnte nicht in Ihr Inventar aufgenommen werden. Bitte kontaktieren Sie einen Administrator!",
 	"daily_empty":				 	"Momentan enthält der Daily Befehl keine Belohnungen!",
 	"daily_cooldown":			 	"Sie haben ihre tägliche Belohnung heute bereits erhalten! Warten Sie **{}** Stunden und **{}** Minuten für die nächste Ziehung!",
+	"daily_rivet":					"Ich bitte um Entschuldigung... Sie haben diesmal nichts gewonnen. Verlieren Sie nicht den Mut und versuchen Sie es morgen noch einmal!",
 	
 	"display_input_not_found":	 	"Es wurde nichts für die angeforderte Eingabe gefunden!",
 	"display_help":				 	"Verwenden Sie einen der verfügbaren Parameter zusammen mit dem Befehl, um weitere Informationen anzuzeigen:\n\n",
@@ -591,7 +592,7 @@
 	"set_rank_skin_err":			"Rang-Bilder sind für das aktuelle Thema nicht verfügbar!",
 	"set_profile_skin_err":			"Profil-Bilder sind für das aktuelle Thema nicht verfügbar!",
 	"set_icon_skin_err":			"Symbole sind für das aktuelle Thema nicht verfügbar!",
-	"set_daily_item_help":			"Schreiben Sie den Itemtyp als zweiten Parameter, die Wahrscheinlichkeit als dritten Parameter und den Item-Namen als letzten Parameter! Hier zwei Beispiele, wie der Wahrscheinlichkeitsparameter aussehen soll:\n\n*0,01% = 1*\n*25,00% = 25000*\n\nDiese Artikeltypen sind verfügbar:\n\n*cur*: Währung\n*exp*: Erfahrungs-Booster\n*cod*: Verlosungen",
+	"set_daily_item_help":			"Schreiben Sie den Itemtyp als zweiten Parameter, die Wahrscheinlichkeit als dritten Parameter und den Item-Namen als letzten Parameter! Hier zwei Beispiele, wie der Wahrscheinlichkeitsparameter aussehen soll:\n\n*0,01% = 1*\n*25,00% = 25000*\n\nDiese Artikeltypen sind verfügbar:\n\n*cur*: Währung\n*exp*: Erfahrungs-Booster\n*cod*: Verlosungen\n*riv*: Nieten",
 	"set_daily_invalid_type":		"Bitte verwenden sie entweder *cur*, *exp* oder *cod*",
 	"set_daily_probability_err":	"Bitte geben Sie einen numerischen Wahrscheinlichkeitswert an!",
 	"set_daily_already_registered":	"Dieses Item wurde bereits registriert!",

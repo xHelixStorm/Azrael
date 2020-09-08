@@ -274,6 +274,7 @@ public enum Translation {
 	DAILY_ERROR_3				("daily_error_3"),
 	DAILY_EMPTY					("daily_empty"),
 	DAILY_COOLDOWN				("daily_cooldown"),
+	DAILY_RIVET					("daily_rivet"),
 	
 	DISPLAY_INPUT_NOT_FOUND		("display_input_not_found"),
 	DISPLAY_HELP				("display_help"),

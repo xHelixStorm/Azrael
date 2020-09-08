@@ -272,6 +272,7 @@
 	"daily_error_3":			 	"An internal error occurred! Your daily item couldn't be put into your inventory. Please contact an administrator!",
 	"daily_empty":				 	"For now, the daily command doesn't contain any items to obtain!",
 	"daily_cooldown":			 	"Wait, slow down! You can open your next daily in **{}** hours and **{}** minutes!",
+	"daily_rivet":					"My apologies... you have won nothing this time. Don't lose heart and try again tomorrow!",
 	
 	"display_input_not_found":	 	"Nothing has been found for the requested input!",
 	"display_help":				 	"Use one of the available parameters, together with the command, to display further information:\n\n",
@@ -591,7 +592,7 @@
 	"set_rank_skin_err":			"Rank skins are not available with the current theme!",
 	"set_profile_skin_err":			"Profile skins are not available with the current theme!",
 	"set_icon_skin_err":			"Icon skins are not available with the current theme!",
-	"set_daily_item_help":			"Write the type of item as second parameter, the probability as third parameter and the item name as last parameter! Here two examples on how the probability parameter should look like:\n\n*0,01% = 1*\n*25,00% = 25000*\n\nThese item types are available:\n\n*cur*: Currency\n*exp*: Experience boosters\n*cod*: Giveaway rewards",
+	"set_daily_item_help":			"Write the type of item as second parameter, the probability as third parameter and the item name as last parameter! Here two examples on how the probability parameter should look like:\n\n*0,01% = 1*\n*25,00% = 25000*\n\nThese item types are available:\n\n*cur*: Currency\n*exp*: Experience boosters\n*cod*: Giveaway rewards\n*riv*: Rivets",
 	"set_daily_invalid_type":		"Please use an existing daily type!",
 	"set_daily_probability_err":	"Please forward a numerical probability!",
 	"set_daily_already_registered":	"This daily item has been already registered!",

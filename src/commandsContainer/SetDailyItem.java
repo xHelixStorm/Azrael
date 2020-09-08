@@ -32,7 +32,7 @@ public class SetDailyItem {
 			return;
 		}
 		//verify that the item type has been passed correctly
-		if(args[1].equalsIgnoreCase("cur") || args[1].equalsIgnoreCase("exp") || args[1].equalsIgnoreCase("cod")) {
+		if(args[1].equalsIgnoreCase("cur") || args[1].equalsIgnoreCase("exp") || args[1].equalsIgnoreCase("cod") || args[1].equalsIgnoreCase("riv")) {
 			type = args[1].toLowerCase();
 		}
 		else {

@@ -166,6 +166,13 @@ public class Daily implements CommandPublic {
 							//mark the code as used
 							editedRows = RankingSystem.SQLUpdateUsedOnReward(cod_reward, e.getGuild().getIdLong());
 						}
+						//If the player was unlucky, send a message that nothing was won
+						else if(list.get(random).getType().equals("riv")) {
+							EmbedBuilder message = new EmbedBuilder().setColor(Color.getHSBColor(268, 81, 88)).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DAILY));
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_RIVET)).build()).queue();
+							//mark as successful
+							editedRows = 1;
+						}
 						//if the inventory has been updated, set the daily for this user and the current day as opened
 						if(editedRows > 0) {
 							if(RankingSystem.SQLInsertDailiesUsage(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), timestamp, timestamp2) > 0) {
