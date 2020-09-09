@@ -143,7 +143,7 @@ public class RankingThreadExecution {
 		boolean editLevel = false;
 		var levels = RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild_settings.getThemeID());
 		final var current_level = levels.parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null);
-		if(current_level.getExpLoss() > 0) {
+		if(current_level != null && current_level.getExpLoss() > 0) {
 			long passedTime = System.currentTimeMillis() - user_details.getLastUpdate().getTime();
 			//remove 2 days from the passed time
 			passedTime -= 172800000;

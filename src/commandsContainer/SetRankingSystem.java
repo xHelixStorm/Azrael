@@ -41,13 +41,15 @@ public class SetRankingSystem {
 				guild.setRankingState(ranking_state);
 				Hashes.addStatus(e.getGuild().getIdLong(), guild);
 				logger.debug("{} has set the ranking system to {} in guild {}", e.getMember().getUser().getId(), _input, e.getGuild().getId());
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(message).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(message).build()).queue();
 				
 				if(ranking_state == true) {
+					Hashes.clearRankingLevels();
 					if(RankingSystem.SQLgetRoles(e.getGuild().getIdLong()) == null) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Roles from RankingSystem.roles couldn't be called and cached in guild {}", e.getGuild().getId());
 					}
+					Hashes.clearRankingLevels();
 					if(RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild.getThemeID()).size() == 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Levels from RankingSystem.level_list couldn't be called and cached in guild {}", e.getGuild().getId());

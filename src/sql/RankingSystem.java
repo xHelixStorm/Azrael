@@ -845,7 +845,7 @@ public class RankingSystem {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-				String sql = ("SELECT * FROM ranking_level WHERE level_id = ? AND theme_id = ?");
+				String sql = ("SELECT * FROM ranking_level WHERE level_id = ? AND fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _skin_id);
 				stmt.setInt(2, _theme_id);
@@ -900,7 +900,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT * FROM ranking_level WHERE theme_id = ?");
+			String sql = ("SELECT * FROM ranking_level WHERE fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _theme_id);
 			rs = stmt.executeQuery();
@@ -949,7 +949,7 @@ public class RankingSystem {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-				String sql = ("SELECT * FROM ranking_rank WHERE rank_id = ? AND theme_id = ?");
+				String sql = ("SELECT * FROM ranking_rank WHERE rank_id = ? AND fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _skin_id);
 				stmt.setInt(2, _theme_id);
@@ -1015,7 +1015,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT * FROM ranking_rank WHERE theme_id = ?");
+			String sql = ("SELECT * FROM ranking_rank WHERE fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _theme_id);
 			rs = stmt.executeQuery();
@@ -1075,7 +1075,7 @@ public class RankingSystem {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-				String sql = ("SELECT * FROM ranking_profile WHERE profile_id = ? AND theme_id = ?");
+				String sql = ("SELECT * FROM ranking_profile WHERE profile_id = ? AND fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _skin_id);
 				stmt.setInt(2, _theme_id);
@@ -1150,7 +1150,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT * FROM ranking_profile WHERE theme_id = ?");
+			String sql = ("SELECT * FROM ranking_profile WHERE fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _theme_id);
 			rs = stmt.executeQuery();
@@ -1219,7 +1219,7 @@ public class RankingSystem {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-				String sql = ("SELECT * FROM ranking_icons WHERE icon_id = ? AND theme_id = ?");
+				String sql = ("SELECT * FROM ranking_icons WHERE icon_id = ? AND fk_theme_id = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setInt(1, _skin_id);
 				stmt.setInt(2, _theme_id);
@@ -1260,7 +1260,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT * FROM ranking_icons WHERE theme_id = ?");
+			String sql = ("SELECT * FROM ranking_icons WHERE fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setInt(1, _theme_id);
 			rs = stmt.executeQuery();
