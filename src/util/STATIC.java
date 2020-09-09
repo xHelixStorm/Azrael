@@ -72,7 +72,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.26.481";
+	private static final String VERSION = "7.26.482";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -103,26 +103,26 @@ public class STATIC {
 	
 	private static String getMessage(String lang, Translation event) {
 		return switch(lang) {
-		case "eng" -> {
-			if(eng_lang.has(event.section()))
-				yield (String)eng_lang.get(event.section());
-			else
-				yield "Message "+event.section()+" not found!";
-		}
-		case "ger" -> {
-			if(ger_lang.has(event.section()))
-				yield (String)ger_lang.get(event.section());
-			else
-				yield "Message "+event.section()+" not found!";
-		}
-		case "spa" -> {
-			if(spa_lang.has(event.section()))
-				yield (String)spa_lang.getString(event.section());
-			else
-				yield "Message "+event.section()+" not found!";
-		}
-		default -> "Missing translation!";
-	};
+			case "eng" -> {
+				if(eng_lang.has(event.section()))
+					yield (String)eng_lang.get(event.section());
+				else
+					yield "Message "+event.section()+" not found!";
+			}
+			case "ger" -> {
+				if(ger_lang.has(event.section()))
+					yield (String)ger_lang.get(event.section());
+				else
+					yield "Message "+event.section()+" not found!";
+			}
+			case "spa" -> {
+				if(spa_lang.has(event.section()))
+					yield (String)spa_lang.getString(event.section());
+				else
+					yield "Message "+event.section()+" not found!";
+			}
+			default -> "Missing translation!";
+		};
 	}
 	
 	/**

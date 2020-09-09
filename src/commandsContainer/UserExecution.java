@@ -17,7 +17,7 @@ import constructors.Cache;
 import constructors.Channels;
 import constructors.Guilds;
 import constructors.Messages;
-import constructors.Rank;
+import constructors.Ranking;
 import constructors.User;
 import constructors.Watchlist;
 import core.Hashes;
@@ -143,7 +143,7 @@ public class UserExecution {
 							else
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_WATCH_LEVEL), "**"+watchedUser.getLevel()+"**", true);
 							message.addBlankField(false);
-							Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
+							Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
 							if(guild_settings.getRankingState() == true && user_details != null) {
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_LEVEL), "**"+user_details.getLevel()+"**/**"+guild_settings.getMaxLevel()+"**", true);
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_EXPERIENCE), "**"+user_details.getCurrentExperience()+"**/**"+user_details.getRankUpExperience()+"**", true);
@@ -369,7 +369,7 @@ public class UserExecution {
 											var mute_role = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 											if(mute_role != null) {
 												long assignedRole = 0;
-												Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
+												Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
 												if(user_details != null) {
 													assignedRole = user_details.getCurrentRole();
 												}
@@ -1485,7 +1485,7 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*",	"").equals("gift-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
+					Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
 					long experience = Integer.parseInt(_message);
 					long totExperience = 0;
 					long currentExperience = 0;
@@ -1557,7 +1557,7 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("set-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
+					Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
 					long experience = Long.parseLong(_message);
 					long totExperience = 0;
 					long currentExperience = 0;
@@ -1631,7 +1631,7 @@ public class UserExecution {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					int level = Integer.parseInt(_message);
 					if(level <= guild_settings.getMaxLevel()) {
-						Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
+						Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
 						long experience = 0;
 						long rankUpExperience = 0;
 						long assign_role = 0;
@@ -1699,7 +1699,7 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("gift-currency")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
+					Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(user_details.getCurrency()+currency);
 					user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
@@ -1718,7 +1718,7 @@ public class UserExecution {
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("set-currency")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
+					Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
 					long currency = Long.parseLong(_message);
 					user_details.setCurrency(currency);
 					user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));

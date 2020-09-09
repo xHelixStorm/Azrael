@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
 import constructors.Level;
-import constructors.Rank;
+import constructors.Ranking;
 import constructors.Roles;
 import core.Hashes;
 import enums.Translation;
@@ -41,7 +41,7 @@ import util.STATIC;
 public class RankingThreadExecution {
 	private final static Logger logger = LoggerFactory.getLogger(RankingThreadExecution.class);
 	
-	public static void setProgress(GuildMessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, int percent_multiplier, Rank user_details, Guilds guild_settings) {
+	public static void setProgress(GuildMessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, int percent_multiplier, Ranking user_details, Guilds guild_settings) {
 		//delete all expired items from the inventory (e.g experience booster)
 		RankingSystem.SQLDeleteInventory();
 		int multiplier = 1;
@@ -127,20 +127,16 @@ public class RankingThreadExecution {
 		}
 	}
 	
-	private static void ExperienceGain(GuildMessageReceivedEvent e, Rank user_details, Guilds guild_settings, int currentExperience, long experience, int daily_experience, int roleAssignLevel, boolean max_experience_enabled, Timestamp reset) {
+	private static void ExperienceGain(GuildMessageReceivedEvent e, Ranking user_details, Guilds guild_settings, int currentExperience, long experience, int daily_experience, int roleAssignLevel, boolean max_experience_enabled, Timestamp reset) {
 		//check if the default skin had been updated, if yes update level skin, description and file type
 		var old_guild_settings = Hashes.getOldGuildSettings(e.getGuild().getIdLong());
 		if(old_guild_settings != null && old_guild_settings.getLevelID() == user_details.getRankingLevel()) {
 			user_details.setRankingLevel(guild_settings.getLevelID());
-			user_details.setLevelDescription(guild_settings.getLevelDescription());
-			user_details.setFileTypeLevel(guild_settings.getFileTypeLevel());
 			Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
 		}
 		//then do the same comparison for level icons
 		if(old_guild_settings != null && old_guild_settings.getIconID() == user_details.getRankingIcon()) {
 			user_details.setRankingIcon(guild_settings.getIconID());
-			user_details.setIconDescription(guild_settings.getIconDescription());
-			user_details.setFileTypeIcon(guild_settings.getFileTypeIcon());
 			Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
 		}
 		

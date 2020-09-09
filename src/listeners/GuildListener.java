@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Bancollect;
 import constructors.Cache;
 import constructors.Guilds;
-import constructors.Rank;
+import constructors.Ranking;
 import core.Hashes;
 import enums.Channel;
 import enums.GoogleEvent;
@@ -146,7 +146,7 @@ public class GuildListener extends ListenerAdapter {
 				}
 				//Assign an unlocked ranking role after verifying that the ranking system is enabled
 				if(guild_settings.getRankingState()) {
-					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
+					Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
 					if(user_details.getCurrentRole() != 0) {e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(user_details.getCurrentRole())).queue();}
 				}
 			}

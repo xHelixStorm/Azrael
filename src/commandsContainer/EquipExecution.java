@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import constructors.Cache;
-import constructors.Rank;
+import constructors.Ranking;
 import core.Hashes;
 import core.UserPrivs;
 import enums.Translation;
@@ -94,7 +94,7 @@ public class EquipExecution {
 	
 	public static void equipmentItemScreen(PrivateMessageReceivedEvent e, final String guild_id, String action) {
 		final long guild = guild_id.transform(v -> Long.valueOf(v));
-		Rank user_details = null;
+		Ranking user_details = null;
 		RankingSystem.SQLDeleteInventory();
 		//retrieve weapon descriptions for already equipped items or find out, if they're expired from the inventory and then remove
 		var weapon1 = RankingSystemItems.SQLgetEquippedWeaponDescription(e.getAuthor().getIdLong(), guild, 1);

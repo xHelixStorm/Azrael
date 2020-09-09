@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Bancollect;
-import constructors.Rank;
+import constructors.Ranking;
 import constructors.Warning;
 import core.Hashes;
 import core.UserPrivs;
@@ -151,7 +151,7 @@ public class RoleListener extends ListenerAdapter {
 					int warning_id = warnedUser.getWarningID();
 					long assignedRole = 0;
 					//check if this user has a ranking role registered and if yes, save it for when the mute elapsed
-					Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
+					Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
 					if(user_details != null) {
 						assignedRole = user_details.getCurrentRole();
 					}

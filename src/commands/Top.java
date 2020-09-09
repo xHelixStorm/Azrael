@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.Ranking;
 import core.UserPrivs;
 import enums.Channel;
 import enums.Translation;
@@ -64,8 +65,8 @@ public class Top implements CommandPublic {
 					
 		var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 		if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
-			ArrayList<constructors.Rank> rankList = RankingSystem.SQLRanking(guild_id);
-			constructors.Rank ranking1 = rankList.parallelStream().filter(r -> r.getUser_ID() == member_id).findAny().orElse(null);
+			ArrayList<Ranking> rankList = RankingSystem.SQLRanking(guild_id);
+			Ranking ranking1 = rankList.parallelStream().filter(r -> r.getUser_ID() == member_id).findAny().orElse(null);
 			rank = ranking1.getRank();
 			user_experience = ranking1.getExperience();
 			user_level = ranking1.getLevel();
@@ -80,7 +81,7 @@ public class Top implements CommandPublic {
 			//display the top ten of the current page
 			for(int iterate = index; iterate < page*10; iterate++) {
 				if(iterate < rankList.size()) {
-					constructors.Rank ranking = rankList.get(iterate);
+					Ranking ranking = rankList.get(iterate);
 					i = i + 1;
 					Member member = e.getGuild().getMemberById(ranking.getUser_ID());
 					if(member != null)

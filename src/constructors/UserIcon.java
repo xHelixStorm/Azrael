@@ -1,0 +1,40 @@
+package constructors;
+
+public class UserIcon {
+	private int skin;
+	private String skinDescription;
+	private String fileType;
+	private int themeID;
+	private int line;
+	
+	public int getSkin() {
+		return skin;
+	}
+	public String getSkinDescription() {
+		return skinDescription;
+	}
+	public String getFileType() {
+		return fileType;
+	}
+	public int getThemeID() {
+		return themeID;
+	}
+	public int getLine() {
+		return line;
+	}
+	public void setSkin(int skin) {
+		this.skin = skin;
+	}
+	public void setSkinDescription(String skinDescription) {
+		this.skinDescription = skinDescription;
+	}
+	public void setFileType(String fileType) {
+		this.fileType = fileType;
+	}
+	public void setThemeID(int themeID) {
+		this.themeID = themeID;
+	}
+	public void setLine(int line) {
+		this.line = line;
+	}
+}

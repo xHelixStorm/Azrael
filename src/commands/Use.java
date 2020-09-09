@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Guilds;
+import constructors.Ranking;
 import core.Hashes;
 import core.UserPrivs;
 import enums.Channel;
@@ -45,7 +46,7 @@ public class Use implements CommandPublic {
 	@Override
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-		constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+		Ranking user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		if(guild_settings.getRankingState()) {
 			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
@@ -53,34 +54,18 @@ public class Use implements CommandPublic {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_HELP)).build()).queue();
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL))) {
-					constructors.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(guild_settings.getLevelDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
-					user_details.setRankingLevel(rank.getRankingLevel());
-					user_details.setLevelDescription(rank.getLevelDescription());
-					user_details.setFileTypeLevel(rank.getFileTypeLevel());
-					user_details.setColorRLevel(rank.getColorRLevel());
-					user_details.setColorGLevel(rank.getColorGLevel());
-					user_details.setColorBLevel(rank.getColorBLevel());
-					user_details.setRankXLevel(rank.getRankXLevel());
-					user_details.setRankYLevel(rank.getRankYLevel());
-					user_details.setRankWidthLevel(rank.getRankWidthLevel());
-					user_details.setRankHeightLevel(rank.getRankHeightLevel());
-					user_details.setLevelXLevel(rank.getLevelXLevel());
-					user_details.setLevelYLevel(rank.getLevelYLevel());
-					user_details.setNameXLevel(rank.getNameXLevel());
-					user_details.setNameYLevel(rank.getNameYLevel());
-					user_details.setNameLengthLimit_Level(rank.getNameLengthLimit_Level());
-					user_details.setTextFontSize_Level(rank.getTextFontSize_Level());
-					user_details.setNameFontSize_Level(rank.getNameFontSize_Level());
+					final var skin = RankingSystem.SQLgetRankingLevel(guild_settings.getLevelID(), guild_settings.getThemeID());
+					user_details.setRankingLevel(skin.getSkin());
 					if(user_details.getRankingLevel() != 0) {
 						if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel()) > 0) {
 							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_LEVEL_RESET).replace("{}", user_details.getLevelDescription())).build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_LEVEL_RESET).replace("{}", skin.getSkinDescription())).build()).queue();
 						}
 						else {
 							//if rows didn't get updated, throw an error and write it into error log
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							logger.error("RankingSystem.users table couldn't be updated with the default level skin for {}", e.getMember().getUser().getId());
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getLevelDescription());
+							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+skin.getSkinDescription());
 						}
 					}
 					else {
@@ -89,46 +74,18 @@ public class Use implements CommandPublic {
 					}
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK))) {
-					constructors.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(guild_settings.getRankDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
-					user_details.setRankingRank(rank.getRankingRank());
-					user_details.setRankDescription(rank.getRankDescription());
-					user_details.setFileTypeRank(rank.getFileTypeRank());
-					user_details.setBarColorRank(rank.getBarColorRank());
-					user_details.setColorRRank(rank.getColorRRank());
-					user_details.setColorGRank(rank.getColorGRank());
-					user_details.setColorBRank(rank.getColorBRank());
-					user_details.setRankXRank(rank.getRankXRank());
-					user_details.setRankYRank(rank.getRankYRank());
-					user_details.setRankWidthRank(rank.getRankWidthRank());
-					user_details.setRankHeightRank(rank.getRankHeightRank());
-					user_details.setNameXRank(rank.getNameXRank());
-					user_details.setNameYRank(rank.getNameYRank());
-					user_details.setBarXRank(rank.getBarXRank());
-					user_details.setBarYRank(rank.getBarYRank());
-					user_details.setAvatarXRank(rank.getAvatarXRank());
-					user_details.setAvatarYRank(rank.getAvatarYRank());
-					user_details.setAvatarWidthRank(rank.getAvatarWidthRank());
-					user_details.setAvatarHeightRank(rank.getAvatarHeightRank());
-					user_details.setExpTextXRank(rank.getExpTextXRank());
-					user_details.setExpTextYRank(rank.getExpTextYRank());
-					user_details.setPercentTextXRank(rank.getPercentTextXRank());
-					user_details.setPercentTextYRank(rank.getPercentTextYRank());
-					user_details.setPlacementXRank(rank.getPlacementXRank());
-					user_details.setPlacementYRank(rank.getPlacementYRank());
-					user_details.setNameLengthLimit_Rank(rank.getNameLengthLimit_Rank());
-					user_details.setTextFontSize_Rank(rank.getTextFontSize_Rank());
-					user_details.setNameFontSize_Rank(rank.getNameFontSize_Rank());
-					
+					final var skin = RankingSystem.SQLgetRankingRank(guild_settings.getRankID(), guild_settings.getThemeID());
+					user_details.setRankingRank(skin.getSkin());
 					if(user_details.getRankingRank() != 0) {
 						if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank()) > 0) {
 							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_RANK_RESET).replace("{}", user_details.getRankDescription())).build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_RANK_RESET).replace("{}", skin.getSkinDescription())).build()).queue();
 						}
 						else {
 							//if rows didn't get updated, throw an error and write it into error log
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							logger.error("RankingSystem.users table couldn't be updated with the default rank skin for {}", e.getMember().getUser().getId());
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getRankDescription());
+							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+skin.getSkinDescription());
 						}
 					}
 					else {
@@ -137,52 +94,18 @@ public class Use implements CommandPublic {
 					}
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE))) {
-					constructors.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(guild_settings.getProfileDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
-					user_details.setRankingProfile(rank.getRankingProfile());
-					user_details.setProfileDescription(rank.getProfileDescription());
-					user_details.setFileTypeProfile(rank.getFileTypeProfile());
-					user_details.setBarColorProfile(rank.getBarColorProfile());
-					user_details.setColorRProfile(rank.getColorRProfile());
-					user_details.setColorGProfile(rank.getColorGProfile());
-					user_details.setColorBProfile(rank.getColorBProfile());
-					user_details.setRankXProfile(rank.getRankXProfile());
-					user_details.setRankYProfile(rank.getRankYProfile());
-					user_details.setRankWidthProfile(rank.getRankWidthProfile());
-					user_details.setRankHeightProfile(rank.getRankHeightProfile());
-					user_details.setLevelXProfile(rank.getLevelXProfile());
-					user_details.setLevelYProfile(rank.getLevelYProfile());
-					user_details.setNameXProfile(rank.getNameXProfile());
-					user_details.setNameYProfile(rank.getNameYProfile());
-					user_details.setBarXProfile(rank.getBarXProfile());
-					user_details.setBarYProfile(rank.getBarYProfile());
-					user_details.setAvatarXProfile(rank.getAvatarXProfile());
-					user_details.setAvatarYProfile(rank.getAvatarYProfile());
-					user_details.setAvatarWidthProfile(rank.getAvatarWidthProfile());
-					user_details.setAvatarHeightProfile(rank.getAvatarHeightProfile());
-					user_details.setExpTextXProfile(rank.getExpTextXProfile());
-					user_details.setExpTextYProfile(rank.getExpTextYProfile());
-					user_details.setPercentTextXProfile(rank.getPercentTextXProfile());
-					user_details.setPercentTextYProfile(rank.getPercentTextYProfile());
-					user_details.setPlacementXProfile(rank.getPlacementXProfile());
-					user_details.setPlacementYProfile(rank.getPlacementYProfile());
-					user_details.setExperienceXProfile(rank.getExperienceXProfile());
-					user_details.setExperienceYProfile(rank.getExperienceYProfile());
-					user_details.setCurrencyXProfile(rank.getCurrencyXProfile());
-					user_details.setCurrencyYProfile(rank.getCurrencyYProfile());
-					user_details.setNameLengthLimit_Profile(rank.getNameLengthLimit_Profile());
-					user_details.setTextFontSize_Profile(rank.getTextFontSize_Profile());
-					user_details.setNameFontSize_Profile(rank.getNameFontSize_Profile());
-					user_details.setDescriptionMode_Profile(rank.getDescriptionMode_Profile());
+					final var skin = RankingSystem.SQLgetRankingProfile(guild_settings.getProfileID(), guild_settings.getThemeID());
+					user_details.setRankingProfile(skin.getSkin());
 					if(user_details.getRankingProfile() != 0) {
 						if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile()) > 0) {
 							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_PROFILE_RESET).replace("{}", user_details.getProfileDescription())).build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_PROFILE_RESET).replace("{}", skin.getSkinDescription())).build()).queue();
 						}
 						else {
 							//if rows didn't get updated, throw an error and write it into error log
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							logger.error("RankingSystem.users table couldn't be updated with the default profile skin for {}", e.getMember().getUser().getId());
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getProfileDescription());
+							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+skin.getSkinDescription());
 						}
 					}
 					else {
@@ -191,20 +114,18 @@ public class Use implements CommandPublic {
 					}
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICONS))) {
-					constructors.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(guild_settings.getIconDescription()) && r.getThemeID() == guild_settings.getThemeID()).findAny().orElse(null);
-					user_details.setRankingIcon(rank.getRankingIcon());
-					user_details.setIconDescription(rank.getIconDescription());
-					user_details.setFileTypeIcon(rank.getFileTypeIcon());
+					final var skin = RankingSystem.SQLgetRankingIcons(guild_settings.getIconID(), guild_settings.getThemeID());
+					user_details.setRankingIcon(skin.getSkin());
 					if(user_details.getRankingIcon() != 0) {
 						if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon()) > 0) {
 							Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_ICON_RESET).replace("{}", user_details.getIconDescription())).build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_ICON_RESET).replace("{}", skin.getSkinDescription())).build()).queue();
 						}
 						else {
 							//if rows didn't get updated, throw and error and write it into error log
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							logger.error("RankingSystem.users table couldn't be updated with the default icon skin for {}", e.getMember().getUser().getId());
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icons skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+user_details.getIconDescription());
+							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icons skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+skin.getSkinDescription());
 						}
 					}
 					else {
@@ -222,139 +143,58 @@ public class Use implements CommandPublic {
 					if(inventory != null && inventory.getItemID() != 0 && inventory.getStatus().equals("perm")) {
 						if(inventory.getSkinType().equals("lev")) {
 							final String filter = input;
-							constructors.Rank rank = RankingSystem.SQLgetRankingLevel().parallelStream().filter(r -> r.getLevelDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
-							user_details.setRankingLevel(rank.getRankingLevel());
-							user_details.setLevelDescription(rank.getLevelDescription());
-							user_details.setFileTypeLevel(rank.getFileTypeLevel());
-							user_details.setColorRLevel(rank.getColorRLevel());
-							user_details.setColorGLevel(rank.getColorGLevel());
-							user_details.setColorBLevel(rank.getColorBLevel());
-							user_details.setRankXLevel(rank.getRankXLevel());
-							user_details.setRankYLevel(rank.getRankYLevel());
-							user_details.setRankWidthLevel(rank.getRankWidthLevel());
-							user_details.setRankHeightLevel(rank.getRankHeightLevel());
-							user_details.setLevelXLevel(rank.getLevelXLevel());
-							user_details.setLevelYLevel(rank.getLevelYLevel());
-							user_details.setNameXLevel(rank.getNameXLevel());
-							user_details.setNameYLevel(rank.getNameYLevel());
-							user_details.setNameLengthLimit_Level(rank.getNameLengthLimit_Level());
-							user_details.setTextFontSize_Level(rank.getTextFontSize_Level());
-							user_details.setNameFontSize_Level(rank.getNameFontSize_Level());
+							final var skin = RankingSystem.SQLgetRankingLevelList(guild_settings.getThemeID()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+							user_details.setRankingLevel(skin.getSkin());
 							if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel()) > 0) {
 								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_SKIN).replace("{}", input)).build()).queue();
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("RankingSystem.users table couldn't be updated with the selected level skin {} for {}", user_details.getLevelDescription(), e.getMember().getUser().getId());
-								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be updated", "Level skin update has failed. Skin: "+user_details.getLevelDescription());
+								logger.error("RankingSystem.users table couldn't be updated with the selected level skin {} for {}", skin.getSkinDescription(), e.getMember().getUser().getId());
+								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be updated", "Level skin update has failed. Skin: "+skin.getSkinDescription());
 							}
 						}
 						else if(inventory.getSkinType().equals("ran")) {
 							final String filter = input;
-							constructors.Rank rank = RankingSystem.SQLgetRankingRank().parallelStream().filter(r -> r.getRankDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
-							user_details.setRankingRank(rank.getRankingRank());
-							user_details.setRankDescription(rank.getRankDescription());
-							user_details.setFileTypeRank(rank.getFileTypeRank());
-							user_details.setBarColorRank(rank.getBarColorRank());
-							user_details.setColorRRank(rank.getColorRRank());
-							user_details.setColorGRank(rank.getColorGRank());
-							user_details.setColorBRank(rank.getColorBRank());
-							user_details.setRankXRank(rank.getRankXRank());
-							user_details.setRankYRank(rank.getRankYRank());
-							user_details.setRankWidthRank(rank.getRankWidthRank());
-							user_details.setRankHeightRank(rank.getRankHeightRank());
-							user_details.setNameXRank(rank.getNameXRank());
-							user_details.setNameYRank(rank.getNameYRank());
-							user_details.setBarXRank(rank.getBarXRank());
-							user_details.setBarYRank(rank.getBarYRank());
-							user_details.setAvatarXRank(rank.getAvatarXRank());
-							user_details.setAvatarYRank(rank.getAvatarYRank());
-							user_details.setAvatarWidthRank(rank.getAvatarWidthRank());
-							user_details.setAvatarHeightRank(rank.getAvatarHeightRank());
-							user_details.setExpTextXRank(rank.getExpTextXRank());
-							user_details.setExpTextYRank(rank.getExpTextYRank());
-							user_details.setPercentTextXRank(rank.getPercentTextXRank());
-							user_details.setPercentTextYRank(rank.getPercentTextYRank());
-							user_details.setPlacementXRank(rank.getPlacementXRank());
-							user_details.setPlacementYRank(rank.getPlacementYRank());
-							user_details.setNameLengthLimit_Rank(rank.getNameLengthLimit_Rank());
-							user_details.setTextFontSize_Rank(rank.getTextFontSize_Rank());
-							user_details.setNameFontSize_Rank(rank.getNameFontSize_Rank());
+							final var skin = RankingSystem.SQLgetRankingRankList(guild_settings.getThemeID()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+							user_details.setRankingRank(skin.getSkin());
 							if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank()) > 0) {
 								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_SKIN).replace("{}", input)).build()).queue();
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("RankingSystem.users table couldn't be updated with the selected rank skin {} for {}", user_details.getRankDescription(), e.getMember().getUser().getId());
-								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be updated", "Rank skin update has failed. Skin: "+user_details.getRankDescription());
+								logger.error("RankingSystem.users table couldn't be updated with the selected rank skin {} for {}", skin.getSkinDescription(), e.getMember().getUser().getId());
+								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be updated", "Rank skin update has failed. Skin: "+skin.getSkinDescription());
 							}
 						}
 						else if(inventory.getSkinType().equals("pro")) {
 							final String filter = input;
-							constructors.Rank rank = RankingSystem.SQLgetRankingProfile().parallelStream().filter(r -> r.getProfileDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
-							user_details.setRankingProfile(rank.getRankingProfile());
-							user_details.setProfileDescription(rank.getProfileDescription());
-							user_details.setFileTypeProfile(rank.getFileTypeProfile());
-							user_details.setBarColorProfile(rank.getBarColorProfile());
-							user_details.setColorRProfile(rank.getColorRProfile());
-							user_details.setColorGProfile(rank.getColorGProfile());
-							user_details.setColorBProfile(rank.getColorBProfile());
-							user_details.setRankXProfile(rank.getRankXProfile());
-							user_details.setRankYProfile(rank.getRankYProfile());
-							user_details.setRankWidthProfile(rank.getRankWidthProfile());
-							user_details.setRankHeightProfile(rank.getRankHeightProfile());
-							user_details.setLevelXProfile(rank.getLevelXProfile());
-							user_details.setLevelYProfile(rank.getLevelYProfile());
-							user_details.setNameXProfile(rank.getNameXProfile());
-							user_details.setNameYProfile(rank.getNameYProfile());
-							user_details.setBarXProfile(rank.getBarXProfile());
-							user_details.setBarYProfile(rank.getBarYProfile());
-							user_details.setAvatarXProfile(rank.getAvatarXProfile());
-							user_details.setAvatarYProfile(rank.getAvatarYProfile());
-							user_details.setAvatarWidthProfile(rank.getAvatarWidthProfile());
-							user_details.setAvatarHeightProfile(rank.getAvatarHeightProfile());
-							user_details.setExpTextXProfile(rank.getExpTextXProfile());
-							user_details.setExpTextYProfile(rank.getExpTextYProfile());
-							user_details.setPercentTextXProfile(rank.getPercentTextXProfile());
-							user_details.setPercentTextYProfile(rank.getPercentTextYProfile());
-							user_details.setPlacementXProfile(rank.getPlacementXProfile());
-							user_details.setPlacementYProfile(rank.getPlacementYProfile());
-							user_details.setExperienceXProfile(rank.getExperienceXProfile());
-							user_details.setExperienceYProfile(rank.getExperienceYProfile());
-							user_details.setCurrencyXProfile(rank.getCurrencyXProfile());
-							user_details.setCurrencyYProfile(rank.getCurrencyYProfile());
-							user_details.setExpReachXProfile(rank.getExpReachXProfile());
-							user_details.setExpReachYProfile(rank.getExpReachYProfile());
-							user_details.setNameLengthLimit_Profile(rank.getNameLengthLimit_Profile());
-							user_details.setTextFontSize_Profile(rank.getTextFontSize_Profile());
-							user_details.setNameFontSize_Profile(rank.getNameFontSize_Profile());
-							user_details.setDescriptionMode_Profile(rank.getDescriptionMode_Profile());
+							final var skin = RankingSystem.SQLgetRankingProfileList(guild_settings.getThemeID()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+							user_details.setRankingProfile(skin.getSkin());
 							if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile()) > 0) {
 								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_SKIN).replace("{}", input)).build()).queue();
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("RankingSystem.users table couldn't be updated with the selected profile skin {} for {}", user_details.getProfileDescription(), e.getMember().getUser().getId());
-								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be updated", "Profile skin update has failed. Skin: "+user_details.getProfileDescription());
+								logger.error("RankingSystem.users table couldn't be updated with the selected profile skin {} for {}", skin.getSkinDescription(), e.getMember().getUser().getId());
+								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be updated", "Profile skin update has failed. Skin: "+skin.getSkinDescription());
 							}
 						}
 						else if(inventory.getSkinType().equals("ico")) {
 							final String filter = input;
-							constructors.Rank rank = RankingSystem.SQLgetRankingIcons().parallelStream().filter(r -> r.getIconDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
-							user_details.setRankingIcon(rank.getRankingIcon());
-							user_details.setIconDescription(rank.getIconDescription());
-							user_details.setFileTypeIcon(rank.getFileTypeIcon());
+							final var skin = RankingSystem.SQLgetRankingIconsList(guild_settings.getThemeID()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+							user_details.setRankingIcon(skin.getSkin());
 							if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon()) > 0) {
 								Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_SKIN).replace("{}", input)).build()).queue();
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("RankingSystem.users table couldn't be updated with the selected icons skin {} for {}", user_details.getIconDescription(), e.getMember().getUser().getId());
-								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icon skin couldn't be updated", "Icon skin update has failed. Skin: "+user_details.getIconDescription());
+								logger.error("RankingSystem.users table couldn't be updated with the selected icons skin {} for {}", skin.getSkinDescription(), e.getMember().getUser().getId());
+								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icon skin couldn't be updated", "Icon skin update has failed. Skin: "+skin.getSkinDescription());
 							}
 						}
 						else if(inventory.getSkinType().equals("ite")) {

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Cache;
 import constructors.Guilds;
-import constructors.Rank;
+import constructors.Ranking;
 import constructors.WeaponAbbvs;
 import constructors.WeaponStats;
 import constructors.Weapons;
@@ -105,7 +105,7 @@ public class RandomshopExecution {
 			//second, check if anything has been found, else interrupt the process
 			if(abbv != null || category != null) {
 				Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-				Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+				Ranking user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 				final long price = guild_settings.getRandomshopPrice();
 				if(user_details.getCurrency() >= price) {
 					List<WeaponStats> stats = RankingSystemItems.SQLgetWeaponStats(e.getGuild().getIdLong(), guild_settings.getThemeID());

@@ -18,9 +18,13 @@ import constructors.Guilds;
 import constructors.Inventory;
 import constructors.InventoryContent;
 import constructors.Level;
-import constructors.Rank;
+import constructors.Ranking;
 import constructors.Roles;
 import constructors.Skins;
+import constructors.UserIcon;
+import constructors.UserLevel;
+import constructors.UserProfile;
+import constructors.UserRank;
 import core.Hashes;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.entities.Member;
@@ -757,9 +761,9 @@ public class RankingSystem {
 		}
 	}
 	
-	public static ArrayList<Rank> SQLRanking(long _guild_id) {
+	public static ArrayList<Ranking> SQLRanking(long _guild_id) {
 		logger.trace("SQLgetRanking launched. Passed params {}", _guild_id);
-		ArrayList<Rank> rankList = new ArrayList<Rank>();
+		ArrayList<Ranking> rankList = new ArrayList<Ranking>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -770,7 +774,7 @@ public class RankingSystem {
 			stmt.setLong(1, _guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				Rank rank = new Rank();
+				Ranking rank = new Ranking();
 				rank.setUser_ID(rs.getLong(1));
 				rank.setLevel(rs.getInt(2));
 				rank.setExperience(rs.getLong(3));
@@ -832,43 +836,101 @@ public class RankingSystem {
 	}
 	
 	//ranking_level
-	public static ArrayList<Rank> SQLgetRankingLevel() {
-		logger.trace("SQLgetRankingLevel launched. No params passed.");
-		ArrayList<Rank> rankList = new ArrayList<Rank>();
+	public static UserLevel SQLgetRankingLevel(int _skin_id, int _theme_id) {
+		UserLevel skin = Hashes.getLevelSkin(_skin_id);
+		if(skin == null) {
+			logger.trace("SQLgetRankingLevel launched. Params passed {}, {}", _skin_id, _theme_id);
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				String sql = ("SELECT * FROM ranking_level WHERE level_id = ? AND theme_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setInt(1, _skin_id);
+				stmt.setInt(2, _theme_id);
+				rs = stmt.executeQuery();
+				if(rs.next()) {
+					UserLevel levelSkin = new UserLevel();
+					levelSkin.setSkin(rs.getInt(1));
+					levelSkin.setSkinDescription(rs.getString(2));
+					levelSkin.setFileType(rs.getString(3));
+					levelSkin.setColorR(rs.getInt(4));
+					levelSkin.setColorG(rs.getInt(5));
+					levelSkin.setColorB(rs.getInt(6));
+					levelSkin.setIconX(rs.getInt(7));
+					levelSkin.setIconY(rs.getInt(8));
+					levelSkin.setIconWidth(rs.getInt(9));
+					levelSkin.setIconHeight(rs.getInt(10));
+					levelSkin.setLevelX(rs.getInt(11));
+					levelSkin.setLevelY(rs.getInt(12));
+					levelSkin.setNameX(rs.getInt(13));
+					levelSkin.setNameY(rs.getInt(14));
+					levelSkin.setNameLengthLimit(rs.getInt(15));
+					levelSkin.setTextFontSize(rs.getInt(16));
+					levelSkin.setNameFontSize(rs.getInt(17));
+					levelSkin.setThemeID(rs.getInt(18));
+					levelSkin.setLine(rs.getInt(19));
+					Hashes.addLevelSkin(levelSkin.getSkin(), levelSkin);
+					return levelSkin;
+				}
+				return null;
+			} catch (SQLException e) {
+				logger.error("SQLgetRankingLevel Exception", e);
+				return null;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		else if(skin.getThemeID() == _theme_id) {
+			return skin;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public static ArrayList<UserLevel> SQLgetRankingLevelList(int _theme_id) {
+		logger.trace("SQLgetRankingLevelList launched. Params passed {}", _theme_id);
+		ArrayList<UserLevel> levelList = new ArrayList<UserLevel>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT * FROM ranking_level");
+			String sql = ("SELECT * FROM ranking_level WHERE theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
+			stmt.setInt(1, _theme_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				Rank rankingSystem = new Rank();
-				rankingSystem.setRankingLevel(rs.getInt(1));
-				rankingSystem.setLevelDescription(rs.getString(2));
-				rankingSystem.setFileTypeLevel(rs.getString(3));
-				rankingSystem.setColorRLevel(rs.getInt(4));
-				rankingSystem.setColorGLevel(rs.getInt(5));
-				rankingSystem.setColorBLevel(rs.getInt(6));
-				rankingSystem.setRankXLevel(rs.getInt(7));
-				rankingSystem.setRankYLevel(rs.getInt(8));
-				rankingSystem.setRankWidthLevel(rs.getInt(9));
-				rankingSystem.setRankHeightLevel(rs.getInt(10));
-				rankingSystem.setLevelXLevel(rs.getInt(11));
-				rankingSystem.setLevelYLevel(rs.getInt(12));
-				rankingSystem.setNameXLevel(rs.getInt(13));
-				rankingSystem.setNameYLevel(rs.getInt(14));
-				rankingSystem.setNameLengthLimit_Level(rs.getInt(15));
-				rankingSystem.setTextFontSize_Level(rs.getInt(16));
-				rankingSystem.setNameFontSize_Level(rs.getInt(17));
-				rankingSystem.setThemeID(rs.getInt(18));
-				rankingSystem.setLevelLine(rs.getInt(19));
-				rankList.add(rankingSystem);
+				UserLevel levelSkin = new UserLevel();
+				levelSkin.setSkin(rs.getInt(1));
+				levelSkin.setSkinDescription(rs.getString(2));
+				levelSkin.setFileType(rs.getString(3));
+				levelSkin.setColorR(rs.getInt(4));
+				levelSkin.setColorG(rs.getInt(5));
+				levelSkin.setColorB(rs.getInt(6));
+				levelSkin.setIconX(rs.getInt(7));
+				levelSkin.setIconY(rs.getInt(8));
+				levelSkin.setIconWidth(rs.getInt(9));
+				levelSkin.setIconHeight(rs.getInt(10));
+				levelSkin.setLevelX(rs.getInt(11));
+				levelSkin.setLevelY(rs.getInt(12));
+				levelSkin.setNameX(rs.getInt(13));
+				levelSkin.setNameY(rs.getInt(14));
+				levelSkin.setNameLengthLimit(rs.getInt(15));
+				levelSkin.setTextFontSize(rs.getInt(16));
+				levelSkin.setNameFontSize(rs.getInt(17));
+				levelSkin.setThemeID(rs.getInt(18));
+				levelSkin.setLine(rs.getInt(19));
+				levelList.add(levelSkin);
+				Hashes.addLevelSkin(levelSkin.getSkin(), levelSkin);
 			}
-			return rankList;
+			return levelList;
 		} catch (SQLException e) {
-			logger.error("SQLgetRankingLevel Exception", e);
+			logger.error("SQLgetRankingLevelList Exception", e);
 			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -878,55 +940,124 @@ public class RankingSystem {
 	}
 	
 	//ranking_rank
-	public static ArrayList<Rank> SQLgetRankingRank() {
-		logger.trace("SQLgetRankingrank launched. No params passed.");
-		ArrayList<Rank> rankList = new ArrayList<Rank>();
+	public static UserRank SQLgetRankingRank(int _skin_id, int _theme_id) {
+		UserRank skin = Hashes.getRankSkin(_skin_id);
+		if(skin == null) {
+			logger.trace("SQLgetRankingRank launched. Params passed {}, {}", _skin_id, _theme_id);
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				String sql = ("SELECT * FROM ranking_rank WHERE rank_id = ? AND theme_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setInt(1, _skin_id);
+				stmt.setInt(2, _theme_id);
+				rs = stmt.executeQuery();
+				if(rs.next()) {
+					UserRank rankSkin = new UserRank();
+					rankSkin.setSkin(rs.getInt(1));
+					rankSkin.setSkinDescription(rs.getString(2));
+					rankSkin.setFileType(rs.getString(3));
+					rankSkin.setBarColor(rs.getInt(4));
+					rankSkin.setColorR(rs.getInt(5));
+					rankSkin.setColorG(rs.getInt(6));
+					rankSkin.setColorB(rs.getInt(7));
+					rankSkin.setIconX(rs.getInt(8));
+					rankSkin.setIconY(rs.getInt(9));
+					rankSkin.setIconWidth(rs.getInt(10));
+					rankSkin.setIconHeight(rs.getInt(11));
+					rankSkin.setNameX(rs.getInt(12));
+					rankSkin.setNameY(rs.getInt(13));
+					rankSkin.setBarX(rs.getInt(14));
+					rankSkin.setBarY(rs.getInt(15));
+					rankSkin.setAvatarX(rs.getInt(16));
+					rankSkin.setAvatarY(rs.getInt(17));
+					rankSkin.setAvatarWidth(rs.getInt(18));
+					rankSkin.setAvatarHeight(rs.getInt(19));
+					rankSkin.setExpTextX(rs.getInt(20));
+					rankSkin.setExpTextY(rs.getInt(21));
+					rankSkin.setPercentTextX(rs.getInt(22));
+					rankSkin.setPercentTextY(rs.getInt(23));
+					rankSkin.setPlacementX(rs.getInt(24));
+					rankSkin.setPlacementY(rs.getInt(25));
+					rankSkin.setNameLengthLimit(rs.getInt(26));
+					rankSkin.setTextFontSize(rs.getInt(27));
+					rankSkin.setNameFontSize(rs.getInt(28));
+					rankSkin.setThemeID(rs.getInt(29));
+					rankSkin.setLine(rs.getInt(30));
+					Hashes.addRankSkin(rankSkin.getSkin(), rankSkin);
+					return rankSkin;
+				}
+				return null;
+			} catch (SQLException e) {
+				logger.error("SQLgetRankingRank Exception", e);
+				return null;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		else if(skin.getThemeID() == _theme_id) {
+			return skin;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public static ArrayList<UserRank> SQLgetRankingRankList(int _theme_id) {
+		logger.trace("SQLgetRankingRankList launched. Params passed {}", _theme_id);
+		ArrayList<UserRank> skinList = new ArrayList<UserRank>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT * FROM ranking_rank");
+			String sql = ("SELECT * FROM ranking_rank WHERE theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
+			stmt.setInt(1, _theme_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				Rank rankingSystem = new Rank();
-				rankingSystem.setRankingRank(rs.getInt(1));
-				rankingSystem.setRankDescription(rs.getString(2));
-				rankingSystem.setFileTypeRank(rs.getString(3));
-				rankingSystem.setBarColorRank(rs.getInt(4));
-				rankingSystem.setColorRRank(rs.getInt(5));
-				rankingSystem.setColorGRank(rs.getInt(6));
-				rankingSystem.setColorBRank(rs.getInt(7));
-				rankingSystem.setRankXRank(rs.getInt(8));
-				rankingSystem.setRankYRank(rs.getInt(9));
-				rankingSystem.setRankWidthRank(rs.getInt(10));
-				rankingSystem.setRankHeightRank(rs.getInt(11));
-				rankingSystem.setNameXRank(rs.getInt(12));
-				rankingSystem.setNameYRank(rs.getInt(13));
-				rankingSystem.setBarXRank(rs.getInt(14));
-				rankingSystem.setBarYRank(rs.getInt(15));
-				rankingSystem.setAvatarXRank(rs.getInt(16));
-				rankingSystem.setAvatarYRank(rs.getInt(17));
-				rankingSystem.setAvatarWidthRank(rs.getInt(18));
-				rankingSystem.setAvatarHeightRank(rs.getInt(19));
-				rankingSystem.setExpTextXRank(rs.getInt(20));
-				rankingSystem.setExpTextYRank(rs.getInt(21));
-				rankingSystem.setPercentTextXRank(rs.getInt(22));
-				rankingSystem.setPercentTextYRank(rs.getInt(23));
-				rankingSystem.setPlacementXRank(rs.getInt(24));
-				rankingSystem.setPlacementYRank(rs.getInt(25));
-				rankingSystem.setNameLengthLimit_Rank(rs.getInt(26));
-				rankingSystem.setTextFontSize_Rank(rs.getInt(27));
-				rankingSystem.setNameFontSize_Rank(rs.getInt(28));
-				rankingSystem.setThemeID(rs.getInt(29));
-				rankingSystem.setRankLine(rs.getInt(30));
-				rankList.add(rankingSystem);
+				UserRank rankSkin = new UserRank();
+				rankSkin.setSkin(rs.getInt(1));
+				rankSkin.setSkinDescription(rs.getString(2));
+				rankSkin.setFileType(rs.getString(3));
+				rankSkin.setBarColor(rs.getInt(4));
+				rankSkin.setColorR(rs.getInt(5));
+				rankSkin.setColorG(rs.getInt(6));
+				rankSkin.setColorB(rs.getInt(7));
+				rankSkin.setIconX(rs.getInt(8));
+				rankSkin.setIconY(rs.getInt(9));
+				rankSkin.setIconWidth(rs.getInt(10));
+				rankSkin.setIconHeight(rs.getInt(11));
+				rankSkin.setNameX(rs.getInt(12));
+				rankSkin.setNameY(rs.getInt(13));
+				rankSkin.setBarX(rs.getInt(14));
+				rankSkin.setBarY(rs.getInt(15));
+				rankSkin.setAvatarX(rs.getInt(16));
+				rankSkin.setAvatarY(rs.getInt(17));
+				rankSkin.setAvatarWidth(rs.getInt(18));
+				rankSkin.setAvatarHeight(rs.getInt(19));
+				rankSkin.setExpTextX(rs.getInt(20));
+				rankSkin.setExpTextY(rs.getInt(21));
+				rankSkin.setPercentTextX(rs.getInt(22));
+				rankSkin.setPercentTextY(rs.getInt(23));
+				rankSkin.setPlacementX(rs.getInt(24));
+				rankSkin.setPlacementY(rs.getInt(25));
+				rankSkin.setNameLengthLimit(rs.getInt(26));
+				rankSkin.setTextFontSize(rs.getInt(27));
+				rankSkin.setNameFontSize(rs.getInt(28));
+				rankSkin.setThemeID(rs.getInt(29));
+				rankSkin.setLine(rs.getInt(30));
+				Hashes.addRankSkin(rankSkin.getSkin(), rankSkin);
+				skinList.add(rankSkin);
 			}
-			return rankList;
+			return skinList;
 		} catch (SQLException e) {
-			logger.error("SQLgetRankingRank Exception", e);
-			return rankList;
+			logger.error("SQLgetRankingRankList Exception", e);
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -935,64 +1066,142 @@ public class RankingSystem {
 	}
 	
 	//ranking_profile
-	public static ArrayList<Rank> SQLgetRankingProfile() {
-		logger.trace("SQLgetRankingProfile launched. No params passed.");
-		ArrayList<Rank> rankList = new ArrayList<Rank>();
+	public static UserProfile SQLgetRankingProfile(int _skin_id, int _theme_id) {
+		UserProfile skin = Hashes.getProfileSkin(_skin_id);
+		if(skin == null) {
+			logger.trace("SQLgetRankingProfile launched. Params passed {}, {}", _skin_id, _theme_id);
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				String sql = ("SELECT * FROM ranking_profile WHERE profile_id = ? AND theme_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setInt(1, _skin_id);
+				stmt.setInt(2, _theme_id);
+				rs = stmt.executeQuery();
+				if(rs.next()) {
+					UserProfile profileSkin = new UserProfile();
+					profileSkin.setSkin(rs.getInt(1));
+					profileSkin.setSkinDescription(rs.getString(2));
+					profileSkin.setFileType(rs.getString(3));
+					profileSkin.setBarColor(rs.getInt(4));
+					profileSkin.setColorR(rs.getInt(5));
+					profileSkin.setColorG(rs.getInt(6));
+					profileSkin.setColorB(rs.getInt(7));
+					profileSkin.setIconX(rs.getInt(8));
+					profileSkin.setIconY(rs.getInt(9));
+					profileSkin.setIconWidth(rs.getInt(10));
+					profileSkin.setIconHeight(rs.getInt(11));
+					profileSkin.setLevelX(rs.getInt(12));
+					profileSkin.setLevelY(rs.getInt(13));
+					profileSkin.setNameX(rs.getInt(14));
+					profileSkin.setNameY(rs.getInt(15));
+					profileSkin.setBarX(rs.getInt(16));
+					profileSkin.setBarY(rs.getInt(17));
+					profileSkin.setAvatarX(rs.getInt(18));
+					profileSkin.setAvatarY(rs.getInt(19));
+					profileSkin.setAvatarWidth(rs.getInt(20));
+					profileSkin.setAvatarHeight(rs.getInt(21));
+					profileSkin.setExpTextX(rs.getInt(22));
+					profileSkin.setExpTextY(rs.getInt(23));
+					profileSkin.setPercentTextX(rs.getInt(24));
+					profileSkin.setPercentTextY(rs.getInt(25));
+					profileSkin.setPlacementX(rs.getInt(26));
+					profileSkin.setPlacementY(rs.getInt(27));
+					profileSkin.setExperienceX(rs.getInt(28));
+					profileSkin.setExperienceY(rs.getInt(29));
+					profileSkin.setCurrencyX(rs.getInt(30));
+					profileSkin.setCurrencyY(rs.getInt(31));
+					profileSkin.setExpReachX(rs.getInt(32));
+					profileSkin.setExpReachY(rs.getInt(33));
+					profileSkin.setNameLengthLimit(rs.getInt(34));
+					profileSkin.setTextFontSize(rs.getInt(35));
+					profileSkin.setNameFontSize(rs.getInt(36));
+					profileSkin.setDescriptionMode(rs.getInt(37));
+					profileSkin.setThemeID(rs.getInt(38));
+					profileSkin.setLine(rs.getInt(39));
+					Hashes.addProfileSkin(profileSkin.getSkin(), profileSkin);
+					return profileSkin;
+				}
+				return null;
+			} catch (SQLException e) {
+				logger.error("SQLgetRankingProfile Exception", e);
+				return null;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		else if(skin.getThemeID() == _theme_id) {
+			return skin;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public static ArrayList<UserProfile> SQLgetRankingProfileList(int _theme_id) {
+		logger.trace("SQLgetRankingProfileList launched. Params passed {}", _theme_id);
+		ArrayList<UserProfile> skinList = new ArrayList<UserProfile>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT * FROM ranking_profile");
+			String sql = ("SELECT * FROM ranking_profile WHERE theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
+			stmt.setInt(1, _theme_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				Rank rankingSystem = new Rank();
-				rankingSystem.setRankingProfile(rs.getInt(1));
-				rankingSystem.setProfileDescription(rs.getString(2));
-				rankingSystem.setFileTypeProfile(rs.getString(3));
-				rankingSystem.setBarColorProfile(rs.getInt(4));
-				rankingSystem.setColorRProfile(rs.getInt(5));
-				rankingSystem.setColorGProfile(rs.getInt(6));
-				rankingSystem.setColorBProfile(rs.getInt(7));
-				rankingSystem.setRankXProfile(rs.getInt(8));
-				rankingSystem.setRankYProfile(rs.getInt(9));
-				rankingSystem.setRankWidthProfile(rs.getInt(10));
-				rankingSystem.setRankHeightProfile(rs.getInt(11));
-				rankingSystem.setLevelXProfile(rs.getInt(12));
-				rankingSystem.setLevelYProfile(rs.getInt(13));
-				rankingSystem.setNameXProfile(rs.getInt(14));
-				rankingSystem.setNameYProfile(rs.getInt(15));
-				rankingSystem.setBarXProfile(rs.getInt(16));
-				rankingSystem.setBarYProfile(rs.getInt(17));
-				rankingSystem.setAvatarXProfile(rs.getInt(18));
-				rankingSystem.setAvatarYProfile(rs.getInt(19));
-				rankingSystem.setAvatarWidthProfile(rs.getInt(20));
-				rankingSystem.setAvatarHeightProfile(rs.getInt(21));
-				rankingSystem.setExpTextXProfile(rs.getInt(22));
-				rankingSystem.setExpTextYProfile(rs.getInt(23));
-				rankingSystem.setPercentTextXProfile(rs.getInt(24));
-				rankingSystem.setPercentTextYProfile(rs.getInt(25));
-				rankingSystem.setPlacementXProfile(rs.getInt(26));
-				rankingSystem.setPlacementYProfile(rs.getInt(27));
-				rankingSystem.setExperienceXProfile(rs.getInt(28));
-				rankingSystem.setExperienceYProfile(rs.getInt(29));
-				rankingSystem.setCurrencyXProfile(rs.getInt(30));
-				rankingSystem.setCurrencyYProfile(rs.getInt(31));
-				rankingSystem.setExpReachXProfile(rs.getInt(32));
-				rankingSystem.setExpReachYProfile(rs.getInt(33));
-				rankingSystem.setNameLengthLimit_Profile(rs.getInt(34));
-				rankingSystem.setTextFontSize_Profile(rs.getInt(35));
-				rankingSystem.setNameFontSize_Profile(rs.getInt(36));
-				rankingSystem.setDescriptionMode_Profile(rs.getInt(37));
-				rankingSystem.setThemeID(rs.getInt(38));
-				rankingSystem.setProfileLine(rs.getInt(39));
-				rankList.add(rankingSystem);
+				UserProfile profileSkin = new UserProfile();
+				profileSkin.setSkin(rs.getInt(1));
+				profileSkin.setSkinDescription(rs.getString(2));
+				profileSkin.setFileType(rs.getString(3));
+				profileSkin.setBarColor(rs.getInt(4));
+				profileSkin.setColorR(rs.getInt(5));
+				profileSkin.setColorG(rs.getInt(6));
+				profileSkin.setColorB(rs.getInt(7));
+				profileSkin.setIconX(rs.getInt(8));
+				profileSkin.setIconY(rs.getInt(9));
+				profileSkin.setIconWidth(rs.getInt(10));
+				profileSkin.setIconHeight(rs.getInt(11));
+				profileSkin.setLevelX(rs.getInt(12));
+				profileSkin.setLevelY(rs.getInt(13));
+				profileSkin.setNameX(rs.getInt(14));
+				profileSkin.setNameY(rs.getInt(15));
+				profileSkin.setBarX(rs.getInt(16));
+				profileSkin.setBarY(rs.getInt(17));
+				profileSkin.setAvatarX(rs.getInt(18));
+				profileSkin.setAvatarY(rs.getInt(19));
+				profileSkin.setAvatarWidth(rs.getInt(20));
+				profileSkin.setAvatarHeight(rs.getInt(21));
+				profileSkin.setExpTextX(rs.getInt(22));
+				profileSkin.setExpTextY(rs.getInt(23));
+				profileSkin.setPercentTextX(rs.getInt(24));
+				profileSkin.setPercentTextY(rs.getInt(25));
+				profileSkin.setPlacementX(rs.getInt(26));
+				profileSkin.setPlacementY(rs.getInt(27));
+				profileSkin.setExperienceX(rs.getInt(28));
+				profileSkin.setExperienceY(rs.getInt(29));
+				profileSkin.setCurrencyX(rs.getInt(30));
+				profileSkin.setCurrencyY(rs.getInt(31));
+				profileSkin.setExpReachX(rs.getInt(32));
+				profileSkin.setExpReachY(rs.getInt(33));
+				profileSkin.setNameLengthLimit(rs.getInt(34));
+				profileSkin.setTextFontSize(rs.getInt(35));
+				profileSkin.setNameFontSize(rs.getInt(36));
+				profileSkin.setDescriptionMode(rs.getInt(37));
+				profileSkin.setThemeID(rs.getInt(38));
+				profileSkin.setLine(rs.getInt(39));
+				Hashes.addProfileSkin(profileSkin.getSkin(), profileSkin);
+				skinList.add(profileSkin);
 			}
-			return rankList;
+			return skinList;
 		} catch (SQLException e) {
-			logger.error("SQLgetRankingProfile Exception", e);
-			return rankList;
+			logger.error("SQLgetRankingProfileList Exception", e);
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1001,30 +1210,74 @@ public class RankingSystem {
 	}
 	
 	//ranking_icon
-	public static ArrayList<Rank> SQLgetRankingIcons() {
-		logger.trace("SQLgetRankingIcons launched. No params passed.");
-		ArrayList<Rank> rankList = new ArrayList<Rank>();
+	public static UserIcon SQLgetRankingIcons(int _skin_id, int _theme_id) {
+		UserIcon skin = Hashes.getIconSkin(_skin_id);
+		if(skin == null) {
+			logger.trace("SQLgetRankingIcons launched. Params passed {}, {}", _skin_id, _theme_id);
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				String sql = ("SELECT * FROM ranking_icons WHERE icon_id = ? AND theme_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setInt(1, _skin_id);
+				stmt.setInt(2, _theme_id);
+				rs = stmt.executeQuery();
+				if(rs.next()) {
+					UserIcon iconSkin = new UserIcon();
+					iconSkin.setSkin(rs.getInt(1));
+					iconSkin.setSkinDescription(rs.getString(2));
+					iconSkin.setFileType(rs.getString(3));
+					iconSkin.setThemeID(rs.getInt(4));
+					iconSkin.setLine(rs.getInt(5));
+					Hashes.addIconSkin(iconSkin.getSkin(), iconSkin);
+					return iconSkin;
+				}
+				return null;
+			} catch (SQLException e) {
+				logger.error("SQLgetRankingIcons Exception", e);
+				return null;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		else if(skin.getThemeID() == _theme_id) {
+			return skin;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public static ArrayList<UserIcon> SQLgetRankingIconsList(int _theme_id) {
+		logger.trace("SQLgetRankingIconsList launched. Params passed {}", _theme_id);
+		ArrayList<UserIcon> skinList = new ArrayList<UserIcon>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT * FROM ranking_icons");
+			String sql = ("SELECT * FROM ranking_icons WHERE theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
+			stmt.setInt(1, _theme_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				Rank rankingSystem = new Rank();
-				rankingSystem.setRankingIcon(rs.getInt(1));
-				rankingSystem.setIconDescription(rs.getString(2));
-				rankingSystem.setFileTypeIcon(rs.getString(3));
-				rankingSystem.setThemeID(rs.getInt(4));
-				rankingSystem.setIconLine(rs.getInt(5));
-				rankList.add(rankingSystem);
+				UserIcon iconSkin = new UserIcon();
+				iconSkin.setSkin(rs.getInt(1));
+				iconSkin.setSkinDescription(rs.getString(2));
+				iconSkin.setFileType(rs.getString(3));
+				iconSkin.setThemeID(rs.getInt(4));
+				iconSkin.setLine(rs.getInt(5));
+				Hashes.addIconSkin(iconSkin.getSkin(), iconSkin);
+				skinList.add(iconSkin);
 			}
-			return rankList;
+			return skinList;
 		} catch (SQLException e) {
-			logger.error("SQLgetRankingIcons Exception", e);
-			return rankList;
+			logger.error("SQLgetRankingIconsList Exception", e);
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1492,7 +1745,7 @@ public class RankingSystem {
 	}
 	
 	//JOINS
-	public synchronized static Rank SQLgetWholeRankView(long _user_id, long _guild_id) {
+	public synchronized static Ranking SQLgetWholeRankView(long _user_id, long _guild_id) {
 		if(Hashes.getRanking(_guild_id+"_"+_user_id) == null) {
 			logger.trace("SQLgetWholeRankView launched. Passed params {}, {}", _user_id, _guild_id);
 			Connection myConn = null;
@@ -1506,7 +1759,7 @@ public class RankingSystem {
 				stmt.setLong(2, _guild_id);
 				rs = stmt.executeQuery();
 				if(rs.next()) {
-					Rank rank = new Rank();
+					Ranking rank = new Ranking();
 					rank.setUser_ID(rs.getLong(1));
 					rank.setLevel(rs.getInt(2));
 					rank.setCurrentExperience(rs.getInt(3));
@@ -1515,97 +1768,16 @@ public class RankingSystem {
 					rank.setCurrency(rs.getLong(6));
 					rank.setCurrentRole(rs.getLong(7));
 					rank.setRankingLevel(rs.getInt(8));
-					rank.setLevelDescription(rs.getString(9));
-					rank.setRankingRank(rs.getInt(10));
-					rank.setRankDescription(rs.getString(11));
-					rank.setRankingProfile(rs.getInt(12));
-					rank.setProfileDescription(rs.getString(13));
-					rank.setRankingIcon(rs.getInt(14));
-					rank.setIconDescription(rs.getString(15));
-					rank.setBarColorProfile(rs.getInt(16));
-					rank.setBarColorRank(rs.getInt(17));
-					rank.setNameLengthLimit_Level(rs.getInt(18));
-					rank.setNameLengthLimit_Rank(rs.getInt(19));
-					rank.setNameLengthLimit_Profile(rs.getInt(20));
-					rank.setTextFontSize_Level(rs.getInt(21));
-					rank.setTextFontSize_Rank(rs.getInt(22));
-					rank.setTextFontSize_Profile(rs.getInt(23));
-					rank.setNameFontSize_Level(rs.getInt(24));
-					rank.setNameFontSize_Rank(rs.getInt(25));
-					rank.setNameFontSize_Profile(rs.getInt(26));
-					rank.setDescriptionMode_Profile(rs.getInt(27));
-					rank.setColorRProfile(rs.getInt(28));
-					rank.setColorRRank(rs.getInt(29));
-					rank.setColorRLevel(rs.getInt(30));
-					rank.setColorGProfile(rs.getInt(31));
-					rank.setColorGRank(rs.getInt(32));
-					rank.setColorGLevel(rs.getInt(33));
-					rank.setColorBProfile(rs.getInt(34));
-					rank.setColorBRank(rs.getInt(35));
-					rank.setColorBLevel(rs.getInt(36));
-					rank.setRankXLevel(rs.getInt(37));
-					rank.setRankYLevel(rs.getInt(38));
-					rank.setRankWidthLevel(rs.getInt(39));
-					rank.setRankHeightLevel(rs.getInt(40));
-					rank.setRankXRank(rs.getInt(41));
-					rank.setRankYRank(rs.getInt(42));
-					rank.setRankWidthRank(rs.getInt(43));
-					rank.setRankHeightRank(rs.getInt(44));
-					rank.setRankXProfile(rs.getInt(45));
-					rank.setRankYProfile(rs.getInt(46));
-					rank.setRankWidthProfile(rs.getInt(47));
-					rank.setRankHeightProfile(rs.getInt(48));
-					rank.setLevelXLevel(rs.getInt(49));
-					rank.setLevelYLevel(rs.getInt(50));
-					rank.setLevelXProfile(rs.getInt(51));
-					rank.setLevelYProfile(rs.getInt(52));
-					rank.setNameXLevel(rs.getInt(53));
-					rank.setNameYLevel(rs.getInt(54));
-					rank.setNameXRank(rs.getInt(55));
-					rank.setNameYRank(rs.getInt(56));
-					rank.setNameXProfile(rs.getInt(57));
-					rank.setNameYProfile(rs.getInt(58));
-					rank.setBarXRank(rs.getInt(59));
-					rank.setBarYRank(rs.getInt(60));
-					rank.setBarXProfile(rs.getInt(61));
-					rank.setBarYProfile(rs.getInt(62));
-					rank.setAvatarXRank(rs.getInt(63));
-					rank.setAvatarYRank(rs.getInt(64));
-					rank.setAvatarXProfile(rs.getInt(65));
-					rank.setAvatarYProfile(rs.getInt(66));
-					rank.setAvatarWidthRank(rs.getInt(67));
-					rank.setAvatarHeightRank(rs.getInt(68));
-					rank.setAvatarWidthProfile(rs.getInt(69));
-					rank.setAvatarHeightProfile(rs.getInt(70));
-					rank.setExpTextXRank(rs.getInt(71));
-					rank.setExpTextYRank(rs.getInt(72));
-					rank.setExpTextXProfile(rs.getInt(73));
-					rank.setExpTextYProfile(rs.getInt(74));
-					rank.setPercentTextXRank(rs.getInt(75));
-					rank.setPercentTextYRank(rs.getInt(76));
-					rank.setPercentTextXProfile(rs.getInt(77));
-					rank.setPercentTextYProfile(rs.getInt(78));
-					rank.setPlacementXRank(rs.getInt(79));
-					rank.setPlacementYRank(rs.getInt(80));
-					rank.setPlacementXProfile(rs.getInt(81));
-					rank.setPlacementYProfile(rs.getInt(82));
-					rank.setExperienceXProfile(rs.getInt(83));
-					rank.setExperienceYProfile(rs.getInt(84));
-					rank.setCurrencyXProfile(rs.getInt(85));
-					rank.setCurrencyYProfile(rs.getInt(86));
-					rank.setExpReachXProfile(rs.getInt(87));
-					rank.setExpReachYProfile(rs.getInt(88));
-					rank.setFileTypeLevel(rs.getString(89));
-					rank.setFileTypeRank(rs.getString(90));
-					rank.setFileTypeProfile(rs.getString(91));
-					rank.setFileTypeIcon(rs.getString(92));
-					rank.setDailyExperience(rs.getInt(93));
-					rank.setDailyReset(rs.getTimestamp(94));
-					rank.setWeapon1(rs.getInt(95));
-					rank.setWeapon2(rs.getInt(96));
-					rank.setWeapon3(rs.getInt(97));
-					rank.setSkill(rs.getInt(98));
-					rank.setLastUpdate(rs.getTimestamp(99));
+					rank.setRankingRank(rs.getInt(9));
+					rank.setRankingProfile(rs.getInt(10));
+					rank.setRankingIcon(rs.getInt(11));
+					rank.setDailyExperience(rs.getInt(12));
+					rank.setDailyReset(rs.getTimestamp(13));
+					rank.setWeapon1(rs.getInt(14));
+					rank.setWeapon2(rs.getInt(15));
+					rank.setWeapon3(rs.getInt(16));
+					rank.setSkill(rs.getInt(17));
+					rank.setLastUpdate(rs.getTimestamp(18));
 					Hashes.addRanking(_guild_id+"_"+_user_id, rank);
 					return rank;
 				}

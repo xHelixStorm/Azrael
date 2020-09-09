@@ -27,7 +27,7 @@ import commandsContainer.WriteEditExecution;
 import constructors.Cache;
 import constructors.Guilds;
 import constructors.Messages;
-import constructors.Rank;
+import constructors.Ranking;
 import core.CommandHandler;
 import core.CommandParser;
 import core.Hashes;
@@ -625,7 +625,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					//check if the ranking system is enabled and that there's currently no message timeout
 					if(guild_settings != null && guild_settings.getRankingState() == true && (Hashes.getCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId()) == null || guild_settings.getMessageTimeout() == 0)) {
 						//retrieve all details from the user
-						Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
+						Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
 						if(user_details == null) {
 							//if no user details have been found, insert the user into the users table and into the user details table
 							if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {

@@ -18,11 +18,15 @@ import constructors.Messages;
 import constructors.NameFilter;
 import constructors.Quizes;
 import constructors.RSS;
-import constructors.Rank;
+import constructors.Ranking;
 import constructors.Roles;
 import constructors.Skills;
 import constructors.Skins;
 import constructors.SpamDetection;
+import constructors.UserIcon;
+import constructors.UserLevel;
+import constructors.UserProfile;
+import constructors.UserRank;
 import constructors.Watchlist;
 import constructors.WeaponAbbvs;
 import constructors.WeaponStats;
@@ -30,17 +34,8 @@ import constructors.Weapons;
 import net.dv8tion.jda.api.entities.Member;
 
 public class Hashes {
-	/*private static final int max_message_pool_size = 100000;
-	private static final LinkedHashMap<Long, ArrayList<Messages>> message_pool = new LinkedHashMap<Long, ArrayList<Messages>>() {
-		private static final long serialVersionUID = 7505333508062985903L;
-		@Override
-		@SuppressWarnings("rawtypes")
-        protected boolean removeEldestEntry(final Map.Entry eldest) {
-            return size() > max_message_pool_size;
-        }
-    };*/
     private static final int max_ranking_pool_size = 500;
-    private static final LinkedHashMap<String, Rank> ranking = new LinkedHashMap<String, Rank>() {
+    private static final LinkedHashMap<String, Ranking> ranking = new LinkedHashMap<String, Ranking>() {
 		private static final long serialVersionUID = 7054847678737381845L;
 		@Override
 		@SuppressWarnings("rawtypes")
@@ -86,7 +81,10 @@ public class Hashes {
     private static final ConcurrentHashMap<Long, Thread> heavyCensoringThread = new ConcurrentHashMap<Long, Thread>();
     private static final ConcurrentHashMap<String, SpamDetection> spamDetection = new ConcurrentHashMap<String, SpamDetection>();
     private static final ConcurrentHashMap<Long, String> languages = new ConcurrentHashMap<Long, String>();
-	
+    private static final ConcurrentHashMap<Integer, UserLevel> level_skins = new ConcurrentHashMap<Integer, UserLevel>();
+    private static final ConcurrentHashMap<Integer, UserRank> rank_skins = new ConcurrentHashMap<Integer, UserRank>();
+    private static final ConcurrentHashMap<Integer, UserProfile> profile_skins = new ConcurrentHashMap<Integer, UserProfile>();
+    private static final ConcurrentHashMap<Integer, UserIcon> icon_skins = new ConcurrentHashMap<Integer, UserIcon>();
     
     public static void initializeGuildMessagePool(Long _key, final int max_message_pool_size) {
     	LinkedHashMap<Long, ArrayList<Messages>> message_pool = new LinkedHashMap<Long, ArrayList<Messages>>() {
@@ -121,7 +119,7 @@ public class Hashes {
 	public static void addStatus(Long _key, Guilds _status) {
 		status.put(_key, _status);
 	}
-	public static void addRanking(String _key, Rank _details) {
+	public static void addRanking(String _key, Ranking _details) {
 		ranking.put(_key, _details);
 	}
 	public static void addRankingRoles(Long _key, ArrayList<Roles> _details) {
@@ -217,6 +215,18 @@ public class Hashes {
 	public static void setLanguage(Long _key, String _lang) {
 		languages.put(_key, _lang);
 	}
+	public static void addLevelSkin(Integer _key, UserLevel _userLevel) {
+		level_skins.put(_key, _userLevel);
+	}
+	public static void addRankSkin(Integer _key, UserRank _userRank) {
+		rank_skins.put(_key, _userRank);
+	}
+	public static void addProfileSkin(Integer _key, UserProfile _userProfile) {
+		profile_skins.put(_key, _userProfile);
+	}
+	public static void addIconSkin(Integer _key, UserIcon _userIcon) {
+		icon_skins.put(_key, _userIcon);
+	}
 	
 	public static ArrayList<Messages> getMessagePool(long _key, long _message_id) {
 		final var message_pool = guild_message_pool.get(_key);
@@ -243,7 +253,7 @@ public class Hashes {
 	public static Guilds getStatus(long _key) {
 		return status.get(_key);
 	}
-	public static Rank getRanking(String _key) {
+	public static Ranking getRanking(String _key) {
 		return ranking.get(_key);
 	}
 	public static ArrayList<Roles> getRankingRoles(Long _key) {
@@ -352,6 +362,18 @@ public class Hashes {
 	public static String getLanguage(long _key) {
 		return languages.get(_key);
 	}
+	public static UserLevel getLevelSkin(int _key) {
+		return level_skins.get(_key);
+	}
+	public static UserRank getRankSkin(int _key) {
+		return rank_skins.get(_key);
+	}
+	public static UserProfile getProfileSkin(int _key) {
+		return profile_skins.get(_key);
+	}
+	public static UserIcon getIconSkin(int _key) {
+		return icon_skins.get(_key);
+	}
 	
 	public static void removeMessagePool(final long _key, long _message_id) {
 		final var message_pool = guild_message_pool.get(_key);
@@ -375,6 +397,9 @@ public class Hashes {
 	}
 	public static void removeRankingRoles(long _key) {
 		ranking_roles.remove(_key);
+	}
+	public static void clearRankingLevels() {
+		ranking_levels.clear();
 	}
 	public static void removeQuiz(int _key) {
 		quiz.remove(_key);
@@ -501,5 +526,17 @@ public class Hashes {
 				spamDetection.remove(key);
 			}
 		});
+	}
+	public static void clearLevelSkins() {
+		level_skins.clear();
+	}
+	public static void clearRankSkins() {
+		rank_skins.clear();
+	}
+	public static void clearProfileSkins() {
+		profile_skins.clear();
+	}
+	public static void clearIconSkins() {
+		icon_skins.clear();
 	}
 }

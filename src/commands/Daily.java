@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Cache;
 import constructors.Dailies;
 import constructors.InventoryContent;
+import constructors.Ranking;
 import core.Hashes;
 import core.UserPrivs;
 import enums.Channel;
@@ -127,7 +128,7 @@ public class Daily implements CommandPublic {
 							var editedRows = 0;
 							//if it's a currency reward, add it directly to the total currency of the user and update the db
 							if(list.get(random).getType().equals("cur")) {
-								constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+								Ranking user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 								user_details.setCurrency(user_details.getCurrency()+Long.parseLong(list.get(random).getDescription().replaceAll("[^0-9]*", "")));
 								user_details.setLastUpdate(timestamp);
 								editedRows = RankingSystem.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), user_details.getLastUpdate());

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import constructors.Cache;
 import constructors.Guilds;
+import constructors.Ranking;
 import core.Hashes;
 import core.UserPrivs;
 import enums.Channel;
@@ -85,20 +86,16 @@ public class Profile implements CommandPublic {
 					//put the command in timeout for the user
 					Hashes.addTempCache("profileDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(30000));
 					
-					constructors.Rank user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
+					Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
 					//check if the default skin had been updated, if yes update profile skin, description and file type
 					var old_guild_settings = Hashes.getOldGuildSettings(guild_id);
 					if(old_guild_settings != null && old_guild_settings.getProfileID() == user_details.getRankingProfile()) {
 						user_details.setRankingProfile(guild_settings.getProfileID());
-						user_details.setProfileDescription(guild_settings.getProfileDescription());
-						user_details.setFileTypeProfile(guild_settings.getFileTypeProfile());
 						Hashes.addRanking(guild_id+"_"+user_id, user_details);
 					}
 					//then do the same comparison for level icons
 					if(old_guild_settings != null && old_guild_settings.getIconID() == user_details.getRankingIcon()) {
 						user_details.setRankingIcon(guild_settings.getIconID());
-						user_details.setIconDescription(guild_settings.getIconDescription());
-						user_details.setFileTypeIcon(guild_settings.getFileTypeIcon());
 						Hashes.addRanking(guild_id+"_"+user_id, user_details);
 					}
 					
@@ -124,7 +121,7 @@ public class Profile implements CommandPublic {
 					}
 					
 					//collect the current ranking on the server
-					ArrayList<constructors.Rank> rankList = RankingSystem.SQLRanking(guild_id);
+					ArrayList<Ranking> rankList = RankingSystem.SQLRanking(guild_id);
 					if(rankList.size() > 0) {
 						final var ranking = rankList.parallelStream().filter(f -> f.getUser_ID() == user_id).findAny().orElse(null);
 						if(ranking != null)

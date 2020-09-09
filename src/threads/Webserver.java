@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.StringTokenizer;
-import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,13 +76,13 @@ public class Webserver implements Runnable {
 						}
 					}
 				} catch(IOException e) {
-					logger.error("Webservice error", e);
+					logger.error("Request error", e);
 					WebserviceUtils.return500(out, "Unknown Error: "+e, false);
 				} catch(JSONException e) {
-					logger.error("Webservice json error", e);
+					logger.error("Json error", e);
 					WebserviceUtils.return502(out, "JSON Error: "+e, false);
 				} catch(Exception e) {
-					logger.error("Webservice error", e);
+					logger.error("Request error", e);
 					WebserviceUtils.return500(out, "Unkown Error: "+e, false);
 				} finally {
 					in.close();
