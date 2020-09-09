@@ -1762,22 +1762,23 @@ public class RankingSystem {
 					Ranking rank = new Ranking();
 					rank.setUser_ID(rs.getLong(1));
 					rank.setLevel(rs.getInt(2));
-					rank.setCurrentExperience(rs.getInt(3));
-					rank.setRankUpExperience(rs.getInt(4));
-					rank.setExperience(rs.getLong(5));
-					rank.setCurrency(rs.getLong(6));
-					rank.setCurrentRole(rs.getLong(7));
-					rank.setRankingLevel(rs.getInt(8));
-					rank.setRankingRank(rs.getInt(9));
-					rank.setRankingProfile(rs.getInt(10));
-					rank.setRankingIcon(rs.getInt(11));
-					rank.setDailyExperience(rs.getInt(12));
-					rank.setDailyReset(rs.getTimestamp(13));
-					rank.setWeapon1(rs.getInt(14));
-					rank.setWeapon2(rs.getInt(15));
-					rank.setWeapon3(rs.getInt(16));
-					rank.setSkill(rs.getInt(17));
-					rank.setLastUpdate(rs.getTimestamp(18));
+					rank.setDisplayLevel(rs.getInt(3));
+					rank.setCurrentExperience(rs.getInt(4));
+					rank.setRankUpExperience(rs.getInt(5));
+					rank.setExperience(rs.getLong(6));
+					rank.setCurrency(rs.getLong(7));
+					rank.setCurrentRole(rs.getLong(8));
+					rank.setRankingLevel(rs.getInt(9));
+					rank.setRankingRank(rs.getInt(10));
+					rank.setRankingProfile(rs.getInt(11));
+					rank.setRankingIcon(rs.getInt(12));
+					rank.setDailyExperience(rs.getInt(13));
+					rank.setDailyReset(rs.getTimestamp(14));
+					rank.setWeapon1(rs.getInt(15));
+					rank.setWeapon2(rs.getInt(16));
+					rank.setWeapon3(rs.getInt(17));
+					rank.setSkill(rs.getInt(18));
+					rank.setLastUpdate(rs.getTimestamp(19));
 					Hashes.addRanking(_guild_id+"_"+_user_id, rank);
 					return rank;
 				}
@@ -1902,7 +1903,7 @@ public class RankingSystem {
 				stmt.setInt(2, _theme_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
-					levels.add(new Level(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getInt(5), rs.getInt(6)));
+					levels.add(new Level(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7)));
 				}
 				Hashes.addRankingLevels(_guild_id+"_"+_theme_id, levels);
 				return levels;

@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 public class Ranking {
 	private long user_id;
 	private int level;
+	private int displaLevel;
 	private int currentExperience;
 	private int rankUpExperience;
 	private long experience;
@@ -39,6 +40,9 @@ public class Ranking {
 	}
 	public void setLevel(int _level) {
 		this.level = _level;
+	}
+	public void setDisplayLevel(int _displayLevel) {
+		this.displaLevel = _displayLevel;
 	}
 	public void setCurrentExperience(int _currentExperience) {
 		this.currentExperience = _currentExperience;
@@ -112,6 +116,9 @@ public class Ranking {
 	}
 	public int getLevel() {
 		return this.level;
+	}
+	public int getDisplayLevel() {
+		return this.displaLevel;
 	}
 	public int getCurrentExperience() {
 		return this.currentExperience;

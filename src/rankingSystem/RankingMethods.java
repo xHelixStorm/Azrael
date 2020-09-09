@@ -54,7 +54,7 @@ public class RankingMethods extends ListenerAdapter {
 			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+rank_icon+"."+skinIcon.getFileType()));
 			String name = e.getMember().getEffectiveName();
 			int characterCounter = name.length();
-			int level = user_details.getLevel();
+			int level = (user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel());
 			int level1;
 			int level2;
 			String levelS1 = null;
@@ -62,13 +62,17 @@ public class RankingMethods extends ListenerAdapter {
 			StringBuilder sb = new StringBuilder();
 			StringBuilder sb2 = new StringBuilder();
 			
-			if(level > 9) {
+			if(level > 9 && level < 100) {
 				level1 = level / 10;
 				level2 = level % 10;
 				sb.append(level1);
 				levelS1 = sb.toString();
 				sb2.append(level2);
 				levelS2 = sb2.toString();
+			}
+			else if(level > 99) {
+				levelS1 = "";
+				levelS2 = ""+level;
 			}
 			else {
 				levelS1 = "0";
@@ -376,7 +380,7 @@ public class RankingMethods extends ListenerAdapter {
 				
 				if(skin.getDescriptionMode() == 0) {
 					if(skin.getLevelX() > 0 || skin.getLevelY() > 0)
-						g.drawString(""+user_details.getLevel(), skin.getLevelX(), skin.getLevelY());
+						g.drawString(""+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel()), skin.getLevelX(), skin.getLevelY());
 					if(skin.getExperienceX() > 0 || skin.getExperienceY() > 0)
 						g.drawString(insertDots(user_details.getExperience()), skin.getExperienceX(), skin.getExperienceY());
 					if(skin.getCurrencyX() > 0 || skin.getCurrencyY() > 0)
@@ -386,7 +390,7 @@ public class RankingMethods extends ListenerAdapter {
 				}
 				else if(skin.getDescriptionMode() == 1) {
 					if(skin.getLevelX() > 0 || skin.getLevelY() > 0)
-						g.drawString(""+user_details.getLevel(), getCenteredString(""+user_details.getLevel(), skin.getLevelX(), g), skin.getLevelY());
+						g.drawString(""+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel()), getCenteredString(""+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel()), skin.getLevelX(), g), skin.getLevelY());
 					if(skin.getExperienceX() > 0 || skin.getExperienceY() > 0) {
 						var experienceString = insertDots(user_details.getExperience());
 						g.drawString(experienceString, getCenteredString(experienceString, skin.getExperienceX(), g), skin.getExperienceY());
@@ -402,7 +406,7 @@ public class RankingMethods extends ListenerAdapter {
 				}
 				else if(skin.getDescriptionMode() == 2) {
 					if(skin.getLevelX() > 0 || skin.getLevelY() > 0)
-						g.drawString(""+user_details.getLevel(), getRightString(""+user_details.getLevel(), skin.getLevelX(), g), skin.getLevelY());
+						g.drawString(""+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel()), getRightString(""+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel()), skin.getLevelX(), g), skin.getLevelY());
 					if(skin.getExperienceX() > 0 || skin.getExperienceY() > 0) {
 						var experienceString = insertDots(user_details.getExperience());
 						g.drawString(""+experienceString, getRightString(""+experienceString, skin.getExperienceX(), g), skin.getExperienceY());
@@ -460,7 +464,7 @@ public class RankingMethods extends ListenerAdapter {
 					
 					if(skin.getDescriptionMode() == 0) {
 						if(skin.getLevelX() > 0 || skin.getLevelY() > 0)
-							g.drawString(""+user_details.getLevel(), skin.getLevelX(), skin.getLevelY());
+							g.drawString(""+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel()), skin.getLevelX(), skin.getLevelY());
 						if(skin.getExperienceX() > 0 || skin.getExperienceY() > 0)
 							g.drawString(insertDots(user_details.getExperience()), skin.getExperienceX(), skin.getExperienceY());
 						if(skin.getCurrencyX() > 0 || skin.getCurrencyY() > 0)
@@ -470,7 +474,7 @@ public class RankingMethods extends ListenerAdapter {
 					}
 					else if(skin.getDescriptionMode() == 1) {
 						if(skin.getLevelX() > 0 || skin.getLevelY() > 0)
-							g.drawString(""+user_details.getLevel(), getCenteredString(""+user_details.getLevel(), skin.getLevelX(), g), skin.getLevelY());
+							g.drawString(""+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel()), getCenteredString(""+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel()), skin.getLevelX(), g), skin.getLevelY());
 						if(skin.getExperienceX() > 0 || skin.getExperienceY() > 0) {
 							var experienceString = insertDots(user_details.getExperience());
 							g.drawString(experienceString, getCenteredString(experienceString, skin.getExperienceX(), g), skin.getExperienceY());
@@ -486,7 +490,7 @@ public class RankingMethods extends ListenerAdapter {
 					}
 					else if(skin.getDescriptionMode() == 2) {
 						if(skin.getLevelX() > 0 || skin.getLevelY() > 0)
-							g.drawString(""+user_details.getLevel(), getRightString(""+user_details.getLevel(), skin.getLevelX(), g), skin.getLevelY());
+							g.drawString(""+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel()), getRightString(""+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel()), skin.getLevelX(), g), skin.getLevelY());
 						if(skin.getExperienceX() > 0 || skin.getExperienceY() > 0) {
 							var experienceString = insertDots(user_details.getExperience());
 							g.drawString(""+experienceString, getRightString(""+experienceString, skin.getExperienceX(), g), skin.getExperienceY());

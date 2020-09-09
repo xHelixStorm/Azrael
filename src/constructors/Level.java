@@ -2,14 +2,16 @@ package constructors;
 
 public class Level {
 	private int level;
+	private int display_level;
 	private int experience;
 	private int currency;
 	private int rank_icon;
 	private int fail_rate;
 	private int exp_loss;
 	
-	public Level(int _level, int _experience, int _currency, int _rank_icon, int _fail_rate, int _exp_loss) {
+	public Level(int _level, int _display_level, int _experience, int _currency, int _rank_icon, int _fail_rate, int _exp_loss) {
 		this.level = _level;
+		this.display_level = _display_level;
 		this.experience = _experience;
 		this.currency = _currency;
 		this.rank_icon = _rank_icon;
@@ -19,6 +21,9 @@ public class Level {
 	
 	public int getLevel() {
 		return this.level;
+	}
+	public int getDisplayLevel() {
+		return this.display_level;
 	}
 	public int getExperience() {
 		return this.experience;
