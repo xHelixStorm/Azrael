@@ -139,9 +139,12 @@ public class ReadyListener extends ListenerAdapter {
 			if(guild_settings == null) {
 				logger.error("Guild information from RankingSystem.guilds couldn't be retrieved and cached in guild {}", guild.getId());
 			}
-			//if the ranking system is enabled, retrieve all registered ranking roles
-			if(guild_settings != null && guild_settings.getRankingState() && RankingSystem.SQLgetRoles(guild.getIdLong()).size() == 0) {
-				logger.warn("Roles from RankingSystem.roles couldn't be called and cached in guild {}", guild.getId());
+			//if the ranking system is enabled, retrieve all registered ranking roles and initialize guild ranking
+			if(guild_settings != null && guild_settings.getRankingState()) {
+				if(RankingSystem.SQLgetRoles(guild.getIdLong()).size() == 0) {
+					logger.warn("Roles from RankingSystem.roles couldn't be called and cached in guild {}", guild.getId());
+				}
+				Hashes.initializeGuildRanking(guild.getIdLong());
 			}
 			//retrieve all registered rss feeds and start the timer to make these display on the server
 			ParseSubscription.runTask(e.getJDA(), guild.getIdLong());

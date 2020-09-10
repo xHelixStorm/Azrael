@@ -1746,7 +1746,8 @@ public class RankingSystem {
 	
 	//JOINS
 	public synchronized static Ranking SQLgetWholeRankView(long _user_id, long _guild_id) {
-		if(Hashes.getRanking(_guild_id+"_"+_user_id) == null) {
+		final var user = Hashes.getRanking(_guild_id, _user_id); 
+		if(user == null) {
 			logger.trace("SQLgetWholeRankView launched. Passed params {}, {}", _user_id, _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1779,7 +1780,7 @@ public class RankingSystem {
 					rank.setWeapon3(rs.getInt(17));
 					rank.setSkill(rs.getInt(18));
 					rank.setLastUpdate(rs.getTimestamp(19));
-					Hashes.addRanking(_guild_id+"_"+_user_id, rank);
+					Hashes.addRanking(_guild_id, _user_id, rank);
 					return rank;
 				}
 				return null;
@@ -1792,7 +1793,7 @@ public class RankingSystem {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getRanking(_guild_id+"_"+_user_id);
+		return user;
 	}
 	
 	public static Guilds SQLgetGuild(long _guild_id) {

@@ -91,12 +91,12 @@ public class Profile implements CommandPublic {
 					var old_guild_settings = Hashes.getOldGuildSettings(guild_id);
 					if(old_guild_settings != null && old_guild_settings.getProfileID() == user_details.getRankingProfile()) {
 						user_details.setRankingProfile(guild_settings.getProfileID());
-						Hashes.addRanking(guild_id+"_"+user_id, user_details);
+						Hashes.addRanking(guild_id, user_id, user_details);
 					}
 					//then do the same comparison for level icons
 					if(old_guild_settings != null && old_guild_settings.getIconID() == user_details.getRankingIcon()) {
 						user_details.setRankingIcon(guild_settings.getIconID());
-						Hashes.addRanking(guild_id+"_"+user_id, user_details);
+						Hashes.addRanking(guild_id, user_id, user_details);
 					}
 					
 					float experienceCounter;

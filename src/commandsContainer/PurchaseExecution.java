@@ -36,7 +36,7 @@ public class PurchaseExecution {
 					editedRows = RankingSystem.SQLUpdateCurrencyAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), new_currency, skin.getItemID(), timestamp, 1, guild_settings.getThemeID());
 				if(editedRows > 0) {
 					user_details.setCurrency(new_currency);
-					Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
+					Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 					logger.debug("{} has purchased {}", e.getMember().getUser().getId(), skin.getShopDescription());
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASED).replace("{}", skin.getShopDescription())).build()).queue();
 					returnSkinMenu(e, guild_settings, type);
@@ -65,7 +65,7 @@ public class PurchaseExecution {
 					editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertTimedInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), new_currency, weapon.getWeaponID(), timestamp, timestamp, 1, guild_settings.getThemeID(), true);
 				if(editedRows > 0) {
 					user_details.setCurrency(new_currency);
-					Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
+					Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 					logger.debug("{} has purchased {}", e.getMember().getUser().getId(), weapon.getDescription()+" "+weapon.getStatDescription());
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASED).replace("{}", weapon.getDescription()+" "+weapon.getStatDescription())).build()).queue();
 					ShopExecution.displayShopWeapons(e, weapon.getCategoryDescription());
@@ -94,7 +94,7 @@ public class PurchaseExecution {
 					editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertTimedInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), new_currency, skill.getSkillId(), timestamp, timestamp, 1, guild_settings.getThemeID(), false);
 				if(editedRows > 0) {
 					user_details.setCurrency(new_currency);
-					Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
+					Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 					logger.debug("{} has purchased {}", e.getMember().getUser().getId(), skill.getDescription());
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASED).replace("{}", skill.getDescription())).build()).queue();
 					ShopExecution.displaySkills(e, guild_settings);
@@ -153,7 +153,7 @@ public class PurchaseExecution {
 						logger.error("The RankingSystem.users table couldn't be updated with the default icon skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
-				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
+				Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_SOLD)).build()).queue();
 				returnSkinMenu(e, guild_settings, type);
 			}

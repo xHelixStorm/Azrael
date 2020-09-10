@@ -133,7 +133,7 @@ public class Daily implements CommandPublic {
 								user_details.setLastUpdate(timestamp);
 								editedRows = RankingSystem.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), user_details.getLastUpdate());
 								if(editedRows > 0)
-									Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getIdLong(), user_details);
+									Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 							}
 							//if it's a experience boost reward, add it to inventory and activate it, if the action is set to 'use'
 							else if(list.get(random).getType().equals("exp")) {

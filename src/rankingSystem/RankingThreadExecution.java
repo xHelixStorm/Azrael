@@ -132,12 +132,12 @@ public class RankingThreadExecution {
 		var old_guild_settings = Hashes.getOldGuildSettings(e.getGuild().getIdLong());
 		if(old_guild_settings != null && old_guild_settings.getLevelID() == user_details.getRankingLevel()) {
 			user_details.setRankingLevel(guild_settings.getLevelID());
-			Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
+			Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 		}
 		//then do the same comparison for level icons
 		if(old_guild_settings != null && old_guild_settings.getIconID() == user_details.getRankingIcon()) {
 			user_details.setRankingIcon(guild_settings.getIconID());
-			Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
+			Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 		}
 		
 		boolean editLevel = false;
@@ -207,7 +207,7 @@ public class RankingThreadExecution {
 					
 					//reset experience points to the beginning of the current level
 					if(RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getExperience(), user_details.getLastUpdate()) > 0) {
-						Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
+						Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_LEVEL_UP)).setDescription(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.LEVEL_PROMOTION_FAILED)+user_details.getLevel()).build()).queue();
 					}
 					else {
@@ -252,7 +252,7 @@ public class RankingThreadExecution {
 			//update all level up details to table and log the details
 			if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0) {
 				RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Level Up", "User reached level "+user_details.getLevel());
-				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
+				Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 				if(user_details.getRankingLevel() > 0 && user_details.getRankingIcon() > 0) {
 					//Upload level up image
 					RankingMethods.getRankUp(e, guild_settings.getThemeID(), user_details, rankIcon);
@@ -310,7 +310,7 @@ public class RankingThreadExecution {
 			//update the gained experience points on table
 			if((!editLevel && RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getExperience(), user_details.getLastUpdate()) > 0) ||
 				(editLevel && RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0)) {
-				Hashes.addRanking(e.getGuild().getId()+"_"+e.getMember().getUser().getId(), user_details);
+				Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 			}
 			else {
 				logger.error("Experience points for the user {} in the guild {} couldn't be updated in the table RankingSystem.user_details", e.getMember().getUser().getId(), e.getGuild().getId());

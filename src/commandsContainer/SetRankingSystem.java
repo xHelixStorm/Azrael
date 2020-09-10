@@ -43,7 +43,8 @@ public class SetRankingSystem {
 				logger.debug("{} has set the ranking system to {} in guild {}", e.getMember().getUser().getId(), _input, e.getGuild().getId());
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(message).build()).queue();
 				
-				if(ranking_state == true) {
+				if(ranking_state) {
+					Hashes.initializeGuildRanking(e.getGuild().getIdLong());
 					Hashes.clearRankingLevels();
 					if(RankingSystem.SQLgetRoles(e.getGuild().getIdLong()) == null) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -55,6 +56,9 @@ public class SetRankingSystem {
 						logger.error("Levels from RankingSystem.level_list couldn't be called and cached in guild {}", e.getGuild().getId());
 					}
 					new Thread(new CollectUsers(e, true)).start();
+				}
+				else {
+					Hashes.removeGuildRanking(e.getGuild().getIdLong());
 				}
 			}
 			else {

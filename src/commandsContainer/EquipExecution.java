@@ -109,7 +109,7 @@ public class EquipExecution {
 			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 			if(user_details != null) {
 				user_details.setWeapon1(0);
-				Hashes.addRanking(guild+"_"+e.getAuthor().getId(), user_details);
+				Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
 			}
 			weapon1 = STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EMPTY);
 		}
@@ -120,7 +120,7 @@ public class EquipExecution {
 			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 			if(user_details != null) {
 				user_details.setWeapon2(0);
-				Hashes.addRanking(guild+"_"+e.getAuthor().getId(), user_details);
+				Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
 			}
 			weapon2 = STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EMPTY);
 		}
@@ -131,7 +131,7 @@ public class EquipExecution {
 			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 			if(user_details != null) {
 				user_details.setWeapon3(0);
-				Hashes.addRanking(guild+"_"+e.getAuthor().getId(), user_details);
+				Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
 			}
 			weapon3 = STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EMPTY);
 		}
@@ -142,7 +142,7 @@ public class EquipExecution {
 			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 			if(user_details != null) {
 				user_details.setSkill(0);
-				Hashes.addRanking(guild+"_"+e.getAuthor().getId(), user_details);
+				Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
 			}
 			skill = STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EMPTY);
 		}
@@ -256,7 +256,7 @@ public class EquipExecution {
 								case 2 -> user_details.setWeapon2(weapon.getItemId());
 								case 3 -> user_details.setWeapon3(weapon.getItemId());
 							}
-							Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
+							Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
 							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
 							e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EQUIPPED)).build()).queue();
 							equipmentItemScreen(e, guild_id, "set");
@@ -308,7 +308,7 @@ public class EquipExecution {
 				if(skill.getItemId() != user_details.getSkill()) {
 					if(RankingSystemItems.SQLEquipSkill(e.getAuthor().getIdLong(), guild, skill.getItemId()) > 0) {
 						user_details.setSkill(skill.getItemId());
-						Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
+						Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
 						EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
 						e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_EQUIPPED)).build()).queue();
 						equipmentItemScreen(e, guild_id, "set");
@@ -367,7 +367,7 @@ public class EquipExecution {
 									case 1 -> user_details.setWeapon2(weapon_id);
 									case 2 -> user_details.setWeapon3(weapon_id);
 								}
-								Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
+								Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
 								EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
 								e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EQUIPPED)).build()).queue();
 								equipmentItemScreen(e, guild_id, "set");
@@ -395,7 +395,7 @@ public class EquipExecution {
 					if(user_details.getSkill() != skill_id) {
 						if(RankingSystemItems.SQLEquipSkill(e.getAuthor().getIdLong(), guild, skill_id) > 0) {
 							user_details.setSkill(skill_id);
-							Hashes.addRanking(guild_id+"_"+e.getAuthor().getId(), user_details);
+							Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
 							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
 							e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_EQUIPPED)).build()).queue();
 							equipmentItemScreen(e, guild_id, "set");

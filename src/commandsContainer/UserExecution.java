@@ -1521,7 +1521,7 @@ public class UserExecution {
 					user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
 					if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0) {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Experience points gifted", "User received "+experience+" experience points");
-						Hashes.addRanking(e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
+						Hashes.addRanking(e.getGuild().getIdLong(), user_details.getUser_ID(), user_details);
 						if(roles.size() > 0) {
 							if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 								Member member = e.getGuild().getMemberById(user_id);
@@ -1593,7 +1593,7 @@ public class UserExecution {
 					user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
 					if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0) {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Experience points edited", "User has been set to "+experience+" experience points");
-						Hashes.addRanking(e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
+						Hashes.addRanking(e.getGuild().getIdLong(), user_details.getUser_ID(), user_details);
 						if(roles.size() > 0) {
 							if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 								Member member = e.getGuild().getMemberById(user_id);
@@ -1659,7 +1659,7 @@ public class UserExecution {
 						user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
 						if(RankingSystem.SQLsetLevelUp(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getLevel(), user_details.getExperience(), user_details.getCurrency(), user_details.getCurrentRole(), user_details.getLastUpdate()) > 0) {
 							RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Level changed", "User is now level "+user_details.getLevel());
-							Hashes.addRanking(e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
+							Hashes.addRanking(e.getGuild().getIdLong(), user_details.getUser_ID(), user_details);
 							if(roles.size() > 0) {
 								if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 									Member member = e.getGuild().getMemberById(user_id);
@@ -1705,7 +1705,7 @@ public class UserExecution {
 					user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
 					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getCurrency(), user_details.getLastUpdate()) > 0) {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Money gifted", "User received money in value of "+currency+" "+guild_settings.getCurrency());
-						Hashes.addRanking(e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
+						Hashes.addRanking(e.getGuild().getIdLong(), user_details.getUser_ID(), user_details);
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_GIFT_CUR_ADDED)).build()).queue();
 						logger.debug("{} has gifted {} currency value to {} in guild {}", e.getMember().getUser().getId(), _message, user_id, e.getGuild().getId());
 						Hashes.clearTempCache(key);
@@ -1724,7 +1724,7 @@ public class UserExecution {
 					user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
 					if(RankingSystem.SQLUpdateCurrency(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getCurrency(), user_details.getLastUpdate()) > 0) {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Money set", "Currency value for the user has been changed to "+currency+" "+guild_settings.getCurrency());
-						Hashes.addRanking(e.getGuild().getId()+"_"+user_details.getUser_ID(), user_details);
+						Hashes.addRanking(e.getGuild().getIdLong(), user_details.getUser_ID(), user_details);
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_SET_CUR_UPDATED)).build()).queue();
 						logger.debug("{} has set {} currency value to {} in guild {}", e.getMember().getUser().getId(), _message, user_id, e.getGuild().getId());
 						Hashes.clearTempCache(key);

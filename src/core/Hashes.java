@@ -34,16 +34,7 @@ import constructors.Weapons;
 import net.dv8tion.jda.api.entities.Member;
 
 public class Hashes {
-    private static final int max_ranking_pool_size = 500;
-    private static final LinkedHashMap<String, Ranking> ranking = new LinkedHashMap<String, Ranking>() {
-		private static final long serialVersionUID = 7054847678737381845L;
-		@Override
-		@SuppressWarnings("rawtypes")
-    	protected boolean removeEldestEntry(final Map.Entry eldest) {
-    		return size() > max_ranking_pool_size;
-    	}
-    };
-    
+    private final static ConcurrentMap<Long, LinkedHashMap<Long, Ranking>> guild_ranking = new ConcurrentHashMap<Long, LinkedHashMap<Long, Ranking>>();
     private final static ConcurrentMap<Long, LinkedHashMap<Long, ArrayList<Messages>>> guild_message_pool = new ConcurrentHashMap<Long, LinkedHashMap<Long, ArrayList<Messages>>>();
     private static final ConcurrentMap<String, ArrayList<String>> querry_result = new ConcurrentHashMap<String, ArrayList<String>>();
     private static final ConcurrentMap<Long, ArrayList<NameFilter>> name_filter = new ConcurrentHashMap<Long, ArrayList<NameFilter>>();
@@ -119,8 +110,21 @@ public class Hashes {
 	public static void addStatus(Long _key, Guilds _status) {
 		status.put(_key, _status);
 	}
-	public static void addRanking(String _key, Ranking _details) {
-		ranking.put(_key, _details);
+	public static void initializeGuildRanking(Long _key) {
+		final LinkedHashMap<Long, Ranking> ranking = new LinkedHashMap<Long, Ranking>() {
+			private static final long serialVersionUID = 1770564696361163460L;
+			@Override
+			@SuppressWarnings("rawtypes")
+	    	protected boolean removeEldestEntry(final Map.Entry eldest) {
+	    		return size() > 100;
+	    	}
+	    };
+	    guild_ranking.put(_key, ranking);
+	}
+	public static void addRanking(Long _key, Long _key2, Ranking _details) {
+		final var ranking = guild_ranking.get(_key);
+		ranking.put(_key2, _details);
+		guild_ranking.put(_key, ranking);
 	}
 	public static void addRankingRoles(Long _key, ArrayList<Roles> _details) {
 		ranking_roles.put(_key, _details);
@@ -253,8 +257,8 @@ public class Hashes {
 	public static Guilds getStatus(long _key) {
 		return status.get(_key);
 	}
-	public static Ranking getRanking(String _key) {
-		return ranking.get(_key);
+	public static Ranking getRanking(long _key, long _key2) {
+		return guild_ranking.get(_key).get(_key2);
 	}
 	public static ArrayList<Roles> getRankingRoles(Long _key) {
 		return ranking_roles.get(_key);
@@ -389,8 +393,8 @@ public class Hashes {
 	public static void removeNameFilter(Long _key) {
 		name_filter.remove(_key);
 	}
-	public static void removeRanking(String _key) {
-		ranking.remove(_key);
+	public static void removeGuildRanking(long _key) {
+		guild_ranking.remove(_key);
 	}
 	public static void removeReactionRoles(Long _key) {
 		reaction_roles.remove(_key);
