@@ -13,6 +13,7 @@ import com.vdurmont.emoji.EmojiParser;
 import constructors.RSS;
 import core.Hashes;
 import enums.Translation;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -24,57 +25,64 @@ import util.STATIC;
 public class BasicModel {
 	private static final Logger logger = LoggerFactory.getLogger(BasicModel.class);
 
-	public static void ModelParse(BufferedReader in, Guild guild, RSS rss, long rss_channel, boolean defaultChannel) throws IOException {
+	public static boolean ModelParse(BufferedReader in, Guild guild, RSS rss, long rss_channel, boolean defaultChannel) throws IOException {
+		boolean success = false;
 		final TextChannel textChannel = guild.getTextChannelById(rss_channel);
 		if(textChannel != null) {
-			String format = rss.getFormat();
-			String title = "";
-			String description = "";
-			String pubDate = "";
-			String link = "";
-			
-			String line;
-			StringBuilder collection = new StringBuilder();
-			while((line = in.readLine()) != null) {
-				collection.append(line);
+			if(guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY)) {
+				String format = rss.getFormat();
+				String title = "";
+				String description = "";
+				String pubDate = "";
+				String link = "";
+				
+				String line;
+				StringBuilder collection = new StringBuilder();
+				while((line = in.readLine()) != null) {
+					collection.append(line);
+				}
+				String code = collection.toString();
+				if(code.contains("<item>")) {
+					code = code.substring(code.indexOf("<item>"), code.indexOf("</item>")).replaceAll("(<item>|</item>)", "");
+					if(code.contains("<title>") && code.contains("</title>")) {
+						int firstPos = code.indexOf("<title>");
+						int lastPos = code.indexOf("</title>");
+						title = code.substring(firstPos, lastPos).replaceAll("(<title>|</title>)", "");
+					}
+					if(code.contains("<description>") && code.contains("</description>")) {
+						int firstPos = code.indexOf("<description>");
+						int lastPos = code.indexOf("</description>");
+						description = code.substring(firstPos, lastPos).replaceAll("(<description>|</descrption>)", "");
+					}
+					if(code.contains("<pubDate>") && code.contains("</pubDate>")) {
+						int firstPos = code.indexOf("<pubDate>");
+						int lastPos = code.indexOf("</pubDate>");
+						pubDate = code.substring(firstPos, lastPos).replaceAll("(<pubDate>|</pubDate>)", "");
+					}
+					if(code.contains("<link>") && code.contains("</link>")) {
+						int firstPos = code.indexOf("<link>");
+						int lastPos = code.indexOf("</link>");
+						link = code.substring(firstPos, lastPos).replaceAll("(<link>|</link>)", "");
+					}
+				}
+				if(title.length() > 0 || description.length() > 0 || pubDate.length() > 0 || link.length() > 0) {
+					success = true;
+					String out = format.replace("{title}", title);
+					out = out.replace("{description}", description);
+					out = out.replace("{pubDate}", pubDate);
+					out = out.replace("{link}", link);
+					out = out.replaceAll("&#039;", "'");
+					final String outMessage = EmojiParser.parseToUnicode(out);
+					MessageHistory history = new MessageHistory(textChannel);
+					history.retrievePast(100).queue(historyList -> {
+						Message historyMessage = historyList.parallelStream().filter(f -> f.getContentRaw().equals(outMessage)).findAny().orElse(null);
+						if(historyMessage == null)
+							textChannel.sendMessage(outMessage).queue();
+					});
+				}
 			}
-			String code = collection.toString();
-			if(code.contains("<item>")) {
-				code = code.substring(code.indexOf("<item>"), code.indexOf("</item>")).replaceAll("(<item>|</item>)", "");
-				if(code.contains("<title>") && code.contains("</title>")) {
-					int firstPos = code.indexOf("<title>");
-					int lastPos = code.indexOf("</title>");
-					title = code.substring(firstPos, lastPos).replaceAll("(<title>|</title>)", "");
-				}
-				if(code.contains("<description>") && code.contains("</description>")) {
-					int firstPos = code.indexOf("<description>");
-					int lastPos = code.indexOf("</description>");
-					description = code.substring(firstPos, lastPos).replaceAll("(<description>|</descrption>)", "");
-				}
-				if(code.contains("<pubDate>") && code.contains("</pubDate>")) {
-					int firstPos = code.indexOf("<pubDate>");
-					int lastPos = code.indexOf("</pubDate>");
-					pubDate = code.substring(firstPos, lastPos).replaceAll("(<pubDate>|</pubDate>)", "");
-				}
-				if(code.contains("<link>") && code.contains("</link>")) {
-					int firstPos = code.indexOf("<link>");
-					int lastPos = code.indexOf("</link>");
-					link = code.substring(firstPos, lastPos).replaceAll("(<link>|</link>)", "");
-				}
-			}
-			if(title.length() > 0 || description.length() > 0 || pubDate.length() > 0 || link.length() > 0) {
-				String out = format.replace("{title}", title);
-				out = out.replace("{description}", description);
-				out = out.replace("{pubDate}", pubDate);
-				out = out.replace("{link}", link);
-				out = out.replaceAll("&#039;", "'");
-				final String outMessage = EmojiParser.parseToUnicode(out);
-				MessageHistory history = new MessageHistory(textChannel);
-				history.retrievePast(100).queue(historyList -> {
-					Message historyMessage = historyList.parallelStream().filter(f -> f.getContentRaw().equals(outMessage)).findAny().orElse(null);
-					if(historyMessage == null)
-						textChannel.sendMessage(outMessage).queue();
-				});
+			else {
+				logger.warn("MESSAGE_WRITE and MESSAGE_HISTORY permission required to print the subscription in channel {} for guild {}", rss_channel, guild.getId());
 			}
 		}
 		else {
@@ -96,6 +104,7 @@ public class BasicModel {
 			}
 		}
 		in.close();
+		return success;
 	}
 	
 	public static void ModelTest(GuildMessageReceivedEvent e, RSS rss) {

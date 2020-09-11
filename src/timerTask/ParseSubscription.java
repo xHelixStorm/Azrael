@@ -1,4 +1,5 @@
 package timerTask;
+import java.awt.Color;
 import java.net.SocketTimeoutException;
 import java.util.Calendar;
 import java.util.Timer;
@@ -11,7 +12,10 @@ import org.slf4j.LoggerFactory;
 
 
 import constructors.RSS;
+import core.Hashes;
 import enums.Channel;
+import enums.Translation;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -64,14 +68,21 @@ public class ParseSubscription extends TimerTask{
 								}
 								try {
 									logger.trace("Retrieving subscription for {} in guild {}", rss.getURL(), e.getGuildById(guild_id).getName());
+									boolean success = false;
 									if(rss.getType() == 1)
-										BasicModel.ModelParse(STATIC.retrieveWebPageCode(rss.getURL()), guild, rss, channel_id, defaultChannel);
+										success = BasicModel.ModelParse(STATIC.retrieveWebPageCode(rss.getURL()), guild, rss, channel_id, defaultChannel);
 									else if(rss.getType() == 2)
-										TwitterModel.ModelParse(guild, rss, channel_id, defaultChannel);
+										success = TwitterModel.ModelParse(guild, rss, channel_id, defaultChannel);
+									if(success)
+										Hashes.addSubscriptionStatus(guild.getId()+"_"+rss.getURL(), 0);
+									else
+										incrementSubscriptionStatus(guild, rss.getURL());
 								} catch(SocketTimeoutException e1){
 									logger.warn("Timeout on subscription {}", rss.getURL());
+									incrementSubscriptionStatus(guild, rss.getURL());
 								} catch (Exception e1) {
 									logger.error("Error on retrieving subscription {}", rss.getURL(), e1);
+									incrementSubscriptionStatus(guild, rss.getURL());
 								}
 							}).start();
 						}
@@ -109,5 +120,17 @@ public class ParseSubscription extends TimerTask{
 	
 	public static boolean timerIsRunning(long guild_id) {
 		return timers.contains(guild_id);
+	}
+	
+	private static void incrementSubscriptionStatus(Guild guild, String subscription) {
+		int count = Hashes.getSubscriptionStatus(guild.getId()+"_"+subscription)+1;
+		//one full day, if we assume subscriptions are fetched every 10 minutes
+		if(count == 144) {
+			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(guild, Translation.SUBSCRIBE_STATUS).replace("{}", subscription), "log");
+			logger.info("Unreachable subscription {} for the last 24 hours in guild {}", subscription, guild.getId());
+			Hashes.addSubscriptionStatus(guild.getId()+"_"+subscription, 0);
+		}
+		else
+			Hashes.addSubscriptionStatus(guild.getId()+"_"+subscription, count);
 	}
 }

@@ -685,6 +685,7 @@ public enum Translation {
 	SUBSCRIBE_CHANNEL_ERR_2		("subscribe_channel_err_2"),
 	SUBSCRIBE_CHANNEL_ADDED		("subscribe_channel_added"),
 	SUBSCRIBE_CHANNEL_DEFAULT	("subscribe_channel_default"),
+	SUBSCRIBE_STATUS			("subscribe_status"),
 	SUBSCRIBE_EXIT				("subscribe_exit"),
 	
 	TOP_USER_LEFT				("top_user_left"),

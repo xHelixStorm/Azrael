@@ -86,6 +86,7 @@ public class SubscribeExecution {
 			Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 			if(Azrael.SQLDeleteRSSFeed(url, e.getGuild().getIdLong()) > 0) {
 				Hashes.removeFeeds(e.getGuild().getIdLong());
+				Hashes.removeSubscriptionStatus(e.getGuild().getId()+"_"+url);
 				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_REMOVED)).build()).queue();
 				logger.debug("{} rss feed has been deleted from guild {}", url, e.getGuild().getId());
 			}

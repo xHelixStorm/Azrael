@@ -683,6 +683,7 @@
 	"subscribe_channel_err_2":		"Text channel doesn't exist!",
 	"subscribe_channel_added":		"Text channel has been set!",
 	"subscribe_channel_default":	"DEFAULT",
+	"subscribe_status":				"Subscription from **{}** couldn't be fetched for the last 24 hours. Please verify that the url is still available and that the permissions on the text channel are set correctly.",
 	"subscribe_exit":				"Subscribe command interrupted!",
 	
 	"top_user_left":				"<User has left the server>",

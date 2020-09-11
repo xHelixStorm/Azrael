@@ -683,6 +683,7 @@
 	"subscribe_channel_err_2":		"Textkanal existiert nicht!",
 	"subscribe_channel_added":		"Textkanal ist gesetzt!",
 	"subscribe_channel_default":	"STANDARD",
+	"subscribe_status":				"Das Abonnement von **{}** konnte in den letzten 24 Stunden nicht geholt werden. Bitte überprüfen Sie, ob die Url noch verfügbar ist und ob die Berechtigungen für den Textkanal korrekt gesetzt sind.",
 	"subscribe_exit":				"Abonnieren-Befehl unterbrochen!",
 	
 	"top_user_left":				"<Benutzer hat den Server verlassen>",

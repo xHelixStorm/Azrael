@@ -76,6 +76,7 @@ public class Hashes {
     private static final ConcurrentHashMap<Integer, UserRank> rank_skins = new ConcurrentHashMap<Integer, UserRank>();
     private static final ConcurrentHashMap<Integer, UserProfile> profile_skins = new ConcurrentHashMap<Integer, UserProfile>();
     private static final ConcurrentHashMap<Integer, UserIcon> icon_skins = new ConcurrentHashMap<Integer, UserIcon>();
+    private static final ConcurrentHashMap<String, Integer> subscription_status = new ConcurrentHashMap<String, Integer>();
     
     public static void initializeGuildMessagePool(Long _key, final int max_message_pool_size) {
     	LinkedHashMap<Long, ArrayList<Messages>> message_pool = new LinkedHashMap<Long, ArrayList<Messages>>() {
@@ -231,6 +232,9 @@ public class Hashes {
 	public static void addIconSkin(Integer _key, UserIcon _userIcon) {
 		icon_skins.put(_key, _userIcon);
 	}
+	public static void addSubscriptionStatus(String _key, Integer _value) {
+		subscription_status.put(_key, _value);
+	}
 	
 	public static ArrayList<Messages> getMessagePool(long _key, long _message_id) {
 		final var message_pool = guild_message_pool.get(_key);
@@ -377,6 +381,9 @@ public class Hashes {
 	}
 	public static UserIcon getIconSkin(int _key) {
 		return icon_skins.get(_key);
+	}
+	public static Integer getSubscriptionStatus(String _key) {
+		return subscription_status.get(_key);
 	}
 	
 	public static void removeMessagePool(final long _key, long _message_id) {
@@ -542,5 +549,8 @@ public class Hashes {
 	}
 	public static void clearIconSkins() {
 		icon_skins.clear();
+	}
+	public static void removeSubscriptionStatus(String _key) {
+		subscription_status.remove(_key);
 	}
 }
