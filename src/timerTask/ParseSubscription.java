@@ -123,10 +123,14 @@ public class ParseSubscription extends TimerTask{
 	}
 	
 	private static void incrementSubscriptionStatus(Guild guild, String subscription) {
-		int count = Hashes.getSubscriptionStatus(guild.getId()+"_"+subscription)+1;
+		Integer count = Hashes.getSubscriptionStatus(guild.getId()+"_"+subscription);
+		if(count == null)
+			count = 1;
+		else
+			count++;
 		//one full day, if we assume subscriptions are fetched every 10 minutes
 		if(count == 144) {
-			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(guild, Translation.SUBSCRIBE_STATUS).replace("{}", subscription), "log");
+			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(guild, Translation.SUBSCRIBE_STATUS).replace("{}", subscription), Channel.LOG.getType());
 			logger.info("Unreachable subscription {} for the last 24 hours in guild {}", subscription, guild.getId());
 			Hashes.addSubscriptionStatus(guild.getId()+"_"+subscription, 0);
 		}

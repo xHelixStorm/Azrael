@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -25,6 +26,7 @@ import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import inventory.DrawDaily;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
 import sql.Azrael;
@@ -117,7 +119,13 @@ public class Daily implements CommandPublic {
 								}
 							}
 							//get the index of an array depending on the random number and draw the reward into the screen
-							DrawDaily.draw(e, list.get(random).getDescription(), guild_settings);
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES)))
+								DrawDaily.draw(e, list.get(random).getDescription(), guild_settings);
+							else {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
+								logger.error("Permission MESSAGE_ATTACH_FILES required to display the dailies for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+							}
+							
 							//set the daily reset to next midnight time
 							long time = System.currentTimeMillis();
 							Timestamp timestamp = new Timestamp(time);

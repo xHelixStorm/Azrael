@@ -2,6 +2,7 @@ package commands;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class Changemap implements CommandPublic {
 					}
 					if(map != null && map.getMapID() != 0) {
 						final var selectedMap = map;
-						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY) && room.getType() != 3) {
+						if((e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_HISTORY))) && room.getType() != 3) {
 							//retrieve message from history and replace it
 							e.getChannel().retrieveMessageById(room.getMessageID()).queue(m -> {
 								MessageEmbed embed = m.getEmbeds().get(0);

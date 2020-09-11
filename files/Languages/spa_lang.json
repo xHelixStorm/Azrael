@@ -168,7 +168,7 @@
 	"low_privileges":				"¡El usuario **{}** no puede ser silenciado porque los privilegios del rol actual son muy bajos!",
 	"no_mute_role":					"¡No se ha encontrado ningún rol para usuarios silenciados! ¡Por favor registra un rol para usuarios silenciados antes de continuar!",
 	"missing_permission":			"¡Se requieren más permisos! Habilita el siguiente permiso e inténtalo de nuevo: ",
-	"missing_permission_in":		"¡Se requiere el permiso {}! Inténtalo de nuevo después de habilitar este permiso para el canal de texto ",
+	"missing_permission_in":		"¡Se requiere el permiso {}! Por favor habilita este/estos permiso(s) para el canal de texto ",
 	"cooldown":						"Actualmente, este comando está en enfriamiento, vuelve a intentarlo más tarde.",
 	"general_error":				"Ha ocurrido un error interno. ¡Por favor, ponte en contacto con un administrador!",
 	"gif_compression":				"Comprimiendo GIF. Por favor espera...",

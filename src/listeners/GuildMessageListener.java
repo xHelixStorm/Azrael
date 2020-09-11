@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -42,6 +43,7 @@ import filter.URLFilter;
 import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -252,7 +254,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					
 					//include vote up and vote down reactions, if it's a vote channel
 					if(currentChannel != null && currentChannel.getChannel_Type() != null && currentChannel.getChannel_Type().equals(Channel.VOT.getType()) && e.getGuild().getSelfMember().getIdLong() != e.getMember().getUser().getIdLong()) {
-						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
+						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION))) {
 							e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsup:").getUnicode()).queue();
 							e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsdown:").getUnicode()).queue();
 							
@@ -270,27 +272,32 @@ public class GuildMessageListener extends ListenerAdapter {
 					//check if the randomshop command has been used
 					final var randomshop_bot = Hashes.getTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 					if(randomshop_bot != null && e.getGuild().getSelfMember().getIdLong() == e.getMember().getUser().getIdLong() && randomshop_bot.getExpiration() - System.currentTimeMillis() > 0) {
-						//get details of the inventory
-						String cache_content = randomshop_bot.getAdditionalInfo();
-						String [] array = cache_content.split("_");
-						final long member_id = Long.parseLong(array[0]);
-						final int current_page = Integer.parseInt(array[1]);
-						final String input = array[2];
-						final int last_page = Integer.parseInt(array[3]);
-						
-						boolean createCache = false;
-						//add reactions
-						if(current_page > 1) {
-							e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).queue();
-							createCache = true;
+						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION))) {
+							//get details of the inventory
+							String cache_content = randomshop_bot.getAdditionalInfo();
+							String [] array = cache_content.split("_");
+							final long member_id = Long.parseLong(array[0]);
+							final int current_page = Integer.parseInt(array[1]);
+							final String input = array[2];
+							final int last_page = Integer.parseInt(array[3]);
+							
+							boolean createCache = false;
+							//add reactions
+							if(current_page > 1) {
+								e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).queue();
+								createCache = true;
+							}
+							if(current_page < last_page) {
+								e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).queue();
+								createCache = true;
+							}
+							//enable reaction events for the current user and drawn inventory
+							if(createCache == true) {
+								Hashes.addTempCache("randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id, new Cache(0, current_page+"_"+last_page+"_"+input));
+							}
 						}
-						if(current_page < last_page) {
-							e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).queue();
-							createCache = true;
-						}
-						//enable reaction events for the current user and drawn inventory
-						if(createCache == true) {
-							Hashes.addTempCache("randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+member_id, new Cache(0, current_page+"_"+last_page+"_"+input));
+						else {
+							logger.warn("MESSAGE_ADD_REACTION permission required to to browse through pages by reacting for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 						}
 						Hashes.clearTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 					}
@@ -666,16 +673,28 @@ public class GuildMessageListener extends ListenerAdapter {
 				//check if the language filter is enabled for this channel and retrieve all languages
 				var filter_lang = Azrael.SQLgetChannel_Filter(channel_id);
 				if(filter_lang != null && filter_lang.size() > 0) {
-					new Thread(new LanguageFilter(e, filter_lang, allChannels)).start();
-					//if url censoring is enabled, also run the url censoring thread
-					if(currentChannel != null && currentChannel.getURLCensoring())
-						new Thread(new URLFilter(e, null, filter_lang, allChannels)).start();
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE))) {
+						new Thread(new LanguageFilter(e, filter_lang, allChannels)).start();
+						//if url censoring is enabled, also run the url censoring thread
+						if(currentChannel != null && currentChannel.getURLCensoring())
+							new Thread(new URLFilter(e, null, filter_lang, allChannels)).start();
+					}
+					else {
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
+						logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required for text channel {} in guild {} to censor messages", e.getChannel().getId(), e.getGuild().getId());
+					}
 				}
 				//if url censoring is enabled but no language has been applied, use english as default and run the url censoring thread
 				else if(currentChannel != null && currentChannel.getURLCensoring()) {
-					ArrayList<String> lang = new ArrayList<String>();
-					lang.add("eng");
-					new Thread(new URLFilter(e, null, filter_lang, allChannels)).start();
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE))) {
+						ArrayList<String> lang = new ArrayList<String>();
+						lang.add("eng");
+						new Thread(new URLFilter(e, null, filter_lang, allChannels)).start();
+					}
+					else {
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
+						logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required for text channel {} in guild {} to censor messages", e.getChannel().getId(), e.getGuild().getId());
+					}
 				}
 				//check if the channel log and cache log is enabled and if one of the two or bot is/are enabled then write message to file or/and log to system cache
 				var log = GuildIni.getChannelAndCacheLog(guild_id);
@@ -707,18 +726,32 @@ public class GuildMessageListener extends ListenerAdapter {
 				var sentMessage = Hashes.getMessagePool(e.getGuild().getIdLong(), e.getMessageIdLong());
 				//if the watched member level equals 2, then print all written messages from that user in a separate channel
 				if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
-					var cachedMessage = sentMessage.get(0);
-					var printMessage = cachedMessage.getMessage();
-					e.getGuild().getTextChannelById(watchedMember.getWatchChannel()).sendMessage(new EmbedBuilder()
-						.setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")")
-						.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_WATCH)).setColor(Color.WHITE)
-						.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+					TextChannel textChannel = e.getGuild().getTextChannelById(watchedMember.getWatchChannel());
+					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
+						var cachedMessage = sentMessage.get(0);
+						var printMessage = cachedMessage.getMessage();
+						textChannel.sendMessage(new EmbedBuilder()
+							.setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")")
+							.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_WATCH)).setColor(Color.WHITE)
+							.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+					}
+					else {
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
+						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log messages of watched users", e.getChannel().getId(), e.getGuild().getId());
+					}
 				}
 				//print an error if the cache log is not enabled
 				else if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage == null) {
-					e.getGuild().getTextChannelById(watchedMember.getWatchChannel()).sendMessage(new EmbedBuilder()
-						.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED)
-						.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.MESSAGE_WATCH_ERR).replace("{}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator())).build()).queue();
+					TextChannel textChannel = e.getGuild().getTextChannelById(watchedMember.getWatchChannel());
+					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
+						textChannel.sendMessage(new EmbedBuilder()
+								.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED)
+								.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.MESSAGE_WATCH_ERR).replace("{}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator())).build()).queue();
+					}
+					else {
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
+						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log messages of watched users", e.getChannel().getId(), e.getGuild().getId());
+					}
 				}
 			}).start();
 		}

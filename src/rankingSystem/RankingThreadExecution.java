@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -254,13 +255,25 @@ public class RankingThreadExecution {
 				RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Level Up", "User reached level "+user_details.getLevel());
 				Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 				if(user_details.getRankingLevel() > 0 && user_details.getRankingIcon() > 0) {
-					//Upload level up image
-					RankingMethods.getRankUp(e, guild_settings.getThemeID(), user_details, rankIcon);
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES))) {
+						//Upload level up image
+						RankingMethods.getRankUp(e, guild_settings.getThemeID(), user_details, rankIcon);
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+e.getChannel().getAsMention()).build()).queue();
+						logger.error("MESSAGE_WRITE and MESSAGE_ATTACH_FILES permissions required to display the level up image in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
+					}
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.LEVEL_TITLE)).setColor(Color.MAGENTA)
-						.setAuthor(e.getMember().getEffectiveName(), e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getUser().getEffectiveAvatarUrl())
-						.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_MESSAGE).replace("{}", ""+user_details.getLevel())).build()).queue();
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE))) {
+						e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.LEVEL_TITLE)).setColor(Color.MAGENTA)
+							.setAuthor(e.getMember().getEffectiveName(), e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getUser().getEffectiveAvatarUrl())
+							.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_MESSAGE).replace("{}", ""+user_details.getLevel())).build()).queue();
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName())+e.getChannel().getAsMention()).build()).queue();
+						logger.error("MESSAGE_WRITE permission required to display the level up message in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
+					}
 				}
 			}
 			else {

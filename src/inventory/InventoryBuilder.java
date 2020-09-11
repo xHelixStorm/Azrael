@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 
 import javax.imageio.ImageIO;
 
@@ -19,6 +20,7 @@ import constructors.InventoryContent;
 import enums.Translation;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import util.STATIC;
@@ -102,26 +104,33 @@ public class InventoryBuilder {
 					ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 				else
 					ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+e2.getGuild().getId()+"us"+e2.getMember().getUser().getId()+".png"));
-			} catch(IOException ioe) {
+				
 				if(e != null) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_DRAW_ERR)).build()).queue();
+					File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
+					e.getChannel().sendFile(upload, "inventory.png").complete();
+					upload.delete();
 				}
 				else {
-					e2.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e2.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e2.getMember(), Translation.INVENTORY_DRAW_ERR)).build()).queue();
+					File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+e2.getGuild().getId()+"us"+e2.getMember().getUser().getId()+".png");
+					e2.getChannel().sendFile(upload, "inventory.png").complete();
+					upload.delete();
+				}
+			} catch(IOException ioe) {
+				if(e != null) {
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_DRAW_ERR)).build()).queue();
+					else
+						e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_DRAW_ERR)).queue();
+				}
+				else {
+					if(e2.getGuild().getSelfMember().hasPermission(e2.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e2.getGuild(), e2.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
+						e2.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e2.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e2.getMember(), Translation.INVENTORY_DRAW_ERR)).build()).queue();
+					else
+						e2.getChannel().sendMessage(STATIC.getTranslation(e2.getMember(), Translation.INVENTORY_DRAW_ERR)).queue();
 				}
 				logger.warn("Inventory couldn't be drawn. Last item {}", ioe);
 			}
 			
-			if(e != null) {
-				File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
-				e.getChannel().sendFile(upload, "inventory.png").complete();
-				upload.delete();
-			}
-			else {
-				File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+e2.getGuild().getId()+"us"+e2.getMember().getUser().getId()+".png");
-				e2.getChannel().sendFile(upload, "inventory.png").complete();
-				upload.delete();
-			}
 		}
 		else {
 			StringBuilder out = new StringBuilder();

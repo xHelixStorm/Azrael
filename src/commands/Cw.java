@@ -1,6 +1,7 @@
 package commands;
 
 import java.awt.Color;
+import java.util.EnumSet;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -85,7 +86,7 @@ public class Cw implements CommandPublic {
 												if(Competitive.SQLJoinRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), room.getRoomID(), team) > 0) {
 													e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_QUEUE).replaceFirst("\\{\\}", username).replaceFirst("\\{\\}", ""+room.getRoomID()).replaceFirst("\\{\\}", ""+(room.getMembers()+1)).replace("{}", ""+members)).build()).queue();
 													//print room details
-													if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY)) {
+													if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_HISTORY))) {
 														if(room.getMessageID() != 0) {
 															e.getGuild().getTextChannelById(room.getChannelID()).retrieveMessageById(room.getMessageID()).queue(m -> {
 																m.delete().queue();
@@ -162,7 +163,7 @@ public class Cw implements CommandPublic {
 												if(Competitive.SQLLeaveRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), room_id) > 0) {
 													e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_SUCCESS).replaceFirst("\\{\\}", username).replaceFirst("\\{\\}", ""+(room.getMembers()-1)).replace("{}", ""+members)).build()).queue();
 													//print room details
-													if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY)) {
+													if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_HISTORY))) {
 														if(room.getMessageID() != 0) {
 															e.getGuild().getTextChannelById(room.getChannelID()).retrieveMessageById(room.getMessageID()).queue(m -> {
 																m.delete().queue();
@@ -238,7 +239,7 @@ public class Cw implements CommandPublic {
 												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.CW_START_SUCCESS).replace("{}", ""+room.getRoomID())).build()).queue();
 												//print room details
 												room.setStatus(2);
-												if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY)) {
+												if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_HISTORY))) {
 													if(room.getMessageID() != 0) {
 														e.getGuild().getTextChannelById(room.getChannelID()).retrieveMessageById(room.getMessageID()).queue(m -> {
 															m.delete().queue();

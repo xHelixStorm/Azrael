@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -19,6 +20,7 @@ import constructors.Weapons;
 import enums.Translation;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import util.STATIC;
@@ -79,10 +81,18 @@ public class RandomshopItemDrawer {
 				e2.getChannel().sendFile(file1, "randomshop.png").complete();
 			file1.delete();
 		} catch (IOException e1) {
-			if(e != null)
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR)).build()).queue();
-			else
-				e2.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e2.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e2.getMember(), Translation.RANDOMSHOP_ERR)).build()).queue();
+			if(e != null) {
+				if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR)).build()).queue();
+				else
+					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR)).queue();
+			}
+			else {
+				if(e2.getGuild().getSelfMember().hasPermission(e2.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e2.getGuild(), e2.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
+					e2.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e2.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e2.getMember(), Translation.RANDOMSHOP_ERR)).build()).queue();
+				else
+					e2.getChannel().sendMessage(STATIC.getTranslation(e2.getMember(), Translation.RANDOMSHOP_ERR)).queue();
+			}
 			logger.error("Randomshop Items couldn't be drawn. Error for item {}", traceWeapon, e1);
 		}
 	}

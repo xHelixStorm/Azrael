@@ -2,6 +2,7 @@ package commands;
 
 import java.awt.Color;
 import java.io.File;
+import java.util.EnumSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +79,7 @@ public class DoubleExperience implements CommandPublic {
 						var bot_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).findAny().orElse(null);
 						if(bot_channel != null) {
 							final TextChannel textChannel = e.getGuild().getTextChannelById(bot_channel.getChannel_ID());
-							if(textChannel != null && e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)) {
+							if(textChannel != null && (e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.MESSAGE_ATTACH_FILES)))) {
 								textChannel.sendFile(doubleEvent, "doubleweekend.jpg").queue();
 								textChannel.sendMessage("```css\n"+STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_MESSAGE)+"```").queue();
 							}

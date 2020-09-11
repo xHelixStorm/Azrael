@@ -7,9 +7,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import enums.Channel;
 import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
@@ -19,6 +23,8 @@ import sql.DiscordRoles;
 import util.STATIC;
 
 public class VerifyMutedMembers extends TimerTask {
+	private final static Logger logger = LoggerFactory.getLogger(VerifyMutedMembers.class);
+	
 	private ReadyEvent event;
 	private ReconnectedEvent event2;
 	private ResumedEvent event3;
@@ -43,6 +49,7 @@ public class VerifyMutedMembers extends TimerTask {
 		}
 		var e = (event != null ? event : (event2 != null ? event2 : event3));
 		for(var guild : e.getJDA().getGuilds()) {
+			final boolean ROLE_MANAGEMENT = guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES);
 			var mute_role = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mute")).findAny().orElse(null);
 			if(mute_role != null) {
 				List<Member> mutedMembers = guild.getMembersWithRoles(guild.getRoleById(mute_role.getRole_ID()));
@@ -50,8 +57,14 @@ public class VerifyMutedMembers extends TimerTask {
 				for(var member : mutedMembers) {
 					var data = Azrael.SQLgetData(member.getUser().getIdLong(), guild.getIdLong());
 					if(data.getUnmute() != null && System.currentTimeMillis() > data.getUnmute().getTime()) {
-						guild.removeRoleFromMember(member, guild.getRoleById(mute_role.getRole_ID())).queue();
-						count++;
+						if(ROLE_MANAGEMENT) {
+							guild.removeRoleFromMember(member, guild.getRoleById(mute_role.getRole_ID())).queue();
+							count++;
+						}
+						else {
+							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName(), Channel.LOG.getType());
+							logger.error("MANAGE_ROLES permission required to remove the mute role from a user in guild {}", guild.getId());
+						}
 					}
 				}
 				var channels = Azrael.SQLgetChannels(guild.getIdLong());

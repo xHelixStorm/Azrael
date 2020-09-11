@@ -2,6 +2,7 @@ package listeners;
 
 import java.awt.Color;
 import java.sql.Timestamp;
+import java.util.EnumSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,11 +55,7 @@ public class BanListener extends ListenerAdapter {
 				STATIC.killThread("mute_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 			}
 			else {
-				if(log_channel != null) {
-					final TextChannel textChannel = e.getGuild().getTextChannelById(log_channel.getChannel_ID());
-					if(textChannel != null && e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
-						textChannel.sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_ERR)).build()).queue();
-				}
+				STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.BAN_ERR), Channel.LOG.getType());
 				logger.error("banned user {} couldn't be marked as banned on Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getId());
 			}
 		}
@@ -69,11 +66,7 @@ public class BanListener extends ListenerAdapter {
 				STATIC.killThread("mute_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 			}
 			else {
-				if(log_channel != null) {
-					final TextChannel textChannel = e.getGuild().getTextChannelById(log_channel.getChannel_ID());
-					if(textChannel != null && e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
-						textChannel.sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_ERR)).build()).queue();
-				}
+				STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.BAN_ERR), Channel.LOG.getType());
 				logger.error("banned user {} couldn't be inserted into Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
 			}
 		}
@@ -87,7 +80,7 @@ public class BanListener extends ListenerAdapter {
 			
 			if(log_channel != null) {
 				final TextChannel textChannel = e.getGuild().getTextChannelById(log_channel.getChannel_ID());
-				if(textChannel != null && e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)) {
+				if(textChannel != null && (e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))) {
 					//retrieve reason and applier if it has been cached, else retrieve the user from the audit log
 					var cache = Hashes.getTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 					if(cache != null) {
@@ -122,7 +115,7 @@ public class BanListener extends ListenerAdapter {
 							getBanAuditLog(e, user_id, guild_id, log_channel, user);
 						}
 						else {
-							EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle("User banned!");
+							EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
 							textChannel.sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_4).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE)).replace("{}", STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON))).build()).queue();
 							logger.warn("VIEW AUDIT LOGS permission missing in guild {}!", e.getGuild().getId());
 						}

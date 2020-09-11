@@ -1,6 +1,7 @@
 package preparedMessages;
 
 import java.awt.Color;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,12 +12,16 @@ import com.vdurmont.emoji.EmojiManager;
 
 import constructors.Roles;
 import core.Hashes;
+import enums.Channel;
 import enums.Translation;
 import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import sql.Azrael;
 import sql.DiscordRoles;
 import util.STATIC;
 
@@ -27,44 +32,63 @@ public class ReactionMessage {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		var reactionRoles = DiscordRoles.SQLgetReactionRoles(e.getGuild().getIdLong());
 		if(reactionRoles != null && reactionRoles.size() > 0) {
-			var roles = reactionRoles.parallelStream().filter(f -> !f.isPersistent()).collect(Collectors.toList());
-			if(roles.size() > 0) {
-				String [] reactions = GuildIni.getReactions(e.getGuild().getIdLong());
-				StringBuilder sb = new StringBuilder();
-				var reactionEnabled = GuildIni.getReactionEnabled(e.getGuild().getIdLong());
-				for(int i = 0; i < roles.size(); i++) {
-					String reaction;
-					if(!reactionEnabled) {
-						reaction = getReaction(i);
-					}
-					else {
-						if(reactions[i].length() > 0) {
-							try {
-								reaction = e.getGuild().getEmotesByName(reactions[i], false).get(0).getAsMention();
-							} catch(Exception exc) {
-								reaction = EmojiManager.getForAlias(":"+reactions[i]+":").getUnicode();
+			TextChannel textChannel = e.getGuild().getTextChannelById(channel_id);
+			if(textChannel != null) {
+				if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
+					var roles = reactionRoles.parallelStream().filter(f -> !f.isPersistent()).collect(Collectors.toList());
+					if(roles.size() > 0) {
+						String [] reactions = GuildIni.getReactions(e.getGuild().getIdLong());
+						StringBuilder sb = new StringBuilder();
+						var reactionEnabled = GuildIni.getReactionEnabled(e.getGuild().getIdLong());
+						for(int i = 0; i < roles.size(); i++) {
+							String reaction;
+							if(!reactionEnabled) {
+								reaction = getReaction(i);
 							}
+							else {
+								if(reactions[i].length() > 0) {
+									try {
+										reaction = e.getGuild().getEmotesByName(reactions[i], false).get(0).getAsMention();
+									} catch(Exception exc) {
+										reaction = EmojiManager.getForAlias(":"+reactions[i]+":").getUnicode();
+									}
+								}
+								else {
+									reaction = getReaction(i);
+								}
+							}
+							sb.append(reaction+" **"+roles.get(i).getRole_Name()+"**\n");
+							if(i == 8) break;
 						}
+						String reactionMessage = FileSetting.readFile("./files/Guilds/"+e.getGuild().getId()+"/reactionmessage.txt");
+						if(reactionMessage.length() > 0) {
+							textChannel.sendMessage(message.setDescription(reactionMessage+"\n\n"
+								+ ""+sb.toString()).build()).queue(response -> {
+									addReactions(response, e, roles, reactionEnabled, reactions);
+								});
+						}
+						
 						else {
-							reaction = getReaction(i);
+							textChannel.sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.ROLE_REACTION_PRINT)
+								+ ""+sb.toString()).build()).queue(response -> {
+									addReactions(response, e, roles, reactionEnabled, reactions);
+								});
 						}
 					}
-					sb.append(reaction+" **"+roles.get(i).getRole_Name()+"**\n");
-					if(i == 8) break;
 				}
-				String reactionMessage = FileSetting.readFile("./files/Guilds/"+e.getGuild().getId()+"/reactionmessage.txt");
-				if(reactionMessage.length() > 0) {
-					e.getGuild().getTextChannelById(channel_id).sendMessage(reactionMessage+"\n\n"
-						+ ""+sb.toString()).queue(response -> {
-							addReactions(response, e, roles, reactionEnabled, reactions);
-						});
-				}
-				
 				else {
-					e.getGuild().getTextChannelById(channel_id).sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.ROLE_REACTION_PRINT)
-						+ ""+sb.toString()).build()).queue(response -> {
-							addReactions(response, e, roles, reactionEnabled, reactions);
-						});
+					STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+textChannel.getAsMention(), Channel.LOG.getType());
+					logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to print a reaction message for channel {} in guild {}", channel_id, e.getGuild().getId());
+				}
+			}
+			else {
+				//remove not anymore existing channel
+				if(Azrael.SQLDeleteChannelConf(channel_id, e.getGuild().getIdLong()) > 0) {
+					Azrael.SQLDeleteChannel_Filter(channel_id);
+					Azrael.SQLDeleteChannels(channel_id);
+					logger.info("Not anymore existing reaction channel {} has been removed for guild {}", channel_id, e.getGuild().getId());
+					Hashes.removeFilterLang(channel_id);
+					Hashes.removeChannels(e.getGuild().getIdLong());
 				}
 			}
 		}
@@ -88,23 +112,29 @@ public class ReactionMessage {
 	}
 	
 	private static void addReactions(Message message, GuildMessageReceivedEvent e, List<Roles> reactionRoles, boolean reactionEnabled, String [] reactions) {
-		for(int i = 0; i < reactionRoles.size(); i++) {
-			if(!reactionEnabled) {
-				message.addReaction(EmojiManager.getForAlias(ReactionMessage.getReaction(i)).getUnicode()).queue();
-			}
-			else {
-				if(reactions[i].length() > 0) {
-					try {
-						message.addReaction(e.getGuild().getEmotesByName(reactions[i], false).get(0)).queue();
-					} catch(Exception exc) {
-						message.addReaction(EmojiManager.getForAlias(":"+reactions[i]+":").getUnicode()).queue();
-					}
-				}
-				else {
+		if(e.getGuild().getSelfMember().hasPermission(message.getTextChannel(), Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), message.getTextChannel(), EnumSet.of(Permission.MESSAGE_ADD_REACTION))) {
+			for(int i = 0; i < reactionRoles.size(); i++) {
+				if(!reactionEnabled) {
 					message.addReaction(EmojiManager.getForAlias(ReactionMessage.getReaction(i)).getUnicode()).queue();
 				}
+				else {
+					if(reactions[i].length() > 0) {
+						try {
+							message.addReaction(e.getGuild().getEmotesByName(reactions[i], false).get(0)).queue();
+						} catch(Exception exc) {
+							message.addReaction(EmojiManager.getForAlias(":"+reactions[i]+":").getUnicode()).queue();
+						}
+					}
+					else {
+						message.addReaction(EmojiManager.getForAlias(ReactionMessage.getReaction(i)).getUnicode()).queue();
+					}
+				}
+				if(i == 8) break;
 			}
-			if(i == 8) break;
+		}
+		else {
+			STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_ADD_REACTION.getName())+message.getTextChannel().getAsMention(), Channel.LOG.getType());
+			logger.error("MESSAGE_ADD_REACTION permission required to add reactions to a message for channel {} in guild {}", message.getTextChannel().getId(), e.getGuild().getId());
 		}
 		Hashes.addReactionMessage(e.getGuild().getIdLong(), message.getIdLong());
 	}

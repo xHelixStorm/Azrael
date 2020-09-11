@@ -47,7 +47,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
@@ -75,7 +74,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.27.491";
+	private static final String VERSION = "7.27.493";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -399,19 +398,19 @@ public class STATIC {
 		logger.debug("Message removed from {} in guild {}", member.getUser().getId(), guild.getId());
 		var muteRole = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 		if(muteRole == null) {
-			if(guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE))
+			if(guild.getSelfMember().hasPermission(channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(guild, channel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 				channel.sendMessage(member.getAsMention()+" "+output[0]).queue();
 		}
 		else {
 			var cache = Hashes.getTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId());
 			if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
-				if(guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE))
+				if(guild.getSelfMember().hasPermission(channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(guild, channel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 					channel.sendMessage(member.getAsMention()+" "+output[0]).queue();
 				Hashes.addTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId(), new Cache(300000, "1"));
 			}
 			else if(cache != null) {
 				if(cache.getAdditionalInfo().equals("1")) {
-					if(guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE))
+					if(guild.getSelfMember().hasPermission(channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(guild, channel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 						channel.sendMessage(member.getAsMention()+" "+output[1]).queue();
 					Hashes.addTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId(), new Cache(300000, "2"));
 				}
@@ -438,14 +437,28 @@ public class STATIC {
 		var watchedUser = Azrael.SQLgetWatchlist(user_id, guild_id);
 		if(watchedUser != null) {
 			if(Azrael.SQLDeleteWatchlist(user_id, guild_id) > 0) {
-				e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_WATCH_LIFTED))
-					.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.WATCHING_LIFTED).replace("{}", e.getUser().getName()+"#"+e.getUser().getDiscriminator())+unwatchReason+"!").build()).queue();
+				TextChannel textChannel = e.getGuild().getTextChannelById(watchedUser.getWatchChannel());
+				if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
+					textChannel.sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_WATCH_LIFTED))
+						.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.WATCHING_LIFTED).replace("{}", e.getUser().getName()+"#"+e.getUser().getDiscriminator())+unwatchReason+"!").build()).queue();
+				}
+				else {
+					STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+textChannel.getAsMention(), Channel.LOG.getType());
+					logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log notifications regarding the removal of the watch status", textChannel.getId(), e.getGuild().getId());
+				}
 				Hashes.removeWatchlist(guild_id+"-"+user_id);
 				logger.debug("The user {} has been removed from the watchlist in guild {}", user_id, guild_id);
 			}
 			else {
-				e.getGuild().getTextChannelById(watchedUser.getWatchChannel()).sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR))
-					.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.WATCHING_LIFTED_ERR).replace("{}", e.getUser().getName()+"#"+e.getUser().getDiscriminator())).build()).queue();
+				TextChannel textChannel = e.getGuild().getTextChannelById(watchedUser.getWatchChannel());
+				if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
+					textChannel.sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR))
+						.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.WATCHING_LIFTED_ERR).replace("{}", e.getUser().getName()+"#"+e.getUser().getDiscriminator())).build()).queue();
+				}
+				else {
+					STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+textChannel.getAsMention(), Channel.LOG.getType());
+					logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log notifications regarding the removal of the watch status", textChannel.getId(), e.getGuild().getId());
+				}
 				logger.error("An internal error occurred. The user {} couldn't be removed from the Azrael.watchlist table for guild {}", user_id, guild_id);
 			}
 		}
@@ -544,14 +557,20 @@ public class STATIC {
 					if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
 						if(cache.getAdditionalInfo().equalsIgnoreCase(message)) {
 							if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
-								final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
-								if(mute != null) {
-									e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
-									final int warning = Azrael.SQLgetWarning(user_id, guild_id);
-									final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
-									Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
-									Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
-									return true;
+								if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+									final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+									if(mute != null) {
+										e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
+										final int warning = Azrael.SQLgetWarning(user_id, guild_id);
+										final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
+										Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
+										Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+										return true;
+									}
+								}
+								else {
+									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES, Channel.LOG.getType());
+									logger.error("MANAGE_ROLES permission required to mute a user for spam in guild {}", e.getGuild().getId());
 								}
 							}
 							else {
@@ -586,20 +605,26 @@ public class STATIC {
 					if(messagesLimit != 0 && spamMessages.size() == messagesLimit) {
 						Hashes.removeSpamDetection(user_id+"_"+guild_id);
 						if(cache == null) {
-							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_WRITE))
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 								e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
 							Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage));
 						}
 						else {
 							if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
-								final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
-								if(mute != null) {
-									e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
-									final int warning = Azrael.SQLgetWarning(user_id, guild_id);
-									final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
-									Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
-									Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
-									return true;
+								if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+									final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+									if(mute != null) {
+										e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
+										final int warning = Azrael.SQLgetWarning(user_id, guild_id);
+										final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
+										Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
+										Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+										return true;
+									}
+								}
+								else {
+									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES, Channel.LOG.getType());
+									logger.error("MANAGE_ROLES permission required to mute a user for spam in guild {}", e.getGuild().getId());
 								}
 							}
 							else {
@@ -616,20 +641,26 @@ public class STATIC {
 						if(messagesOverChannelsLimit != 0 && channels.size() == messagesOverChannelsLimit) {
 							Hashes.removeSpamDetection(user_id+"_"+guild_id);
 							if(cache == null) {
-								if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_WRITE))
+								if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 									e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
 								Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage));
 							}
 							else {
 								if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
-									final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
-									if(mute != null) {
-										e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
-										final int warning = Azrael.SQLgetWarning(user_id, guild_id);
-										final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
-										Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
-										Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
-										return true;
+									if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+										final var mute = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+										if(mute != null) {
+											e.getGuild().addRoleToMember(user_id, e.getGuild().getRoleById(mute.getRole_ID())).reason(STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2)).queue();
+											final int warning = Azrael.SQLgetWarning(user_id, guild_id);
+											final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
+											Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
+											Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+											return true;
+										}
+									}
+									else {
+										STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES, Channel.LOG.getType());
+										logger.error("MANAGE_ROLES permission required to mute a user for spam in guild {}", e.getGuild().getId());
 									}
 								}
 								else {
@@ -651,11 +682,11 @@ public class STATIC {
 		if(channel != null) {
 			final TextChannel textChannel = guild.getTextChannelById(channel.getChannel_ID());
 			if(textChannel != null) {
-				if(embed != null && (guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))) {
+				if(embed != null && (guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))) {
 					textChannel.sendMessage(embed.setDescription(message).build()).queue();
 					return true;
 				}
-				else if(embed == null && (guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE) || setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE)))) {
+				else if(embed == null && (guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))) {
 					textChannel.sendMessage(message).queue();
 				}
 				else {
@@ -674,11 +705,11 @@ public class STATIC {
 		if(channel != null) {
 			final TextChannel textChannel = guild.getTextChannelById(channel.getChannel_ID());
 			if(textChannel != null) {
-				if(embed != null && (guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))) {
+				if(embed != null && (guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))) {
 					textChannel.sendMessage(embed.setDescription(message).build()).queue();
 					return true;
 				}
-				else if(embed == null && (guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE) || setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE)))) {
+				else if(embed == null && (guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))) {
 					textChannel.sendMessage(message).queue();
 				}
 				else {
@@ -690,9 +721,10 @@ public class STATIC {
 	}
 	
 	public static boolean setPermissions(Guild guild, TextChannel textChannel, Collection<Permission> permissions) {
-		if(guild.getSelfMember().hasPermission(Permission.MANAGE_CHANNEL)) {
+		if(guild.getSelfMember().hasPermission(textChannel, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)) {
 			textChannel.getManager().putPermissionOverride(guild.getSelfMember(), permissions, null).complete();
 			logger.info("Permissions overriden for text channel {} in guild {}", textChannel.getId(), guild.getId());
+			return true;
 		}
 		return false;
 	}

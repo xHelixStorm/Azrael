@@ -3,6 +3,7 @@ package listeners;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import google.GoogleSheets;
 import inventory.InventoryBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.DiscordRoles;
@@ -161,9 +163,10 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 						isEmojiCustom = true;
 					final boolean customEmoji = isEmojiCustom;
 					//check that the permissions are correct
-					if(e.getGuild().getSelfMember().hasPermission(e.getGuild().getTextChannelById(channel_id), Permission.MESSAGE_HISTORY)) {
-						if(e.getGuild().getSelfMember().hasPermission(e.getGuild().getTextChannelById(channel_id), Permission.MESSAGE_ADD_REACTION)) {
-							e.getGuild().getTextChannelById(channel_id).retrieveMessageById(message_id).queue(message -> {
+					TextChannel textChannel = e.getGuild().getTextChannelById(channel_id);
+					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY))) {
+						if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.MESSAGE_ADD_REACTION))) {
+							textChannel.retrieveMessageById(message_id).queue(message -> {
 								String reaction = null;
 								//unicode emojis
 								if(!customEmoji) {
@@ -204,58 +207,80 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 					
 					//execute if it's an inventory reaction
 					if(inventory != null) {
-						//retrieve all inventory details
-						String cache_content = inventory.getAdditionalInfo();
-						String [] array = cache_content.split("_");
-						int current_page = Integer.parseInt(array[0]);
-						final int last_page = Integer.parseInt(array[1]);
-						final String inventory_tab = array[2];
-						final String sub_tab = array[3];
-						//either return to the previous page or go to the next page and redraw the inventory
-						if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") && current_page != 1)
-							current_page--;
-						else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && current_page != last_page)
-							current_page++;
-						//delete previously drawn inventory so that the new inventory image can be drawn
-						e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
-						Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab));
-						//retrieve current theme and max items in the current inventory
-						final var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-						final var theme = guild_settings.getThemeID();
-						final int maxItems = guild_settings.getInventoryMaxItems();
-						//draw inventory depending on the category that was chosen
-						if(inventory_tab.equalsIgnoreCase("weapons")) {
-							if(!sub_tab.equalsIgnoreCase("total"))
-								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, sub_tab, theme), current_page, last_page, guild_settings);
+						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES))) {
+							//retrieve all inventory details
+							String cache_content = inventory.getAdditionalInfo();
+							String [] array = cache_content.split("_");
+							int current_page = Integer.parseInt(array[0]);
+							final int last_page = Integer.parseInt(array[1]);
+							final String inventory_tab = array[2];
+							final String sub_tab = array[3];
+							//either return to the previous page or go to the next page and redraw the inventory
+							if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") && current_page != 1)
+								current_page--;
+							else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && current_page != last_page)
+								current_page++;
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_MANAGE))) {
+								//delete previously drawn inventory so that the new inventory image can be drawn
+								e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
+							}
+							else {
+								logger.warn("MESSAGE_MANAGE permission required to delete the image for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+							}
+							Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab));
+							//retrieve current theme and max items in the current inventory
+							final var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
+							final var theme = guild_settings.getThemeID();
+							final int maxItems = guild_settings.getInventoryMaxItems();
+							//draw inventory depending on the category that was chosen
+							if(inventory_tab.equalsIgnoreCase("weapons")) {
+								if(!sub_tab.equalsIgnoreCase("total"))
+									InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, sub_tab, theme), current_page, last_page, guild_settings);
+								else
+									InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
+							}
+							else if(inventory_tab.equalsIgnoreCase("skins"))
+								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
 							else
-								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
+								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
 						}
-						else if(inventory_tab.equalsIgnoreCase("skins"))
-							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
-						else
-							InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
+						else {
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
+							logger.error("MESSAGE_WRITE and MESSAGE_ATTACH_FILES permission required to reupload a new image for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+						}
 					}
 					//execute if it's a randomshop reaction
 					else if(randomshop != null) {
-						//retrieve all randomshop details
-						String cache_content = randomshop.getAdditionalInfo();
-						String [] array = cache_content.split("_");
-						int current_page = Integer.parseInt(array[0]);
-						final int last_page = Integer.parseInt(array[1]);
-						final String input = array[2];
-						//either return to the previous page or go to the next page and redraw the randomshop
-						if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") && current_page != 1)
-							current_page--;
-						else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && current_page != last_page)
-							current_page++;
-						//delete previous randomshop image and redraw the new one
-						e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
-						final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-						RandomshopExecution.inspectItems(null, e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), theme), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme, false), input, current_page);
+						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES))) {
+							//retrieve all randomshop details
+							String cache_content = randomshop.getAdditionalInfo();
+							String [] array = cache_content.split("_");
+							int current_page = Integer.parseInt(array[0]);
+							final int last_page = Integer.parseInt(array[1]);
+							final String input = array[2];
+							//either return to the previous page or go to the next page and redraw the randomshop
+							if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:") && current_page != 1)
+								current_page--;
+							else if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_right:") && current_page != last_page)
+								current_page++;
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_MANAGE))) {
+								//delete previous randomshop image and redraw the new one
+								e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
+							}
+							else {
+								logger.warn("MESSAGE_MANAGE permission required to delete the image for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+							}
+							final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
+							RandomshopExecution.inspectItems(null, e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), theme), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme, false), input, current_page);
+						}
+						else {
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
+							logger.error("MESSAGE_WRITE and MESSAGE_ATTACH_FILES permission required to reupload a new image for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+						}
 					}
 					//execute if it's a clan reaction
 					else if(clan != null) {
-						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY)) {
+						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY, Permission.MESSAGE_ADD_REACTION))) {
 							@SuppressWarnings("unchecked")
 							final var clans = (ArrayList<Clan>) clan.getObject();
 							int currentPage = Integer.parseInt(clan.getAdditionalInfo());
@@ -270,7 +295,10 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 							final int page = currentPage;
 							final int lastPage = totPages;
 							e.getChannel().retrieveMessageById(e.getMessageId()).queue(m -> {
-								m.delete().queue();
+								if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_MANAGE)))
+									m.delete().queue();
+								else
+									logger.warn("MESSAGE_MANAGE permission required to delete the message for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 								int count = 0;
 								StringBuilder out = new StringBuilder();
 								for(int i = (page-1)*10; i < clans.size(); i++) {
@@ -288,7 +316,8 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 							});
 						}
 						else {
-							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_HISTORY.getName())+e.getChannel().getName(), Channel.LOG.getType());
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+", "+Permission.MESSAGE_HISTORY.getName()+" and "+Permission.MESSAGE_ADD_REACTION.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
+							logger.error("MESSAGE_WRITE, MESSAGE_HISTORY and MESSAGE_REACTION_ADD permissions required to display a new clan page with reactions for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 						}
 					}
 				}
@@ -297,77 +326,83 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 				final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
 				final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 				if(thisChannel != null && thisChannel.getChannel_Type() != null && thisChannel.getChannel_Type().equals(Channel.VOT.getType())) {
-					if(e.getReactionEmote().isEmoji()) {
-						boolean runSpreadsheet = false;
-						if(thumbsup.equals(e.getReactionEmote().getName())) {
-							e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsdown, e.getUser()).queue();
-							runSpreadsheet = true;
-						}
-						else if(thumbsdown.equals(e.getReactionEmote().getName())) {
-							e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsup, e.getUser()).queue();
-							runSpreadsheet = true;
-						}
-						
-						//Run google service, if enabled
-						if(runSpreadsheet && GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
-							final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id);
-							if(sheet != null && !sheet[0].equals("empty")) {
-								final String file_id = sheet[0];
-								final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
-								
-								try {
-									final var response = GoogleSheets.readWholeSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, row_start);
-									int currentRow = 0;
-									for(var row : response.getValues()) {
-										currentRow++;
-										if(row.parallelStream().filter(f -> {
-											String cell = (String)f;
-											if(cell.equals(e.getMessageId()))
-												return true;
-											else
-												return false;
-											}).findAny().orElse(null) != null) {
-											//retrieve the saved mapping for the vote event
-											final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id, e.getGuild().getIdLong());
-											if(columns != null && columns.size() > 0) {
-												//find out where the up_vote and down_vote columns are and mark them
-												int columnUpVote = 0;
-												int columnDownVote = 0;
-												for(final var column : columns) {
-													if(column.getItem() == GoogleDD.UP_VOTE)
-														columnUpVote = column.getColumn();
-													else if(column.getItem() == GoogleDD.DOWN_VOTE)
-														columnDownVote = column.getColumn();
-												}
-												if(columnUpVote != 0 || columnDownVote != 0) {
-													//build update array
-													ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-													int columnCount = 0;
-													for(final var column : row) {
-														columnCount ++;
-														if(columnCount == columnUpVote)
-															values.add(Arrays.asList("<upVote>"));
-														else if(columnCount == columnDownVote)
-															values.add(Arrays.asList("<downVote>"));
-														else
-															values.add(Arrays.asList(column));
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE))) {
+						if(e.getReactionEmote().isEmoji()) {
+							boolean runSpreadsheet = false;
+							if(thumbsup.equals(e.getReactionEmote().getName())) {
+								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsdown, e.getUser()).queue();
+								runSpreadsheet = true;
+							}
+							else if(thumbsdown.equals(e.getReactionEmote().getName())) {
+								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsup, e.getUser()).queue();
+								runSpreadsheet = true;
+							}
+							
+							//Run google service, if enabled
+							if(runSpreadsheet && GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+								final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id);
+								if(sheet != null && !sheet[0].equals("empty")) {
+									final String file_id = sheet[0];
+									final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
+									
+									try {
+										final var response = GoogleSheets.readWholeSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, row_start);
+										int currentRow = 0;
+										for(var row : response.getValues()) {
+											currentRow++;
+											if(row.parallelStream().filter(f -> {
+												String cell = (String)f;
+												if(cell.equals(e.getMessageId()))
+													return true;
+												else
+													return false;
+												}).findAny().orElse(null) != null) {
+												//retrieve the saved mapping for the vote event
+												final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id, e.getGuild().getIdLong());
+												if(columns != null && columns.size() > 0) {
+													//find out where the up_vote and down_vote columns are and mark them
+													int columnUpVote = 0;
+													int columnDownVote = 0;
+													for(final var column : columns) {
+														if(column.getItem() == GoogleDD.UP_VOTE)
+															columnUpVote = column.getColumn();
+														else if(column.getItem() == GoogleDD.DOWN_VOTE)
+															columnDownVote = column.getColumn();
 													}
-													//execute Runnable
-													if(!STATIC.threadExists("vote"+e.getMessageId())) {
-														new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote)).start();
+													if(columnUpVote != 0 || columnDownVote != 0) {
+														//build update array
+														ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+														int columnCount = 0;
+														for(final var column : row) {
+															columnCount ++;
+															if(columnCount == columnUpVote)
+																values.add(Arrays.asList("<upVote>"));
+															else if(columnCount == columnDownVote)
+																values.add(Arrays.asList("<downVote>"));
+															else
+																values.add(Arrays.asList(column));
+														}
+														//execute Runnable
+														if(!STATIC.threadExists("vote"+e.getMessageId())) {
+															new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote)).start();
+														}
 													}
 												}
+												//interrupt the row search
+												break;
 											}
-											//interrupt the row search
-											break;
 										}
+									} catch (Exception e1) {
+										STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
+										logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
 									}
-								} catch (Exception e1) {
-									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-									logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
 								}
 							}
 						}
+					}
+					else {
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_MANAGE.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
+						logger.error("MESSAGE_MANAGE permission required to remove a reaction from a user for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 			}

@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -176,7 +177,7 @@ public class URLFilter implements Runnable{
 		//for sent messages
 		if(e != null) {
 			//check if Bot has the manage messages permission
-			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_MANAGE)) {
+			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE))) {
 				Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
 				//delete message which contains the url
 				e.getMessage().delete().queue(success -> {
@@ -209,7 +210,7 @@ public class URLFilter implements Runnable{
 		}
 		//for edited messages
 		else {
-			if(e2.getGuild().getSelfMember().hasPermission(e2.getChannel(), Permission.MESSAGE_MANAGE)) {
+			if(e2.getGuild().getSelfMember().hasPermission(e2.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e2.getGuild(), e2.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE))) {
 				Hashes.addTempCache("message-removed-filter_gu"+e2.getGuild().getId()+"ch"+e2.getChannel().getId()+"us"+e2.getMember().getUser().getId(), new Cache(180000));
 				//delete message which contains the url
 				e2.getMessage().delete().queue(success -> {

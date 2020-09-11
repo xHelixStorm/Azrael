@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.util.EnumSet;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -184,11 +185,17 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 						message.setColor(Color.DARK_GRAY);
 						final TextChannel textChannel = e.getGuild().getTextChannelById(watchedUser.getWatchChannel());
 						if(textChannel != null) {
-							//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
-							for(final var cachedMessage : removed_messages) {
-								message.setTimestamp(cachedMessage.getTime()).setTitle(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
-								final var printMessage = STATIC.getTranslation2(e.getGuild(), Translation.DELETE_WATCHED)+(cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))+"\n\n"+cachedMessage.getMessage();
-								textChannel.sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+							if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
+								//iterate through removed_messages to print the main message and if available, all edited messages belonging to the same message id
+								for(final var cachedMessage : removed_messages) {
+									message.setTimestamp(cachedMessage.getTime()).setTitle(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")").setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
+									final var printMessage = STATIC.getTranslation2(e.getGuild(), Translation.DELETE_WATCHED)+(cachedMessage.isEdit() ? STATIC.getTranslation2(e.getGuild(), Translation.DELETE_EDITED_MESSAGE) : STATIC.getTranslation2(e.getGuild(), Translation.DELETE_MESSAGE))+"\n\n"+cachedMessage.getMessage();
+									textChannel.sendMessage(message.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+								}
+							}
+							else {
+								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+textChannel.getAsMention(), Channel.LOG.getType());
+								logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to display the message of a watched member for channel {} in guild {}", textChannel.getId(), e.getGuild().getId());
 							}
 						}
 					}

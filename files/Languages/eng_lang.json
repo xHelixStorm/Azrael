@@ -168,7 +168,7 @@
 	"low_privileges":				"The user **{}** can't be muted because the current role privileges are too low!",
 	"no_mute_role":					"No mute role found! Please register a mute role before continuing!",
 	"missing_permission":			"More permissions required! Please enable the following permission and then try again: ",
-	"missing_permission_in":		"The permission {} is required! Please try again after enabling this permission for the text channel ",
+	"missing_permission_in":		"The permission {} is required! Please enable this/these permission(s) for the text channel ",
 	"cooldown":						"This command is currently having a cooldown, please try again later!",
 	"general_error":				"An internal error has occurred. Please contact an administrator!",
 	"gif_compression":				"Compressing GIF. Please wait...",

@@ -168,7 +168,7 @@
 	"low_privileges":				"Der Benutzer **{}** kann nicht blockiert werden, weil die aktuellen Rollenprivilegien zu niedrig sind!",
 	"no_mute_role":					"Keine Rolle zum Blockieren gefunden! Bitte registrieren Sie eine Rolle um Benutzer zu blockieren, bevor Sie fortfahren!",
 	"missing_permission":			"Weitere Berechtigungen erforderlich! Bitte aktivieren Sie die folgende Berechtigung und versuchen Sie es dann erneut: ",
-	"missing_permission_in":		"Die Berechtigung {} ist erforderlich! Bitte versuchen Sie es erneut, nachdem Sie diese Berechtigung gesetzt haben für den Textkanal ",
+	"missing_permission_in":		"Die Berechtigung {} ist erforderlich! Bitte aktivieren Sie diese Berechtigung(en) für den Textkanal ",
 	"cooldown":						"Dieser Befehl hat derzeit eine Abklingzeit, bitte versuchen Sie es später noch einmal!",
 	"general_error":				"Es ist ein interner Fehler aufgetreten. Bitte kontaktieren Sie einen Administrator!",
 	"gif_compression":				"GIF komprimieren. Bitte warten...",

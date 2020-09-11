@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.util.EnumSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +10,10 @@ import com.vdurmont.emoji.EmojiManager;
 
 import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.priv.react.PrivateMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Competitive;
@@ -166,7 +170,12 @@ public class PrivateMessageReactionAddListener extends ListenerAdapter {
 																if(room_id > 0) {
 																	m.delete().queue();
 																	e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getUser(), Translation.CW_WAR_ACCEPTED).replace("{}", challengerClanName)).build()).queue();
-																	e.getJDA().getGuildById(guild_id).getTextChannelById(reservation.getChannelID()).sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getJDA().getGuildById(guild_id), Translation.CW_WAR_ACCEPTED_2).replaceFirst("\\{\\}", challengeClan.getClanName()).replaceFirst("\\{\\}", challengerClanName).replace("{}", ""+room_id)).build()).queue();
+																	Guild guild = e.getJDA().getGuildById(guild_id);
+																	TextChannel textChannel = guild.getTextChannelById(reservation.getChannelID());
+																	if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))
+																		textChannel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getJDA().getGuildById(guild_id), Translation.CW_WAR_ACCEPTED_2).replaceFirst("\\{\\}", challengeClan.getClanName()).replaceFirst("\\{\\}", challengerClanName).replace("{}", ""+room_id)).build()).queue();
+																	else
+																		logger.warn("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permission required to display the cw reply for channel {} in guild {}", textChannel.getId(), guild.getId());
 																	Competitive.SQLUpdateClanReservationAction(guild_id, user_id, clan_id, reservation.getType(), 1);
 																}
 																else {

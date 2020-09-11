@@ -2,6 +2,7 @@ package commands;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import rankingSystem.RankingMethods;
@@ -133,8 +135,15 @@ public class Rank implements CommandPublic {
 					//print the rank page, if the current experience isn't in the negative area
 					if(currentExperience >= 0) {
 						//draw rank skin if it isn't 0
-						if(user_details.getRankingRank() > 0 && user_details.getRankingIcon() > 0)
-							RankingMethods.getRank(e, name, avatar, convertedExperience, rank, guild_settings.getThemeID(), user_details);
+						if(user_details.getRankingRank() > 0 && user_details.getRankingIcon() > 0) {
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+								RankingMethods.getRank(e, name, avatar, convertedExperience, rank, guild_settings.getThemeID(), user_details);
+							}
+							else {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
+								logger.error("Permission MESSAGE_ATTACH_FILES required to display the rank page in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
+							}
+						}
 						//send an embed if it's 0
 						else {
 							EmbedBuilder message = new EmbedBuilder();

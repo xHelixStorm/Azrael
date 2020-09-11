@@ -1,6 +1,7 @@
 package commands;
 
 import java.awt.Color;
+import java.util.EnumSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import fileManagement.GuildIni;
 import interfaces.CommandPublic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import util.STATIC;
 
@@ -83,7 +85,8 @@ public class Edit implements CommandPublic {
 
 	private static void checkMessage(GuildMessageReceivedEvent e, String channel_id, String message_id, String parameter, final boolean reaction) {
 		if(message_id.length() == 17 || message_id.length() == 18) {
-			if(e.getGuild().getSelfMember().hasPermission(e.getGuild().getTextChannelById(channel_id), Permission.MESSAGE_HISTORY)) {
+			TextChannel textChannel = e.getGuild().getTextChannelById(channel_id);
+			if((e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.MESSAGE_HISTORY)))) {
 				e.getGuild().getTextChannelById(channel_id).retrieveMessageById(message_id).queue(m -> {
 					if(!reaction) {
 						Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "E", channel_id, message_id));

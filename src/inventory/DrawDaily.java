@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.EnumSet;
 
 import javax.imageio.ImageIO;
 
@@ -18,17 +19,18 @@ import constructors.Guilds;
 import enums.Translation;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import util.STATIC;
 
 public class DrawDaily {
 	private final static Logger logger = LoggerFactory.getLogger(DrawDaily.class);
 	
-	public static void draw(GuildMessageReceivedEvent _e, String _reward, Guilds guild_settings) {
+	public static void draw(GuildMessageReceivedEvent e, String obtained, Guilds guild_settings) {
 		try {
 			var theme_id = guild_settings.getThemeID();
 			BufferedImage daily = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/daily_blank.png"));
-			BufferedImage reward = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/"+_reward+".png"));
+			BufferedImage reward = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/"+obtained+".png"));
 			
 			final int rewardX = guild_settings.getDailyRewardX();
 			final int rewardY = guild_settings.getDailyRewardY();
@@ -49,20 +51,25 @@ public class DrawDaily {
 			g.setColor(Color.LIGHT_GRAY);
 			g.setFont(new Font("Nexa Bold", Font.PLAIN, generalTextFontSize));
 			if(descriptionMode == 0)
-				g.drawString(_reward, descriptionX, descriptionY);
+				g.drawString(obtained, descriptionX, descriptionY);
 			else if(descriptionMode == 1)
-				g.drawString(_reward, descriptionStartX+getCenteredString(_reward, fieldSizeX, g), descriptionY);
+				g.drawString(obtained, descriptionStartX+getCenteredString(obtained, fieldSizeX, g), descriptionY);
 			else if(descriptionMode == 2)
-				g.drawString(_reward, getRightString(_reward, descriptionX, g),  descriptionY);
-			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"daily_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png"));
+				g.drawString(obtained, getRightString(obtained, descriptionX, g),  descriptionY);
+			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"daily_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 			g.dispose();
+			
+			final File file1 = new File(IniFileReader.getTempDirectory()+"daily_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
+			e.getChannel().sendFile(file1, "daily.png").queue(message -> {
+				file1.delete();
+			});
 		} catch(IOException ioe) {
-			_e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(_e.getMember(), Translation.EMBED_TITLE_ERROR)+_reward).setDescription(STATIC.getTranslation(_e.getMember(), Translation.DAILY_ERROR_1)).build()).queue();
-			logger.error("Error on drawing the daily reward in guild {}", _e.getGuild().getId(), ioe);
+			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_1)+obtained).build()).queue();
+			else
+				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_1)+obtained).queue();
+			logger.error("Error on drawing the daily reward in guild {}", e.getGuild().getId(), ioe);
 		}
-		File file1 = new File(IniFileReader.getTempDirectory()+"daily_gu"+_e.getGuild().getId()+"us"+_e.getMember().getUser().getId()+".png");
-		_e.getChannel().sendFile(file1, "daily.png").complete();
-		file1.delete();
 	}
 	
 	private static int getCenteredString(String s, int w, Graphics2D g) {

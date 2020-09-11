@@ -1,6 +1,8 @@
 package threads;
 
+import java.awt.Color;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -9,8 +11,13 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiManager;
 
+import enums.Channel;
+import enums.Translation;
 import google.GoogleSheets;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
 import util.STATIC;
 
 public class DelayedVoteUpdate implements Runnable {
@@ -47,19 +54,31 @@ public class DelayedVoteUpdate implements Runnable {
 		try {
 			Thread.sleep(TimeUnit.MINUTES.toMillis(3));
 			
-			guild.getTextChannelById(channel_id).retrieveMessageById(message_id).queue(message -> {
-				for(final var reaction : message.getReactions()) {
-					if(upVoteColumn > 0 && reaction.getReactionEmote().getName().equals(thumbsup))
-						values.set(upVoteColumn-1, Arrays.asList(""+(reaction.getCount()-1)));
-					else if(downVoteColumn > 0 && reaction.getReactionEmote().getName().equals(thumbsdown))
-						values.set(downVoteColumn-1, Arrays.asList(""+(reaction.getCount()-1)));
+			TextChannel textChannel = guild.getTextChannelById(channel_id);
+			if(textChannel != null) {
+				if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
+					textChannel.retrieveMessageById(message_id).queue(message -> {
+						for(final var reaction : message.getReactions()) {
+							if(upVoteColumn > 0 && reaction.getReactionEmote().getName().equals(thumbsup))
+								values.set(upVoteColumn-1, Arrays.asList(""+(reaction.getCount()-1)));
+							else if(downVoteColumn > 0 && reaction.getReactionEmote().getName().equals(thumbsdown))
+								values.set(downVoteColumn-1, Arrays.asList(""+(reaction.getCount()-1)));
+						}
+						try {
+							GoogleSheets.overwriteRowOnSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, row);
+						} catch (Exception e) {
+							logger.error("Google Webservice error in guild {}", guild.getId(), e);
+						}
+					});
 				}
-				try {
-					GoogleSheets.overwriteRowOnSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, row);
-				} catch (Exception e) {
-					logger.error("Google Webservice error in guild {}", guild.getId(), e);
+				else {
+					STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_HISTORY.getName())+textChannel.getAsMention(), Channel.LOG.getType());
+					logger.error("MESSAGE_HISTORY permission required to retrieve the votes from a message for channel {} in guild {}", textChannel.getId(), guild.getId());
 				}
-			});
+			}
+			else {
+				logger.warn("Vote channel {} doesn't exist anymore in guild {}", channel_id, guild.getId());
+			}
 		} catch (InterruptedException e) {
 			logger.debug("Vote task of message ID {} terminated for guild {}", message_id, guild.getId());
 		}

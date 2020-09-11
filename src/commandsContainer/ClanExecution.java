@@ -2,6 +2,7 @@ package commandsContainer;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -48,7 +49,7 @@ public class ClanExecution {
 				if(filteredClans.size() > 10) {
 					final var fixedClans = filteredClans;
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.CLAN_TITLE)).setDescription(out.toString()).build()).queue(m -> {
-						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
+						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ADD_REACTION))) {
 							m.addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).queue();
 							m.addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).queue();
 							Hashes.addTempCache("clan_gu"+e.getGuild().getId()+"me"+m.getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "1").setObject(fixedClans));

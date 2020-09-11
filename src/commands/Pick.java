@@ -1,6 +1,7 @@
 package commands;
 
 import java.awt.Color;
+import java.util.EnumSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,7 @@ public class Pick implements CommandPublic {
 											if(Competitive.SQLPickMember(e.getGuild().getIdLong(), room.getRoomID(), member.getUserID(), picker.getUserID(), picker.getTeam()) > 0) {
 												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PICK_SUCCESS).replaceFirst("\\{\\}", member.getUsername()).replace("{}", ""+picker.getTeam())).build()).queue();
 												//if the Bot can read the history, delete the old room message and reprint, else just print the newest message
-												if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY)) {
+												if((e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_HISTORY)))) {
 													e.getChannel().retrieveMessageById(room.getMessageID()).queue(m -> {
 														m.delete().queue();
 														Changemap.printMessage(e, room, map, false);

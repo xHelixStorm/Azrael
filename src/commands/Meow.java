@@ -1,6 +1,8 @@
 package commands;
 
+import java.awt.Color;
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -12,6 +14,8 @@ import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 import util.STATIC;
@@ -49,10 +53,16 @@ public class Meow implements CommandPublic {
 		
 		//check if any bot channel is registered, else print the image anyway
 		if((bot_channels.size() > 0 && this_channel != null) || bot_channels.size() == 0) {
-			try {
-				MeowExecution.Execute(e, args, path, (bot_channels.size() > 0 ? this_channel.getChannel_ID() : e.getChannel().getIdLong()));
-			} catch (IOException e1) {
-				logger.error("Selected meow picture {} couldn't be found", args[1], e1);
+			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+				try {
+					MeowExecution.Execute(e, args, path, (bot_channels.size() > 0 ? this_channel.getChannel_ID() : e.getChannel().getIdLong()));
+				} catch (IOException e1) {
+					logger.error("Selected meow picture {} couldn't be found", args[1], e1);
+				}
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
+				logger.error("Permission MESSAGE_ATTACH_FILES required to display a cat picture in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
 			}
 		}
 		else {

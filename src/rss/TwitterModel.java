@@ -3,6 +3,7 @@ package rss;
 import java.awt.Color;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -43,7 +44,7 @@ public class TwitterModel {
 		boolean success = false;
 		final TextChannel textChannel = guild.getTextChannelById(rss_channel);
 		if(textChannel != null) {
-			if(guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY)) {
+			if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
 				STATIC.loginTwitter();
 				TwitterFactory tf = STATIC.getTwitterFactory();
 				if(tf != null) {
