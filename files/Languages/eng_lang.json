@@ -679,9 +679,10 @@
 	"subscribe_options_6":			"Type *enable/disable pictures/videos/text* to either enable or disable one of these options!\nAlso, type *add-child/remove-child #<hashtag>* to combine a hashtag with another hashtag or to remove the binding.\nOnce complete, type *exit* to complete the set up.",
 	"subscribe_option_bound":		"Child Hashtag is already bound to ",
 	"subscribe_option_not_bound":	"Child Hashtag is already not bound to ",
-	"subscribe_channel_add":		"Now mention an existing text channel or write a text channel id!",
+	"subscribe_channel_add":		"Now mention an existing text channel or write a text channel id!\nThis subscription is currently set to write in {}.",
 	"subscribe_channel_err_2":		"Text channel doesn't exist!",
 	"subscribe_channel_added":		"Text channel has been set!",
+	"subscribe_channel_default":	"DEFAULT",
 	"subscribe_exit":				"Subscribe command interrupted!",
 	
 	"top_user_left":				"<User has left the server>",

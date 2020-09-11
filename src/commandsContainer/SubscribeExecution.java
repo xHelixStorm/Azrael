@@ -282,8 +282,9 @@ public class SubscribeExecution {
 		EmbedBuilder message = new EmbedBuilder();
 		ArrayList<RSS> subscriptions = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong());
 		if(subscriptions.size() >= feed+1) {
+			final var subscription = subscriptions.get(feed);
 			Hashes.addTempCache(key, new Cache(180000, "set-channel", ""+feed));
-			e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_ADD)).build()).queue();
+			e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_ADD).replace("{}", (subscription.getChannelID() > 0 ? "<#"+subscription.getChannelID()+">" : STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_DEFAULT)))).build()).queue();
 		}
 	}
 	

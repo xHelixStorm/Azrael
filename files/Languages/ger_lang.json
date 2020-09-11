@@ -679,9 +679,10 @@
 	"subscribe_options_6":			"Geben Sie *aktivieren/deaktivieren bilder/videos/text* ein, um eine dieser Optionen entweder zu aktivieren oder zu deaktivieren!\nGeben Sie außerdem *kind-hinzufügen/kind-entfernen #<hashtag>* ein, um einen Hashtag mit einem anderen Hashtag zu kombinieren oder um die Bindung zu entfernen.\nSobald fertig, geben Sie *verlassen* ein, um die Einrichtung abzuschließen.",
 	"subscribe_option_bound":		"Kind Hashtag ist bereits gebunden an ",
 	"subscribe_option_not_bound":	"Kind Hashtag ist bereits nicht gebunden an ",
-	"subscribe_channel_add":		"Erwähnen Sie jetzt einen bestehenden Textkanal oder schreiben Sie eine Textkanal-ID!",
+	"subscribe_channel_add":		"Erwähnen Sie jetzt einen bestehenden Textkanal oder schreiben Sie eine Textkanal-ID!\nDieses Abonnement schreibt derzeit in {}.",
 	"subscribe_channel_err_2":		"Textkanal existiert nicht!",
 	"subscribe_channel_added":		"Textkanal ist gesetzt!",
+	"subscribe_channel_default":	"STANDARD",
 	"subscribe_exit":				"Abonnieren-Befehl unterbrochen!",
 	
 	"top_user_left":				"<Benutzer hat den Server verlassen>",

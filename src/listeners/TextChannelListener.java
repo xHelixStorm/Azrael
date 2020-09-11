@@ -47,7 +47,7 @@ public class TextChannelListener extends ListenerAdapter {
 			Azrael.SQLDeleteChannel_Filter(e.getChannel().getIdLong());
 			Azrael.SQLDeleteChannelConf(e.getChannel().getIdLong(), e.getGuild().getIdLong());
 			Azrael.SQLDeleteChannels(e.getChannel().getIdLong());
-			Hashes.clearChannels();
+			Hashes.removeChannels(e.getGuild().getIdLong());
 			logger.debug("TextChannel {} for guild {} has been deleted from all tables!", e.getChannel().getId(), e.getGuild().getId());
 		}).start();
 	}
@@ -56,7 +56,7 @@ public class TextChannelListener extends ListenerAdapter {
 		var e = (e1 != null ? e1 : e2);
 		//insert text channel into table
 		if(Azrael.SQLInsertChannels(e.getChannel().getIdLong(), e.getChannel().getName()) > 0) {
-			Hashes.clearChannels();
+			Hashes.removeChannels(e.getGuild().getIdLong());
 			logger.debug("TextChannel {} has been created for guild {}", e.getChannel().getId(), e.getGuild().getId());
 		}
 		else {
