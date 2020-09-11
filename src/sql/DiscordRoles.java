@@ -175,7 +175,8 @@ public class DiscordRoles {
 
 	
 	public static ArrayList<Roles> SQLgetRoles(long _guild_id) {
-		if(Hashes.getDiscordRole(_guild_id) == null) {
+		final var cachedRoles = Hashes.getDiscordRole(_guild_id);
+		if(cachedRoles == null) {
 			logger.trace("SQLgetRoles launched. Passed params {}", _guild_id);
 			ArrayList<Roles> roles = new ArrayList<Roles>();
 			Connection myConn = null;
@@ -209,11 +210,12 @@ public class DiscordRoles {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getDiscordRole(_guild_id);
+		return cachedRoles;
 	}
 	
 	public static ArrayList<Roles> SQLgetReactionRoles(long _guild_id) {
-		if(Hashes.getReactionRoles(_guild_id) == null) {
+		final var roles = Hashes.getReactionRoles(_guild_id);
+		if(roles == null) {
 			logger.trace("SQLgetReactionRoles launched. Passed params {}", _guild_id);
 			ArrayList<Roles> reactionRoles = new ArrayList<Roles>();
 			Connection myConn = null;
@@ -246,7 +248,7 @@ public class DiscordRoles {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getReactionRoles(_guild_id);
+		return roles;
 	}
 	
 	public static int SQLUpdateRoleName(long _guild_id, long _role_id, String _name) {

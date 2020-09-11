@@ -518,7 +518,8 @@ public class Azrael {
 	}
 	
 	public static String SQLgetUserLang(long _user_id) {
-		if(Hashes.getLanguage(_user_id) == null) {
+		final var language = Hashes.getLanguage(_user_id);
+		if(language == null) {
 			logger.trace("SQLgetUserLang launched. Passed params {}", _user_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -543,7 +544,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getLanguage(_user_id);
+		return language;
 	}
 	
 	public static long SQLgetGuild(long _guild_id) {
@@ -1413,7 +1414,8 @@ public class Azrael {
 	}
 	
 	public static synchronized ArrayList<Channels> SQLgetChannels(long _guild_id) {
-		if(Hashes.getChannels(_guild_id) == null) {
+		final var cachedChannels = Hashes.getChannels(_guild_id);
+		if(cachedChannels == null) {
 			logger.trace("SQLgetChannels launched. Passed params {}", _guild_id);
 			ArrayList<Channels> channels = new ArrayList<Channels>();
 			Connection myConn = null;
@@ -1449,7 +1451,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getChannels(_guild_id);
+		return cachedChannels;
 	}
 	
 	public static ArrayList<Channels> SQLgetChannelTypes() {
@@ -1526,7 +1528,8 @@ public class Azrael {
 	}
 	
 	public synchronized static ArrayList<String> SQLgetChannel_Filter(long _channel_id) {
-		if(Hashes.getFilterLang(_channel_id) == null) {
+		final var censor = Hashes.getFilterLang(_channel_id);
+		if(censor == null) {
 			logger.trace("SQLgetChannel_Filter launched. Passed params {}", _channel_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1552,11 +1555,12 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getFilterLang(_channel_id);
+		return censor;
 	}
 	
 	public synchronized static ArrayList<String> SQLgetFilter(String _filter_lang, long _guild_id) {
-		if(Hashes.getQuerryResult(_filter_lang+"_"+_guild_id) == null) {
+		final var query = Hashes.getQuerryResult(_filter_lang+"_"+_guild_id);
+		if(query == null) {
 			logger.trace("SQLgetFilter launched. Passed params {}, {}", _filter_lang, _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1590,7 +1594,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getQuerryResult(_filter_lang+"_"+_guild_id);
+		return query;
 	}
 	
 	public static int SQLInsertWordFilter(String _lang, String _word, long _guild_id) {
@@ -1695,7 +1699,8 @@ public class Azrael {
 	}
 	
 	public synchronized static ArrayList<String> SQLgetStaffNames(long _guild_id) {
-		if(Hashes.getQuerryResult("staff-names_"+_guild_id) == null) {
+		final var query = Hashes.getQuerryResult("staff-names_"+_guild_id);
+		if(query == null) {
 			logger.trace("SQLgetStaffNames launched. Passed params {}", _guild_id);
 			ArrayList<String> staff_names = new ArrayList<String>();
 			Connection myConn = null;
@@ -1721,7 +1726,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getQuerryResult("staff-names_"+_guild_id);
+		return query;
 	}
 	
 	public static int SQLInsertStaffName(String _word, long _guild_id) {
@@ -1844,7 +1849,8 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetFunnyNames(long _guild_id) {
-		if(Hashes.getQuerryResult("funny-names_"+_guild_id) == null) {
+		final var query = Hashes.getQuerryResult("funny-names_"+_guild_id);
+		if(query == null) {
 			ArrayList<String> names = new ArrayList<String>();
 			logger.trace("SQLgetFunnyNames launched. Passed params {}", _guild_id);
 			Connection myConn = null;
@@ -1870,7 +1876,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getQuerryResult("funny-names_"+_guild_id);
+		return query;
 	}
 	
 	public static int SQLInsertFunnyNames(String _word, long _guild_id) {
@@ -1914,7 +1920,8 @@ public class Azrael {
 	}
 	
 	public static ArrayList<NameFilter> SQLgetNameFilter(long _guild_id) {
-		if(Hashes.getNameFilter(_guild_id) == null) {
+		final var namesFilter = Hashes.getNameFilter(_guild_id); 
+		if(namesFilter == null) {
 			logger.trace("SQLgetNameFilter launched. Passed params {}", _guild_id);
 			ArrayList<NameFilter> names = new ArrayList<NameFilter>();
 			Connection myConn = null;
@@ -1940,7 +1947,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getNameFilter(_guild_id);
+		return namesFilter;
 	}
 	
 	public static int SQLInsertNameFilter(String _word, boolean _kick, long _guild_id) {
@@ -2011,7 +2018,8 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetFilterLanguages() {
-		if(Hashes.getFilterLang(0) == null) {
+		final var languages = Hashes.getFilterLang(0);
+		if(languages == null) {
 			logger.trace("SQLgetFilterLanguages launched. No params passed");
 			ArrayList<String> filter_lang = new ArrayList<String>();
 			Connection myConn = null;
@@ -2035,7 +2043,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getFilterLang(0);
+		return languages;
 	}
 	
 	public static int SQLInsertRSS(String _url, long _guild_id, int _type) {
@@ -2091,7 +2099,8 @@ public class Azrael {
 	}
 	
 	public static ArrayList<RSS> SQLgetSubscriptions(long _guild_id) {
-		if(Hashes.getFeed(_guild_id) == null) {
+		final var feed = Hashes.getFeed(_guild_id);
+		if(feed == null) {
 			logger.trace("SQLgetSubscriptions launched. Params passed {}", _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -2128,7 +2137,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getFeed(_guild_id);
+		return feed;
 	}
 	
 	public static ArrayList<RSS> SQLgetSubscriptions(long _guild_id, int _type) {
@@ -2338,7 +2347,8 @@ public class Azrael {
 	}
 	
 	public static synchronized ArrayList<String> SQLgetURLBlacklist(long _guild_id) {
-		if(Hashes.getURLBlacklist(_guild_id) == null) {
+		final var blacklist = Hashes.getURLBlacklist(_guild_id); 
+		if(blacklist == null) {
 			logger.trace("SQLgetURLBlacklist launched. Passed params {}", _guild_id);
 			ArrayList<String> urls = new ArrayList<String>();
 			Connection myConn = null;
@@ -2363,7 +2373,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getURLBlacklist(_guild_id);
+		return blacklist;
 	}
 	
 	public static int SQLInsertURLBlacklist(String _url, long _guild_id) {
@@ -2407,7 +2417,8 @@ public class Azrael {
 	}
 	
 	public static synchronized ArrayList<String> SQLgetURLWhitelist(long _guild_id) {
-		if(Hashes.getURLWhitelist(_guild_id) == null) {
+		final var whitelist = Hashes.getURLWhitelist(_guild_id);
+		if(whitelist == null) {
 			logger.trace("SQLgetURLWhitelist launched. Passed params {}", _guild_id);
 			ArrayList<String> urls = new ArrayList<String>();
 			Connection myConn = null;
@@ -2432,7 +2443,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getURLWhitelist(_guild_id);
+		return whitelist;
 	}
 	
 	public static int SQLInsertURLWhitelist(String _url, long _guild_id) {
@@ -2476,7 +2487,8 @@ public class Azrael {
 	}
 	
 	public static synchronized ArrayList<String> SQLgetTweetBlacklist(long _guild_id) {
-		if(Hashes.getTweetBlacklist(_guild_id) == null) {
+		final var blacklist = Hashes.getTweetBlacklist(_guild_id);
+		if(blacklist == null) {
 			logger.trace("SQLgetTweetBlacklist launched. Passed params {}", _guild_id);
 			ArrayList<String> urls = new ArrayList<String>();
 			Connection myConn = null;
@@ -2501,7 +2513,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getTweetBlacklist(_guild_id);
+		return blacklist;
 	}
 	
 	public static int SQLInsertTweetBlacklist(String _username, long _guild_id) {
@@ -2545,7 +2557,8 @@ public class Azrael {
 	}
 	
 	public static synchronized Watchlist SQLgetWatchlist(long _user_id, long _guild_id) {
-		if(Hashes.getWatchlist(_guild_id+"-"+_user_id) == null) {
+		final var cachedWatchlist = Hashes.getWatchlist(_guild_id+"-"+_user_id);
+		if(cachedWatchlist == null) {
 			logger.trace("SQLgetWatchlist launched. Params passed {}, {}", _user_id, _guild_id);
 			Watchlist watchlist = null;
 			Connection myConn = null;
@@ -2572,7 +2585,7 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getWatchlist(_guild_id+"-"+_user_id);
+		return cachedWatchlist;
 	}
 	
 	public static synchronized void SQLgetWholeWatchlist() {

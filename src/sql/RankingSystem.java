@@ -536,7 +536,8 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<Roles> SQLgetRoles(long _guild_id) {
-		if(Hashes.getRankingRoles(_guild_id) == null) {
+		final var cachedRoles = Hashes.getRankingRoles(_guild_id);
+		if(cachedRoles == null) {
 			logger.trace("SQLgetRoles launched. Passed params {}", _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -562,7 +563,7 @@ public class RankingSystem {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getRankingRoles(_guild_id);
+		return cachedRoles;
 	}
 	
 	public static boolean SQLgetRole(long _role_id, long _guild_id) {
@@ -1717,33 +1718,6 @@ public class RankingSystem {
 		}
 	}
 	
-	//themes
-	public static boolean SQLgetThemes() {
-		logger.trace("SQLgetThemes launched. No params has been passed");
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT theme, theme_id FROM themes");
-			var success = false;
-			stmt = myConn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			while(rs.next()) {
-				Hashes.addTheme(rs.getString(1), rs.getInt(2));
-				success = true;
-			}
-			return success;
-		} catch (SQLException e) {
-			logger.error("SQLgetThemes Exception", e);
-			return false;
-		} finally {
-		try { rs.close(); } catch (Exception e) { /* ignored */ }
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	//JOINS
 	public synchronized static Ranking SQLgetWholeRankView(long _user_id, long _guild_id) {
 		final var user = Hashes.getRanking(_guild_id, _user_id); 
@@ -1797,7 +1771,8 @@ public class RankingSystem {
 	}
 	
 	public static Guilds SQLgetGuild(long _guild_id) {
-		if(Hashes.getStatus(_guild_id) == null) {
+		final var status = Hashes.getStatus(_guild_id);
+		if(status == null) {
 			logger.trace("SQLgetGuild launched. Passed params {}", _guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1886,11 +1861,12 @@ public class RankingSystem {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getStatus(_guild_id);
+		return status;
 	}
 	
 	public static ArrayList<Level> SQLgetLevels(long _guild_id, int _theme_id) {
-		if(Hashes.getRankingLevels(_guild_id+"_"+_theme_id) == null) {
+		final var levelList = Hashes.getRankingLevels(_guild_id+"_"+_theme_id);
+		if(levelList == null) {
 			logger.trace("SQLgetLevels launched. Passed params {}, {}", _guild_id, _theme_id);
 			ArrayList<Level> levels = new ArrayList<Level>();
 			Connection myConn = null;
@@ -1917,11 +1893,12 @@ public class RankingSystem {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getRankingLevels(_guild_id+"_"+_theme_id);
+		return levelList;
 	}
 	
 	public static ArrayList<Skins> SQLgetSkinshopContentAndType(long _guild_id, int _theme_id) {
-		if(Hashes.getShopContent(_guild_id) == null) {
+		final var shop = Hashes.getShopContent(_guild_id);
+		if(shop == null) {
 			logger.trace("SQLgetSkinshopContentAndType launched. Params passed {}, {}", _guild_id, _theme_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1955,7 +1932,7 @@ public class RankingSystem {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getShopContent(_guild_id);
+		return shop;
 	}
 	
 	public static int SQLgetItemID(long _user_id, long _guild_id, int _item_id, int _theme_id) {
@@ -2333,7 +2310,8 @@ public class RankingSystem {
 	}
 	
 	public static ArrayList<Dailies> SQLgetDailiesAndType(long _guild_id, int _theme_id) {
-		if(Hashes.getDailyItems(_guild_id) == null) {
+		final var dailyItems = Hashes.getDailyItems(_guild_id);
+		if(dailyItems == null) {
 			logger.trace("SQLgetDailiesAndType launched. Params passed {}, {}", _guild_id, _theme_id);
 			ArrayList<Dailies> dailies = new ArrayList<Dailies>();
 			Connection myConn = null;
@@ -2366,7 +2344,7 @@ public class RankingSystem {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getDailyItems(_guild_id);
+		return dailyItems;
 	}
 	
 	//Transaction

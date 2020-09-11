@@ -245,8 +245,9 @@ public class RankingSystemItems {
 	
 	
 	//weapon_category
-	public static ArrayList<String> SQLgetWeaponCategories(long _guild_id, int _theme_id, boolean _overrideSkill){
-		if(Hashes.getWeaponCategories(_guild_id) == null) {
+	public static ArrayList<String> SQLgetWeaponCategories(long _guild_id, int _theme_id, boolean _overrideSkill) {
+		final var weaponCategories = Hashes.getWeaponCategories(_guild_id);
+		if(weaponCategories == null) {
 			logger.trace("SQLgetWeaponCategories launched. Params passed {}, {}", _guild_id, _theme_id);
 			ArrayList<String> categories = new ArrayList<String>();
 			Connection myConn = null;
@@ -272,12 +273,13 @@ public class RankingSystemItems {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getWeaponCategories(_guild_id);
+		return weaponCategories;
 	}
 	
 	//weapon_abbreviation
 	public static ArrayList<WeaponAbbvs> SQLgetWeaponAbbvs(long _guild_id, int _theme_id) {
-		if(Hashes.getWeaponAbbreviations(_guild_id) == null) {
+		final var weapons = Hashes.getWeaponAbbreviations(_guild_id);
+		if(weapons == null) {
 			logger.trace("SQLgetWeaponAbbvs launched. Params passed {}, {}", _guild_id, _theme_id);
 			ArrayList<WeaponAbbvs> abbreviations = new ArrayList<WeaponAbbvs>();
 			Connection myConn = null;
@@ -304,12 +306,13 @@ public class RankingSystemItems {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getWeaponAbbreviations(_guild_id);
+		return weapons;
 	}
 	
 	//weapon_stats
 	public static ArrayList<WeaponStats> SQLgetWeaponStats(long _guild_id, int _theme_id) {
-		if(Hashes.getWeaponStats(_guild_id) == null) {
+		final var weaponStats = Hashes.getWeaponStats(_guild_id);
+		if(weaponStats == null) {
 			logger.trace("SQLgetWeaponStats launched. Params passed {}, {}", _guild_id, _theme_id);
 			ArrayList<WeaponStats> stats = new ArrayList<WeaponStats>();
 			Connection myConn = null;
@@ -336,12 +339,13 @@ public class RankingSystemItems {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getWeaponStats(_guild_id);
+		return weaponStats;
 	}
 	
 	//JOINS
 	public static ArrayList<Weapons> SQLgetWholeWeaponShop(long _guild_id, int _theme_id) {
-		if(Hashes.getWeaponShopContent(_guild_id) == null) {
+		final var shop = Hashes.getWeaponShopContent(_guild_id);
+		if(shop == null) {
 			logger.trace("SQLgetWholeWeaponShop launched. Params passed {}", _guild_id);
 			ArrayList<Weapons> weapons = new ArrayList<Weapons>();
 			Connection myConn = null;
@@ -432,11 +436,12 @@ public class RankingSystemItems {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getWeaponShopContent(_guild_id);
+		return shop;
 	}
 	
 	public static ArrayList<Skills> SQLgetSkills(long _guild_id, int _theme_id) {
-		if(Hashes.getSkillShop(_guild_id) == null) {
+		final var shop = Hashes.getSkillShop(_guild_id);
+		if(shop == null) {
 			logger.trace("SQLgetSkills launched. Params passed {}, {}", _guild_id, _theme_id);
 			ArrayList<Skills> skills = new ArrayList<Skills>();
 			Connection myConn = null;
@@ -469,7 +474,7 @@ public class RankingSystemItems {
 			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return Hashes.getSkillShop(_guild_id);
+		return shop;
 	}
 	
 	public static InventoryContent SQLgetNumberAndExpirationFromInventory(long _user_id, long _guild_id, int _item_id, String _status, int _theme_id, boolean _weapon){

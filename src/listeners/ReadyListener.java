@@ -81,10 +81,6 @@ public class ReadyListener extends ListenerAdapter {
 		GuildIni.initialize();
 		STATIC.loginTwitter();
 
-		//retrieve all available ranking themes
-		if(RankingSystem.SQLgetThemes() == false) {
-			logger.error("Themes couldn't be retried from RankingSystem.themes");
-		}
 		//Iterate through all joined guilds
 		for(Guild guild : e.getJDA().getGuilds()) {
 			//create a guild ini file for new servers or verify if there are any old or missing variables that need to be added or removed

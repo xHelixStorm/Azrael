@@ -55,7 +55,6 @@ public class Hashes {
     private static final ConcurrentMap<Long, ArrayList<String>> weaponCategories = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final ConcurrentMap<Long, ArrayList<WeaponAbbvs>> weaponAbbvs = new ConcurrentHashMap<Long, ArrayList<WeaponAbbvs>>();
     private static final LinkedHashMap<Long, ArrayList<WeaponStats>> weaponStats = new LinkedHashMap<Long, ArrayList<WeaponStats>>();
-    private static final ConcurrentMap<String, Integer> themes = new ConcurrentHashMap<String, Integer>();
     private static final ConcurrentMap<Long, ArrayList<Channels>> channels = new ConcurrentHashMap<Long, ArrayList<Channels>>();
     private static final ConcurrentHashMap<String, String> commentedUsers = new ConcurrentHashMap<String, String>();
     private static final ConcurrentHashMap<String, Cache> tempCache = new ConcurrentHashMap<String, Cache>();
@@ -168,9 +167,6 @@ public class Hashes {
 	}
 	public static void addWeaponStat(Long _key, ArrayList<WeaponStats> _stats) {
 		weaponStats.put(_key, _stats);
-	}
-	public static void addTheme(String _key, Integer _id) {
-		themes.put(_key, _id);
 	}
 	public static void addChannels(Long _key, ArrayList<Channels> _channels) {
 		channels.put(_key, _channels);
@@ -315,9 +311,6 @@ public class Hashes {
 	}
 	public static ArrayList<WeaponStats> getWeaponStats(Long _key) {
 		return weaponStats.get(_key);
-	}
-	public static Integer getTheme(String _key) {
-		return themes.get(_key);
 	}
 	public static ArrayList<Channels> getChannels(Long _key) {
 		return channels.get(_key);
@@ -465,9 +458,6 @@ public class Hashes {
 	}
 	public static void clearWeaponStats() {
 		weaponStats.clear();
-	}
-	public static void clearThemes() {
-		themes.clear();
 	}
 	public static void clearChannels() {
 		channels.clear();
