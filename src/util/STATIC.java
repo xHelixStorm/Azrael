@@ -72,7 +72,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.26.486";
+	private static final String VERSION = "7.26.487";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -495,6 +495,7 @@ public class STATIC {
 			final var tokens = IniFileReader.getTwitterKeys();
 			if(tokens[0] != null && tokens[1] != null && tokens[2] != null && tokens[3] != null) {
 				ConfigurationBuilder cb = new ConfigurationBuilder()
+						.setDebugEnabled(false)
 						.setOAuthConsumerKey(tokens[0])
 						.setOAuthConsumerSecret(tokens[1])
 						.setOAuthAccessToken(tokens[2])
