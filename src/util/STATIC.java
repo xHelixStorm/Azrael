@@ -13,6 +13,8 @@ import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +47,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
@@ -72,7 +75,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.26.490";
+	private static final String VERSION = "7.27.491";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -648,11 +651,11 @@ public class STATIC {
 		if(channel != null) {
 			final TextChannel textChannel = guild.getTextChannelById(channel.getChannel_ID());
 			if(textChannel != null) {
-				if(embed != null && guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)) {
+				if(embed != null && (guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))) {
 					textChannel.sendMessage(embed.setDescription(message).build()).queue();
 					return true;
 				}
-				else if(embed == null && guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE)) {
+				else if(embed == null && (guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE) || setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE)))) {
 					textChannel.sendMessage(message).queue();
 				}
 				else {
@@ -671,17 +674,25 @@ public class STATIC {
 		if(channel != null) {
 			final TextChannel textChannel = guild.getTextChannelById(channel.getChannel_ID());
 			if(textChannel != null) {
-				if(embed != null && guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)) {
+				if(embed != null && (guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))) {
 					textChannel.sendMessage(embed.setDescription(message).build()).queue();
 					return true;
 				}
-				else if(embed == null && guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE)) {
+				else if(embed == null && (guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE) || setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE)))) {
 					textChannel.sendMessage(message).queue();
 				}
 				else {
 					logger.warn("MESSAGE_WRITE or MESSAGE_EMBED_LINKS permission missing to send a message in channel {}", textChannel.getId());
 				}
 			}
+		}
+		return false;
+	}
+	
+	public static boolean setPermissions(Guild guild, TextChannel textChannel, Collection<Permission> permissions) {
+		if(guild.getSelfMember().hasPermission(Permission.MANAGE_CHANNEL)) {
+			textChannel.getManager().putPermissionOverride(guild.getSelfMember(), permissions, null).complete();
+			logger.info("Permissions overriden for text channel {} in guild {}", textChannel.getId(), guild.getId());
 		}
 		return false;
 	}
