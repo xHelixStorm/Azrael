@@ -3,6 +3,7 @@ package commandsContainer;
 import java.awt.Color;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -1790,7 +1791,7 @@ public class UserExecution {
 							final var currentMessage = messages.get(i).get(0);
 							TextChannel channel = e.getGuild().getTextChannelById(currentMessage.getChannelID());
 							if(channel != null) {
-								if(e.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_HISTORY)) {
+								if(e.getGuild().getSelfMember().hasPermission(channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), channel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY))) {
 									Message m = e.getGuild().getTextChannelById(currentMessage.getChannelID()).retrieveMessageById(currentMessage.getMessageID()).complete();
 									for(final var cachedMessage: messages.get(i)) {
 										collected_messages.append((cachedMessage.isEdit() ? "EDIT" : "MESSAGE")+" ["+cachedMessage.getTime().toString()+" - "+cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")]: "+cachedMessage.getMessage());
@@ -1804,8 +1805,8 @@ public class UserExecution {
 								else {
 									if(channelErr.contains(currentMessage.getChannelID())) {
 										error.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS));
-										e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_HISTORY.getName())+"<#"+currentMessage.getChannelID()+">").build()).queue();
-										logger.warn("MESSAGE HISTORY permission to retrieve messages is missing in guild {}!", e.getGuild().getId());
+										e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_MANAGE+" and "+Permission.MESSAGE_HISTORY.getName())+channel.getAsMention()).build()).queue();
+										logger.warn("MESSAGE_MANAGE and MESSAGE_HISTORY permissions rewquired to retrieve and delete messages in channel {} for guild {}", channel.getId(), e.getGuild().getId());
 										channelErr.add(currentMessage.getChannelID());
 									}
 									hash_counter--;
