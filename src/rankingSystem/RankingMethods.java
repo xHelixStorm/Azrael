@@ -151,12 +151,15 @@ public class RankingMethods extends ListenerAdapter {
 							file1.delete();
 							message.delete().queue();
 							final File file2 = new File(IniFileReader.getTempDirectory()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-							e.getChannel().sendFile(file2, "level_up."+skin.getFileType()).queue(complete -> {
-								file2.delete();
-							}, error -> {
+							try {
+								e.getChannel().sendFile(file2, "level_up."+skin.getFileType()).queue(complete -> {
+									file2.delete();
+								});
+							} catch(IllegalArgumentException e1) {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+								logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
 								file2.delete();
-							});;
+							}
 						}
 					} catch(IOException | DataFormatException e1) {
 						logger.error("Compression error for file {}", skin.getSkinDescription()+skin.getFileType(), e1);
@@ -296,12 +299,15 @@ public class RankingMethods extends ListenerAdapter {
 							file1.delete();
 							message.delete().queue();
 							final File file2 = new File(IniFileReader.getTempDirectory()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-							e.getChannel().sendFile(file2, "rank."+skin.getFileType()).queue(complete -> {
-								file2.delete();
-							}, error -> {
+							try {
+								e.getChannel().sendFile(file2, "rank."+skin.getFileType()).queue(complete -> {
+									file2.delete();
+								});
+							} catch(IllegalArgumentException e1) {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+								logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
 								file2.delete();
-							});
+							}
 						}
 					} catch(IOException | DataFormatException e1) {
 						e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
@@ -536,12 +542,15 @@ public class RankingMethods extends ListenerAdapter {
 							file1.delete();
 							message.delete().queue();
 							final File file2 = new File(IniFileReader.getTempDirectory()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-							e.getChannel().sendFile(file2, "profile."+skin.getFileType()).queue(complete -> {
-								file2.delete();
-							}, error -> {
+							try {
+								e.getChannel().sendFile(file2, "profile."+skin.getFileType()).queue(complete -> {
+									file2.delete();
+								});
+							} catch(IllegalArgumentException e1) {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+								logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
 								file2.delete();
-							});;
+							}
 						}
 					} catch(IOException | DataFormatException e1) {
 						e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
