@@ -3,6 +3,7 @@ package sql;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.slf4j.Logger;
@@ -111,6 +112,30 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 			}
 		} catch (SQLException e) {
 			logger.error("SQLCodeUsageLog Exception", e);
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLgetLoginType(long _user_id) {
+		logger.trace("SQLgetLoginType launched. Passed params {}", _user_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
+			String sql = ("SELECT auth_type FROM users WHERE user_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return rs.getInt(1);
+			}
+			return 0;
+		} catch (SQLException e) {
+			logger.error("SQLgetLoginType Exception", e);
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
