@@ -234,6 +234,8 @@ public class Hashes {
 	
 	public static ArrayList<Messages> getMessagePool(long _key, long _message_id) {
 		final var message_pool = guild_message_pool.get(_key);
+		if(message_pool == null)
+			return null;
 		return message_pool.get(_message_id);
 	}
 	public static ArrayList<String> getFilterLang(long _channel_id) {
@@ -258,7 +260,10 @@ public class Hashes {
 		return status.get(_key);
 	}
 	public static Ranking getRanking(long _key, long _key2) {
-		return guild_ranking.get(_key).get(_key2);
+		final var ranking = guild_ranking.get(_key);
+		if(ranking == null)
+			return null;
+		return ranking.get(_key2);
 	}
 	public static ArrayList<Roles> getRankingRoles(Long _key) {
 		return ranking_roles.get(_key);
