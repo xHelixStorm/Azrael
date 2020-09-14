@@ -160,6 +160,7 @@ public class GuildIni {
 		commandLevels.put("Rank", "1");
 		commandLevels.put("Register", "20");
 		commandLevels.put("RegisterRole", "20");
+		commandLevels.put("RegisterCategory", "20");
 		commandLevels.put("RegisterTextChannel", "20");
 		commandLevels.put("RegisterTextChannelURL", "20");
 		commandLevels.put("RegisterTextChannelTXT", "20");
@@ -704,6 +705,10 @@ public class GuildIni {
 	public static int getRegisterRoleLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "RegisterRole", int.class);
+	}
+	public static int getRegisterCategoryLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "RegisterCategory", int.class);
 	}
 	public static int getRegisterTextChannelLevel(long guild_id) {
 		Ini ini = readIni(guild_id);

@@ -95,7 +95,7 @@ public class RegisterRole {
 		long role_id;
 		
 		if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getRegisterRoleLevel(e.getGuild().getIdLong())) || adminPermission) {
-			Pattern pattern = Pattern.compile("(adm|mod|com|bot|mut|rea|boo)");
+			Pattern pattern = Pattern.compile("(adm|mod|com|bot|mut|rea|boo|ver)");
 			Matcher matcher = pattern.matcher(_args[1].toLowerCase());
 			if(_args.length > 2 && matcher.find()) {
 				category_abv = matcher.group();

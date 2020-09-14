@@ -38,6 +38,7 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearShopContent();
 		Hashes.clearLevelSkins();
 		Hashes.clearDailyItems();
+		Hashes.clearCategories();
 		Hashes.clearSkillShop();
 		Hashes.clearActionlog();
 		Hashes.clearRankSkins();

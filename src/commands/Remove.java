@@ -130,6 +130,53 @@ public class Remove implements CommandPublic {
 				}
 			}
 		}
+		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY))) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CATEGORY_HELP)).build()).queue();
+		}
+		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY))) {
+			if(args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))) {
+				final int result = Azrael.SQLDeleteAllCategoryConfs(e.getGuild().getIdLong());
+				if(result > 0) {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CATEGORIES)).build()).queue();
+					Hashes.removeCategories(e.getGuild().getIdLong());
+					logger.debug("User {} has removed all registered categories from guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+				}
+				else if(result == 0) {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CATEGORIES_ERR)).build()).queue();
+				}
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("Categories couldn't be removed from Azrael.category_conf table in guild {}", e.getGuild().getId());
+				}
+			}
+			else {
+				var category_string = args[1].replaceAll("[<>#]*", "");
+				if(!category_string.matches("[^\\d]*")) {
+					var category_id = Long.parseLong(category_string);
+					if(e.getGuild().getCategoryById(category_id) != null) {
+						final var result = Azrael.SQLDeleteCategoryConf(category_id);
+						if(result > 0) {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CATEGORY)).build()).queue();
+							Hashes.removeCategories(e.getGuild().getIdLong());
+							logger.debug("User {} has removed the category {} from guild {}", e.getMember().getUser().getId(), category_id, e.getGuild().getId());
+						}
+						else if(result == 0) {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CATEGORY_ERR)).build()).queue();
+						}
+						else {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("Category {} couldn't be removed from Azrael.category_conf table in guild {}", e.getGuild().getId());
+						}
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.CATEGORY_NOT_EXISTS)).build()).queue();
+					}
+				}
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_CATEGORY)).build()).queue();
+				}
+			}
+		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL))) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_TXT_CHANNEL_HELP)).build()).queue();
 		}

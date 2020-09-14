@@ -5,6 +5,7 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import commandsContainer.RegisterCategory;
 import commandsContainer.RegisterChannel;
 import commandsContainer.RegisterRankingRole;
 import commandsContainer.RegisterRole;
@@ -76,6 +77,18 @@ public class Register implements CommandPublic {
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
 				RegisterRole.runCommand(e, guild_id, args, adminPermission);
+			}
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY))) {
+				final var commandLevel = GuildIni.getRegisterCategoryLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+					RegisterCategory.runHelp(e);
+				}
+				else {
+					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
+				}
+			}
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY))) {
+				RegisterCategory.runCommand(e, args, adminPermission);
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL))) {
 				final var commandLevel = GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong());

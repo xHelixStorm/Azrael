@@ -57,6 +57,7 @@ import commands.Write;
 import fileManagement.IniFileReader;
 import listeners.AvatarUpdateListener;
 import listeners.BanListener;
+import listeners.CategoryListener;
 import listeners.GuildJoinListener;
 import listeners.GuildLeaveListener;
 import listeners.GuildListener;
@@ -268,7 +269,8 @@ public class Main {
 			new RoleCreateListener(),
 			new TextChannelListener(),
 			new RoleNameUpdateListener(),
-			new PrivateMessageReactionAddListener()
+			new PrivateMessageReactionAddListener(),
+			new CategoryListener()
 		);
 	}
 }

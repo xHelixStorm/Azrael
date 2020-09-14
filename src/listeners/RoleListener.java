@@ -344,13 +344,15 @@ public class RoleListener extends ListenerAdapter {
 	private boolean removeRoles(GuildMemberRoleAddEvent e, long mute_id) {
 		//check that the bot has the manage roles permission before removing roles
 		if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+			//get role exceptions to not remove
+			final var verRole = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("ver")).findAny().orElse(null);
 			//remove all roles on mute role reassign except for the mute role itself
 			for(Role role : e.getMember().getRoles()) {
-				if(role.getIdLong() != mute_id) {
+				if(role.getIdLong() != mute_id && (verRole == null || (verRole != null && role.getIdLong() != verRole.getRole_ID()))) {
 					e.getGuild().removeRoleFromMember(e.getMember(), role).queue(
 						//don't remove the role, if it can't be removed. Like booster role
-						success -> logger.info("{} role got removed from {} in guild {}", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId()),
-						error -> logger.info("{} role could not be removed from {} in guild {}. It's a persistant role!", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId())
+						success -> logger.trace("{} role got removed from {} in guild {}", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId()),
+						error -> logger.warn("{} role could not be removed from {} in guild {}. It's a persistant role!", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId())
 					);
 				}
 			}

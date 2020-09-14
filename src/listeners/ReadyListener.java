@@ -249,6 +249,7 @@ public class ReadyListener extends ListenerAdapter {
 			if(GuildIni.getNotifications(g.getIdLong()))
 				STATIC.writeToRemoteChannel(g, null, "Bot is now operational!", Channel.LOG.getType());
 			executor.execute(new RoleExtend(g));
+			Azrael.SQLBulkInsertCategories(g.getCategories());
 			Azrael.SQLBulkInsertChannels(g.getTextChannels());
 		});
 		

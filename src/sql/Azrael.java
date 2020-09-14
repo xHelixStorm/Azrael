@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constructors.Bancollect;
+import constructors.CategoryConf;
 import constructors.Channels;
 import constructors.GoogleAPISetup;
 import constructors.GoogleEvents;
@@ -30,6 +31,7 @@ import core.Hashes;
 import enums.GoogleDD;
 import enums.GoogleEvent;
 import fileManagement.IniFileReader;
+import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import util.STATIC;
@@ -3336,6 +3338,210 @@ public class Azrael {
 			logger.error("SQLDeleteTweetLog Exception", e);
 			return 0;
 		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static void SQLBulkInsertCategories(List<Category> _categories) {
+		logger.trace("SQLBulkInsertCategories launched. Array param passed");
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn.setAutoCommit(false); 
+			String sql = ("INSERT INTO categories (category_id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)");
+			stmt = myConn.prepareStatement(sql);
+			for(final var category : _categories) {
+				stmt.setLong(1, category.getIdLong());
+				stmt.setString(2, category.getName());
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			myConn.commit();
+		} catch (SQLException e) {
+			logger.error("SQLBulkInsertCategories Exception", e);
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<CategoryConf> SQLgetCategories(long _guild_id) {
+		final var cachedCategories = Hashes.getCategories(_guild_id);
+		if(cachedCategories == null) {
+			logger.trace("SQLgetCategories launched. Params passed {}", _guild_id);
+			ArrayList<CategoryConf> categories = new ArrayList<CategoryConf>();
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				String sql = ("SELECT fk_category_id, fk_category_type FROM category_conf WHERE fk_guild_id = ?");
+				stmt = myConn.prepareStatement(sql);
+				stmt.setLong(1, _guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()) {
+					categories.add(new CategoryConf(
+						rs.getLong(1),
+						rs.getString(2)
+					));
+				}
+				Hashes.addCategories(_guild_id, categories);
+				return categories;
+			} catch (SQLException e) {
+				logger.error("SQLgetCategories Exception", e);
+				return null;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		return cachedCategories;
+	}
+	
+	public static int SQLInsertCategory(long _category_id, String _name) {
+		logger.trace("SQLInsertCategory launched. Params passed {}, {}", _category_id, _name);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("INSERT INTO categories (category_id, name) VALUES(?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _category_id);
+			stmt.setString(2, _name);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertCategory Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteCategory(long _category_id) {
+		logger.trace("SQLDeleteCategory launched. Params passed {}", _category_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM categories WHERE category_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _category_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteCategory Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateCategoryName(long _category_id, String _name) {
+		logger.trace("SQLUpdateCategoryName launched. Params passed {}, {}", _category_id, _name);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE categories SET name = ? WHERE category_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _name);
+			stmt.setLong(2, _category_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateCategoryName Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLInsertCategoryConf(long _category_id, String _categoryType, long _guild_id) {
+		logger.trace("SQLInsertCategoryConf launched. Params passed {}, {}, {}", _category_id, _categoryType, _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("INSERT INTO category_conf(fk_category_id, fk_category_type, fk_guild_id) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE fk_category_type=VALUES(fk_category_type)");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _category_id);
+			stmt.setString(2, _categoryType);
+			stmt.setLong(3, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLInsertCategoryConf Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteCategoryConf(long _category_id) {
+		logger.trace("SQLDeleteCategoryConf launched. Params passed {}", _category_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM category_conf WHERE fk_category_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _category_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteCategoryConf Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteAllCategoryConfs(long _guild_id) {
+		logger.trace("SQLDeleteAllCategoryConf launched. Params passed {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM category_conf WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteAllCategoryConf Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<constructors.Category> SQLgetCategoryTypes() {
+		logger.trace("SQLgetCategoryTypes launched. No params");
+		ArrayList<constructors.Category> categories = new ArrayList<constructors.Category>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT * FROM category_types");
+			stmt = myConn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				categories.add(new constructors.Category(
+					rs.getString(1),
+					rs.getString(2)
+				));
+			}
+			return categories;
+		} catch (SQLException e) {
+			logger.error("SQLgetCategoryTypes Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}

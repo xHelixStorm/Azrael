@@ -102,7 +102,7 @@ public class RegisterChannel {
 					}
 					Hashes.removeChannels(_guild_id);
 					if(result > 0) {
-						logger.debug("{} has registered the channel {} as {} channel in guild {}", e.getMember().getUser().getId(), channel_type, channel_type, _guild_id);
+						logger.info("Channel {} as {} channel registered in guild {}", channel_id, channel_type, _guild_id);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
 						if(channel_type.equals("rea")) {
 							//use the temp cache to append reactions after the bot sends a message
@@ -122,6 +122,9 @@ public class RegisterChannel {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("text channel {} couldn't be registered in guild {}", channel_id, _guild_id);
 					}
+				}
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 				}
 			}
 			else{

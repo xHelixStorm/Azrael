@@ -52,6 +52,8 @@ public class GuildJoinListener extends ListenerAdapter {
 		if(Patchnotes.SQLInsertGuild(guild_id, guild_name) == 0) {
 			logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", guild_id);
 		}
+		//insert all categories into table
+		Azrael.SQLBulkInsertCategories(e.getGuild().getCategories());
 		//insert all channels into table
 		Azrael.SQLBulkInsertChannels(e.getGuild().getTextChannels());
 		

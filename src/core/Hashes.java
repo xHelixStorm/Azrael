@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import constructors.Cache;
+import constructors.CategoryConf;
 import constructors.Channels;
 import constructors.Dailies;
 import constructors.Guilds;
@@ -40,7 +41,7 @@ public class Hashes {
     private static final ConcurrentMap<Long, ArrayList<NameFilter>> name_filter = new ConcurrentHashMap<Long, ArrayList<NameFilter>>();
     private static final ConcurrentMap<Long, ArrayList<String>> filter_lang = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final Set<String> actionlog = new LinkedHashSet<String>();
-    private static final ConcurrentHashMap<Long, Guilds> status = new ConcurrentHashMap<Long, Guilds>();
+    private static final ConcurrentMap<Long, Guilds> status = new ConcurrentHashMap<Long, Guilds>();
     private static final ConcurrentMap<Long, ArrayList<Roles>> ranking_roles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
     private static final LinkedHashMap<String, ArrayList<Level>> ranking_levels = new LinkedHashMap<String, ArrayList<Level>>();
     private static final ConcurrentMap<Long, ArrayList<Roles>> reaction_roles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
@@ -56,26 +57,27 @@ public class Hashes {
     private static final ConcurrentMap<Long, ArrayList<WeaponAbbvs>> weaponAbbvs = new ConcurrentHashMap<Long, ArrayList<WeaponAbbvs>>();
     private static final LinkedHashMap<Long, ArrayList<WeaponStats>> weaponStats = new LinkedHashMap<Long, ArrayList<WeaponStats>>();
     private static final ConcurrentMap<Long, ArrayList<Channels>> channels = new ConcurrentHashMap<Long, ArrayList<Channels>>();
-    private static final ConcurrentHashMap<String, String> commentedUsers = new ConcurrentHashMap<String, String>();
-    private static final ConcurrentHashMap<String, Cache> tempCache = new ConcurrentHashMap<String, Cache>();
+    private static final ConcurrentMap<String, String> commentedUsers = new ConcurrentHashMap<String, String>();
+    private static final ConcurrentMap<String, Cache> tempCache = new ConcurrentHashMap<String, Cache>();
     private static final ConcurrentMap<Long, ArrayList<Skills>> skillShop = new ConcurrentHashMap<Long, ArrayList<Skills>>();
     private static final Set<String> globalURLBlacklist = new HashSet<String>();
-    private static final ConcurrentHashMap<Long, ArrayList<String>> urlBlacklist = new ConcurrentHashMap<Long, ArrayList<String>>();
-    private static final ConcurrentHashMap<Long, ArrayList<String>> urlWhitelist = new ConcurrentHashMap<Long, ArrayList<String>>();
-    private static final ConcurrentHashMap<Long, ArrayList<String>> tweetBlacklist = new ConcurrentHashMap<Long, ArrayList<String>>();
-    private static final ConcurrentHashMap<String, Watchlist> watchlist = new ConcurrentHashMap<String, Watchlist>();
-    private static final ConcurrentHashMap<Long, Boolean> heavyCensoring = new ConcurrentHashMap<Long, Boolean>();
-    private static final ConcurrentHashMap<Long, ArrayList<String>> censorMessage = new ConcurrentHashMap<Long, ArrayList<String>>();
-    private static final ConcurrentHashMap<Long, Guilds> old_guild_settings = new ConcurrentHashMap<Long, Guilds>();
-    private static final ConcurrentHashMap<Long, String> filter_threshold = new ConcurrentHashMap<Long, String>();
-    private static final ConcurrentHashMap<Long, Thread> heavyCensoringThread = new ConcurrentHashMap<Long, Thread>();
-    private static final ConcurrentHashMap<String, SpamDetection> spamDetection = new ConcurrentHashMap<String, SpamDetection>();
-    private static final ConcurrentHashMap<Long, String> languages = new ConcurrentHashMap<Long, String>();
-    private static final ConcurrentHashMap<Integer, UserLevel> level_skins = new ConcurrentHashMap<Integer, UserLevel>();
-    private static final ConcurrentHashMap<Integer, UserRank> rank_skins = new ConcurrentHashMap<Integer, UserRank>();
-    private static final ConcurrentHashMap<Integer, UserProfile> profile_skins = new ConcurrentHashMap<Integer, UserProfile>();
-    private static final ConcurrentHashMap<Integer, UserIcon> icon_skins = new ConcurrentHashMap<Integer, UserIcon>();
-    private static final ConcurrentHashMap<String, Integer> subscription_status = new ConcurrentHashMap<String, Integer>();
+    private static final ConcurrentMap<Long, ArrayList<String>> urlBlacklist = new ConcurrentHashMap<Long, ArrayList<String>>();
+    private static final ConcurrentMap<Long, ArrayList<String>> urlWhitelist = new ConcurrentHashMap<Long, ArrayList<String>>();
+    private static final ConcurrentMap<Long, ArrayList<String>> tweetBlacklist = new ConcurrentHashMap<Long, ArrayList<String>>();
+    private static final ConcurrentMap<String, Watchlist> watchlist = new ConcurrentHashMap<String, Watchlist>();
+    private static final ConcurrentMap<Long, Boolean> heavyCensoring = new ConcurrentHashMap<Long, Boolean>();
+    private static final ConcurrentMap<Long, ArrayList<String>> censorMessage = new ConcurrentHashMap<Long, ArrayList<String>>();
+    private static final ConcurrentMap<Long, Guilds> old_guild_settings = new ConcurrentHashMap<Long, Guilds>();
+    private static final ConcurrentMap<Long, String> filter_threshold = new ConcurrentHashMap<Long, String>();
+    private static final ConcurrentMap<Long, Thread> heavyCensoringThread = new ConcurrentHashMap<Long, Thread>();
+    private static final ConcurrentMap<String, SpamDetection> spamDetection = new ConcurrentHashMap<String, SpamDetection>();
+    private static final ConcurrentMap<Long, String> languages = new ConcurrentHashMap<Long, String>();
+    private static final ConcurrentMap<Integer, UserLevel> level_skins = new ConcurrentHashMap<Integer, UserLevel>();
+    private static final ConcurrentMap<Integer, UserRank> rank_skins = new ConcurrentHashMap<Integer, UserRank>();
+    private static final ConcurrentMap<Integer, UserProfile> profile_skins = new ConcurrentHashMap<Integer, UserProfile>();
+    private static final ConcurrentMap<Integer, UserIcon> icon_skins = new ConcurrentHashMap<Integer, UserIcon>();
+    private static final ConcurrentMap<String, Integer> subscription_status = new ConcurrentHashMap<String, Integer>();
+    private static final ConcurrentMap<Long, ArrayList<CategoryConf>> categories = new ConcurrentHashMap<Long, ArrayList<CategoryConf>>();
     
     public static void initializeGuildMessagePool(Long _key, final int max_message_pool_size) {
     	LinkedHashMap<Long, ArrayList<Messages>> message_pool = new LinkedHashMap<Long, ArrayList<Messages>>() {
@@ -231,6 +233,9 @@ public class Hashes {
 	public static void addSubscriptionStatus(String _key, Integer _value) {
 		subscription_status.put(_key, _value);
 	}
+	public static void addCategories(Long _key, ArrayList<CategoryConf> _categories) {
+		categories.put(_key, _categories);
+	}
 	
 	public static ArrayList<Messages> getMessagePool(long _key, long _message_id) {
 		final var message_pool = guild_message_pool.get(_key);
@@ -382,6 +387,9 @@ public class Hashes {
 	}
 	public static Integer getSubscriptionStatus(String _key) {
 		return subscription_status.get(_key);
+	}
+	public static ArrayList<CategoryConf> getCategories(Long _key) {
+		return categories.get(_key);
 	}
 	
 	public static void removeMessagePool(final long _key, long _message_id) {
@@ -547,5 +555,11 @@ public class Hashes {
 	}
 	public static void removeSubscriptionStatus(String _key) {
 		subscription_status.remove(_key);
+	}
+	public static void removeCategories(Long _key) {
+		categories.remove(_key);
+	}
+	public static void clearCategories() {
+		categories.clear();
 	}
 }
