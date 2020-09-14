@@ -2,6 +2,7 @@ package listeners;
 
 import java.awt.Color;
 import java.sql.Timestamp;
+import java.util.EnumSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,6 +130,24 @@ public class GuildLeaveListener extends ListenerAdapter {
 				Hashes.clearTempCache("kick-ignore_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 				Azrael.SQLInsertActionLog("MEMBER_KICK", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
 				logger.debug("{} has been kicked from guild {}", e.getUser().getId(), e.getGuild().getId());
+			}
+			
+			//check if a waiting room was set up for this user and if yes, remove the channel
+			final var categories = Azrael.SQLgetCategories(e.getGuild().getIdLong());
+			if(categories != null) {
+				final var verification = categories.parallelStream().filter(f -> f.getType().equals("ver")).findAny().orElse(null);
+				if(verification != null) {
+					final var textChannel = e.getGuild().getTextChannels().parallelStream().filter(f -> f.getName().equals(e.getMember().getUser().getId())).findAny().orElse(null);
+					if(textChannel != null) {
+						if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MANAGE_CHANNEL) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MANAGE_CHANNEL))) {
+							textChannel.delete().queue();
+						}
+						else {
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MANAGE_CHANNEL.getName())+textChannel.getAsMention(), Channel.LOG.getType());
+							logger.error("MANAGE_CHANNEL permission required to remove the text channel {} in guild {}", textChannel.getId(), e.getGuild().getId());
+						}
+					}
+				}
 			}
 		}).start();
 	}

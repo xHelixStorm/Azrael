@@ -12,11 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commands.About;
+import commands.Accept;
 import commands.Changemap;
 import commands.Clan;
 import commands.Cw;
 import commands.Help;
 import commands.Daily;
+import commands.Deny;
 import commands.Display;
 import commands.DoubleExperience;
 import commands.Edit;
@@ -236,6 +238,8 @@ public class Main {
 		CommandHandler.commandsPublic.put("stats", new Stats());
 		CommandHandler.commandsPublic.put("leaderboard", new Leaderboard());
 		CommandHandler.commandsPublic.put("web", new Web());
+		CommandHandler.commandsPublic.put("accept", new Accept());
+		CommandHandler.commandsPublic.put("deny", new Deny());
 	}
 	
 	public static void addPrivateCommands() {

@@ -134,6 +134,8 @@ public class GuildIni {
 		commands.put("Room", "false");
 		commands.put("Stats", "false");
 		commands.put("Leaderboard", "false");
+		commands.put("Accept", "false");
+		commands.put("Deny", "false");
 		fileContent.put("Commands", commands);
 		
 		//collect all CommandLevels variables
@@ -145,6 +147,8 @@ public class GuildIni {
 		commandLevels.put("DisplayRoles", "20");
 		commandLevels.put("DisplayRegisteredRoles", "20");
 		commandLevels.put("DisplayRankingRoles", "1");
+		commandLevels.put("DisplayCategories", "20");
+		commandLevels.put("DisplayRegisteredCategories", "20");
 		commandLevels.put("DisplayTextChannels", "20");
 		commandLevels.put("DisplayVoiceChannels", "20");
 		commandLevels.put("DisplayRegisteredChannels", "20");
@@ -241,6 +245,8 @@ public class GuildIni {
 		commandLevels.put("RoomReopen", "1");
 		commandLevels.put("Stats", "1");
 		commandLevels.put("Leaderboard", "1");
+		commandLevels.put("Accept", "20");
+		commandLevels.put("Deny", "20");
 		fileContent.put("CommandLevels", commandLevels);
 	}
 	
@@ -621,6 +627,14 @@ public class GuildIni {
 	public static int getDisplayRankingRolesLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "DisplayRankingRoles", int.class);
+	}
+	public static int getDisplayCategoriesLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "DisplayCategories", int.class);
+	}
+	public static int getDisplayRegisteredCategoriesLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "DisplayRegisteredCategories", int.class);
 	}
 	public static int getDisplayTextChannelsLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
@@ -1141,5 +1155,21 @@ public class GuildIni {
 	public static int getLeaderboardLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "Leaderboard", int.class);
+	}
+	public static boolean getAcceptCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Accept", boolean.class);
+	}
+	public static int getAcceptLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Accept", int.class);
+	}
+	public static boolean getDenyCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Deny", boolean.class);
+	}
+	public static int getDenyLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Deny", int.class);
 	}
 }

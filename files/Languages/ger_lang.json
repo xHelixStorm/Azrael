@@ -146,6 +146,8 @@
 	"param_extend":					"verlängern",
 	"param_channel":				"kanal",
 	"param_category":				"kategorie",
+	"param_categories":				"kategorien",
+	"param_registered_categories":	"registrierte-kategorien",
 
 	"lang_eng":						"Englisch",
 	"lang_ger":						"Deutsch",
@@ -170,6 +172,7 @@
 	"no_mute_role":					"Keine Rolle zum Blockieren gefunden! Bitte registrieren Sie eine Rolle um Benutzer zu blockieren, bevor Sie fortfahren!",
 	"missing_permission":			"Weitere Berechtigungen erforderlich! Bitte aktivieren Sie die folgende Berechtigung und versuchen Sie es dann erneut: ",
 	"missing_permission_in":		"Die Berechtigung {} ist erforderlich! Bitte aktivieren Sie diese Berechtigung(en) für den Textkanal ",
+	"missing_permission_in_2":		"Die Berechtigung {} ist erforderlich! Bitte aktivieren Sie diese Berechtigung(en) für die Kategorie ",
 	"cooldown":						"Dieser Befehl hat derzeit eine Abklingzeit, bitte versuchen Sie es später noch einmal!",
 	"general_error":				"Es ist ein interner Fehler aufgetreten. Bitte kontaktieren Sie einen Administrator!",
 	"gif_compression":				"GIF komprimieren. Bitte warten...",
@@ -282,13 +285,16 @@
 	"display_help_1":			 	"- **rollen**:\nAlle Serverrollen anzeigen.\n",
 	"display_help_2":			 	"- **registrierte-rollen**:\nAlle registrierten Rollen und ihre Berechtigungsstufe anzeigen.\n",
 	"display_help_3":			 	"- **rang-rollen**:\nAlle mit dem Stufensystem verbundenen Rollen mit ihren Entsperrungsanforderungen anzeigen.\n",
-	"display_help_4":			 	"- **textkanäle**:\nAlle Textkanäle anzeigen.\n",
-	"display_help_5":			 	"- **sprachkanäle**:\nAlle Sprachkanäle anzeigen.\n",
-	"display_help_6":			 	"- **registered-channels**:\nDisplay all registered text channels and their configuration.\n",
-	"display_help_7":			 	"- **tägliche-belohnungen**:\nAlle tägliche Belohnungen anzeigen mit ihren Erhaltungwahrscheinlichkeiten.\n",
-	"display_help_8":			 	"- **beobachtete-benutzer**:\nAlle beobachtete Benutzer anzeigen.\n",
-	"display_help_9":			 	"- **berechtigungen**:\nFür jeden Befehl der 1. und 2. Ebene die Berechtigungsstufe anzeigen.\n",
+	"display_help_4":				"- **kategorien**:\nAlle Kategories anzeigen.\n",
+	"display_help_5":				"- **registrierte-kategorien**:\nAlle registrierte Kategorien anzeigen.\n",
+	"display_help_6":			 	"- **textkanäle**:\nAlle Textkanäle anzeigen.\n",
+	"display_help_7":			 	"- **sprachkanäle**:\nAlle Sprachkanäle anzeigen.\n",
+	"display_help_8":			 	"- **registered-channels**:\nDisplay all registered text channels and their configuration.\n",
+	"display_help_9":			 	"- **tägliche-belohnungen**:\nAlle tägliche Belohnungen anzeigen mit ihren Erhaltungwahrscheinlichkeiten.\n",
+	"display_help_10":			 	"- **beobachtete-benutzer**:\nAlle beobachtete Benutzer anzeigen.\n",
+	"display_help_11":			 	"- **berechtigungen**:\nFür jeden Befehl der 1. und 2. Ebene die Berechtigungsstufe anzeigen.\n",
 	"display_role_type":		 	"Rollen Art: ",
+	"display_category_type":		"Kategorie Art: ",
 	"display_channel_type":		 	"Kanal Art: ",
 	"display_permission_level":	 	"Berechtigung Stufe: ",
 	"display_persistant":		 	"Beständig: ",
@@ -889,10 +895,11 @@
 	"ban_message_2":				"**{}** with the ID Number **{}** has been banned without enough protocolled warnings! Warnings: {}\nBanned by: {}\nReason: ",
 	"ban_message_3":				"**{}** with the ID Number **{}** has been banned!\nBanned by: {}\nReason: ",
 	"ban_message_4":				"**{}** with the ID Number **{}** has been banned!\nBanned by: {}\nReason: {}\n**Audit log permission required to display more details!**",
-	"ban_dm_locked":				"The banned user **{}** with the ID number **{}** has his direct messages locked and couldn't receive any notification!",
+	"ban_dm_locked":				"The banned user **{}** with the ID number **{}** has the direct messages locked and couldn't receive any notification!",
 	
 	"kick_title":					"User kicked!",
 	"kick_message":					"**{}** with the id number **{}** has been kicked!\n Kicked by: {}\nReason: ",
+	"kick_dm_locked":				"The kicked user **{}** with the ID number **{}** has the direct messages locked and couldn't receive any notification!",
 	
 	"left_title":					"User left!",
 	"left_message_1":				"**{}** has left the server while being muted!",
@@ -910,6 +917,8 @@
 	"join_err_9":					"Rejoin Tasks couldn't be verified for the user **{}** with the ID number **{}**!",
 	"join_message":					"**{}** has joined the server!",
 	"join_permission_err":			"The joined user **{}** with the ID number **{}** couldn't be muted because the following permission is required: ",
+	"join_permission_err_2":		"The joined user **{}** with the ID number **{}** couldn't be banned because the following permission is required: ",
+	"join_verify":					"Welcome to {} {}\nYou have been placed in our holding room. An available administrator or moderator will verify you shortly.",
 	
 	"name_title":					"Not allowed name found!",
 	"name_reason":					"Renamed due to current name censor settings!",
@@ -1008,6 +1017,8 @@
 	"unmute_recount_excluded":		"\nExcluded are users that are permanently muted on this server!",
 	"unmute_remove_err":			"The mute role couldn't be removed because the following permission is required: ",
 	"unmute_limbo":					" users were stuck in a mute limbo and have been unmuted!",
+	"unmute_waiting_title":			"Users moved into waiting room!",
+	"unmute_waiting_moved":			" users have been moved into the waiting room(s) on boot!",
 	
 	"join_no_profile":				"Before this command can be used, you'll have to create a profile page. Complete your profile page by submitting a *name* to represent yourself.",
 	"join_no_profile_2":			"Before this command can be used, you'll have to create a profile page. Start by submitting a *name* to represent yourself, and after that submit the name of the server you're mainly playing in.",
@@ -1207,5 +1218,15 @@
 	"web_redirect_err":				"Setup incomplete! Please contact an administrator!",
 	"web_create":					"Follow this link to complete your registration and to be able to access the website for the Bot!\n",
 	"web_not_allowed":				"You have disabled the direct login method for the website. Please login directly on the website through this link and change the login settings to use this login method!\n",
-	"web_code":						"Use this key to login into the website. The key is valid for 5 minutes. If you didn't request the login, please contact an administrator!\n**{}**"
+	"web_code":						"Use this key to login into the website. The key is valid for 5 minutes. If you didn't request the login, please contact an administrator!\n**{}**",
+	
+	"accept_no_wait":				"A verification category and a verified role needs to be registered to use this command!",
+	"accept_help":					"Mention a user or write the user ID of that user to complete the verification! Every verified user will receive the verified role!",
+	"accept_reason":				"User has been accepted to join the server!",
+	"accept_err":					"The selected user is currently in no waiting room!",
+	"accept_done":					"The user {} with the id number {} has been accepted to the server!",
+	
+	"deny_help":					"Mention a user or write the user ID of that user to complete the verification! The user will be kicked from the server upon denying! Optionally, add a reason as second parameter to deny the user.",
+	"deny_reason":					"Verification denied!",
+	"deny_done":					"The verification for the user {} with the ID number {} has been denied from joining the server!"
 }

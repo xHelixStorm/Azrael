@@ -45,6 +45,7 @@ import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -74,7 +75,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.28.499";
+	private static final String VERSION = "7.28.500";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -724,6 +725,15 @@ public class STATIC {
 		if(guild.getSelfMember().hasPermission(textChannel, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)) {
 			textChannel.getManager().putPermissionOverride(guild.getSelfMember(), permissions, null).complete();
 			logger.info("Permissions overriden for text channel {} in guild {}", textChannel.getId(), guild.getId());
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean setPermissions(Guild guild, Category category, Collection<Permission> permissions) {
+		if(guild.getSelfMember().hasPermission(category, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)) {
+			category.getManager().putPermissionOverride(guild.getSelfMember(), permissions, null).complete();
+			logger.info("Permissions overriden for category {} in guild {}", category.getId(), guild.getId());
 			return true;
 		}
 		return false;

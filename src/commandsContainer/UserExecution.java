@@ -1245,9 +1245,10 @@ public class UserExecution {
 							member.getUser().openPrivateChannel().queue(channel -> {
 								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_KICK_DM)
 									+ (GuildIni.getKickSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
-										e.getGuild().kick(e.getGuild().getMemberById(user_id)).reason(reason).queue();
+										e.getGuild().kick(member).reason(reason).queue();
 									}, err -> {
-										e.getGuild().kick(e.getGuild().getMemberById(user_id)).reason(reason).queue();
+										e.getGuild().kick(member).reason(reason).queue();
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.KICK_DM_LOCKED).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator()).replace("{}", member.getUser().getId())).build()).queue();
 									});
 							});
 							Azrael.SQLInsertHistory(e.getGuild().getMemberById(user_id).getUser().getIdLong(), e.getGuild().getIdLong(), "kick", reason, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
@@ -1282,9 +1283,10 @@ public class UserExecution {
 						member.getUser().openPrivateChannel().queue(channel -> {
 							channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_KICK_DM)
 								+ (GuildIni.getKickSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
-									e.getGuild().kick(e.getGuild().getMemberById(user_id)).reason(_message).queue();
+									e.getGuild().kick(member).reason(_message).queue();
 								}, err -> {
-									e.getGuild().kick(e.getGuild().getMemberById(user_id)).reason(_message).queue();
+									e.getGuild().kick(member).reason(_message).queue();
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.KICK_DM_LOCKED).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator()).replace("{}", member.getUser().getId())).build()).queue();
 								});
 						});
 						Azrael.SQLInsertHistory(e.getGuild().getMemberById(user_id).getUser().getIdLong(), e.getGuild().getIdLong(), "kick", _message, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());

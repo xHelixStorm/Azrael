@@ -148,6 +148,8 @@ public enum Translation {
 	PARAM_EXTEND				("param_extend"),
 	PARAM_CHANNEL				("param_channel"),
 	PARAM_CATEGORY				("param_category"),
+	PARAM_CATEGORIES			("param_categories"),
+	PARAM_REGISTERED_CATEGORIES	("param_registered_categories"),
 	
 	LANG_ENG					("lang_eng"),
 	LANG_GER					("lang_ger"),
@@ -172,6 +174,7 @@ public enum Translation {
 	NO_MUTE_ROLE				("no_mute_role"),
 	MISSING_PERMISSION			("missing_permission"),
 	MISSING_PERMISSION_IN		("missing_permission_in"),
+	MISSING_PERMISSION_IN_2		("missing_permission_in_2"),
 	COOLDOWN					("cooldown"),
 	GENERAL_ERROR				("general_error"),
 	GIF_COMPRESSION				("gif_compression"),
@@ -290,7 +293,10 @@ public enum Translation {
 	DISPLAY_HELP_7				("display_help_7"),
 	DISPLAY_HELP_8				("display_help_8"),
 	DISPLAY_HELP_9				("display_help_9"),
+	DISPLAY_HELP_10				("display_help_10"),
+	DISPLAY_HELP_11				("display_help_11"),
 	DISPLAY_ROLE_TYPE			("display_role_type"),
+	DISPLAY_CATEGORY_TYPE		("display_category_type"),
 	DISPLAY_CHANNEL_TYPE		("display_channel_type"),
 	DISPLAY_PERMISSION_LEVEL	("display_permission_level"),
 	DISPLAY_PERSISTANT			("display_persistant"),
@@ -895,6 +901,7 @@ public enum Translation {
 	
 	KICK_TITLE					("kick_title"),
 	KICK_MESSAGE				("kick_message"),
+	KICK_DM_LOCKED				("kick_dm_locked"),
 	
 	LEFT_TITLE					("left_title"),
 	LEFT_MESSAGE_1				("left_message_1"),
@@ -912,6 +919,8 @@ public enum Translation {
 	JOIN_ERR_9					("join_err_9"),
 	JOIN_MESSAGE				("join_message"),
 	JOIN_PERMISSION_ERR			("join_permission_err"),
+	JOIN_PERMISSION_ERR_2		("join_permission_err_2"),
+	JOIN_VERIFY					("join_verify"),
 	
 	NAME_TITLE					("name_title"),
 	NAME_REASON					("name_reason"),
@@ -1010,6 +1019,8 @@ public enum Translation {
 	UNMUTE_RECOUNT				("unmute_recount"),
 	UNMUTE_RECOUNT_EXCLUDED		("unmute_recount_excluded"),
 	UNMUTE_LIMBO				("unmute_limbo"),
+	UNMUTE_WAITING_TITLE		("unmute_waiting_title"),
+	UNMUTE_WAITING_MOVED		("unmute_waiting_moved"),
 	
 	JOIN_NO_PROFILE				("join_no_profile"),
 	JOIN_NO_PROFILE_2			("join_no_profile_2"),
@@ -1209,7 +1220,17 @@ public enum Translation {
 	WEB_REDIRECT_ERR			("web_redirect_err"),
 	WEB_CREATE					("web_create"),
 	WEB_NOT_ALLOWED				("web_not_allowed"),
-	WEB_CODE					("web_code");
+	WEB_CODE					("web_code"),
+	
+	ACCEPT_NO_WAIT				("accept_no_wait"),
+	ACCEPT_HELP					("accept_help"),
+	ACCEPT_REASON				("accept_reason"),
+	ACCEPT_ERR					("accept_err"),
+	ACCEPT_DONE					("accept_done"),
+	
+	DENY_HELP					("deny_help"),
+	DENY_REASON					("deny_reason"),
+	DENY_DONE					("deny_done");
 	
 	private String value;
 	

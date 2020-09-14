@@ -3,6 +3,8 @@ package listeners;
 import java.awt.Color;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
+import java.util.EnumSet;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +17,16 @@ import core.Hashes;
 import enums.Channel;
 import enums.GoogleEvent;
 import enums.Translation;
+import fileManagement.FileSetting;
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
 import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.RankingSystem;
@@ -52,7 +59,8 @@ public class GuildListener extends ListenerAdapter {
 			final EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_TITLE));
 			final EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_TITLE));
 			final EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR));
-			logger.debug("{} has joined the guild {}", e.getUser().getId(), e.getGuild().getId());
+			logger.trace("{} has joined the guild {}", e.getUser().getId(), e.getGuild().getId());
+			boolean excludeChannelCreation = false;
 			long user_id = e.getMember().getUser().getIdLong();
 			String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
 			long guild_id = e.getGuild().getIdLong();
@@ -115,8 +123,10 @@ public class GuildListener extends ListenerAdapter {
 				//verify that the bot has the manage roles permission before muting again
 				if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 					var mute_role = DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
-					if(mute_role != null)
+					if(mute_role != null) {
 						e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
+						excludeChannelCreation = true;
+					}
 					else
 						STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_4).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 				}
@@ -223,22 +233,29 @@ public class GuildListener extends ListenerAdapter {
 				}
 				//ban a joined user
 				else if(rejoinAction.getType().equals("ban")) {
-					//send a private message before banning
-					e.getUser().openPrivateChannel().queue(channel -> {
-						channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2).replace("{}", e.getGuild().getName())
-								+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+rejoinAction.getReason() : "")).queue(success -> {
-									Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getReporter(), rejoinAction.getReason()));
-									e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
-									Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
-									channel.close().queue();
-								}, error -> {
-									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(e.getGuild(), Translation.BAN_DM_LOCKED).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
-									Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getReporter(), rejoinAction.getReason()));
-									e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
-									Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
-									channel.close().queue();
-								});
-					});
+					//check if the bot has the ban permission before continuing
+					if(e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
+						//send a private message before banning
+						e.getUser().openPrivateChannel().queue(channel -> {
+							channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2).replace("{}", e.getGuild().getName())
+									+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+rejoinAction.getReason() : "")).queue(success -> {
+										Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getReporter(), rejoinAction.getReason()));
+										e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
+										Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
+										channel.close().queue();
+									}, error -> {
+										STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(e.getGuild(), Translation.BAN_DM_LOCKED).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
+										Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getReporter(), rejoinAction.getReason()));
+										e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
+										Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
+										channel.close().queue();
+									});
+						});
+						excludeChannelCreation = true;
+					}
+					else {
+						STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_PERMISSION_ERR_2).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)+Permission.BAN_MEMBERS.getName(), Channel.LOG.getType());
+					}
 					if(Azrael.SQLDeleteRejoinTask(user_id, guild_id) == 0) {
 						STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_8).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 						logger.error("Rejoin task couldn't be removed from table Azrael.reminder for user {} in guild {}", user_id, guild_id);
@@ -250,6 +267,11 @@ public class GuildListener extends ListenerAdapter {
 				if(rejoinAction == null) {
 					STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_9).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 					logger.error("Rejoin tasks couldn't be verified for the user {} in guild {} from table Azrael.reminder", user_id, guild_id);
+				}
+				
+				//verify if additional verification actions are required
+				if(!excludeChannelCreation) {
+					putUserIntoWaitingRoom(e.getGuild(), e.getMember());
 				}
 				
 				String nickname = null;
@@ -363,5 +385,43 @@ public class GuildListener extends ListenerAdapter {
 			
 			Azrael.SQLInsertActionLog("GUILD_MEMBER_JOIN", user_id, guild_id, user_name);
 		}).start();
+	}
+	
+	public static void putUserIntoWaitingRoom(Guild guild, Member member) {
+		final var categories = Azrael.SQLgetCategories(guild.getIdLong());
+		if(categories != null && categories.size() > 0) {
+			final var verification = categories.parallelStream().filter(f -> f.getType().equals("ver")).findAny().orElse(null);
+			if(verification != null) {
+				Category category = guild.getCategoryById(verification.getCategoryID());
+				if(category != null) {
+					if(guild.getSelfMember().hasPermission(category, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS) || STATIC.setPermissions(guild, category, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS))) {
+						//create a new text channel under the category and add the required permissions
+						category.createTextChannel(""+member.getUser().getId())
+							.addPermissionOverride(guild.getSelfMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.MESSAGE_WRITE, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS), null)
+							.addPermissionOverride(guild.getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.MESSAGE_WRITE))
+							.addPermissionOverride(member, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES, Permission.MESSAGE_EMBED_LINKS), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS))
+							.queue(channel -> {
+								final var roles = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("adm") || f.getCategory_ABV().equals("mod")).collect(Collectors.toList());
+								for(final var role : roles) {
+									Role serverRole = guild.getRoleById(role.getRole_ID());
+									if(serverRole != null) {
+										channel.getManager().putPermissionOverride(serverRole, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES, Permission.MESSAGE_EMBED_LINKS), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)).queue();
+									}
+								}
+								final String verificationMessage = FileSetting.readFile("files/Guilds/"+guild.getId()+"/verificationmessage.txt");
+								channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(guild.getIconUrl()).setDescription((verificationMessage != null && verificationMessage.length() > 0 ? verificationMessage : STATIC.getTranslation2(guild, Translation.JOIN_VERIFY).replaceFirst("\\{\\}", guild.getName()).replace("{}", member.getAsMention()))).build()).queue();
+							}
+						);
+					}
+					else {
+						STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.MISSING_PERMISSION_IN_2).replace("{}", Permission.MANAGE_CHANNEL.getName()+" and "+Permission.MANAGE_PERMISSIONS.getName())+category.getName(), Channel.LOG.getType());
+						logger.warn("MANAGE_CHANNEL and MANAGE_PERMISSIONS for category {} required to create verification channels for guild {}", verification.getCategoryID(), guild.getId());
+					}
+				}
+				else {
+					logger.warn("Category {} doesn't exist anymore for guild {}", verification.getCategoryID(), guild.getId());
+				}
+			}
+		}
 	}
 }
