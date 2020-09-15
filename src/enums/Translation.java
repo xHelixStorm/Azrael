@@ -549,6 +549,10 @@ public enum Translation {
 	REGISTER_ROLE_INVALID_PARAM	("register_role_invalid_param"),
 	REGISTER_ROLE_ADM_ADDED		("register_role_adm_added"),
 	REGISTER_ROLE_ADDED			("register_role_added"),
+	REGISTER_ROLE_NOTICE		("register_role_notice"),
+	REGISTER_ROLE_ERR			("register_role_err"),
+	REGISTER_ROLE_ASSIGN_START	("register_role_assign_start"),
+	REGISTER_ROLE_DONE			("register_role_done"),
 	
 	REMOVE_HELP					("remove_help"),
 	REMOVE_ROLE_HELP			("remove_role_help"),

@@ -547,6 +547,10 @@
 	"register_role_invalid_param":	"Passed parameter doesn't exist or *adm* for the first role hasn't been used!",
 	"register_role_adm_added":		"The primary administrator role has been registered!",
 	"register_role_added":			"The role has been registered!",
+	"register_role_notice":			"Do you wish to assign all current users on the server the verified role?\nNote that declining will result in creating a hidden room for all users who have no role assigned once the Bot has to restart.\n*As long a verification section has not been created, waiting rooms can't be created!*",
+	"register_role_err":			"The permission {} is required to assign this role to all members on the server! Please assign the required permission and resubmit your answer.",
+	"register_role_assign_start":	"Role is being assigned to all members!",
+	"register_role_done":			"Registration completed!",
 	
 	"remove_help":					"Remove a registered option! Write one of the following parameters together with the command for more details:\n\n- **role**:\nRemove a registered role.\n- **ranking-role**:\nRemove a registered ranking role.\n- **category**:\nRemove a registered category.\n- **text-channel**:\nRemove a registered text channel.\n- **channel-censor**:\nRemove censoring languages from a text channel.",
 	"remove_role_help":				"Insert a role ID together with the full command to remove a registered role or type *all* to remove all registerd roles!",

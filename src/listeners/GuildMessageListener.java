@@ -19,6 +19,7 @@ import commandsContainer.FilterExecution;
 import commandsContainer.GoogleSpreadsheetsExecution;
 import commandsContainer.JoinExecution;
 import commandsContainer.PurchaseExecution;
+import commandsContainer.RegisterRole;
 import commandsContainer.RoomExecution;
 import commandsContainer.SubscribeExecution;
 import commandsContainer.SetWarning;
@@ -112,6 +113,14 @@ public class GuildMessageListener extends ListenerAdapter {
 					final var filter = Hashes.getTempCache("filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					if(filter != null) {
 						FilterExecution.performAction(e, message, filter);
+					}
+					
+					//for some cases do additional actions after registering a role
+					final var roleRegistered = Hashes.getTempCache("register_role_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+					if(roleRegistered != null && roleRegistered.getExpiration() - System.currentTimeMillis() > 0 && !e.getMember().getUser().isBot()) {
+						if(roleRegistered.getAdditionalInfo().equals("ver")) {
+							RegisterRole.assignVerifiedRoleToMembers(e, roleRegistered);
+						}
 					}
 					
 					//if the shop command has been used, help the user to navigate through the shop easily

@@ -547,6 +547,10 @@
 	"register_role_invalid_param":	"Übergebener Parameter existiert nicht oder *adm* für die erste Rolle wurde nicht verwendet!",
 	"register_role_adm_added":		"Die primäre Administrator-Rolle wurde registriert!",
 	"register_role_added":			"Die Rolle wurde registriert!",
+	"register_role_notice":			"Möchten Sie allen aktuellen Benutzern auf dem Server die verifiziert Rolle zuweisen?\nBeachten Sie, dass bei der Ablehnung ein versteckter Raum für alle Benutzer, denen keine Rolle zugewiesen wurde, geschaffen wird, sobald der Bot neu gestartet werden muss.\n*Solange keine Kategorie für die Verifizierung von Benutzer registriert wurde, können keine Warteräume eingerichtet werden!*",
+	"register_role_err":			"Die Berechtigung {} ist erforderlich, um diese Rolle allen Mitgliedern auf dem Server zuzuweisen! Bitte weisen Sie die erforderliche Berechtigung zu und schreiben Sie Ihre Antwort erneut.",
+	"register_role_assign_start":	"Rolle wird an alle Mitglieder zugewiesen!",
+	"register_role_done":			"Registrierung abgeschlossen!",
 	
 	"remove_help":					"Entfernen Sie eine registrierte Option! Schreiben Sie einen der folgenden Parameter zusammen mit dem Befehl für weitere Details:\n\n- **rolle**:\nEine registrierte Rolle entfernen.\n- **rang-rolle**:\nEine registrierte Rang-Rolle entfernen.\n- **kategorie**:\nEine registrierte Kategorie entfernen.\n- **textkanal**:\nEinen registrierten Textkanal entfernen.\n- **kanal-zensierung**:\nEntfernen Sie Sprachzensuren aus einem Textkanal.",
 	"remove_role_help":				"Fügen Sie eine Rollen-ID zusammen mit dem vollständigen Befehl zum Entfernen einer registrierten Rolle ein oder geben Sie *alle* ein, um alle registrierten Rollen zu entfernen!",
