@@ -1696,7 +1696,7 @@ public class UserExecution {
 						}
 					}
 					else {
-						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_LEVEL_ERR)+guild_settings.getMaxLevel()).build()).queue();
+						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_LEVEL_ERR).replace("{}", ""+guild_settings.getMaxLevel())).build()).queue();
 					}
 				}
 			}
