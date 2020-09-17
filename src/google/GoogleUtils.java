@@ -88,7 +88,7 @@ public class GoogleUtils {
 		};
 	}
 	
-	public static void handleSpreadsheetRequest(Guild guild, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, long message_id, String message, int up_vote, int down_vote, int event_id) {
+	public static void handleSpreadsheetRequest(Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, long message_id, String message, int up_vote, int down_vote, int event_id) {
 		logger.debug("Initializing spreadsheet request for event {} in guild {}", action, guild.getId());
 		//Retrieve the file id and row start for this event
 		final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, event_id);
@@ -97,179 +97,181 @@ public class GoogleUtils {
 			return;
 		final String file_id = array[0];
 		final String sheetRowStart = array[1];
-		if(file_id != null && file_id.length() > 0 && sheetRowStart != null && !sheetRowStart.isBlank()) {
-			//retrieve the saved mapping for the current event
-			final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, event_id, guild.getIdLong());
-			if(columns != null && columns.size() > 0) {
-				final var EVENT = GoogleEvent.valueOfId(event_id);
-				//format rows to write
-				ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-				for(final var column : columns) {
-					GoogleDD item = column.getItem();
-					switch(EVENT) {
-						case MUTE, MUTE_READD -> {
-							switch(item) {
-								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
-								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
-								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
-								case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
-								case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
-								case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
-								case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
-								case TIME ->				values.add(Arrays.asList(item.valueFormatter(time, column.getFormatter())));
-								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
-								case WARNING ->				values.add(Arrays.asList(item.valueFormatter(warning_id, column.getFormatter())));
-								case UNMUTE_TIME -> 		values.add(Arrays.asList(item.valueFormatter(unmute_timestamp, column.getFormatter())));
-								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
-								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
-								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
-								default -> {}
-							}
-						}
-						case UNMUTE, UNMUTE_MANUAL -> {
-							switch(item) {
-								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
-								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
-								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
-								case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
-								case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
-								case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
-								case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
-								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
-								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
-								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
-								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
-								case ROLE_ID ->				values.add(Arrays.asList(item.valueFormatter(role_id, column.getFormatter())));
-								case ROLE_NAME ->			values.add(Arrays.asList(item.valueFormatter(role_name, column.getFormatter())));
-								default -> {}
-							}
-						}
-						case KICK, UNBAN -> {
-							switch(item) {
-								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
-								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
-								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
-								case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
-								case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
-								case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
-								case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
-								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
-								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
-								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
-								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
-								default -> {}
-							}
-						}
-						case BAN -> {
-							switch(item) {
-								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
-								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
-								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
-								case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
-								case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
-								case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
-								case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
-								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
-								case WARNING ->				values.add(Arrays.asList(item.valueFormatter(warning_id, column.getFormatter())));
-								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
-								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
-								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
-								default -> {}
-							}
-						}
-						case RENAME -> {
+		if((array[2] == null || array[2].length() == 0) || array[2].equals(channel_id)) {
+			if(file_id != null && file_id.length() > 0 && sheetRowStart != null && !sheetRowStart.isBlank()) {
+				//retrieve the saved mapping for the current event
+				final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, event_id, guild.getIdLong());
+				if(columns != null && columns.size() > 0) {
+					final var EVENT = GoogleEvent.valueOfId(event_id);
+					//format rows to write
+					ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+					for(final var column : columns) {
+						GoogleDD item = column.getItem();
+						switch(EVENT) {
+							case MUTE, MUTE_READD -> {
 								switch(item) {
-								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
-								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
-								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
-								case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
-								case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
-								case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
-								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
-								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
-								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
-								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
-								case OLD_NAME -> 			values.add(Arrays.asList(item.valueFormatter(oldname, column.getFormatter())));
-								case NEW_NAME -> 			values.add(Arrays.asList(item.valueFormatter(newname, column.getFormatter())));
-								default -> {}
+									case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+									case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+									case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+									case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
+									case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
+									case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
+									case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
+									case TIME ->				values.add(Arrays.asList(item.valueFormatter(time, column.getFormatter())));
+									case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+									case WARNING ->				values.add(Arrays.asList(item.valueFormatter(warning_id, column.getFormatter())));
+									case UNMUTE_TIME -> 		values.add(Arrays.asList(item.valueFormatter(unmute_timestamp, column.getFormatter())));
+									case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+									case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+									case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+									default -> {}
+								}
 							}
-						}
-						case RENAME_MANUAL -> {
-							switch(item) {
-								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
-								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
-								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
-								case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
-								case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
-								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
-								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
-								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
-								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
-								case OLD_NAME -> 			values.add(Arrays.asList(item.valueFormatter(oldname, column.getFormatter())));
-								case NEW_NAME -> 			values.add(Arrays.asList(item.valueFormatter(newname, column.getFormatter())));
-								default -> {}
+							case UNMUTE, UNMUTE_MANUAL -> {
+								switch(item) {
+									case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+									case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+									case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+									case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
+									case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
+									case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
+									case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
+									case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+									case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+									case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+									case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+									case ROLE_ID ->				values.add(Arrays.asList(item.valueFormatter(role_id, column.getFormatter())));
+									case ROLE_NAME ->			values.add(Arrays.asList(item.valueFormatter(role_name, column.getFormatter())));
+									default -> {}
+								}
 							}
-						}
-						case VOTE -> {
-							switch(item) {
-								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
-								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
-								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
-								case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
-								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
-								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
-								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
-								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
-								case MESSAGE_ID -> 			values.add(Arrays.asList(item.valueFormatter(message_id, column.getFormatter())));
-								case MESSAGE ->				values.add(Arrays.asList(item.valueFormatter(message, column.getFormatter())));
-								case UP_VOTE -> 			values.add(Arrays.asList(item.valueFormatter(up_vote, column.getFormatter())));
-								case DOWN_VOTE -> 			values.add(Arrays.asList(item.valueFormatter(down_vote, column.getFormatter())));
-								default -> {}
+							case KICK, UNBAN -> {
+								switch(item) {
+									case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+									case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+									case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+									case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
+									case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
+									case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
+									case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
+									case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+									case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+									case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+									case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+									default -> {}
+								}
 							}
+							case BAN -> {
+								switch(item) {
+									case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+									case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+									case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+									case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
+									case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
+									case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
+									case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
+									case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+									case WARNING ->				values.add(Arrays.asList(item.valueFormatter(warning_id, column.getFormatter())));
+									case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+									case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+									case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+									default -> {}
+								}
+							}
+							case RENAME -> {
+									switch(item) {
+									case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+									case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+									case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+									case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
+									case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
+									case REASON	->				values.add(Arrays.asList(item.valueFormatter(reason, column.getFormatter())));
+									case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+									case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+									case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+									case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+									case OLD_NAME -> 			values.add(Arrays.asList(item.valueFormatter(oldname, column.getFormatter())));
+									case NEW_NAME -> 			values.add(Arrays.asList(item.valueFormatter(newname, column.getFormatter())));
+									default -> {}
+								}
+							}
+							case RENAME_MANUAL -> {
+								switch(item) {
+									case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+									case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+									case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+									case REPORTER_NAME -> 		values.add(Arrays.asList(item.valueFormatter(reporterName, column.getFormatter())));
+									case REPORTER_USERNAME -> 	values.add(Arrays.asList(item.valueFormatter(reporterEffectiveName, column.getFormatter())));
+									case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+									case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+									case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+									case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+									case OLD_NAME -> 			values.add(Arrays.asList(item.valueFormatter(oldname, column.getFormatter())));
+									case NEW_NAME -> 			values.add(Arrays.asList(item.valueFormatter(newname, column.getFormatter())));
+									default -> {}
+								}
+							}
+							case VOTE -> {
+								switch(item) {
+									case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+									case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+									case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+									case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
+									case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+									case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+									case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+									case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+									case MESSAGE_ID -> 			values.add(Arrays.asList(item.valueFormatter(message_id, column.getFormatter())));
+									case MESSAGE ->				values.add(Arrays.asList(item.valueFormatter(message, column.getFormatter())));
+									case UP_VOTE -> 			values.add(Arrays.asList(item.valueFormatter(up_vote, column.getFormatter())));
+									case DOWN_VOTE -> 			values.add(Arrays.asList(item.valueFormatter(down_vote, column.getFormatter())));
+									default -> {}
+								}
+							}
+							default -> {}
 						}
-						default -> {}
+					}
+					if(values.size() > 0) {
+						try {
+							GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
+						} catch (IOException e1) {
+							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)), e1.getMessage(), Channel.LOG.getType());
+							logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+						} catch (Exception e1) {
+							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)), e1.getMessage(), Channel.LOG.getType());
+							logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+						}
 					}
 				}
-				if(values.size() > 0) {
-					try {
-						GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
-					} catch (IOException e1) {
-						STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)), e1.getMessage(), Channel.LOG.getType());
-						logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
-					} catch (Exception e1) {
-						STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)), e1.getMessage(), Channel.LOG.getType());
-						logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
-					}
+				else if(columns.size() == 0) {
+					STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_MAPPING), Channel.LOG.getType());
+					logger.warn("Mute spreadsheet {} is not mapped in guild {}", file_id, guild.getId());
+				}
+				else {
+					STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
+					logger.error("Mapping couldn't be retrieved from Azrael.google_spreadsheet_mapping for file id {} in guild ", file_id, guild.getId());
 				}
 			}
-			else if(columns.size() == 0) {
-				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_MAPPING), Channel.LOG.getType());
-				logger.warn("Mute spreadsheet {} is not mapped in guild {}", file_id, guild.getId());
+			else if(sheetRowStart == null) {
+				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
+				logger.error("Spreadsheet starting point couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
+			}
+			else if(sheetRowStart.isBlank()) {
+				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_START_POINT), Channel.LOG.getType());
+				logger.warn("Spreadsheet starting point couldn't be found in guild {}", guild.getId());
+			}
+			else if(file_id == null) {
+				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
+				logger.error("Spreadsheet couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
 			}
 			else {
-				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
-				logger.error("Mapping couldn't be retrieved from Azrael.google_spreadsheet_mapping for file id {} in guild ", file_id, guild.getId());
+				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_FOUND), Channel.LOG.getType());
+				logger.warn("Spreadsheet couldn't be found in guild {}", guild.getId());
 			}
-		}
-		else if(sheetRowStart == null) {
-			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
-			logger.error("Spreadsheet starting point couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
-		}
-		else if(sheetRowStart.isBlank()) {
-			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_START_POINT), Channel.LOG.getType());
-			logger.warn("Spreadsheet starting point couldn't be found in guild {}", guild.getId());
-		}
-		else if(file_id == null) {
-			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
-			logger.error("Spreadsheet couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
-		}
-		else {
-			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_FOUND), Channel.LOG.getType());
-			logger.warn("Spreadsheet couldn't be found in guild {}", guild.getId());
 		}
 	}
 	
-	public static boolean handleSpreadsheetRequest(Guild guild, String user_id, Timestamp timestamp, String name, String action, long ping, long member_count, long guilds_count, int event_id) {
+	public static boolean handleSpreadsheetRequest(Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String action, long ping, long member_count, long guilds_count, int event_id) {
 		logger.debug("Initializing spreadsheet request for event {} in guild {}", action, guild.getId());
 		//Retrieve the file id and row start for this event
 		final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, event_id);
@@ -278,71 +280,73 @@ public class GoogleUtils {
 			return false;
 		final String file_id = array[0];
 		final String sheetRowStart = array[1];
-		if(file_id != null && file_id.length() > 0 && sheetRowStart != null && !sheetRowStart.isBlank()) {
-			//retrieve the saved mapping for the current event
-			final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, event_id, guild.getIdLong());
-			if(columns != null && columns.size() > 0) {
-				final var EVENT = GoogleEvent.valueOfId(event_id);
-				//format rows to write
-				ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-				for(final var column : columns) {
-					GoogleDD item = column.getItem();
-					switch(EVENT) {
-						case EXPORT -> {
-							switch(item) {
-								case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
-								case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
-								case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
-								case PING ->				values.add(Arrays.asList(item.valueFormatter(ping, column.getFormatter())));
-								case MEMBER_COUNT ->		values.add(Arrays.asList(item.valueFormatter(member_count, column.getFormatter())));
-								case GUILDS_COUNT ->		values.add(Arrays.asList(item.valueFormatter(guilds_count, column.getFormatter())));
-								case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
-								case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
-								case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
-								case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
-								default -> {}
+		if((array[2] == null || array[2].length() == 0) || array[2].equals(channel_id)) {
+			if(file_id != null && file_id.length() > 0 && sheetRowStart != null && !sheetRowStart.isBlank()) {
+				//retrieve the saved mapping for the current event
+				final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, event_id, guild.getIdLong());
+				if(columns != null && columns.size() > 0) {
+					final var EVENT = GoogleEvent.valueOfId(event_id);
+					//format rows to write
+					ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+					for(final var column : columns) {
+						GoogleDD item = column.getItem();
+						switch(EVENT) {
+							case EXPORT -> {
+								switch(item) {
+									case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+									case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+									case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+									case PING ->				values.add(Arrays.asList(item.valueFormatter(ping, column.getFormatter())));
+									case MEMBER_COUNT ->		values.add(Arrays.asList(item.valueFormatter(member_count, column.getFormatter())));
+									case GUILDS_COUNT ->		values.add(Arrays.asList(item.valueFormatter(guilds_count, column.getFormatter())));
+									case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+									case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+									case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+									case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+									default -> {}
+								}
 							}
+							default -> {}
 						}
-						default -> {}
+					}
+					if(values.size() > 0) {
+						try {
+							GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
+							return true;
+						} catch (IOException e1) {
+							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)), e1.getMessage(), Channel.LOG.getType());
+							logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+						} catch (Exception e1) {
+							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)), e1.getMessage(), Channel.LOG.getType());
+							logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+						}
 					}
 				}
-				if(values.size() > 0) {
-					try {
-						GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
-						return true;
-					} catch (IOException e1) {
-						STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)), e1.getMessage(), Channel.LOG.getType());
-						logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
-					} catch (Exception e1) {
-						STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)), e1.getMessage(), Channel.LOG.getType());
-						logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
-					}
+				else if(columns.size() == 0) {
+					STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_MAPPING), Channel.LOG.getType());
+					logger.warn("Mute spreadsheet {} is not mapped in guild {}", file_id, guild.getId());
+				}
+				else {
+					STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
+					logger.error("Mapping couldn't be retrieved from Azrael.google_spreadsheet_mapping for file id {} in guild ", file_id, guild.getId());
 				}
 			}
-			else if(columns.size() == 0) {
-				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_MAPPING), Channel.LOG.getType());
-				logger.warn("Mute spreadsheet {} is not mapped in guild {}", file_id, guild.getId());
+			else if(sheetRowStart == null) {
+				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
+				logger.error("Spreadsheet starting point couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
+			}
+			else if(sheetRowStart.isBlank()) {
+				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_START_POINT), Channel.LOG.getType());
+				logger.warn("Spreadsheet starting point couldn't be found in guild {}", guild.getId());
+			}
+			else if(file_id == null) {
+				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
+				logger.error("Spreadsheet couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
 			}
 			else {
-				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
-				logger.error("Mapping couldn't be retrieved from Azrael.google_spreadsheet_mapping for file id {} in guild ", file_id, guild.getId());
+				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_FOUND), Channel.LOG.getType());
+				logger.warn("Spreadsheet couldn't be found in guild {}", guild.getId());
 			}
-		}
-		else if(sheetRowStart == null) {
-			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
-			logger.error("Spreadsheet starting point couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
-		}
-		else if(sheetRowStart.isBlank()) {
-			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_START_POINT), Channel.LOG.getType());
-			logger.warn("Spreadsheet starting point couldn't be found in guild {}", guild.getId());
-		}
-		else if(file_id == null) {
-			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
-			logger.error("Spreadsheet couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
-		}
-		else {
-			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_FOUND), Channel.LOG.getType());
-			logger.warn("Spreadsheet couldn't be found in guild {}", guild.getId());
 		}
 		return false;
 	}

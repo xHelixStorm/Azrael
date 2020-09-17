@@ -208,31 +208,33 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 					if(sheet != null && !sheet[0].equals("empty")) {
 						final String file_id = sheet[0];
 						final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
-						try {
-							final var service = GoogleSheets.getSheetsClientService();
-							final var response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
-							int currentRow = 0;
-							for(var row : response.getValues()) {
-								currentRow++;
-								if(row.parallelStream().filter(f -> {
-									String cell = (String)f;
-									if(cell.equals(e.getMessageId()))
-										return true;
-									else
-										return false;
-									}).findAny().orElse(null) != null) {
-									STATIC.killThread("vote"+e.getMessageId());
-									final var file = GoogleSheets.getSpreadsheet(service, file_id);
-									final var retrievedSheet = file.getSheets().parallelStream().filter(f -> f.getProperties().getTitle().equals(row_start)).findAny().orElse(null);
-									if(retrievedSheet != null) {
-										GoogleSheets.deleteRowOnSpreadsheet(service, file_id, currentRow, retrievedSheet.getProperties().getSheetId());
+						if((sheet[2] == null || sheet[2].length() == 0) || sheet[2].equals(e.getChannel().getId())) {
+							try {
+								final var service = GoogleSheets.getSheetsClientService();
+								final var response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
+								int currentRow = 0;
+								for(var row : response.getValues()) {
+									currentRow++;
+									if(row.parallelStream().filter(f -> {
+										String cell = (String)f;
+										if(cell.equals(e.getMessageId()))
+											return true;
+										else
+											return false;
+										}).findAny().orElse(null) != null) {
+										STATIC.killThread("vote"+e.getMessageId());
+										final var file = GoogleSheets.getSpreadsheet(service, file_id);
+										final var retrievedSheet = file.getSheets().parallelStream().filter(f -> f.getProperties().getTitle().equals(row_start)).findAny().orElse(null);
+										if(retrievedSheet != null) {
+											GoogleSheets.deleteRowOnSpreadsheet(service, file_id, currentRow, retrievedSheet.getProperties().getSheetId());
+										}
+										break;
 									}
-									break;
 								}
+							} catch (Exception e1) {
+								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
+								logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
 							}
-						} catch (Exception e1) {
-							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-							logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
 						}
 					}
 				}

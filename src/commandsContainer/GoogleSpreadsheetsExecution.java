@@ -21,6 +21,7 @@ import google.GoogleDrive;
 import google.GoogleSheets;
 import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
 import util.STATIC;
@@ -566,5 +567,123 @@ public class GoogleSpreadsheetsExecution {
 				Hashes.clearTempCache(key);
 			}
 		}
+	}
+	
+	public static void restrict(GuildMessageReceivedEvent e, final String key) {
+		var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
+		if(setup == null) {
+			//db error
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			Hashes.clearTempCache(key);
+		}
+		else if(setup.size() > 0) {
+			//list files
+			StringBuilder out = new StringBuilder();
+			for(int i = 0; i < setup.size(); i++) {
+				final GoogleAPISetup currentSetup = setup.get(i);
+				out.append("**"+(i+1)+": "+currentSetup.getTitle()+"**\n"+GoogleUtils.buildFileURL(currentSetup.getFileID(), currentSetup.getApiID())+"\n\n");
+			}
+			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_RESTRICT_HELP)+out.toString()).build()).queue();
+			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-restrict"));
+		}
+		else {
+			//nothing found information
+			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_NO_FILE)).build()).queue();
+			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+		}
+	}
+	
+	public static void restrictSelection(GuildMessageReceivedEvent e, int selection, final String key) {
+		final var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
+		if(setup == null) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			Hashes.clearTempCache(key);
+		}
+		else if(selection >= 0 && selection < setup.size()) {
+			final var file = setup.get(selection);
+			final var events = Azrael.SQLgetGoogleLinkedEventsRestrictions(file.getFileID(), e.getGuild().getIdLong());
+			if(events == null) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file.getFileID());
+				Hashes.clearTempCache(key);
+			}
+			else if(events.size() > 0) {
+				StringBuilder out = new StringBuilder();
+				int count = 0;
+				for(final int event : events) {
+					if(count == 0)
+						out.append("`"+GoogleEvent.valueOfId(event).value+"`");
+					else
+						out.append(",`"+GoogleEvent.valueOfId(event).value+"`");
+					count++;
+				}
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_EVENT_SELECT)+out.toString()).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-restrict-events", file.getFileID()));
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_RESTRICT_ERR)).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+			}
+		}
+	}
+	
+	public static void restrictEvents(GuildMessageReceivedEvent e, String file_id, String event, final String key) {
+		final var events = Azrael.SQLgetGoogleLinkedEventsRestrictions(file_id, e.getGuild().getIdLong());
+		if(events == null || events.size() == 0) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file_id);
+			Hashes.clearTempCache(key);
+		}
+		else {
+			GoogleEvent EVENT = GoogleEvent.valueOfEvent(event);
+			if(EVENT != null && events.parallelStream().filter(f -> f == EVENT.id).findAny().orElse(null) != null) {
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_RESTRICT_SET)).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-restrict-update", file_id, event));
+			}
+		}
+	}
+	
+	public static void restrictUpdate(GuildMessageReceivedEvent e, String file_id, String event, String channel, final String key) {
+		if(channel.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE))) {
+			final var result = Azrael.SQLUpdateGoogleRemoveChannelRestriction(e.getGuild().getIdLong(), file_id, GoogleEvent.valueOfEvent(event).id);
+			if(result > 0) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_RESTRICT_REMOVE)).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+			}
+			else if(result == 0) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_RESTRICT_ERR_2)).build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("Channel restriction couldn't be removed for google file {} in guild {}", file_id, e.getGuild().getId());
+				Hashes.clearTempCache(key);
+			}
+		}
+		else {
+			final String channel_id = channel.replaceAll("[<#>]*", "");
+			if(channel_id.replaceAll("[0-9]*", "").length() == 0) {
+				final TextChannel textChannel = e.getGuild().getTextChannelById(channel_id);
+				if(textChannel != null) {
+					final var result = Azrael.SQLUpdateGoogleChannelRestriction(e.getGuild().getIdLong(), file_id, GoogleEvent.valueOfEvent(event).id, textChannel.getIdLong());
+					if(result > 0) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_RESTRICT_ADD)).build()).queue();
+						Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+					}
+					else if (result == 0) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_RESTRICT_ERR_3)).build()).queue();
+						Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Channel restriction couldn't be set for google file {} in guild {}", file_id, e.getGuild().getId());
+						Hashes.clearTempCache(key);
+					}
+				}
+			}
+		}
+		Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 	}
 }

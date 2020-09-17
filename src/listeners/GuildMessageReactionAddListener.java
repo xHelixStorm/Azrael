@@ -344,57 +344,58 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 								if(sheet != null && !sheet[0].equals("empty")) {
 									final String file_id = sheet[0];
 									final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
-									
-									try {
-										final var response = GoogleSheets.readWholeSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, row_start);
-										int currentRow = 0;
-										for(var row : response.getValues()) {
-											currentRow++;
-											if(row.parallelStream().filter(f -> {
-												String cell = (String)f;
-												if(cell.equals(e.getMessageId()))
-													return true;
-												else
-													return false;
-												}).findAny().orElse(null) != null) {
-												//retrieve the saved mapping for the vote event
-												final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id, e.getGuild().getIdLong());
-												if(columns != null && columns.size() > 0) {
-													//find out where the up_vote and down_vote columns are and mark them
-													int columnUpVote = 0;
-													int columnDownVote = 0;
-													for(final var column : columns) {
-														if(column.getItem() == GoogleDD.UP_VOTE)
-															columnUpVote = column.getColumn();
-														else if(column.getItem() == GoogleDD.DOWN_VOTE)
-															columnDownVote = column.getColumn();
-													}
-													if(columnUpVote != 0 || columnDownVote != 0) {
-														//build update array
-														ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-														int columnCount = 0;
-														for(final var column : row) {
-															columnCount ++;
-															if(columnCount == columnUpVote)
-																values.add(Arrays.asList("<upVote>"));
-															else if(columnCount == columnDownVote)
-																values.add(Arrays.asList("<downVote>"));
-															else
-																values.add(Arrays.asList(column));
+									if((sheet[2] == null || sheet[2].length() == 0) || sheet[2].equals(e.getChannel().getId())) {
+										try {
+											final var response = GoogleSheets.readWholeSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, row_start);
+											int currentRow = 0;
+											for(var row : response.getValues()) {
+												currentRow++;
+												if(row.parallelStream().filter(f -> {
+													String cell = (String)f;
+													if(cell.equals(e.getMessageId()))
+														return true;
+													else
+														return false;
+													}).findAny().orElse(null) != null) {
+													//retrieve the saved mapping for the vote event
+													final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id, e.getGuild().getIdLong());
+													if(columns != null && columns.size() > 0) {
+														//find out where the up_vote and down_vote columns are and mark them
+														int columnUpVote = 0;
+														int columnDownVote = 0;
+														for(final var column : columns) {
+															if(column.getItem() == GoogleDD.UP_VOTE)
+																columnUpVote = column.getColumn();
+															else if(column.getItem() == GoogleDD.DOWN_VOTE)
+																columnDownVote = column.getColumn();
 														}
-														//execute Runnable
-														if(!STATIC.threadExists("vote"+e.getMessageId())) {
-															new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote)).start();
+														if(columnUpVote != 0 || columnDownVote != 0) {
+															//build update array
+															ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+															int columnCount = 0;
+															for(final var column : row) {
+																columnCount ++;
+																if(columnCount == columnUpVote)
+																	values.add(Arrays.asList("<upVote>"));
+																else if(columnCount == columnDownVote)
+																	values.add(Arrays.asList("<downVote>"));
+																else
+																	values.add(Arrays.asList(column));
+															}
+															//execute Runnable
+															if(!STATIC.threadExists("vote"+e.getMessageId())) {
+																new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote)).start();
+															}
 														}
 													}
+													//interrupt the row search
+													break;
 												}
-												//interrupt the row search
-												break;
 											}
+										} catch (Exception e1) {
+											STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
+											logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
 										}
-									} catch (Exception e1) {
-										STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-										logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
 									}
 								}
 							}

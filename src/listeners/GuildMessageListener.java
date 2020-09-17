@@ -269,7 +269,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "VOTE", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), 0, 0, GoogleEvent.VOTE.id);
+								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "VOTE", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), 0, 0, GoogleEvent.VOTE.id);
 							}
 						}
 						else {
@@ -450,6 +450,8 @@ public class GuildMessageListener extends ListenerAdapter {
 									GoogleSpreadsheetsExecution.sheet(e, key);
 								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAP)))
 									GoogleSpreadsheetsExecution.map(e, key);
+								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_RESTRICT)))
+									GoogleSpreadsheetsExecution.restrict(e, key);
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-events") && lcMessage.matches("[\\d]*")) {
 								GoogleSpreadsheetsExecution.eventsFileSelection(e, Integer.parseInt(message)-1, key);
@@ -474,6 +476,15 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-map-update")) {
 								GoogleSpreadsheetsExecution.mapUpdate(e, google.getAdditionalInfo2(), Integer.parseInt(google.getAdditionalInfo3()), message, key);
+							}
+							else if(google.getAdditionalInfo().equals("spreadsheets-restrict") && lcMessage.matches("[\\d]*")) {
+								GoogleSpreadsheetsExecution.restrictSelection(e, Integer.parseInt(message)-1, key);
+							}
+							else if(google.getAdditionalInfo().equals("spreadsheets-restrict-events")) {
+								GoogleSpreadsheetsExecution.restrictEvents(e, google.getAdditionalInfo2(), message.toUpperCase(), key);
+							}
+							else if(google.getAdditionalInfo().equals("spreadsheets-restrict-update")) {
+								GoogleSpreadsheetsExecution.restrictUpdate(e, google.getAdditionalInfo2(), google.getAdditionalInfo3(), message, key);
 							}
 							
 							//actions for google drive

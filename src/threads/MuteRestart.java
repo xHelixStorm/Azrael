@@ -86,7 +86,7 @@ public class MuteRestart implements Runnable {
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
 							final String NA = STATIC.getTranslation2(guild, Translation.NOT_AVAILABLE);
-							GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, timestamp, user_name, effectiveName, "", "", NA, null, null, "UNMUTED", null, NA, NA, null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id);
+							GoogleUtils.handleSpreadsheetRequest(guild, "", ""+user_id, timestamp, user_name, effectiveName, "", "", NA, null, null, "UNMUTED", null, NA, NA, null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id);
 						}
 					}
 					else
@@ -138,7 +138,7 @@ public class MuteRestart implements Runnable {
 						role_id = role.getId();
 						role_name = role.getName();
 					}
-					GoogleUtils.handleSpreadsheetRequest(guild, ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, effectiveName, reporter_name, reporter_username, NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id);
+					GoogleUtils.handleSpreadsheetRequest(guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, effectiveName, reporter_name, reporter_username, NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id);
 				}
 			}
 		}

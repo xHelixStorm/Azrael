@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -2778,6 +2779,33 @@ public class Azrael {
 		}
 	}
 	
+	public static ArrayList<Integer> SQLgetGoogleLinkedEventsRestrictions(String _file_id, long _guild_id) {
+		logger.trace("SQLgetGoogleLinkedEvents launched. Params passed {}, {}", _file_id, _guild_id);
+		ArrayList<Integer> events = new ArrayList<Integer>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT fk_event_id FROM google_file_to_event INNER JOIN google_event_types ON fk_event_id = event_id WHERE fk_file_id = ? AND fk_guild_id = ? AND restrictable = 1");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _file_id);
+			stmt.setLong(2, _guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				events.add(rs.getInt(1));
+			}
+			return events;
+		} catch (SQLException e) {
+			logger.error("SQLgetGoogleLinkedEvents Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static ArrayList<GoogleEvents> SQLgetGoogleEventsSupportSpreadsheet() {
 		logger.trace("SQLgetGoogleEventsSupportSpreadsheet launched. No params passed");
 		ArrayList<GoogleEvents> events = new ArrayList<GoogleEvents>();
@@ -2790,7 +2818,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				events.add(new GoogleEvents(rs.getInt(1), rs.getString(2), rs.getBoolean(3), rs.getBoolean(4), rs.getBoolean(5)));
+				events.add(new GoogleEvents(rs.getInt(1), rs.getString(2), rs.getBoolean(3), rs.getBoolean(4), rs.getBoolean(5), rs.getBoolean(6)));
 			}
 			return events;
 		} catch (SQLException e) {
@@ -2822,6 +2850,50 @@ public class Azrael {
 		} catch (SQLException e) {
 			logger.error("SQLBatchInsertGoogleFileToEventLink Exception", e);
 			return false;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateGoogleChannelRestriction(long _guild_id, String _file_id, int _event_id, long _channel_id) {
+		logger.trace("SQLUpdateGoogleChannelRestriction launched. Passed params {}, {}, {}, {}", _guild_id, _file_id, _event_id, _channel_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE google_file_to_event SET channel_id = ? WHERE fk_guild_id = ? AND fk_file_id = ? AND fk_event_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _channel_id);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, _file_id);
+			stmt.setInt(4, _event_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateGoogleChannelRestriction Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateGoogleRemoveChannelRestriction(long _guild_id, String _file_id, int _event_id) {
+		logger.trace("SQLUpdateGoogleRemoveChannelRestriction launched. Passed params {}, {}, {}", _guild_id, _file_id, _event_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE google_file_to_event SET channel_id = ? WHERE fk_guild_id = ? AND fk_file_id = ? AND fk_event_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setNull(1, Types.BIGINT);
+			stmt.setLong(2, _guild_id);
+			stmt.setString(3, _file_id);
+			stmt.setInt(4, _event_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateGoogleRemoveChannelRestriction Exception", e);
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -3122,16 +3194,17 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT file_id, sheet_row_start FROM google_files_and_events WHERE guild_id = ? AND api_id = ? AND event_id = ?");
+			String sql = ("SELECT file_id, sheet_row_start, channel_id FROM google_files_and_events WHERE guild_id = ? AND api_id = ? AND event_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _api_id);
 			stmt.setInt(3, _event_id);
 			rs = stmt.executeQuery();
-			String [] array = new String [2];
+			String [] array = new String [3];
 			if(rs.next()) {
 				array[0] = rs.getString(1);
 				array[1] = rs.getString(2);
+				array[2] = rs.getString(3);
 				return array;
 			}
 			array[0] = "empty";

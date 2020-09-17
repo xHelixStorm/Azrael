@@ -93,7 +93,7 @@ public class UnbanListener extends ListenerAdapter {
 			
 			//Run google service, if enabled
 			if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-				GoogleUtils.handleSpreadsheetRequest(e.getGuild(), ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), reason, null, null, "UNBAN", null, null, null, null, null, 0, null, 0, 0, GoogleEvent.UNBAN.id);
+				GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), reason, null, null, "UNBAN", null, null, null, null, null, 0, null, 0, 0, GoogleEvent.UNBAN.id);
 			}
 		}).start();
 	}

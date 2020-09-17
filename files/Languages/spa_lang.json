@@ -148,6 +148,8 @@
 	"param_category":				"category",
 	"param_categories":				"categories",
 	"param_registered_categories":	"registered-categories",
+	"param_none":					"none",
+	"param_restrict":				"restrict",
 
 	"lang_eng":						"English",
 	"lang_ger":						"German",
@@ -440,6 +442,13 @@
 	"google_sheet_not_found":		"¡No se ha encontrado la hoja de cálculo!",
 	"google_sheet_not_inserted":	"¡No se pudo insertar la fila en la hoja de cálculo!",
 	"google_sheet_no_service":		"¡El servicio de hoja de cálculo no se pudo recuperar!",
+	"google_sheet_restrict_help":	"The following spreadsheets are linked! Please select a spreadsheet to restrict an event to a text channel through the shown number:\n\n",
+	"google_sheet_restrict_err":	"There's no linked event to this spreadsheet which can be restricted on a text channel! Please link at least one event that can be restricted before proceeding!",
+	"google_sheet_restrict_err_2":	"This event is already not restricted to a text channel!",
+	"google_sheet_restrict_err_3":	"This channel restriction has been already set!",
+	"google_sheet_restrict_set":	"Now please write a text channel mention or text channel ID to restrict the selected event to a textchannel. To remove it, write *none*!",
+	"google_sheet_restrict_remove":	"Restriction has been removed for this event!",
+	"google_sheet_restrict_add":	"Text channel restriction has been added for this event and spreadsheet!",
 	"google_exit":					"¡Comando de Google terminado!",
 	
 	"heavy_censoring_help":		 	"¡Añade o *enable* o *disable* al comando para usar esta funcionalidad! Si la censura pesada está habilitada y un canal de texto está censurando al menos un idioma, se eliminarán los siguientes mensajes:\n- *Mensajes que contienen sólo una letra*.\n- *Mensajes que contienen capturas de pantalla*.\n- *Mensajes que se repiten varias veces*.\n- *Mensajes que no contienen ninguna letra o dígito normal (p. ej. unicodes)*.\n\n¡Si esta funcionalidad elimina un gran número de mensajes y se ha alcanzado el umbral de 30, advertirá a los usuarios silenciándolos después de eliminar el mensaje! ¡El contador del umbral aumenta para *cada mensaje eliminado* y *disminuye automáticamente en 1* después de cada minuto. Usa el parámetro *reset* para restablecer manualmente el contador a 0!",

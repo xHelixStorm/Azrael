@@ -150,6 +150,8 @@ public enum Translation {
 	PARAM_CATEGORY				("param_category"),
 	PARAM_CATEGORIES			("param_categories"),
 	PARAM_REGISTERED_CATEGORIES	("param_registered_categories"),
+	PARAM_NONE					("param_none"),
+	PARAM_RESTRICT				("param_restrict"),
 	
 	LANG_ENG					("lang_eng"),
 	LANG_GER					("lang_ger"),
@@ -442,6 +444,13 @@ public enum Translation {
 	GOOGLE_SHEET_NOT_FOUND		("google_sheet_not_found"),
 	GOOGLE_SHEET_NOT_INSERTED	("google_row_not_inserted"),
 	GOOGLE_SHEET_NO_SERVICE		("google_sheet_no_service"),
+	GOOGLE_SHEET_RESTRICT_HELP	("google_sheet_restrict_help"),
+	GOOGLE_SHEET_RESTRICT_ERR	("google_sheet_restrict_err"),
+	GOOGLE_SHEET_RESTRICT_ERR_2	("google_sheet_restrict_err_2"),
+	GOOGLE_SHEET_RESTRICT_ERR_3	("google_sheet_restrict_err_3"),
+	GOOGLE_SHEET_RESTRICT_SET	("google_sheet_restrict_set"),
+	GOOGLE_SHEET_RESTRICT_REMOVE("google_sheet_restrict_remove"),
+	GOOGLE_SHEET_RESTRICT_ADD	("google_sheet_restrict_add"),
 	GOOGLE_EXIT					("google_exit"),
 	
 	HEAVY_CENSORING_HELP		("heavy_censoring_help"),

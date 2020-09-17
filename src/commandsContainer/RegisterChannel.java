@@ -86,14 +86,14 @@ public class RegisterChannel {
 							if(result == 0)
 								logger.error("New channel type {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
 						}
-						case "bot", "co1", "co2", "co3" -> {
+						case "bot", "co1", "co2", "co3", "vot" -> {
 							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
 							Azrael.SQLDeleteChannel_Filter(channel_id);
 							if(result == 0)
 								logger.error("New channel filter all couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_id, _guild_id);
 							
 						}
-						case "log", "tra", "rea", "qui", "rss", "wat", "del", "edi", "vot" -> {
+						case "log", "tra", "rea", "qui", "rss", "wat", "del", "edi" -> {
 							Azrael.SQLDeleteChannelType(channel_type, _guild_id);
 							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
 							if(result == 0)
