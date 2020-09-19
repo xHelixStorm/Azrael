@@ -28,6 +28,7 @@ import commands.Google;
 import commands.HeavyCensoring;
 import commands.Inventory;
 import commands.Join;
+import commands.Language;
 import commands.Leaderboard;
 import commands.Leave;
 import commands.Matchmaking;
@@ -240,6 +241,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("web", new Web());
 		CommandHandler.commandsPublic.put("accept", new Accept());
 		CommandHandler.commandsPublic.put("deny", new Deny());
+		CommandHandler.commandsPublic.put("language", new Language());
 	}
 	
 	public static void addPrivateCommands() {

@@ -11,6 +11,7 @@ import commandsContainer.SetCompServer;
 import commandsContainer.SetDailyItem;
 import commandsContainer.SetGiveawayItems;
 import commandsContainer.SetIconDefaultSkin;
+import commandsContainer.SetLanguage;
 import commandsContainer.SetLevelDefaultSkin;
 import commandsContainer.SetMaps;
 import commandsContainer.SetMatchmakingMembers;
@@ -456,6 +457,21 @@ public class Set implements CommandPublic {
 				commandLevel = GuildIni.getSetMapsLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetMaps.runTask(e, args);
+				}
+				else {
+					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
+				}
+			}
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LANGUAGE))) {
+				commandLevel = GuildIni.getSetLanguageLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+					SetLanguage.runHelp(e);
+				}
+			}
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LANGUAGE))) {
+				commandLevel = GuildIni.getSetLanguageLevel(e.getGuild().getIdLong());
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+					SetLanguage.runTask(e, args);
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);

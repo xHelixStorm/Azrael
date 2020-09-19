@@ -550,6 +550,26 @@ public class Azrael {
 		return language;
 	}
 	
+	public static int SQLUpdateUserLanguage(long _user_id, String _language) {
+		logger.trace("SQLUpdateUserLanguage launched. Passed params {}, {}", _user_id, _language);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE users SET lang = ? WHERE user_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _language);
+			stmt.setLong(2, _user_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateUserLanguage Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static long SQLgetGuild(long _guild_id) {
 		logger.trace("SQLgetGuild launched. Passed params {}", _guild_id);
 		Connection myConn = null;
@@ -613,7 +633,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateLanguage Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -3308,6 +3328,58 @@ public class Azrael {
 		} catch (SQLException e) {
 			logger.error("SQLgetLanguages Exception", e);
 			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<String> SQLgetTranslatedLanguages(String _lang) {
+		logger.trace("SQLgetTranslatedLanguages launched. Params passed {}", _lang);
+		ArrayList<String> langs = new ArrayList<String>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT lang, translation FROM languages_translation WHERE lang2 = ? AND translated = 1");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _lang);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				langs.add(rs.getString(1)+"-"+rs.getString(2));
+			}
+			return langs;
+		} catch (SQLException e) {
+			logger.error("SQLgetTranslatedLanguages Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLisLanguageTranslated(String _lang, String _lang2) {
+		logger.trace("SQLisLanguageTranslated launched. Params passed {}, {}", _lang, _lang2);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT * FROM languages_translation WHERE lang = ? AND lang2 = ? AND translated = 1");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setString(1, _lang);
+			stmt.setString(2, _lang2);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				return true;
+			}
+			return false;
+		} catch (SQLException e) {
+			logger.error("SQLisLanguageTranslated Exception", e);
+			return false;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

@@ -150,6 +150,7 @@
 	"param_registered_categories":	"registrierte-kategorien",
 	"param_none":					"keinen",
 	"param_restrict":				"begrenzen",
+	"param_language":				"sprache",
 
 	"lang_eng":						"Englisch",
 	"lang_ger":						"Deutsch",
@@ -261,15 +262,18 @@
 	"command_about":			 	"- **{}about**\nEine Zusammenfassung des Bot anzeigen.\n",
 	"command_display":			 	"- **{}display**\nAnzeige registrierter Rollen, Kanäle und mehr (einige Parameter können eingeschränkt sein).\n",
 	"command_patchnotes":		 	"- **{}patchnotes**\nVerfügbare Patch-Notizen anzeigen.\n",
-	"command_matchmaking":		 	"- **{}matchmaking**\nCreate a matchmaking room.\n",
-	"command_join":		 			"- **{}join**\nJoin a matchmaking room.\n",
-	"command_leave":		 		"- **{}leave**\nLeave an already joined matchmaking room.\n",
-	"command_clan":				 	"- **{}clan**\nJoin or manage a clan.\n",
-	"command_queue":			 	"- **{}queue**\nDisplay all queue members of the joined matchmaking room.\n",
-	"command_cw":		 			"- **{}cw**\nInteract with other clans to organize clan wars.\n",
-	"command_room":				 	"- **{}room**\nManage matchmaking rooms and declare winners.\n",
-	"command_stats":		 		"- **{}patchnotes**\nDisplay your current ELO and matchmaking stats.\n",
-	"command_leaderboard":		 	"- **{}leaderboard**\nDisplay top 10 users with most ELO points.\n",
+	"command_matchmaking":		 	"- **{}matchmaking**\nErstelle einen Matchmaking Raum.\n",
+	"command_join":		 			"- **{}join**\nBetrete einen Matchmaking Raum.\n",
+	"command_leave":		 		"- **{}leave**\nVerlasse einen beigetretenen Matchmaking Raum.\n",
+	"command_clan":				 	"- **{}clan**\nTrete einen Klan bei oder verwalte dieses.\n",
+	"command_queue":			 	"- **{}queue**\nZeige alle Mitglieder im Matchmaking Raum.\n",
+	"command_cw":		 			"- **{}cw**\nFordere andere Klans zu Klan Kriege heraus.\n",
+	"command_room":				 	"- **{}room**\nVerwalte Matchmaking Räume und wähle Gewinner.\n",
+	"command_stats":		 		"- **{}stats**\nZeige deine momentanen Punkte und ELO Level.\n",
+	"command_leaderboard":		 	"- **{}leaderboard**\nZeige die Top 10 Benutzer mit die meisten ELO Punkte.\n",
+	"command_accept":			 	"- **{}accept**\nAkzeptiere einen wartenden Benutzer in den Server.\n",
+	"command_deny":				 	"- **{}deny**\nKicke einen wartenden Benutzer vom Server.\n",
+	"command_language":		 		"- **{}language**\nÄndere die Bot Sprache.\n",
 	"commands_disabled":		 	"Alle Befehle sind deaktiviert!",
 	
 	"daily_reward":				 	"Herzlichen Glückwunsch! Sie haben die folgende Belohnung freigeschaltet:\n",
@@ -595,7 +599,7 @@
 	"role_reaction_disable":		"Rollen-Reaktionen wurden deaktiviert und alle nicht persistenten Reaktions-Rollen wurden von allen Benutzern entfernt!",
 	"role_reaction_print":			"Weisen Sie sich selbst eine einzigartige Rolle zu! Reagieren Sie auf eine der folgenden Reaktionen, um Ihre Rolle zu erhalten! Um die Rolle entfernt zu bekommen, reagieren Sie einfach noch einmal! Hier eine Auflistung mit allen verfügbaren Reaktionen und Rollen:\n\n",
 	
-	"set_help":						"Aktualisieren Sie Optionen und Funktionalitäten! Diese Parameter sind verfügbar:\n\n- **berechtigungslevel**:\nAktualisieren Sie die Berechtigungsstufe einer Rolle.\n- **kanal-zensur**:\nStellen Sie eine oder mehrere Zensursprachen für einen Textkanal ein.\n- **warnungen**:\nDefinieren Sie die maximale Anzahl von Warnungen, die ein Benutzer erhalten kann, bevor er ein Verbot oder eine permanente Stummschaltung erhält, und legen Sie für jede Warnung eine Stummschaltungszeit fest.\n- **stufensystem**:\nAktivieren oder deaktivieren Sie das Stufensystem\n- **max-erfahrung**:\nDefinieren Sie ein tägliches Limit an erreichbaren Erfahrungspunkten oder aktivieren und deaktivieren Sie diese Funktionalität.\n- **standard-level-bild**:\nDefinieren Sie einen Standard Level Up Bild.\n- **standard-rank-bild**:\nDefinieren Sie einen Standard Rang Bild.\n- **standard-profile-skin**:\nDefinieren Sie einen Standard Profil Bild.\n- **standard-rang-bild**:\nDefinieren Sie Symbole auf den Bezug zum Level.\n- **tägliche-belohnung**:\nDefinieren Sie Gegenstände, die man täglich gewinnen kann.\n- **belohnungen-verlosen**:\nFügen Sie Belohnungen hinzu für das daily Befehl.\n- **comp-server**:\nDefinieren Sie kompetitive Server für das matchmaking Befehl.\n- **max-klan-mitglieder**\nLegen Sie eine Grenze für die Anzahl der Mitglieder fest, die einem Klan angehören dürfen.\n- **matchmaking-mitglieder**:\nLegen Sie eine Grenze für die Anzahl der Mitglieder fest, die einem matchmaking Raum beitreten können.\n- **karte**:\nFügen Sie Karten hinzu für alle kompetitive Befehle.",
+	"set_help":						"Aktualisieren Sie Optionen und Funktionalitäten! Diese Parameter sind verfügbar:\n\n- **berechtigungslevel**:\nAktualisieren Sie die Berechtigungsstufe einer Rolle.\n- **kanal-zensur**:\nStellen Sie eine oder mehrere Zensursprachen für einen Textkanal ein.\n- **warnungen**:\nDefinieren Sie die maximale Anzahl von Warnungen, die ein Benutzer erhalten kann, bevor er ein Verbot oder eine permanente Stummschaltung erhält, und legen Sie für jede Warnung eine Stummschaltungszeit fest.\n- **stufensystem**:\nAktivieren oder deaktivieren Sie das Stufensystem\n- **max-erfahrung**:\nDefinieren Sie ein tägliches Limit an erreichbaren Erfahrungspunkten oder aktivieren und deaktivieren Sie diese Funktionalität.\n- **standard-level-bild**:\nDefinieren Sie einen Standard Level Up Bild.\n- **standard-rank-bild**:\nDefinieren Sie einen Standard Rang Bild.\n- **standard-profile-skin**:\nDefinieren Sie einen Standard Profil Bild.\n- **standard-rang-bild**:\nDefinieren Sie Symbole auf den Bezug zum Level.\n- **tägliche-belohnung**:\nDefinieren Sie Gegenstände, die man täglich gewinnen kann.\n- **belohnungen-verlosen**:\nFügen Sie Belohnungen hinzu für das daily Befehl.\n- **comp-server**:\nDefinieren Sie kompetitive Server für das matchmaking Befehl.\n- **max-klan-mitglieder**\nLegen Sie eine Grenze für die Anzahl der Mitglieder fest, die einem Klan angehören dürfen.\n- **matchmaking-mitglieder**:\nLegen Sie eine Grenze für die Anzahl der Mitglieder fest, die einem matchmaking Raum beitreten können.\n- **karte**:\nFügen Sie Karten hinzu für alle kompetitive Befehle.\n- **sprache**:\nÄndere die Bot Sprache für den ganzen Server.",
 	"set_permission":				"Ändern Sie die Berechtigungsstufe einer Rolle zwischen 0 (niedrigste) und 100 (höchste)! Schreiben Sie als zweiten Parameter eine numerische Rollen-ID und als dritten Parameter die numerische Berechtigungsstufe!",
 	"set_permission_added":			"Die Berechtigungsstufe wurde für diese Rolle erfolgreich aktualisiert!",
 	"set_permission_no_level":		"Bitte geben Sie als dritten Parameter eine numerische Berechtigungsstufe zwischen 0 und 100 an!",
@@ -653,6 +657,9 @@
 	"set_maps_help":				"Registrieren Sie optionale Karten, die mit kompetitiven Befehlen verwendet werden können! Schreiben Sie den Namen der Karte als zweiten Parameter und, falls verfügbar, eine Bild-URL als dritten Parameter.",
 	"set_maps_err":					"Wenn Sie eine Bildurl für die Karte festlegen, stellen Sie bitte sicher, dass die angegebene Url gültig ist!",
 	"set_maps_success":				"Karte wurde erfolgreich hinzugefügt oder aktualisiert!",
+	"set_language_help":			"Schreiben Sie eines der unten angegebenen Sprachen um die Bot Sprache für den ganzen Server zu ändern!",
+	"set_language_err":				"Diese Sprache wurde nicht übersetzt!",
+	"set_language_success":			"Die Server Sprache wurde erfolgreich aktualisiert!",
 	
 	"shop_title":					"Willkommen, treten Sie ein!",
 	"shop_help":					"Willkommen in meinem Geschäft! Schauen Sie sich um! Schreiben Sie den Abschnitt aus, den Sie sich näher ansehen möchten, und schreiben Sie *verlassen*, wenn Sie gehen möchten!\n\n*LEVEL UPS*:\nInspizieren und Kaufen Sie Level-Up-Bilder!\n*RÄNGE*:\nInspizieren und Kaufen Sie Rang-Bilder!\n*PROFILE*:\nInspizieren und Kaufen Sie Profil-Bilder!\n*SYMBOLE*:\nInspizieren und kaufen Sie Symbole, die zusammen mit anderen Bild-Arten verwendet werden!\n*GEGENSTÄNDE*:\nInspizieren und kaufen Sie Gegenstände wie einen Erfahrung-Booster!\n*WAFFEN*:\nInspizieren und kaufen Sie Waffen für ihren Arsenal!\n*FERTIGKEITEN*:\nInspizieren und kaufen Sie Fertigkeiten!",
@@ -1241,5 +1248,8 @@
 	
 	"deny_help":					"Erwähnen Sie einen Benutzer oder schreiben Sie eine Benutzer ID um den Benutzer zu verifizieren! Der Benutzer wird mit diesem Befehl vom Server gekickt und den Einlass zum Server nicht gewährt! Optional kann einen Grund als zweiten Parameter angegeben werden.",
 	"deny_reason":					"Verfizierung abgelehnt!",
-	"deny_done":					"Die Verifizierung für den Benutzer {} mit der ID Nummer {} wurde abgelehnt und darf den Server nicht betreten!"
+	"deny_done":					"Die Verifizierung für den Benutzer {} mit der ID Nummer {} wurde abgelehnt und darf den Server nicht betreten!",
+	
+	"language_help":				"Wähle eines der unten stehenden Sprachen zusammen mit den Befehl aus um die Bot Sprache zu ändern, zB. für die Antworten auf Befehlen!",
+	"language_changed":				"Bot Sprache wurde geändert!"
 }

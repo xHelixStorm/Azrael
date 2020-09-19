@@ -152,6 +152,7 @@ public enum Translation {
 	PARAM_REGISTERED_CATEGORIES	("param_registered_categories"),
 	PARAM_NONE					("param_none"),
 	PARAM_RESTRICT				("param_restrict"),
+	PARAM_LANGUAGE				("param_language"),
 	
 	LANG_ENG					("lang_eng"),
 	LANG_GER					("lang_ger"),
@@ -272,6 +273,9 @@ public enum Translation {
 	COMMAND_ROOM				("command_room"),
 	COMMAND_STATS				("command_stats"),
 	COMMAND_LEADERBOARD			("command_leaderboard"),
+	COMMAND_ACCEPT				("command_accept"),
+	COMMAND_DENY				("command_deny"),
+	COMMAND_LANGUAGE			("command_language"),
 	COMMANDS_DISABLED			("commands_disabled"),
 	
 	DAILY_REWARD				("daily_reward"),
@@ -655,6 +659,9 @@ public enum Translation {
 	SET_MAPS_HELP				("set_maps_help"),
 	SET_MAPS_ERR				("set_maps_err"),
 	SET_MAPS_SUCCESS			("set_maps_success"),
+	SET_LANGUAGE_HELP			("set_language_help"),
+	SET_LANGUAGE_ERR			("set_language_err"),
+	SET_LANGUAGE_SUCCESS		("set_language_success"),
 	
 	SHOP_TITLE					("shop_title"),
 	SHOP_HELP					("shop_help"),
@@ -1243,7 +1250,10 @@ public enum Translation {
 	
 	DENY_HELP					("deny_help"),
 	DENY_REASON					("deny_reason"),
-	DENY_DONE					("deny_done");
+	DENY_DONE					("deny_done"),
+	
+	LANGUAGE_HELP				("language_help"),
+	LANGUAGE_CHANGED			("language_changed");
 	
 	private String value;
 	

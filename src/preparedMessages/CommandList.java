@@ -14,7 +14,7 @@ public class CommandList {
 		boolean entertainment = false;
 		boolean other = false;
 		
-		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getSubscribeCommand(guild_id) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoringCommand(guild_id) || GuildIni.getMuteCommand(guild_id) || GuildIni.getGoogleCommand(guild_id) || GuildIni.getWriteCommand(guild_id) || GuildIni.getEditCommand(guild_id))) {
+		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getSubscribeCommand(guild_id) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoringCommand(guild_id) || GuildIni.getMuteCommand(guild_id) || GuildIni.getGoogleCommand(guild_id) || GuildIni.getWriteCommand(guild_id) || GuildIni.getEditCommand(guild_id) || GuildIni.getAcceptCommand(guild_id) || GuildIni.getDenyCommand(guild_id))) {
 			administration = true;
 		}
 		
@@ -22,7 +22,7 @@ public class CommandList {
 			entertainment = true;
 		}
 		
-		if(GuildIni.getAboutCommand(guild_id) || GuildIni.getHelpCommand(guild_id) || GuildIni.getDisplayCommand(guild_id) || GuildIni.getPatchnotesCommand(guild_id)) {
+		if(GuildIni.getAboutCommand(guild_id) || GuildIni.getHelpCommand(guild_id) || GuildIni.getDisplayCommand(guild_id) || GuildIni.getPatchnotesCommand(guild_id) || GuildIni.getLanguageCommand(guild_id)) {
 			other = true;
 		}
 		
@@ -41,6 +41,8 @@ public class CommandList {
 			if(GuildIni.getGoogleCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_GOOGLE).replace("{}", prefix));
 			if(GuildIni.getWriteCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_WRITE).replace("{}", prefix));
 			if(GuildIni.getEditCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_EDIT).replace("{}", prefix));
+			if(GuildIni.getAcceptCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ACCEPT).replace("{}", prefix));
+			if(GuildIni.getDenyCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DENY).replace("{}", prefix));
 		}
 		if(entertainment == true && type == 2) {
 			if(GuildIni.getPugCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PUG).replace("{}", prefix));
@@ -69,6 +71,7 @@ public class CommandList {
 			if(GuildIni.getAboutCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ABOUT).replace("{}", prefix));
 			if(GuildIni.getDisplayCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DISPLAY).replace("{}", prefix));
 			if(GuildIni.getPatchnotesCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PATCHNOTES).replace("{}", prefix));
+			if(GuildIni.getLanguageCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_LANGUAGE).replace("{}", prefix));
 		}
 		
 		if(administration == false && entertainment == false && other == false){

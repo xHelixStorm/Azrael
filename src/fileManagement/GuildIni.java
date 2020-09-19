@@ -136,6 +136,7 @@ public class GuildIni {
 		commands.put("Leaderboard", "false");
 		commands.put("Accept", "false");
 		commands.put("Deny", "false");
+		commands.put("Language", "false");
 		fileContent.put("Commands", commands);
 		
 		//collect all CommandLevels variables
@@ -187,6 +188,7 @@ public class GuildIni {
 		commandLevels.put("SetMatchmakingMembers", "20");
 		commandLevels.put("SetMaxClanMembers", "20");
 		commandLevels.put("SetMaps", "20");
+		commandLevels.put("SetLanguage", "20");
 		commandLevels.put("Shop", "1");
 		commandLevels.put("Top", "1");
 		commandLevels.put("Use", "1");
@@ -247,6 +249,7 @@ public class GuildIni {
 		commandLevels.put("Leaderboard", "1");
 		commandLevels.put("Accept", "20");
 		commandLevels.put("Deny", "20");
+		commandLevels.put("Language", "20");
 		fileContent.put("CommandLevels", commandLevels);
 	}
 	
@@ -816,6 +819,10 @@ public class GuildIni {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "SetMaps", int.class);
 	}
+	public static int getSetLanguageLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "SetLanguage", int.class);
+	}
 	public static boolean getShopCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Commands", "Shop", boolean.class);
@@ -1171,5 +1178,13 @@ public class GuildIni {
 	public static int getDenyLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "Deny", int.class);
+	}
+	public static boolean getLanguageCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Language", boolean.class);
+	}
+	public static int getLanguageLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Language", int.class);
 	}
 }

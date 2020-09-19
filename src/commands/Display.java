@@ -366,6 +366,9 @@ public class Display implements CommandPublic{
 				out.append("Reopen rooms room subcommand: "+GuildIni.getRoomReopenLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Stats command: "+GuildIni.getStatsLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Leaderboard command: "+GuildIni.getLeaderboardLevel(e.getGuild().getIdLong()));
+				out.append("Accept command: "+GuildIni.getAcceptLevel(e.getGuild().getIdLong()));
+				out.append("Deny command: "+GuildIni.getDenyLevel(e.getGuild().getIdLong()));
+				out.append("Language command: "+GuildIni.getLanguageLevel(e.getGuild().getIdLong()));
 				//print second part
 				e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
 			}
