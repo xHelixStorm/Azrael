@@ -1011,7 +1011,7 @@
 	"unban_message":				"**{}** with the ID number **{}** has been unbanned!\nUnbanned by: **{}**\nReason: ",
 	"unban_flag_err":				"An internal error occurred! The ban flag couldn't be removed! Please contact an administrator!",
 	
-	"meow_help":					"Write one of these parameters together with the command to display a car picture!\n\n",
+	"meow_help":					"Write one of these parameters together with the command to display a cat picture!\n\n",
 	"meow_help_1":					"meow emojis:\n",
 	"meow_help_2":					"Cat emojis with food:\n",
 	"meow_help_3":					"Parameters for a random cat:\n",
@@ -1200,7 +1200,7 @@
 	"room_param_3":					"`reopen` Reopen the room and undo stats.",
 	"room_close":					"Room number {} has been removed!",
 	"room_winner_help":				"Write either **1** for {} or **2** for {} to select the winning team of the room!",
-	"room_winner_err":				"Please write either 1 or 2 to select the winning team",
+	"room_winner_err":				"Please write either 1 or 2 to select the winning team!",
 	"room_winner_decided":			"{} is the winner of room {}",
 	"room_reopen":					"Room {} has been reopened and stats have been resetted! Status of the room has been set to Review!",
 	
@@ -1237,7 +1237,7 @@
 	"accept_help":					"Mention a user or write the user ID of that user to complete the verification! Every verified user will receive the verified role!",
 	"accept_reason":				"User has been accepted to join the server!",
 	"accept_err":					"The selected user is currently in no waiting room!",
-	"accept_done":					"The user {} with the id number {} has been accepted to the server!",
+	"accept_done":					"The user {} with the ID number {} has been accepted to the server!",
 	
 	"deny_help":					"Mention a user or write the user ID of that user to complete the verification! The user will be kicked from the server upon denying! Optionally, add a reason as second parameter to deny the user.",
 	"deny_reason":					"Verification denied!",
