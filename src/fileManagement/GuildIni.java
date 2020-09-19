@@ -249,7 +249,7 @@ public class GuildIni {
 		commandLevels.put("Leaderboard", "1");
 		commandLevels.put("Accept", "20");
 		commandLevels.put("Deny", "20");
-		commandLevels.put("Language", "20");
+		commandLevels.put("Language", "1");
 		fileContent.put("CommandLevels", commandLevels);
 	}
 	
