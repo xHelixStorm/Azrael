@@ -53,7 +53,7 @@ public class RankingMethods extends ListenerAdapter {
 		}
 		
 		try {
-			BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+rank_icon+"."+skinIcon.getFileType()));
+			BufferedImage rank = ImageIO.read(new File((skinIcon.getSource() == null ? "./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+rank_icon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rank_icon+"."+skinIcon.getFileType())));
 			String name = e.getMember().getEffectiveName();
 			int characterCounter = name.length();
 			int level = (user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel());
@@ -86,7 +86,7 @@ public class RankingMethods extends ListenerAdapter {
 				name = name.substring(0, skin.getNameLengthLimit());
 			
 			if(!skin.getFileType().equals("gif")) {
-				BufferedImage rankUp = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/"+skin.getSkinDescription()+"."+skin.getFileType()));
+				BufferedImage rankUp = ImageIO.read(new File((skin.getSource() == null ? "./files/RankingSystem/"+theme_id+"/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				int rankUpW = rankUp.getWidth();
 				int rankUpH = rankUp.getHeight();
 				BufferedImage overlay = new BufferedImage(rankUpW, rankUpH, BufferedImage.TYPE_4BYTE_ABGR);
@@ -111,7 +111,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.dispose();
 			}
 			else {
-				final GifImage gif = GifDecoder.read(new FileInputStream("./files/RankingSystem/"+theme_id+"/Skins/"+skin.getSkinDescription()+"."+skin.getFileType()));
+				final GifImage gif = GifDecoder.read(new FileInputStream(skin.getSource() == null ? "./files/RankingSystem/"+theme_id+"/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType()));
 				var frames = gif.getFrameCount();
 				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(IniFileReader.getTempDirectory()+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
 				int rankUpW = gif.getWidth();

@@ -43,6 +43,7 @@ public class UserRank {
 	private String fileType;
 	private int themeID;
 	private int line;
+	private String source;
 	
 	public int getNameLengthLimit() {
 		return nameLengthLimit;
@@ -140,6 +141,9 @@ public class UserRank {
 	public int getLine() {
 		return line;
 	}
+	public String getSource() {
+		return source;
+	}
 	public void setNameLengthLimit(int nameLengthLimit) {
 		this.nameLengthLimit = nameLengthLimit;
 	}
@@ -235,5 +239,8 @@ public class UserRank {
 	}
 	public void setLine(int line) {
 		this.line = line;
+	}
+	public void setSource(String source) {
+		this.source = source;
 	}
 }

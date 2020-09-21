@@ -6,6 +6,7 @@ public class UserIcon {
 	private String fileType;
 	private int themeID;
 	private int line;
+	private String source;
 	
 	public int getSkin() {
 		return skin;
@@ -22,6 +23,9 @@ public class UserIcon {
 	public int getLine() {
 		return line;
 	}
+	public String getSource() {
+		return source;
+	}
 	public void setSkin(int skin) {
 		this.skin = skin;
 	}
@@ -36,5 +40,8 @@ public class UserIcon {
 	}
 	public void setLine(int line) {
 		this.line = line;
+	}
+	public void setSource(String source) {
+		this.source = source;
 	}
 }

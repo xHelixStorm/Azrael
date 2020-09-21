@@ -872,6 +872,7 @@ public class RankingSystem {
 					levelSkin.setNameFontSize(rs.getInt(17));
 					levelSkin.setThemeID(rs.getInt(18));
 					levelSkin.setLine(rs.getInt(19));
+					levelSkin.setSource(rs.getString(20));
 					Hashes.addLevelSkin(levelSkin.getSkin(), levelSkin);
 					return levelSkin;
 				}
@@ -926,6 +927,7 @@ public class RankingSystem {
 				levelSkin.setNameFontSize(rs.getInt(17));
 				levelSkin.setThemeID(rs.getInt(18));
 				levelSkin.setLine(rs.getInt(19));
+				levelSkin.setSource(rs.getString(20));
 				levelList.add(levelSkin);
 				Hashes.addLevelSkin(levelSkin.getSkin(), levelSkin);
 			}
@@ -987,6 +989,7 @@ public class RankingSystem {
 					rankSkin.setNameFontSize(rs.getInt(28));
 					rankSkin.setThemeID(rs.getInt(29));
 					rankSkin.setLine(rs.getInt(30));
+					rankSkin.setSource(rs.getString(31));
 					Hashes.addRankSkin(rankSkin.getSkin(), rankSkin);
 					return rankSkin;
 				}
@@ -1052,6 +1055,7 @@ public class RankingSystem {
 				rankSkin.setNameFontSize(rs.getInt(28));
 				rankSkin.setThemeID(rs.getInt(29));
 				rankSkin.setLine(rs.getInt(30));
+				rankSkin.setSource(rs.getString(31));
 				Hashes.addRankSkin(rankSkin.getSkin(), rankSkin);
 				skinList.add(rankSkin);
 			}
@@ -1122,6 +1126,7 @@ public class RankingSystem {
 					profileSkin.setDescriptionMode(rs.getInt(37));
 					profileSkin.setThemeID(rs.getInt(38));
 					profileSkin.setLine(rs.getInt(39));
+					profileSkin.setSource(rs.getString(40));
 					Hashes.addProfileSkin(profileSkin.getSkin(), profileSkin);
 					return profileSkin;
 				}
@@ -1196,6 +1201,7 @@ public class RankingSystem {
 				profileSkin.setDescriptionMode(rs.getInt(37));
 				profileSkin.setThemeID(rs.getInt(38));
 				profileSkin.setLine(rs.getInt(39));
+				profileSkin.setSource(rs.getString(40));
 				Hashes.addProfileSkin(profileSkin.getSkin(), profileSkin);
 				skinList.add(profileSkin);
 			}

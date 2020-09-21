@@ -26,6 +26,7 @@ public class UserLevel {
 	private String fileType;
 	private int themeID;
 	private int line;
+	private String source;
 	
 	public int getNameLengthLimit() {
 		return nameLengthLimit;
@@ -84,6 +85,9 @@ public class UserLevel {
 	public int getLine() {
 		return line;
 	}
+	public String getSource() {
+		return source;
+	}
 	public void setNameLengthLimit(int nameLengthLimit) {
 		this.nameLengthLimit = nameLengthLimit;
 	}
@@ -140,5 +144,8 @@ public class UserLevel {
 	}
 	public void setLine(int line) {
 		this.line = line;
+	}
+	public void setSource(String source) {
+		this.source = source;
 	}
 }
