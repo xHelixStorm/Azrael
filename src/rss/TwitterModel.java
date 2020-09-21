@@ -53,6 +53,8 @@ public class TwitterModel {
 					QueryResult result;
 					result = twitter.search(query);
 					List<Status> tweets;
+					if(result.getTweets().size() > 0)
+						success = true;
 					if(result.getTweets().size() >= 30)
 						tweets = result.getTweets().subList(0, 29);
 					else
@@ -192,7 +194,6 @@ public class TwitterModel {
 				                	}
 				                	
 				                	if(printMessage) {
-				                		success = true;
 				                		String format = rss.getFormat();
 					                	String out = format.replace("{description}", message);
 										out = out.replace("{pubDate}", pubDate);
