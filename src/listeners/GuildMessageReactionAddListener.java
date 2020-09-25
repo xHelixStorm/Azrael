@@ -340,7 +340,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 							
 							//Run google service, if enabled
 							if(runSpreadsheet && GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
-								final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id);
+								final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
 								if(sheet != null && !sheet[0].equals("empty")) {
 									final String file_id = sheet[0];
 									final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");

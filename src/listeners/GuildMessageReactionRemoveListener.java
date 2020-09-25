@@ -142,7 +142,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 					final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
 					final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.VOT.getType())).findAny().orElse(null);
 					if(thisChannel != null) {
-						final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id);
+						final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
 						if(sheet != null && !sheet[0].equals("empty")) {
 							final String file_id = sheet[0];
 							final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");

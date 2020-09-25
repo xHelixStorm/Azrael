@@ -3207,18 +3207,19 @@ public class Azrael {
 		}
 	}
 	
-	public static String [] SQLgetGoogleFilesAndEvent(long _guild_id, int _api_id, int _event_id) {
-		logger.trace("SQLgetGoogleFilesAndEvent launched. Params passed {}, {}, {}", _guild_id, _api_id, _event_id);
+	public static String [] SQLgetGoogleFilesAndEvent(long _guild_id, int _api_id, int _event_id, String _channel_id) {
+		logger.trace("SQLgetGoogleFilesAndEvent launched. Params passed {}, {}, {}, {}", _guild_id, _api_id, _event_id, _channel_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT file_id, sheet_row_start, channel_id FROM google_files_and_events WHERE guild_id = ? AND api_id = ? AND event_id = ?");
+			String sql = ("SELECT file_id, sheet_row_start, channel_id FROM google_files_and_events WHERE guild_id = ? AND api_id = ? AND event_id = ? AND (channel_id = ? OR channel_id IS NULL OR channel_id = 0) ORDER BY channel_id desc LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _api_id);
 			stmt.setInt(3, _event_id);
+			stmt.setString(4, _channel_id);
 			rs = stmt.executeQuery();
 			String [] array = new String [3];
 			if(rs.next()) {
