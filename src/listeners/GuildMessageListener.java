@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -269,7 +270,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "VOTE", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), 0, 0, GoogleEvent.VOTE.id);
+								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "VOTE", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), null, 0, 0, GoogleEvent.VOTE.id);
 							}
 						}
 						else {
@@ -771,6 +772,22 @@ public class GuildMessageListener extends ListenerAdapter {
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
 						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log messages of watched users", e.getChannel().getId(), e.getGuild().getId());
+					}
+				}
+				
+				//Run google service, if enabled
+				if(!e.getMember().getUser().isBot() && GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+					//log low priority messages to google spreadsheets
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
+						e.getChannel().retrieveMessageById(e.getMessageId()).queueAfter(10, TimeUnit.SECONDS, m -> {
+							StringBuilder urls = new StringBuilder();
+							for(final var attachment : e.getMessage().getAttachments()) {
+								urls.append(attachment.getProxyUrl()+"\n");
+							}
+							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "COMMENT", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim(), 0, 0, GoogleEvent.COMMENT.id);
+						}, err -> {
+							//message was removed
+						});
 					}
 				}
 			}).start();

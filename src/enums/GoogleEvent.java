@@ -24,7 +24,8 @@ public enum GoogleEvent {
 	RENAME			(8, "RENAME"),
 	RENAME_MANUAL	(9, "RENAME_MANUAL"),
 	VOTE			(10, "VOTE"),
-	EXPORT			(11, "EXPORT");
+	EXPORT			(11, "EXPORT"),
+	COMMENT			(12, "COMMENT");
 	
 	/**
 	 * Maps defined here to retrieve enum either by id or value

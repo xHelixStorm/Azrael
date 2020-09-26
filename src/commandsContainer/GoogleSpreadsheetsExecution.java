@@ -257,13 +257,15 @@ public class GoogleSpreadsheetsExecution {
 	public static void eventsFileHandler(GuildMessageReceivedEvent e, String userMessage, String file_id, final String key) {
 		boolean addEvents;
 		String [] events;
+		final String ADD = STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD);
+		final String REMOVE = STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE);
 		if(userMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD))) {
-			userMessage = userMessage.substring(4);
+			userMessage = userMessage.substring(ADD.length()+1);
 			events = userMessage.split(",");
 			addEvents = true;
 		}
 		else {
-			userMessage = userMessage.substring(7);
+			userMessage = userMessage.substring(REMOVE.length()+1);
 			events = userMessage.split(",");
 			addEvents = false;
 		}

@@ -13,6 +13,7 @@ public class GoogleEvents {
 	private boolean spreadsheetsSupport;
 	private boolean driveSupport;
 	private boolean restrictable;
+	private boolean forceRestriction;
 	
 	/**
 	 * Main constructor
@@ -22,15 +23,17 @@ public class GoogleEvents {
 	 * @param _spreadsheetsSupport
 	 * @param _driveSupport
 	 * @param _restrictable
+	 * @param _forceRestriction
 	 */
 	
-	public GoogleEvents(int _event_id, String _event, boolean _docsSupport, boolean _spreadsheetsSupport, boolean _driveSupport, boolean _restrictable) {
+	public GoogleEvents(int _event_id, String _event, boolean _docsSupport, boolean _spreadsheetsSupport, boolean _driveSupport, boolean _restrictable, boolean _forceRestriction) {
 		this.event_id = _event_id;
 		this.event = _event;
 		this.docsSupport = _docsSupport;
 		this.spreadsheetsSupport = _spreadsheetsSupport;
 		this.driveSupport = _driveSupport;
 		this.restrictable = _restrictable;
+		this.forceRestriction = _forceRestriction;
 	}
 	
 	/**
@@ -85,5 +88,14 @@ public class GoogleEvents {
 	
 	public boolean getRestrictable() {
 		return this.restrictable;
+	}
+	
+	/**
+	 * Check if the restriction has to be forced
+	 * @return
+	 */
+	
+	public boolean getForceRestriction() {
+		return this.forceRestriction;
 	}
 }

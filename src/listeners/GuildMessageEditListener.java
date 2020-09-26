@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +9,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ import fileManagement.GuildIni;
 import filter.LanguageEditFilter;
 import filter.URLFilter;
 import google.GoogleSheets;
+import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message.Attachment;
@@ -270,6 +273,22 @@ public class GuildMessageEditListener extends ListenerAdapter {
 								logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
 							}
 						}
+					}
+				}
+				
+				//Run google service, if enabled
+				if(!e.getMember().getUser().isBot() && GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+					//log low priority messages to google spreadsheets
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
+						e.getChannel().retrieveMessageById(e.getMessageId()).queueAfter(10, TimeUnit.SECONDS, m -> {
+							StringBuilder urls = new StringBuilder();
+							for(final var attachment : e.getMessage().getAttachments()) {
+								urls.append(attachment.getProxyUrl()+"\n");
+							}
+							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getChannel().getId(), ""+e.getMember().getUser().getId(), new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "COMMENT", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim(), 0, 0, GoogleEvent.COMMENT.id);
+						}, err -> {
+							//message was removed
+						});
 					}
 				}
 			});

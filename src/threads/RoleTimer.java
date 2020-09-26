@@ -127,7 +127,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
 								final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
-								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), "", "", NA, null, null, "UNMUTED", null, NA, NA, null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id);
+								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), "", "", NA, null, null, "UNMUTED", null, NA, NA, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
 							}
 						}
 						else
@@ -178,7 +178,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							role_id = role.getId();
 							role_name = role.getName();
 						}
-						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, 0, 0, GoogleEvent.UNMUTE.id);
+						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
 					}
 				}
 			}

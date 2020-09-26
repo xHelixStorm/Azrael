@@ -88,7 +88,7 @@ public class GoogleUtils {
 		};
 	}
 	
-	public static void handleSpreadsheetRequest(Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, long message_id, String message, int up_vote, int down_vote, int event_id) {
+	public static void handleSpreadsheetRequest(Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, long message_id, String message, String screenshots, int up_vote, int down_vote, int event_id) {
 		logger.debug("Initializing spreadsheet request for event {} in guild {}", action, guild.getId());
 		//Retrieve the file id and row start for this event
 		final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, event_id, channel_id);
@@ -97,6 +97,9 @@ public class GoogleUtils {
 			return;
 		final String file_id = array[0];
 		final String sheetRowStart = array[1];
+		final String forceRestriction = array[3];
+		if(forceRestriction.equals("1") && (array[2] == null || !array[2].equals(channel_id)))
+			return;
 		if((array[2] == null || array[2].length() == 0) || array[2].equals(channel_id)) {
 			if(file_id != null && file_id.length() > 0 && sheetRowStart != null && !sheetRowStart.isBlank()) {
 				//retrieve the saved mapping for the current event
@@ -228,6 +231,22 @@ public class GoogleUtils {
 									default -> {}
 								}
 							}
+							case COMMENT -> {
+								switch(item) {
+									case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
+									case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
+									case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
+									case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
+									case ACTION ->				values.add(Arrays.asList(item.valueFormatter(action, column.getFormatter())));
+									case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
+									case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
+									case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
+									case MESSAGE_ID -> 			values.add(Arrays.asList(item.valueFormatter(message_id, column.getFormatter())));
+									case MESSAGE ->				values.add(Arrays.asList(item.valueFormatter(message, column.getFormatter())));
+									case SCREEN_URL ->			values.add(Arrays.asList(item.valueFormatter(screenshots, column.getFormatter())));
+									default -> {}
+								}
+							}
 							default -> {}
 						}
 					}
@@ -280,6 +299,9 @@ public class GoogleUtils {
 			return false;
 		final String file_id = array[0];
 		final String sheetRowStart = array[1];
+		final String forceRestriction = array[3];
+		if(forceRestriction.equals("1") && (array[2] == null || !array[2].equals(channel_id)))
+			return false;
 		if((array[2] == null || array[2].length() == 0) || array[2].equals(channel_id)) {
 			if(file_id != null && file_id.length() > 0 && sheetRowStart != null && !sheetRowStart.isBlank()) {
 				//retrieve the saved mapping for the current event

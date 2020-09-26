@@ -2838,7 +2838,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				events.add(new GoogleEvents(rs.getInt(1), rs.getString(2), rs.getBoolean(3), rs.getBoolean(4), rs.getBoolean(5), rs.getBoolean(6)));
+				events.add(new GoogleEvents(rs.getInt(1), rs.getString(2), rs.getBoolean(3), rs.getBoolean(4), rs.getBoolean(5), rs.getBoolean(6), rs.getBoolean(7)));
 			}
 			return events;
 		} catch (SQLException e) {
@@ -3214,18 +3214,19 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT file_id, sheet_row_start, channel_id FROM google_files_and_events WHERE guild_id = ? AND api_id = ? AND event_id = ? AND (channel_id = ? OR channel_id IS NULL OR channel_id = 0) ORDER BY channel_id desc LIMIT 1");
+			String sql = ("SELECT file_id, sheet_row_start, channel_id, force_restriction FROM google_files_and_events WHERE guild_id = ? AND api_id = ? AND event_id = ? AND (channel_id = ? OR channel_id IS NULL OR channel_id = 0) ORDER BY channel_id desc LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _api_id);
 			stmt.setInt(3, _event_id);
 			stmt.setString(4, _channel_id);
 			rs = stmt.executeQuery();
-			String [] array = new String [3];
+			String [] array = new String [4];
 			if(rs.next()) {
 				array[0] = rs.getString(1);
 				array[1] = rs.getString(2);
 				array[2] = rs.getString(3);
+				array[3] = rs.getString(4);
 				return array;
 			}
 			array[0] = "empty";
