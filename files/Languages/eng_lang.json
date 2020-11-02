@@ -181,6 +181,7 @@
 	"gif_compression":				"Compressing GIF. Please wait...",
 	"gif_compress_err":				"GIF couldn't be compressed. Command aborted!",
 	"gif_send_err":					"GIF exceeded the allowed file size! Command aborted!",
+	"image_send_err":				"Image exceeded the allowed file size! Command aborted!",
 	"higher_privileges_required":	" My apologies young padawan. Higher privileges are required. Here a cookie :cookie:",
 	"higher_privileges_role":		" My apologies young padawan. Higher privileges are required. Here a cookie :cookie:\nOne of these roles are required: ",
 	"higher_privileges_ranking":	"Higher privileges are required. You will be able to use this command when you reach level **{}** with the role ",

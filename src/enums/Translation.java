@@ -183,6 +183,7 @@ public enum Translation {
 	GIF_COMPRESSION				("gif_compression"),
 	GIF_COMPRESS_ERR			("gif_compress_err"),
 	GIF_SEND_ERR				("gif_send_err"),
+	IMAGE_SEND_ERR				("image_send_err"),
 	HIGHER_PRIVILEGES_REQUIRED	("higher_privileges_required"),
 	HIGHER_PRIVILEGES_ROLE		("higher_privileges_role"),
 	HIGHER_PRIVILEGES_RANKING	("higher_privileges_ranking"),

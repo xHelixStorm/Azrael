@@ -181,6 +181,7 @@
 	"gif_compression":				"Comprimiendo GIF. Por favor espera...",
 	"gif_compress_err":				"El GIF no pudo ser comprimido. ¡Comando abortado!",
 	"gif_send_err":					"¡El GIF superó el tamaño de archivo permitido! ¡Comando abortado!",
+	"image_send_err":				"¡La foto superó el tamaño de archivo permitido! ¡Comando abortado!",
 	"higher_privileges_required":	" Mis disculpas joven padawan. Se requieren privilegios más altos. Ten, una galleta :cookie:",
 	"higher_privileges_role":		" Mis disculpas joven padawan. Se requieren privilegios más altos. Ten, una galleta :cookie:\nSe necesitan uno de estos roles: ",
 	"higher_privileges_ranking":	"Se necesitan privilegios más altos. Podrás usar este comando cuando alcances el nivel **{}** con el rol ",

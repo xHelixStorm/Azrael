@@ -11,16 +11,23 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.zip.DataFormatException;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -178,7 +185,32 @@ public class RankingMethods extends ListenerAdapter {
 					});
 				}
 				else {
-					//TODO: regular file compression
+					BufferedImage image = ImageIO.read(file1);
+					File file2 = new File(IniFileReader.getTempDirectory()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+					OutputStream os = new FileOutputStream(file2);
+					Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(skin.getFileType());
+					ImageWriter writer = writers.next();
+					ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+					writer.setOutput(ios);
+					ImageWriteParam param = writer.getDefaultWriteParam();
+					param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+					param.setCompressionQuality(0.05f);
+					writer.write(null, new IIOImage(image, null, null), param);
+					
+					os.close();
+					ios.close();
+					writer.dispose();
+					
+					file1.delete();
+					try {
+						e.getChannel().sendFile(file2, "level_up."+skin.getFileType()).queue(complete -> {
+							file2.delete();
+						});
+					} catch(IllegalArgumentException e1) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.IMAGE_SEND_ERR)).build()).queue();
+						logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
+						file2.delete();
+					}
 				}
 			}
 			else {
@@ -336,7 +368,32 @@ public class RankingMethods extends ListenerAdapter {
 					});
 				}
 				else {
-					//TODO: regular file compression
+					BufferedImage image = ImageIO.read(file1);
+					File file2 = new File(IniFileReader.getTempDirectory()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+					OutputStream os = new FileOutputStream(file2);
+					Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(skin.getFileType());
+					ImageWriter writer = writers.next();
+					ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+					writer.setOutput(ios);
+					ImageWriteParam param = writer.getDefaultWriteParam();
+					param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+					param.setCompressionQuality(0.05f);
+					writer.write(null, new IIOImage(image, null, null), param);
+					
+					os.close();
+					ios.close();
+					writer.dispose();
+					
+					file1.delete();
+					try {
+						e.getChannel().sendFile(file2, "rank."+skin.getFileType()).queue(complete -> {
+							file2.delete();
+						});
+					} catch(IllegalArgumentException e1) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.IMAGE_SEND_ERR)).build()).queue();
+						logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
+						file2.delete();
+					}
 				}
 			}
 			else {
@@ -588,7 +645,32 @@ public class RankingMethods extends ListenerAdapter {
 					});
 				}
 				else {
-					//TODO: regular file compression
+					BufferedImage image = ImageIO.read(file1);
+					File file2 = new File(IniFileReader.getTempDirectory()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+					OutputStream os = new FileOutputStream(file2);
+					Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(skin.getFileType());
+					ImageWriter writer = writers.next();
+					ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+					writer.setOutput(ios);
+					ImageWriteParam param = writer.getDefaultWriteParam();
+					param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+					param.setCompressionQuality(0.05f);
+					writer.write(null, new IIOImage(image, null, null), param);
+					
+					os.close();
+					ios.close();
+					writer.dispose();
+					
+					file1.delete();
+					try {
+						e.getChannel().sendFile(file2, "profile."+skin.getFileType()).queue(complete -> {
+							file2.delete();
+						});
+					} catch(IllegalArgumentException e1) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.IMAGE_SEND_ERR)).build()).queue();
+						logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
+						file2.delete();
+					}
 				}
 			}
 			else {

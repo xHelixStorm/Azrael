@@ -51,7 +51,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import sql.Azrael;
@@ -431,7 +431,7 @@ public class STATIC {
 	}
 	
 	//remove the watch state from a user that either got banned or kicked from a server
-	public static void handleUnwatch(GuildBanEvent e, GuildMemberLeaveEvent e2, short type) {
+	public static void handleUnwatch(GuildBanEvent e, GuildMemberRemoveEvent e2, short type) {
 		var user_id = (e != null ? e.getUser().getIdLong() : e2.getMember().getUser().getIdLong());
 		var guild_id = (e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong());
 		var unwatchReason = (type == 1 ? "ban" : "kick");

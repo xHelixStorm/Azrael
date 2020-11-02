@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.sql.Timestamp;
+import java.util.EnumSet;
 
 import javax.security.auth.login.LoginException;
 
@@ -84,16 +85,18 @@ import listeners.ShutdownListener;
 import listeners.StatusListener;
 import listeners.TextChannelListener;
 import listeners.UnbanListener;
-import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import util.STATIC;
 
 public class Main {
 	static {System.setProperty("logback.configurationFile", "./logback.xml");}
 	public static JDABuilder builder;
 	
+	@SuppressWarnings({ "static-access", "deprecation" })
 	public static void main(String [] args) {
 		
 		Logger logger = LoggerFactory.getLogger(Main.class);
@@ -177,8 +180,9 @@ public class Main {
 		}
 		
 		String token = STATIC.getToken();
-		builder = new JDABuilder(AccountType.BOT);
-		builder.setToken(token);
+		builder = new JDABuilder().createDefault(token)
+				.enableIntents(EnumSet.of(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES))
+				.setMemberCachePolicy(MemberCachePolicy.ALL);
 		builder.setAutoReconnect(true);
 		builder.setStatus(OnlineStatus.ONLINE);	
 	
