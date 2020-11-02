@@ -181,6 +181,7 @@
 	"gif_compression":				"GIF komprimieren. Bitte warten...",
 	"gif_compress_err":				"GIF konnte nicht komprimiert werden. Befehl abgebrochen!",
 	"gif_send_err":					"GIF überschritt die zulässige Dateigröße! Befehl abgebrochen!",
+	"image_send_err":				"Bild überschritt die zulässige Dateigröße! Befehl abgebrochen!",
 	"higher_privileges_required":	" Ich bitte um Entschuldigung, junger Padawan. Höhere Privilegien sind erforderlich. Hier ein Keks :cookie:",
 	"higher_privileges_role":		" Ich bitte um Entschuldigung, junger Padawan. Höhere Privilegien sind erforderlich. Hier ein Keks :cookie:\nEine dieser Rollen ist erforderlich: ",
 	"higher_privileges_ranking":	"Höhere Privilegien sind erforderlich. Sie können diesen Befehl verwenden, wenn Sie Stufe **{}** erreichen mit der Rolle ",

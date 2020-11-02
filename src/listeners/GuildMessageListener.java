@@ -440,11 +440,11 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-selection")) {
 								if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE)))
-									GoogleSpreadsheetsExecution.create(e, (lcMessage.length() > 7 ? message.substring(7) : null), key);
+									GoogleSpreadsheetsExecution.create(e, (lcMessage.length() > 7 ? message.substring(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE).length()+1) : null), key);
 								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD)))
-									GoogleSpreadsheetsExecution.add(e, (lcMessage.length() > 4 ? message.substring(4) : null), key);
+									GoogleSpreadsheetsExecution.add(e, (lcMessage.length() > 4 ? message.substring(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD).length()+1) : null), key);
 								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE)))
-									GoogleSpreadsheetsExecution.remove(e, (lcMessage.length() > 7 ? message.substring(7) : null), key);
+									GoogleSpreadsheetsExecution.remove(e, (lcMessage.length() > 7 ? message.substring(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE).length()+1) : null), key);
 								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_EVENTS)))
 									GoogleSpreadsheetsExecution.events(e, key);
 								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_SHEET)))

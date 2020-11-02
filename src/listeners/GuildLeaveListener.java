@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
 import sql.Azrael;
@@ -41,7 +41,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildLeaveListener.class);
 	
 	@Override
-	public void onGuildMemberLeave(GuildMemberLeaveEvent e) {
+	public void onGuildMemberRemove(GuildMemberRemoveEvent e) {
 		new Thread(() -> {
 			if(Hashes.getTempCache("kick-ignore_gu"+e.getGuild().getId()+"us"+e.getUser().getId()) == null) {
 				final long user_id = e.getUser().getIdLong();
