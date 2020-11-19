@@ -54,5 +54,8 @@
 	<classpathentry kind="lib" path="lib/google-api-services-sheets-v4-rev606-1.25.0.jar"/>
 	<classpathentry kind="lib" path="lib/google-api-services-drive-v3.jar"/>
 	<classpathentry kind="lib" path="lib/JDA-4.2.0_168.jar"/>
+	<classpathentry kind="lib" path="lib/google-api-services-youtube-v3-rev222-1.25.0.jar"/>
+	<classpathentry kind="lib" path="lib/google-auth-library-oauth2-http-0.22.0.jar"/>
+	<classpathentry kind="lib" path="lib/google-auth-library-credentials-0.22.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

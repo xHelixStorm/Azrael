@@ -14,11 +14,8 @@ public class GoogleDrive {
 	
 	/**
 	 * Retrieve Drive client service
-	 * @param guild_id to retrieve the credentials from
 	 * @return Drive service
 	 * @throws Exception Any error along the way
-	 * @return
-	 * @throws Exception
 	 */
 	
 	public static Drive getDriveClientService() throws Exception {

@@ -22,7 +22,6 @@ public class GoogleSheets {
 	
 	/**
 	 * Retrieve Sheets client service
-	 * @param guild_id to retrieve the credentials from
 	 * @return Sheets service
 	 * @throws Exception Any error along the way
 	 */

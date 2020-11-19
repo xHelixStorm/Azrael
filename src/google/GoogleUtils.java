@@ -13,13 +13,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.docs.v1.DocsScopes;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.youtube.YouTubeScopes;
+import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.GoogleCredentials;
 
 import enums.Channel;
 import enums.GoogleDD;
@@ -36,13 +38,13 @@ import util.STATIC;
  *
  */
 
-@SuppressWarnings("deprecation")
 public class GoogleUtils {
 	private static final Logger logger = LoggerFactory.getLogger(GoogleUtils.class);
 	private static final JacksonFactory jacksonFactory = JacksonFactory.getDefaultInstance();
 	private static final List<String> SCOPESDOCS = Collections.singletonList(DocsScopes.DOCUMENTS);
 	private static final List<String> SCOPESSHEETS = Collections.singletonList(SheetsScopes.SPREADSHEETS);
 	private static final List<String> SCOPESDRIVE = Collections.singletonList(DriveScopes.DRIVE);
+	private static final List<String> SCOPESYOUTUBE = Collections.singletonList(YouTubeScopes.YOUTUBE_READONLY);
 	
 	/**
 	 * Retrieve credentials
@@ -51,17 +53,20 @@ public class GoogleUtils {
 	 * @throws Exception File error / other errors
 	 */
 	
-	public static Credential getCredentials(final NetHttpTransport httpTransport, final String type) throws Exception {
+	public static HttpRequestInitializer getCredentials(final NetHttpTransport httpTransport, final String type) throws Exception {
 		//use the fitting scopes
 		List<String> scopes;
 		switch(type) {
 			case "docs" -> scopes = SCOPESDOCS;
 			case "sheets" -> scopes = SCOPESSHEETS;
 			case "drive" -> scopes = SCOPESDRIVE;
+			case "youtube" -> scopes = SCOPESYOUTUBE;
 			default -> scopes = null;
 		}
 		
-		return GoogleCredential.fromStream(new FileInputStream(new File("files/Google/credentials.json"))).createScoped(scopes);
+		
+		return new HttpCredentialsAdapter(GoogleCredentials.fromStream(new FileInputStream(new File("files/Google/credentials.json"))).createScoped(scopes));
+		//return GoogleCredential.fromStream(new FileInputStream(new File("files/Google/credentials.json"))).createScoped(scopes);
 	}
 	
 	/**
