@@ -30,7 +30,7 @@ public class CommandHandler {
 						commandsPublic.get(cmd.invoke).executed(safe, cmd.e);
 					}
 					else {
-						logger.warn("Either MESSAGE_WRITE or MESSAGE_EMBED_LINKS is missing for channel {} in guild {}");
+						logger.warn("Either MESSAGE_WRITE or MESSAGE_EMBED_LINKS is missing for channel {} in guild {}", cmd.e.getChannel().getId(), cmd.e.getGuild().getId());
 					}
 				}
 				else {
