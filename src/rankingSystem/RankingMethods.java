@@ -237,12 +237,12 @@ public class RankingMethods extends ListenerAdapter {
 		
 		try{
 			BufferedImage experienceBar;
-			if(_experience != 0) {
+			if(_experience != 0 && skin.getBarColor() > 0) {
 				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+skin.getBarColor()+"_"+100+".png"));
 				experienceBar = experienceBar.getSubimage(0, 0, 2*_experience, experienceBar.getHeight());
 			}
 			else {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+0+"_"+0+".png"));
+				experienceBar = null;
 			}
 			int rankIcon = RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), theme_id).parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null).getRankIcon();
 			BufferedImage level = ImageIO.read(new File((skinIcon.getSource() == null ? "./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
@@ -269,7 +269,7 @@ public class RankingMethods extends ListenerAdapter {
 				Graphics2D g = overlay.createGraphics();
 				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 				g.drawImage(rank, 0, 0, null);
-				if(skin.getBarX() > 0 || skin.getBarY() > 0)
+				if(experienceBar != null)
 					g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
 				if(skin.getIconX() > 0 || skin.getIconY() > 0)
 					g.drawImage(blurImage(level), skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
@@ -306,8 +306,7 @@ public class RankingMethods extends ListenerAdapter {
 					Graphics2D g = overlay.createGraphics();
 					g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 					g.drawImage(rank, 0, 0, null);
-					if(skin.getBarX() > 0 || skin.getBarY() > 0)
-						g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
+					g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
 					if(skin.getIconX() > 0 || skin.getIconY() > 0)
 						g.drawImage(blurImage(level), skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
 					if(skin.getAvatarX() > 0 || skin.getAvatarY() > 0)
@@ -420,12 +419,12 @@ public class RankingMethods extends ListenerAdapter {
 		
 		try{
 			BufferedImage experienceBar;
-			if(_experiencePercentage != 0) {
+			if(_experiencePercentage != 0 && skin.getBarColor() > 0) {
 				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+skin.getBarColor()+"_"+100+".png"));
 				experienceBar = experienceBar.getSubimage(0, 0, (experienceBar.getWidth()*_experiencePercentage)/100, experienceBar.getHeight());
 			}
 			else {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+0+"_"+0+".png"));
+				experienceBar = null;
 			}
 			int rankIcon = RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), theme_id).parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null).getRankIcon();
 			BufferedImage level = ImageIO.read(new File((skinIcon.getSource() == null ? "./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
@@ -455,7 +454,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 				g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				if(skin.getBarX() > 0 || skin.getBarY() > 0)
+				if(experienceBar != null)
 					g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
 				if(skin.getIconX() > 0 || skin.getIconY() > 0)
 					g.drawImage(blurImage(level), skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
@@ -539,8 +538,7 @@ public class RankingMethods extends ListenerAdapter {
 					g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 					g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-					if(skin.getBarX() > 0 || skin.getBarY() > 0)
-						g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
+					g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
 					if(skin.getIconX() > 0 || skin.getIconY() > 0)
 						g.drawImage(blurImage(level), skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
 					if(skin.getAvatarX() > 0 || skin.getAvatarY() > 0)
