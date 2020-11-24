@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Bancollect;
 import constructors.CategoryConf;
 import constructors.Channels;
+import constructors.CustomCommand;
 import constructors.GoogleAPISetup;
 import constructors.GoogleEvents;
 import constructors.GoogleSheet;
@@ -3686,6 +3687,38 @@ public class Azrael {
 			return categories;
 		} catch (SQLException e) {
 			logger.error("SQLgetCategoryTypes Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static CustomCommand SQLgetCustomCommand(long _guild_id, String _command) {
+		logger.trace("SQLgetCustomCommand launched. No params");
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT * FROM custom_commands");
+			stmt = myConn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return new CustomCommand(
+					rs.getString(2),
+					rs.getString(3),
+					rs.getInt(4),
+					rs.getString(5),
+					rs.getInt(6),
+					rs.getLong(7),
+					rs.getBoolean(8)
+				);
+			}
+			return null;
+		} catch (SQLException e) {
+			logger.error("SQLgetCustomCommand Exception", e);
 			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
