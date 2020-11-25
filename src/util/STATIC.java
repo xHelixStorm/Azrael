@@ -75,7 +75,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.31.512";
+	private static final String VERSION = "7.31.513";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -369,13 +369,28 @@ public class STATIC {
 		StringBuilder out = new StringBuilder();
 		var first = true;
 		var last = channels.size()-1;
-		for(Channels channel : channels) {
+		for(final Channels channel : channels) {
 			if(first)
 				out.append("<#"+channel.getChannel_ID()+">");
 			else if(channels.get(last).getChannel_ID() == channel.getChannel_ID())
 				out.append(" or <#"+channel.getChannel_ID()+">");
 			else
 				out.append(", <#"+channel.getChannel_ID()+">");
+		}
+		return out.toString();
+	}
+	
+	public static String getRestrictedChannels(List<String> channels) {
+		StringBuilder out = new StringBuilder();
+		var first = true;
+		var last = channels.size()-1;
+		for(final String channel : channels) {
+			if(first)
+				out.append("<#"+channel+">");
+			else if(channels.get(last).equals(channel))
+				out.append(" or <#"+channel+">");
+			else
+				out.append(", <#"+channel+">");
 		}
 		return out.toString();
 	}

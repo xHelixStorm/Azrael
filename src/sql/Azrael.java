@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -3719,6 +3720,39 @@ public class Azrael {
 			return null;
 		} catch (SQLException e) {
 			logger.error("SQLgetCustomCommand Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static HashSet<String> SQLgetCustomCommandRestrictions(long _guild_id, String _command) {
+		logger.trace("SQLgetCustomCommandRestrictions launched. No params");
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			HashSet<String> channels = new HashSet<String>();
+			String sql = ("SELECT * FROM custom_commands_restrictions");
+			stmt = myConn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				final String channelType = rs.getString(3);
+				final String channelId = rs.getString(4);
+				String channel = null;
+				if(channelType != null)
+					channel = channelType;
+				else if(channelId != null)
+					channel = channelId;
+				if(channel != null && !channels.contains(channel))
+					channels.add(channel);
+			}
+			return channels;
+		} catch (SQLException e) {
+			logger.error("SQLgetCustomCommandRestrictions Exception", e);
 			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
