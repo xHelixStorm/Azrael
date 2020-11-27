@@ -40,6 +40,10 @@ private static String parseMessage;
 		return parseMessage;
 	}
 	
+	public static String simpleReplace(String message) {
+		return message.replaceAll("[\\.\\?!,\"+@#$%^&*\\(\\)\\{\\}\\]\\[\\/\\-\\_\\|\\=§‘’`„°•—–¿¡₩€¢¥£-​]", "");
+	}
+	
 	private static String [] exceptions = {
 			"sex change"
 	};

@@ -37,6 +37,7 @@ import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import util.CharacterReplacer;
 import util.STATIC;
 
 public class Azrael {
@@ -342,7 +343,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateAvatar Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -2042,7 +2043,7 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<String> SQLgetFilterLanguages() {
+	public static ArrayList<String> SQLgetFilterLanguages(String _lang) {
 		final var languages = Hashes.getFilterLang(0);
 		if(languages == null) {
 			logger.trace("SQLgetFilterLanguages launched. No params passed");
@@ -2052,8 +2053,9 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv  != \"all\"");
+				String sql = ("SELECT translation FROM languages_translation WHERE lang2 = ? AND lang != \"all\"");
 				stmt = myConn.prepareStatement(sql);
+				stmt.setString(1, _lang);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
 					filter_lang.add(rs.getString(1));
@@ -3910,7 +3912,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql2);
 			
 			for(String word : _words) {
-				stmt.setString(1, word.toLowerCase());
+				stmt.setString(1, CharacterReplacer.simpleReplace(word.toLowerCase()));
 				stmt.setString(2, _lang);
 				stmt.setLong(3, _guild_id);
 				stmt.addBatch();

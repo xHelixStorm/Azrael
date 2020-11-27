@@ -43,7 +43,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 	public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent e) {
 		new Thread(() -> {
 			//no action should be taken, if a bot has added a reaction
-			if(!UserPrivs.isUserBot(e.getGuild().getMember(e.getUser()))) {
+			if(e.getUser() != null && !UserPrivs.isUserBot(e.getGuild().getMember(e.getUser()))) {
 				//any action below won't apply for muted users
 				if(!UserPrivs.isUserMuted(e.getGuild().getMember(e.getUser()))) {
 					//verify that the custom server reactions is enabled

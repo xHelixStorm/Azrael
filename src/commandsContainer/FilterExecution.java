@@ -19,6 +19,7 @@ import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.Azrael;
+import util.CharacterReplacer;
 import util.Pastebin;
 import util.STATIC;
 
@@ -136,7 +137,7 @@ public class FilterExecution {
 					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
 						StringBuilder out = new StringBuilder();
-						for(String lang : Azrael.SQLgetFilterLanguages()) {
+						for(String lang : Azrael.SQLgetFilterLanguages(STATIC.getLanguage(e.getMember()))) {
 							out.append(lang+"\n");
 						}
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
@@ -146,7 +147,7 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						StringBuilder out = new StringBuilder();
-						for(String lang : Azrael.SQLgetFilterLanguages()) {
+						for(String lang : Azrael.SQLgetFilterLanguages(STATIC.getLanguage(e.getMember()))) {
 							out.append(lang+"\n");
 						}
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
@@ -156,7 +157,7 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						StringBuilder out = new StringBuilder();
-						for(String lang : Azrael.SQLgetFilterLanguages()) {
+						for(String lang : Azrael.SQLgetFilterLanguages(STATIC.getLanguage(e.getMember()))) {
 							out.append(lang+"\n");
 						}
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
@@ -166,7 +167,7 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
 						StringBuilder out = new StringBuilder();
-						for(String lang : Azrael.SQLgetFilterLanguages()) {
+						for(String lang : Azrael.SQLgetFilterLanguages(STATIC.getLanguage(e.getMember()))) {
 							out.append(lang+"\n");
 						}
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
@@ -176,7 +177,7 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
 						StringBuilder out = new StringBuilder();
-						for(String lang : Azrael.SQLgetFilterLanguages()) {
+						for(String lang : Azrael.SQLgetFilterLanguages(STATIC.getLanguage(e.getMember()))) {
 							out.append(lang+"\n");
 						}
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
@@ -1201,7 +1202,7 @@ public class FilterExecution {
 	}
 	
 	private static void insertLangWord(GuildMessageReceivedEvent e, EmbedBuilder message, final String key, final String lang, String word) {
-		if(Azrael.SQLInsertWordFilter(lang.substring(0, 3), word, e.getGuild().getIdLong()) >= 0) {
+		if(Azrael.SQLInsertWordFilter(lang.substring(0, 3), CharacterReplacer.simpleReplace(word), e.getGuild().getIdLong()) >= 0) {
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT)).build()).queue();
 			clearHash(e, lang, true);
 			Hashes.removeQuerryResult("all_"+e.getGuild().getId());
@@ -1216,7 +1217,7 @@ public class FilterExecution {
 	}
 	
 	private static void removeLangWord(GuildMessageReceivedEvent e, EmbedBuilder message, final String key, final String lang, String word) {
-		final var result = Azrael.SQLDeleteWordFilter(lang.substring(0, 3), word, e.getGuild().getIdLong());
+		final var result = Azrael.SQLDeleteWordFilter(lang.substring(0, 3), CharacterReplacer.simpleReplace(word), e.getGuild().getIdLong());
 		if(result > 0) {
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE)).build()).queue();
 			clearHash(e, lang, true);
