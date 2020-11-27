@@ -237,6 +237,7 @@
 	"command_header_1":			 	"Comandos administrativos",
 	"command_header_2":			 	"Comandos de entretenimiento",
 	"command_header_3":			 	"Otros comandos",
+	"command_header_4":				"comandos personalizados",
 	"command_register":			 	"- **{}register**\nRegistrar canales, roles y más para usar varias funcionalidades de moderación\n",
 	"command_set":				 	"- **{}set**\nActualizar, establecer o cambiar varias configuraciones del Bot para este servidor\n",
 	"command_remove":			 	"- **{}remove**\nEliminar canales de texto ya registrados, roles y más de la configuración del Bot\n",

@@ -75,7 +75,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.32.514";
+	private static final String VERSION = "7.32.517";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -370,12 +370,16 @@ public class STATIC {
 		var first = true;
 		var last = channels.size()-1;
 		for(final Channels channel : channels) {
-			if(first)
+			if(first) {
 				out.append("<#"+channel.getChannel_ID()+">");
-			else if(channels.get(last).getChannel_ID() == channel.getChannel_ID())
+			}
+			else if(channels.get(last).getChannel_ID() == channel.getChannel_ID()) {
 				out.append(" or <#"+channel.getChannel_ID()+">");
-			else
+			}
+			else {
 				out.append(", <#"+channel.getChannel_ID()+">");
+			}
+			first = false;
 		}
 		return out.toString();
 	}
@@ -385,12 +389,16 @@ public class STATIC {
 		var first = true;
 		var last = channels.size()-1;
 		for(final String channel : channels) {
-			if(first)
+			if(first) {
 				out.append("<#"+channel+">");
-			else if(channels.get(last).equals(channel))
+			}
+			else if(channels.get(last).equals(channel)) {
 				out.append(" or <#"+channel+">");
-			else
+			}
+			else {
 				out.append(", <#"+channel+">");
+			}
+			first = false;
 		}
 		return out.toString();
 	}

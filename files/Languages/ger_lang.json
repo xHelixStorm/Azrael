@@ -237,6 +237,7 @@
 	"command_header_1":			 	"Administrative Befehle",
 	"command_header_2":			 	"Befehle zur Unterhaltung",
 	"command_header_3":			 	"Andere Befehle",
+	"command_header_4":				"Benutzerdefinierte Befehle",
 	"command_register":			 	"- **{}register**\nRegistrieren Sie Kanäle, Rollen und mehr, um verschiedene Moderationsfunktionen zu nutzen.\n",
 	"command_set":				 	"- **{}set**\nVerschiedene Bot-Einstellungen für diesen Server aktualisieren, festlegen oder ändern.\n",
 	"command_remove":			 	"- **{}remove**\nEntfernen Sie bereits registrierte Textkanäle, Rollen und mehr aus den Bot-Einstellungen.\n",

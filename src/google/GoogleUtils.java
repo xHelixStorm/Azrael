@@ -66,7 +66,6 @@ public class GoogleUtils {
 		
 		
 		return new HttpCredentialsAdapter(GoogleCredentials.fromStream(new FileInputStream(new File("files/Google/credentials.json"))).createScoped(scopes));
-		//return GoogleCredential.fromStream(new FileInputStream(new File("files/Google/credentials.json"))).createScoped(scopes);
 	}
 	
 	/**

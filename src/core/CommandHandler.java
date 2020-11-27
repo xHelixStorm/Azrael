@@ -27,8 +27,9 @@ public class CommandHandler {
 	public static boolean handleCommand(CommandParser.CommandContainer cmd) {
 		
 		if(cmd.e != null) {
-			if(commandsPublic.containsKey(cmd.invoke)) {
-				final CommandPublic command = commandsPublic.get(cmd.invoke);
+			final String cmdInvoker = cmd.invoke.toLowerCase();
+			if(commandsPublic.containsKey(cmdInvoker)) {
+				final CommandPublic command = commandsPublic.get(cmdInvoker);
 				boolean safe = command.called(cmd.args, cmd.e);
 				
 				if(safe) {
@@ -46,7 +47,7 @@ public class CommandHandler {
 				return true;
 			}
 			else {
-				final String commandKey = cmd.e.getGuild().getId()+""+cmd.invoke;
+				final String commandKey = cmd.e.getGuild().getId()+""+cmdInvoker;
 				if(commandsPublic.containsKey(commandKey)) {
 					final CommandPublic command = commandsPublic.get(commandKey);
 					boolean safe = command.called(cmd.args, cmd.e);
@@ -69,8 +70,9 @@ public class CommandHandler {
 			}
 		}
 		else {
-			if(commandsPrivate.containsKey(cmd.invoke)) {
-				final CommandPrivate command = commandsPrivate.get(cmd.invoke);
+			final String cmdInvoker = cmd.invoke.toLowerCase();
+			if(commandsPrivate.containsKey(cmdInvoker)) {
+				final CommandPrivate command = commandsPrivate.get(cmdInvoker);
 				boolean safe = command.called(cmd.args, cmd.e2);
 				if(safe) {
 					command.action(cmd.args, cmd.e2);

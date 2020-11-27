@@ -40,8 +40,7 @@ public class CustomCmd implements CommandPublic {
 		final String cmd = e.getMessage().getContentRaw().split(" ")[0].substring(GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length());
 		final var command = Azrael.SQLgetCustomCommand(e.getGuild().getIdLong(), cmd);
 		if(command != null && command.isEnabled()) {
-			if(UserPrivs.comparePrivilege(e.getMember(), command.getLevel()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-				
+			if(UserPrivs.comparePrivilege(e.getMember(), command.getLevel()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {		
 				//channel restrictions check
 				HashSet<String> restrictions = Azrael.SQLgetCustomCommandRestrictions(e.getGuild().getIdLong(), command.getCommand());
 				if(restrictions != null && restrictions.size() > 0) {
@@ -64,7 +63,7 @@ public class CustomCmd implements CommandPublic {
 								}
 							}
 						});
-						if(restrictedChannels.contains(e.getChannel().getId())) {
+						if(!restrictedChannels.contains(e.getChannel().getId())) {
 							e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.NOT_BOT_CHANNEL)+STATIC.getRestrictedChannels(restrictedChannels)).queue();
 							return;
 						}
@@ -119,7 +118,7 @@ public class CustomCmd implements CommandPublic {
 					
 					SearchListResponse response = null;
 					try {
-						response = GoogleYoutube.searchYouTubeVideo(GoogleYoutube.getService(), input.trim(), 1);
+						response = GoogleYoutube.searchYouTubeVideo(GoogleYoutube.getService(), input.trim(), 1L);
 					} catch (Exception e1) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("YouTube query couldn't be executed for command {} in guild {}", command.getCommand(), e.getGuild().getId(), e1);
@@ -128,7 +127,7 @@ public class CustomCmd implements CommandPublic {
 					
 					if(response != null && response.getItems().size() > 0) {
 						final var snippet = response.getItems().get(0).getSnippet();
-						out = out.replaceAll("\\{\\}", YOUTUBEENDPOINT+response.getItems().get(0).getId().getVideoId())
+						out = out.replaceAll("\\{youtube_url\\}", YOUTUBEENDPOINT+response.getItems().get(0).getId().getVideoId())
 							.replaceAll("\\{youtube_title\\}", snippet.getTitle())
 							.replaceAll("\\{youtube_description\\}", snippet.getDescription())
 							.replaceAll("\\{youtube_channel\\}", snippet.getChannelTitle())
@@ -178,7 +177,7 @@ public class CustomCmd implements CommandPublic {
 								
 								out = out.replaceAll("\\{roles\\}", roleName)
 									.replaceAll("\\{role_ids\\}", roleId)
-									.replaceAll("\\{role_mention\\}", roleMention);
+									.replaceAll("\\{role_mentions\\}", roleMention);
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
@@ -207,7 +206,7 @@ public class CustomCmd implements CommandPublic {
 				
 				if(out.trim().length() > 0) {
 					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.MESSAGE_WRITE)))
-						e.getGuild().getTextChannelById(textChannel.getIdLong()).sendMessage(out);
+						e.getGuild().getTextChannelById(textChannel.getIdLong()).sendMessage(out).queue();
 					else 
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName())+textChannel.getAsMention(), "log");
 				}

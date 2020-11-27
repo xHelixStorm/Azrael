@@ -239,6 +239,7 @@ public enum Translation {
 	COMMAND_HEADER_1			("command_header_1"),
 	COMMAND_HEADER_2			("command_header_2"),
 	COMMAND_HEADER_3			("command_header_3"),
+	COMMAND_HEADER_4			("command_header_4"),
 	COMMAND_REGISTER			("command_register"),
 	COMMAND_SET					("command_set"),
 	COMMAND_REMOVE				("command_remove"),

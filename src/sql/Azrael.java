@@ -3756,6 +3756,42 @@ public class Azrael {
 		}
 	}
 	
+	public static ArrayList<CustomCommand> SQLgetCustomCommands2(long _guild_id) {
+		logger.trace("SQLgetCustomCommands2 launched. Params passed {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			ArrayList<CustomCommand> commands = new ArrayList<CustomCommand>();
+			String sql = ("SELECT * FROM custom_commands WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				commands.add(
+					new CustomCommand(
+						rs.getString(2),
+						rs.getString(3),
+						rs.getInt(4),
+						rs.getString(5),
+						rs.getInt(6),
+						rs.getLong(7),
+						rs.getBoolean(8)
+					)
+				);
+			}
+			return commands;
+		} catch (SQLException e) {
+			logger.error("SQLgetCustomCommands2 Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static HashSet<String> SQLgetCustomCommandRestrictions(long _guild_id, String _command) {
 		logger.trace("SQLgetCustomCommandRestrictions launched. Params passed {}, {}", _guild_id, _command);
 		Connection myConn = null;
