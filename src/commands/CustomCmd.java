@@ -187,7 +187,7 @@ public class CustomCmd implements CommandPublic {
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Role(s) to assign don't exist anymore!").build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROLES_NOW_INVALID)).build()).queue();
 							return;
 						}
 					}
