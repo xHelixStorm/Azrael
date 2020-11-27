@@ -14,10 +14,12 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import commands.CustomCmd;
 import constructors.Cache;
 import constructors.Guilds;
 import constructors.Messages;
 import constructors.Patchnote;
+import core.CommandHandler;
 import core.Hashes;
 import enums.Channel;
 import enums.Translation;
@@ -141,6 +143,16 @@ public class ReadyListener extends ListenerAdapter {
 					logger.warn("Roles from RankingSystem.roles couldn't be called and cached in guild {}", guild.getId());
 				}
 				Hashes.initializeGuildRanking(guild.getIdLong());
+			}
+			//retrieve all custom commands
+			final var customCommands = Azrael.SQLgetCustomCommands(guild.getIdLong());
+			if(customCommands != null && customCommands.size() > 0) {
+				for(final String command : customCommands) {
+					CommandHandler.commandsPublic.put(command, new CustomCmd());
+				}
+			}
+			else if(customCommands == null) {
+				logger.error("Custom commands couldn't be retrieved for guild {}", guild.getId());
 			}
 			//retrieve all registered rss feeds and start the timer to make these display on the server
 			ParseSubscription.runTask(e.getJDA(), guild.getIdLong());

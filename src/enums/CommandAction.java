@@ -4,8 +4,10 @@ import java.util.HashMap;
 
 public enum CommandAction {
 	
-	MESSAGE	(1, false), 
-	YOUTUBE	(2, true);
+	MESSAGE		(1, false), 
+	YOUTUBE		(2, true),
+	ROLEADD		(3, false),
+	ROLEREMOVE	(4, false);
 	
 	/**
 	 * Defined map to retrieve enum by numeric action type

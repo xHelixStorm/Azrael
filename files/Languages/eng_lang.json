@@ -207,6 +207,8 @@
 	"watching_lifted_err":			"An internal error occurred! User **{}** couldn't be lifted from being watched!",
 	"category_not_exists":			"The provided category doesn't exist!",
 	"no_category":					"Please submit a numerical category ID!",
+	"youtube_video_not_found":		"YouTube video not found!",
+	"roles_now_invalid":			"Role(s) to assign don't exist anymore!",
 	
 	"embed_title_error":		 	"An error occurred!",
 	"embed_title_about": 		 	"About Me Page!",

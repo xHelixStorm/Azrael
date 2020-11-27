@@ -209,6 +209,8 @@ public enum Translation {
 	WATCHING_LIFTED_ERR			("watching_lifted_err"),
 	CATEGORY_NOT_EXISTS			("category_not_exists"),
 	NO_CATEGORY					("no_category"),
+	YOUTUBE_VIDEO_NOT_FOUND		("youtube_video_not_found"),
+	ROLES_NOW_INVALID			("roles_now_invalid"),
 	
 	EMBED_TITLE_ERROR			("embed_title_error"),
 	EMBED_TITLE_ABOUT			("embed_title_about"),

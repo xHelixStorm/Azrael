@@ -3697,14 +3697,16 @@ public class Azrael {
 	}
 	
 	public static CustomCommand SQLgetCustomCommand(long _guild_id, String _command) {
-		logger.trace("SQLgetCustomCommand launched. No params");
+		logger.trace("SQLgetCustomCommand launched. Params passed {}, {}", _guild_id, _command);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM custom_commands");
+			String sql = ("SELECT * FROM custom_commands WHERE fk_guild_id = ? AND command = ?");
 			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setString(2, _command);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new CustomCommand(
@@ -3728,16 +3730,44 @@ public class Azrael {
 		}
 	}
 	
+	public static ArrayList<String> SQLgetCustomCommands(long _guild_id) {
+		logger.trace("SQLgetCustomCommands launched. Params passed {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			ArrayList<String> commands = new ArrayList<String>();
+			String sql = ("SELECT command FROM custom_commands WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				commands.add(_guild_id+""+rs.getString(1));
+			}
+			return commands;
+		} catch (SQLException e) {
+			logger.error("SQLgetCustomCommands Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static HashSet<String> SQLgetCustomCommandRestrictions(long _guild_id, String _command) {
-		logger.trace("SQLgetCustomCommandRestrictions launched. No params");
+		logger.trace("SQLgetCustomCommandRestrictions launched. Params passed {}, {}", _guild_id, _command);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			HashSet<String> channels = new HashSet<String>();
-			String sql = ("SELECT * FROM custom_commands_restrictions");
+			String sql = ("SELECT * FROM custom_commands_restrictions WHERE fk_guild_id = ? AND command = ?");
 			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setString(2, _command);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				final String channelType = rs.getString(3);
@@ -3753,6 +3783,33 @@ public class Azrael {
 			return channels;
 		} catch (SQLException e) {
 			logger.error("SQLgetCustomCommandRestrictions Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<Long> SQLgetCustomCommandRoles(long _guild_id, String _command) {
+		logger.trace("SQLgetCustomCommandRoles launched. Params passed {}, {}", _guild_id, _command);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			ArrayList<Long> roles = new ArrayList<Long>();
+			String sql = ("SELECT role_id FROM custom_commands_roles WHERE fk_guild_id = ? AND command = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setString(2, _command);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				roles.add(rs.getLong(1));
+			}
+			return roles;
+		} catch (SQLException e) {
+			logger.error("SQLgetCustomCommandRoles Exception", e);
 			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }

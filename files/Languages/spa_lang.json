@@ -207,6 +207,8 @@
 	"watching_lifted_err":			"¡Ha ocurrido un error interno! ¡No se pudo quitar la observación del usuario **{}**!",
 	"category_not_exists":			"The provided category doesn't exist!",
 	"no_category":					"Please submit a numerical category ID!",
+	"youtube_video_not_found":		"YouTube video found!",
+	"roles_now_invalid":			"Role(s) to assign don't exist anymore!",
 	
 	"embed_title_error":		 	"¡Ha ocurrido un error!",
 	"embed_title_about": 		 	"¡Página Acerca de!",

@@ -207,6 +207,8 @@
 	"watching_lifted_err":			"Ein interner Fehler ist aufgetreten! Der Benutzer **{}** konnte nicht von der Überwachung ausgenommen werden!",
 	"category_not_exists":			"Die vorgesehene Kategorie existiert nicht!",
 	"no_category":					"Bitte geben Sie eine numerische Kategorie-ID an!",
+	"youtube_video_not_found":		"YouTube Video nicht gefunden!",
+	"roles_now_invalid":			"Rolle(n) sind nicht mehr vorhanden!",
 	
 	"embed_title_error":		 	"Ein Fehler ist aufgetreten!",
 	"embed_title_about": 		 	"Über mich Seite!",
