@@ -158,7 +158,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						}
 						//display details of the currently selected item or skin
 						else if(shop.getAdditionalInfo().matches("(lev|ran|pro|ico|ite)") && !shop.getAdditionalInfo2().contains("%") && !shop.getAdditionalInfo2().contains("$") && !shop.getAdditionalInfo2().contains("#")) {
-							if(!message.matches("[^\\d]*") && message.length() <= 9) {
+							if(message.replaceAll("[0-9]*", "").trim().length() == 0 && message.length() <= 9) {
 								ShopExecution.displaySingleItem(e, shop.getAdditionalInfo(), shop.getAdditionalInfo2().split("-"), guild_settings, Integer.parseInt(message)-1);
 							}
 						}
