@@ -66,25 +66,28 @@ public class NicknameListener extends ListenerAdapter {
 				}
 				//Run google service, if enabled
 				if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-					final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
-					String reporter_name = NA;
-					String reporter_effectivename = NA;
-					if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
-						var roleLog = e.getGuild().retrieveAuditLogs();
-						//iterate through the log
-						for(final var entry : roleLog) {
-							//retrieve the first log about a role update
-							if(entry.getType() == ActionType.MEMBER_UPDATE) {
-								reporter_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
-								reporter_effectivename = e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName();
-								break;
+					final String [] array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.RENAME_MANUAL.id, "");
+					if(array != null && !array[0].equals("empty")) {
+						final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
+						String reporter_name = NA;
+						String reporter_effectivename = NA;
+						if(e.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS)) {
+							var roleLog = e.getGuild().retrieveAuditLogs();
+							//iterate through the log
+							for(final var entry : roleLog) {
+								//retrieve the first log about a role update
+								if(entry.getType() == ActionType.MEMBER_UPDATE) {
+									reporter_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
+									reporter_effectivename = e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName();
+									break;
+								}
 							}
 						}
+						else {
+							logger.warn("VIEW_AUDIT_LOGS permission missing for renamed google event RENAMED in guild {}", guild_id);
+						}
+						GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, reporter_name, reporter_effectivename, null, null, null, "RENAMED", null, null, null, e.getOldValue(), e.getNewValue(), 0, null, null, 0, 0, GoogleEvent.RENAME_MANUAL.id);
 					}
-					else {
-						logger.warn("VIEW_AUDIT_LOGS permission missing for renamed google event RENAMED in guild {}", guild_id);
-					}
-					GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, reporter_name, reporter_effectivename, null, null, null, "RENAMED", null, null, null, e.getOldValue(), e.getNewValue(), 0, null, null, 0, 0, GoogleEvent.RENAME_MANUAL.id);
 				}
 			}
 			else

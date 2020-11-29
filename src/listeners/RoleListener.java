@@ -85,17 +85,20 @@ public class RoleListener extends ListenerAdapter {
 						STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_1).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 						Azrael.SQLInsertActionLog("MEMBER_PERM_MUTE_READD", user_id, guild_id, "Permanent Mute role reassigned");
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-							Object [] object = getReporterFromAuditLog(e);
-							var reporter = e.getGuild().getMemberById((long)object[0]);
-							String reason = (String)object[1];
-							final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
-							String reporter_name = NA;
-							String reporter_username = NA;
-							if(reporter != null) {
-								reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
-								reporter_username = reporter.getEffectiveName();
+							final String [] array =  Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE_READD.id, "");
+							if(array != null && !array[0].equals("empty")) {
+								Object [] object = getReporterFromAuditLog(e);
+								var reporter = e.getGuild().getMemberById((long)object[0]);
+								String reason = (String)object[1];
+								final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
+								String reporter_name = NA;
+								String reporter_username = NA;
+								if(reporter != null) {
+									reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
+									reporter_username = reporter.getEffectiveName();
+								}
+								GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE_READD.id);
 							}
-							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE_READD.id);
 						}
 					}
 					else {
@@ -119,17 +122,20 @@ public class RoleListener extends ListenerAdapter {
 					Azrael.SQLInsertActionLog("MEMBER_MUTE_READD", user_id, guild_id, "Mute role reassigned");
 					//Run google service, if enabled
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-						Object [] object = getReporterFromAuditLog(e);
-						var reporter = e.getGuild().getMemberById((long)object[0]);
-						String reason = (String)object[1];
-						final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
-						String reporter_name = NA;
-						String reporter_username = NA;
-						if(reporter != null) {
-							reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
-							reporter_username = reporter.getEffectiveName();
+						final String [] array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE_READD.id, "");
+						if(array != null && !array[0].equals("empty")) {
+							Object [] object = getReporterFromAuditLog(e);
+							var reporter = e.getGuild().getMemberById((long)object[0]);
+							String reason = (String)object[1];
+							final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
+							String reporter_name = NA;
+							String reporter_username = NA;
+							if(reporter != null) {
+								reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
+								reporter_username = reporter.getEffectiveName();
+							}
+							GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE_READD.id);
 						}
-						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE_READD.id);
 					}
 				}
 				//enter in this block, if the user has been already muted but rejoined the server before the time elapsed
@@ -189,7 +195,7 @@ public class RoleListener extends ListenerAdapter {
 						
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", e.getMember().getUser().getId(), new Timestamp(time), user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", new Timestamp(time+mute_time), null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE.id);
+							GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE.id, ""), e.getGuild(), "", e.getMember().getUser().getId(), new Timestamp(time), user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", new Timestamp(time+mute_time), null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE.id);
 						}
 					}
 					//execute this block if a regular mute has been applied
@@ -238,7 +244,7 @@ public class RoleListener extends ListenerAdapter {
 							
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE.id);
+								GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE.id, ""), e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE.id);
 							}
 						}
 						//ban or perm mute if the current warning exceeded the max allowed warning
@@ -292,7 +298,7 @@ public class RoleListener extends ListenerAdapter {
 								
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, "PERMANENT", ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE.id);
+									GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE.id, ""), e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, "PERMANENT", ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE.id);
 								}
 							}
 						}

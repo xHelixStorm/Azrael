@@ -92,19 +92,17 @@ public class GoogleUtils {
 		};
 	}
 	
-	public static void handleSpreadsheetRequest(Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, long message_id, String message, String screenshots, int up_vote, int down_vote, int event_id) {
+	public static void handleSpreadsheetRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, long message_id, String message, String screenshots, int up_vote, int down_vote, int event_id) {
 		logger.debug("Initializing spreadsheet request for event {} in guild {}", action, guild.getId());
-		//Retrieve the file id and row start for this event
-		final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, event_id, channel_id);
 		//If nothing has been found, don't try to write into the spreadsheet
-		if(array != null && array[0].equals("empty"))
+		if(event != null && event[0].equals("empty"))
 			return;
-		final String file_id = array[0];
-		final String sheetRowStart = array[1];
-		final String forceRestriction = array[3];
-		if(forceRestriction.equals("1") && (array[2] == null || !array[2].equals(channel_id)))
+		final String file_id = event[0];
+		final String sheetRowStart = event[1];
+		final String forceRestriction = event[3];
+		if(forceRestriction.equals("1") && (event[2] == null || !event[2].equals(channel_id)))
 			return;
-		if((array[2] == null || array[2].length() == 0) || array[2].equals(channel_id)) {
+		if((event[2] == null || event[2].length() == 0) || event[2].equals(channel_id)) {
 			if(file_id != null && file_id.length() > 0 && sheetRowStart != null && !sheetRowStart.isBlank()) {
 				//retrieve the saved mapping for the current event
 				final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, event_id, guild.getIdLong());
@@ -294,19 +292,17 @@ public class GoogleUtils {
 		}
 	}
 	
-	public static boolean handleSpreadsheetRequest(Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String action, long ping, long member_count, long guilds_count, int event_id) {
+	public static boolean handleSpreadsheetRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String action, long ping, long member_count, long guilds_count, int event_id) {
 		logger.debug("Initializing spreadsheet request for event {} in guild {}", action, guild.getId());
-		//Retrieve the file id and row start for this event
-		final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, event_id, channel_id);
 		//If nothing has been found, don't try to write into the spreadsheet
-		if(array != null && array[0].equals("empty"))
+		if(event != null && event[0].equals("empty"))
 			return false;
-		final String file_id = array[0];
-		final String sheetRowStart = array[1];
-		final String forceRestriction = array[3];
-		if(forceRestriction.equals("1") && (array[2] == null || !array[2].equals(channel_id)))
+		final String file_id = event[0];
+		final String sheetRowStart = event[1];
+		final String forceRestriction = event[3];
+		if(forceRestriction.equals("1") && (event[2] == null || !event[2].equals(channel_id)))
 			return false;
-		if((array[2] == null || array[2].length() == 0) || array[2].equals(channel_id)) {
+		if((event[2] == null || event[2].length() == 0) || event[2].equals(channel_id)) {
 			if(file_id != null && file_id.length() > 0 && sheetRowStart != null && !sheetRowStart.isBlank()) {
 				//retrieve the saved mapping for the current event
 				final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, event_id, guild.getIdLong());
