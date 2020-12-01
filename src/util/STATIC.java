@@ -75,7 +75,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.32.520";
+	private static final String VERSION = "7.32.521";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -455,7 +455,7 @@ public class STATIC {
 	
 	//remove the watch state from a user that either got banned or kicked from a server
 	public static void handleUnwatch(GuildBanEvent e, GuildMemberRemoveEvent e2, short type) {
-		var user_id = (e != null ? e.getUser().getIdLong() : e2.getMember().getUser().getIdLong());
+		var user_id = (e != null ? e.getUser().getIdLong() : e2.getUser().getIdLong());
 		var guild_id = (e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong());
 		var unwatchReason = (type == 1 ? "ban" : "kick");
 		var watchedUser = Azrael.SQLgetWatchlist(user_id, guild_id);

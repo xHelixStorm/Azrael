@@ -357,8 +357,8 @@ public class RoleListener extends ListenerAdapter {
 				if(role.getIdLong() != mute_id && (verRole == null || (verRole != null && role.getIdLong() != verRole.getRole_ID()))) {
 					e.getGuild().removeRoleFromMember(e.getMember(), role).queue(
 						//don't remove the role, if it can't be removed. Like booster role
-						success -> logger.trace("{} role got removed from {} in guild {}", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId()),
-						error -> logger.warn("{} role could not be removed from {} in guild {}. It's a persistant role!", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId())
+						success -> logger.trace("Role {} got removed from {} in guild {}", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId()),
+						error -> logger.info("Role {} could not be removed from {} in guild {}. It's a booster role!", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId())
 					);
 				}
 			}
