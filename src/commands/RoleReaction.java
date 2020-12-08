@@ -50,12 +50,13 @@ public class RoleReaction implements CommandPublic {
 			else {
 				if(Azrael.SQLUpdateReaction(e.getGuild().getIdLong(), true) > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROLE_REACTION_ENABLE)).build()).queue();
+					logger.info("User {} has enabled role reactions in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.REA.getType())).findAny().orElse(null);
 					if(rea_channel != null) ReactionMessage.print(e, rea_channel.getChannel_ID());
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Role reactions couldn't be enabled in Azrael.guild table for guild {}", e.getGuild().getName());
+					logger.error("Role reactions couldn't be enabled in guild {}", e.getGuild().getId());
 				}
 			}
 		}
@@ -84,14 +85,15 @@ public class RoleReaction implements CommandPublic {
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
-							logger.warn("MANAGE_ROLES permission required to remove roles from users for guild {}", e.getGuild().getId());
+							logger.warn("MANAGE_ROLES permission required to remove roles from users in guild {}", e.getGuild().getId());
 						}
 					}
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROLE_REACTION_DISABLE)).build()).queue();
+					logger.info("User {} has disabled role reactions in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Role reactions couldn't be disabled for Azrael.guild table in guild {}", e.getGuild().getId());
+					logger.error("Role reactions couldn't be disabled in guild {}", e.getGuild().getId());
 				}
 			}
 		}

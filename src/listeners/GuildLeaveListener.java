@@ -61,7 +61,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 					STATIC.writeToRemoteChannel(e.getGuild(), kick, STATIC.getTranslation2(e.getGuild(), Translation.KICK_MESSAGE).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", e.getUser().getId()).replace("{}", kick_issuer)+kick_reason, Channel.LOG.getType());
 					Azrael.SQLInsertActionLog("MEMBER_KICK", e.getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
 					Hashes.clearTempCache("kick_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
-					logger.debug("{} has been kicked from guild {}", e.getUser().getId(), e.getGuild().getId());
+					logger.info("User {} has been kicked in guild {}", e.getUser().getId(), e.getGuild().getId());
 					
 					//Run google service, if enabled
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
@@ -88,7 +88,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 							EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.KICK_TITLE));
 							STATIC.writeToRemoteChannel(e.getGuild(), kick, STATIC.getTranslation2(e.getGuild(), Translation.KICK_MESSAGE).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", e.getUser().getId()).replace("{}", kick_issuer)+kick_reason, Channel.LOG.getType());
 							Azrael.SQLInsertActionLog("MEMBER_KICK", e.getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
-							logger.debug("{} has been kicked from guild {}", e.getUser().getId(), e.getGuild().getId());
+							logger.info("User {} has been kicked in guild {}", e.getUser().getId(), e.getGuild().getId());
 							
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
@@ -129,7 +129,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 			else {
 				Hashes.clearTempCache("kick-ignore_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 				Azrael.SQLInsertActionLog("MEMBER_KICK", e.getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
-				logger.debug("{} has been kicked from guild {}", e.getUser().getId(), e.getGuild().getId());
+				logger.info("User {} has been kicked in guild {}", e.getUser().getId(), e.getGuild().getId());
 			}
 			
 			//check if a waiting room was set up for this user and if yes, remove the channel

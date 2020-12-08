@@ -191,18 +191,18 @@ public class Daily implements CommandPublic {
 							//if the inventory has been updated, set the daily for this user and the current day as opened
 							if(editedRows > 0) {
 								if(RankingSystem.SQLInsertDailiesUsage(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), timestamp, timestamp2) > 0) {
-									logger.debug("{} received {} out of the Daily command", e.getMember().getUser().getId(), list.get(random).getDescription());
+									logger.info("{} received {} out of the Daily command in guild {}", e.getMember().getUser().getId(), list.get(random).getDescription(), e.getGuild().getId());
 									RankingSystem.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily retrieved", list.get(random).getDescription());
 								}
 								else {
 									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_2)+e.getMember().getAsMention(), Channel.LOG.getType());
-									logger.error("used dailies from {} couldn't be marked in RankingSystem.dailies_usage table", e.getMember().getUser().getId());
+									logger.error("used dailies from {} couldn't be marked as used in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily retrieval not marked", list.get(random).getDescription());
 								}
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_3)).build()).queue();
-								logger.error("{} couldn't be inserted into inventory", list.get(random).getDescription());
+								logger.error("{} couldn't be inserted into inventory in guild {}", list.get(random).getDescription(), e.getGuild().getId());
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily item couldn't be inserted to inventory", "An insert error occurred for the following item "+list.get(random).getDescription());
 							}
 							list.clear();

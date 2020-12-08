@@ -42,7 +42,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 			var message = e.getMessage().getContentRaw().toLowerCase();
 			if(e.getMessage().getContentRaw().startsWith("!") && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
 				if(!CommandHandler.handleCommand(CommandParser.parser(message, null, e))) {
-					logger.warn("Private message command {} doesn't exist!", e.getMessage().getContentRaw());
+					logger.trace("Private message command {} doesn't exist", e.getMessage().getContentRaw());
 				}
 			}
 			

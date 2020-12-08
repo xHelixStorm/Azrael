@@ -117,7 +117,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT type, reason, time, penalty, info FROM history WHERE fk_user_id = ? && fk_guild_id = ?");
+			String sql = ("SELECT type, reason, time, penalty, info FROM history WHERE fk_user_id = ? && fk_guild_id = ? ORDER BY time desc");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -179,7 +179,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT description FROM action_log WHERE target_id = ? && (guild_id = ? || guild_id = 0) && (event = ? || event = ?) GROUP BY description");
+			String sql = ("SELECT description FROM action_log WHERE target_id = ? && (guild_id = ? || guild_id = 0) && (event = ? || event = ?) GROUP BY description LIMIT 50");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
 			stmt.setLong(2, _guild_id);
@@ -208,7 +208,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT description FROM action_log WHERE target_id = ? && guild_id = ? && event = ? GROUP BY description");
+			String sql = ("SELECT description FROM action_log WHERE target_id = ? && guild_id = ? && event = ? GROUP BY description LIMIT 50");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
 			stmt.setLong(2, _guild_id);

@@ -141,7 +141,7 @@ public class Rank implements CommandPublic {
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
-								logger.error("Permission MESSAGE_ATTACH_FILES required to display the rank page in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
+								logger.error("Permission MESSAGE_ATTACH_FILES required to display the rank page in channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 							}
 						}
 						//send an embed if it's 0
@@ -162,7 +162,7 @@ public class Rank implements CommandPublic {
 						EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 						e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						RankingSystem.SQLInsertActionLog("critical", user_id, guild_id, "negative experience value", "The user has less experience points in proportion to his level: "+currentExperience);
-						logger.error("Negative experience valur for {} in guild {}", user_id, e.getGuild().getName());
+						logger.error("Negative experience value for user {} in guild {}", user_id, e.getGuild().getId());
 					}
 				}
 				else{

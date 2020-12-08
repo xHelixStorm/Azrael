@@ -71,7 +71,7 @@ public class LanguageFilter implements Runnable {
 					if(option.isPresent()) {
 						Hashes.addTempCache("message-removed-filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(10000));
 						e.getMessage().delete().reason("Message removed due to bad manner!").queue(success -> {}, error -> {
-							logger.warn("Message already removed!");
+							logger.warn("Message {} already removed in guild {}", e.getMessageId(), e.getGuild().getId());
 						});
 						STATIC.handleRemovedMessages(e, null, output);
 						var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.TRA.getType())).findAny().orElse(null);

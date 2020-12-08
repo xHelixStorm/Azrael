@@ -365,12 +365,21 @@ public class Display implements CommandPublic{
 				out.append("Set winners room subcommand command: "+GuildIni.getRoomWinnerLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Reopen rooms room subcommand: "+GuildIni.getRoomReopenLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Stats command: "+GuildIni.getStatsLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Leaderboard command: "+GuildIni.getLeaderboardLevel(e.getGuild().getIdLong()));
-				out.append("Accept command: "+GuildIni.getAcceptLevel(e.getGuild().getIdLong()));
-				out.append("Deny command: "+GuildIni.getDenyLevel(e.getGuild().getIdLong()));
+				out.append("Leaderboard command: "+GuildIni.getLeaderboardLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Accept command: "+GuildIni.getAcceptLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Deny command: "+GuildIni.getDenyLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Language command: "+GuildIni.getLanguageLevel(e.getGuild().getIdLong()));
 				//print second part
 				e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
+				//print third part (custom commands)
+				out.setLength(0);
+				final var commands = Azrael.SQLgetCustomCommands2(guild_id);
+				if(commands != null && commands.size() > 0) {
+					for(final var command : commands) {
+						out.append(command.getCommand().replaceFirst(command.getCommand().substring(0, 1), command.getCommand().substring(0, 1).toUpperCase())+" command: "+command.getLevel()+"\n");
+					}
+					e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
+				}
 			}
 			else{
 				UserPrivs.throwNotEnoughPrivilegeError(e, commandsLevel);

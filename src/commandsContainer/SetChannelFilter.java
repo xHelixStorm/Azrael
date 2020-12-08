@@ -54,11 +54,11 @@ public class SetChannelFilter {
 					for(String language : filter_lang) {
 						if(Azrael.SQLInsertChannel_Filter(channel_id, language) > 0) {
 							filterUpdated = true;
-							logger.debug("{} has set the channel filter {} for channel {} in guild {}", e.getMember().getUser().getId(), language, channel_id, e.getGuild().getId());
+							logger.info("User {} has set the channel filter {} for channel {} in guild {}", e.getMember().getUser().getId(), language, channel_id, e.getGuild().getId());
 						}
 						else {
 							errorCount++;
-							logger.error("channel filter {} couldn't be updated for the channel {} in guild {}", language, channel_id, e.getGuild().getId());
+							logger.error("Channel filter {} couldn't be set for channel {} in guild {}", language, channel_id, e.getGuild().getId());
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_CENSOR_ERR).replace("{}", language)).build()).queue();
 						}
 					}

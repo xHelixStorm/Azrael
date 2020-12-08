@@ -82,7 +82,7 @@ public class Randomshop implements CommandPublic {
 			else if(args.length > 0) {
 				//display the weapons that can be obtained.
 				if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES)))
-					RandomshopExecution.inspectItems(e, null, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), false), bundleArguments(args, 0), 1);
+					RandomshopExecution.inspectItems(e.getMember(), e.getChannel(), RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), false), bundleArguments(args, 0), 1, false);
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
 					logger.error("Permission MESSAGE_ATTACH_FILES required to display the randomshop in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
@@ -100,7 +100,7 @@ public class Randomshop implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("The user {} has executed the Randomshop command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+		logger.trace("The user {} has used Randomshop command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 	
 	private String bundleArguments(String [] args, int start) {

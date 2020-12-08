@@ -41,7 +41,7 @@ public class RegisterCategory {
 		}
 		else {
 			e.getChannel().sendMessage(messageBuild.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Category types from Azrael.channeltypes couldn't be retrieved in guild {}", e.getGuild().getId());
+			logger.error("Category types couldn't be retrieved in guild {}", e.getGuild().getId());
 		}
 	}
 	
@@ -70,7 +70,7 @@ public class RegisterCategory {
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Category {} couldn't be registered in guild {}", guildCategory.getId(), e.getGuild().getId());
+							logger.error("Category {} couldn't be registered as {} category in guild {}", guildCategory.getId(), categoryType, e.getGuild().getId());
 						}
 					}
 					else {

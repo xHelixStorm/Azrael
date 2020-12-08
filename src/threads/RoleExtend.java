@@ -74,7 +74,7 @@ public class RoleExtend implements Runnable {
 			}
 			//display the amount of users that are still muted
 			if(banHammerFound == true) {
-				logger.debug("Found muted users on start up in guild {}", guild.getId());
+				logger.info("{} muted users found on startup in guild {}", i, guild.getId());
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_TITLE));
 				STATIC.writeToRemoteChannel(guild, message, i+STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT)+(GuildIni.getOverrideBan(guild.getIdLong()) ? STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_EXCLUDED) : ""), Channel.LOG.getType());
 			}
@@ -116,17 +116,17 @@ public class RoleExtend implements Runnable {
 						}
 						else {
 							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.MISSING_PERMISSION_IN_2).replace("{}", Permission.MANAGE_CHANNEL.getName()+" and "+Permission.MANAGE_PERMISSIONS.getName())+category.getName(), Channel.LOG.getType());
-							logger.warn("MANAGE_CHANNEL and MANAGE_PERMISSIONS for category {} required to create verification channels for guild {}", verification.getCategoryID(), guild.getId());
+							logger.warn("MANAGE_CHANNEL and MANAGE_PERMISSIONS for category {} required to create verification channels in guild {}", verification.getCategoryID(), guild.getId());
 						}
 					}
 					else {
-						logger.warn("Category {} doesn't exist anymore for guild {}", verification.getCategoryID(), guild.getId());
+						logger.warn("Category {} doesn't exist anymore in guild {}", verification.getCategoryID(), guild.getId());
 					}
 				}
 			}
 			//display the amount of users that were put into waiting rooms
 			if(y > 0) {
-				logger.debug("Found users who were put into waiting rooms in guild {}", guild.getId());
+				logger.info("{} users have been moved into waiting rooms in guild {}", y, guild.getId());
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.UNMUTE_WAITING_TITLE));
 				STATIC.writeToRemoteChannel(guild, message, y+STATIC.getTranslation2(guild, Translation.UNMUTE_WAITING_MOVED), Channel.LOG.getType());
 			}

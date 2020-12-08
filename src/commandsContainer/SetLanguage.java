@@ -30,7 +30,7 @@ public class SetLanguage {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Translated languages couldn't be retrieved for translated lang {} in guild {}", lang, e.getGuild().getId());
+			logger.error("Translated languages couldn't be retrieved for language {} in guild {}", lang, e.getGuild().getId());
 		}
 	}
 	
@@ -41,10 +41,11 @@ public class SetLanguage {
 				if(Azrael.SQLUpdateLanguage(e.getGuild().getIdLong(), lang) != -1) {
 					Hashes.setLanguage(e.getGuild().getIdLong(), lang);
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LANGUAGE_SUCCESS)).build()).queue();
+					logger.info("User {} has updated the default server language to {} in guild {}", e.getMember().getUser().getId(), lang, e.getGuild().getId());
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Language {} couldn't be set for the whole guild {}", lang, e.getGuild().getId());
+					logger.error("Language {} couldn't be used in guild {}", lang, e.getGuild().getId());
 				}
 			}
 			else {

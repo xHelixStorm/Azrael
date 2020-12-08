@@ -84,14 +84,17 @@ public class DoubleExperience implements CommandPublic {
 								textChannel.sendMessage("```css\n"+STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_MESSAGE)+"```").queue();
 							}
 						}
+						logger.info("User {} has enabled the double experience mode for guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 					//if it has been disabled, disable it in cache as well
 					else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_OFF))) {
 						Hashes.addTempCache("doubleExp_gu"+e.getGuild().getId(), new Cache("off"));
+						logger.info("User {} has disabled the double experience mode for guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 					//if it has been set to auto, remove the option from the cache
 					else {
 						Hashes.clearTempCache("doubleExp_gu"+e.getGuild().getId());
+						logger.info("User {} has set the double experience mode to auto for guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				else {

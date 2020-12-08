@@ -30,12 +30,12 @@ public class SetPrivilegeLevel {
 					if(level <= 100 && level >= 0) {
 						if(DiscordRoles.SQLUpdateLevel(e.getGuild().getIdLong(), role_id, level) > 0) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PERMISSION_ADDED)).build()).queue();
-							logger.debug("role id {} has been updated with privilege level {} in guild {}", role_id, level, e.getGuild().getId());
+							logger.info("User {} has updated the permission level of role {} to level {} in guild {}", role_id, level, e.getGuild().getId());
 							DiscordRoles.SQLgetRoles(e.getGuild().getIdLong());
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("privilege level of role if {} couldn't be updated in table DiscordRoles.roles for guild {}", role_id, e.getGuild().getId());
+							logger.error("Permission level of role {} couldn't be updated to level {} in guild {}", role_id, level, e.getGuild().getId());
 						}
 					}
 					else {

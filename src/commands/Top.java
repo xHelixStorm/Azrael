@@ -65,6 +65,7 @@ public class Top implements CommandPublic {
 					
 		var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 		if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
+			//TODO: error handling when Ranking query ran into error or is empty
 			ArrayList<Ranking> rankList = RankingSystem.SQLRanking(guild_id);
 			Ranking ranking1 = rankList.parallelStream().filter(r -> r.getUser_ID() == member_id).findAny().orElse(null);
 			rank = ranking1.getRank();

@@ -94,7 +94,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Languages couldn't be retrieved from Azrael.languages_translation in guild {}", e.getGuild().getId());
+						logger.error("Languages couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -180,7 +180,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Level skins couldn't be retrieved from RankingSystem.ranking_level in guild {}", e.getGuild().getId());
+						logger.error("Level skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -205,7 +205,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Level skins couldn't be retrieved from RankingSystem.ranking_level in guild {}", e.getGuild().getId());
+						logger.error("Level skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -231,7 +231,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Rank skins couldn't be retrieved from RankingSystem.ranking_rank in guild {}", e.getGuild().getId());
+						logger.error("Rank skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -256,7 +256,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Rank skins couldn't be retrieved from RankingSystem.ranking_rank in guild {}", e.getGuild().getId());
+						logger.error("Rank skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -282,7 +282,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Profile skins couldn't be retrieved from RankingSystem.ranking_profile in guild {}", e.getGuild().getId());
+						logger.error("Profile skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -307,7 +307,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Profile skins couldn't be retrieved from RankingSystem.ranking_profile in guild {}", e.getGuild().getId());
+						logger.error("Profile skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -333,7 +333,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Icon skins couldn't be retrieved from RankingSystem.ranking_icons in guild {}", e.getGuild().getId());
+						logger.error("Icon skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -357,7 +357,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Icon skins couldn't be retrieved from RankingSystem.ranking_icons in guild {}", e.getGuild().getId());
+						logger.error("Icon skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {

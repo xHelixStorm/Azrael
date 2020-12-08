@@ -769,7 +769,7 @@ public class PugExecution {
 				}
 				else {
 					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.IMAGE_ERR)).queue();
-					Hashes.clearTempCache("meowDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
+					Hashes.clearTempCache("pugDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 		}

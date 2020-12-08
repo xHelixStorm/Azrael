@@ -37,12 +37,13 @@ public class PurchaseExecution {
 				if(editedRows > 0) {
 					user_details.setCurrency(new_currency);
 					Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
-					logger.debug("{} has purchased {}", e.getMember().getUser().getId(), skin.getShopDescription());
+					logger.info("User {} has purchased {} with value {} in guild {}", e.getMember().getUser().getId(), skin.getShopDescription(), skin.getPrice(), e.getGuild().getId());
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASED).replace("{}", skin.getShopDescription())).build()).queue();
 					returnSkinMenu(e, guild_settings, type);
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("Item or skin {} couldn't be purchased by user {} in guild {}", skin.getShopDescription(), e.getMember().getUser().getId(), e.getGuild().getId());
 					RankingSystem.SQLInsertActionLog("critical", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "purchase interrupted", "An error occurred while purchasing "+skin.getShopDescription());
 					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
@@ -66,12 +67,13 @@ public class PurchaseExecution {
 				if(editedRows > 0) {
 					user_details.setCurrency(new_currency);
 					Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
-					logger.debug("{} has purchased {}", e.getMember().getUser().getId(), weapon.getDescription()+" "+weapon.getStatDescription());
+					logger.info("User {} has purchased {} with value {} in guild {}", e.getMember().getUser().getId(), weapon.getDescription()+" "+weapon.getStatDescription(), weapon.getPrice(), e.getGuild().getId());
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASED).replace("{}", weapon.getDescription()+" "+weapon.getStatDescription())).build()).queue();
 					ShopExecution.displayShopWeapons(e, weapon.getCategoryDescription());
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("Weapon {} couldn't be purchased by user {} in guild {}", weapon.getDescription()+" "+weapon.getStatDescription(), e.getMember().getUser().getId(), e.getGuild().getId());
 					RankingSystem.SQLInsertActionLog("critical", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "purchase interrupted", "An error occurred while purchasing "+weapon.getDescription()+" "+weapon.getStatDescription());
 					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
@@ -95,12 +97,13 @@ public class PurchaseExecution {
 				if(editedRows > 0) {
 					user_details.setCurrency(new_currency);
 					Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
-					logger.debug("{} has purchased {}", e.getMember().getUser().getId(), skill.getDescription());
+					logger.info("User {} has purchased {} with value {} in guild {}", e.getMember().getUser().getId(), skill.getDescription(), skill.getPrice(), e.getGuild().getId());
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASED).replace("{}", skill.getDescription())).build()).queue();
 					ShopExecution.displaySkills(e, guild_settings);
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("Skill {} couldn't be purchased by user {} in guild {}", skill.getDescription(), e.getMember().getUser().getId(), e.getGuild().getId());
 					RankingSystem.SQLInsertActionLog("critical", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "purchase interrupted", "An error occurred while purchasing "+skill.getDescription());
 					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
@@ -120,13 +123,14 @@ public class PurchaseExecution {
 			var newCurrency = user_details.getCurrency()+(skin.getPrice()/10);
 			user_details.setLastUpdate(new Timestamp(System.currentTimeMillis()));
 			if(RankingSystem.SQLUpdateCurrencyAndRemoveInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), newCurrency, skin.getItemID(), guild_settings.getThemeID(), user_details.getLastUpdate()) > 0) {
+				logger.info("User {} has sold {} for {} in guild {}", e.getMember().getUser().getId(), skin.getShopDescription(), (skin.getPrice()/10), e.getGuild().getId());
 				user_details.setCurrency(newCurrency);
 				var curLevelSkin = RankingSystem.SQLgetRankingLevel(user_details.getLevel(), guild_settings.getThemeID());
 				if(curLevelSkin.getSkinDescription().equals(skin.getShopDescription())) {
 					user_details.setRankingLevel(guild_settings.getLevelID());
 					if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID()) == 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("The RankingSystem.users table couldn't be updated with the default level up skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+						logger.error("The default level up skin for user {} couldn't be updated upon selling in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				var curRankSkin = RankingSystem.SQLgetRankingRank(user_details.getLevel(), guild_settings.getThemeID());
@@ -134,7 +138,7 @@ public class PurchaseExecution {
 					user_details.setRankingRank(guild_settings.getRankID());
 					if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getRankID()) == 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("The RankingSystem.users table couldn't be updated with the default rank skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+						logger.error("The default rank skin for user {} couldn't be updated upon selling in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				var curProfileSkin = RankingSystem.SQLgetRankingProfile(user_details.getLevel(), guild_settings.getThemeID());
@@ -142,7 +146,7 @@ public class PurchaseExecution {
 					user_details.setRankingProfile(guild_settings.getProfileID());
 					if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getProfileID()) == 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("The RankingSystem.users table couldn't be updated with the default profile skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+						logger.error("The default profile skin for user {} couldn't be updated upon selling in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				var curIconSkin = RankingSystem.SQLgetRankingProfile(user_details.getLevel(), guild_settings.getThemeID());
@@ -150,7 +154,7 @@ public class PurchaseExecution {
 					user_details.setRankingIcon(guild_settings.getIconID());
 					if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getIconID()) == 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("The RankingSystem.users table couldn't be updated with the default icon skin for {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+						logger.error("The default icon skin for user {} couldn't be updated upon selling in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);

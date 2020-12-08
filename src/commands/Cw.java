@@ -110,12 +110,12 @@ public class Cw implements CommandPublic {
 											}
 											else {
 												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-												logger.error("Map {} couldn't be retrieved from Azrael.comp_maps", room.getMapID(), e.getGuild().getId());
+												logger.error("Map {} couldn't be retrieved in guild {}", room.getMapID(), e.getGuild().getId(), e.getGuild().getId());
 											}
 										}
 										else {
 											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-											logger.error("Username for user {} couldn't be retrieved from Azrael.user_stats in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+											logger.error("Username for user {} couldn't be retrieved in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 										}
 									}
 									else {
@@ -195,12 +195,12 @@ public class Cw implements CommandPublic {
 										}
 										else {
 											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-											logger.error("Map {} couldn't be retrieved from Azrael.comp_maps in guild {}", room.getMapID(), e.getGuild().getId());
+											logger.error("Map {} couldn't be retrieved in guild {}", room.getMapID(), e.getGuild().getId());
 										}
 									}
 									else {
 										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.error("Username couldn't be retrieved from Azrael.user_stats for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+										logger.error("Username couldn't be retrieved for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 									}
 								}
 								else {
@@ -258,12 +258,12 @@ public class Cw implements CommandPublic {
 											}
 											else {
 												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-												logger.error("Matchmaking room status in Azrael.matchmaking_rooms of room {} couldn't be updated in guild {}", room.getRoomID(), e.getGuild().getId());
+												logger.error("Matchmaking room status of room {} couldn't be updated in guild {}", room.getRoomID(), e.getGuild().getId());
 											}
 										}
 										else {
 											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-											logger.error("Map {} couldn't be retrieved from Azrael.comp_maps in guild {}", room.getMapID(), e.getGuild().getId());
+											logger.error("Map {} couldn't be retrieved in guild {}", room.getMapID(), e.getGuild().getId());
 										}
 									}
 									else {
@@ -310,7 +310,7 @@ public class Cw implements CommandPublic {
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("Clan reservation of clan {} from Azrael.clan_view couldn't be retrieved in guild {}", member.getClanID(), e.getGuild().getId());
+								logger.error("Clan reservation of clan {} couldn't be retrieved in guild {}", member.getClanID(), e.getGuild().getId());
 							}
 						}
 						else if(result == 1) {
@@ -332,7 +332,7 @@ public class Cw implements CommandPublic {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Clan details of user {} from Azrael.clan_view couldn't be retrieved in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			logger.error("Clan details of user {} couldn't be retrieved in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 		}
 	}
 
@@ -369,12 +369,12 @@ public class Cw implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("CW reservation couldn't be set in Azrael.clans_reservations for user {} and clan {} in guild {}", e.getMember().getUser().getId(), member.getClanID(), e.getGuild().getId());
+						logger.error("CW reservation couldn't be set for user {} and clan {} in guild {}", e.getMember().getUser().getId(), member.getClanID(), e.getGuild().getId());
 					}
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Deputys of clan {} couldn't be retrieved from Azrael.clan_view in guild {}", clan_id, e.getGuild().getId());
+					logger.error("Deputies of clan {} couldn't be retrieved in guild {}", clan_id, e.getGuild().getId());
 				}
 			}
 			else if(result == 1) {
@@ -390,7 +390,7 @@ public class Cw implements CommandPublic {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Clan id couldn't be retrieved from Azrael.clans in guild {}", e.getGuild().getId());
+			logger.error("Clan id couldn't be retrieved in guild {}", e.getGuild().getId());
 		}
 	}
 }

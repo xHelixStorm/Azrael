@@ -454,8 +454,8 @@ public class RankingSystem {
 	}
 	
 	//roles table
-	public static int SQLInsertRoles(long _role_id, String _name, int _role_level_requirement, long _guild_id) {
-		logger.trace("SQLInsertRoles launched. Passed params {}, {}, {}, {}", _role_id, _name, _role_level_requirement, _guild_id);
+	public static int SQLInsertRole(long _role_id, String _name, int _role_level_requirement, long _guild_id) {
+		logger.trace("SQLInsertRole launched. Passed params {}, {}, {}, {}", _role_id, _name, _role_level_requirement, _guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -468,8 +468,8 @@ public class RankingSystem {
 			stmt.setLong(4, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLInsertRoles Exception", e);
-			return 0;
+			logger.error("SQLInsertRole Exception", e);
+			return -1;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1998,7 +1998,7 @@ public class RankingSystem {
 	}
 	
 	public static int SQLgetInventoryNumber(long _user_id, long _guild_id, String _description, String _status, int _theme_id) {
-		logger.trace("SQLgetInventoryNumber launched. Passed params {}, {}, {}, {}", _user_id, _guild_id, _description, _status, _theme_id);
+		logger.trace("SQLgetInventoryNumber launched. Passed params {}, {}, {}, {}, {}", _user_id, _guild_id, _description, _status, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;

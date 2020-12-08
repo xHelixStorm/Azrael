@@ -93,7 +93,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(e.getMessage().getContentRaw().startsWith(GuildIni.getCommandPrefix(e.getGuild().getIdLong())) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
 						var prefixLength = GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length();
 						if(!CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength), e, null))) {
-							logger.warn("Command {} doesn't exist!", e.getMessage().getContentRaw());
+							logger.warn("Command {} doesn't exist in guild {}", e.getMessage().getContentRaw(), e.getGuild().getId());
 						}
 					}
 					
@@ -101,7 +101,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(currentChannel != null && currentChannel.getTxtRemoval() && e.getMessage().getAttachments().size() == 0) {
 						Hashes.addTempCache("message-removed_gu"+guild_id+"ch"+channel_id+"us"+user_id, new Cache(10000));
 						e.getMessage().delete().reason("Text comment without screenshot not allowed!").queue(success -> {}, error -> {
-							logger.warn("Message already removed!");
+							logger.warn("Message {} has been already removed in guild {}", e.getMessageId(), e.getGuild().getId());
 						});
 					}
 					
@@ -277,7 +277,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 						}
 						else {
-							logger.error("MESSAGE_ADD_REACTION permission missing for votes in guild {}", e.getGuild().getId());
+							logger.error("MESSAGE_ADD_REACTION permission required to vote on text channel {} in guild {}", e.getChannel(), e.getGuild().getId());
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_ADD_REACTION.getName())+e.getChannel().getName(), Channel.LOG.getType());
 						}
 					}
@@ -310,7 +310,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 						}
 						else {
-							logger.warn("MESSAGE_ADD_REACTION permission required to to browse through pages by reacting for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+							logger.warn("MESSAGE_ADD_REACTION permission required to browse through the randomshop pages by reacting on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 						}
 						Hashes.clearTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 					}
@@ -705,7 +705,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required for text channel {} in guild {} to censor messages", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required to censor messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				//if url censoring is enabled but no language has been applied, use english as default and run the url censoring thread
@@ -717,7 +717,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required for text channel {} in guild {} to censor messages", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required to censor messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				//check if the channel log and cache log is enabled and if one of the two or bot is/are enabled then write message to file or/and log to system cache
@@ -761,7 +761,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log messages of watched users", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to log messages of watched users on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				//print an error if the cache log is not enabled
@@ -774,7 +774,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log messages of watched users", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to log messages of watched users on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				

@@ -25,13 +25,14 @@ public class SetCompServer {
 				final int result = Competitive.SQLInsertCompServer(e.getGuild().getIdLong(), server);
 				if(result > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_COMP_SERVER_ADD).replace("{}", server)).build()).queue();
+					logger.info("User {} has added the competitive server {} in guild {}", e.getMember().getUser().getId(), server, e.getGuild().getId());
 				}
 				else if(result == 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_COMP_SERVER_READD).replace("{}", server)).build()).queue();
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Comp server name {} couldn't be added for guild {}", server, e.getGuild().getIdLong());
+					logger.error("Comp server name {} couldn't be added in guild {}", server, e.getGuild().getIdLong());
 				}
 			}
 			else if(args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
@@ -39,6 +40,7 @@ public class SetCompServer {
 				final int result = Competitive.SQLRemoveCompServer(e.getGuild().getIdLong(), server); 
 				if(result > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_COMP_SERVER_REMOVE).replace("{}", server)).build()).queue();
+					logger.info("User {} has removed the competitive server {} in guild {}", e.getMember().getUser().getId(), server, e.getGuild().getId());
 					Competitive.SQLUpdateServerFromUserStats(e.getGuild().getIdLong(), server);
 				}
 				else if(result == 0) {
@@ -46,7 +48,7 @@ public class SetCompServer {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Comp server name {} couldn't be removed for guild {}", server, e.getGuild().getIdLong());
+					logger.error("Comp server name {} couldn't be removed in guild {}", server, e.getGuild().getIdLong());
 				}
 			}
 		}

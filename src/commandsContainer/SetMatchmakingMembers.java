@@ -25,10 +25,11 @@ public class SetMatchmakingMembers {
 				if(members >= 0 && members <= 100) {
 					if(Competitive.SQLUpdateMatchmakingMembers(e.getGuild().getIdLong(), members) > 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MATCHMAKING_MEMBERS_SUC).replace("{}", ""+members)).build()).queue();
+						logger.info("User {} has updated the max matchamking members limit to {} in guild {}", e.getMember().getUser().getId(), members, e.getGuild().getId());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Max matchmaking members couldn't be updated in table Azrael.guild for guild {}", e.getGuild().getId());
+						logger.error("The max matchmaking members limit of {} members in a room couldn't be updated in guild {}", members, e.getGuild().getId());
 					}
 				}
 				else {

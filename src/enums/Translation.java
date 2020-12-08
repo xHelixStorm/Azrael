@@ -381,6 +381,7 @@ public enum Translation {
 	EQUIP_SELECT_NUMBER			("equip_select_number"),
 	
 	FILTER_HELP					("filter_help"),
+	FILTER_ABORT				("filter_abort"),
 	FILTER_ACTIONS				("filter_actions"),
 	FILTER_DISPLAY				("filter_display"),
 	FILTER_INSERT				("filter_insert"),
@@ -391,8 +392,9 @@ public enum Translation {
 	FILTER_NO_LANGS				("filter_no_langs"),
 	FILTER_LIST					("filter_list"),
 	FILTER_LIST_EMPTY			("filter_list_empty"),
+	FILTER_LIST_LANG_NA			("filter_list_lang_na"),
 	FILTER_WRITE_WORD			("filter_write_word"),
-	FILTER_WRITE_PASTEBIN		("filter_write_pastebin"),
+	FILTER_WRITE_PASTE			("filter_write_paste"),
 	FILTER_WRITE_FQDN			("filter_write_fqdn"),
 	FILTER_WRITE_PASTE_FQDN		("filter_write_paste_fqdn"),
 	FILTER_WRITE_USERNAME		("filter_write_username"),
@@ -459,6 +461,7 @@ public enum Translation {
 	GOOGLE_SHEET_RESTRICT_SET	("google_sheet_restrict_set"),
 	GOOGLE_SHEET_RESTRICT_REMOVE("google_sheet_restrict_remove"),
 	GOOGLE_SHEET_RESTRICT_ADD	("google_sheet_restrict_add"),
+	GOOGLE_SHEET_NO_LINK		("google_sheet_not_link"),
 	GOOGLE_EXIT					("google_exit"),
 	
 	HEAVY_CENSORING_HELP		("heavy_censoring_help"),

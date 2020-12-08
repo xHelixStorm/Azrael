@@ -57,7 +57,7 @@ public class RankingMethods extends ListenerAdapter {
 		final var skin = RankingSystem.SQLgetRankingLevel(user_details.getRankingLevel(), theme_id);
 		if(skinIcon == null || skin == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).build()).queue();
-			logger.error("RankUp couldn't be drawn for guild {}. Skin not found!", e.getGuild().getIdLong());
+			logger.error("RankUp couldn't be drawn. Skin not found in guild {}", e.getGuild().getIdLong());
 			return;
 		}
 		
@@ -177,7 +177,7 @@ public class RankingMethods extends ListenerAdapter {
 								}
 							}
 						} catch(IOException | DataFormatException e1) {
-							logger.error("Compression error for file {}", skin.getSkinDescription()+skin.getFileType(), e1);
+							logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
 							file1.delete();
 							message.delete().queue();
 							e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
@@ -222,7 +222,7 @@ public class RankingMethods extends ListenerAdapter {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).queue();
-			logger.error("RankUp couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
+			logger.error("RankUp couldn't be drawn in guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	
@@ -231,7 +231,7 @@ public class RankingMethods extends ListenerAdapter {
 		final var skin = RankingSystem.SQLgetRankingRank(user_details.getRankingRank(), theme_id);
 		if(skinIcon == null || skin == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).build()).queue();
-			logger.error("Rank couldn't be drawn for guild {}. Skin not found!", e.getGuild().getIdLong());
+			logger.error("Rank couldn't be drawn. Skin not found in guild {}", e.getGuild().getIdLong());
 			return;
 		}
 		
@@ -360,7 +360,7 @@ public class RankingMethods extends ListenerAdapter {
 							}
 						} catch(IOException | DataFormatException e1) {
 							e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
-							logger.error("Compression error for file {}", skin.getSkinDescription()+skin.getFileType(), e1);
+							logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
 							file1.delete();
 							message.delete().queue();
 						}
@@ -404,7 +404,7 @@ public class RankingMethods extends ListenerAdapter {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).queue();
-			logger.error("Rank couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
+			logger.error("Rank couldn't be drawn in guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	
@@ -413,7 +413,7 @@ public class RankingMethods extends ListenerAdapter {
 		final var skin = RankingSystem.SQLgetRankingProfile(user_details.getRankingProfile(), theme_id);
 		if(skinIcon == null || skin == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).build()).queue();
-			logger.error("Profile couldn't be drawn for guild {}. Skin not found!", e.getGuild().getIdLong());
+			logger.error("Profile couldn't be drawn. Skin not found in guild {}", e.getGuild().getIdLong());
 			return;
 		}
 		
@@ -636,7 +636,7 @@ public class RankingMethods extends ListenerAdapter {
 							}
 						} catch(IOException | DataFormatException e1) {
 							e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
-							logger.error("Compression error for file {}", skin.getSkinDescription()+skin.getFileType(), e1);
+							logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
 							file1.delete();
 							message.delete().queue();
 						}
@@ -680,7 +680,7 @@ public class RankingMethods extends ListenerAdapter {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).queue();
-			logger.error("Profile couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
+			logger.error("Profile couldn't be drawn in guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	

@@ -21,6 +21,7 @@ import util.STATIC;
 public class QuizExecution {
 	private static final Logger logger = LoggerFactory.getLogger(QuizExecution.class);
 	
+	//TODO: full overhaul required
 	public static void registerRewards(GuildMessageReceivedEvent e, String _link) {
 		//check if it is a link that was inserted and if yes call readPublicPasteLink and then
 		//split the returned String in an array
@@ -61,14 +62,15 @@ public class QuizExecution {
 					String integrity = IntegrityCheck(e);
 					if(integrity.equals("0")) {
 						e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.QUIZ_REWARDS_REGISTERED)).queue();
-						logger.debug("Quiz rewards have been registered in guild {}", e.getGuild().getId());
+						logger.info("User {} has registered the quiz rewards with the pastebin url {} in guild {}", e.getMember().getUser().getId(), _link, e.getGuild().getId());
 					}
 					else {
+						//TODO: check wtf I did here
 						try {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)+"\n"+Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR), integrity, e.getGuild().getIdLong())).build()).queue();
 							logger.error("Quiz rewards couldn't be registered in guild {}", e.getGuild().getId());
 						} catch (IllegalStateException | LoginException | PasteException e1) {
-							logger.warn("Error on creating paste!", e1);
+							logger.warn("Error on creating pastebin page in guild {}", e.getGuild().getId(), e1);
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						}
 						clearRewards(1);
@@ -81,7 +83,7 @@ public class QuizExecution {
 			} catch (MalformedURLException | RuntimeException e2) {
 				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-				logger.error("Reading paste failed in guild {}!", e.getGuild().getId(), e2);
+				logger.error("Reading pastebin url {} failed in guild {}", _link, e.getGuild().getId(), e2);
 			}
 		}
 		else {
@@ -103,7 +105,7 @@ public class QuizExecution {
 				} catch (MalformedURLException | RuntimeException e1) {
 					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-					logger.error("Reading paste failed in guild {}!", e.getGuild().getId(), e1);
+					logger.error("Reading paste pastebin {} failed in guild {}", _link, e.getGuild().getId(), e1);
 				}
 			}
 			else {
@@ -168,7 +170,7 @@ public class QuizExecution {
 				String integrity = IntegrityCheck(e);
 				if(integrity.equals("0")) {
 					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.QUIZ_QUESTIONS_REGISTERED)).queue();
-					logger.debug("Quiz questions have been registered in guild {}", e.getGuild().getId());
+					logger.info("Quiz questions have been registered in guild {}", e.getGuild().getId());
 				}
 				else {
 					try {
@@ -249,17 +251,17 @@ public class QuizExecution {
 			new File("./files/QuizBackup").mkdirs();
 			FileSetting.createFile("./files/QuizBackup/quizsettings"+e.getGuild().getId()+".azr", sb.toString());
 			e.getChannel().sendMessage("Quiz settings have been saved successfully!").queue();
-			logger.debug("The settings for the quiz have been registered");
+			logger.info("The settings for the quiz have been registered in guild {}", e.getGuild().getId());
 		}
 		else if(sb.toString().equals(noQuestions)) {
 			EmbedBuilder error = new EmbedBuilder().setTitle("Questions missing!").setColor(Color.RED);
 			e.getChannel().sendMessage(error.setDescription("A backup from the settings couldn't be created because the questions are missing. Please register them first").build()).queue();
-			logger.warn("Quiz backup file couldn't be created due to the missing questions");
+			logger.warn("Quiz backup file couldn't be created due to the missing questions in guild {}", e.getGuild().getId());
 		}
 		else if(sb.toString().equals(noRewards)) {
 			EmbedBuilder error = new EmbedBuilder().setTitle("Rewards missing!").setColor(Color.RED);
 			e.getChannel().sendMessage(error.setDescription("A backup from the settings couldn't be created because the rewards are missing. Please register them first").build()).queue();
-			logger.warn("Quiz backup file couldn't be created due to the missing rewards");
+			logger.warn("Quiz backup file couldn't be created due to the missing rewards in guild {}", e.getGuild().getId());
 		}
 	}
 	

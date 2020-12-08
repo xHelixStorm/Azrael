@@ -59,7 +59,7 @@ public class ShopExecution {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Skins couldn't be retrieved from RankingSystem.all_enabled_skins in guild {}", e.getGuild().getId());
+			logger.error("Shop skins couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 	}
@@ -104,7 +104,7 @@ public class ShopExecution {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Shop content couldn't be retrieved from RankingSystem.all_enabled_skins in guild {}", e.getGuild().getId());
+				logger.error("Shop content couldn't be retrieved in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}
@@ -136,7 +136,7 @@ public class ShopExecution {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Weapon categories couldn't be retrieved from RankingSystem.weapon_category in guild {}", e.getGuild().getId());
+			logger.error("Weapon categories couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 	}
@@ -169,7 +169,7 @@ public class ShopExecution {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Weapons couldn't be retrieved from RankingSystem.all_weapons in guild {}", e.getGuild().getId());
+			logger.error("Weapons couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 	}
@@ -192,7 +192,7 @@ public class ShopExecution {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Weapons couldn't be retrieved from RankingSystem.all_weapons in guild {}", e.getGuild().getId());
+				logger.error("Weapons couldn't be retrieved in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}
@@ -226,7 +226,7 @@ public class ShopExecution {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Skills couldn't be retrieved from RankingSystem.skill_shop_content in guild {}", e.getGuild().getId());
+			logger.error("Skills couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 	}
@@ -249,7 +249,7 @@ public class ShopExecution {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Skills couldn't be retrieved from RankingSystem.skill_shop_content in guild {}", e.getGuild().getId());
+				logger.error("Skills couldn't be retrieved in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}

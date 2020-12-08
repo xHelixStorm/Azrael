@@ -55,7 +55,7 @@ public class Room implements CommandPublic {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Ongoing matchmaking rooms couldn't be retrieved from Azrael.matchmaking_rooms in guild {}", e.getGuild().getId());
+					logger.error("Ongoing matchmaking rooms couldn't be retrieved in guild {}", e.getGuild().getId());
 				}
 			}
 			else if(args[0].replaceAll("[0-9]*", "").length() == 0) {
@@ -120,12 +120,12 @@ public class Room implements CommandPublic {
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Map {} couldn't be retrieved from Azrael.comp_maps in guild {}", room.getMapID(), e.getGuild().getId());
+							logger.error("Map {} couldn't be retrieved in guild {}", room.getMapID(), e.getGuild().getId());
 						}
 					}
 					else if(members == -1) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Matchmaking room member limit couldn't be retrieved from Azrael.guild in guild {}", e.getGuild().getId());
+						logger.error("Matchmaking room member limit couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else if(room != null) {

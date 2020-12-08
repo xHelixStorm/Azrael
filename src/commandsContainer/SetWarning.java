@@ -38,13 +38,13 @@ public class SetWarning {
 			}
 			
 			if(editedRows > 0) {
-				logger.debug("{} has edited the warning level in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+				logger.info("User {} has updated the warning level to {} total warnings in guild {}", e.getMember().getUser().getId(), warning_value, e.getGuild().getId());
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_WARNING_1).replace("{}", ""+warning_value)).build()).queue();
 				Hashes.addTempCache("warnings_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "1"));
 			}
 			else {
-				logger.error("The warning level for the guild {} couldn't be edited on Azrael.warnings", e.getGuild().getId());
+				logger.error("The warning level couldn't be updated to {} total warnings in guild {}", warning_value, e.getGuild().getId());
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			}
 		}
@@ -63,12 +63,13 @@ public class SetWarning {
 					if(Azrael.SQLUpdateMuteTimeOfWarning(e.getGuild().getIdLong(), value, (Long.parseLong(_message)*60*1000)) > 0) {
 						message.setColor(Color.BLUE);
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_WARNING_2).replaceFirst("\\{\\}", _message).replace("{}", ""+(value+1))).build()).queue();
+						logger.info("The timer of warning {} has been updated to {} in guild {}", value, _message, e.getGuild().getId());
 						cache.updateDescription(""+(value+1)).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("warning timer {} couldn't be updated in guild {}", _message, e.getGuild().getId());
+						logger.error("The Timer of warning {} couldn't be updated to {} in guild {}", value, _message, e.getGuild().getId());
 					}
 				}
 				else if(value == max_warning) {
@@ -78,7 +79,7 @@ public class SetWarning {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("warning timer couldn't be updated in guild {}", e.getGuild().getId());
+						logger.error("The Timer of warning {} couldn't be updated to {} in guild {}", value, _message, e.getGuild().getId());
 					}
 				}
 			}

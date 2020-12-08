@@ -98,7 +98,7 @@ public class Matchmaking implements CommandPublic {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("It couldn't be verified if an already existing matchmaking room exists for type 1 in guild {}", e.getGuild().getId());
+			logger.error("It couldn't be verified if a matchmaking room of type 1 already exists in guild {}", e.getGuild().getId());
 		}
 	}
 	
@@ -124,7 +124,7 @@ public class Matchmaking implements CommandPublic {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("It couldn't be verified if an already existing matchmaking room exists for type 1 in guild {}", e.getGuild().getId());
+			logger.error("It couldn't be verified if a matchmaking room of type 2 already exists in guild {}", e.getGuild().getId());
 		}
 	}
 	
@@ -136,7 +136,7 @@ public class Matchmaking implements CommandPublic {
 			final var map = Competitive.SQLgetRandomMap(e.getGuild().getIdLong());
 			if(map == null) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Random map from Azrael.comp_maps couldn't be retrieved in guild {}", e.getGuild().getId());
+				logger.error("Random map couldn't be retrieved in guild {}", e.getGuild().getId());
 				return;
 			}
 			//create the matchmaking room

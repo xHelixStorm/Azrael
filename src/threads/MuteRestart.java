@@ -80,7 +80,7 @@ public class MuteRestart implements Runnable {
 				else {
 					if(Azrael.SQLUpdateMutedOnEnd(user_id, guild.getIdLong(), false, false) > 0) {
 						if(Azrael.SQLUpdateGuildLeft(user_id, guild.getIdLong(), false) == 0) {
-							logger.error("Guild left state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild.getIdLong());
+							logger.error("Guild left state couldn't be update for user {} in guild {}", user_id, guild.getIdLong());
 						}
 						Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild.getIdLong(), "Mute role removed");
 						//Run google service, if enabled
@@ -90,12 +90,12 @@ public class MuteRestart implements Runnable {
 						}
 					}
 					else
-						logger.error("Mute end state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild.getIdLong());
+						logger.error("Mute end state couldn't be updated for user {} in guild {}", user_id, guild.getIdLong());
 				}
 			}			
 		} catch (InterruptedException e2) {
 			//executed when H!user unmute was used to interrupt the Thread.sleep
-			logger.info("The mute of {} ing guild {} has been interrupted!", user_id, guild.getId());
+			logger.info("The mute of user {} has been interrupted in guild {}", user_id, guild.getId());
 			//verify that the user is not banned and still labeled as muted before printing a message and before updating the unmute time
 			if(!Azrael.SQLisBanned(user_id, guild.getIdLong())) {
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());

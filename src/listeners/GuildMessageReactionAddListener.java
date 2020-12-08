@@ -26,6 +26,7 @@ import google.GoogleSheets;
 import inventory.InventoryBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -91,8 +92,11 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 											if(reactions[i].length() > 0 && (reactionName.equals(reactions[i]) || EmojiParser.parseToAliases(reactionName).replaceAll(":", "").equals(reactions[i]))) {
 												//check if the bot has the manage roles permission
 												if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-													e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(i).getRole_ID())).queue();
-													logger.debug("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+													final Role role = e.getGuild().getRoleById(reactionRoles.get(i).getRole_ID());
+													if(role != null) {
+														e.getGuild().addRoleToMember(e.getMember(), role).queue();
+														logger.info("User {} received the role {} by reacting in guild {}", e.getUser().getId(), role.getId(), e.getGuild().getId());
+													}
 												}
 												else
 													printPermissionError(e);
@@ -109,8 +113,11 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 											if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 												//A tenth emote possibility doesn't exist
 												if(emote != 9) {
-													e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
-													logger.debug("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+													final Role role = e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID());
+													if(role != null) {
+														e.getGuild().addRoleToMember(e.getMember(), role).queue();
+														logger.info("User {} received the role {} by reacting in guild {}", e.getUser().getId(), role.getId(), e.getGuild().getId());
+													}
 												}
 											}
 											else
@@ -120,19 +127,23 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 									else {
 										int emote = STATIC.returnEmote(reactionName);
 										//check if the bot has the manage roles permission
-										if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+										if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 											//A tenth emote possibility doesn't exist
 											if(emote != 9) {
-												e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
-												logger.debug("{} received a role upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+												final Role role = e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID());
+												if(role != null) {
+													e.getGuild().addRoleToMember(e.getMember(), role).queue();
+													logger.info("User {} received the role {} by reacting in guild {}", e.getUser().getId(), role.getId(), e.getGuild().getId());
+												}
 											}
+										}
 										else
 											printPermissionError(e);
 									}
 								}
 							}
 							else
-								logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());
+								logger.error("Reaction roles couldn't be retrieved in guild {}", e.getGuild().getId());
 						}
 						
 						//check if a role has to be assigned
@@ -185,13 +196,13 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ADD_REACTION.getName()).build()).queue();
-							logger.error("MESSAGE_ADD_REACTION permission missing for channel {} in guild {} to add a reaction", channel_id, e.getGuild().getId());
+							logger.error("MESSAGE_ADD_REACTION permission required to add a reaction on text channel {} in guild {}", channel_id, e.getGuild().getId());
 							Hashes.clearTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getUserId()+"me"+e.getMessageId());
 						}
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_HISTORY.getName()).build()).queue();
-						logger.error("MESSAGE_HISTORY permission missing for channel {} in guild {} to read the history", channel_id, e.getGuild().getId());
+						logger.error("MESSAGE_HISTORY permission required to read the history of text channel {} in guild {}", channel_id, e.getGuild().getId());
 						Hashes.clearTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getUserId()+"me"+e.getMessageId());
 					}
 				}
@@ -225,7 +236,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 								e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
 							}
 							else {
-								logger.warn("MESSAGE_MANAGE permission required to delete the image for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+								logger.warn("MESSAGE_MANAGE permission required to delete messages in text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 							}
 							Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab));
 							//retrieve current theme and max items in the current inventory
@@ -235,18 +246,18 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 							//draw inventory depending on the category that was chosen
 							if(inventory_tab.equalsIgnoreCase("weapons")) {
 								if(!sub_tab.equalsIgnoreCase("total"))
-									InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, sub_tab, theme), current_page, last_page, guild_settings);
+									InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, sub_tab, theme), current_page, last_page, guild_settings);
 								else
-									InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
+									InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
 							}
 							else if(inventory_tab.equalsIgnoreCase("skins"))
-								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
+								InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
 							else
-								InventoryBuilder.DrawInventory(null, e, inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
+								InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
 						}
 						else {
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
-							logger.error("MESSAGE_WRITE and MESSAGE_ATTACH_FILES permission required to reupload a new image for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+							logger.error("MESSAGE_WRITE and MESSAGE_ATTACH_FILES permission required to reupload a new image in channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 						}
 					}
 					//execute if it's a randomshop reaction
@@ -268,14 +279,14 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 								e.getChannel().retrieveMessageById(e.getMessageId()).complete().delete().queue();
 							}
 							else {
-								logger.warn("MESSAGE_MANAGE permission required to delete the image for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+								logger.warn("MESSAGE_MANAGE permission required to delete messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 							}
 							final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-							RandomshopExecution.inspectItems(null, e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), theme), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme, false), input, current_page);
+							RandomshopExecution.inspectItems(e.getMember(), e.getChannel(), RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), theme), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme, false), input, current_page, true);
 						}
 						else {
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
-							logger.error("MESSAGE_WRITE and MESSAGE_ATTACH_FILES permission required to reupload a new image for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+							logger.error("MESSAGE_WRITE and MESSAGE_ATTACH_FILES permission required to reupload a new image on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 						}
 					}
 					//execute if it's a clan reaction
@@ -298,7 +309,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 								if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_MANAGE)))
 									m.delete().queue();
 								else
-									logger.warn("MESSAGE_MANAGE permission required to delete the message for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+									logger.warn("MESSAGE_MANAGE permission required to delete messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 								int count = 0;
 								StringBuilder out = new StringBuilder();
 								for(int i = (page-1)*10; i < clans.size(); i++) {
@@ -317,7 +328,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 						}
 						else {
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+", "+Permission.MESSAGE_HISTORY.getName()+" and "+Permission.MESSAGE_ADD_REACTION.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
-							logger.error("MESSAGE_WRITE, MESSAGE_HISTORY and MESSAGE_REACTION_ADD permissions required to display a new clan page with reactions for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+							logger.error("MESSAGE_WRITE, MESSAGE_HISTORY and MESSAGE_REACTION_ADD permissions required to display a new clan page with reactions on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 						}
 					}
 				}
@@ -394,7 +405,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 											}
 										} catch (Exception e1) {
 											STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-											logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
+											logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
 										}
 									}
 								}
@@ -403,7 +414,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_MANAGE.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
-						logger.error("MESSAGE_MANAGE permission required to remove a reaction from a user for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_MANAGE permission required to remove a reaction from a user on channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 			}
@@ -416,6 +427,6 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 	 */
 	private static void printPermissionError(GuildMessageReactionAddEvent e) {
 		STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName(), Channel.LOG.getType());
-		logger.warn("MANAGE ROLES permission missing to apply reaction roles in guild {}!", e.getGuild().getId());
+		logger.warn("MANAGE ROLES permission required to apply reaction roles in guild {}", e.getGuild().getId());
 	}
 }

@@ -160,15 +160,16 @@ public class RankingSystemItems {
 	}
 	
 	//inventory
-	public static int SQLgetNumberOfWeaponID(long _guild_id, int _weapon_id, int _theme_id) {
-		logger.trace("SQLgetNumberOfWeaponID launched. Params passed {}, {}, {}", _guild_id, _weapon_id, _theme_id);
+	public static int SQLgetNumberOfWeaponID(long _user_id, long _guild_id, int _weapon_id, int _theme_id) {
+		logger.trace("SQLgetNumberOfWeaponID launched. Params passed {}, {}, {}, {}", _user_id, _guild_id, _weapon_id, _theme_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT number FROM inventory WHERE fk_guild_id =  ? AND fk_weapon_id = ? AND fk_theme_id = ?");
+			String sql = ("SELECT number FROM inventory WHERE fk_user_id = ? AND fk_guild_id =  ? AND fk_weapon_id = ? AND fk_theme_id = ?");
 			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _user_id);
 			stmt.setLong(1, _guild_id);
 			stmt.setInt(2, _weapon_id);
 			stmt.setInt(3, _theme_id);
@@ -179,7 +180,7 @@ public class RankingSystemItems {
 			return 0;
 		} catch (SQLException e) {
 			logger.error("SQLgetNumberOfWeaponID Exception", e);
-			return 0;
+			return -1;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -207,7 +208,7 @@ public class RankingSystemItems {
 			return 0;
 		} catch (SQLException e) {
 			logger.error("SQLgetRandomWeaponIDByAbbv Exception", e);
-			return 0;
+			return -1;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -234,7 +235,7 @@ public class RankingSystemItems {
 			return 0;
 		} catch (SQLException e) {
 			logger.error("SQLgetRandomWeaponIDByAbbv Exception", e);
-			return 0;
+			return -1;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }

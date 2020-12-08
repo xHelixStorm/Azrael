@@ -21,14 +21,14 @@ import enums.Translation;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import util.STATIC;
 
 public class RandomshopItemDrawer {
 	private final static Logger logger = LoggerFactory.getLogger(RandomshopItemDrawer.class);
 	
-	public static void drawItems(GuildMessageReceivedEvent e, GuildMessageReactionAddEvent e2, List<Weapons> weapons, int current_page, int last_page, Guilds guild_settings) {
+	public static void drawItems(Member member, TextChannel channel, List<Weapons> weapons, int current_page, int last_page, Guilds guild_settings) {
 		String traceWeapon = null;
 		try {
 			var theme_id = guild_settings.getThemeID();
@@ -71,29 +71,19 @@ public class RandomshopItemDrawer {
 			}
 			g.setFont(new Font("Nexa Bold", Font.BOLD, generalFontSize));
 			g.drawString(current_page+" / "+ last_page, pageX+getCenteredString(current_page+" / "+ last_page, 0, g), pageY);
-			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"randomshop_items_gu"+(e != null ? e.getGuild().getId() : e2.getGuild().getId())+"us"+(e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId())+".png"));
+			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png"));
 			g.dispose();
 			
-			File file1 = new File(IniFileReader.getTempDirectory()+"randomshop_items_gu"+(e != null ? e.getGuild().getId() : e2.getGuild().getId())+"us"+(e != null ? e.getMember().getUser().getId() : e2.getMember().getUser().getId())+".png");
-			if(e != null)
-				e.getChannel().sendFile(file1, "randomshop.png").complete();
-			else
-				e2.getChannel().sendFile(file1, "randomshop.png").complete();
-			file1.delete();
+			File file1 = new File(IniFileReader.getTempDirectory()+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png");
+			channel.sendFile(file1, "randomshop.png").queue(m -> {
+				file1.delete();
+			});
 		} catch (IOException e1) {
-			if(e != null) {
-				if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR)).build()).queue();
-				else
-					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR)).queue();
-			}
-			else {
-				if(e2.getGuild().getSelfMember().hasPermission(e2.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e2.getGuild(), e2.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-					e2.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e2.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e2.getMember(), Translation.RANDOMSHOP_ERR)).build()).queue();
-				else
-					e2.getChannel().sendMessage(STATIC.getTranslation(e2.getMember(), Translation.RANDOMSHOP_ERR)).queue();
-			}
-			logger.error("Randomshop Items couldn't be drawn. Error for item {}", traceWeapon, e1);
+			if(member.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(member.getGuild(), channel, EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
+				channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(member, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(member, Translation.RANDOMSHOP_ERR)).build()).queue();
+			else
+				channel.sendMessage(STATIC.getTranslation(member, Translation.RANDOMSHOP_ERR)).queue();
+			logger.error("Randomshop Items couldn't be drawn. Error for item {} in guild {}", traceWeapon, member.getGuild().getId(), e1);
 		}
 	}
 	

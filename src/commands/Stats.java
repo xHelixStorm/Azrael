@@ -60,7 +60,7 @@ public class Stats implements CommandPublic {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Ranking couldn't be retrieved from Azrael.user_stats in guild {}", e.getGuild().getId());
+					logger.error("Ranking couldn't be retrieved in guild {}", e.getGuild().getId());
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RENAME))) {
@@ -79,7 +79,7 @@ public class Stats implements CommandPublic {
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Username couldn't be updated in Azrael.user_stats for user {} and guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+							logger.error("Username couldn't be updated for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 						}
 					}
 					else if(nameTaken == 1) {
@@ -88,7 +88,7 @@ public class Stats implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("It couldn't be verified if the name is already taken in Azrael.user_stats for name {} and guild {}", newName, e.getGuild().getId());
+						logger.error("It couldn't be verified if the name {} is already taken in guild {}", newName, e.getGuild().getId());
 					}
 				}
 				else {
@@ -110,7 +110,7 @@ public class Stats implements CommandPublic {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Servers couldn't be retrieved from Azrael.comp_servers in guild {}", e.getGuild().getId());
+					logger.error("Servers couldn't be retrieved in guild {}", e.getGuild().getId());
 				}
 			}
 			else if(member.getServer() != null && args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SERVER))) {
@@ -124,7 +124,7 @@ public class Stats implements CommandPublic {
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Server couldn't be updated in Azrael.user_stats for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+							logger.error("Server couldn't be updated for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 						}
 					}
 					else {
@@ -134,7 +134,7 @@ public class Stats implements CommandPublic {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Servers couldn't be retrieved from Azrael.comp_servers in guild {}", e.getGuild().getId());
+					logger.error("Servers couldn't be retrieved in guild {}", e.getGuild().getId());
 				}
 			}
 			else {
@@ -146,7 +146,7 @@ public class Stats implements CommandPublic {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("User stats couldn't be retrieved from Azrael.user_stats for user {} and guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			logger.error("User stats couldn't be retrieved for user {} and guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 		}
 	}
 

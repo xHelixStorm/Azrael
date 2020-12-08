@@ -21,15 +21,17 @@ import enums.Translation;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import util.STATIC;
 
 public class InventoryBuilder {
 	private final static Logger logger = LoggerFactory.getLogger(InventoryBuilder.class);
 	
-	public static void DrawInventory(GuildMessageReceivedEvent e, GuildMessageReactionAddEvent e2, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, Guilds guild_settings) {
+	public static void DrawInventory(Guild guild, Member member, TextChannel channel, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, Guilds guild_settings) {
 		int theme_id = guild_settings.getThemeID();
+		String lastItem = "";
 		if(new File("./files/RankingSystem/"+theme_id+"/Inventory/inventory_blank.png").exists()) {
 			try {
 				BufferedImage blank_inventory = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Inventory/inventory_blank.png"));
@@ -67,6 +69,8 @@ public class InventoryBuilder {
 				var currentX = startX;
 				var currentY = startY;
 				for(InventoryContent inventory : _items) {
+					lastItem = inventory.getDescription();
+					
 					i++;
 					BufferedImage item;
 					if(inventory.getType() != null && inventory.getType().equals("ite"))
@@ -100,35 +104,17 @@ public class InventoryBuilder {
 					}
 				}
 				
-				if(e != null)
-					ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
-				else
-					ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+e2.getGuild().getId()+"us"+e2.getMember().getUser().getId()+".png"));
-				
-				if(e != null) {
-					File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
-					e.getChannel().sendFile(upload, "inventory.png").complete();
+				ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png"));
+				File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png");
+				channel.sendFile(upload, "inventory.png").queue(m -> {
 					upload.delete();
-				}
-				else {
-					File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+e2.getGuild().getId()+"us"+e2.getMember().getUser().getId()+".png");
-					e2.getChannel().sendFile(upload, "inventory.png").complete();
-					upload.delete();
-				}
+				});
 			} catch(IOException ioe) {
-				if(e != null) {
-					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_DRAW_ERR)).build()).queue();
-					else
-						e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_DRAW_ERR)).queue();
-				}
-				else {
-					if(e2.getGuild().getSelfMember().hasPermission(e2.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e2.getGuild(), e2.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-						e2.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e2.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e2.getMember(), Translation.INVENTORY_DRAW_ERR)).build()).queue();
-					else
-						e2.getChannel().sendMessage(STATIC.getTranslation(e2.getMember(), Translation.INVENTORY_DRAW_ERR)).queue();
-				}
-				logger.warn("Inventory couldn't be drawn. Last item {}", ioe);
+				if(guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(guild, channel, EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
+					channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(member, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(member, Translation.INVENTORY_DRAW_ERR)).build()).queue();
+				else
+					channel.sendMessage(STATIC.getTranslation(member, Translation.INVENTORY_DRAW_ERR)).queue();
+				logger.warn("Inventory couldn't be drawn for user {} and item {} in guild {}", member.getUser().getId(), lastItem, guild.getId(), ioe);
 			}
 			
 		}
@@ -154,7 +140,7 @@ public class InventoryBuilder {
 				}
 				out.append("\n");
 			}
-			e.getChannel().sendMessage("```\n"+out.toString()+"\n```");
+			channel.sendMessage("```\n"+out.toString()+"\n```");
 		}
 	}
 	

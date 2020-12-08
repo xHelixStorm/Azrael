@@ -54,7 +54,7 @@ public class RandomshopRewardDrawer {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR_2)+weapon.getDescription()+" "+weapon.getStatDescription()).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR_2)+weapon.getDescription()+" "+weapon.getStatDescription()).queue();
-			logger.error("An error occurred while printing the random shop price {}", weapon.getDescription(), e1);
+			logger.error("An error occurred while printing the random shop prize {} in guild {}", weapon.getDescription(), e.getGuild().getId(), e1);
 		}
 	}
 }

@@ -58,6 +58,7 @@ public class HeavyCensoring implements CommandPublic {
 					if(heavyCensoring == null || !heavyCensoring) {
 						Hashes.addHeavyCensoring(e.getGuild().getIdLong(), true);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_ENABLED)).setThumbnail(IniFileReader.getHeavyThumbnail()).build()).queue();
+						logger.info("User {} has enabled heavy censoring in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 						new Thread(new LowerHeavyCensoring(e)).start();
 					}
 					else {
@@ -71,6 +72,7 @@ public class HeavyCensoring implements CommandPublic {
 						//clear all heavy censoring related HashMaps and thread
 						Hashes.addHeavyCensoring(e.getGuild().getIdLong(), false);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_DISABLED)).setThumbnail(IniFileReader.getHeavyEndThumbnail()).build()).queue();
+						logger.info("User {} has disabled heavy censoring in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 						Hashes.removeCensoreMessage(e.getGuild().getIdLong());
 						Hashes.removeFilterThreshold(e.getGuild().getIdLong());
 						Hashes.getHeavyCensoringThread(e.getGuild().getIdLong()).interrupt();
@@ -85,6 +87,7 @@ public class HeavyCensoring implements CommandPublic {
 					if(heavyCensoring != null && heavyCensoring) {
 						Hashes.addFilterThreshold(e.getGuild().getIdLong(), "0");
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_RESET)).build()).queue();
+						logger.info("User {} has resetted the heavy censoring threshold back to 0 in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_RESET_ERR)).build()).queue();
@@ -102,7 +105,7 @@ public class HeavyCensoring implements CommandPublic {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("The HeavyCensoring command has been used from {}", e.getMember().getUser().getId());
+		logger.trace("{} has used HeavyCensoring command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 
 }

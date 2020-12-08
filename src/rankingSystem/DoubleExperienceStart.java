@@ -61,8 +61,8 @@ public class DoubleExperienceStart extends TimerTask {
 							event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\n"+STATIC.getTranslation2(g, Translation.DOUBLE_EXPERIENCE_AUTO)+"```").queue();
 						}
 						else
-							logger.warn("MESSAGE_WRITE and MESSAGE_ATTACH_FILE permissions required to announce the double experience event for channel {} in guild {}", textChannel.getId(), g.getId());
-						logger.info("Double experience event started for guild {}!", guild_id);
+							logger.warn("MESSAGE_WRITE and MESSAGE_ATTACH_FILE permissions required to announce the double experience event on channel {} in guild {}", textChannel.getId(), g.getId());
+						logger.info("Double experience event started in guild {}", guild_id);
 					}
 				}
 			}

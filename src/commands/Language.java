@@ -48,7 +48,7 @@ public class Language implements CommandPublic {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Translated languages couldn't be retrieved for translated lang {} in guild {}", lang, e.getGuild().getId());
+				logger.error("Translated languages couldn't be retrieved for lang {} in guild {}", lang, e.getGuild().getId());
 			}
 		}
 		else if(args.length == 1 && args[0].length() == 3) {
@@ -59,7 +59,7 @@ public class Language implements CommandPublic {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Language {} couldn't be set for the whole guild {}", args[0], e.getGuild().getId());
+					logger.error("Language {} couldn't be used for the whole guild {}", args[0], e.getGuild().getId());
 				}
 			}
 			else {

@@ -36,7 +36,7 @@ public class CollectUsers implements Runnable {
 			RankingSystem.SQLBulkInsertUsers(members, guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID());
 			RankingSystem.SQLBulkInsertUserDetails(members, 0, 0, guild_settings.getStartCurrency(), 0);
 		}
-		logger.debug("{} has registered all users from the guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+		logger.info("User {} has registered all available users in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 		if(!suppressMessage)
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_REGISTER_COMPLETE)).build()).queue();
 	}

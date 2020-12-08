@@ -30,10 +30,11 @@ public class SetMaps {
 			
 			if(Competitive.SQLInsertMap(e.getGuild().getIdLong(), args[1], url) > 0) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MAPS_SUCCESS)).build()).queue();
+				logger.info("User {} has saved the new competitive map {} in guild {}", e.getMember().getUser().getId(), args[0], e.getGuild().getId());
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Map {} couldn't be inserted into Azrael.comp_maps for guild {}", args[0], e.getGuild().getId());
+				logger.error("Competitive map {} couldn't be saved in guild {}", args[0], e.getGuild().getId());
 			}
 		}
 		else {

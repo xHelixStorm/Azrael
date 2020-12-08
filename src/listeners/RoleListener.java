@@ -75,7 +75,7 @@ public class RoleListener extends ListenerAdapter {
 					//set mute status to true
 					if(Azrael.SQLUpdateMuted(user_id, guild_id, true) == 0) {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_7).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
-						logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
+						logger.error("Mute information of user {} couldn't be updated in guild {}", user_id, e.getGuild().getId());
 					}
 					//remove all roles, except the mute role when the muted user has more than 1 assigned role
 					if(e.getMember().getRoles().size() > 1 && !removeRoles(e, mute_id))
@@ -112,7 +112,7 @@ public class RoleListener extends ListenerAdapter {
 					//set mute status to true
 					if(Azrael.SQLUpdateMuted(user_id, guild_id, true) == 0) {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_7), Channel.LOG.getType());
-						logger.error("Mute information of {} couldn't be updated in Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
+						logger.error("Mute information of user {} couldn't be updated in guild {}", user_id, e.getGuild().getId());
 					}
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 					STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_2).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
@@ -191,7 +191,7 @@ public class RoleListener extends ListenerAdapter {
 						});
 						//unmute after a specific amount of time
 						new Thread(new RoleTimer(e, mute_time, mute_id, assignedRole, hour_add, and_add, minute_add, 0, 0, issuer, reason)).start();
-						logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getId());
+						logger.info("User {} got muted in guild {}", e.getUser().getId(), e.getGuild().getId());
 						
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
@@ -225,7 +225,7 @@ public class RoleListener extends ListenerAdapter {
 							//mark the user as muted with a set time
 							if(Azrael.SQLInsertData(user_id, guild_id, (warning_id+1), 1, timestamp, unmute_timestamp, true, false) == 0) {
 								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_FLAG_SET), Channel.LOG.getType());
-								logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
+								logger.error("Muted user {} couldn't be labeled as muted in guild {}", e.getUser().getId(), e.getGuild().getId());
 							}
 							//send a private message
 							e.getUser().openPrivateChannel().queue(channel -> {
@@ -240,7 +240,7 @@ public class RoleListener extends ListenerAdapter {
 							});
 							//run RoleTimer for automatic unmute
 							new Thread(new RoleTimer(e, mute_time, mute_id, assignedRole, hour_add, and_add, minute_add, (warning_id+1), max_warning, issuer, reason)).start();
-							logger.debug("{} got muted in guild {}", e.getUser().getId(), e.getGuild().getId());
+							logger.info("User {} got muted in guild {}", e.getUser().getId(), e.getGuild().getId());
 							
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
@@ -259,28 +259,26 @@ public class RoleListener extends ListenerAdapter {
 													//ban the user
 													e.getGuild().ban(e.getMember(), 0).reason(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_REASON)).queue();
 													Azrael.SQLInsertHistory(user_id, guild_id, "ban", reason, 0, e.getJDA().getSelfUser().getName()+"#"+e.getJDA().getSelfUser().getDiscriminator());
-													logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 													channel.close().queue();
 												}, error -> {
 													STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_DM_LOCKED), Channel.LOG.getType());
 													//ban the user
 													e.getGuild().ban(e.getMember(), 0).reason(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_REASON)).queue();
 													Azrael.SQLInsertHistory(user_id, guild_id, "ban", reason, 0, e.getJDA().getSelfUser().getName()+"#"+e.getJDA().getSelfUser().getDiscriminator());
-													logger.debug("{} got banned in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 													channel.close().queue();
 												});
 									});
 								}
 								else {
 									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_PERMISSION_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)+Permission.BAN_MEMBERS.getName(), Channel.LOG.getType());
-									logger.warn("BAN MEMBERS permission missing to ban a user in guild {}!", e.getGuild().getId());
+									logger.warn("BAN MEMBERS permission required to ban a user in guild {}", e.getGuild().getId());
 								}
 							}
 							else {
 								//mark the user as permanently muted
 								if(Azrael.SQLInsertData(user_id, guild_id, warning_id, 1, timestamp, null, true, false) == 0) {
 									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_FLAG_SET), Channel.LOG.getType());
-									logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
+									logger.error("The muted user {} couldn't be labeled as muted in guild {}", e.getUser().getId(), e.getGuild().getName());
 								}
 								//send a private message
 								e.getUser().openPrivateChannel().queue(channel -> {
@@ -314,11 +312,11 @@ public class RoleListener extends ListenerAdapter {
 						//remove the mute role and send a message
 						e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue();
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_RETRACTED_TITLE)), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_REMOVED), Channel.LOG.getType());
-						logger.warn("{} received a mute role that has been instantly removed in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+						logger.warn("User {} received a mute role which has been removed due to missing hierarchy permissions in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_REMOVE_ERR)+Permission.MANAGE_ROLES.getName(), Channel.LOG.getType());
-						logger.warn("MANAGE ROLES permission missing to retract the mute role in guild {}!", e.getGuild().getId());
+						logger.warn("MANAGE ROLES permission required to retract the mute role from a user with higher hierarchy permissions in guild {}", e.getGuild().getId());
 					}
 				}
 				if(unmute_time - System.currentTimeMillis() < 0) {
@@ -357,14 +355,14 @@ public class RoleListener extends ListenerAdapter {
 				if(role.getIdLong() != mute_id && (verRole == null || (verRole != null && role.getIdLong() != verRole.getRole_ID()))) {
 					e.getGuild().removeRoleFromMember(e.getMember(), role).queue(
 						//don't remove the role, if it can't be removed. Like booster role
-						success -> logger.trace("Role {} got removed from {} in guild {}", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId()),
-						error -> logger.info("Role {} could not be removed from {} in guild {}. It's a booster role!", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId())
+						success -> logger.trace("Role {} removed from user {} during a mute in guild {}", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId()),
+						error -> logger.info("Role {} could not be removed from user {} during a mute in guild {}", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId())
 					);
 				}
 			}
 		}
 		else {
-			logger.warn("MANAGE ROLES permission required to remove all roles from a user in guild {}!", e.getGuild().getId());
+			logger.warn("MANAGE ROLES permission required to remove all roles from a user in guild {}", e.getGuild().getId());
 			return false;
 		}
 		return true;

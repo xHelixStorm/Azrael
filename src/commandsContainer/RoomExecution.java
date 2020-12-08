@@ -22,10 +22,11 @@ public class RoomExecution {
 		if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getRoomCloseLevel(e.getGuild().getIdLong())) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 			if(Competitive.SQLDeleteMatchmakingRoom(e.getGuild().getIdLong(), room_id) > 0) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROOM_CLOSE).replace("{}", ""+room_id)).build()).queue();
+				logger.info("User {} has removed the room {} in guild {}", e.getMember().getUser().getId(), room_id, e.getGuild().getId());
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Matchmaking room {} couldn't be deleted in guild {}", room_id, e.getGuild().getId());
+				logger.error("Matchmaking room {} couldn't be removed in guild {}", room_id, e.getGuild().getId());
 			}
 			Hashes.clearTempCache("room_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
@@ -55,11 +56,12 @@ public class RoomExecution {
 						else
 							teamName = (iniTeamName2.length() > 0 ? iniTeamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2));
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROOM_WINNER_DECIDED).replaceFirst("\\{\\}", teamName).replace("{}", ""+room_id)).build()).queue();
+						logger.info("User {} has selected team {} as winners of room {} in guild {}", e.getMember().getUser().getId(), team, room_id, e.getGuild().getId());
 						Hashes.clearTempCache("room_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Winner couldn't be set in room {} and guild {}", room_id, e.getGuild().getId());
+						logger.error("Winner couldn't be set for room {} in guild {}", room_id, e.getGuild().getId());
 						Hashes.clearTempCache("room_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					}
 				}
@@ -81,15 +83,16 @@ public class RoomExecution {
 			if(room != null && room.getRoomID() != 0) {
 				if(Competitive.SQLrevertWinner(e.getGuild().getIdLong(), room_id, room.getWinner(), clan) > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROOM_REOPEN).replace("{}", ""+room_id)).build()).queue();
+					logger.info("User {} has undone the previous winner selection for room {} in guild {}", e.getMember().getUser().getId(), room_id, e.getGuild().getId());
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Room details couldn't be retrieved from Azrael.matchmaking_rooms for room {} and guild {}", room_id, e.getGuild().getId());
+					logger.error("Room winner couldn't be reverted for room {} in guild {}", room_id, e.getGuild().getId());
 				}
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Room details couldn't be retrieved from Azrael.matchmaking_rooms for room {} and guild {}", room_id, e.getGuild().getId());
+				logger.error("Room details couldn't be retrieved for room {} in guild {}", room_id, e.getGuild().getId());
 			}
 			Hashes.clearTempCache("room_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}

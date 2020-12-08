@@ -104,7 +104,7 @@ public class UserPrivs {
 				}
 				else {
 					if(DiscordRoles.SQLInsertRole(member.getGuild().getIdLong(), role.getIdLong(), 0, role.getName(), "def", false) == 0) {
-						logger.error("The role id {} couldn't be inserted into DiscordRoles.roles table", role.getId());
+						logger.error("The role id {} couldn't be saved as new role in guild {}", role.getId(), member.getGuild().getId());
 					}
 				}
 			}

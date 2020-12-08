@@ -41,7 +41,7 @@ public class GoogleSpreadsheetsExecution {
 		final var spreadsheets = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
 		final String NA = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
 		if(spreadsheets == null)
-			logger.error("Data couldn't be retrieved from Azrael.google_api_setup in guild {}", e.getGuild().getId());
+			logger.error("Google API information couldn't be retrieved in guild {}", e.getGuild().getId());
 		else if(spreadsheets.size() == 0)
 			out.append("**"+NA+"**");
 		else {
@@ -72,7 +72,7 @@ public class GoogleSpreadsheetsExecution {
 					Azrael.SQLInsertActionLog("GOOGLE_SPREADSHEET_OWNERSHIP", 0, e.getGuild().getIdLong(), email);
 					GoogleDrive.transferOwnerOfFile(GoogleDrive.getDriveClientService(), file_id, email);
 				} catch (Exception e1) {
-					logger.error("An error occurred on process step \"{}\"", processStep, e1);
+					logger.error("An error occurred on process step \"{}\" in guild {}", processStep, e.getGuild().getId(), e1);
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
 					err = true;
 				}
@@ -80,11 +80,11 @@ public class GoogleSpreadsheetsExecution {
 				if(!err) {
 					if(Azrael.SQLInsertGoogleAPISetup(file_id, e.getGuild().getIdLong(), title, 2) > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_CREATED)+file_id).build()).queue();
-						logger.debug("Spreadsheet with the file id {} has been created from guild {}", file_id, e.getGuild().getIdLong());
+						logger.info("Spreadsheet with the file id {} has been created in guild {}", file_id, e.getGuild().getIdLong());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_CREATED_2)+file_id).build()).queue();
-						logger.warn("Spreadsheet with the file id {} has been created from guild {} but without linkage", file_id, e.getGuild().getIdLong());
+						logger.warn("Spreadsheet with the file id {} has been created in guild {} but without linkage", file_id, e.getGuild().getIdLong());
 					}
 				}
 			}
@@ -108,7 +108,7 @@ public class GoogleSpreadsheetsExecution {
 				try {
 					spreadsheet = GoogleSheets.getSpreadsheet(GoogleSheets.getSheetsClientService(), file_id);
 				}catch (Exception e1) {
-					logger.error("An error occurred on process step \"Retrieve Spreadsheet\"", e1);
+					logger.error("An error occurred on process step \"Retrieve Spreadsheet\" in guild {}", e.getGuild().getId(), e1);
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
 					err = true;
 				}
@@ -116,12 +116,12 @@ public class GoogleSpreadsheetsExecution {
 				if(!err) {
 					if(Azrael.SQLInsertGoogleAPISetup(spreadsheet.getSpreadsheetId(), e.getGuild().getIdLong(), spreadsheet.getProperties().getTitle(), 2) > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_ADDED)).build()).queue();
-						logger.debug("Spreadsheet with the file id {} has been linked to the bot in guild {}", file_id, e.getGuild().getIdLong());
+						logger.info("Spreadsheet with the file id {} has been linked to the bot in guild {}", file_id, e.getGuild().getIdLong());
 						Azrael.SQLInsertActionLog("GOOGLE_SPREADSHEET_LINK", 0, e.getGuild().getIdLong(), file_id);
 						Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription("An internal error has occurred. Google Spreadsheet couldn't be linked to the bot.").build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_NO_LINK)).build()).queue();
 						logger.error("Spreadsheet with the file id {} couldn't be linked to the bot in guild {}");
 						Hashes.clearTempCache(key);
 					}
@@ -147,7 +147,7 @@ public class GoogleSpreadsheetsExecution {
 				try {
 					spreadsheet = GoogleSheets.getSpreadsheet(GoogleSheets.getSheetsClientService(), file_id);
 				}catch (Exception e1) {
-					logger.error("An error occurred on process step \"Retrieve Spreadsheet\"", e1);
+					logger.error("An error occurred on process step \"Retrieve Spreadsheet\" in guild {}", e.getGuild().getId(), e1);
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
 					err = true;
 				}
@@ -158,7 +158,7 @@ public class GoogleSpreadsheetsExecution {
 					Azrael.SQLDeleteGoogleFileToEvent(spreadsheet.getSpreadsheetId(), e.getGuild().getIdLong());
 					if(Azrael.SQLDeleteGoogleAPISetup(spreadsheet.getSpreadsheetId(), e.getGuild().getIdLong()) > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_REMOVED)).build()).queue();
-						logger.debug("Link of the spreadsheet with the file id {} has been severed from the bot in guild {}", file_id, e.getGuild().getIdLong());
+						logger.info("Link of the spreadsheet with the file id {} has been severed from the bot in guild {}", file_id, e.getGuild().getIdLong());
 						Azrael.SQLInsertActionLog("GOOGLE_SPREADSHEET_UNLINK", 0, e.getGuild().getIdLong(), file_id);
 						Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 					}
@@ -180,8 +180,8 @@ public class GoogleSpreadsheetsExecution {
 		var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
 		if(setup == null) {
 			//db error
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription("An internal error has occurred! Spreadsheets from database couldn't be retrieved. Returning to the spreadsheets parameters selection page...").build()).queue();
-			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Google API information couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache(key);
 		}
 		else if(setup.size() > 0) {
@@ -205,7 +205,7 @@ public class GoogleSpreadsheetsExecution {
 		final var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
 		if(setup == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			logger.error("Google API information couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache(key);
 		}
 		else if(selection >= 0 && selection < setup.size()) {
@@ -213,7 +213,7 @@ public class GoogleSpreadsheetsExecution {
 			if(events == null) {
 				//db error
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_EVENT_HELP)).build()).queue();
-				logger.error("Data from Azrael.google_events couldn't be retrieved for guild {}", e.getGuild().getId());
+				logger.error("Google events couldn't be retrieved in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 			else if(events.size() > 0) {
@@ -248,7 +248,7 @@ public class GoogleSpreadsheetsExecution {
 			else {
 				//nothing found information
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_NO_EVENTS)).build()).queue();
-				logger.error("Google spreadsheets events are not defined!");
+				logger.error("Google spreadsheets events are not defined in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 		}
@@ -284,35 +284,33 @@ public class GoogleSpreadsheetsExecution {
 			if(addEvents) {
 				if(Azrael.SQLBatchInsertGoogleFileToEventLink(file_id, e.getGuild().getIdLong(), handleEvents)) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_EVENTS_ADDED)).build()).queue();
-					logger.debug("Events added for file_id {} in guild {}", file_id, e.getGuild().getId());
+					logger.info("Events added to file id {} in guild {}", file_id, e.getGuild().getId());
 					Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 				}
 			}
 			else {
 				if(Azrael.SQLBatchDeleteGoogleSpreadsheetSheet(file_id, e.getGuild().getIdLong(), handleEvents)) {
-					logger.debug("Events removed from Azrael.google_spreadsheetsheet for file_id {} in guild {}", file_id, e.getGuild().getId());
 					if(Azrael.SQLBatchDeleteGoogleSpreadsheetMapping(file_id, e.getGuild().getIdLong(), handleEvents)) {
-						logger.debug("Events removed from Azrael.google_spreadsheet_mapping for file_id {} in guild {}", file_id, e.getGuild().getId());
 						if(Azrael.SQLBatchDeleteGoogleFileToEvent(file_id, e.getGuild().getIdLong(), handleEvents)) {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_EVENTS_REMOVED)).build()).queue();
-							logger.debug("Events removed from Azrael.google_file_to_event for file_id {} in guild {}", file_id, e.getGuild().getId());
+							logger.info("Events removed for file_id {} in guild {}", file_id, e.getGuild().getId());
 							Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Events couldn't be removed from Azrael.google_file_to_event with file_id {} in guild {}", file_id, e.getGuild().getId());
+							logger.error("Registered events couldn't be removed for file_id {} in guild {}", file_id, e.getGuild().getId());
 							Hashes.clearTempCache(key);
 						}
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Events couldn't be removed from Azrael.google_spreadsheet_mapping with file_id {} in guild {}", file_id, e.getGuild().getId());
+						logger.error("Mapped events couldn't be removed for file_id {} in guild {}", file_id, e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Events couldn't be removed from Azrael.google_spreadsheet_sheet with file_id {} in guild {}", file_id, e.getGuild().getId());
+					logger.error("Table events couldn't be removed for file_id {} in guild {}", file_id, e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
 			}
@@ -324,7 +322,7 @@ public class GoogleSpreadsheetsExecution {
 		if(setup == null) {
 			//db error
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			logger.error("Google API information couldn't be retrieved for guild {}", e.getGuild().getId());
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
 		else if(setup.size() > 0) {
@@ -348,7 +346,7 @@ public class GoogleSpreadsheetsExecution {
 		final var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
 		if(setup == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			logger.error("Google API information couldn't be retrieved for guild {}", e.getGuild().getId());
 			Hashes.clearTempCache(key);
 		}
 		else if(selection >= 0 && selection < setup.size()) {
@@ -356,7 +354,7 @@ public class GoogleSpreadsheetsExecution {
 			final var events = Azrael.SQLgetGoogleLinkedEvents(file.getFileID(), e.getGuild().getIdLong());
 			if(events == null) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file.getFileID());
+				logger.error("Linked google events couldn't be retrieved for spreadsheet id {} in guild {}", file.getFileID(), e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 			else if(events.size() > 0) {
@@ -397,7 +395,7 @@ public class GoogleSpreadsheetsExecution {
 		final var events = Azrael.SQLgetGoogleLinkedEvents(file_id, e.getGuild().getIdLong());
 		if(events == null || events.size() == 0) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file_id);
+			logger.error("Linked google events couldn't be retrieved for spreadsheet id {} in guild {}", file_id, e.getGuild().getId());
 			Hashes.clearTempCache(key);
 		}
 		else {
@@ -413,12 +411,12 @@ public class GoogleSpreadsheetsExecution {
 		if(startingPoint.matches("[a-zA-Z0-9\\[\\]\\s]{1,}[a-zA-Z\\[\\]]{1}[!]{1}[A-Z]{1,3}[1-9]{1}[0-9]*")) {
 			if(Azrael.SQLInsertGoogleSpreadsheetSheet(file_id, GoogleEvent.valueOfEvent(event).id, startingPoint, e.getGuild().getIdLong()) > 0) {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_START_UPDATED)).build()).queue();
-				logger.debug("Google spreadsheet starting point updated for guild {}, spreadsheet {}, event {} with value {}", e.getGuild().getId(), file_id, event, startingPoint);
+				logger.info("Google spreadsheet starting point updated for spreadsheet {} and event {} with value {} in guild {}", file_id, event, startingPoint, e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Google spreadsheet starting point couldn't be updated for guild {}, spreadsheet {}, event {} with value {}", e.getGuild().getId(), file_id, event, startingPoint);
+				logger.error("Google spreadsheet starting point couldn't be updated for spreadsheet {} and event {} with value {} in guild {}", file_id, event, startingPoint, e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 		}
@@ -429,7 +427,7 @@ public class GoogleSpreadsheetsExecution {
 		if(setup == null) {
 			//db error
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			logger.error("Google API information couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache(key);
 		}
 		else if(setup.size() > 0) {
@@ -453,7 +451,7 @@ public class GoogleSpreadsheetsExecution {
 		final var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
 		if(setup == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			logger.error("Google API information couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache(key);
 		}
 		else if(selection >= 0 && selection < setup.size()) {
@@ -461,7 +459,7 @@ public class GoogleSpreadsheetsExecution {
 			final var events = Azrael.SQLgetGoogleLinkedEvents(file.getFileID(), e.getGuild().getIdLong());
 			if(events == null) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file.getFileID());
+				logger.error("Linked google events couldn't be retrieved for spreadsheet id {} in guild {}", file.getFileID());
 				Hashes.clearTempCache(key);
 			}
 			else if(events.size() > 0) {
@@ -488,7 +486,7 @@ public class GoogleSpreadsheetsExecution {
 		final var events = Azrael.SQLgetGoogleLinkedEvents(file_id, e.getGuild().getIdLong());
 		if(events == null || events.size() == 0) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file_id);
+			logger.error("Linked google events couldn't be retrieved for spreadsheet id {} in guild {}", file_id, e.getGuild().getId());
 			Hashes.clearTempCache(key);
 		}
 		else {
@@ -497,7 +495,7 @@ public class GoogleSpreadsheetsExecution {
 				final var items = Azrael.SQLgetGoogleEventsToDD(2, EVENT.id);
 				if(items == null) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Data dictionary items couldn't be retrieved from Azrael.google_events_to_dd for api id 2 and event id {} for guild {}", EVENT.id, e.getGuild().getId());
+					logger.error("Data dictionary items couldn't be retrieved for api id 2 and event id {} in guild {}", EVENT.id, e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
 				else if(items.size() > 0) {
@@ -559,13 +557,13 @@ public class GoogleSpreadsheetsExecution {
 				}
 				else if(result[0] == -1) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Batch insert error occurred on Azrael.google_spreadsheet_mapping for the spreadsheet {}, event id {} from guild {}", file_id, event, e.getGuild().getId());
+					logger.error("Mapping set error for the spreadsheet {} and event id {} in guild {}", file_id, event, e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).build()).queue();
-				logger.error("Table Azrael.google_spreadsheet_mapping couldn't be cleared for spreadsheet {} and event id {} for guild {}", file_id, event, e.getGuild().getId());
+				logger.error("Current mapping couldn't be cleared for spreadsheet {} and event id {} in guild {}", file_id, event, e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 		}
@@ -576,7 +574,7 @@ public class GoogleSpreadsheetsExecution {
 		if(setup == null) {
 			//db error
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			logger.error("Google API information couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache(key);
 		}
 		else if(setup.size() > 0) {
@@ -600,7 +598,7 @@ public class GoogleSpreadsheetsExecution {
 		final var setup = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
 		if(setup == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Data from Azrael.google_api_setup_view couldn't be retrieved for guild {}", e.getGuild().getId());
+			logger.error("Google API information couldn't be retrieved for guild {}", e.getGuild().getId());
 			Hashes.clearTempCache(key);
 		}
 		else if(selection >= 0 && selection < setup.size()) {
@@ -608,7 +606,7 @@ public class GoogleSpreadsheetsExecution {
 			final var events = Azrael.SQLgetGoogleLinkedEventsRestrictions(file.getFileID(), e.getGuild().getIdLong());
 			if(events == null) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file.getFileID());
+				logger.error("Linked google events couldn't be retrieved for spreadsheet id {} in guild {}", file.getFileID(), e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 			else if(events.size() > 0) {
@@ -635,7 +633,7 @@ public class GoogleSpreadsheetsExecution {
 		final var events = Azrael.SQLgetGoogleLinkedEventsRestrictions(file_id, e.getGuild().getIdLong());
 		if(events == null || events.size() == 0) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Linked google events couldn't be retrieved from Azrael.google_file_to_event for spreadsheet id {}", file_id);
+			logger.error("Linked google events couldn't be retrieved for spreadsheet id {} in guild {}", file_id, e.getGuild().getId());
 			Hashes.clearTempCache(key);
 		}
 		else {
@@ -652,6 +650,7 @@ public class GoogleSpreadsheetsExecution {
 			final var result = Azrael.SQLUpdateGoogleRemoveChannelRestriction(e.getGuild().getIdLong(), file_id, GoogleEvent.valueOfEvent(event).id);
 			if(result > 0) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_RESTRICT_REMOVE)).build()).queue();
+				logger.info("Channel restriction removed for file id {} and event {} in guild {}", file_id, event, e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 			}
 			else if(result == 0) {
@@ -660,7 +659,7 @@ public class GoogleSpreadsheetsExecution {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Channel restriction couldn't be removed for google file {} in guild {}", file_id, e.getGuild().getId());
+				logger.error("Channel restriction couldn't be removed for file id {} and event {} in guild {}", file_id, event, e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 		}
@@ -672,6 +671,7 @@ public class GoogleSpreadsheetsExecution {
 					final var result = Azrael.SQLUpdateGoogleChannelRestriction(e.getGuild().getIdLong(), file_id, GoogleEvent.valueOfEvent(event).id, textChannel.getIdLong());
 					if(result > 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_RESTRICT_ADD)).build()).queue();
+						logger.info("Channel restriction {} added for file id {} and event {} in guild {}", textChannel.getId(), file_id, event, e.getGuild().getId());
 						Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 					}
 					else if (result == 0) {
@@ -680,7 +680,7 @@ public class GoogleSpreadsheetsExecution {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Channel restriction couldn't be set for google file {} in guild {}", file_id, e.getGuild().getId());
+						logger.error("Channel restriction {} couldn't be set for file id {} and event {} in guild {}", textChannel.getId(), file_id, event, e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 				}

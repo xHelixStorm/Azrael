@@ -24,6 +24,7 @@ public class JoinExecution {
 			final int nameTaken = Competitive.SQLisNameTaken(e.getGuild().getIdLong(), e.getMessage().getContentRaw());
 			if(nameTaken == 0) {
 				if(Competitive.SQLInsertUserStat(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), e.getMessage().getContentRaw()) > 0) {
+					logger.info("User {} has generated his profile page in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					final var servers = (ArrayList<String>) cache.getObject();
 					if(servers.size() == 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_PROFILE_CREATED).replace("{}", e.getMessage().getContentRaw())).build()).queue();
@@ -71,13 +72,14 @@ public class JoinExecution {
 			final var server = e.getMessage().getContentRaw().toUpperCase();
 			if(Competitive.SQLUpdateSelectedServerInUserStats(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), server) > 0) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_SERVER_ADDED)).build()).queue();
+				logger.info("User {} has added a default server to the generated profile in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 				Azrael.SQLInsertActionLog("PROFILE_UPDATE", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Server update to "+server);
 				Hashes.clearTempCache("userProfile_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 			else {
 				//server update error
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Server couldn't be updated in table Azrael.user_stats for user {} in guild {}", e.getGuild().getId(), e.getMember().getUser().getId());
+				logger.error("Default server couldn't be updated for user {} in guild {}", e.getGuild().getId(), e.getMember().getUser().getId());
 				Hashes.clearTempCache("userProfile_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}

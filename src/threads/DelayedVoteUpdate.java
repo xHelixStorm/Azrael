@@ -67,20 +67,20 @@ public class DelayedVoteUpdate implements Runnable {
 						try {
 							GoogleSheets.overwriteRowOnSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, row);
 						} catch (Exception e) {
-							logger.error("Google Webservice error in guild {}", guild.getId(), e);
+							logger.error("Google Webservice error for event VOTE in guild {}", guild.getId(), e);
 						}
 					});
 				}
 				else {
 					STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_HISTORY.getName())+textChannel.getAsMention(), Channel.LOG.getType());
-					logger.error("MESSAGE_HISTORY permission required to retrieve the votes from a message for channel {} in guild {}", textChannel.getId(), guild.getId());
+					logger.error("MESSAGE_HISTORY permission required to retrieve the votes from a message on channel {} in guild {}", textChannel.getId(), guild.getId());
 				}
 			}
 			else {
 				logger.warn("Vote channel {} doesn't exist anymore in guild {}", channel_id, guild.getId());
 			}
 		} catch (InterruptedException e) {
-			logger.debug("Vote task of message ID {} terminated for guild {}", message_id, guild.getId());
+			logger.trace("Vote task of message {} terminated in guild {}", message_id, guild.getId());
 		}
 		
 		//task completed! Remove this thread from the array of currently running threads

@@ -49,7 +49,7 @@ public class Equip implements CommandPublic, CommandPrivate {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used Equip command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+		logger.trace("User {} has used Equip command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 
 	//PRIVATE COMMAND SECTION START

@@ -176,7 +176,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.DELETE_PERMISSION_ERR)+Permission.VIEW_AUDIT_LOGS.getName(), Channel.TRA.getType());
-						logger.warn("VIEW AUDIT LOG permission missing in guild {}!", e.getGuild().getId());
+						logger.warn("VIEW AUDIT LOG permission required to retrieve the user who deleted a message in guild {}", e.getGuild().getId());
 					}
 					
 					//Log additional removed messages from users that are being watched with watch level 1
@@ -195,7 +195,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 							}
 							else {
 								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+textChannel.getAsMention(), Channel.LOG.getType());
-								logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to display the message of a watched member for channel {} in guild {}", textChannel.getId(), e.getGuild().getId());
+								logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to display the message of a watched member on channel {} in guild {}", textChannel.getId(), e.getGuild().getId());
 							}
 						}
 					}
@@ -233,7 +233,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 								}
 							} catch (Exception e1) {
 								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-								logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
+								logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
 							}
 						}
 					}

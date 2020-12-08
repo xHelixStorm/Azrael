@@ -47,21 +47,21 @@ public class NicknameListener extends ListenerAdapter {
 				//if the nickname has been removed, delete from table
 				if(nickname == null) {
 					if(Azrael.SQLDeleteNickname(user_id, guild_id) > 0) {
-						logger.debug("{} got the nickname {} removed in guild {}", e.getUser().getId(), e.getOldNickname(), e.getGuild().getId());
+						logger.info("User {} got the nickname {} removed in guild {}", e.getUser().getId(), e.getOldNickname(), e.getGuild().getId());
 						Azrael.SQLInsertActionLog("MEMBER_NICKNAME_CLEAR", user_id, guild_id, "<cleared name>");
 					}
 					else {
-						logger.error("The nickname {} for user {} in guild {} couldn't be deleted from Azrael.nickname", nickname, user_id, guild_id);
+						logger.error("The nickname {} couldn't be deleted for user {} in guild {}", nickname, user_id, guild_id);
 					}
 				}
 				//if the nickname has been set or changed, insert/update to table
 				else {
 					if(Azrael.SQLInsertNickname(user_id, guild_id, nickname) > 0) {
-						logger.debug("{} received the nickname {} in guild {}", user_id, nickname, guild_id);
+						logger.info("User {} received the nickname {} in guild {}", user_id, nickname, guild_id);
 						Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild_id, nickname);
 					}
 					else {
-						logger.error("The nickname {} for user {} in guild {} couldn't be updated on the table Azrael.nickname", nickname, user_id, guild_id);
+						logger.error("The nickname {} couldn't be updated for user {} in guild {}", nickname, user_id, guild_id);
 					}
 				}
 				//Run google service, if enabled
@@ -84,7 +84,7 @@ public class NicknameListener extends ListenerAdapter {
 							}
 						}
 						else {
-							logger.warn("VIEW_AUDIT_LOGS permission missing for renamed google event RENAMED in guild {}", guild_id);
+							logger.warn("VIEW_AUDIT_LOGS permission required to run the google event RENAMED in guild {}", guild_id);
 						}
 						GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, reporter_name, reporter_effectivename, null, null, null, "RENAMED", null, null, null, e.getOldValue(), e.getNewValue(), 0, null, null, 0, 0, GoogleEvent.RENAME_MANUAL.id);
 					}

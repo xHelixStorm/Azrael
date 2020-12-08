@@ -110,7 +110,7 @@ public class RankingThreadExecution {
 					ExperienceGain(e, user_details,  guild_settings, currentExperience, experience, daily_experience, roleAssignLevel, max_experience_enabled, reset);
 					//notify the user in private message if the experience limit for the day has been reached
 					if(daily_experience > max_experience*multiplier) {
-						logger.info("{} has reached the limit of today's max experience points gain", e.getMember().getUser().getId());
+						logger.info("User {} has reached the limit of obtainable experience points for today in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 						RankingSystem.SQLInsertActionLog("medium", user_id, guild_id, "Experience limit reached", "User reached the limit of experience points");
 						e.getMember().getUser().openPrivateChannel().queue(channel -> {
 							channel.sendMessage(STATIC.getTranslation(e.getMember(), Translation.EXP_LIMIT)).queue(success -> channel.close().queue(), error -> channel.close().queue());
@@ -212,7 +212,7 @@ public class RankingThreadExecution {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_LEVEL_UP)).setDescription(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.LEVEL_PROMOTION_FAILED)+user_details.getLevel()).build()).queue();
 					}
 					else {
-						logger.error("Experience points for the user {} in the guild {} couldn't be updated in the table RankingSystem.user_details", e.getMember().getUser().getId(), e.getGuild().getId());
+						logger.error("Experience points for the user {} couldn't be updated in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 					return;
 				}
@@ -261,7 +261,7 @@ public class RankingThreadExecution {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+e.getChannel().getAsMention()).build()).queue();
-						logger.error("MESSAGE_WRITE and MESSAGE_ATTACH_FILES permissions required to display the level up image in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_WRITE and MESSAGE_ATTACH_FILES permissions required to display the level up image on channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				else {
@@ -272,15 +272,15 @@ public class RankingThreadExecution {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName())+e.getChannel().getAsMention()).build()).queue();
-						logger.error("MESSAGE_WRITE permission required to display the level up message in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_WRITE permission required to display the level up message on channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 			}
 			else {
-				logger.error("RankingSystem.user_details table couldn't be updated with the latest experience and level information for the user {}", user_details.getUser_ID());
+				logger.error("Experience points and level of user {} couldn't be updated in guild {}", user_details.getUser_ID(), e.getGuild().getId());
 			}
 			if(max_experience_enabled == true && editedRows == 0) {
-				logger.error("RankingSystem.daily_experience table couldn't be updated with the latest experience information for the user {}", user_details.getUser_ID());
+				logger.error("Daily experience points of user {} couldn't be updated in guild {}", user_details.getUser_ID(), e.getGuild().getId());
 			}
 		}
 		else {
@@ -317,7 +317,7 @@ public class RankingThreadExecution {
 				}
 			}
 			else {
-				logger.warn("MANAGE ROLES permission for assigning a ranking role is missing for guild {}!", e.getGuild().getId());
+				logger.warn("MANAGE ROLES permission required to assign ranking roles to a user in guild {}", e.getGuild().getId());
 			}
 			
 			//update the gained experience points on table
@@ -326,10 +326,10 @@ public class RankingThreadExecution {
 				Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 			}
 			else {
-				logger.error("Experience points for the user {} in the guild {} couldn't be updated in the table RankingSystem.user_details", e.getMember().getUser().getId(), e.getGuild().getId());
+				logger.error("Experience points for user {} couldn't be updated in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			}
 			if(max_experience_enabled == true && editedRows == 0) {
-				logger.error("RankingSystem.daily_experience table couldn't be updated with the latest experience information for the user {}", user_details.getUser_ID());
+				logger.error("Daily experience points for user {} couldn't be updated in guild {}", user_details.getUser_ID(), e.getGuild().getId());
 			}
 		}
 	}
@@ -354,7 +354,7 @@ public class RankingThreadExecution {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_UP_ROLE_ERR)+Permission.MANAGE_ROLES.getName()).build()).queue();
-			logger.warn("MANAGE ROLES permission for assigning a ranking role is missing for guild {}!", e.getGuild().getId());
+			logger.warn("MANAGE ROLES permission required to assign ranking rolea to users in guild {}", e.getGuild().getId());
 		}
 		return current_role;
 	}

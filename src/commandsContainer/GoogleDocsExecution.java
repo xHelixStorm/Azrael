@@ -21,7 +21,7 @@ public class GoogleDocsExecution {
 	public static void runTask(GuildMessageReceivedEvent e) {
 		final String key = "google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
 		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription("Google docs is not yet supported!").build()).queue();
-		logger.debug("Google docs is not yet supported!");
+		logger.info("Google docs is not yet supported!");
 		Hashes.clearTempCache(key);
 	}
 }

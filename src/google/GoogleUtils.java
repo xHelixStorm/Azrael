@@ -93,7 +93,7 @@ public class GoogleUtils {
 	}
 	
 	public static void handleSpreadsheetRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, long message_id, String message, String screenshots, int up_vote, int down_vote, int event_id) {
-		logger.debug("Initializing spreadsheet request for event {} in guild {}", action, guild.getId());
+		logger.info("Initializing spreadsheet request for event {} in guild {}", action, guild.getId());
 		//If nothing has been found, don't try to write into the spreadsheet
 		if(event != null && event[0].equals("empty"))
 			return;
@@ -257,43 +257,43 @@ public class GoogleUtils {
 							GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
 						} catch (IOException e1) {
 							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)), e1.getMessage(), Channel.LOG.getType());
-							logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+							logger.error("Values couldn't be added into spredsheet for file id {} and event {} in guild {}", file_id, action, guild.getId(), e1);
 						} catch (Exception e1) {
 							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)), e1.getMessage(), Channel.LOG.getType());
-							logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+							logger.error("Values couldn't be added into spredsheet on for file id {} and event {} in guild {}", file_id, action, guild.getId(), e1);
 						}
 					}
 				}
 				else if(columns.size() == 0) {
 					STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_MAPPING), Channel.LOG.getType());
-					logger.warn("Mute spreadsheet {} is not mapped in guild {}", file_id, guild.getId());
+					logger.warn("Spreadsheet {} is not mapped for event {} in guild {}", file_id, action, guild.getId());
 				}
 				else {
 					STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
-					logger.error("Mapping couldn't be retrieved from Azrael.google_spreadsheet_mapping for file id {} in guild ", file_id, guild.getId());
+					logger.error("Spreadsheet mapping couldn't be retrieved for file id {} and event {} in guild ", file_id, action, guild.getId());
 				}
 			}
 			else if(sheetRowStart == null) {
 				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
-				logger.error("Spreadsheet starting point couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
+				logger.error("Spreadsheet starting point couldn't be retrieved for file id {} and event {} in guild {}", file_id, action, guild.getId());
 			}
 			else if(sheetRowStart.isBlank()) {
 				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_START_POINT), Channel.LOG.getType());
-				logger.warn("Spreadsheet starting point couldn't be found in guild {}", guild.getId());
+				logger.warn("Spreadsheet starting point couldn't be found for file id {} and event {} in guild {}", file_id, action, guild.getId());
 			}
 			else if(file_id == null) {
 				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
-				logger.error("Spreadsheet couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
+				logger.error("Spreadsheet couldn't be retrieved for event {} in guild {}", action, guild.getId());
 			}
 			else {
 				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_FOUND), Channel.LOG.getType());
-				logger.warn("Spreadsheet couldn't be found in guild {}", guild.getId());
+				logger.warn("Spreadsheet couldn't be found for event {} in guild {}", action, guild.getId());
 			}
 		}
 	}
 	
 	public static boolean handleSpreadsheetRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String action, long ping, long member_count, long guilds_count, int event_id) {
-		logger.debug("Initializing spreadsheet request for event {} in guild {}", action, guild.getId());
+		logger.info("Initializing spreadsheet request for event {} in guild {}", action, guild.getId());
 		//If nothing has been found, don't try to write into the spreadsheet
 		if(event != null && event[0].equals("empty"))
 			return false;
@@ -334,40 +334,39 @@ public class GoogleUtils {
 					if(values.size() > 0) {
 						try {
 							GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
-							return true;
 						} catch (IOException e1) {
 							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)), e1.getMessage(), Channel.LOG.getType());
-							logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+							logger.error("Values couldn't be added into spredsheet for file id {} and event {} in guild {}", file_id, action, guild.getId(), e1);
 						} catch (Exception e1) {
 							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)), e1.getMessage(), Channel.LOG.getType());
-							logger.error("Values couldn't be added into spredsheet on Mute for file id {} in guild {}", file_id, guild.getId(), e1);
+							logger.error("Values couldn't be added into spredsheet on for file id {} and event {} in guild {}", file_id, action, guild.getId(), e1);
 						}
 					}
 				}
 				else if(columns.size() == 0) {
 					STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_MAPPING), Channel.LOG.getType());
-					logger.warn("Mute spreadsheet {} is not mapped in guild {}", file_id, guild.getId());
+					logger.warn("Spreadsheet {} is not mapped for event {} in guild {}", file_id, action, guild.getId());
 				}
 				else {
 					STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
-					logger.error("Mapping couldn't be retrieved from Azrael.google_spreadsheet_mapping for file id {} in guild ", file_id, guild.getId());
+					logger.error("Spreadsheet mapping couldn't be retrieved for file id {} and event {} in guild ", file_id, action, guild.getId());
 				}
 			}
 			else if(sheetRowStart == null) {
 				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
-				logger.error("Spreadsheet starting point couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
+				logger.error("Spreadsheet starting point couldn't be retrieved for file id {} and event {} in guild {}", file_id, action, guild.getId());
 			}
 			else if(sheetRowStart.isBlank()) {
 				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_START_POINT), Channel.LOG.getType());
-				logger.warn("Spreadsheet starting point couldn't be found in guild {}", guild.getId());
+				logger.warn("Spreadsheet starting point couldn't be found for file id {} and event {} in guild {}", file_id, action, guild.getId());
 			}
 			else if(file_id == null) {
 				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.GENERAL_ERROR), Channel.LOG.getType());
-				logger.error("Spreadsheet couldn't be retrieved from google_files_and_events in guild {}", guild.getId());
+				logger.error("Spreadsheet couldn't be retrieved for event {} in guild {}", action, guild.getId());
 			}
 			else {
 				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_FOUND), Channel.LOG.getType());
-				logger.warn("Spreadsheet couldn't be found in guild {}", guild.getId());
+				logger.warn("Spreadsheet couldn't be found for event {} in guild {}", action, guild.getId());
 			}
 		}
 		return false;

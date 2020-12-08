@@ -16,7 +16,7 @@ public class CategoryListener extends ListenerAdapter {
 	@Override
 	public void onCategoryCreate(CategoryCreateEvent e) {
 		if(Azrael.SQLInsertCategory(e.getCategory().getIdLong(), e.getCategory().getName()) == 0) {
-			logger.error("New category {} couldn't be inserted for guild {}", e.getCategory().getId(), e.getGuild().getId());
+			logger.error("New category {} couldn't be saved in guild {}", e.getCategory().getId(), e.getGuild().getId());
 		}
 	}
 	
@@ -24,11 +24,11 @@ public class CategoryListener extends ListenerAdapter {
 	public void onCategoryDelete(CategoryDeleteEvent e) {
 		if(Azrael.SQLDeleteCategoryConf(e.getCategory().getIdLong()) != -1) {
 			if(Azrael.SQLDeleteCategory(e.getCategory().getIdLong()) == -1) {
-				logger.error("Category {} couldn't be deleted for guild {}", e.getCategory().getId(), e.getGuild().getId());
+				logger.error("Category {} couldn't be deleted in guild {}", e.getCategory().getId(), e.getGuild().getId());
 			}
 		}
 		else {
-			logger.error("Configuration for category {} couldn't be removed for guild {}");
+			logger.error("Configuration for category {} couldn't be removed in guild {}");
 		}
 		Hashes.removeCategories(e.getGuild().getIdLong());
 	}
@@ -38,11 +38,11 @@ public class CategoryListener extends ListenerAdapter {
 		final int result = Azrael.SQLUpdateCategoryName(e.getCategory().getIdLong(), e.getCategory().getName());
 		if(result == 0) {
 			if(Azrael.SQLInsertCategory(e.getCategory().getIdLong(), e.getCategory().getName()) == 0) {
-				logger.error("Missing category {} couldn't be inserted for guild {}", e.getCategory().getId(), e.getGuild().getId());
+				logger.error("Missing category {} couldn't be saved in guild {}", e.getCategory().getId(), e.getGuild().getId());
 			}
 		}
 		else {
-			logger.error("Name of category {} couldn't be updated for guild {}", e.getCategory().getId(), e.getGuild().getId());
+			logger.error("Name of category {} couldn't be updated in guild {}", e.getCategory().getId(), e.getGuild().getId());
 		}
 	}
 }

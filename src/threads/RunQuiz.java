@@ -61,7 +61,7 @@ public class RunQuiz implements Runnable{
 					//check the created file if someone was able to answer the question
 					if(FileSetting.readFile(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr").length() == 18 || FileSetting.readFile(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr").length() == 17) {
 						long user_id = Long.parseLong(FileSetting.readFile(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr"));
-						logger.debug("{} received the reward {} out of the quiz in guild {}", e.getMember().getUser().getId(), quiz.getReward(), e.getGuild().getId());
+						logger.info("User {} received the reward {} from the quiz in guild {}", e.getMember().getUser().getId(), quiz.getReward(), e.getGuild().getId());
 						quizChannel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_WINNER).replaceFirst("\\{\\}", ""+index).replace("{}", e.getGuild().getMemberById(user_id).getAsMention())).queue();
 						
 						//send the reward in private message to the user and log the reward and user at the same time in the log channel.
@@ -130,8 +130,8 @@ public class RunQuiz implements Runnable{
 			Hashes.clearQuizWinners();
 			File file = new File(IniFileReader.getTempDirectory()+"quiztime_gu"+e.getGuild().getId()+".azr");
 			file.delete();
-		} catch (InterruptedException e) {
-			logger.error("Thread sleep has been interrupted on RunQuiz", e);
+		} catch (InterruptedException e1) {
+			logger.trace("Thread sleep has been interrupted on RunQuiz in guild {}", e.getGuild().getId());
 		}
 	}
 	

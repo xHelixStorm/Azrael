@@ -69,7 +69,7 @@ public class UnbanListener extends ListenerAdapter {
 				}
 				else {
 					append_message = STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_INFO_ERR)+Permission.VIEW_AUDIT_LOGS.getName();
-					logger.warn("VIEW AUDIT LOGS permission is missing to display the user who unbanned a user in guild {}!", e.getGuild().getId());
+					logger.warn("VIEW AUDIT LOGS permission required to fetch the user who issued a ban in guild {}", e.getGuild().getId());
 				}
 			}
 			
@@ -85,10 +85,10 @@ public class UnbanListener extends ListenerAdapter {
 			//remove the affected user from the bancollect table to symbolize that all current warnings have been removed
 			if(Azrael.SQLDeleteData(user_id, guild_id) == -1) {
 				STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_FLAG_ERR), Channel.LOG.getType());
-				logger.error("The user's ban of {} couldn't be cleared from Azrael.bancollect in guild {}", e.getUser().getId(), e.getGuild().getId());
+				logger.error("The ban of user {} couldn't be removed in guild {}", e.getUser().getId(), e.getGuild().getId());
 			}
 			//log action
-			logger.debug("{} has been unbanned from guild {}", user_id, e.getGuild().getName());
+			logger.info("User {} has been unbanned in guild {}", user_id, e.getGuild().getId());
 			Azrael.SQLInsertActionLog("MEMBER_BAN_REMOVE", user_id, guild_id, "User Unbanned");
 			
 			//Run google service, if enabled

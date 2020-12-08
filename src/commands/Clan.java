@@ -67,7 +67,7 @@ public class Clan implements CommandPublic {
 				else {
 					//db error
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Clan details couldn't be retrieved from Azrael.clan_view in guild {}", e.getGuild().getId());
+					logger.error("Clan details couldn't be retrieved in guild {}", e.getGuild().getId());
 				}
 			}
 			else if(memberLevel == 0) {
@@ -78,7 +78,7 @@ public class Clan implements CommandPublic {
 			else {
 				//db error
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Member level couldn't be retrieved from Azrael.clan_members in guild {}", e.getGuild().getId());
+				logger.error("Member level couldn't be retrieved in guild {}", e.getGuild().getId());
 			}
 		}
 	}

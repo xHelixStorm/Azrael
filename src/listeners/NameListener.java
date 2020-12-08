@@ -51,7 +51,7 @@ public class NameListener extends ListenerAdapter {
 			
 			//update the user name in table Azrael.users
 			if(Azrael.SQLUpdateUser(user_id, newname) == 0) {
-				logger.error("Azrael.users couldn't be updated with a name update from {}",user_id);
+				logger.error("Name {} couldn't be updated for user {}",newname, user_id);
 			}
 			//process every mutual guild in parallel
 			e.getUser().getMutualGuilds().parallelStream().forEach(guild -> {
@@ -81,7 +81,7 @@ public class NameListener extends ListenerAdapter {
 							}
 							else {
 								STATIC.writeToRemoteChannel(guild, message.setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.NAME_STAFF_ERR_2)+Permission.NICKNAME_MANAGE.getName(), Channel.LOG.getType());
-								logger.warn("Lacking MANAGE NICKNAME permission in guild {}", guild.getId());
+								logger.warn("MANAGE NICKNAME permission required to assign nicknames in guild {}", guild.getId());
 							}
 							staff_name = true;
 						}
@@ -112,7 +112,7 @@ public class NameListener extends ListenerAdapter {
 									}
 									else {
 										STATIC.writeToRemoteChannel(guild, message.setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED), STATIC.getTranslation2(guild, Translation.NAME_ASSIGN_ERR_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replace("{}", newname)+Permission.NICKNAME_MANAGE.getName(), Channel.LOG.getType());
-										logger.warn("Lacking MANAGE NICKNAME permission in guild {}", guild.getId());
+										logger.warn("MANAGE NICKNAME permission required to assign nicknames in guild {}", guild.getId());
 									}
 								}
 								else {
@@ -140,7 +140,7 @@ public class NameListener extends ListenerAdapter {
 									else {
 										message.setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS));
 										STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.NAME_KICK_PERMISSION_ERR_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", word.getName().toUpperCase())+Permission.KICK_MEMBERS.getName(), Channel.LOG.getType());
-										logger.warn("Lacking KICK MEMBERS permission in guild {}", guild.getId());
+										logger.warn("KICK MEMBERS permission required to kick users in guild {}", guild.getId());
 									}
 								}
 							}
@@ -157,19 +157,19 @@ public class NameListener extends ListenerAdapter {
 		final var guild_id = member.getGuild().getIdLong();
 		if(nickname != null && Azrael.SQLgetNickname(user_id, guild_id).length() > 0) {
 			if(Azrael.SQLUpdateNickname(user_id, guild_id, nickname) == 0) {
-				logger.error("User nickname of {} couldn't be updated in Azrael.nickname", user_id);
+				logger.error("User nickname of {} couldn't be updated in guild {}", user_id, guild_id);
 			}
 			else {
-				logger.debug("{} received the nickname {} in guild {}", user_id, nickname, guild_id);
+				logger.info("User {} received the nickname {} in guild {}", user_id, nickname, guild_id);
 				Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild_id, nickname);
 			}
 		}
 		else if(nickname != null) {
 			if(Azrael.SQLInsertNickname(user_id, guild_id, nickname) == 0) {
-				logger.error("User nickname of {} couldn't be inserted into Azrael.nickname", user_id);
+				logger.error("User nickname of {} couldn't be saved in guild {}", user_id, guild_id);
 			}
 			else {
-				logger.debug("{} received the nickname {} in guild {}", user_id, nickname, guild_id);
+				logger.info("User {} received the nickname {} in guild {}", user_id, nickname, guild_id);
 				Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild_id, nickname);
 			}
 		}

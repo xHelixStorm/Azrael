@@ -378,7 +378,8 @@
 	"equip_exit":					"Ausrüstung abgeschlossen!",
 	"equip_select_number":			"Bitte wählen Sie eine der sichtbaren Zahlen aus!",
 	
-	"filter_help":					"Schreiben Sie einen der folgenden Parameter mit dem Befehl, um an bestimmten Zensurlisten zu arbeiten! Diese Zensurlisten sind verfügbar:\n\n- **wort-zensur**:\nFür Wörter, die in einer bestimmten Sprache zu zensieren sind!\n- **namen-zensur**:\nFür verwendete Wörter in einem Namen, die automatisch umbenannt werden sollen!\n- **namen-kick**:\nFür verwendete Wörter in einem Namen, die automatisch vom Server gekickt werden!\n- **lustige-namen**:\nNamen für Benutzer, die automatisch umbenannt wurden!\n- **personal-namen**:\nFür verwendete Namen, die zum Personal gehören, automatisch umbenennen!\n- **verbotene-urls**:\nFür URLs, die auf dem Server nicht verwendet werden dürfen!\n- **erlaubte-urls**:\nFür URL-Ausnahmen, wenn die automatische URL-Löschung aktiviert ist!\n- **verbotene-tweets**:\nFür Benutzer auf Twitter, um zu verhindern, dass ihre Tweets auf dem Server angezeigt werden!",
+	"filter_help":					"Schreiben Sie einen der folgenden Parameter mit dem Befehl, um an bestimmten Zensurlisten zu arbeiten oder *verlassen* um den Prozess zu unterbrechen! Diese Zensurlisten sind verfügbar:\n\n- **wort-zensur**:\nFür Wörter, die in einer bestimmten Sprache zu zensieren sind!\n- **namen-zensur**:\nFür verwendete Wörter in einem Namen, die automatisch umbenannt werden sollen!\n- **namen-kick**:\nFür verwendete Wörter in einem Namen, die automatisch vom Server gekickt werden!\n- **lustige-namen**:\nNamen für Benutzer, die automatisch umbenannt wurden!\n- **personal-namen**:\nFür verwendete Namen, die zum Personal gehören, automatisch umbenennen!\n- **verbotene-urls**:\nFür URLs, die auf dem Server nicht verwendet werden dürfen!\n- **erlaubte-urls**:\nFür URL-Ausnahmen, wenn die automatische URL-Löschung aktiviert ist!\n- **verbotene-tweets**:\nFür Benutzer auf Twitter, um zu verhindern, dass ihre Tweets auf dem Server angezeigt werden!",
+	"filter_abort":					"Der Befehl *filter* wurde abgebrochen!",
 	"filter_actions":				"Wählen Sie nun die gewünschte Aktion:\n\n**anzeigen\nhinzufügen\nentfernen\nergänze-pastebin\nlade-pastebin**",
 	"filter_display":				"ANZEIGEN",
 	"filter_insert":				"HINZUFÜGEN",
@@ -389,6 +390,7 @@
 	"filter_no_langs":				"<keine Sprachen verfügbar>",
 	"filter_list":					"Hier die angefragte Liste: ",
 	"filter_list_empty":			"Die angefragte Liste ist leer!",
+	"filter_list_lang_na":			"Die angefragte Sprache steht nicht zur Auswahl!",
 	"filter_write_word":			"Geben Sie jetzt bitte das Wort oder den Namen an!",
 	"filter_write_paste":			"Geben Sie jetzt bitte eine Pastebin-URL an, die alle Wörter oder Namen enthält!",
 	"filter_write_fqdn":			"Geben Sie jetzt bitte einen voll qualifizierten Domänennamen an. Zum Beispiel: *https://www.google.com*\n Bitte fügen Sie nichts nach der Top-Level-Domain hinzu (z.B. com, de, org)!",
@@ -457,6 +459,7 @@
 	"google_sheet_restrict_set":	"Schreiben Sie jetzt bitte eine Textkanal Erwähnung oder eine Texkanal ID um das selektierte Event an einen Textkanal zu binden. Um es wieder zu entfernen, schreiben Sie stattdessen *keinen*!",
 	"google_sheet_restrict_remove":	"Textkanal Bindung entfernt!",
 	"google_sheet_restrict_add":	"Textkanal Bindung gesetzt für dieses Event und Spreadsheet!",
+	"google_sheet_no_link":			"Ein interner Fehler ist aufgetreten! Google Tabelle konnte nicht mit dem Bot verknüpft werden.",
 	"google_exit":					"Google-Befehl beendet!",
 	
 	"heavy_censoring_help":		 	"Fügen Sie dem Befehl entweder *aktivieren* oder *deaktivieren* hinzu, um diese Funktionalität zu bedienen! Wenn die starke Zensur aktiviert ist und ein Textkanal mindestens eine Sprache zensiert, werden die folgenden Nachrichten entfernt:\n- *Nachrichten, die nur einen Buchstaben enthalten*.\n- *Nachrichten, die Screenshots enthalten*.\n- *Nachrichten, die mehrfach wiederholt werden*.\n- *Nachrichten, die keine normalen Buchstaben oder Ziffern enthalten (z.B. Unicodes)*.\n\nWenn diese Funktion eine große Anzahl von Meldungen entfernt und der Schwellenwert von 30 erreicht ist, warnt sie die Benutzer nach dem Entfernen einer Meldung mit der Zuweisung der Stummschaltung Rolle! Der Zähler für den Schwellenwert erhöht sich für *jede entfernte Nachricht* und *verringert sich automatisch nach jeder Minute um 1*. Benutzen Sie den Parameter *zurücksetzen*, um diesen Zähler manuell auf 0 zurückzusetzen!",
@@ -880,7 +883,7 @@
 	"write_too_long":				"Nachricht kann nicht länger als 2000 Zeichen sein!",
 	"write_no_screens":				"Bilder sind nicht erlaubt!",
 	
-	"randomshop_help":				"Schreiben Sie entweder eine Waffenart oder Waffenkategorie um den Random Laden zu öffnen, als ersten Parameter! Indem *ziehe* als zweiten Parameter geschrieben wird und mit der Waffenart oder Waffenkategorie als dritten Parameter folgt, beginnt eine Randomshop Runde, wo eine random Waffe ausgelost wird! Wenn stattdessen *erneut-ziehen* als zweiten Parameter benutzt wird, dann startet eine neue Runde mit den selben Filter aus der Vorrunde!",
+	"randomshop_help":				"Schreiben Sie entweder eine Waffenart oder Waffenkategorie um den Randomshop zu öffnen, als ersten Parameter! Indem *ziehe* als zweiten Parameter geschrieben wird und mit der Waffenart oder Waffenkategorie als dritten Parameter folgt, beginnt eine Randomshop Runde, wo eine random Waffe ausgelost wird! Wenn stattdessen *erneut-ziehen* als zweiten Parameter benutzt wird, dann startet eine neue Runde mit den selben Filter aus der Vorrunde!",
 	"randomshop_not_available":		"Der Randomshop ist momentan nicht verfügbar! Bitte probieren Sie es später erneut!",
 	"randomshop_wep_types":			"Waffenarten",
 	"randomshop_wep_categories":	"Waffenkategorien",

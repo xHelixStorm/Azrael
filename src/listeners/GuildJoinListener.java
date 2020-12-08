@@ -31,26 +31,26 @@ public class GuildJoinListener extends ListenerAdapter {
 	
 	@Override
 	public void onGuildJoin(GuildJoinEvent e){
-		logger.debug("Bot joined a new guild: {}", e.getGuild().getName());
+		logger.info("Guild join in guild {}", e.getGuild().getId());
 		
 		long guild_id = e.getGuild().getIdLong();
 		String guild_name = e.getGuild().getName();
 		
 		//insert into Azrael table
 		if(Azrael.SQLInsertGuild(guild_id, guild_name) == 0) {
-			logger.error("guild information couldn't be inserted into Azrael.guilds table for the guild {}", guild_id);
+			logger.error("General guild information couldn't be saved on join in guild {}", guild_id);
 		}
 		//insert into DiscordRoles table
 		if(DiscordRoles.SQLInsertGuild(guild_id, guild_name) == 0) {
-			logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", guild_id);
+			logger.error("Guild roles information couldn't be saved on join in guild {}", guild_id);
 		}
 		//insert into RankingSystem table
 		if(RankingSystem.SQLInsertGuild(guild_id, guild_name, false) == 0) {
-			logger.error("guild settings couldn't be inserted into RankingSystem.guilds table for the guild {}", guild_id);
+			logger.error("Guild ranking information couldn't be saved on join in guild {}", guild_id);
 		}
 		//insert into Patchnotes table
 		if(Patchnotes.SQLInsertGuild(guild_id, guild_name) == 0) {
-			logger.error("guild information couldn't be inserted into DiscordRoles.guilds table for the guild {}", guild_id);
+			logger.error("Guild patchnotes information couldn't be saved on join in guild {}", guild_id);
 		}
 		//insert all categories into table
 		Azrael.SQLBulkInsertCategories(e.getGuild().getCategories());

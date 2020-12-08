@@ -378,7 +378,8 @@
 	"equip_exit":					"Equip setup terminated!",
 	"equip_select_number":			"Please select one of the visible numbers!",
 	
-	"filter_help":					"Write one of the following parameters with the command to work on specific censoring lists! These censoring lists are available:\n\n- **word-filter**:\nFor words to censor in a specific language!\n- **name-filter**:\nFor used words in a name to automatically rename!\n- **name-kick**:\nFor used words in a name to automatically kick from the server!\n- **funny-names**:\nNames to assign to users which got automatically renamed!\n- **staff-names**:\nFor used names which belongs to the staff to automatically rename!\n- **prohibited-urls**:\nFor URLs that are not allowed to use on the server!\n- **allowed-urls**:\nFor URL exceptions when the auto URL deletion is enabled!\n- **prohibited-tweets**:\nFor users on Twitter to keep their tweets from displaying on the server!",
+	"filter_help":					"Write one of the following parameters with the command to work on specific censoring lists or *exit* to interrupt the process! These censoring lists are available:\n\n- **word-filter**:\nFor words to censor in a specific language!\n- **name-filter**:\nFor used words in a name to automatically rename!\n- **name-kick**:\nFor used words in a name to automatically kick from the server!\n- **funny-names**:\nNames to assign to users which got automatically renamed!\n- **staff-names**:\nFor used names which belongs to the staff to automatically rename!\n- **prohibited-urls**:\nFor URLs that are not allowed to use on the server!\n- **allowed-urls**:\nFor URL exceptions when the auto URL deletion is enabled!\n- **prohibited-tweets**:\nFor users on Twitter to keep their tweets from displaying on the server!",
+	"filter_abort":					"The *filter* command has been aborted!",
 	"filter_actions":				"Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**",
 	"filter_display":				"DISPLAY",
 	"filter_insert":				"INSERT",
@@ -389,6 +390,7 @@
 	"filter_no_langs":				"<no languages available>",
 	"filter_list":					"Here the requested list: ",
 	"filter_list_empty":			"The requested list is empty!",
+	"filter_list_lang_na":			"The requested language is not available!",
 	"filter_write_word":			"Now please provide the word or name!",
 	"filter_write_paste":			"Now please provide a pastebin URL which contains all words or names!",
 	"filter_write_fqdn":			"Now please provide a fully qualified domain name. For example: *https://www.google.com*\n Please don't add anything after the top level domain (e.g. com, de, org)!",
@@ -457,6 +459,7 @@
 	"google_sheet_restrict_set":	"Now please write a text channel mention or text channel ID to restrict the selected event to a textchannel. To remove it, write *none*!",
 	"google_sheet_restrict_remove":	"Restriction has been removed for this event!",
 	"google_sheet_restrict_add":	"Text channel restriction has been added for this event and spreadsheet!",
+	"google_sheet_no_link":			"An internal error has occurred! Google Spreadsheet couldn't be linked to the Bot.",
 	"google_exit":					"Google command terminated!",
 	
 	"heavy_censoring_help":		 	"Add either *enable* or *disable* to the command to operate this functionality! If Heavy Censoring is enabled and a text channel is censoring at least one language, the following messages will be removed:\n- *Messages which contain only one letter*.\n- *Messages which contain screenshots*.\n- *Messages which are repeated multiple times*.\n- *Messages which don't contain any normal letter or digits (e.g. unicodes)*.\n\nIf this functionality removes a large number of messages and the threshold of 30 has been reached, it will warn users with a mute after removing a message! The counter for the threshold increases for *every removed message* and *decreases automatically by 1* after every minute. Use the *reset* parameter to manually reset this counter to 0!",
