@@ -225,7 +225,7 @@ public class Display implements CommandPublic{
 			final var dailiesLevel = GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), dailiesLevel) || adminPermission) {
 				//retrieve all daily rewards from table
-				for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID())) {
+				for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id)) {
 					out.append("**"+daily.getDescription()+"**\n"+STATIC.getTranslation(e.getMember(), Translation.DISPLAY_PROBABILITY)+daily.getWeight()+"%\n\n");
 				}
 				e.getChannel().sendMessage((out.length() > 0) ? messageBuild.setDescription(out.toString()).build() : error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();

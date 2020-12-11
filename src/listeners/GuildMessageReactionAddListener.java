@@ -239,21 +239,20 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 								logger.warn("MESSAGE_MANAGE permission required to delete messages in text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 							}
 							Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+current_page+"_"+last_page+"_"+inventory_tab+"_"+sub_tab));
-							//retrieve current theme and max items in the current inventory
+							//retrieve and max items in the current inventory
 							final var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-							final var theme = guild_settings.getThemeID();
 							final int maxItems = guild_settings.getInventoryMaxItems();
 							//draw inventory depending on the category that was chosen
 							if(inventory_tab.equalsIgnoreCase("weapons")) {
 								if(!sub_tab.equalsIgnoreCase("total"))
-									InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, sub_tab, theme), current_page, last_page, guild_settings);
+									InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, sub_tab), current_page, last_page, guild_settings);
 								else
-									InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
+									InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems), current_page, last_page, guild_settings);
 							}
 							else if(inventory_tab.equalsIgnoreCase("skins"))
-								InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
+								InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems), current_page, last_page, guild_settings);
 							else
-								InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems, theme), current_page, last_page, guild_settings);
+								InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems), current_page, last_page, guild_settings);
 						}
 						else {
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
@@ -281,8 +280,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 							else {
 								logger.warn("MESSAGE_MANAGE permission required to delete messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 							}
-							final var theme = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-							RandomshopExecution.inspectItems(e.getMember(), e.getChannel(), RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), theme), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme, false), input, current_page, true);
+							RandomshopExecution.inspectItems(e.getMember(), e.getChannel(), RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), false), input, current_page, true);
 						}
 						else {
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());

@@ -1,5 +1,6 @@
 package commands;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,7 @@ import enums.Channel;
 import enums.Translation;
 import fileManagement.GuildIni;
 import interfaces.CommandPublic;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import sql.RankingSystem;
@@ -65,45 +67,50 @@ public class Top implements CommandPublic {
 					
 		var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 		if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
-			//TODO: error handling when Ranking query ran into error or is empty
 			ArrayList<Ranking> rankList = RankingSystem.SQLRanking(guild_id);
 			Ranking ranking1 = rankList.parallelStream().filter(r -> r.getUser_ID() == member_id).findAny().orElse(null);
-			rank = ranking1.getRank();
-			user_experience = ranking1.getExperience();
-			user_level = ranking1.getLevel();
-			
-			//always display the last page if an unreasonable page has been provided
-			int index = (page-1)*10;
-			while(index >= rankList.size()) {
-				index -= 10;
-				page --;
-			}
-			
-			//display the top ten of the current page
-			for(int iterate = index; iterate < page*10; iterate++) {
-				if(iterate < rankList.size()) {
-					Ranking ranking = rankList.get(iterate);
-					i = i + 1;
-					Member member = e.getGuild().getMemberById(ranking.getUser_ID());
-					if(member != null)
-						name = member.getUser().getName();
-					else
-						name = STATIC.getTranslation(e.getMember(), Translation.TOP_USER_LEFT);
-					level = ranking.getLevel();
-					experience = ranking.getExperience();				
-					if(i == 10 || i == rankList.size()) {
-						message.append("["+(ranking.getRank() < 10 ? "0"+ranking.getRank() : ranking.getRank())+"] \t> #"+name+"\n\t\t\t Level: "+level+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_EXPERIENCE)+experience+"\n");
-						e.getChannel().sendMessage("```CMake\n"+STATIC.getTranslation(e.getMember(), Translation.TOP_TITLE)+"\n\n"+message.toString()+"\n"
-							+ "-------------------------------------\n #"+STATIC.getTranslation(e.getMember(), Translation.TOP_PERSONAL_INFO)+"\n"
-							+ " "+STATIC.getTranslation(e.getMember(), Translation.TOP_RANK)+rank+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_LEVEL)+user_level+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_EXPERIENCE)+user_experience+"\n\n"+STATIC.getTranslation(e.getMember(), Translation.TOP_PAGE)+page+"```").queue();
+			if(rankList.size() > 0 && ranking1 != null) {
+				rank = ranking1.getRank();
+				user_experience = ranking1.getExperience();
+				user_level = ranking1.getLevel();
+				
+				//always display the last page if an unreasonable page has been provided
+				int index = (page-1)*10;
+				while(index >= rankList.size()) {
+					index -= 10;
+					page --;
+				}
+				
+				//display the top ten of the current page
+				for(int iterate = index; iterate < page*10; iterate++) {
+					if(iterate < rankList.size()) {
+						Ranking ranking = rankList.get(iterate);
+						i = i + 1;
+						Member member = e.getGuild().getMemberById(ranking.getUser_ID());
+						if(member != null)
+							name = member.getUser().getName();
+						else
+							name = STATIC.getTranslation(e.getMember(), Translation.TOP_USER_LEFT);
+						level = ranking.getLevel();
+						experience = ranking.getExperience();				
+						if(i == 10 || i == rankList.size()) {
+							message.append("["+(ranking.getRank() < 10 ? "0"+ranking.getRank() : ranking.getRank())+"] \t> #"+name+"\n\t\t\t Level: "+level+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_EXPERIENCE)+experience+"\n");
+							e.getChannel().sendMessage("```CMake\n"+STATIC.getTranslation(e.getMember(), Translation.TOP_TITLE)+"\n\n"+message.toString()+"\n"
+								+ "-------------------------------------\n#"+STATIC.getTranslation(e.getMember(), Translation.TOP_PERSONAL_INFO)+"\n"
+								+ STATIC.getTranslation(e.getMember(), Translation.TOP_RANK)+rank+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_LEVEL)+user_level+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_EXPERIENCE)+user_experience+"\n\n"+STATIC.getTranslation(e.getMember(), Translation.TOP_PAGE)+page+"```").queue();
+						}
+						else {
+							message.append("["+(ranking.getRank() < 10 ? "0"+ranking.getRank() : ranking.getRank())+"] \t> #"+name+"\n\t\t\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_LEVEL)+level+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_EXPERIENCE)+experience+"\n");
+						}
 					}
 					else {
-						message.append("["+(ranking.getRank() < 10 ? "0"+ranking.getRank() : ranking.getRank())+"] \t> #"+name+"\n\t\t\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_LEVEL)+level+"\t "+STATIC.getTranslation(e.getMember(), Translation.TOP_EXPERIENCE)+experience+"\n");
+						break;
 					}
 				}
-				else {
-					break;
-				}
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("Ranking list couldn't be retrieved or user {} couldn't be found in the ranking in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			}
 		}
 		else{

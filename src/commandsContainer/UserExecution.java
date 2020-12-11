@@ -762,7 +762,7 @@ public class UserExecution {
 						}
 						else {
 							denied.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
-							e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).queue();
+							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -781,7 +781,7 @@ public class UserExecution {
 						}
 						else {
 							denied.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
-							e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).queue();
+							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -1502,7 +1502,7 @@ public class UserExecution {
 					long assign_role = 0;
 					boolean toBreak = false;
 					var roles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
-					for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild_settings.getThemeID())) {
+					for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong())) {
 						if((user_details.getExperience() + experience) >= ranks.getExperience()) {
 							totExperience = ranks.getExperience();
 							level = ranks.getLevel();
@@ -1574,7 +1574,7 @@ public class UserExecution {
 					long assign_role = 0;
 					boolean toBreak = false;
 					var roles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
-					for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild_settings.getThemeID())) {
+					for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong())) {
 						if(experience >= ranks.getExperience()) {
 							totExperience = ranks.getExperience();
 							level = ranks.getLevel();
@@ -1645,7 +1645,7 @@ public class UserExecution {
 						long assign_role = 0;
 						boolean toBreak = false;
 						var roles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
-						for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild_settings.getThemeID())) {
+						for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong())) {
 							var role = roles.parallelStream().filter(f -> f.getLevel() == ranks.getLevel()).findAny().orElse(null);
 							if(role != null && toBreak == false) {
 								assign_role = role.getRole_ID();
@@ -1705,6 +1705,7 @@ public class UserExecution {
 					}
 				}
 			}
+			//TODO: check why it doesn't work in any other language than english
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("gift-currency")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());

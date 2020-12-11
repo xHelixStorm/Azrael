@@ -57,7 +57,7 @@ public class RankingThreadExecution {
 		message = message.replaceAll("<:[a-zA-Z0-9]*:[0-9]{18,18}>", ""); //Edit custom images
 		message = message.replaceAll("<a:[a-zA-Z0-9]*:[0-9]{18,18}>", ""); //Edit custom animated images
 		message = message.replaceAll("<@[0-9!]{18,19}>", ""); //Edit tags
-		message = message.replaceAll("[^\\w\\d\\s]", ""); //Edit all special characters
+		//message = message.replaceAll("[^\\w\\d\\s]", ""); //Edit all special characters //allow special characters again
 		message = message.replaceAll("[_]", ""); // Edit all underscores
 		message = message.replaceAll("[\\s]{2,}", " "); //Edit every multiple whitespace type to a single whitespace
 		int messageLength = message.length();
@@ -142,7 +142,7 @@ public class RankingThreadExecution {
 		}
 		
 		boolean editLevel = false;
-		var levels = RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild_settings.getThemeID());
+		var levels = RankingSystem.SQLgetLevels(e.getGuild().getIdLong());
 		final var current_level = levels.parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null);
 		if(current_level != null && current_level.getExpLoss() > 0) {
 			long passedTime = System.currentTimeMillis() - user_details.getLastUpdate().getTime();
@@ -257,7 +257,7 @@ public class RankingThreadExecution {
 				if(user_details.getRankingLevel() > 0 && user_details.getRankingIcon() > 0) {
 					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES))) {
 						//Upload level up image
-						RankingMethods.getRankUp(e, guild_settings.getThemeID(), user_details, rankIcon);
+						RankingMethods.getRankUp(e, user_details, rankIcon);
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+e.getChannel().getAsMention()).build()).queue();

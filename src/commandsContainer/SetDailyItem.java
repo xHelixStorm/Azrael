@@ -65,7 +65,7 @@ public class SetDailyItem {
 		
 		//verify that the probability doesn't exceed the limit
 		if((_weight+probability) <= 10000) {
-			if(RankingSystem.SQLInsertDailyItems(itemName, probability, type, e.getGuild().getIdLong(), RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID()) > 0) {
+			if(RankingSystem.SQLInsertDailyItems(itemName, probability, type, e.getGuild().getIdLong()) > 0) {
 				Hashes.removeDailyItems(e.getGuild().getIdLong());
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_ADDED).replace("{}", ""+(_weight+probability))).build()).queue();
 				logger.info("User {} has inserted the item {} into the daily item pool with the probability {} in guild {}", e.getMember().getUser().getId(), itemName, probability, e.getGuild().getId());

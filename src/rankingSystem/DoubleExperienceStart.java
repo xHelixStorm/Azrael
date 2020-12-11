@@ -56,9 +56,10 @@ public class DoubleExperienceStart extends TimerTask {
 					if(bot_channel != null) {
 						final TextChannel textChannel = g.getTextChannelById(bot_channel.getChannel_ID());
 						if(textChannel != null && (g.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(g, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)))) {
-							File doubleEvent = new File("./files/RankingSystem/"+RankingSystem.SQLgetGuild(guild_id).getThemeID()+"/doubleweekend.jpg");
-							event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg").queue();
-							event.getJDA().getGuildById(guild_id).getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\n"+STATIC.getTranslation2(g, Translation.DOUBLE_EXPERIENCE_AUTO)+"```").queue();
+							File doubleEvent = new File("./files/RankingSystem/Banners/doubleweekend.jpg");
+							if(doubleEvent.exists())
+								g.getTextChannelById(bot_channel.getChannel_ID()).sendFile(doubleEvent, "doubleweekend.jpg").queue();
+							g.getTextChannelById(bot_channel.getChannel_ID()).sendMessage("```css\n"+STATIC.getTranslation2(g, Translation.DOUBLE_EXPERIENCE_AUTO)+"```").queue();
 						}
 						else
 							logger.warn("MESSAGE_WRITE and MESSAGE_ATTACH_FILE permissions required to announce the double experience event on channel {} in guild {}", textChannel.getId(), g.getId());

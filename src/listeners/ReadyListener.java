@@ -49,7 +49,7 @@ import util.STATIC;
 /**
  * First event that gets executed on start up and on successful login to Discord
  * 
- * collect themes, roles, settings, etc before the Bot is fully operational for taking
+ * collect roles, settings, etc before the Bot is fully operational for taking
  * commands, restart timers for muted users and start timers for regular check ups and 
  * clean ups
  * @author xHelixStorm

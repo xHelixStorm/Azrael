@@ -41,7 +41,6 @@ public class UserRank {
 	private int placementY;
 	
 	private String fileType;
-	private int themeID;
 	private int line;
 	private String source;
 	
@@ -134,9 +133,6 @@ public class UserRank {
 	}
 	public String getFileType() {
 		return fileType;
-	}
-	public int getThemeID() {
-		return themeID;
 	}
 	public int getLine() {
 		return line;
@@ -233,9 +229,6 @@ public class UserRank {
 	}
 	public void setFileType(String fileType) {
 		this.fileType = fileType;
-	}
-	public void setThemeID(int themeID) {
-		this.themeID = themeID;
 	}
 	public void setLine(int line) {
 		this.line = line;

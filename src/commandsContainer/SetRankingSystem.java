@@ -51,7 +51,7 @@ public class SetRankingSystem {
 						logger.error("Registered ranking roles couldn't be called and cached in guild {}", e.getGuild().getId());
 					}
 					Hashes.clearRankingLevels();
-					if(RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild.getThemeID()).size() == 0) {
+					if(RankingSystem.SQLgetLevels(e.getGuild().getIdLong()).size() == 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Ranking levels couldn't be called and cached in guild {}", e.getGuild().getId());
 					}

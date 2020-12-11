@@ -151,7 +151,7 @@ public class GuildMessageListener extends ListenerAdapter {
 								ShopExecution.displayShop(e, "ite", "");
 							}
 							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WEAPONS))) {
-								ShopExecution.displayWeaponCategories(e, guild_settings.getThemeID());
+								ShopExecution.displayWeaponCategories(e);
 							}
 							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SKILLS))) {
 								ShopExecution.displaySkills(e, guild_settings);
@@ -681,7 +681,7 @@ public class GuildMessageListener extends ListenerAdapter {
 								//check if the user has an item to boost the experience points
 								int percent_multiplier;
 								try {
-									percent_multiplier = Integer.parseInt(RankingSystem.SQLExpBoosterExistsInInventory(user_id, guild_id, guild_settings.getThemeID()).replaceAll("[^0-9]*", ""));
+									percent_multiplier = Integer.parseInt(RankingSystem.SQLExpBoosterExistsInInventory(user_id, guild_id).replaceAll("[^0-9]*", ""));
 								} catch(NumberFormatException nfe) {
 									percent_multiplier = 0;
 								}

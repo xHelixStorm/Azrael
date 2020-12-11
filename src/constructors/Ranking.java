@@ -26,8 +26,6 @@ public class Ranking {
 	private int level_requirement;
 	private long guild_id;
 	
-	private int theme_id;
-	
 	private int weapon1;
 	private int weapon2;
 	private int weapon3;
@@ -91,9 +89,6 @@ public class Ranking {
 	}
 	public void setGuildID(long _guild_id) {
 		this.guild_id = _guild_id;
-	}
-	public void setThemeID(int _theme_id) {
-		this.theme_id = _theme_id;
 	}
 	public void setWeapon1(int _weapon1) {
 		this.weapon1 = _weapon1;
@@ -167,9 +162,6 @@ public class Ranking {
 	}
 	public long getGuildID() {
 		return this.guild_id;
-	}
-	public int getThemeID() {
-		return this.theme_id;
 	}
 	public int getWeapon1() {
 		return this.weapon1;

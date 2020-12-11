@@ -49,48 +49,53 @@ public class Randomshop implements CommandPublic {
 		var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 		if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
 			Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-			if(args.length == 0) {
-				//run help and collect all possible parameters
-				RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), false));
-			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PLAY))) {
-				//start a round
-				if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES)))
-					RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), false), bundleArguments(args, 1));
-				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
-					logger.error("Permission MESSAGE_ATTACH_FILES required to display the randomshop in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
+			if(guild_settings.getRankingState()) {
+				if(args.length == 0) {
+					//run help and collect all possible parameters
+					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), false));
 				}
-			}
-			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REPLAY))) {
-				//play another round if a match occurred within 3 minutes
-				var cache = Hashes.getTempCache("randomshop_play_"+e.getMember().getUser().getId());
-				if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
+				else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PLAY))) {
+					//start a round
 					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES)))
-						RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), false), cache.getAdditionalInfo());
+						RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), false), bundleArguments(args, 1));
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
+						logger.error("Permission MESSAGE_ATTACH_FILES required to display the randomshop in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
+					}
+				}
+				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REPLAY))) {
+					//play another round if a match occurred within 3 minutes
+					var cache = Hashes.getTempCache("randomshop_play_"+e.getMember().getUser().getId());
+					if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
+						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES)))
+							RandomshopExecution.runRound(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), false), cache.getAdditionalInfo());
+						else {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
+							logger.error("Permission MESSAGE_ATTACH_FILES required to display the randomshop in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
+						}
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_REPLAY_ERR)).build()).queue();
+						if(cache != null)
+							Hashes.clearTempCache("randomshop_play_"+e.getMember().getUser().getId());
+					}
+				}
+				else if(args.length > 0) {
+					//display the weapons that can be obtained.
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES)))
+						RandomshopExecution.inspectItems(e.getMember(), e.getChannel(), RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), false), bundleArguments(args, 0), 1, false);
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
 						logger.error("Permission MESSAGE_ATTACH_FILES required to display the randomshop in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_REPLAY_ERR)).build()).queue();
-					if(cache != null)
-						Hashes.clearTempCache("randomshop_play_"+e.getMember().getUser().getId());
-				}
-			}
-			else if(args.length > 0) {
-				//display the weapons that can be obtained.
-				if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES)))
-					RandomshopExecution.inspectItems(e.getMember(), e.getChannel(), RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), false), bundleArguments(args, 0), 1, false);
-				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
-					logger.error("Permission MESSAGE_ATTACH_FILES required to display the randomshop in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
+					//if typos occur, run help
+					RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), false));
 				}
 			}
 			else {
-				//if typos occur, run help
-				RandomshopExecution.runHelp(e, RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong(), guild_settings.getThemeID()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), guild_settings.getThemeID(), false));
+				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).queue();
 			}
 		}
 		else {

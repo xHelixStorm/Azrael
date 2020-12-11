@@ -28,9 +28,8 @@ public class DrawDaily {
 	
 	public static void draw(GuildMessageReceivedEvent e, String obtained, Guilds guild_settings) {
 		try {
-			var theme_id = guild_settings.getThemeID();
-			BufferedImage daily = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/daily_blank.png"));
-			BufferedImage reward = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/"+obtained+".png"));
+			BufferedImage daily = ImageIO.read(new File("./files/RankingSystem/Dailies/daily_blank.png"));
+			BufferedImage reward = ImageIO.read(new File("./files/RankingSystem/Dailies/"+obtained+".png"));
 			
 			final int rewardX = guild_settings.getDailyRewardX();
 			final int rewardY = guild_settings.getDailyRewardY();

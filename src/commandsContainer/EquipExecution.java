@@ -258,10 +258,9 @@ public class EquipExecution {
 				if(user_details != null) {
 					var weapon = weapons.get(0);
 					if(weapon.getItemId() != user_details.getWeapon1() && weapon.getItemId() != user_details.getWeapon2() && weapon.getItemId() != user_details.getWeapon3()) {
-						var guild_settings = RankingSystem.SQLgetGuild(guild);
-						var weapon1 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon1()).findAny().orElse(null);
-						var weapon2 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon2()).findAny().orElse(null);
-						var weapon3 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon3()).findAny().orElse(null);
+						var weapon1 = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon1()).findAny().orElse(null);
+						var weapon2 = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon2()).findAny().orElse(null);
+						var weapon3 = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon3()).findAny().orElse(null);
 						if(!weapon.getAbbreviation().equals((weapon1 != null ? weapon1.getWeaponAbbv() : "")) && !weapon.getAbbreviation().equals((weapon2 != null ? weapon2.getWeaponAbbv() : "")) && !weapon.getAbbreviation().equals((weapon3 != null ? weapon3.getWeaponAbbv() : ""))) {
 							if(RankingSystemItems.SQLEquipWeapon(e.getAuthor().getIdLong(), guild, weapon.getItemId(), selection) > 0) {
 								switch(selection) {
@@ -377,11 +376,10 @@ public class EquipExecution {
 					var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 					if(user_details != null) {
 						if(weapon_id != user_details.getWeapon1() && weapon_id != user_details.getWeapon2() && weapon_id != user_details.getWeapon3()) {
-							var guild_settings = RankingSystem.SQLgetGuild(guild);
-							var weapon1 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon1()).findAny().orElse(null);
-							var weapon2 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon2()).findAny().orElse(null);
-							var weapon3 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon3()).findAny().orElse(null);
-							var selectedWeapon = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == weapon_id).findAny().orElse(null);
+							var weapon1 = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon1()).findAny().orElse(null);
+							var weapon2 = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon2()).findAny().orElse(null);
+							var weapon3 = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon3()).findAny().orElse(null);
+							var selectedWeapon = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == weapon_id).findAny().orElse(null);
 							if(!selectedWeapon.getWeaponAbbv().equals((weapon1 != null ? weapon1.getWeaponAbbv() : "")) && !selectedWeapon.getWeaponAbbv().equals((weapon2 != null ? weapon2.getWeaponAbbv() : "")) && !selectedWeapon.getWeaponAbbv().equals((weapon3 != null ? weapon3.getWeaponAbbv() : ""))) {
 								if(RankingSystemItems.SQLEquipWeapon(e.getAuthor().getIdLong(), guild, weapon_id, slot) > 0) {
 									switch(selection) {

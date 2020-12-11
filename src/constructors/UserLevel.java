@@ -24,7 +24,6 @@ public class UserLevel {
 	private int nameY;
 	
 	private String fileType;
-	private int themeID;
 	private int line;
 	private String source;
 	
@@ -78,9 +77,6 @@ public class UserLevel {
 	}
 	public String getFileType() {
 		return fileType;
-	}
-	public int getThemeID() {
-		return themeID;
 	}
 	public int getLine() {
 		return line;
@@ -138,9 +134,6 @@ public class UserLevel {
 	}
 	public void setFileType(String fileType) {
 		this.fileType = fileType;
-	}
-	public void setThemeID(int themeID) {
-		this.themeID = themeID;
 	}
 	public void setLine(int line) {
 		this.line = line;

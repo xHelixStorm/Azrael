@@ -69,7 +69,7 @@ public class RegisterRankingRole {
 					logger.info("User {} has registered the ranking role {} with the level requirement {} in guild {}", e.getMember().getUser().getId(), role_name, level_requirement, e.getGuild().getId());
 					Hashes.removeRankingRoles(guild_id);
 					if(RankingSystem.SQLgetRoles(guild_id).size() > 0) {
-						if(RankingSystem.SQLgetLevels(guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID()).size() == 0) {
+						if(RankingSystem.SQLgetLevels(guild_id).size() == 0) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							logger.error("RankingSystem Levels couldn't be retrieved and cached in guild {}", e.getGuild().getId());
 						}
