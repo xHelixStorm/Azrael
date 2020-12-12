@@ -29,7 +29,7 @@ import util.STATIC;
 public class ShopExecution {
 	private final static Logger logger = LoggerFactory.getLogger(ShopExecution.class);
 	
-	public static void displayShop(GuildMessageReceivedEvent e, String _type, String _description){
+	public static void displayShop(GuildMessageReceivedEvent e, String _type, String _description) {
 		Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 		final var content = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), true);
 		if(content != null) {
@@ -73,7 +73,7 @@ public class ShopExecution {
 				var defaultSkin = false;
 				var alreadyPurchased = false;
 				var terminator = "%";
-				if(guild_settings.getLevelDescription().equals(shopItem.getShopDescription()) || guild_settings.getRankDescription().equals(shopItem.getShopDescription()) || guild_settings.getProfileDescription().equals(shopItem.getShopDescription()) || guild_settings.getIconDescription().equals(shopItem.getShopDescription())) {
+				if((guild_settings.getLevelID() > 0 && guild_settings.getLevelDescription().equals(shopItem.getShopDescription())) || (guild_settings.getRankID() > 0 && guild_settings.getRankDescription().equals(shopItem.getShopDescription())) || (guild_settings.getProfileID() > 0 && guild_settings.getProfileDescription().equals(shopItem.getShopDescription())) || (guild_settings.getIconID() > 0 && guild_settings.getIconDescription().equals(shopItem.getShopDescription()))) {
 					defaultSkin = true;
 				}
 				if(RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), shopItem.getShopDescription()) != null && !shopItem.getSkinType().equals("ite")) {

@@ -168,11 +168,13 @@ public class Set implements CommandPublic {
 					StringBuilder out2 = new StringBuilder();
 					final var skins = RankingSystem.SQLgetRankingLevelList(e.getGuild().getIdLong());
 					if(skins != null) {
+						out.append("0\n");
+						out2.append(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase()+"\n");
 						for(final var skin : skins) {
 							out.append(skin.getLine()+"\n");
 							out2.append(skin.getSkinDescription()+"\n");
 						}
-						if(out.length() > 0)
+						if(skins.size() > 0)
 							e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 						else
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_SKIN_ERR)).build()).queue();
@@ -217,11 +219,13 @@ public class Set implements CommandPublic {
 					StringBuilder out2 = new StringBuilder();
 					final var skins = RankingSystem.SQLgetRankingRankList(e.getGuild().getIdLong());
 					if(skins != null) {
+						out.append("0\n");
+						out2.append(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase()+"\n");
 						for(final var skin : skins) {
 							out.append(skin.getLine()+"\n");
 							out2.append(skin.getSkinDescription()+"\n");
 						}
-						if(out.length() > 0)
+						if(skins.size() > 0)
 							e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANK_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 						else
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANK_SKIN_ERR)).build()).queue();
@@ -266,11 +270,13 @@ public class Set implements CommandPublic {
 					StringBuilder out2 = new StringBuilder();
 					final var skins = RankingSystem.SQLgetRankingProfileList(e.getGuild().getIdLong());
 					if(skins != null) {
+						out.append("0\n");
+						out2.append(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase()+"\n");
 						for(final var skin : skins) {
 							out.append(skin.getLine()+"\n");
 							out2.append(skin.getSkinDescription()+"\n");
 						}
-						if(out.length() > 0)
+						if(skins.size() > 0)
 							e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PROFILE_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 						else
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PROFILE_SKIN_ERR)).build()).queue();
@@ -315,11 +321,13 @@ public class Set implements CommandPublic {
 					StringBuilder out2 = new StringBuilder();
 					final var skins = RankingSystem.SQLgetRankingIconsList(e.getGuild().getIdLong());
 					if(skins != null) {
+						out.append("0\n");
+						out2.append(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase()+"\n");
 						for(final var skin : skins) {
 							out.append(skin.getLine()+"\n");
 							out2.append(skin.getSkinDescription()+"\n");
 						}
-						if(out.length() > 0)
+						if(skins.size() > 0)
 							e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ICON_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 						else
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ICON_SKIN_ERR)).build()).queue();

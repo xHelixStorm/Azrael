@@ -19,26 +19,28 @@ public class SetLevelDefaultSkin {
 	private final static Logger logger = LoggerFactory.getLogger(SetLevelDefaultSkin.class);
 	
 	public static void runTask(GuildMessageReceivedEvent e, int _default_skin, int _last_theme, ArrayList<UserLevel> skins) {
-		if(_default_skin >= 0 && _default_skin <= _last_theme) {
+		if((_default_skin > 0 && _default_skin <= _last_theme) || _default_skin == 0) {
 			final var skin = skins.parallelStream().filter(f -> f.getLine() == _default_skin).findAny().orElse(null);
-			if(skin != null) {
-				if(RankingSystem.SQLUpdateLevelDefaultSkin(e.getGuild().getIdLong(), e.getGuild().getName(), skin.getSkin()) > 0) {
-					logger.info("User {} has set the default level skin to {} in guild {}", e.getMember().getUser().getId(), skin.getSkin(), e.getGuild().getId());
+			if(skin != null || _default_skin == 0) {
+				final var skinId = (skin != null ? skin.getSkin() : _default_skin);
+				final var skinDescription = (skin != null ? skin.getSkinDescription() : STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase());
+				if(RankingSystem.SQLUpdateLevelDefaultSkin(e.getGuild().getIdLong(), e.getGuild().getName(), skinId) > 0) {
+					logger.info("User {} has set the default level skin to {} in guild {}", e.getMember().getUser().getId(), skinId, e.getGuild().getId());
 					Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-					if(RankingSystem.SQLUpdateUsersDefaultLevelSkin(guild_settings.getLevelID(), skin.getSkin(), e.getGuild().getIdLong()) != -1) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_UPDATE)+skin.getSkinDescription()).build()).queue();
+					if(RankingSystem.SQLUpdateUsersDefaultLevelSkin(guild_settings.getLevelID(), skinId, e.getGuild().getIdLong()) != -1) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_UPDATE)+skinDescription).build()).queue();
 						logger.info("The default level skin has been updated for all users who utilized the previous level skin {} in guild {}", guild_settings.getLevelID(), e.getGuild().getId());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("The new default level skin {} couldn't be set for all users in guild {}", skin.getSkin(), e.getGuild().getId());
+						logger.error("The new default level skin {} couldn't be set for all users in guild {}", skinId, e.getGuild().getId());
 					}
 					Hashes.removeStatus(e.getGuild().getIdLong());
 					Hashes.addOldGuildSettings(e.getGuild().getIdLong(), guild_settings);
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("The new default level skin {} couldn't be saved in guild {}", skin.getSkin(), e.getGuild().getId());
+					logger.error("The new default level skin {} couldn't be saved in guild {}", skinId, e.getGuild().getId());
 				}
 			}
 			else {

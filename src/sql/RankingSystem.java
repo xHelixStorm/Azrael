@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -141,7 +142,10 @@ public class RankingSystem {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE users SET level_skin = ?, name = ? WHERE user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _skin_id);
+			if(_skin_id > 0)
+				stmt.setInt(1, _skin_id);
+			else
+				stmt.setNull(1, Types.INTEGER);
 			stmt.setString(2, _name);
 			stmt.setLong(3, _user_id);
 			stmt.setLong(4, _guild_id);
@@ -163,7 +167,10 @@ public class RankingSystem {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE users SET level_skin = ? WHERE (level_skin = ? OR level_skin IS NULL) && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _skin_id_new);
+			if(_skin_id_new > 0)
+				stmt.setInt(1, _skin_id_new);
+			else
+				stmt.setNull(1, Types.INTEGER);
 			stmt.setInt(2, _skin_id_old);
 			stmt.setLong(3, _guild_id);
 			return stmt.executeUpdate();
@@ -184,7 +191,10 @@ public class RankingSystem {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE users SET rank_skin = ?, name = ? WHERE user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _skin_id);
+			if(_skin_id > 0)
+				stmt.setInt(1, _skin_id);
+			else
+				stmt.setNull(1, Types.INTEGER);
 			stmt.setString(2, _name);
 			stmt.setLong(3, _user_id);
 			stmt.setLong(4, _guild_id);
@@ -206,7 +216,10 @@ public class RankingSystem {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE users SET rank_skin = ? WHERE (rank_skin = ? OR rank_skin IS NULL) && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _skin_id_new);
+			if(_skin_id_new > 0)
+				stmt.setInt(1, _skin_id_new);
+			else
+				stmt.setNull(1, Types.INTEGER);
 			stmt.setInt(2, _skin_id_old);
 			stmt.setLong(3, _guild_id);
 			return stmt.executeUpdate();
@@ -227,7 +240,10 @@ public class RankingSystem {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE users SET profile_skin = ?, name = ? WHERE user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _skin_id);
+			if(_skin_id > 0)
+				stmt.setInt(1, _skin_id);
+			else
+				stmt.setNull(1, Types.INTEGER);
 			stmt.setString(2, _name);
 			stmt.setLong(3, _user_id);
 			stmt.setLong(4, _guild_id);
@@ -249,7 +265,10 @@ public class RankingSystem {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE users SET profile_skin = ? WHERE (profile_skin = ? OR profile_skin IS NULL) && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _skin_id_new);
+			if(_skin_id_new > 0)
+				stmt.setInt(1, _skin_id_new);
+			else
+				stmt.setNull(1, Types.INTEGER);
 			stmt.setInt(2, _skin_id_old);
 			stmt.setLong(3, _guild_id);
 			return stmt.executeUpdate();
@@ -270,7 +289,10 @@ public class RankingSystem {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE users SET icon_skin = ?, name = ? WHERE user_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _skin_id);
+			if(_skin_id > 0)
+				stmt.setInt(1, _skin_id);
+			else
+				stmt.setNull(1, Types.INTEGER);
 			stmt.setString(2, _name);
 			stmt.setLong(3, _user_id);
 			stmt.setLong(4, _guild_id);
@@ -292,7 +314,10 @@ public class RankingSystem {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = ("UPDATE users SET icon_skin = ? WHERE (icon_skin = ? OR icon_skin IS NULL) && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _skin_id_new);
+			if(_skin_id_new > 0)
+				stmt.setInt(1, _skin_id_new);
+			else
+				stmt.setNull(1, Types.INTEGER);
 			stmt.setInt(2, _skin_id_old);
 			stmt.setLong(3, _guild_id);
 			return stmt.executeUpdate();
@@ -378,7 +403,10 @@ public class RankingSystem {
 			String sql = ("UPDATE guilds SET name = ?, fk_level_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
-			stmt.setInt(2, _level_skin);
+			if(_level_skin > 0)
+				stmt.setInt(2, _level_skin);
+			else
+				stmt.setNull(2, Types.INTEGER);
 			stmt.setLong(3, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -399,7 +427,10 @@ public class RankingSystem {
 			String sql = ("UPDATE guilds SET name = ?, fk_rank_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
-			stmt.setInt(2, _rank_skin);
+			if(_rank_skin > 0)
+				stmt.setInt(2, _rank_skin);
+			else
+				stmt.setNull(2, Types.INTEGER);
 			stmt.setLong(3, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -420,7 +451,10 @@ public class RankingSystem {
 			String sql = ("UPDATE guilds SET name = ?, fk_profile_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
-			stmt.setInt(2, _profile_skin);
+			if(_profile_skin > 0)
+				stmt.setInt(2, _profile_skin);
+			else
+				stmt.setNull(2, Types.INTEGER);
 			stmt.setLong(3, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -441,7 +475,10 @@ public class RankingSystem {
 			String sql = ("UPDATE guilds SET name = ?, fk_icon_id = ? WHERE guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, _guild_name);
-			stmt.setInt(2, _icon_skin);
+			if(_icon_skin > 0)
+				stmt.setInt(2, _icon_skin);
+			else
+				stmt.setNull(2, Types.INTEGER);
 			stmt.setLong(3, _guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -1940,7 +1977,7 @@ public class RankingSystem {
 			ArrayList<Skins> set_skin = new ArrayList<Skins>();
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-				String sql = ("SELECT * FROM all_enabled_skins WHERE fk_guild_id = ? enabled = ?");
+				String sql = ("SELECT * FROM all_enabled_skins WHERE guild_id = ? AND enabled = ?");
 				stmt = myConn.prepareStatement(sql);
 				stmt.setLong(1, _guild_id);
 				stmt.setBoolean(2, _enabled);
