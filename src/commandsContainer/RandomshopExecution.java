@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -111,55 +112,77 @@ public class RandomshopExecution {
 				if(user_details.getCurrency() >= price) {
 					List<WeaponStats> stats = RankingSystemItems.SQLgetWeaponStats(e.getGuild().getIdLong());
 					if(stats.size() > 0) {
-						final int rand = ThreadLocalRandom.current().nextInt(0, (stats.size()-1));
+						final int rand = ThreadLocalRandom.current().nextInt(0, stats.size());
 						user_details.setCurrency(user_details.getCurrency()-price);
+						long extend = 0;
 						var weapon_id = 0;
 						var editedRows = 0;
 						//get a random weapon id basing of either abbreviation or category and the random stat
-						//TODO: upgrade logic to insert either permanent or timed weapon
+						var number = 0;
 						if(abbv != null) {
 							weapon_id = RankingSystemItems.SQLgetRandomWeaponIDByAbbv(abbv, stats.get(rand).getID(), e.getGuild().getIdLong());
-							final var number = RankingSystemItems.SQLgetNumberOfWeaponID(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), weapon_id);
-							if(number == -1) {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("It couldn't be verified if weapon {} already exists in inventory of user {} in guild {}", weapon_id, e.getMember().getUser().getId(), e.getGuild().getId());
-								return;
-							}
-							if(weapon_id > 0) {
-								editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1));
-							}
-							else if (weapon_id == 0) {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_WEP_TYPE_NA)).build()).queue();
-							}
-							else {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("Random weapon couldn't be retrieved by abbreviation abbreviation {} in guild {}", abbv, e.getGuild().getId());
-							}
+							number = RankingSystemItems.SQLgetNumberOfWeaponID(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), weapon_id);
 						}
 						else {
 							weapon_id = RankingSystemItems.SQLgetRandomWeaponIDByCategory(e.getGuild().getIdLong(), category, stats.get(rand).getID());
-							final var number = RankingSystemItems.SQLgetNumberOfWeaponID(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), weapon_id);
-							if(number == -1) {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("It couldn't be verified if weapon {} already exists in inventory of user {} in guild {}", weapon_id, e.getMember().getUser().getId(), e.getGuild().getId());
-								return;
-							}
-							if(weapon_id > 0) {
-								editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1));
-							}
-							else if(weapon_id == 0) {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_WEP_CAT_NA)).build()).queue();
+							number = RankingSystemItems.SQLgetNumberOfWeaponID(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), weapon_id);
+						}
+						if(number == -1) {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("It couldn't be verified if weapon {} already exists in inventory of user {} in guild {}", weapon_id, e.getMember().getUser().getId(), e.getGuild().getId());
+							return;
+						}
+						if(weapon_id > 0) {
+							final var weapons = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong());
+							if(weapons != null) {
+								final var selWeapon = weapon_id;
+								//since the first query to retrieve the weapon id worked, we will assume that the weapon has been found
+								final var weapon = weapons.parallelStream().filter(w -> w.getWeaponID() == selWeapon).findAny().orElse(null);
+								//calculate if weapon will be timed or permanent
+								switch(weapon.getOverlayLevel()) {
+									case 1, 2 -> {
+										extend = randomizeWeaponDuration(false);
+									}
+									case 3 -> {
+										extend = randomizeWeaponDuration(true);
+									}
+								}
+								if(extend == 0) {
+									editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertWeaponRandomshop(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, new Timestamp(System.currentTimeMillis()), (number+1));
+								}
+								else {
+									final var inventoryItem = RankingSystemItems.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), weapon_id, "limit", true);
+									if(inventoryItem != null) {
+										editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertTimedInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, System.currentTimeMillis(), inventoryItem.getExpiration().getTime(), (inventoryItem.getNumber()+1), true, extend);
+									}
+									else {
+										final long time = System.currentTimeMillis();
+										editedRows = RankingSystemItems.SQLUpdateCurrencyAndInsertTimedInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), weapon_id, time, time, 1, true, extend);
+									}
+								}
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("Random weapon couldn't be retrieved by category {} in guild {}", category, e.getGuild().getId());
 							}
+						}
+						else if (weapon_id == 0) {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_WEP_TYPE_NA)).build()).queue();
+							logger.error("Available weapons couldn't be retrieved in guild {}", e.getGuild().getId());
+							Hashes.clearTempCache("randomshop_play_"+e.getMember().getUser().getId());
+						}
+						else {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							if(abbv != null)
+								logger.error("Random weapon couldn't be retrieved by abbreviation abbreviation {} in guild {}", abbv, e.getGuild().getId());
+							else
+								logger.error("Random weapon couldn't be retrieved by category {} in guild {}", category, e.getGuild().getId());
+							Hashes.clearTempCache("randomshop_play_"+e.getMember().getUser().getId());
 						}
 						
 						if(editedRows > 0) {
 							//draw won item from the Randomshop
 							final int weapon = weapon_id;
-							RandomshopRewardDrawer.drawReward(e, RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong()).parallelStream().filter(w -> w.getWeaponID() == weapon).findAny().orElse(null), user_details.getCurrency(), guild_settings);
+							RandomshopRewardDrawer.drawReward(e, RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong()).parallelStream().filter(w -> w.getWeaponID() == weapon).findAny().orElse(null), user_details.getCurrency(), guild_settings, extend);
 							Hashes.addTempCache("randomshop_play_"+e.getMember().getUser().getId(), new Cache(180000, input));
 						}
 						else if(weapon_id > 0) {
@@ -257,6 +280,32 @@ public class RandomshopExecution {
 			}
 			else {
 				channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(member, Translation.PARAM_NOT_FOUND)).build()).queue();
+			}
+		}
+	}
+	
+	private static long randomizeWeaponDuration(final boolean highRank) {
+		final int rand = ThreadLocalRandom.current().nextInt(0, 100);
+		if(!highRank) {
+			if(rand <= 28) {
+				return TimeUnit.DAYS.toMillis(1);
+			}
+			else if(rand > 28 && rand <= 54) {
+				return TimeUnit.DAYS.toMillis(7);
+			}
+			else if(rand > 54 && rand <= 80) {
+				return TimeUnit.DAYS.toMillis(30);
+			}
+			else {
+				return 0L;
+			}
+		}
+		else {
+			if(rand <= 50) {
+				return TimeUnit.DAYS.toMillis(30);
+			}
+			else {
+				return 0L;
 			}
 		}
 	}

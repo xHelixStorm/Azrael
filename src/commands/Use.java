@@ -116,8 +116,8 @@ public class Use implements CommandPublic {
 					}
 					String input = out.toString().trim();
 					constructors.Inventory inventory = RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input);
-					if(inventory != null && inventory.getItemID() != 0 && inventory.getStatus().equals("perm")) {
-						if(inventory.getSkinType().equals("lev")) {
+					if(inventory != null && inventory.getItemID() != 0) {
+						if(inventory.getSkinType().equals("lev") && inventory.getStatus().equals("perm")) {
 							final String filter = input;
 							final var skin = RankingSystem.SQLgetRankingLevelList(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 							user_details.setRankingLevel(skin.getSkin());
@@ -131,7 +131,7 @@ public class Use implements CommandPublic {
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be updated", "Level skin update has failed. Skin: "+skin.getSkinDescription());
 							}
 						}
-						else if(inventory.getSkinType().equals("ran")) {
+						else if(inventory.getSkinType().equals("ran") && inventory.getStatus().equals("perm")) {
 							final String filter = input;
 							final var skin = RankingSystem.SQLgetRankingRankList(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 							user_details.setRankingRank(skin.getSkin());
@@ -145,7 +145,7 @@ public class Use implements CommandPublic {
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be updated", "Rank skin update has failed. Skin: "+skin.getSkinDescription());
 							}
 						}
-						else if(inventory.getSkinType().equals("pro")) {
+						else if(inventory.getSkinType().equals("pro") && inventory.getStatus().equals("perm")) {
 							final String filter = input;
 							final var skin = RankingSystem.SQLgetRankingProfileList(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 							user_details.setRankingProfile(skin.getSkin());
@@ -159,7 +159,7 @@ public class Use implements CommandPublic {
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be updated", "Profile skin update has failed. Skin: "+skin.getSkinDescription());
 							}
 						}
-						else if(inventory.getSkinType().equals("ico")) {
+						else if(inventory.getSkinType().equals("ico") && inventory.getStatus().equals("perm")) {
 							final String filter = input;
 							final var skin = RankingSystem.SQLgetRankingIconsList(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 							user_details.setRankingIcon(skin.getSkin());
@@ -173,7 +173,6 @@ public class Use implements CommandPublic {
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icon skin couldn't be updated", "Icon skin update has failed. Skin: "+skin.getSkinDescription());
 							}
 						}
-						//TODO: throw different message if a used item is still available in inventory but changed from limited use to expiration
 						else if(inventory.getSkinType().equals("ite")) {
 							var inventoryNumber = RankingSystem.SQLgetInventoryNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input, "perm");
 							var expiration = RankingSystem.SQLgetExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventory.getItemID());
@@ -192,16 +191,21 @@ public class Use implements CommandPublic {
 									logger.error("Item id {} for the user {} couldn't be used or opened in guild {}", inventory.getItemID(), e.getMember().getUser().getId(), e.getGuild().getId());
 									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+inventory.getItemID());
 								}
+								else
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_ITEM).replace("{}", input)).build()).queue();
 							}
-							else {
+							else if(inventoryNumber > 1) {
 								if(RankingSystem.SQLUpdateAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventoryNumber, numberLimit+1, inventory.getItemID(), timestamp, timestamp2) == 0) {
 									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 									logger.error("Item id {} for the user {} couldn't be used or opened in guild {}", inventory.getItemID(), e.getMember().getUser().getId(), e.getGuild().getId());
 									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+inventory.getItemID());
 								}
+								else
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_ITEM).replace("{}", input)).build()).queue();
 							}
-							
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_ITEM).replace("{}", input)).build()).queue();
+							else if(numberLimit > 0) {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_ITEM_ALREADY_OPEN).replace("{}", input)).build()).queue();
+							}
 						}
 					}
 					else {

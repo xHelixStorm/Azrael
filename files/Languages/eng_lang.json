@@ -745,6 +745,7 @@
 	"use_icon_reset":				"Icon skins resetted to **{}**",
 	"use_skin":						"**{}** will be used from now on!",
 	"use_item":						"**{}** has been used!",
+	"use_item_already_open":		"**{}** is already in use!",
 	"use_not_exists":				"This item or skin doesn't exist in your inventory!",
 	
 	"user_help":					"To display information or to take administrative actions against a user, mention the user or write the user's user ID as parameter!",
@@ -883,7 +884,7 @@
 	"write_too_long":				"Message can't be longer than 2000 letters!",
 	"write_no_screens":				"Screenshots are not allowed!",
 	
-	"randomshop_help":				"Write either one weapon type or weapon category as first parameter to open the random shop! By writing *play* as second parameter and the weapon type or weapon category as third parameter, then a randomshop round will start to receive a weapon as reward! Instead if *replay* is used as second parameter, then another round will start with the previously selected weapon type or weapon category!",
+	"randomshop_help":				"Write either one weapon type or weapon category as first parameter to open the random shop! By writing *play* as first parameter and the weapon type or weapon category as second parameter, then a randomshop round will start to receive a weapon as reward! Instead if *replay* is used as second parameter, then another round will start with the previously selected weapon type or weapon category!",
 	"randomshop_not_available":		"The randomshop is currently not available! Please try again later!",
 	"randomshop_wep_types":			"Weapon Types",
 	"randomshop_wep_categories":	"Weapon Categories",
@@ -894,6 +895,8 @@
 	"randomshop_err":				"Randomshop page couldn't be displayed!",
 	"randomshop_err_2":				"Randomshop reward couldn't be displayed! You have obtained **{}**.",
 	"randomshop_reward":			"Congratulations, you have received **{}**. Remaining balance: **{}**",
+	"randomshop_days":				" days",
+	"randomshop_perm":				" permanent",
 	
 	"censor_removed_warn_1":		" Message has been removed due to bad behaviour!",
 	"censor_removed_warn_2":		" This has been the second warning. One more and you'll be **muted** from the server!",

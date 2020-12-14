@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -368,18 +369,18 @@ public class RankingSystemItems {
 						rs.getString(7),
 						rs.getInt(8),
 						rs.getString(9),
-						rs.getString(10),
-						rs.getBoolean(11),
-						rs.getString(12),
+						rs.getInt(10),
+						rs.getString(11),
+						rs.getBoolean(12),
 						rs.getString(13),
-						rs.getBoolean(14),
+						rs.getString(14),
 						rs.getBoolean(15),
 						rs.getBoolean(16),
-						rs.getInt(17),
+						rs.getBoolean(17),
 						rs.getInt(18),
 						rs.getInt(19),
-						rs.getString(20),
-						rs.getInt(21),
+						rs.getInt(20),
+						rs.getString(21),
 						rs.getInt(22),
 						rs.getInt(23),
 						rs.getInt(24),
@@ -388,9 +389,9 @@ public class RankingSystemItems {
 						rs.getInt(27),
 						rs.getInt(28),
 						rs.getInt(29),
-						rs.getString(30),
+						rs.getInt(30),
 						rs.getString(31),
-						rs.getInt(32),
+						rs.getString(32),
 						rs.getInt(33),
 						rs.getInt(34),
 						rs.getInt(35),
@@ -399,9 +400,9 @@ public class RankingSystemItems {
 						rs.getInt(38),
 						rs.getInt(39),
 						rs.getInt(40),
-						rs.getString(41),
+						rs.getInt(41),
 						rs.getString(42),
-						rs.getInt(43),
+						rs.getString(43),
 						rs.getInt(44),
 						rs.getInt(45),
 						rs.getInt(46),
@@ -410,9 +411,9 @@ public class RankingSystemItems {
 						rs.getInt(49),
 						rs.getInt(50),
 						rs.getInt(51),
-						rs.getString(52),
+						rs.getInt(52),
 						rs.getString(53),
-						rs.getInt(54),
+						rs.getString(54),
 						rs.getInt(55),
 						rs.getInt(56),
 						rs.getInt(57),
@@ -421,7 +422,8 @@ public class RankingSystemItems {
 						rs.getInt(60),
 						rs.getInt(61),
 						rs.getInt(62),
-						rs.getString(63)
+						rs.getInt(63),
+						rs.getString(64)
 					);
 					weapons.add(weapon);
 				}
@@ -487,10 +489,10 @@ public class RankingSystemItems {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			String sql = "";
 			if(_weapon) 
-				sql = ("SELECT number, expires FROM inventory INNER JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_guild_id = weapon_shop_content.fk_guild_id WHERE fk_user_id = ? AND fk_weapon_id = ? AND fk_status = ? AND fk_guild_id = ?");
+				sql = ("SELECT number, expires FROM inventory INNER JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_guild_id = weapon_shop_content.fk_guild_id WHERE fk_user_id = ? AND fk_weapon_id = ? AND fk_status = ? AND weapon_shop_content.fk_guild_id = ?");
 			
 			else 
-				sql = ("SELECT number, expires FROM inventory INNER JOIN skill_shop_content ON fk_skill_id = skill_id AND inventory.fk_guild_id = skill_shop_content.fk_guild_id WHERE fk_user_id = ? AND fk_skill_id = ? AND fk_status = ? AND fk_guild_id = ?");
+				sql = ("SELECT number, expires FROM inventory INNER JOIN skill_shop_content ON fk_skill_id = skill_id AND inventory.fk_guild_id = skill_shop_content.fk_guild_id WHERE fk_user_id = ? AND fk_skill_id = ? AND fk_status = ? AND skill_shop_content.fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
@@ -642,8 +644,8 @@ public class RankingSystemItems {
 	
 	//Transaction
 	@SuppressWarnings("resource")
-	public static int SQLUpdateCurrencyAndInsertTimedInventory(long _user_id, long _guild_id, long _currency, int _item_id, long _position, long _expires, int _number,boolean _weapon){
-		logger.trace("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _position, _expires, _number, _weapon);
+	public static int SQLUpdateCurrencyAndInsertTimedInventory(long _user_id, long _guild_id, long _currency, int _item_id, long _position, long _expires, int _number, boolean _weapon, long _extend) {
+		logger.trace("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}, {}", _user_id, _guild_id, _currency, _item_id, _position, _expires, _number, _weapon, _extend);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -666,7 +668,7 @@ public class RankingSystemItems {
 			stmt.setInt(2, _item_id);
 			stmt.setTimestamp(3, new Timestamp(_position));
 			stmt.setInt(4, _number);
-			stmt.setTimestamp(5, new Timestamp(_expires+604800000));
+			stmt.setTimestamp(5, new Timestamp(_expires+(_extend == 0 ? TimeUnit.DAYS.toMillis(7) : _extend)));
 			stmt.setLong(6, _guild_id);
 			var editedRows = stmt.executeUpdate();
 			myConn.commit();	

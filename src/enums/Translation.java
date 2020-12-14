@@ -747,6 +747,7 @@ public enum Translation {
 	USE_ICON_RESET				("use_icon_reset"),
 	USE_SKIN					("use_skin"),
 	USE_ITEM					("use_item"),
+	USE_ITEM_ALREADY_OPEN		("use_item_already_open"),
 	USE_NOT_EXISTS				("use_not_exists"),
 	
 	USER_HELP					("user_help"),
@@ -896,6 +897,8 @@ public enum Translation {
 	RANDOMSHOP_ERR				("randomshop_err"),
 	RANDOMSHOP_ERR_2			("randomshop_err_2"),
 	RANDOMSHOP_REWARD			("randomshop_reward"),
+	RANDOMSHOP_DAYS				("randomshop_days"),
+	RANDOMSHOP_PERM				("randomshop_perm"),
 	
 	CENSOR_REMOVED_WARN_1		("censor_removed_warn_1"),
 	CENSOR_REMOVED_WARN_2		("censor_removed_warn_2"),

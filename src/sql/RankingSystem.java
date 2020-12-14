@@ -1409,7 +1409,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT number FROM inventory WHERE fk_user_id = ? AND fk_item_id = ? AND fk_guild_id = ?");
+			String sql = ("SELECT number FROM inventory WHERE fk_user_id = ? AND fk_item_id = ? AND fk_guild_id = ? AND fk_status = \"limit\"");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setInt(2, _item_id);
@@ -2041,7 +2041,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT item_id, skin, status FROM inventory_items WHERE user_id = ? AND description = ? AND status = \"perm\" AND guild_id = ?");
+			String sql = ("SELECT item_id, skin, status FROM inventory_items WHERE user_id = ? AND description = ? AND guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _description);
@@ -2347,7 +2347,7 @@ public class RankingSystem {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT number, expires FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id WHERE fk_user_id = ? AND description = ? AND fk_status = ? AND fk_guild_id = ?");
+			String sql = ("SELECT number, expires FROM inventory INNER JOIN shop_content ON fk_item_id = item_id AND inventory.fk_guild_id = shop_content.fk_guild_id WHERE fk_user_id = ? AND description = ? AND fk_status = ? AND shop_content.fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setString(2, _description);

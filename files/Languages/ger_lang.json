@@ -745,6 +745,7 @@
 	"use_icon_reset":				"Symbole wurden zurückgesetzt nach **{}**",
 	"use_skin":						"**{}** wird von nun an benutzt!",
 	"use_item":						"**{}** wurde benutzt!",
+	"use_item_already_open":		"**{}** wird bereits benutzt!",
 	"use_not_exists":				"Dieses Gegenstand oder Bild existiert nicht im ihrem Inventar!",
 	
 	"user_help":					"Um Informationen anzuzeigen oder administrative Maßnahmen gegen einen Benutzer zu ergreifen, erwähnen Sie den Benutzer oder schreiben Sie die Benutzer-ID des Benutzers als Parameter!",
@@ -883,7 +884,7 @@
 	"write_too_long":				"Nachricht kann nicht länger als 2000 Zeichen sein!",
 	"write_no_screens":				"Bilder sind nicht erlaubt!",
 	
-	"randomshop_help":				"Schreiben Sie entweder eine Waffenart oder Waffenkategorie um den Randomshop zu öffnen, als ersten Parameter! Indem *ziehe* als zweiten Parameter geschrieben wird und mit der Waffenart oder Waffenkategorie als dritten Parameter folgt, beginnt eine Randomshop Runde, wo eine random Waffe ausgelost wird! Wenn stattdessen *erneut-ziehen* als zweiten Parameter benutzt wird, dann startet eine neue Runde mit den selben Filter aus der Vorrunde!",
+	"randomshop_help":				"Schreiben Sie entweder eine Waffenart oder Waffenkategorie um den Randomshop zu öffnen, als ersten Parameter! Indem *ziehe* als ersten Parameter geschrieben wird und mit der Waffenart oder Waffenkategorie als zweiten Parameter folgt, beginnt eine Randomshop Runde, wo eine random Waffe ausgelost wird! Wenn stattdessen *erneut-ziehen* als zweiten Parameter benutzt wird, dann startet eine neue Runde mit den selben Filter aus der Vorrunde!",
 	"randomshop_not_available":		"Der Randomshop ist momentan nicht verfügbar! Bitte probieren Sie es später erneut!",
 	"randomshop_wep_types":			"Waffenarten",
 	"randomshop_wep_categories":	"Waffenkategorien",
@@ -894,6 +895,8 @@
 	"randomshop_err":				"Randomshop Seite konnte nicht angezeigt werden!",
 	"randomshop_err_2":				"Randomshop Belohnung konnte nicht angezeigt werden! Sie haben **{}** erhalten.",
 	"randomshop_reward":			"Glückwünsche, Sie haben **{}** erhalten. Momentanes Geldkonto: **{}**",
+	"randomshop_days":				" Tage",
+	"randomshop_perm":				" permanent",
 	
 	"censor_removed_warn_1":		" Nachricht wegen schlechtes Benehmen entfernt!",
 	"censor_removed_warn_2":		" Das ist ihre zweite Warnung. Ein weiteres Mal und Sie werden vom Server gemutet!",
