@@ -65,6 +65,9 @@ public class Help implements CommandPublic {
 			out = CommandList.getHelp(e.getMember(), admin, 3);
 			if(out.length() > 0)
 				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.COMMAND_HEADER_3)).setDescription(out).build()).queue();
+			out = CommandList.getHelp(e.getMember(), admin, 4);
+			if(out.length() > 0)
+				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.COMMAND_HEADER_4)).setDescription(out).build()).queue();
 		}
 	}
 

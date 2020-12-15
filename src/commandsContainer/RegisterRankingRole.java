@@ -64,24 +64,24 @@ public class RegisterRankingRole {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_NO_LEVEL)).build()).queue();
 			}
 			else {
-				if(RankingSystem.SQLInsertRoles(role_id, role_name, level_requirement, guild_id) > 0) {
-					logger.debug("{} has registered the ranking role {} with the level requirement {} in the guild {}", e.getMember().getUser().getId(), role_name, level_requirement, e.getGuild().getId());
+				if(RankingSystem.SQLInsertRole(role_id, role_name, level_requirement, guild_id) != -1) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_ADDED).replaceFirst("\\{\\}", role_name).replace("{}", ""+level_requirement)).build()).queue();
+					logger.info("User {} has registered the ranking role {} with the level requirement {} in guild {}", e.getMember().getUser().getId(), role_name, level_requirement, e.getGuild().getId());
 					Hashes.removeRankingRoles(guild_id);
 					if(RankingSystem.SQLgetRoles(guild_id).size() > 0) {
-						if(RankingSystem.SQLgetLevels(guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID()).size() == 0) {
+						if(RankingSystem.SQLgetLevels(guild_id).size() == 0) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Levels for the ranking system from RankingSystem.level_list couldn't be retrieved and cached for guild {}", e.getGuild().getId());
+							logger.error("RankingSystem Levels couldn't be retrieved and cached in guild {}", e.getGuild().getId());
 						}
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Roles from RankingSystem.roles couldn't be called and cached for guild {}", e.getGuild().getId());
+						logger.error("Ranking roles couldn't be called and cached in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("role id {} couldn't be inserted into the table RankingSystem.roles for the guild {}", role_id, e.getGuild().getId());
+					logger.error("Ranking role {} couldn't be registered in guild {}", role_id, e.getGuild().getId());
 					RankingSystem.SQLInsertActionLog("High", role_id, guild_id, "Role couldn't be registered as ranking role", "The role "+role_name+" couldn't be inserted into the RankingSystem.roles table");
 				}
 			}

@@ -76,7 +76,7 @@ public class PrivateMessageReactionAddListener extends ListenerAdapter {
 														}
 														else {
 															e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getUser(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getUser(), Translation.GENERAL_ERROR)).build()).queue();
-															logger.error("user couldn't be inserted as new clan member into Azrael.clan_members for user {}, clan {} and guild {}", user_id, clan_id, guild_id);
+															logger.error("User {} couldn't join clan {} in guild {}", user_id, clan_id, guild_id);
 														}
 													}
 													else {
@@ -130,7 +130,7 @@ public class PrivateMessageReactionAddListener extends ListenerAdapter {
 														}
 														else {
 															e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getUser(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getUser(), Translation.GENERAL_ERROR)).build()).queue();
-															logger.error("user couldn't be inserted as new clan member into Azrael.clan_members for user {}, clan {} and guild {}", user_id, clan_id, guild_id);
+															logger.error("User {} couldn't join clan {} in guild {}", user_id, clan_id, guild_id);
 														}
 													}
 													else {
@@ -159,7 +159,7 @@ public class PrivateMessageReactionAddListener extends ListenerAdapter {
 														}
 														else if(map == null) {
 															e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getUser(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getUser(), Translation.GENERAL_ERROR)).build()).queue();
-															logger.error("Map from Azrael.comp_maps couldn't be retrieved in guild {}", guild_id);
+															logger.error("Competitive map couldn't be retrieved in guild {}", guild_id);
 															return;
 														}
 														final String challengerClanName = Competitive.SQLgetClanName(guild_id, clan_id);
@@ -175,7 +175,7 @@ public class PrivateMessageReactionAddListener extends ListenerAdapter {
 																	if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))
 																		textChannel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getJDA().getGuildById(guild_id), Translation.CW_WAR_ACCEPTED_2).replaceFirst("\\{\\}", challengeClan.getClanName()).replaceFirst("\\{\\}", challengerClanName).replace("{}", ""+room_id)).build()).queue();
 																	else
-																		logger.warn("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permission required to display the cw reply for channel {} in guild {}", textChannel.getId(), guild.getId());
+																		logger.warn("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permission required to display the clan war reply on channel {} in guild {}", textChannel.getId(), guild.getId());
 																	Competitive.SQLUpdateClanReservationAction(guild_id, user_id, clan_id, reservation.getType(), 1);
 																}
 																else {
@@ -185,12 +185,12 @@ public class PrivateMessageReactionAddListener extends ListenerAdapter {
 															}
 															else {
 																e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getUser(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getUser(), Translation.GENERAL_ERROR)).build()).queue();
-																logger.error("Clan details couldn't be retrieved from Azrael.clan_view for user {} and guild {}", e.getUser().getIdLong(), guild_id);
+																logger.error("Clan details couldn't be retrieved for user {} in guild {}", e.getUser().getIdLong(), guild_id);
 															}
 														}
 														else {
 															e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getUser(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getUser(), Translation.GENERAL_ERROR)).build()).queue();
-															logger.error("Clan name couldn't be retrieved from Azrael.clans for clan {} and guild {}", clan_id, guild_id);
+															logger.error("Clan name couldn't be retrieved for clan {} in guild {}", clan_id, guild_id);
 														}
 													}
 													else if(e.getReactionEmote().getName().equals(deny)) {
@@ -219,12 +219,12 @@ public class PrivateMessageReactionAddListener extends ListenerAdapter {
 															}
 															else {
 																e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getUser(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getUser(), Translation.GENERAL_ERROR)).build()).queue();
-																logger.error("Clan details couldn't be retrieved from Azrael.clan_view for user {} and guild {}", e.getUser().getIdLong(), guild_id);
+																logger.error("Clan details couldn't be retrieved for user {} in guild {}", e.getUser().getIdLong(), guild_id);
 															}
 														}
 														else {
 															e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getUser(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getUser(), Translation.GENERAL_ERROR)).build()).queue();
-															logger.error("Clan name couldn't be retrieved from Azrael.clans for clan {} and guild {}", clan_id, guild_id);
+															logger.error("Clan name couldn't be retrieved for clan {} in guild {}", clan_id, guild_id);
 														}
 													}
 												}
@@ -248,7 +248,7 @@ public class PrivateMessageReactionAddListener extends ListenerAdapter {
 								}
 								else if(reservation == null) {
 									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getUser(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getUser(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("It couldn't be verified if there was an open application, invitation or clan war challenge for user {}, clan {} and guild {}", user_id, clan_id, guild_id);
+									logger.error("It couldn't be verified if there was an open application, invitation or clan war challenge for user {} and clan {} in guild {}", user_id, clan_id, guild_id);
 								}
 							}
 						}

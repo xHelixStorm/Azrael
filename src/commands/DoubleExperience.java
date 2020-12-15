@@ -75,7 +75,7 @@ public class DoubleExperience implements CommandPublic {
 					//if it has been enabled, write it in cache and print the double experience message in the bot channel
 					if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ON))) {
 						Hashes.addTempCache("doubleExp_gu"+e.getGuild().getId(), new Cache("on"));
-						File doubleEvent = new File("./files/RankingSystem/"+guild_settings.getThemeID()+"/doubleweekend.jpg");
+						File doubleEvent = new File("./files/RankingSystem/Banners/doubleweekend.jpg");
 						var bot_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).findAny().orElse(null);
 						if(bot_channel != null) {
 							final TextChannel textChannel = e.getGuild().getTextChannelById(bot_channel.getChannel_ID());
@@ -84,14 +84,17 @@ public class DoubleExperience implements CommandPublic {
 								textChannel.sendMessage("```css\n"+STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_MESSAGE)+"```").queue();
 							}
 						}
+						logger.info("User {} has enabled the double experience mode for guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 					//if it has been disabled, disable it in cache as well
 					else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_OFF))) {
 						Hashes.addTempCache("doubleExp_gu"+e.getGuild().getId(), new Cache("off"));
+						logger.info("User {} has disabled the double experience mode for guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 					//if it has been set to auto, remove the option from the cache
 					else {
 						Hashes.clearTempCache("doubleExp_gu"+e.getGuild().getId());
+						logger.info("User {} has set the double experience mode to auto for guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 				else {

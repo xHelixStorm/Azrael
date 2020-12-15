@@ -48,7 +48,7 @@ public class Changemap implements CommandPublic {
 						map = Competitive.SQLgetRandomMap(e.getGuild().getIdLong());
 						if(map == null) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Random map from Azrael.comp_maps couldn't be retrieved in guild {}", e.getGuild().getId());
+							logger.error("Random map couldn't be retrieved in guild {}", e.getGuild().getId());
 							return;
 						}
 					}
@@ -60,7 +60,7 @@ public class Changemap implements CommandPublic {
 						}
 						else if(map == null) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Map from Azrael.comp_maps couldn't be retrieved in guild {}", e.getGuild().getId());
+							logger.error("Map {} couldn't be retrieved in guild {}", args[0].toLowerCase(), e.getGuild().getId());
 							return;
 						}
 					}
@@ -292,12 +292,12 @@ public class Changemap implements CommandPublic {
 				final String clanName1 = Competitive.SQLgetClanName(e.getGuild().getIdLong(), room.getClanID1());
 				if(clanName1 == null) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Clan name couldn't be retrieved from Azrael.clans for clan {} and guild {}", room.getClanID1(), e.getGuild().getId());
+					logger.error("Clan name couldn't be retrieved for clan {} and guild {}", room.getClanID1(), e.getGuild().getId());
 				}
 				final String clanName2 = Competitive.SQLgetClanName(e.getGuild().getIdLong(), room.getClanID2());
 				if(clanName2 == null) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Clan name couldn't be retrieved from Azrael.clans for clan {} and guild {}", room.getClanID2(), e.getGuild().getId());
+					logger.error("Clan name couldn't be retrieved for clan {} and guild {}", room.getClanID2(), e.getGuild().getId());
 				}
 				
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
@@ -318,7 +318,7 @@ public class Changemap implements CommandPublic {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Users in the room {} couldn't be retrieved from Azrael.matchmaking_view for guild {}", room.getRoomID(), e.getGuild().getId());
+			logger.error("Users in the room {} couldn't be retrieved for guild {}", room.getRoomID(), e.getGuild().getId());
 		}
 	}
 }

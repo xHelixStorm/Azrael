@@ -94,7 +94,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Languages couldn't be retrieved from Azrael.languages_translation in guild {}", e.getGuild().getId());
+						logger.error("Languages couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -164,23 +164,24 @@ public class Set implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL_SKIN))) {
 				commandLevel = GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					final var theme_id = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					StringBuilder out = new StringBuilder();
 					StringBuilder out2 = new StringBuilder();
-					final var skins = RankingSystem.SQLgetRankingLevelList(theme_id);
+					final var skins = RankingSystem.SQLgetRankingLevelList(e.getGuild().getIdLong());
 					if(skins != null) {
+						out.append("0\n");
+						out2.append(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase()+"\n");
 						for(final var skin : skins) {
 							out.append(skin.getLine()+"\n");
 							out2.append(skin.getSkinDescription()+"\n");
 						}
-						if(out.length() > 0)
+						if(skins.size() > 0)
 							e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 						else
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_SKIN_ERR)).build()).queue();
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Level skins couldn't be retrieved from RankingSystem.ranking_level in guild {}", e.getGuild().getId());
+						logger.error("Level skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -190,8 +191,7 @@ public class Set implements CommandPublic {
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL_SKIN))) {
 				commandLevel = GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					final var theme_id = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					final var skins = RankingSystem.SQLgetRankingLevelList(theme_id);
+					final var skins = RankingSystem.SQLgetRankingLevelList(e.getGuild().getIdLong());
 					if(skins != null) {
 						if(skins.size() > 0) {
 							if(args[1].replaceAll("[0-9]*", "").length() == 0)
@@ -205,7 +205,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Level skins couldn't be retrieved from RankingSystem.ranking_level in guild {}", e.getGuild().getId());
+						logger.error("Level skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -215,23 +215,24 @@ public class Set implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK_SKIN))) {
 				commandLevel = GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					final var theme_id = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					StringBuilder out = new StringBuilder();
 					StringBuilder out2 = new StringBuilder();
-					final var skins = RankingSystem.SQLgetRankingRankList(theme_id);
+					final var skins = RankingSystem.SQLgetRankingRankList(e.getGuild().getIdLong());
 					if(skins != null) {
+						out.append("0\n");
+						out2.append(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase()+"\n");
 						for(final var skin : skins) {
 							out.append(skin.getLine()+"\n");
 							out2.append(skin.getSkinDescription()+"\n");
 						}
-						if(out.length() > 0)
+						if(skins.size() > 0)
 							e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANK_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 						else
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANK_SKIN_ERR)).build()).queue();
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Rank skins couldn't be retrieved from RankingSystem.ranking_rank in guild {}", e.getGuild().getId());
+						logger.error("Rank skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -241,8 +242,7 @@ public class Set implements CommandPublic {
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK_SKIN))) {
 				commandLevel = GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					final var theme_id = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					final var skins = RankingSystem.SQLgetRankingRankList(theme_id);
+					final var skins = RankingSystem.SQLgetRankingRankList(e.getGuild().getIdLong());
 					if(skins != null) {
 						if(skins.size() > 0) {
 							if(args[1].replaceAll("[0-9]", "").length() == 0)
@@ -256,7 +256,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Rank skins couldn't be retrieved from RankingSystem.ranking_rank in guild {}", e.getGuild().getId());
+						logger.error("Rank skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -266,23 +266,24 @@ public class Set implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE_SKIN))) {
 				commandLevel = GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					final var theme_id = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					StringBuilder out = new StringBuilder();
 					StringBuilder out2 = new StringBuilder();
-					final var skins = RankingSystem.SQLgetRankingProfileList(theme_id);
+					final var skins = RankingSystem.SQLgetRankingProfileList(e.getGuild().getIdLong());
 					if(skins != null) {
+						out.append("0\n");
+						out2.append(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase()+"\n");
 						for(final var skin : skins) {
 							out.append(skin.getLine()+"\n");
 							out2.append(skin.getSkinDescription()+"\n");
 						}
-						if(out.length() > 0)
+						if(skins.size() > 0)
 							e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PROFILE_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 						else
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PROFILE_SKIN_ERR)).build()).queue();
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Profile skins couldn't be retrieved from RankingSystem.ranking_profile in guild {}", e.getGuild().getId());
+						logger.error("Profile skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -292,8 +293,7 @@ public class Set implements CommandPublic {
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE_SKIN))) {
 				commandLevel = GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					final var theme_id = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					final var skins = RankingSystem.SQLgetRankingProfileList(theme_id);
+					final var skins = RankingSystem.SQLgetRankingProfileList(e.getGuild().getIdLong());
 					if(skins != null) {
 						if(skins.size() > 0) {
 							if(args[1].replaceAll("[0-9]", "").length() == 0)
@@ -307,7 +307,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Profile skins couldn't be retrieved from RankingSystem.ranking_profile in guild {}", e.getGuild().getId());
+						logger.error("Profile skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -317,23 +317,24 @@ public class Set implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICON_SKIN))) {
 				commandLevel = GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					final var theme_id = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
 					StringBuilder out = new StringBuilder();
 					StringBuilder out2 = new StringBuilder();
-					final var skins = RankingSystem.SQLgetRankingIconsList(theme_id);
+					final var skins = RankingSystem.SQLgetRankingIconsList(e.getGuild().getIdLong());
 					if(skins != null) {
+						out.append("0\n");
+						out2.append(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase()+"\n");
 						for(final var skin : skins) {
 							out.append(skin.getLine()+"\n");
 							out2.append(skin.getSkinDescription()+"\n");
 						}
-						if(out.length() > 0)
+						if(skins.size() > 0)
 							e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ICON_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 						else
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ICON_SKIN_ERR)).build()).queue();
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Icon skins couldn't be retrieved from RankingSystem.ranking_icons in guild {}", e.getGuild().getId());
+						logger.error("Icon skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -343,8 +344,7 @@ public class Set implements CommandPublic {
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICON_SKIN))) {
 				commandLevel = GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					final var theme_id = RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID();
-					final var skins = RankingSystem.SQLgetRankingIconsList(theme_id);
+					final var skins = RankingSystem.SQLgetRankingIconsList(e.getGuild().getIdLong());
 					if(skins != null) {
 						if(skins.size() > 0) {
 							if(args[1].replaceAll("[0-9]", "").length() == 0)
@@ -357,7 +357,7 @@ public class Set implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Icon skins couldn't be retrieved from RankingSystem.ranking_icons in guild {}", e.getGuild().getId());
+						logger.error("Icon skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -376,7 +376,7 @@ public class Set implements CommandPublic {
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILY_ITEM))) {
 				commandLevel = GuildIni.getSetDailyItemLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					ArrayList<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong(), RankingSystem.SQLgetGuild(e.getGuild().getIdLong()).getThemeID());
+					ArrayList<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong());
 					var tot_weight = daily_items.parallelStream().mapToInt(i -> i.getWeight()).sum();
 					SetDailyItem.runTask(e, args, daily_items, tot_weight);
 				}

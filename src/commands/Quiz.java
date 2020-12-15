@@ -70,14 +70,14 @@ public class Quiz implements CommandPublic {
 			}
 			//register quiz questions when we have 2 parameters
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER_QUESTIONS))) {
-				logger.debug("{} performed the registration of questions and rewards for the Quiz", e.getMember().getUser().getId());
+				logger.info("{} performed the registration of questions and rewards for the Quiz in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 				QuizExecution.registerQuestions(e, args[1], false);
 			}
 			//clear all questions and rewards
 			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CLEAR))) {
 				Hashes.clearQuiz();
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_CLEAR)).build()).queue();
-				logger.debug("{} cleared all quiz questions and rewards", e.getMember().getUser().getId());
+				logger.info("{} cleared all quiz questions and rewards in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			}
 			//start the quiz in the dedicated channel
 			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RUN))) {
@@ -113,6 +113,7 @@ public class Quiz implements CommandPublic {
 					e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_QA_REWARDS)).build()).queue();
 				}
 			}
+			//TODO: Save to table and not to file
 			//to save the registered rewards and questions
 			else if(args[0].equalsIgnoreCase("save")) {
 				if(Hashes.getWholeQuiz().size() > 0) {
@@ -124,6 +125,7 @@ public class Quiz implements CommandPublic {
 					e.getChannel().sendMessage("There is nothing to save. Please use register-rewards and register-questions before this parameter is used.").queue();
 				}
 			}
+			//TODO: load settings from table
 			//load all settings from file
 			else if(args[0].equalsIgnoreCase("load")) {
 				File file = new File("./files/QuizBackup/quizsettings"+e.getGuild().getId()+".azr");

@@ -55,14 +55,14 @@ public class Remove implements CommandPublic {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_ROLES)).build()).queue();
 					Hashes.removeDiscordRoles(e.getGuild().getIdLong());
 					Hashes.removeReactionRoles(e.getGuild().getIdLong());
-					logger.debug("User {} has removed all registered roles from guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+					logger.info("User {} has removed all registered roles in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 				}
 				else if(result == 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_ROLES_ERR)).build()).queue();
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Roles couldn't be removed from DiscordRoles.roles table in guild {}", e.getGuild().getId());
+					logger.error("Registered roles couldn't be removed in guild {}", e.getGuild().getId());
 				}
 			}
 			else {
@@ -73,7 +73,7 @@ public class Remove implements CommandPublic {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_ROLE)).build()).queue();
 							Hashes.removeDiscordRoles(e.getGuild().getIdLong());
 							Hashes.removeReactionRoles(e.getGuild().getIdLong());
-							logger.debug("User {} has removed the registered role {} from guild {}", e.getMember().getUser().getId(), role, e.getGuild().getId());
+							logger.info("User {} has removed the registered role {} from guild {}", e.getMember().getUser().getId(), role, e.getGuild().getId());
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_ROLE_ERR)).build()).queue();
@@ -97,14 +97,14 @@ public class Remove implements CommandPublic {
 				if(result > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_RANKING_ROLES)).build()).queue();
 					Hashes.removeRankingRoles(e.getGuild().getIdLong());
-					logger.debug("User {} has removed all registered ranking roles from guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+					logger.info("User {} has removed all registered ranking roles from guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 				}
 				else if(result == 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_RANKING_ROLES_ERR)).build()).queue();
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Roles couldn't be removed from RankingSystem.roles table for guild {}", e.getGuild().getId());
+					logger.error("Registered ranking roles couldn't be removed for guild {}", e.getGuild().getId());
 				}
 			}
 			else {
@@ -114,11 +114,11 @@ public class Remove implements CommandPublic {
 						if(RankingSystem.SQLDeleteRole(role, e.getGuild().getIdLong()) > 0) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_RANKING_ROLE)).build()).queue();
 							Hashes.removeRankingRoles(e.getGuild().getIdLong());
-							logger.debug("User {} has removed the registered ranking role {} from guild {}", e.getMember().getUser().getId(), role, e.getGuild().getId());
+							logger.info("User {} has removed the registered ranking role {} from guild {}", e.getMember().getUser().getId(), role, e.getGuild().getId());
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_RANKING_ROLE_ERR)).build()).queue();
-							logger.warn("Role couldn't be removed from guild {} of DiscordRoles.roles", e.getGuild().getId());
+							logger.warn("Registered ranking role couldn't be removed in guild {}", e.getGuild().getId());
 						}
 					}
 					else {
@@ -139,14 +139,14 @@ public class Remove implements CommandPublic {
 				if(result > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CATEGORIES)).build()).queue();
 					Hashes.removeCategories(e.getGuild().getIdLong());
-					logger.debug("User {} has removed all registered categories from guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+					logger.info("User {} has removed all registered categories from guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 				}
 				else if(result == 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CATEGORIES_ERR)).build()).queue();
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Categories couldn't be removed from Azrael.category_conf table in guild {}", e.getGuild().getId());
+					logger.error("Registered categories couldn't be removed in guild {}", e.getGuild().getId());
 				}
 			}
 			else {
@@ -158,14 +158,14 @@ public class Remove implements CommandPublic {
 						if(result > 0) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CATEGORY)).build()).queue();
 							Hashes.removeCategories(e.getGuild().getIdLong());
-							logger.debug("User {} has removed the category {} from guild {}", e.getMember().getUser().getId(), category_id, e.getGuild().getId());
+							logger.info("User {} has removed the registered category {} in guild {}", e.getMember().getUser().getId(), category_id, e.getGuild().getId());
 						}
 						else if(result == 0) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CATEGORY_ERR)).build()).queue();
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Category {} couldn't be removed from Azrael.category_conf table in guild {}", e.getGuild().getId());
+							logger.error("Registered category {} couldn't be removed in guild {}", e.getGuild().getId());
 						}
 					}
 					else {
@@ -190,14 +190,14 @@ public class Remove implements CommandPublic {
 					}
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_TXT_CHANNELS)).build()).queue();
 					Hashes.removeChannels(e.getGuild().getIdLong());
-					logger.debug("User {} has removed all registered text channels from guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+					logger.info("User {} has removed all registered text channels in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 				}
 				else if(result == 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_TXT_CHANNELS_ERR)).build()).queue();
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Text channels couldn't be removed from Azrael.channel_conf table in guild {}", e.getGuild().getId());
+					logger.error("Registered text channels couldn't be removed in guild {}", e.getGuild().getId());
 				}
 			}
 			else {
@@ -210,11 +210,11 @@ public class Remove implements CommandPublic {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_TXT_CHANNEL)).build()).queue();
 							Hashes.removeChannels(e.getGuild().getIdLong());
 							Hashes.removeFilterLang(channel_id);
-							logger.debug("User {} has removed the text channel {} from guild {}", e.getMember().getUser().getId(), channel_id, e.getGuild().getId());
+							logger.info("User {} has removed the registered text channel {} in guild {}", e.getMember().getUser().getId(), channel_id, e.getGuild().getId());
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_TXT_CHANNEL_ERR)).build()).queue();
-							logger.warn("Text channel couldn't be removed from Azrael.channel_conf table in guild {}", e.getGuild().getId());
+							logger.warn("Registered text channel couldn't be removed in guild {}", e.getGuild().getId());
 						}
 					}
 					else {
@@ -234,7 +234,6 @@ public class Remove implements CommandPublic {
 				boolean deleted = false;
 				boolean error = false;
 				for(final var tc : e.getGuild().getTextChannels()) {
-					logger.debug("Removing censor languages for text channel {} in guild {}", tc.getId(), e.getGuild().getId());
 					var result = Azrael.SQLDeleteChannel_Filter(tc.getIdLong());
 					Hashes.removeFilterLang(tc.getIdLong());
 					if(result > 0)   deleted = true;
@@ -242,14 +241,14 @@ public class Remove implements CommandPublic {
 				}
 				if(deleted) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CENSORS)).build()).queue();
-					logger.debug("User {} has removed all registered text channel filters from guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+					logger.info("User {} has removed all registered text channel censors in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 				}
 				else if(!error) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CENSORS_ERR)).build()).queue();
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Censor languages couldn't be removed for all text channels from Azrael.channel_filter table in guild {}", e.getGuild().getId());
+					logger.error("Censor languages couldn't be removed for all text channels in guild {}", e.getGuild().getId());
 				}
 			}
 			else {
@@ -261,14 +260,14 @@ public class Remove implements CommandPublic {
 						if(result > 0) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CENSOR)).build()).queue();
 							Hashes.removeFilterLang(channel_id);
-							logger.debug("User {} has removed all registered text channel censor languages for channel {} from guild {}", e.getMember().getUser().getId(), channel_id, e.getGuild().getId());
+							logger.info("User {} has removed all registered text channel censor languages for channel {} from guild {}", e.getMember().getUser().getId(), channel_id, e.getGuild().getId());
 						}
 						else if(result == 0) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CENSOR_ERR)).build()).queue();
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Censor languages for text channel {} couldn't be removed from Azrael.channel_filter table in guild {}", channel_string, e.getGuild().getId());
+							logger.error("Censor languages for text channel {} couldn't be removed in guild {}", channel_string, e.getGuild().getId());
 						}
 					}
 					else {

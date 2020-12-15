@@ -126,6 +126,11 @@ public class IniFileReader {
 		return ini.get("Pastebin", "DeveloperKey");
 	}
 	
+	public static String getImgurClientID() {
+		Ini ini = readConfig();
+		return ini.get("Imgur", "ClientID");
+	}
+	
 	public static String[] getTwitterKeys() {
 		Ini ini = readConfig();
 		Ini.Section tokens = ini.get("Twitter");

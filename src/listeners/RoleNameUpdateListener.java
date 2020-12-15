@@ -19,7 +19,7 @@ public class RoleNameUpdateListener extends ListenerAdapter {
 	@Override
 	public void onRoleUpdateName(RoleUpdateNameEvent e) {
 		if(DiscordRoles.SQLUpdateRoleName(e.getGuild().getIdLong(), e.getRole().getIdLong(), e.getNewName()) == 0) {
-			logger.error("Role name of role {} couldn't be updated in guild {}", e.getRole().getId(), e.getNewName());
+			logger.error("Role name {} of role {} couldn't be updated in guild {}", e.getNewName(), e.getRole().getId(), e.getGuild().getId());
 		}
 	}
 }

@@ -11,6 +11,12 @@ import interfaces.CommandPublic;
 import net.dv8tion.jda.api.Permission;
 import util.STATIC;
 
+/**
+ * Command existance control and execution
+ * @author xHelixstorm
+ *
+ */
+
 public class CommandHandler {
 	private final static Logger logger = LoggerFactory.getLogger(CommandHandler.class);
 
@@ -21,36 +27,59 @@ public class CommandHandler {
 	public static boolean handleCommand(CommandParser.CommandContainer cmd) {
 		
 		if(cmd.e != null) {
-			if(commandsPublic.containsKey(cmd.invoke)) {
-				boolean safe = commandsPublic.get(cmd.invoke).called(cmd.args, cmd.e);
+			final String cmdInvoker = cmd.invoke.toLowerCase();
+			if(commandsPublic.containsKey(cmdInvoker)) {
+				final CommandPublic command = commandsPublic.get(cmdInvoker);
+				boolean safe = command.called(cmd.args, cmd.e);
 				
 				if(safe) {
 					if(cmd.e.getGuild().getSelfMember().hasPermission(cmd.e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(cmd.e.getGuild(), cmd.e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
-						commandsPublic.get(cmd.invoke).action(cmd.args, cmd.e);
-						commandsPublic.get(cmd.invoke).executed(safe, cmd.e);
+						command.action(cmd.args, cmd.e);
+						command.executed(safe, cmd.e);
 					}
 					else {
-						logger.warn("Either MESSAGE_WRITE or MESSAGE_EMBED_LINKS is missing for channel {} in guild {}");
+						logger.warn("Either MESSAGE_WRITE or MESSAGE_EMBED_LINKS is missing for channel {} in guild {}", cmd.e.getChannel().getId(), cmd.e.getGuild().getId());
 					}
 				}
 				else {
-					commandsPublic.get(cmd.invoke).executed(safe, cmd.e);
+					command.executed(safe, cmd.e);
 				}
 				return true;
 			}
 			else {
+				final String commandKey = cmd.e.getGuild().getId()+""+cmdInvoker;
+				if(commandsPublic.containsKey(commandKey)) {
+					final CommandPublic command = commandsPublic.get(commandKey);
+					boolean safe = command.called(cmd.args, cmd.e);
+					
+					if(safe) {
+						if(cmd.e.getGuild().getSelfMember().hasPermission(cmd.e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(cmd.e.getGuild(), cmd.e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
+							command.action(cmd.args, cmd.e);
+							command.executed(safe, cmd.e);
+						}
+						else {
+							logger.warn("Either MESSAGE_WRITE or MESSAGE_EMBED_LINKS is missing for channel {} in guild {}", cmd.e.getChannel().getId(), cmd.e.getGuild().getId());
+						}
+					}
+					else {
+						command.executed(safe, cmd.e);
+					}
+					return true;
+				}
 				return false;
 			}
 		}
 		else {
-			if(commandsPrivate.containsKey(cmd.invoke)) {
-				boolean safe = commandsPrivate.get(cmd.invoke).called(cmd.args, cmd.e2);
+			final String cmdInvoker = cmd.invoke.toLowerCase();
+			if(commandsPrivate.containsKey(cmdInvoker)) {
+				final CommandPrivate command = commandsPrivate.get(cmdInvoker);
+				boolean safe = command.called(cmd.args, cmd.e2);
 				if(safe) {
-					commandsPrivate.get(cmd.invoke).action(cmd.args, cmd.e2);
-					commandsPrivate.get(cmd.invoke).executed(safe, cmd.e2);
+					command.action(cmd.args, cmd.e2);
+					command.executed(safe, cmd.e2);
 				}
 				else {
-					commandsPrivate.get(cmd.invoke).executed(safe, cmd.e2);
+					command.executed(safe, cmd.e2);
 				}
 				return true;
 			}

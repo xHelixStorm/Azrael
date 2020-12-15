@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import constructors.Cache;
 import constructors.Ranking;
 import core.Hashes;
@@ -24,6 +27,8 @@ import util.STATIC;
  */
 
 public class EquipExecution {
+	private final static Logger logger = LoggerFactory.getLogger(EquipExecution.class);
+	
 	public static void findGuild(PrivateMessageReceivedEvent e, List<String> guilds, final String filter) {
 		var foundGuilds = guilds.parallelStream().filter(f -> f.contains(filter)).collect(Collectors.toList());
 		if(foundGuilds != null) {
@@ -104,7 +109,7 @@ public class EquipExecution {
 		
 		if(weapon1.equals("expired")) {
 			if(RankingSystemItems.SQLRemoveEquippedWeapon(e.getAuthor().getIdLong(), guild, 1) == 0) {
-				//To do: log error
+				logger.error("Weapon slot 1 couldn't be unequipped on expiration for user {} in guild {}", e.getAuthor().getId(), guild);
 			}
 			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 			if(user_details != null) {
@@ -115,7 +120,7 @@ public class EquipExecution {
 		}
 		if(weapon2.equals("expired")) {
 			if(RankingSystemItems.SQLRemoveEquippedWeapon(e.getAuthor().getIdLong(), guild, 2) == 0) {
-				//To do: log error
+				logger.error("Weapon slot 2 couldn't be unequipped on expiration for user {} in guild {}", e.getAuthor().getId(), guild);
 			}
 			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 			if(user_details != null) {
@@ -126,7 +131,7 @@ public class EquipExecution {
 		}
 		if(weapon3.equals("expired")) {
 			if(RankingSystemItems.SQLRemoveEquippedWeapon(e.getAuthor().getIdLong(), guild, 3) == 0) {
-				//To do: log error
+				logger.error("Weapon slot 3 couldn't be unequipped on expiration for user {} in guild {}", e.getAuthor().getId(), guild);
 			}
 			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 			if(user_details != null) {
@@ -137,7 +142,7 @@ public class EquipExecution {
 		}
 		if(skill.equals("expired")) {
 			if(RankingSystemItems.SQLRemoveEquippedSkill(e.getAuthor().getIdLong(), guild) == 0) {
-				//To do: log error
+				logger.error("Skill slot couldn't be unequipped on expiration for user {} in guild {}", e.getAuthor().getId(), guild);
 			}
 			if(user_details == null) user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
 			if(user_details != null) {
@@ -168,6 +173,7 @@ public class EquipExecution {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("All weapons and skill slots couldn't be unequipped for user {} in guild {}", e.getAuthor().getId(), guild_id);
 			}
 		}
 		else {
@@ -220,8 +226,10 @@ public class EquipExecution {
 						}
 						equipmentItemScreen(e, guild_id, "remove");
 					}
-					else
+					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Slot {} couldn't be unequipped for user {} in guild {}", selection, e.getAuthor().getId(), guild_id);
+					}
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SLOT_EMPTY)).build()).queue();
@@ -241,42 +249,53 @@ public class EquipExecution {
 		if(selection >= 1 && selection <= 3) {
 			//weapons
 			var weapons = RankingSystemItems.SQLfilterInventoryWeapons(e.getAuthor().getIdLong(), guild, item);
-			if(weapons.size() == 1) {
+			if(weapons == null) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("Weapon/Skill {} couldn't be retrieved for user {} in guild {}", item, e.getAuthor().getId(), guild_id);
+			}
+			else if(weapons.size() == 1) {
 				var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
-				var weapon = weapons.get(0);
-				if(weapon.getItemId() != user_details.getWeapon1() && weapon.getItemId() != user_details.getWeapon2() && weapon.getItemId() != user_details.getWeapon3()) {
-					var guild_settings = RankingSystem.SQLgetGuild(guild);
-					var weapon1 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon1()).findAny().orElse(null);
-					var weapon2 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon2()).findAny().orElse(null);
-					var weapon3 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon3()).findAny().orElse(null);
-					if(!weapon.getAbbreviation().equals((weapon1 != null ? weapon1.getWeaponAbbv() : "")) && !weapon.getAbbreviation().equals((weapon2 != null ? weapon2.getWeaponAbbv() : "")) && !weapon.getAbbreviation().equals((weapon3 != null ? weapon3.getWeaponAbbv() : ""))) {
-						if(RankingSystemItems.SQLEquipWeapon(e.getAuthor().getIdLong(), guild, weapon.getItemId(), selection) > 0) {
-							switch(selection) {
-								case 1 -> user_details.setWeapon1(weapon.getItemId());
-								case 2 -> user_details.setWeapon2(weapon.getItemId());
-								case 3 -> user_details.setWeapon3(weapon.getItemId());
+				if(user_details != null) {
+					var weapon = weapons.get(0);
+					if(weapon.getItemId() != user_details.getWeapon1() && weapon.getItemId() != user_details.getWeapon2() && weapon.getItemId() != user_details.getWeapon3()) {
+						var weapon1 = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon1()).findAny().orElse(null);
+						var weapon2 = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon2()).findAny().orElse(null);
+						var weapon3 = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon3()).findAny().orElse(null);
+						if(!weapon.getAbbreviation().equals((weapon1 != null ? weapon1.getWeaponAbbv() : "")) && !weapon.getAbbreviation().equals((weapon2 != null ? weapon2.getWeaponAbbv() : "")) && !weapon.getAbbreviation().equals((weapon3 != null ? weapon3.getWeaponAbbv() : ""))) {
+							if(RankingSystemItems.SQLEquipWeapon(e.getAuthor().getIdLong(), guild, weapon.getItemId(), selection) > 0) {
+								switch(selection) {
+									case 1 -> user_details.setWeapon1(weapon.getItemId());
+									case 2 -> user_details.setWeapon2(weapon.getItemId());
+									case 3 -> user_details.setWeapon3(weapon.getItemId());
+								}
+								Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
+								EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
+								e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EQUIPPED)).build()).queue();
+								equipmentItemScreen(e, guild_id, "set");
 							}
-							Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
-							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-							e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EQUIPPED)).build()).queue();
-							equipmentItemScreen(e, guild_id, "set");
+							else {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
+								logger.error("Weapon {} couldn't be equipped for user {} in guild {}", weapon.getItemId(), e.getAuthor().getId(), guild);
+								Hashes.clearTempCache("equip_us"+e.getAuthor().getId());
+							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
-							Hashes.clearTempCache("equip_us"+e.getAuthor().getId());
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED)).build()).queue();
+							var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
+							Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED)).build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED_2)).build()).queue();
 						var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 						Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 					}
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED_2)).build()).queue();
-					var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
-					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("Ranking details of user {} couldn't be retrieved in guild {}", e.getAuthor().getId(), guild_id);
 				}
+				
 			}
 			else if(weapons.size() > 1) {
 				StringBuilder sb = new StringBuilder();
@@ -315,6 +334,7 @@ public class EquipExecution {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Skill {} couldn't be equipped for user {} in guild {}", skill.getItemId(), e.getAuthor().getId(), guild);
 						Hashes.clearTempCache("equip_us"+e.getAuthor().getId());
 					}
 				}
@@ -354,61 +374,74 @@ public class EquipExecution {
 				case 1, 2, 3 -> {
 					var weapon_id = Integer.parseInt(items[selection]);
 					var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
-					if(weapon_id != user_details.getWeapon1() && weapon_id != user_details.getWeapon2() && weapon_id != user_details.getWeapon3()) {
-						var guild_settings = RankingSystem.SQLgetGuild(guild);
-						var weapon1 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon1()).findAny().orElse(null);
-						var weapon2 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon2()).findAny().orElse(null);
-						var weapon3 = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon3()).findAny().orElse(null);
-						var selectedWeapon = RankingSystemItems.SQLgetWholeWeaponShop(guild, guild_settings.getThemeID()).parallelStream().filter(f -> f.getWeaponID() == weapon_id).findAny().orElse(null);
-						if(!selectedWeapon.getWeaponAbbv().equals((weapon1 != null ? weapon1.getWeaponAbbv() : "")) && !selectedWeapon.getWeaponAbbv().equals((weapon2 != null ? weapon2.getWeaponAbbv() : "")) && !selectedWeapon.getWeaponAbbv().equals((weapon3 != null ? weapon3.getWeaponAbbv() : ""))) {
-							if(RankingSystemItems.SQLEquipWeapon(e.getAuthor().getIdLong(), guild, weapon_id, slot) > 0) {
-								switch(selection) {
-									case 0 -> user_details.setWeapon1(weapon_id);
-									case 1 -> user_details.setWeapon2(weapon_id);
-									case 2 -> user_details.setWeapon3(weapon_id);
+					if(user_details != null) {
+						if(weapon_id != user_details.getWeapon1() && weapon_id != user_details.getWeapon2() && weapon_id != user_details.getWeapon3()) {
+							var weapon1 = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon1()).findAny().orElse(null);
+							var weapon2 = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon2()).findAny().orElse(null);
+							var weapon3 = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == user_details.getWeapon3()).findAny().orElse(null);
+							var selectedWeapon = RankingSystemItems.SQLgetWholeWeaponShop(guild).parallelStream().filter(f -> f.getWeaponID() == weapon_id).findAny().orElse(null);
+							if(!selectedWeapon.getWeaponAbbv().equals((weapon1 != null ? weapon1.getWeaponAbbv() : "")) && !selectedWeapon.getWeaponAbbv().equals((weapon2 != null ? weapon2.getWeaponAbbv() : "")) && !selectedWeapon.getWeaponAbbv().equals((weapon3 != null ? weapon3.getWeaponAbbv() : ""))) {
+								if(RankingSystemItems.SQLEquipWeapon(e.getAuthor().getIdLong(), guild, weapon_id, slot) > 0) {
+									switch(selection) {
+										case 0 -> user_details.setWeapon1(weapon_id);
+										case 1 -> user_details.setWeapon2(weapon_id);
+										case 2 -> user_details.setWeapon3(weapon_id);
+									}
+									Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
+									EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
+									e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EQUIPPED)).build()).queue();
+									equipmentItemScreen(e, guild_id, "set");
 								}
-								Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
-								EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-								e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EQUIPPED)).build()).queue();
-								equipmentItemScreen(e, guild_id, "set");
+								else {
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Weapon {} couldn't be equipped for user {} in guild {}", weapon_id, e.getAuthor().getId(), guild);
+									Hashes.clearTempCache("equip_us"+e.getAuthor().getId());
+								}
 							}
 							else {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
-								Hashes.clearTempCache("equip_us"+e.getAuthor().getId());
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED)).build()).queue();
+								var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
+								Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED)).build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED_2)).build()).queue();
 							var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 							Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED_2)).build()).queue();
-						var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
-						Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Ranking details of user {} couldn't be retrieved in guild {}", e.getAuthor().getId(), guild_id);
 					}
 				}
 				case 4 -> {
 					var skill_id = Integer.parseInt(items[selection]);
 					var user_details = RankingSystem.SQLgetWholeRankView(e.getAuthor().getIdLong(), guild);
-					if(user_details.getSkill() != skill_id) {
-						if(RankingSystemItems.SQLEquipSkill(e.getAuthor().getIdLong(), guild, skill_id) > 0) {
-							user_details.setSkill(skill_id);
-							Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
-							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-							e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_EQUIPPED)).build()).queue();
-							equipmentItemScreen(e, guild_id, "set");
+					if(user_details != null) {
+						if(user_details.getSkill() != skill_id) {
+							if(RankingSystemItems.SQLEquipSkill(e.getAuthor().getIdLong(), guild, skill_id) > 0) {
+								user_details.setSkill(skill_id);
+								Hashes.addRanking(guild, e.getAuthor().getIdLong(), user_details);
+								EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
+								e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_EQUIPPED)).build()).queue();
+								equipmentItemScreen(e, guild_id, "set");
+							}
+							else {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
+								logger.error("Skill {} couldn't be equipped for user {} in guild {}", skill_id, e.getAuthor().getId(), guild);
+								Hashes.clearTempCache("equip_us"+e.getAuthor().getId());
+							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
-							Hashes.clearTempCache("equip_us"+e.getAuthor().getId());
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_ALREADY_EQUIPPED)).build()).queue();
+							var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
+							Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_ALREADY_EQUIPPED)).build()).queue();
-						var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
-						Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Ranking details of user {} couldn't be retrieved in guild {}", e.getAuthor().getId(), guild_id);
 					}
 				}
 			}

@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
@@ -24,11 +25,10 @@ import util.STATIC;
 public class RandomshopRewardDrawer {
 	private final static Logger logger = LoggerFactory.getLogger(RandomshopRewardDrawer.class);
 	
-	public static void drawReward(GuildMessageReceivedEvent e, Weapons weapon, long currency, Guilds guild_settings) {
+	public static void drawReward(GuildMessageReceivedEvent e, Weapons weapon, long currency, Guilds guild_settings, long time) {
 		try {
-			var theme_id = guild_settings.getThemeID();
-			BufferedImage rewardOverlay = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Randomshop/"+weapon.getOverlayName()+".png"));
-			BufferedImage drawWeapon = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Weapons/"+weapon.getDescription()+".png"));
+			BufferedImage rewardOverlay = ImageIO.read(new File("./files/RankingSystem/Randomshop/"+weapon.getOverlayName()+".png"));
+			BufferedImage drawWeapon = ImageIO.read(new File("./files/RankingSystem/Weapons/"+weapon.getDescription()+".png"));
 			
 			final int overlayW = rewardOverlay.getWidth();
 			final int overlayH = rewardOverlay.getHeight();
@@ -48,13 +48,13 @@ public class RandomshopRewardDrawer {
 			e.getChannel().sendFile(file1, "reward.png").complete();
 			file1.delete();
 			
-			e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_REWARD).replaceFirst("\\{\\}", weapon.getDescription()+" "+weapon.getStatDescription()).replace("{}", ""+currency)).queue();
+			e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_REWARD).replaceFirst("\\{\\}", weapon.getDescription()+" "+weapon.getStatDescription()+" "+(time > 0 ? TimeUnit.MILLISECONDS.toDays(time)+STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_DAYS) : STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_PERM))).replace("{}", ""+currency)).queue();
 		} catch(IOException e1) {
 			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR_2)+weapon.getDescription()+" "+weapon.getStatDescription()).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR_2)+weapon.getDescription()+" "+weapon.getStatDescription()).queue();
-			logger.error("An error occurred while printing the random shop price {}", weapon.getDescription(), e1);
+			logger.error("An error occurred while printing the random shop prize {} in guild {}", weapon.getDescription(), e.getGuild().getId(), e1);
 		}
 	}
 }

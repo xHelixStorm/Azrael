@@ -83,7 +83,7 @@ public class Pick implements CommandPublic {
 										}
 										else {
 											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-											logger.error("Map from Azrael.comp_maps couldn't be retrieved for map {} in guild {}", room.getMapID(), e.getGuild().getId());
+											logger.error("Map {} couldn't be retrieved in guild {}", room.getMapID(), e.getGuild().getId());
 										}
 									}
 									else {
@@ -101,7 +101,7 @@ public class Pick implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Picker of room {} couldn't be retrieved from Azrael.matchmaking_view for guild {}", room.getRoomID(), e.getGuild().getId());
+						logger.error("Picker of room {} couldn't be retrieved in guild {}", room.getRoomID(), e.getGuild().getId());
 					}
 				}
 			}

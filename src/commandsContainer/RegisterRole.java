@@ -55,7 +55,7 @@ public class RegisterRole {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Role types couldn't be retrieved from DIscordRoles.roles_category for guild {}", e.getGuild().getId());
+			logger.error("Role types couldn't be retrieved in guild {}", e.getGuild().getId());
 		}
 	}
 	
@@ -74,13 +74,13 @@ public class RegisterRole {
 					role_name = e.getGuild().getRoleById(role_id).getName();
 					if(DiscordRoles.SQLInsertRole(_guild_id, role_id, STATIC.getLevel(category_abv), role_name, category_abv, false) > 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_ADM_ADDED)).build()).queue();
-						logger.debug("Administrator role registered {} for guild {}", role_id, e.getGuild().getId());
+						logger.info("User {} has registered the administrator role {} for guild {}", e.getMember().getUser().getId(), role_id, e.getGuild().getId());
 						Hashes.removeDiscordRoles(e.getGuild().getIdLong());
 						DiscordRoles.SQLgetRoles(e.getGuild().getIdLong());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Role {} couldn't be registered into DiscordRoles.roles for the guild {}", role_id, e.getGuild().getId());
+						logger.error("Administrator role {} couldn't be registered in guild {}", role_id, e.getGuild().getId());
 					}
 				}
 			}
@@ -114,7 +114,7 @@ public class RegisterRole {
 					if(category_abv.equals("rea"))
 						persistant = false;
 					if(DiscordRoles.SQLInsertRole(_guild_id, role_id, level, role_name, category_abv, persistant) > 0) {
-						logger.debug("{} has registered the role {} with the category {} in guild {}", e.getMember().getUser().getId(), role_name, category_abv, e.getGuild().getId());
+						logger.info("User {} has registered the role {} with the category {} in guild {}", e.getMember().getUser().getId(), role_name, category_abv, e.getGuild().getId());
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_ADDED)).build()).queue();
 						Hashes.removeDiscordRoles(e.getGuild().getIdLong());
 						if(category_abv.equals("rea")) {
@@ -128,7 +128,7 @@ public class RegisterRole {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Role {} couldn't be registered into DiscordRoles.roles for the guild {}", role_id, e.getGuild().getId());
+						logger.error("Role {} couldn't be registered in guild {}", role_id, e.getGuild().getId());
 					}
 				}
 				else{
@@ -162,19 +162,19 @@ public class RegisterRole {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Role {} doesn't exist anymore for guild {}", ver_role.getRole_ID(), e.getGuild().getId());
+						logger.error("Role {} doesn't exist anymore in guild {}", ver_role.getRole_ID(), e.getGuild().getId());
 						Hashes.clearTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					}
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Registered verified role couldn't be retrieved for guild {}", e.getGuild().getId());
+					logger.error("Registered verified role couldn't be retrieved in guild {}", e.getGuild().getId());
 					Hashes.clearTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_ERR).replace("{}", Permission.MANAGE_ROLES.getName())).build()).queue();
-				logger.error("MANAGE_ROLES permission required to assign roles for guild {}", e.getGuild().getId());
+				logger.error("MANAGE_ROLES permission required to assign roles in guild {}", e.getGuild().getId());
 				Hashes.addTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
 			}
 			

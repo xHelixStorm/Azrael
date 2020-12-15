@@ -29,9 +29,9 @@ import util.STATIC;
 public class ShopExecution {
 	private final static Logger logger = LoggerFactory.getLogger(ShopExecution.class);
 	
-	public static void displayShop(GuildMessageReceivedEvent e, String _type, String _description){
+	public static void displayShop(GuildMessageReceivedEvent e, String _type, String _description) {
 		Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-		final var content = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), guild_settings.getThemeID());
+		final var content = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), true);
 		if(content != null) {
 			List<Skins> filteredContent = content.parallelStream().filter(f -> f.getSkinType().equals(_type)).collect(Collectors.toList());
 			StringBuilder builder = new StringBuilder();
@@ -44,7 +44,7 @@ public class ShopExecution {
 				String price;
 				if(skin_info.getShopDescription().equals(_description)){price = STATIC.getTranslation(e.getMember(), Translation.SHOP_DEFAULT);}
 				else{price = skin_info.getPrice()+" "+guild_settings.getCurrency();}
-				if(RankingSystem.SQLgetItemID(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), skin_info.getItemID(), guild_settings.getThemeID()) != 0 && !skin_info.getSkinType().equals("ite")){price = STATIC.getTranslation(e.getMember(), Translation.SHOP_BOUGHT);}
+				if(RankingSystem.SQLgetItemID(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), skin_info.getItemID()) != 0 && !skin_info.getSkinType().equals("ite")){price = STATIC.getTranslation(e.getMember(), Translation.SHOP_BOUGHT);}
 				builder.append(index+": *_"+skin_info.getShopDescription()+"_*\n");
 				priceBuilder.append("*_"+price+"_*\n");
 				index++;
@@ -59,24 +59,24 @@ public class ShopExecution {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Skins couldn't be retrieved from RankingSystem.all_enabled_skins in guild {}", e.getGuild().getId());
+			logger.error("Shop skins couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 	}
 	
 	public static void displaySingleItem(GuildMessageReceivedEvent e, String _type, String [] _items, Guilds guild_settings, final int selection) {
 		if(selection >= 0 && selection < _items.length) {
-			final var shop = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), guild_settings.getThemeID());
+			final var shop = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), true);
 			if(shop != null) {
 				final var item = Integer.parseInt(_items[selection]);
 				var shopItem = shop.parallelStream().filter(f -> f.getItemID() == item).findAny().orElse(null);
 				var defaultSkin = false;
 				var alreadyPurchased = false;
 				var terminator = "%";
-				if(guild_settings.getLevelDescription().equals(shopItem.getShopDescription()) || guild_settings.getRankDescription().equals(shopItem.getShopDescription()) || guild_settings.getProfileDescription().equals(shopItem.getShopDescription()) || guild_settings.getIconDescription().equals(shopItem.getShopDescription())) {
+				if((guild_settings.getLevelID() > 0 && guild_settings.getLevelDescription().equals(shopItem.getShopDescription())) || (guild_settings.getRankID() > 0 && guild_settings.getRankDescription().equals(shopItem.getShopDescription())) || (guild_settings.getProfileID() > 0 && guild_settings.getProfileDescription().equals(shopItem.getShopDescription())) || (guild_settings.getIconID() > 0 && guild_settings.getIconDescription().equals(shopItem.getShopDescription()))) {
 					defaultSkin = true;
 				}
-				if(RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), shopItem.getShopDescription(), guild_settings.getThemeID()) != null && !shopItem.getSkinType().equals("ite")) {
+				if(RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), shopItem.getShopDescription()) != null && !shopItem.getSkinType().equals("ite")) {
 					alreadyPurchased = true;
 				}
 				EmbedBuilder embed = new EmbedBuilder();
@@ -104,7 +104,7 @@ public class ShopExecution {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Shop content couldn't be retrieved from RankingSystem.all_enabled_skins in guild {}", e.getGuild().getId());
+				logger.error("Shop content couldn't be retrieved in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}
@@ -115,8 +115,8 @@ public class ShopExecution {
 		}
 	}
 	
-	public static void displayWeaponCategories(GuildMessageReceivedEvent e, final int theme_id) {
-		final var categoriesList = RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), theme_id, false);
+	public static void displayWeaponCategories(GuildMessageReceivedEvent e) {
+		final var categoriesList = RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), false);
 		if(categoriesList != null) {
 			StringBuilder builder = new StringBuilder();
 			var categories = "";
@@ -136,14 +136,14 @@ public class ShopExecution {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Weapon categories couldn't be retrieved from RankingSystem.weapon_category in guild {}", e.getGuild().getId());
+			logger.error("Weapon categories couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 	}
 	
 	public static void displayShopWeapons(GuildMessageReceivedEvent e, String _type) {
 		Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-		final var content = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong(), guild_settings.getThemeID());
+		final var content = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong());
 		if(content != null) {
 			List<Weapons> filteredContent = content.parallelStream().filter(f -> f.getCategoryDescription().equalsIgnoreCase(_type) && f.getEnabled()).collect(Collectors.toList());
 			if(filteredContent.size() > 0) {
@@ -169,14 +169,14 @@ public class ShopExecution {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Weapons couldn't be retrieved from RankingSystem.all_weapons in guild {}", e.getGuild().getId());
+			logger.error("Weapons couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 	}
 	
 	public static void displaySingleWeapon(GuildMessageReceivedEvent e, String _type, String [] weapons, Guilds guild_settings, final int selection) {
 		if(selection >= 0 && selection < weapons.length) {
-			var shop = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong(), guild_settings.getThemeID());
+			var shop = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong());
 			if(shop != null) {
 				final var weapon_id = Integer.parseInt(weapons[selection]);
 				var shopItem = shop.parallelStream().filter(f -> f.getWeaponID() == weapon_id && f.getEnabled()).findAny().orElse(null);
@@ -192,7 +192,7 @@ public class ShopExecution {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Weapons couldn't be retrieved from RankingSystem.all_weapons in guild {}", e.getGuild().getId());
+				logger.error("Weapons couldn't be retrieved in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}
@@ -205,7 +205,7 @@ public class ShopExecution {
 	
 	public static void displaySkills(GuildMessageReceivedEvent e, Guilds guild_settings) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail());
-		var skills = RankingSystemItems.SQLgetSkills(e.getGuild().getIdLong(), guild_settings.getThemeID());
+		var skills = RankingSystemItems.SQLgetSkills(e.getGuild().getIdLong());
 		if(skills != null) {
 			StringBuilder builder = new StringBuilder();
 			StringBuilder priceBuilder = new StringBuilder();
@@ -226,14 +226,14 @@ public class ShopExecution {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Skills couldn't be retrieved from RankingSystem.skill_shop_content in guild {}", e.getGuild().getId());
+			logger.error("Skills couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 	}
 	
 	public static void displaySingleSkill(GuildMessageReceivedEvent e, Guilds guild_settings, String [] skills, final int selection) {
 		if(selection >= 0 && selection < skills.length) {
-			final var shop = RankingSystemItems.SQLgetSkills(e.getGuild().getIdLong(), guild_settings.getThemeID());
+			final var shop = RankingSystemItems.SQLgetSkills(e.getGuild().getIdLong());
 			if(shop != null) {
 				final var skill_id = Integer.parseInt(skills[selection]);
 				var shopItem = shop.parallelStream().filter(f -> f.getSkillId() == skill_id && f.getEnabled()).findAny().orElse(null);
@@ -249,7 +249,7 @@ public class ShopExecution {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Skills couldn't be retrieved from RankingSystem.skill_shop_content in guild {}", e.getGuild().getId());
+				logger.error("Skills couldn't be retrieved in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}

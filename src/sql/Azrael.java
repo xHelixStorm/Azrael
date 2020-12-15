@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import constructors.Bancollect;
 import constructors.CategoryConf;
 import constructors.Channels;
+import constructors.CustomCommand;
 import constructors.GoogleAPISetup;
 import constructors.GoogleEvents;
 import constructors.GoogleSheet;
@@ -35,6 +37,7 @@ import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import util.CharacterReplacer;
 import util.STATIC;
 
 public class Azrael {
@@ -114,7 +117,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT type, reason, time, penalty, info FROM history WHERE fk_user_id = ? && fk_guild_id = ?");
+			String sql = ("SELECT type, reason, time, penalty, info FROM history WHERE fk_user_id = ? && fk_guild_id = ? ORDER BY time desc");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _user_id);
 			stmt.setLong(2, _guild_id);
@@ -176,7 +179,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT description FROM action_log WHERE target_id = ? && (guild_id = ? || guild_id = 0) && (event = ? || event = ?) GROUP BY description");
+			String sql = ("SELECT description FROM action_log WHERE target_id = ? && (guild_id = ? || guild_id = 0) && (event = ? || event = ?) GROUP BY description LIMIT 50");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
 			stmt.setLong(2, _guild_id);
@@ -205,7 +208,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT description FROM action_log WHERE target_id = ? && guild_id = ? && event = ? GROUP BY description");
+			String sql = ("SELECT description FROM action_log WHERE target_id = ? && guild_id = ? && event = ? GROUP BY description LIMIT 50");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, _target_id);
 			stmt.setLong(2, _guild_id);
@@ -340,7 +343,7 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateAvatar Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -2040,7 +2043,7 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<String> SQLgetFilterLanguages() {
+	public static ArrayList<String> SQLgetFilterLanguages(String _lang) {
 		final var languages = Hashes.getFilterLang(0);
 		if(languages == null) {
 			logger.trace("SQLgetFilterLanguages launched. No params passed");
@@ -2050,8 +2053,9 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT language FROM filter_languages WHERE lang_abbrv  != \"all\"");
+				String sql = ("SELECT translation FROM languages_translation WHERE lang2 = ? AND lang != \"all\"");
 				stmt = myConn.prepareStatement(sql);
+				stmt.setString(1, _lang);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
 					filter_lang.add(rs.getString(1));
@@ -3694,6 +3698,164 @@ public class Azrael {
 		}
 	}
 	
+	public static CustomCommand SQLgetCustomCommand(long _guild_id, String _command) {
+		logger.trace("SQLgetCustomCommand launched. Params passed {}, {}", _guild_id, _command);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT * FROM custom_commands WHERE fk_guild_id = ? AND command = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setString(2, _command);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return new CustomCommand(
+					rs.getString(2),
+					rs.getString(3),
+					rs.getInt(4),
+					rs.getString(5),
+					rs.getInt(6),
+					rs.getLong(7),
+					rs.getBoolean(8)
+				);
+			}
+			return null;
+		} catch (SQLException e) {
+			logger.error("SQLgetCustomCommand Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<String> SQLgetCustomCommands(long _guild_id) {
+		logger.trace("SQLgetCustomCommands launched. Params passed {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			ArrayList<String> commands = new ArrayList<String>();
+			String sql = ("SELECT command FROM custom_commands WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				commands.add(_guild_id+""+rs.getString(1));
+			}
+			return commands;
+		} catch (SQLException e) {
+			logger.error("SQLgetCustomCommands Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<CustomCommand> SQLgetCustomCommands2(long _guild_id) {
+		logger.trace("SQLgetCustomCommands2 launched. Params passed {}", _guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			ArrayList<CustomCommand> commands = new ArrayList<CustomCommand>();
+			String sql = ("SELECT * FROM custom_commands WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				commands.add(
+					new CustomCommand(
+						rs.getString(2),
+						rs.getString(3),
+						rs.getInt(4),
+						rs.getString(5),
+						rs.getInt(6),
+						rs.getLong(7),
+						rs.getBoolean(8)
+					)
+				);
+			}
+			return commands;
+		} catch (SQLException e) {
+			logger.error("SQLgetCustomCommands2 Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static HashSet<String> SQLgetCustomCommandRestrictions(long _guild_id, String _command) {
+		logger.trace("SQLgetCustomCommandRestrictions launched. Params passed {}, {}", _guild_id, _command);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			HashSet<String> channels = new HashSet<String>();
+			String sql = ("SELECT * FROM custom_commands_restrictions WHERE fk_guild_id = ? AND command = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setString(2, _command);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				final String channelType = rs.getString(3);
+				final String channelId = rs.getString(4);
+				String channel = null;
+				if(channelType != null)
+					channel = channelType;
+				else if(channelId != null)
+					channel = channelId;
+				if(channel != null && !channels.contains(channel))
+					channels.add(channel);
+			}
+			return channels;
+		} catch (SQLException e) {
+			logger.error("SQLgetCustomCommandRestrictions Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<Long> SQLgetCustomCommandRoles(long _guild_id, String _command) {
+		logger.trace("SQLgetCustomCommandRoles launched. Params passed {}, {}", _guild_id, _command);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			ArrayList<Long> roles = new ArrayList<Long>();
+			String sql = ("SELECT role_id FROM custom_commands_roles WHERE fk_guild_id = ? AND command = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, _guild_id);
+			stmt.setString(2, _command);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				roles.add(rs.getLong(1));
+			}
+			return roles;
+		} catch (SQLException e) {
+			logger.error("SQLgetCustomCommandRoles Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	//Transactions
 	@SuppressWarnings("resource")
 	public static int SQLLowerTotalWarning(long _guild_id, int _warning_id) {
@@ -3750,7 +3912,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(sql2);
 			
 			for(String word : _words) {
-				stmt.setString(1, word.toLowerCase());
+				stmt.setString(1, CharacterReplacer.simpleReplace(word.toLowerCase()));
 				stmt.setString(2, _lang);
 				stmt.setLong(3, _guild_id);
 				stmt.addBatch();

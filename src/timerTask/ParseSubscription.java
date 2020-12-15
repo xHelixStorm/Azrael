@@ -44,7 +44,7 @@ public class ParseSubscription extends TimerTask{
 			if(feeds != null && feeds.size() > 0) {
 				Guild guild = e.getGuildById(guild_id);
 				if(guild == null) {
-					logger.info("Subscription thread interrupted due to the bot leaving the guild {}", guild_id);
+					logger.info("Subscription thread interrupted due to the bot leaving the guild in guild {}", guild_id);
 					timers.get(guild_id).cancel();
 					timers.remove(guild_id);
 					this.cancel();
@@ -53,7 +53,7 @@ public class ParseSubscription extends TimerTask{
 				var rss_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.RSS.getType())).findAny().orElse(null);
 				if(rss_channel != null) {
 					if(feeds.size() > 0) {
-						logger.info("Fetching subscriptions for guild {}", guild.getName());
+						logger.info("Fetching subscriptions in guild {}", guild.getId());
 						for(RSS rss : feeds) {
 							new Thread(() -> {
 								long channel_id;
@@ -67,7 +67,7 @@ public class ParseSubscription extends TimerTask{
 									channel_id = rss_channel.getChannel_ID();
 								}
 								try {
-									logger.trace("Retrieving subscription for {} in guild {}", rss.getURL(), e.getGuildById(guild_id).getName());
+									logger.trace("Retrieving subscription {} in guild {}", rss.getURL(), e.getGuildById(guild_id).getId());
 									boolean success = false;
 									if(rss.getType() == 1)
 										success = BasicModel.ModelParse(STATIC.retrieveWebPageCode(rss.getURL()), guild, rss, channel_id, defaultChannel);
@@ -97,14 +97,14 @@ public class ParseSubscription extends TimerTask{
 				}
 			}
 			else {
-				logger.info("Subscription task interrupted for not having any feeds in guild {}", guild_id);
+				logger.info("Subscription task interrupted for not having any subscriptions in guild {}", guild_id);
 				timers.get(guild_id).cancel();
 				timers.remove(guild_id);
 				this.cancel();
 				return;
 			}
 		} catch(NullPointerException npe) {
-			logger.error("Exception while handling ParseRss. Is Discord REST service available?", npe);
+			logger.error("Subscriptions couldn't be fetched in guild {}", npe);
 		}
 	}
 	

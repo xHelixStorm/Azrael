@@ -3,6 +3,7 @@ package preparedMessages;
 import enums.Translation;
 import fileManagement.GuildIni;
 import net.dv8tion.jda.api.entities.Member;
+import sql.Azrael;
 import util.STATIC;
 
 public class CommandList {
@@ -72,6 +73,14 @@ public class CommandList {
 			if(GuildIni.getDisplayCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DISPLAY).replace("{}", prefix));
 			if(GuildIni.getPatchnotesCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PATCHNOTES).replace("{}", prefix));
 			if(GuildIni.getLanguageCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_LANGUAGE).replace("{}", prefix));
+		}
+		if(type == 4) {
+			final var commands = Azrael.SQLgetCustomCommands2(guild_id);
+			if(commands != null && commands.size() > 0) {
+				for(final var command : commands) {
+					textCollector.append("- **"+command.getCommand()+"**\n"+command.getDescription()+"\n");
+				}
+			}
 		}
 		
 		if(administration == false && entertainment == false && other == false){

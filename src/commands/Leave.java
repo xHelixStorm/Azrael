@@ -63,7 +63,7 @@ public class Leave implements CommandPublic {
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Username couldn't be retrieved from Azrael.user_stats for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+							logger.error("Username couldn't be retrieved for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 						}
 					}
 					else {

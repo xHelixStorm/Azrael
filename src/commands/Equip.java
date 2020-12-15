@@ -49,7 +49,7 @@ public class Equip implements CommandPublic, CommandPrivate {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.debug("{} has used Equip command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+		logger.trace("User {} has used Equip command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 
 	//PRIVATE COMMAND SECTION START
@@ -109,7 +109,7 @@ public class Equip implements CommandPublic, CommandPrivate {
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(e.getAuthor().getAsMention()+STATIC.getTranslation3(e.getAuthor(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 		}
 	}
 

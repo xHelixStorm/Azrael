@@ -73,7 +73,7 @@ public class ClanExecution {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Clans couldn't be retrieved from Azrael.clans in guild {}", e.getGuild().getId());
+			logger.error("Clans couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 	}
@@ -116,7 +116,7 @@ public class ClanExecution {
 						else {
 							//error
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Application reservation couldn't be set in Azrael.clans_reservations for user {} and clan {} in guild {}", e.getMember().getUser().getId(), clan_id, e.getGuild().getId());
+							logger.error("Application reservation couldn't be set for user {} and clan {} in guild {}", e.getMember().getUser().getId(), clan_id, e.getGuild().getId());
 							Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 						}
 					}
@@ -127,14 +127,14 @@ public class ClanExecution {
 					else {
 						//error
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Application reservation couldn't be retrieved from Azrael.clans_reservations for user {} and clan {} in guild {}", e.getMember().getUser().getId(), clan_id, e.getGuild().getId());
+						logger.error("Application reservation couldn't be retrieved for user {} and clan {} in guild {}", e.getMember().getUser().getId(), clan_id, e.getGuild().getId());
 						Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					}
 				}
 				else {
 					//error
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Username couldn't be retrieved from Azrael.user_stats for user {} in guild {}", clan_id, e.getMember().getUser().getId(), e.getGuild().getId());
+					logger.error("Username couldn't be retrieved for user {} in guild {}", clan_id, e.getMember().getUser().getId(), e.getGuild().getId());
 					Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
@@ -147,7 +147,7 @@ public class ClanExecution {
 			else {
 				//error
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Management members of clan {} couldn't be retrieved from Azrael.clan_members in guild {}", clan_id, e.getGuild().getId());
+				logger.error("Management members of clan {} couldn't be retrieved in guild {}", clan_id, e.getGuild().getId());
 				Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}
@@ -159,7 +159,7 @@ public class ClanExecution {
 		else {
 			//error
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Clan couldn't be retrieved from Azrael.clans in guild {}", e.getGuild().getId());
+			logger.error("Clan with the name {} couldn't be retrieved in guild {}", clanName, e.getGuild().getId());
 			Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 	}
@@ -181,7 +181,7 @@ public class ClanExecution {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Clan couldn't be created in guild {}", e.getGuild().getId());
+						logger.error("Clan with the name {} couldn't be created in guild {}", name, e.getGuild().getId());
 						Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					}
 				}
@@ -191,7 +191,7 @@ public class ClanExecution {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Clan name couldn't be verified for name {} in guild {}", name, e.getGuild().getId());
+					logger.error("Clan name {} couldn't be verified in guild {}", name, e.getGuild().getId());
 					Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
@@ -278,10 +278,10 @@ public class ClanExecution {
 							});
 						}
 						else
-							logger.error("Username couldn't be retrieved from Azrael.user_stats for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+							logger.error("Username couldn't be retrieved for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 					else {
-						logger.error("Management couldn't be retrieved from Azrael.clan_members for clan {} in guild {}", clan_id, e.getGuild().getId());
+						logger.error("Management couldn't be retrieved for clan {} in guild {}", clan_id, e.getGuild().getId());
 					}
 					
 				}
@@ -360,7 +360,7 @@ public class ClanExecution {
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Application reservation couldn't be set in Azrael.clans_reservations for user {} and clan {} in guild {}", member.getUserID(), clan_id, e.getGuild().getId());
+							logger.error("Application reservation couldn't be set for user {} and clan {} in guild {}", member.getUserID(), clan_id, e.getGuild().getId());
 							Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 						}
 					}
@@ -370,7 +370,7 @@ public class ClanExecution {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Application reservation couldn't be retrieved from Azrael.clans_reservations for user {} and clan {} in guild {}", member.getUserID(), clan_id, e.getGuild().getId());
+						logger.error("Application reservation couldn't be retrieved for user {} and clan {} in guild {}", member.getUserID(), clan_id, e.getGuild().getId());
 						Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					}
 				}
@@ -420,7 +420,7 @@ public class ClanExecution {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Member level couldn't be retrieved from Azrael.clan_members in guild {}", e.getGuild().getId());
+				logger.error("Member level couldn't be retrieved in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}
@@ -437,7 +437,7 @@ public class ClanExecution {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Clan mark couldn't be updated in Azrael.clans for clan {} in guild {}", clan_id, e.getGuild().getId());
+					logger.error("Clan mark couldn't be updated for clan {} in guild {}", clan_id, e.getGuild().getId());
 					Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
@@ -481,7 +481,7 @@ public class ClanExecution {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Clan couldn't be disbanded for clan {} in guild {}", clan_id, e.getGuild().getId());
+					logger.error("Clan {} couldn't be disbanded in guild {}", clan_id, e.getGuild().getId());
 					Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}

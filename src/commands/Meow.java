@@ -57,7 +57,7 @@ public class Meow implements CommandPublic {
 				try {
 					MeowExecution.Execute(e, args, path, (bot_channels.size() > 0 ? this_channel.getChannel_ID() : e.getChannel().getIdLong()));
 				} catch (IOException e1) {
-					logger.error("Selected meow picture {} couldn't be found", args[1], e1);
+					logger.error("Selected cat picture {} couldn't be found", args[1], e1);
 				}
 			}
 			else {

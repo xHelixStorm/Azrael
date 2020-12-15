@@ -51,7 +51,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import sql.Azrael;
@@ -75,7 +75,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.29.508";
+	private static final String VERSION = "7.33.525";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -219,7 +219,7 @@ public class STATIC {
 	}
 	
 	public static void initializeBootTime() {
-		bootTime = OffsetDateTime.of(LocalDateTime.now(), ZoneOffset.of("Z"));
+		bootTime = OffsetDateTime.now();
 	}
 	public static OffsetDateTime getBootTime() {
 		return bootTime;
@@ -369,13 +369,36 @@ public class STATIC {
 		StringBuilder out = new StringBuilder();
 		var first = true;
 		var last = channels.size()-1;
-		for(Channels channel : channels) {
-			if(first)
+		for(final Channels channel : channels) {
+			if(first) {
 				out.append("<#"+channel.getChannel_ID()+">");
-			else if(channels.get(last).getChannel_ID() == channel.getChannel_ID())
+			}
+			else if(channels.get(last).getChannel_ID() == channel.getChannel_ID()) {
 				out.append(" or <#"+channel.getChannel_ID()+">");
-			else
+			}
+			else {
 				out.append(", <#"+channel.getChannel_ID()+">");
+			}
+			first = false;
+		}
+		return out.toString();
+	}
+	
+	public static String getRestrictedChannels(List<String> channels) {
+		StringBuilder out = new StringBuilder();
+		var first = true;
+		var last = channels.size()-1;
+		for(final String channel : channels) {
+			if(first) {
+				out.append("<#"+channel+">");
+			}
+			else if(channels.get(last).equals(channel)) {
+				out.append(" or <#"+channel+">");
+			}
+			else {
+				out.append(", <#"+channel+">");
+			}
+			first = false;
 		}
 		return out.toString();
 	}
@@ -396,7 +419,7 @@ public class STATIC {
 		Member member = (e != null ? e.getMember() : e2.getMember());
 		Guild guild = (e != null ? e.getGuild() : e2.getGuild());
 		TextChannel channel = (e != null ? e.getChannel() : e2.getChannel());
-		logger.debug("Message removed from {} in guild {}", member.getUser().getId(), guild.getId());
+		logger.debug("Message removed from user {} in guild {}", member.getUser().getId(), guild.getId());
 		var muteRole = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 		if(muteRole == null) {
 			if(guild.getSelfMember().hasPermission(channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(guild, channel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
@@ -422,7 +445,7 @@ public class STATIC {
 					}
 					else {
 						writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_ROLE_ADD_ERR)+Permission.MANAGE_ROLES, Channel.LOG.getType());
-						logger.warn("MANAGE ROLES permission required to mute members for guild {}!", guild.getId());
+						logger.warn("MANAGE ROLES permission required to mute members in guild {}", guild.getId());
 					}
 					Hashes.clearTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId());
 				}
@@ -431,8 +454,8 @@ public class STATIC {
 	}
 	
 	//remove the watch state from a user that either got banned or kicked from a server
-	public static void handleUnwatch(GuildBanEvent e, GuildMemberLeaveEvent e2, short type) {
-		var user_id = (e != null ? e.getUser().getIdLong() : e2.getMember().getUser().getIdLong());
+	public static void handleUnwatch(GuildBanEvent e, GuildMemberRemoveEvent e2, short type) {
+		var user_id = (e != null ? e.getUser().getIdLong() : e2.getUser().getIdLong());
 		var guild_id = (e != null ? e.getGuild().getIdLong() : e2.getGuild().getIdLong());
 		var unwatchReason = (type == 1 ? "ban" : "kick");
 		var watchedUser = Azrael.SQLgetWatchlist(user_id, guild_id);
@@ -445,10 +468,10 @@ public class STATIC {
 				}
 				else {
 					STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+textChannel.getAsMention(), Channel.LOG.getType());
-					logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log notifications regarding the removal of the watch status", textChannel.getId(), e.getGuild().getId());
+					logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required on text channel {} to log notifications regarding the removal of the watch status in guild {}", textChannel.getId(), e.getGuild().getId());
 				}
 				Hashes.removeWatchlist(guild_id+"-"+user_id);
-				logger.debug("The user {} has been removed from the watchlist in guild {}", user_id, guild_id);
+				logger.info("User {} has been removed from the watchlist in guild {}", user_id, guild_id);
 			}
 			else {
 				TextChannel textChannel = e.getGuild().getTextChannelById(watchedUser.getWatchChannel());
@@ -458,9 +481,9 @@ public class STATIC {
 				}
 				else {
 					STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+textChannel.getAsMention(), Channel.LOG.getType());
-					logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log notifications regarding the removal of the watch status", textChannel.getId(), e.getGuild().getId());
+					logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required on text channel {} to log notifications regarding the removal of the watch status in guild {}", textChannel.getId(), e.getGuild().getId());
 				}
-				logger.error("An internal error occurred. The user {} couldn't be removed from the Azrael.watchlist table for guild {}", user_id, guild_id);
+				logger.error("User {} couldn't be removed from the watch list in guild {}", user_id, guild_id);
 			}
 		}
 	}
@@ -691,7 +714,7 @@ public class STATIC {
 					textChannel.sendMessage(message).queue();
 				}
 				else {
-					logger.warn("MESSAGE_WRITE or MESSAGE_EMBED_LINKS permission missing to send a message in channel {}", textChannel.getId());
+					logger.warn("MESSAGE_WRITE or MESSAGE_EMBED_LINKS permission required to send a message in channel {}", textChannel.getId());
 				}
 			}
 		}
@@ -714,7 +737,7 @@ public class STATIC {
 					textChannel.sendMessage(message).queue();
 				}
 				else {
-					logger.warn("MESSAGE_WRITE or MESSAGE_EMBED_LINKS permission missing to send a message in channel {}", textChannel.getId());
+					logger.warn("MESSAGE_WRITE or MESSAGE_EMBED_LINKS permission required to send a message in channel {}", textChannel.getId());
 				}
 			}
 		}
@@ -724,7 +747,7 @@ public class STATIC {
 	public static boolean setPermissions(Guild guild, TextChannel textChannel, Collection<Permission> permissions) {
 		if(guild.getSelfMember().hasPermission(textChannel, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)) {
 			textChannel.getManager().putPermissionOverride(guild.getSelfMember(), permissions, null).complete();
-			logger.info("Permissions overriden for text channel {} in guild {}", textChannel.getId(), guild.getId());
+			logger.info("Permissions overriden of text channel {} in guild {}", textChannel.getId(), guild.getId());
 			return true;
 		}
 		return false;
@@ -733,7 +756,7 @@ public class STATIC {
 	public static boolean setPermissions(Guild guild, Category category, Collection<Permission> permissions) {
 		if(guild.getSelfMember().hasPermission(category, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)) {
 			category.getManager().putPermissionOverride(guild.getSelfMember(), permissions, null).complete();
-			logger.info("Permissions overriden for category {} in guild {}", category.getId(), guild.getId());
+			logger.info("Permissions overriden of category {} in guild {}", category.getId(), guild.getId());
 			return true;
 		}
 		return false;

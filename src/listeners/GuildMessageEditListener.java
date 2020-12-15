@@ -82,7 +82,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 						}
 						else {
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
-							logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required for text channel {} in guild {} to censor messages", e.getChannel().getId(), e.getGuild().getId());
+							logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required to censor messages inside text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 						}
 					}
 					//if the url censoring is enabled but no languages to filter have been set, start the url censoring anyway
@@ -92,7 +92,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 						}
 						else {
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
-							logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required for text channel {} in guild {} to censor messages", e.getChannel().getId(), e.getGuild().getId());
+							logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required to censor messages inside text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 						}
 					}
 				});
@@ -182,7 +182,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log messages of watched users", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to log messages of watched users on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				//print an error if the cache log is not enabled
@@ -195,7 +195,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log messages of watched users", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to log messages of watched users on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				
@@ -270,7 +270,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 								}
 							} catch (Exception e1) {
 								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-								logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
+								logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
 							}
 						}
 					}
@@ -278,17 +278,20 @@ public class GuildMessageEditListener extends ListenerAdapter {
 				
 				//Run google service, if enabled
 				if(!e.getMember().getUser().isBot() && GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
-					//log low priority messages to google spreadsheets
-					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
-						e.getChannel().retrieveMessageById(e.getMessageId()).queueAfter(10, TimeUnit.SECONDS, m -> {
-							StringBuilder urls = new StringBuilder();
-							for(final var attachment : e.getMessage().getAttachments()) {
-								urls.append(attachment.getProxyUrl()+"\n");
-							}
-							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getChannel().getId(), ""+e.getMember().getUser().getId(), new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "COMMENT", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim(), 0, 0, GoogleEvent.COMMENT.id);
-						}, err -> {
-							//message was removed
-						});
+					final String [] array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.COMMENT.id, e.getChannel().getId());
+					if(array != null && !array[0].equals("empty")) {
+						//log low priority messages to google spreadsheets
+						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
+							e.getChannel().retrieveMessageById(e.getMessageId()).queueAfter(10, TimeUnit.SECONDS, m -> {
+								StringBuilder urls = new StringBuilder();
+								for(final var attachment : e.getMessage().getAttachments()) {
+									urls.append(attachment.getProxyUrl()+"\n");
+								}
+								GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), e.getChannel().getId(), ""+e.getMember().getUser().getId(), new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "COMMENT", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim(), 0, 0, GoogleEvent.COMMENT.id);
+							}, err -> {
+								//message was removed
+							});
+						}
 					}
 				}
 			});

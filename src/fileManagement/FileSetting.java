@@ -20,7 +20,7 @@ public class FileSetting {
 	private static final Logger logger = LoggerFactory.getLogger(FileSetting.class);
 	private static PrintWriter pw;
 	
-	public static void createFile(String name, String content){
+	public static void createFile(String name, String content) {
 		try {
 			pw = new PrintWriter(name, "UTF-8");
 			pw.print(content);

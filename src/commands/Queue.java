@@ -46,7 +46,7 @@ public class Queue implements CommandPublic {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Users in the room {} couldn't be retrieved from Azrael.matchmaking_view for guild {}", room_id, e.getGuild().getId());
+					logger.error("Users in the room {} couldn't be retrieved in guild {}", room_id, e.getGuild().getId());
 				}
 			}
 			else if(room != null) {
@@ -54,7 +54,7 @@ public class Queue implements CommandPublic {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Room details couldn't be retrieved from Azrael.matchmaking_rooms for room {} and guild {}", room_id, e.getGuild().getId());
+				logger.error("Room details couldn't be retrieved for room {} in guild {}", room_id, e.getGuild().getId());
 			}
 		}
 		else if(room_id == 0) {

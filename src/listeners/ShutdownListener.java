@@ -50,7 +50,7 @@ public class ShutdownListener extends ListenerAdapter {
 		}
 		//do a regular shutdown
 		else {
-			logger.debug("Bot has shut down or reboot has been commenced");
+			logger.info("Bot has shut down or reboot has been commenced!");
 			Azrael.SQLInsertActionLog("BOT_SHUTDOWN", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
 		}
 		System.exit(0);

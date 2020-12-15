@@ -48,7 +48,7 @@ public class TextChannelListener extends ListenerAdapter {
 			Azrael.SQLDeleteChannelConf(e.getChannel().getIdLong(), e.getGuild().getIdLong());
 			Azrael.SQLDeleteChannels(e.getChannel().getIdLong());
 			Hashes.removeChannels(e.getGuild().getIdLong());
-			logger.debug("TextChannel {} for guild {} has been deleted from all tables!", e.getChannel().getId(), e.getGuild().getId());
+			logger.info("TextChannel {} has been removed in guild {}", e.getChannel().getId(), e.getGuild().getId());
 		}).start();
 	}
 	
@@ -57,11 +57,11 @@ public class TextChannelListener extends ListenerAdapter {
 		//insert text channel into table
 		if(Azrael.SQLInsertChannels(e.getChannel().getIdLong(), e.getChannel().getName()) > 0) {
 			Hashes.removeChannels(e.getGuild().getIdLong());
-			logger.debug("TextChannel {} has been created for guild {}", e.getChannel().getId(), e.getGuild().getId());
+			logger.info("TextChannel {} has been saved in guild {}", e.getChannel().getId(), e.getGuild().getId());
 		}
 		else {
 			//throw an error, if channel couldn't be inserted/updated
-			logger.error("An internal error occurred! TextChannel {} couldn't be inserted or updated into Azrael.channels for guild {}", e.getChannel().getId(), e.getGuild().getId());
+			logger.error("New text channel {} couldn't be saved or updated in guild {}", e.getChannel().getId(), e.getGuild().getId());
 		}
 	}
 }

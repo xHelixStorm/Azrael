@@ -56,7 +56,7 @@ public class BanListener extends ListenerAdapter {
 			}
 			else {
 				STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.BAN_ERR), Channel.LOG.getType());
-				logger.error("banned user {} couldn't be marked as banned on Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getId());
+				logger.error("The banned user {} couldn't be labeled as banned in guild {}", e.getUser().getId(), e.getGuild().getId());
 			}
 		}
 		else{
@@ -67,7 +67,7 @@ public class BanListener extends ListenerAdapter {
 			}
 			else {
 				STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.BAN_ERR), Channel.LOG.getType());
-				logger.error("banned user {} couldn't be inserted into Azrael.bancollect for guild {}", e.getUser().getId(), e.getGuild().getName());
+				logger.error("The banned user {} couldn't be labeled as banned in guild {}", e.getUser().getId(), e.getGuild().getId());
 			}
 		}
 		
@@ -75,7 +75,7 @@ public class BanListener extends ListenerAdapter {
 			//Unwatch the banned user, if he's being watched
 			STATIC.handleUnwatch(e, null, (short)1);
 			
-			logger.debug("{} has been banned from {}", e.getUser().getId(), e.getGuild().getName());
+			logger.info("User {} has been banned in guild {}", e.getUser().getId(), e.getGuild().getId());
 			Azrael.SQLInsertActionLog("MEMBER_BAN_ADD", user_id, guild_id, "User Banned");
 			
 			if(log_channel != null) {
@@ -106,7 +106,7 @@ public class BanListener extends ListenerAdapter {
 						
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), ban_reason, null, ""+user.getWarningID(), "BAN", null, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.BAN.id);
+							GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.BAN.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), ban_reason, null, ""+user.getWarningID(), "BAN", null, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.BAN.id);
 						}
 					}
 					else {
@@ -117,7 +117,7 @@ public class BanListener extends ListenerAdapter {
 						else {
 							EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
 							textChannel.sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_4).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE)).replace("{}", STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON))).build()).queue();
-							logger.warn("VIEW AUDIT LOGS permission missing in guild {}!", e.getGuild().getId());
+							logger.warn("VIEW AUDIT LOGS permission required in guild {}", e.getGuild().getId());
 						}
 					}
 				}
@@ -156,7 +156,7 @@ public class BanListener extends ListenerAdapter {
 					
 					//Run google service, if enabled
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-						GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), ban_reason, null, ""+user.getWarningID(), "BAN", null, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.BAN.id);
+						GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.BAN.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), ban_reason, null, ""+user.getWarningID(), "BAN", null, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.BAN.id);
 					}
 				}
 				else {
@@ -164,7 +164,7 @@ public class BanListener extends ListenerAdapter {
 						//put thread to sleep and then retry
 						Thread.sleep(100);
 					} catch (InterruptedException e1) {
-						logger.warn("Ban thread interrupted", e1);
+						logger.trace("Ban thread interrupted for user {} in guild {}", e.getUser().getId(), e.getGuild().getId(), e1);
 					}
 					//retrieve the log recursively until the newly banned user has been found
 					getBanAuditLog(e, user_id, guild_id, log_channel, user);
@@ -175,7 +175,7 @@ public class BanListener extends ListenerAdapter {
 					//put thread to sleep and then retry
 					Thread.sleep(100);
 				} catch (InterruptedException e1) {
-					logger.warn("Ban thread interrupted", e1);
+					logger.trace("Ban thread interrupted for user {} in guild {}", e.getUser().getId(), e.getGuild().getId(), e1);
 				}
 				//retrieve the log recursively until the newly banned user has been found
 				getBanAuditLog(e, user_id, guild_id, log_channel, user);

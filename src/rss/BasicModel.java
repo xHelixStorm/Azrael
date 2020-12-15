@@ -83,7 +83,7 @@ public class BasicModel {
 				}
 			}
 			else {
-				logger.warn("MESSAGE_WRITE and MESSAGE_HISTORY permission required to print the subscription in channel {} for guild {}", rss_channel, guild.getId());
+				logger.warn("MESSAGE_WRITE and MESSAGE_HISTORY permission required to print into the subscription channel {} in guild {}", rss_channel, guild.getId());
 			}
 		}
 		else {
@@ -92,16 +92,16 @@ public class BasicModel {
 				Azrael.SQLDeleteChannel_Filter(rss_channel);
 				Azrael.SQLDeleteChannels(rss_channel);
 				if(defaultChannel) {
-					logger.info("Not existing subscription channel {} has been removed for guild {}", rss_channel, guild.getIdLong());
+					logger.info("Not existing subscription channel {} has been removed in guild {}", rss_channel, guild.getIdLong());
 				}
 				else if(Azrael.SQLUpdateRSSChannel(rss.getURL(), guild.getIdLong(), 0) > 0) {
-					logger.info("Not existing alternative subscription channel {} has been removed for guild {}", rss_channel, guild.getIdLong());
+					logger.info("Not existing alternative subscription channel {} has been removed in guild {}", rss_channel, guild.getIdLong());
 				}
 				Hashes.removeFilterLang(rss_channel);
 				Hashes.removeChannels(guild.getIdLong());
 			}
 			else if(Azrael.SQLUpdateRSSChannel(rss.getURL(), guild.getIdLong(), 0) > 0) {
-				logger.info("Not existing alternative subscription channel {} has been removed for guild {}", rss_channel, guild.getIdLong());
+				logger.info("Not existing alternative subscription channel {} has been removed in guild {}", rss_channel, guild.getIdLong());
 			}
 		}
 		in.close();
@@ -162,7 +162,7 @@ public class BasicModel {
 			}
 			in.close();
 		} catch (IOException e1) {
-			logger.error("Error on retrieving feed!", e1);
+			logger.error("Subscription couldn't be retrieved from {} in guild {}", rss.getURL(), e.getGuild().getId(), e1);
 		}
 	}
 }

@@ -44,7 +44,7 @@ public class CollectUsersGuilds implements Runnable{
 					}
 				}
 				checkedGuilds.add(guild_id);
-				logger.debug("Start up user registration complete in {}", g.getId());
+				logger.info("Start up user registration complete in guild {}", g.getId());
 			}
 		}
 	}

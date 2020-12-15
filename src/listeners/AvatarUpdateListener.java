@@ -23,11 +23,12 @@ public class AvatarUpdateListener extends ListenerAdapter {
 	public void onUserUpdateAvatar(UserUpdateAvatarEvent e) {
 		new Thread(() -> {
 			//update user avatar with the newest avatar
-			if(Azrael.SQLUpdateAvatar(e.getUser().getIdLong(), e.getUser().getEffectiveAvatarUrl()) > 0) {
-				logger.trace("{} has updated his/her avatar: {}", e.getUser().getId(), e.getUser().getEffectiveAvatarUrl());
+			final var result = Azrael.SQLUpdateAvatar(e.getUser().getIdLong(), e.getUser().getEffectiveAvatarUrl());
+			if(result > 0) {
+				logger.trace("User {} has updated the avatar to {}", e.getUser().getId(), e.getUser().getEffectiveAvatarUrl());
 			}
-			else
-				logger.error("Avatar of {} couldn't be updated in Azrael.users", e.getUser().getId());
+			else if(result == -1)
+				logger.error("Avatar of user {} couldn't be updated", e.getUser().getId());
 		}).start();
 	}
 }

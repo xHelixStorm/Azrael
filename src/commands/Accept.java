@@ -74,7 +74,7 @@ public class Accept implements CommandPublic {
 											}
 											else {
 												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-												logger.error("Role {} doesn't exist anymore for guild {}", ver_role.getRole_ID(), e.getGuild().getId());
+												logger.error("Role {} doesn't exist anymore in guild {}", ver_role.getRole_ID(), e.getGuild().getId());
 											}
 										}
 										else {
@@ -104,7 +104,7 @@ public class Accept implements CommandPublic {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Category {} doesn't exist anymore for guild {}", verification.getCategoryID(), e.getGuild().getId());
+					logger.error("Category {} doesn't exist anymore in guild {}", verification.getCategoryID(), e.getGuild().getId());
 				}
 			}
 			else {

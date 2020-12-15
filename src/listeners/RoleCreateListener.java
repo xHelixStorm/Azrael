@@ -26,10 +26,10 @@ public class RoleCreateListener extends ListenerAdapter {
 			var inserted = DiscordRoles.SQLInsertRole(e.getGuild().getIdLong(), e.getRole().getIdLong(), 1, e.getRole().getName(), Channel.DEF.getType(), false);
 			if(inserted > 0) {
 				DiscordRoles.SQLgetRoles(e.getGuild().getIdLong());
-				logger.debug("role id {} has been registered from guild {}", e.getRole().getName(), e.getGuild().getName());
+				logger.info("Role {} has been saved in guild {}", e.getRole().getId(), e.getGuild().getId());
 			}
 			else {
-				logger.error("role id {} couldn't be registered for guild {} in table DiscordRoles.roles", e.getRole().getName(), e.getGuild().getName() );
+				logger.error("Role {} couldn't be saved in guild {}", e.getRole().getId(), e.getGuild().getId());
 			}
 		}).start();
 	}

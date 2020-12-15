@@ -78,7 +78,7 @@ public class ReactionMessage {
 				}
 				else {
 					STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+textChannel.getAsMention(), Channel.LOG.getType());
-					logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to print a reaction message for channel {} in guild {}", channel_id, e.getGuild().getId());
+					logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to print a reaction message on channel {} in guild {}", channel_id, e.getGuild().getId());
 				}
 			}
 			else {
@@ -86,14 +86,14 @@ public class ReactionMessage {
 				if(Azrael.SQLDeleteChannelConf(channel_id, e.getGuild().getIdLong()) > 0) {
 					Azrael.SQLDeleteChannel_Filter(channel_id);
 					Azrael.SQLDeleteChannels(channel_id);
-					logger.info("Not anymore existing reaction channel {} has been removed for guild {}", channel_id, e.getGuild().getId());
+					logger.info("Reaction channel {} doesn't exist anymore in guild {}", channel_id, e.getGuild().getId());
 					Hashes.removeFilterLang(channel_id);
 					Hashes.removeChannels(e.getGuild().getIdLong());
 				}
 			}
 		}
 		else if(reactionRoles == null) {
-			logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());
+			logger.error("Reaction roles couldn't be retrieved in guild {}", e.getGuild().getId());
 		}
 	}
 	
@@ -134,7 +134,7 @@ public class ReactionMessage {
 		}
 		else {
 			STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_ADD_REACTION.getName())+message.getTextChannel().getAsMention(), Channel.LOG.getType());
-			logger.error("MESSAGE_ADD_REACTION permission required to add reactions to a message for channel {} in guild {}", message.getTextChannel().getId(), e.getGuild().getId());
+			logger.error("MESSAGE_ADD_REACTION permission required to add reactions to a message on channel {} in guild {}", message.getTextChannel().getId(), e.getGuild().getId());
 		}
 		Hashes.addReactionMessage(e.getGuild().getIdLong(), message.getIdLong());
 	}

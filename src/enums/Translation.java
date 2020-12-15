@@ -183,6 +183,7 @@ public enum Translation {
 	GIF_COMPRESSION				("gif_compression"),
 	GIF_COMPRESS_ERR			("gif_compress_err"),
 	GIF_SEND_ERR				("gif_send_err"),
+	IMAGE_SEND_ERR				("image_send_err"),
 	HIGHER_PRIVILEGES_REQUIRED	("higher_privileges_required"),
 	HIGHER_PRIVILEGES_ROLE		("higher_privileges_role"),
 	HIGHER_PRIVILEGES_RANKING	("higher_privileges_ranking"),
@@ -208,6 +209,8 @@ public enum Translation {
 	WATCHING_LIFTED_ERR			("watching_lifted_err"),
 	CATEGORY_NOT_EXISTS			("category_not_exists"),
 	NO_CATEGORY					("no_category"),
+	YOUTUBE_VIDEO_NOT_FOUND		("youtube_video_not_found"),
+	ROLES_NOW_INVALID			("roles_now_invalid"),
 	
 	EMBED_TITLE_ERROR			("embed_title_error"),
 	EMBED_TITLE_ABOUT			("embed_title_about"),
@@ -236,6 +239,7 @@ public enum Translation {
 	COMMAND_HEADER_1			("command_header_1"),
 	COMMAND_HEADER_2			("command_header_2"),
 	COMMAND_HEADER_3			("command_header_3"),
+	COMMAND_HEADER_4			("command_header_4"),
 	COMMAND_REGISTER			("command_register"),
 	COMMAND_SET					("command_set"),
 	COMMAND_REMOVE				("command_remove"),
@@ -377,6 +381,7 @@ public enum Translation {
 	EQUIP_SELECT_NUMBER			("equip_select_number"),
 	
 	FILTER_HELP					("filter_help"),
+	FILTER_ABORT				("filter_abort"),
 	FILTER_ACTIONS				("filter_actions"),
 	FILTER_DISPLAY				("filter_display"),
 	FILTER_INSERT				("filter_insert"),
@@ -387,8 +392,9 @@ public enum Translation {
 	FILTER_NO_LANGS				("filter_no_langs"),
 	FILTER_LIST					("filter_list"),
 	FILTER_LIST_EMPTY			("filter_list_empty"),
+	FILTER_LIST_LANG_NA			("filter_list_lang_na"),
 	FILTER_WRITE_WORD			("filter_write_word"),
-	FILTER_WRITE_PASTEBIN		("filter_write_pastebin"),
+	FILTER_WRITE_PASTE			("filter_write_paste"),
 	FILTER_WRITE_FQDN			("filter_write_fqdn"),
 	FILTER_WRITE_PASTE_FQDN		("filter_write_paste_fqdn"),
 	FILTER_WRITE_USERNAME		("filter_write_username"),
@@ -455,6 +461,7 @@ public enum Translation {
 	GOOGLE_SHEET_RESTRICT_SET	("google_sheet_restrict_set"),
 	GOOGLE_SHEET_RESTRICT_REMOVE("google_sheet_restrict_remove"),
 	GOOGLE_SHEET_RESTRICT_ADD	("google_sheet_restrict_add"),
+	GOOGLE_SHEET_NO_LINK		("google_sheet_not_link"),
 	GOOGLE_EXIT					("google_exit"),
 	
 	HEAVY_CENSORING_HELP		("heavy_censoring_help"),
@@ -740,6 +747,7 @@ public enum Translation {
 	USE_ICON_RESET				("use_icon_reset"),
 	USE_SKIN					("use_skin"),
 	USE_ITEM					("use_item"),
+	USE_ITEM_ALREADY_OPEN		("use_item_already_open"),
 	USE_NOT_EXISTS				("use_not_exists"),
 	
 	USER_HELP					("user_help"),
@@ -889,6 +897,8 @@ public enum Translation {
 	RANDOMSHOP_ERR				("randomshop_err"),
 	RANDOMSHOP_ERR_2			("randomshop_err_2"),
 	RANDOMSHOP_REWARD			("randomshop_reward"),
+	RANDOMSHOP_DAYS				("randomshop_days"),
+	RANDOMSHOP_PERM				("randomshop_perm"),
 	
 	CENSOR_REMOVED_WARN_1		("censor_removed_warn_1"),
 	CENSOR_REMOVED_WARN_2		("censor_removed_warn_2"),
@@ -941,6 +951,7 @@ public enum Translation {
 	JOIN_PERMISSION_ERR			("join_permission_err"),
 	JOIN_PERMISSION_ERR_2		("join_permission_err_2"),
 	JOIN_VERIFY					("join_verify"),
+	JOIN_NEW					("join_new"),
 	
 	NAME_TITLE					("name_title"),
 	NAME_REASON					("name_reason"),

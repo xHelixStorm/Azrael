@@ -29,7 +29,8 @@ public class SetMaxExperience {
 		Matcher matcher = pattern.matcher(_input);
 		if(matcher.find()){
 			var editedRows = 0;
-			if(matcher.group().equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))) {
+			final var newStatus = matcher.group();
+			if(newStatus.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))) {
 				guild_settings.setMaxExpEnabled(true);
 				editedRows = RankingSystem.SQLUpdateMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), e.getGuild().getIdLong());
 				if(editedRows > 0)
@@ -38,7 +39,7 @@ public class SetMaxExperience {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				}
 			}
-			else if(matcher.group().equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))) {
+			else if(newStatus.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))) {
 				guild_settings.setMaxExpEnabled(false);
 				editedRows = RankingSystem.SQLUpdateMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), e.getGuild().getIdLong());
 				if(editedRows > 0)
@@ -48,11 +49,11 @@ public class SetMaxExperience {
 				}
 			}
 			if(editedRows > 0) {
-				logger.debug("{} has set the max experience limitation to {} in guild {}", e.getMember().getUser().getId(), matcher.group(), e.getGuild().getId());
 				Hashes.addStatus(e.getGuild().getIdLong(), guild_settings);
+				logger.info("User {} has updated the max experience status to {} in guild {}", e.getMember().getUser().getId(), newStatus, e.getGuild().getId());
 			}
 			else {
-				logger.error("RankingSystem.max_exp couldn't be updated with enable or disable information for guild {}", e.getGuild().getName());
+				logger.error("Max experience status couldn't be updated in guild {}", e.getGuild().getId());
 			}
 		}
 		else {
@@ -62,11 +63,11 @@ public class SetMaxExperience {
 				if(RankingSystem.SQLUpdateMaxExperience(guild_settings.getMaxExperience(), guild_settings.getMaxExpEnabled(), e.getGuild().getIdLong()) > 0) {
 					Hashes.addStatus(e.getGuild().getIdLong(), guild_settings);
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MAX_EXPERIENCE_ADDED)+ "**"+guild_settings.getMaxExperience()+"**").build()).queue();
-					logger.debug("{} has set the max experience limitation to {} exp in guild {}", e.getMember().getUser().getId(), guild_settings.getMaxExperience(), e.getGuild().getId());
+					logger.info("User {} has set the max experience limit to {} experience points in guild {}", e.getMember().getUser().getId(), guild_settings.getMaxExperience(), e.getGuild().getId());
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Max experience couldn't be updated in table RankingSystem.guilds for guild {}", e.getGuild().getId());
+					logger.error("The max experience limit of {} exprience points couldn't be updated in guild {}", guild_settings.getMaxExperience(), e.getGuild().getId());
 				}
 			}
 			else {

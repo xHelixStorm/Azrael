@@ -49,7 +49,7 @@ public class RegisterChannel {
 		}
 		else {
 			e.getChannel().sendMessage(messageBuild.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Channel types from Azrael.channeltypes couldn't be retrieved in guild {}", e.getGuild().getId());
+			logger.error("Channel types couldn't be retrieved in guild {}", e.getGuild().getId());
 		}
 	}
 	
@@ -78,31 +78,26 @@ public class RegisterChannel {
 				if(channel.length() == 18) {
 					channel_id = Long.parseLong(channel);
 					var result = 0;
+					//TODO: replace single sql operations into transactions
 					switch(channel_type) {
 						case "eng", "ger", "fre", "tur", "rus", "spa", "por", "ita", "all" -> {
 							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
 							Azrael.SQLDeleteChannel_Filter(channel_id);
 							result = Azrael.SQLInsertChannel_Filter(channel_id, channel_type);
-							if(result == 0)
-								logger.error("New channel type {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
 						}
 						case "bot", "co1", "co2", "co3", "vot" -> {
-							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
 							Azrael.SQLDeleteChannel_Filter(channel_id);
-							if(result == 0)
-								logger.error("New channel filter all couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_id, _guild_id);
+							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
 							
 						}
 						case "log", "tra", "rea", "qui", "rss", "wat", "del", "edi" -> {
 							Azrael.SQLDeleteChannelType(channel_type, _guild_id);
 							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
-							if(result == 0)
-								logger.error("New channel type {} couldn't be inserted for channel {} in guild {} into Azrael.channel_filter", channel_type, channel_id, _guild_id);
 						}
 					}
 					Hashes.removeChannels(_guild_id);
 					if(result > 0) {
-						logger.info("Channel {} as {} channel registered in guild {}", channel_id, channel_type, _guild_id);
+						logger.info("User {} has registered channel {} as {} channel in guild {}", e.getMember().getUser().getId(), channel_id, channel_type, _guild_id);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
 						if(channel_type.equals("rea")) {
 							//use the temp cache to append reactions after the bot sends a message
@@ -111,7 +106,7 @@ public class RegisterChannel {
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("Role reactions couldn't be set to enable in Azrael.guild for guild {}", _guild_id);
+								logger.error("Role reactions couldn't be automatically enabled in guild {}", _guild_id);
 							}
 						}
 						else if(channel_type.equals("rss") && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong())) {
@@ -120,7 +115,7 @@ public class RegisterChannel {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("text channel {} couldn't be registered in guild {}", channel_id, _guild_id);
+						logger.error("Channel {} couldn't be saved as channel type {} in guild {}", channel_id, channel_type, _guild_id);
 					}
 				}
 				else {
@@ -148,11 +143,11 @@ public class RegisterChannel {
 					if(Azrael.SQLInsertChannel_ConfURLCensoring(channel_id, _guild_id, url_censoring) > 0) {
 						Hashes.removeChannels(_guild_id);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
-						logger.debug("{} has registered the channel {} for url censoring in the guild {}", e.getMember().getUser().getId(), channel_id, e.getGuild().getId());
+						logger.info("User {} has changed the url censoring status of channel {} to {} in guild {}", e.getMember().getUser().getId(), channel_id, url_censoring, e.getGuild().getId());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Azrael.channel_conf couldn't be updated for channel {} and guild {}", channel_id, e.getGuild().getId());
+						logger.error("Url censoring setting couldn't be updated for channel {} in guild {}", channel_id, e.getGuild().getId());
 					}
 				}
 				else {
@@ -180,11 +175,11 @@ public class RegisterChannel {
 					if(Azrael.SQLInsertChannel_ConfTXTCensoring(channel_id, _guild_id, txt_removal) > 0) {
 						Hashes.removeChannels(_guild_id);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
-						logger.debug("{} has registered the channel {} for text removal in the guild {}", e.getMember().getUser().getId(), channel_id, e.getGuild().getId());
+						logger.info("User {} has changed the text removal status of channel {} to {} in guild {}", e.getMember().getUser().getId(), channel_id, txt_removal, e.getGuild().getId());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Azrael.channel_conf couldn't be updated for channel {} and guild {}", channel_id, e.getGuild().getId());
+						logger.error("Text removal setting couldn't be updated for channel {} in guild {}", channel_id, e.getGuild().getId());
 					}
 				}
 				else {
@@ -211,7 +206,7 @@ public class RegisterChannel {
 				}
 			}
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ALL_CHANNELS)).build()).queue();
-			logger.debug("{} has registered all available channels on guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			logger.info("User {} has registered all available channels in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 		}
 		else {
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));

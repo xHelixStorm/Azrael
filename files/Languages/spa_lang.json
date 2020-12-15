@@ -181,6 +181,7 @@
 	"gif_compression":				"Comprimiendo GIF. Por favor espera...",
 	"gif_compress_err":				"El GIF no pudo ser comprimido. ¡Comando abortado!",
 	"gif_send_err":					"¡El GIF superó el tamaño de archivo permitido! ¡Comando abortado!",
+	"image_send_err":				"¡La foto superó el tamaño de archivo permitido! ¡Comando abortado!",
 	"higher_privileges_required":	" Mis disculpas joven padawan. Se requieren privilegios más altos. Ten, una galleta :cookie:",
 	"higher_privileges_role":		" Mis disculpas joven padawan. Se requieren privilegios más altos. Ten, una galleta :cookie:\nSe necesitan uno de estos roles: ",
 	"higher_privileges_ranking":	"Se necesitan privilegios más altos. Podrás usar este comando cuando alcances el nivel **{}** con el rol ",
@@ -206,6 +207,8 @@
 	"watching_lifted_err":			"¡Ha ocurrido un error interno! ¡No se pudo quitar la observación del usuario **{}**!",
 	"category_not_exists":			"The provided category doesn't exist!",
 	"no_category":					"Please submit a numerical category ID!",
+	"youtube_video_not_found":		"YouTube video found!",
+	"roles_now_invalid":			"Role(s) to assign don't exist anymore!",
 	
 	"embed_title_error":		 	"¡Ha ocurrido un error!",
 	"embed_title_about": 		 	"¡Página Acerca de!",
@@ -234,6 +237,7 @@
 	"command_header_1":			 	"Comandos administrativos",
 	"command_header_2":			 	"Comandos de entretenimiento",
 	"command_header_3":			 	"Otros comandos",
+	"command_header_4":				"comandos personalizados",
 	"command_register":			 	"- **{}register**\nRegistrar canales, roles y más para usar varias funcionalidades de moderación\n",
 	"command_set":				 	"- **{}set**\nActualizar, establecer o cambiar varias configuraciones del Bot para este servidor\n",
 	"command_remove":			 	"- **{}remove**\nEliminar canales de texto ya registrados, roles y más de la configuración del Bot\n",
@@ -374,7 +378,8 @@
 	"equip_exit":					"¡Configuración de equipamiento terminada!",
 	"equip_select_number":			"¡Por favor, selecciona uno de los números visibles!",
 	
-	"filter_help":					"¡Escribe uno de los siguientes parámetros con el comando para trabajar en listas de censura específicas! Estas listas de censura están disponibles:\n\n- **word-filter**:\n¡Para censurar palabras en un idioma específico!\n- **name-filter**:\n¡Para censurar nombres!\n- **name-kick**:\n¡Para expulsar automaticamente al usar palabras filtradas en un nombre!\n- **funny-names**:\n¡Nombres para asignar a los usuarios que fueron renombrados automáticamente!\n- **staff-names**:\n¡Para renombrar a los usuarios que usan nombres del staff!\n- **url-blacklist**:\n¡Para las URL que no están permitidas en el servidor!\n- **url-whitelist**:\n¡Para excepciones de URL cuando la eliminación automática de URL está habilitada!\n- **tweet-blacklist**:\n¡Para que los usuarios en Twitter eviten que sus tweets se muestren en el servidor!",
+	"filter_help":					"¡Escribe uno de los siguientes parámetros con el comando para trabajar en listas de censura específicas o *salida* para interrumpir el proceso! Estas listas de censura están disponibles:\n\n- **word-filter**:\n¡Para censurar palabras en un idioma específico!\n- **name-filter**:\n¡Para censurar nombres!\n- **name-kick**:\n¡Para expulsar automaticamente al usar palabras filtradas en un nombre!\n- **funny-names**:\n¡Nombres para asignar a los usuarios que fueron renombrados automáticamente!\n- **staff-names**:\n¡Para renombrar a los usuarios que usan nombres del staff!\n- **url-blacklist**:\n¡Para las URL que no están permitidas en el servidor!\n- **url-whitelist**:\n¡Para excepciones de URL cuando la eliminación automática de URL está habilitada!\n- **tweet-blacklist**:\n¡Para que los usuarios en Twitter eviten que sus tweets se muestren en el servidor!",
+	"filter_abort":					"¡El comando *filter* ha sido anulado!",
 	"filter_actions":				"Elige ahora la acción deseada:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**",
 	"filter_display":				"MOSTRAR",
 	"filter_insert":				"INSERTAR",
@@ -385,6 +390,7 @@
 	"filter_no_langs":				"<no hay idiomas disponibles>",
 	"filter_list":					"Aquí la lista solicitada: ",
 	"filter_list_empty":			"¡La lista solicitada está vacía!",
+	"filter_list_lang_na":			"¡El idioma solicitado no está disponible!",
 	"filter_write_word":			"¡Ahora por favor proporciona la palabra o nombre!",
 	"filter_write_paste":			"Now please provide a pastebin URL which contains all words or names!",
 	"filter_write_fqdn":			"Ahora proporciona un nombre de dominio completo. Por ejemplo: *https://www.google.com*\n No agregues nada después del dominio de nivel superior (p. ej. com, de, org)!",
@@ -453,6 +459,7 @@
 	"google_sheet_restrict_set":	"Now please write a text channel mention or text channel ID to restrict the selected event to a textchannel. To remove it, write *none*!",
 	"google_sheet_restrict_remove":	"Restriction has been removed for this event!",
 	"google_sheet_restrict_add":	"Text channel restriction has been added for this event and spreadsheet!",
+	"google_sheet_no_link":			"An internal error has occurred! Google Spreadsheet couldn't be linked to the Bot.",
 	"google_exit":					"¡Comando de Google terminado!",
 	
 	"heavy_censoring_help":		 	"¡Añade o *enable* o *disable* al comando para usar esta funcionalidad! Si la censura pesada está habilitada y un canal de texto está censurando al menos un idioma, se eliminarán los siguientes mensajes:\n- *Mensajes que contienen sólo una letra*.\n- *Mensajes que contienen capturas de pantalla*.\n- *Mensajes que se repiten varias veces*.\n- *Mensajes que no contienen ninguna letra o dígito normal (p. ej. unicodes)*.\n\n¡Si esta funcionalidad elimina un gran número de mensajes y se ha alcanzado el umbral de 30, advertirá a los usuarios silenciándolos después de eliminar el mensaje! ¡El contador del umbral aumenta para *cada mensaje eliminado* y *disminuye automáticamente en 1* después de cada minuto. Usa el parámetro *reset* para restablecer manualmente el contador a 0!",
@@ -738,6 +745,7 @@
 	"use_icon_reset":				"Icon skins resetted to **{}**",
 	"use_skin":						"**{}** will be used from now on!",
 	"use_item":						"**{}** has been used!",
+	"use_item_already_open":		"**{}** is already in use!",
 	"use_not_exists":				"This item or skin doesn't exist in your inventory!",
 	
 	"user_help":					"To display information or to take administrative actions against a user, mention the user or write the user's user ID as parameter!",
@@ -887,6 +895,8 @@
 	"randomshop_err":				"Randomshop page couldn't be displayed!",
 	"randomshop_err_2":				"Randomshop reward couldn't be displayed! You have obtained **{}**",
 	"randomshop_reward":			"Congratulations, you have received **{}**. Remaining balance: **{}**",
+	"randomshop_days":				" days",
+	"randomshop_perm":				" permanent",
 	
 	"censor_removed_warn_1":		" Message has been removed due to bad behaviour!",
 	"censor_removed_warn_2":		" This has been the second warning. One more and you'll be **muted** from the server!",
@@ -939,6 +949,7 @@
 	"join_permission_err":			"The joined user **{}** with the ID number **{}** couldn't be muted because the following permission is required: ",
 	"join_permission_err_2":		"The joined user **{}** with the ID number **{}** couldn't be banned because the following permission is required: ",
 	"join_verify":					"Welcome to {} {}\nYou have been placed in our holding room. An available administrator or moderator will verify you shortly.",
+	"join_new":						"Created {} hours and {} minutes ago",
 	
 	"name_title":					"Not allowed name found!",
 	"name_reason":					"Renamed due to current name censor settings!",

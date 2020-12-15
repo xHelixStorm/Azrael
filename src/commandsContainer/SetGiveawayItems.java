@@ -35,12 +35,14 @@ public class SetGiveawayItems {
 			final int result = RankingSystem.SQLUpdateRewardExpiration(e.getGuild().getIdLong(), timestamp);
 			if(result > 0) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_GIVEAWAY_EXTENDED)).build()).queue();
+				logger.info("User {} has extended the expiration of the currently registered giveaway rewards until the end of this month in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			}
 			else if(result == 0) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_GIVEAWAY_EXTEND_ERR)).build()).queue();
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("Giveaway rewards expiration couldn't be extended until the end of the current month in guild {}", e.getGuild().getId());
 			}
 		}
 		//verify pastebin link and save the content into array
@@ -54,18 +56,18 @@ public class SetGiveawayItems {
 				boolean err = RankingSystem.SQLBulkInsertGiveawayRewards(rewards, timestamp, e.getGuild().getIdLong());
 				
 				if(err == false) {
-					logger.debug("{} has inserted giveaway items for the daily command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+					logger.info("User {} has used the pastebin url {} to save giveaway rewards in guild {}", e.getMember().getUser().getId(), param, e.getGuild().getId());
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_GIVEAWAY_ADDED)).build()).queue();
 				}
 				else {
 					EmbedBuilder error = new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED);
 					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Rewards couldn't be uploaded into the RankingSystem.giveaway table in guild {}");
+					logger.error("Giveaway rewards couldn't be saved with the pastebin url {} in guild {}", param, e.getGuild().getId());
 				}
 			} catch (MalformedURLException | RuntimeException e1) {
 				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
 				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR_2)).build()).queue();
-				logger.error("Reading paste failed in guild {}!", e.getGuild().getId(), e1);
+				logger.error("Reading pastebin url {} failed in guild {}", param, e.getGuild().getId(), e1);
 			}
 		}
 		else {

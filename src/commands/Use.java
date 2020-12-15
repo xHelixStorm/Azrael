@@ -54,83 +54,59 @@ public class Use implements CommandPublic {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_HELP)).build()).queue();
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL))) {
-					final var skin = RankingSystem.SQLgetRankingLevel(guild_settings.getLevelID(), guild_settings.getThemeID());
-					user_details.setRankingLevel(skin.getSkin());
-					if(user_details.getRankingLevel() != 0) {
-						if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel()) > 0) {
-							Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_LEVEL_RESET).replace("{}", skin.getSkinDescription())).build()).queue();
-						}
-						else {
-							//if rows didn't get updated, throw an error and write it into error log
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("RankingSystem.users table couldn't be updated with the default level skin for {}", e.getMember().getUser().getId());
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+skin.getSkinDescription());
-						}
+					user_details.setRankingLevel(guild_settings.getLevelID());
+					final var skinDescription = (guild_settings.getLevelID() > 0 ? guild_settings.getLevelDescription() : STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase());
+					if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel()) > 0) {
+						Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_LEVEL_RESET).replace("{}", skinDescription)).build()).queue();
 					}
 					else {
+						//if rows didn't get updated, throw an error and write it into error log
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
+						logger.error("Current level skin couldn't be updated with the default level skin for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+						RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+skinDescription);
 					}
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK))) {
-					final var skin = RankingSystem.SQLgetRankingRank(guild_settings.getRankID(), guild_settings.getThemeID());
-					user_details.setRankingRank(skin.getSkin());
-					if(user_details.getRankingRank() != 0) {
-						if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank()) > 0) {
-							Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_RANK_RESET).replace("{}", skin.getSkinDescription())).build()).queue();
-						}
-						else {
-							//if rows didn't get updated, throw an error and write it into error log
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("RankingSystem.users table couldn't be updated with the default rank skin for {}", e.getMember().getUser().getId());
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+skin.getSkinDescription());
-						}
+					user_details.setRankingRank(guild_settings.getRankID());
+					final var skinDescription = (guild_settings.getRankID() > 0 ? guild_settings.getRankDescription() : STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase());
+					if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank()) > 0) {
+						Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_RANK_RESET).replace("{}", skinDescription)).build()).queue();
 					}
 					else {
+						//if rows didn't get updated, throw an error and write it into error log
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
+						logger.error("Current rank skin couldn't be updated with the default rank skin for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+						RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+skinDescription);
 					}
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE))) {
-					final var skin = RankingSystem.SQLgetRankingProfile(guild_settings.getProfileID(), guild_settings.getThemeID());
-					user_details.setRankingProfile(skin.getSkin());
-					if(user_details.getRankingProfile() != 0) {
-						if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile()) > 0) {
-							Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_PROFILE_RESET).replace("{}", skin.getSkinDescription())).build()).queue();
-						}
-						else {
-							//if rows didn't get updated, throw an error and write it into error log
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("RankingSystem.users table couldn't be updated with the default profile skin for {}", e.getMember().getUser().getId());
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+skin.getSkinDescription());
-						}
+					user_details.setRankingProfile(guild_settings.getProfileID());
+					final var skinDescription = (guild_settings.getProfileID() > 0 ? guild_settings.getProfileDescription() : STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase());
+					if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile()) > 0) {
+						Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_PROFILE_RESET).replace("{}", skinDescription)).build()).queue();
 					}
 					else {
+						//if rows didn't get updated, throw an error and write it into error log
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
+						logger.error("Current profile skin couldn't be updated with the default profile skin for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+						RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+skinDescription);
 					}
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICONS))) {
-					final var skin = RankingSystem.SQLgetRankingIcons(guild_settings.getIconID(), guild_settings.getThemeID());
-					user_details.setRankingIcon(skin.getSkin());
-					if(user_details.getRankingIcon() != 0) {
-						if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon()) > 0) {
-							Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_ICON_RESET).replace("{}", skin.getSkinDescription())).build()).queue();
-						}
-						else {
-							//if rows didn't get updated, throw and error and write it into error log
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("RankingSystem.users table couldn't be updated with the default icon skin for {}", e.getMember().getUser().getId());
-							RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icons skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+skin.getSkinDescription());
-						}
+					user_details.setRankingIcon(guild_settings.getIconID());
+					final var skinDescription = (guild_settings.getIconID() > 0 ? guild_settings.getIconDescription() : STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase());
+					if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon()) > 0) {
+						Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_ICON_RESET).replace("{}", skinDescription)).build()).queue();
 					}
 					else {
+						//if rows didn't get updated, throw and error and write it into error log
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Default skins in RankingSystem.guilds are not defined for guild {}", e.getGuild().getName());
+						logger.error("Current icon skin couldn't be updated with the default icon skin for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+						RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icons skin couldn't be resetted", "Resetting to the default skin has failed. Skin: "+skinDescription);
 					}
 				}
 				else {
@@ -139,11 +115,11 @@ public class Use implements CommandPublic {
 						out.append(args[i]+" ");
 					}
 					String input = out.toString().trim();
-					constructors.Inventory inventory = RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input, guild_settings.getThemeID());
-					if(inventory != null && inventory.getItemID() != 0 && inventory.getStatus().equals("perm")) {
-						if(inventory.getSkinType().equals("lev")) {
+					constructors.Inventory inventory = RankingSystem.SQLgetItemIDAndSkinType(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input);
+					if(inventory != null && inventory.getItemID() != 0) {
+						if(inventory.getSkinType().equals("lev") && inventory.getStatus().equals("perm")) {
 							final String filter = input;
-							final var skin = RankingSystem.SQLgetRankingLevelList(guild_settings.getThemeID()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+							final var skin = RankingSystem.SQLgetRankingLevelList(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 							user_details.setRankingLevel(skin.getSkin());
 							if(RankingSystem.SQLUpdateUserLevelSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingLevel()) > 0) {
 								Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
@@ -151,13 +127,13 @@ public class Use implements CommandPublic {
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("RankingSystem.users table couldn't be updated with the selected level skin {} for {}", skin.getSkinDescription(), e.getMember().getUser().getId());
+								logger.error("Selected level skin {} for user {} couldn't be updated in guild {}", skin.getSkinDescription(), e.getMember().getUser().getId(), e.getGuild().getId());
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Level skin couldn't be updated", "Level skin update has failed. Skin: "+skin.getSkinDescription());
 							}
 						}
-						else if(inventory.getSkinType().equals("ran")) {
+						else if(inventory.getSkinType().equals("ran") && inventory.getStatus().equals("perm")) {
 							final String filter = input;
-							final var skin = RankingSystem.SQLgetRankingRankList(guild_settings.getThemeID()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+							final var skin = RankingSystem.SQLgetRankingRankList(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 							user_details.setRankingRank(skin.getSkin());
 							if(RankingSystem.SQLUpdateUserRankSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingRank()) > 0) {
 								Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
@@ -165,13 +141,13 @@ public class Use implements CommandPublic {
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("RankingSystem.users table couldn't be updated with the selected rank skin {} for {}", skin.getSkinDescription(), e.getMember().getUser().getId());
+								logger.error("Selected rank skin {} for user {} couldn't be updated in guild {}", skin.getSkinDescription(), e.getMember().getUser().getId(), e.getGuild().getId());
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Rank skin couldn't be updated", "Rank skin update has failed. Skin: "+skin.getSkinDescription());
 							}
 						}
-						else if(inventory.getSkinType().equals("pro")) {
+						else if(inventory.getSkinType().equals("pro") && inventory.getStatus().equals("perm")) {
 							final String filter = input;
-							final var skin = RankingSystem.SQLgetRankingProfileList(guild_settings.getThemeID()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+							final var skin = RankingSystem.SQLgetRankingProfileList(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 							user_details.setRankingProfile(skin.getSkin());
 							if(RankingSystem.SQLUpdateUserProfileSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingProfile()) > 0) {
 								Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
@@ -179,13 +155,13 @@ public class Use implements CommandPublic {
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("RankingSystem.users table couldn't be updated with the selected profile skin {} for {}", skin.getSkinDescription(), e.getMember().getUser().getId());
+								logger.error("Selected profile skin {} for user {} couldn't be updated in guild {}", skin.getSkinDescription(), e.getMember().getUser().getId(), e.getGuild().getId());
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Profile skin couldn't be updated", "Profile skin update has failed. Skin: "+skin.getSkinDescription());
 							}
 						}
-						else if(inventory.getSkinType().equals("ico")) {
+						else if(inventory.getSkinType().equals("ico") && inventory.getStatus().equals("perm")) {
 							final String filter = input;
-							final var skin = RankingSystem.SQLgetRankingIconsList(guild_settings.getThemeID()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
+							final var skin = RankingSystem.SQLgetRankingIconsList(e.getGuild().getIdLong()).parallelStream().filter(r -> r.getSkinDescription().equalsIgnoreCase(filter)).findAny().orElse(null);
 							user_details.setRankingIcon(skin.getSkin());
 							if(RankingSystem.SQLUpdateUserIconSkin(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), user_details.getRankingIcon()) > 0) {
 								Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
@@ -193,50 +169,43 @@ public class Use implements CommandPublic {
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("RankingSystem.users table couldn't be updated with the selected icons skin {} for {}", skin.getSkinDescription(), e.getMember().getUser().getId());
+								logger.error("Selected icon skin {} for user {} couldn't be updated in guild {}", skin.getSkinDescription(), e.getMember().getUser().getId(), e.getGuild().getId());
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Icon skin couldn't be updated", "Icon skin update has failed. Skin: "+skin.getSkinDescription());
 							}
 						}
 						else if(inventory.getSkinType().equals("ite")) {
-							var inventoryNumber = RankingSystem.SQLgetInventoryNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input, "perm", guild_settings.getThemeID());
-							var expiration = RankingSystem.SQLgetExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventory.getItemID(), guild_settings.getThemeID());
-							var numberLimit = RankingSystem.SQLgetNumberLimitFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventory.getItemID(), guild_settings.getThemeID());
+							var inventoryNumber = RankingSystem.SQLgetInventoryNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), input, "perm");
+							var expiration = RankingSystem.SQLgetExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventory.getItemID());
+							var numberLimit = RankingSystem.SQLgetNumberLimitFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventory.getItemID());
 							long time = System.currentTimeMillis();
 							Timestamp timestamp = new Timestamp(time);
-							try {
-								Timestamp timestamp2 = new Timestamp(expiration.getTime()+1000*60*60*24);
-								if(inventoryNumber == 1) {
-									if(RankingSystem.SQLDeleteAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), numberLimit+1, inventory.getItemID(), timestamp, timestamp2, guild_settings.getThemeID()) == 0) {
-										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.error("Item id {} for the user {} couldn't be used or opened in guild {}", inventory.getItemID(), e.getMember().getUser().getId(), e.getGuild().getId());
-										RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+inventory.getItemID());
-									}
+							Timestamp timestamp2 = null;
+							if(expiration != null)
+								timestamp2 = new Timestamp(expiration.getTime()+1000*60*60*24);
+							else
+								timestamp2 = new Timestamp(time+1000*60*60*24);
+
+							if(inventoryNumber == 1) {
+								if(RankingSystem.SQLDeleteAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), numberLimit+1, inventory.getItemID(), timestamp, timestamp2) == 0) {
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Item id {} for the user {} couldn't be used or opened in guild {}", inventory.getItemID(), e.getMember().getUser().getId(), e.getGuild().getId());
+									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+inventory.getItemID());
 								}
-								else {
-									if(RankingSystem.SQLUpdateAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventoryNumber, numberLimit+1, inventory.getItemID(), timestamp, timestamp2, guild_settings.getThemeID()) == 0) {
-										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.error("Item id {} for the user {} couldn't be used or opened in guild {}", inventory.getItemID(), e.getMember().getUser().getId(), e.getGuild().getId());
-										RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+inventory.getItemID());
-									}
-								}
-							} catch(NullPointerException npe) {
-								Timestamp timestamp2 = new Timestamp(time+1000*60*60*24);
-								if(inventoryNumber == 1) {
-									if(RankingSystem.SQLDeleteAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), numberLimit+1, inventory.getItemID(), timestamp, timestamp2, guild_settings.getThemeID()) == 0) {
-										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.error("Item id {} for the user {} couldn't be used or opened in guild {}", inventory.getItemID(), e.getMember().getUser().getId(), e.getGuild().getId());
-										RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+inventory.getItemID());
-									}
-								}
-								else {
-									if(RankingSystem.SQLUpdateAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventoryNumber, numberLimit+1, inventory.getItemID(), timestamp, timestamp2, guild_settings.getThemeID()) == 0) {
-										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.error("Item id {} for the user {} couldn't be used or opened in guild {}", inventory.getItemID(), e.getMember().getUser().getId(), e.getGuild().getId());
-										RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+inventory.getItemID());
-									}
-								}
+								else
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_ITEM).replace("{}", input)).build()).queue();
 							}
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_ITEM).replace("{}", input)).build()).queue();
+							else if(inventoryNumber > 1) {
+								if(RankingSystem.SQLUpdateAndInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), inventoryNumber, numberLimit+1, inventory.getItemID(), timestamp, timestamp2) == 0) {
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Item id {} for the user {} couldn't be used or opened in guild {}", inventory.getItemID(), e.getMember().getUser().getId(), e.getGuild().getId());
+									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Item couldn't be used or activated", "Item use failed. item id: "+inventory.getItemID());
+								}
+								else
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_ITEM).replace("{}", input)).build()).queue();
+							}
+							else if(numberLimit > 0) {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_ITEM_ALREADY_OPEN).replace("{}", input)).build()).queue();
+							}
 						}
 					}
 					else {

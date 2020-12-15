@@ -11,17 +11,25 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.zip.DataFormatException;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,23 +45,24 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.RankingSystem;
+import util.Imgur;
 import util.STATIC;
 
 public class RankingMethods extends ListenerAdapter {
 	//Class for drawing level ups, ranks and profiles basing on the user settings
 	private final static Logger logger = LoggerFactory.getLogger(RankingMethods.class);
 	
-	public static void getRankUp(GuildMessageReceivedEvent e , int theme_id, Ranking user_details, int rank_icon) {
-		final var skinIcon = RankingSystem.SQLgetRankingIcons(user_details.getRankingIcon(), theme_id);
-		final var skin = RankingSystem.SQLgetRankingLevel(user_details.getRankingLevel(), theme_id);
+	public static void getRankUp(GuildMessageReceivedEvent e, Ranking user_details, int rankIcon) {
+		final var skinIcon = RankingSystem.SQLgetRankingIcons(user_details.getRankingIcon(), e.getGuild().getIdLong());
+		final var skin = RankingSystem.SQLgetRankingLevel(user_details.getRankingLevel(), e.getGuild().getIdLong());
 		if(skinIcon == null || skin == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).build()).queue();
-			logger.error("RankUp couldn't be drawn for guild {}. Skin not found!", e.getGuild().getIdLong());
+			logger.error("RankUp couldn't be drawn. Skin not found in guild {}", e.getGuild().getIdLong());
 			return;
 		}
 		
 		try {
-			BufferedImage rank = ImageIO.read(new File((skinIcon.getSource() == null ? "./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+rank_icon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rank_icon+"."+skinIcon.getFileType())));
+			BufferedImage rank = ImageIO.read(new File((skinIcon.getSource() == null ? "./files/RankingSystem/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
 			String name = e.getMember().getEffectiveName();
 			int characterCounter = name.length();
 			int level = (user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel());
@@ -86,7 +95,7 @@ public class RankingMethods extends ListenerAdapter {
 				name = name.substring(0, skin.getNameLengthLimit());
 			
 			if(!skin.getFileType().equals("gif")) {
-				BufferedImage rankUp = ImageIO.read(new File((skin.getSource() == null ? "./files/RankingSystem/"+theme_id+"/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
+				BufferedImage rankUp = ImageIO.read(new File((skin.getSource() == null ? "./files/RankingSystem/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				int rankUpW = rankUp.getWidth();
 				int rankUpH = rankUp.getHeight();
 				BufferedImage overlay = new BufferedImage(rankUpW, rankUpH, BufferedImage.TYPE_4BYTE_ABGR);
@@ -111,7 +120,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.dispose();
 			}
 			else {
-				final GifImage gif = GifDecoder.read(new FileInputStream(skin.getSource() == null ? "./files/RankingSystem/"+theme_id+"/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType()));
+				final GifImage gif = GifDecoder.read(new FileInputStream(skin.getSource() == null ? "./files/RankingSystem/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType()));
 				var frames = gif.getFrameCount();
 				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(IniFileReader.getTempDirectory()+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
 				int rankUpW = gif.getWidth();
@@ -142,32 +151,67 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			final File file1 = new File(IniFileReader.getTempDirectory()+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-			if(file1.length() > 8000000 && e.getGuild().getBoostCount() < 15) {
-				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
-					try {
-						String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("level", "level_compressed")};
-						final var output = GifOptimizer.startGifOptimization(args);
-						if(output == null) {
+			if(file1.length() > (FileUtils.ONE_MB*8)) {
+				//before attempting file compression, check if it can be uploaded to Imgur
+				final String uploadedFile = Imgur.uploadFile(file1);
+				if(uploadedFile != null) {
+					e.getChannel().sendMessage(uploadedFile).queue();
+				}
+				else if(skin.getFileType().equals("gif")) {
+					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
+						try {
+							String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("level", "level_compressed")};
+							final var output = GifOptimizer.startGifOptimization(args);
+							if(output == null) {
+								file1.delete();
+								message.delete().queue();
+								final File file2 = new File(IniFileReader.getTempDirectory()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+								try {
+									e.getChannel().sendFile(file2, "level_up."+skin.getFileType()).queue(complete -> {
+										file2.delete();
+									});
+								} catch(IllegalArgumentException e1) {
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+									logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
+									file2.delete();
+								}
+							}
+						} catch(IOException | DataFormatException e1) {
+							logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
 							file1.delete();
 							message.delete().queue();
-							final File file2 = new File(IniFileReader.getTempDirectory()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-							try {
-								e.getChannel().sendFile(file2, "level_up."+skin.getFileType()).queue(complete -> {
-									file2.delete();
-								});
-							} catch(IllegalArgumentException e1) {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
-								logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
-								file2.delete();
-							}
+							e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
 						}
-					} catch(IOException | DataFormatException e1) {
-						logger.error("Compression error for file {}", skin.getSkinDescription()+skin.getFileType(), e1);
-						file1.delete();
-						message.delete().queue();
-						e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
+					});
+				}
+				else {
+					BufferedImage image = ImageIO.read(file1);
+					File file2 = new File(IniFileReader.getTempDirectory()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+					OutputStream os = new FileOutputStream(file2);
+					Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(skin.getFileType());
+					ImageWriter writer = writers.next();
+					ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+					writer.setOutput(ios);
+					ImageWriteParam param = writer.getDefaultWriteParam();
+					param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+					param.setCompressionQuality(0.05f);
+					writer.write(null, new IIOImage(image, null, null), param);
+					
+					os.close();
+					ios.close();
+					writer.dispose();
+					
+					file1.delete();
+					try {
+						e.getChannel().sendFile(file2, "level_up."+skin.getFileType()).queue(complete -> {
+							file2.delete();
+						});
+					} catch(IllegalArgumentException e1) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.IMAGE_SEND_ERR)).build()).queue();
+						logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
+						file2.delete();
 					}
-				});
+				}
 			}
 			else {
 				e.getChannel().sendFile(file1, "level_up."+skin.getFileType()).complete();
@@ -178,30 +222,30 @@ public class RankingMethods extends ListenerAdapter {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).queue();
-			logger.error("RankUp couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
+			logger.error("RankUp couldn't be drawn in guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	
-	public static void getRank(GuildMessageReceivedEvent e, String _name, String _avatar, int _experience, int _rank, int theme_id, Ranking user_details) {
-		final var skinIcon = RankingSystem.SQLgetRankingIcons(user_details.getRankingIcon(), theme_id);
-		final var skin = RankingSystem.SQLgetRankingRank(user_details.getRankingRank(), theme_id);
+	public static void getRank(GuildMessageReceivedEvent e, String _name, String _avatar, int _experience, int _rank, Ranking user_details) {
+		final var skinIcon = RankingSystem.SQLgetRankingIcons(user_details.getRankingIcon(), e.getGuild().getIdLong());
+		final var skin = RankingSystem.SQLgetRankingRank(user_details.getRankingRank(), e.getGuild().getIdLong());
 		if(skinIcon == null || skin == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).build()).queue();
-			logger.error("Rank couldn't be drawn for guild {}. Skin not found!", e.getGuild().getIdLong());
+			logger.error("Rank couldn't be drawn. Skin not found in guild {}", e.getGuild().getIdLong());
 			return;
 		}
 		
 		try{
 			BufferedImage experienceBar;
-			if(_experience != 0) {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+skin.getBarColor()+"_"+100+".png"));
+			if(_experience != 0 && skin.getBarColor() > 0) {
+				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+skin.getBarColor()+"_"+100+".png"));
 				experienceBar = experienceBar.getSubimage(0, 0, 2*_experience, experienceBar.getHeight());
 			}
 			else {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+0+"_"+0+".png"));
+				experienceBar = null;
 			}
-			int rankIcon = RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), theme_id).parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null).getRankIcon();
-			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType()));
+			int rankIcon = RankingSystem.SQLgetLevels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null).getRankIcon();
+			BufferedImage level = ImageIO.read(new File((skinIcon.getSource() == null ? "./files/RankingSystem/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -218,14 +262,14 @@ public class RankingMethods extends ListenerAdapter {
 				name = name.substring(0, skin.getNameLengthLimit());
 			
 			if(!skin.getFileType().equals("gif")) {
-				BufferedImage rank = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/"+skin.getSkinDescription()+"."+skin.getFileType()));
+				BufferedImage rank = ImageIO.read(new File((skin.getSource() == null ? "./files/RankingSystem/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				int rankW = rank.getWidth();
 				int rankH = rank.getHeight();
 				BufferedImage overlay = new BufferedImage(rankW, rankH, BufferedImage.TYPE_4BYTE_ABGR);
 				Graphics2D g = overlay.createGraphics();
 				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 				g.drawImage(rank, 0, 0, null);
-				if(skin.getBarX() > 0 || skin.getBarY() > 0)
+				if(experienceBar != null)
 					g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
 				if(skin.getIconX() > 0 || skin.getIconY() > 0)
 					g.drawImage(blurImage(level), skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
@@ -251,7 +295,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.dispose();
 			}
 			else {
-				final GifImage gif = GifDecoder.read(new FileInputStream("./files/RankingSystem/"+theme_id+"/Skins/"+skin.getSkinDescription()+"."+skin.getFileType()));
+				final GifImage gif = GifDecoder.read(new FileInputStream((skin.getSource() == null ? "./files/RankingSystem/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				var frames = gif.getFrameCount();
 				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(IniFileReader.getTempDirectory()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
 				int rankW = gif.getWidth();
@@ -262,8 +306,7 @@ public class RankingMethods extends ListenerAdapter {
 					Graphics2D g = overlay.createGraphics();
 					g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 					g.drawImage(rank, 0, 0, null);
-					if(skin.getBarX() > 0 || skin.getBarY() > 0)
-						g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
+					g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
 					if(skin.getIconX() > 0 || skin.getIconY() > 0)
 						g.drawImage(blurImage(level), skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
 					if(skin.getAvatarX() > 0 || skin.getAvatarY() > 0)
@@ -290,32 +333,67 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			final File file1 = new File(IniFileReader.getTempDirectory()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-			if(file1.length() > 8000000 && e.getGuild().getBoostCount() < 15) {
-				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
-					try {
-						String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("rank", "rank_compressed")};
-						final var output = GifOptimizer.startGifOptimization(args);
-						if(output == null) {
+			if(file1.length() > (FileUtils.ONE_MB*8)) {
+				//before attempting file compression, check if it can be uploaded to Imgur
+				final String uploadedFile = Imgur.uploadFile(file1);
+				if(uploadedFile != null) {
+					e.getChannel().sendMessage(uploadedFile).queue();
+				}
+				else if(skin.getFileType().equals("gif")) {
+					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
+						try {
+							String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("rank", "rank_compressed")};
+							final var output = GifOptimizer.startGifOptimization(args);
+							if(output == null) {
+								file1.delete();
+								message.delete().queue();
+								final File file2 = new File(IniFileReader.getTempDirectory()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+								try {
+									e.getChannel().sendFile(file2, "rank."+skin.getFileType()).queue(complete -> {
+										file2.delete();
+									});
+								} catch(IllegalArgumentException e1) {
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+									logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
+									file2.delete();
+								}
+							}
+						} catch(IOException | DataFormatException e1) {
+							e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
+							logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
 							file1.delete();
 							message.delete().queue();
-							final File file2 = new File(IniFileReader.getTempDirectory()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-							try {
-								e.getChannel().sendFile(file2, "rank."+skin.getFileType()).queue(complete -> {
-									file2.delete();
-								});
-							} catch(IllegalArgumentException e1) {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
-								logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
-								file2.delete();
-							}
 						}
-					} catch(IOException | DataFormatException e1) {
-						e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
-						logger.error("Compression error for file {}", skin.getSkinDescription()+skin.getFileType(), e1);
-						file1.delete();
-						message.delete().queue();
+					});
+				}
+				else {
+					BufferedImage image = ImageIO.read(file1);
+					File file2 = new File(IniFileReader.getTempDirectory()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+					OutputStream os = new FileOutputStream(file2);
+					Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(skin.getFileType());
+					ImageWriter writer = writers.next();
+					ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+					writer.setOutput(ios);
+					ImageWriteParam param = writer.getDefaultWriteParam();
+					param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+					param.setCompressionQuality(0.05f);
+					writer.write(null, new IIOImage(image, null, null), param);
+					
+					os.close();
+					ios.close();
+					writer.dispose();
+					
+					file1.delete();
+					try {
+						e.getChannel().sendFile(file2, "rank."+skin.getFileType()).queue(complete -> {
+							file2.delete();
+						});
+					} catch(IllegalArgumentException e1) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.IMAGE_SEND_ERR)).build()).queue();
+						logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
+						file2.delete();
 					}
-				});
+				}
 			}
 			else {
 				e.getChannel().sendFile(file1, "rank."+skin.getFileType()).complete();
@@ -326,30 +404,30 @@ public class RankingMethods extends ListenerAdapter {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).queue();
-			logger.error("Rank couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
+			logger.error("Rank couldn't be drawn in guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	
-	public static void getProfile(GuildMessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _rank, int currentExperience, int rankUpExperience, int theme_id, Ranking user_details) {
-		final var skinIcon = RankingSystem.SQLgetRankingIcons(user_details.getRankingIcon(), theme_id);
-		final var skin = RankingSystem.SQLgetRankingProfile(user_details.getRankingProfile(), theme_id);
+	public static void getProfile(GuildMessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _rank, int currentExperience, int rankUpExperience, Ranking user_details) {
+		final var skinIcon = RankingSystem.SQLgetRankingIcons(user_details.getRankingIcon(), e.getGuild().getIdLong());
+		final var skin = RankingSystem.SQLgetRankingProfile(user_details.getRankingProfile(), e.getGuild().getIdLong());
 		if(skinIcon == null || skin == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).build()).queue();
-			logger.error("Profile couldn't be drawn for guild {}. Skin not found!", e.getGuild().getIdLong());
+			logger.error("Profile couldn't be drawn. Skin not found in guild {}", e.getGuild().getIdLong());
 			return;
 		}
 		
 		try{
 			BufferedImage experienceBar;
-			if(_experiencePercentage != 0) {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+skin.getBarColor()+"_"+100+".png"));
+			if(_experiencePercentage != 0 && skin.getBarColor() > 0) {
+				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+skin.getBarColor()+"_"+100+".png"));
 				experienceBar = experienceBar.getSubimage(0, 0, (experienceBar.getWidth()*_experiencePercentage)/100, experienceBar.getHeight());
 			}
 			else {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/ExperienceBar/exp"+0+"_"+0+".png"));
+				experienceBar = null;
 			}
-			int rankIcon = RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), theme_id).parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null).getRankIcon();
-			BufferedImage level = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType()));
+			int rankIcon = RankingSystem.SQLgetLevels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null).getRankIcon();
+			BufferedImage level = ImageIO.read(new File((skinIcon.getSource() == null ? "./files/RankingSystem/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -367,7 +445,7 @@ public class RankingMethods extends ListenerAdapter {
 				name = name.substring(0, skin.getNameLengthLimit());
 			
 			if(!skin.getFileType().equals("gif")) {
-				BufferedImage profile = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Skins/"+skin.getSkinDescription()+"."+skin.getFileType()));
+				BufferedImage profile = ImageIO.read(new File((skin.getSource() == null ? "./files/RankingSystem/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				int profileW = profile.getWidth();
 				int profileH = profile.getHeight();
 				BufferedImage overlay = new BufferedImage(profileW, profileH, BufferedImage.TYPE_4BYTE_ABGR);
@@ -376,7 +454,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 				g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				if(skin.getBarX() > 0 || skin.getBarY() > 0)
+				if(experienceBar != null)
 					g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
 				if(skin.getIconX() > 0 || skin.getIconY() > 0)
 					g.drawImage(blurImage(level), skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
@@ -447,7 +525,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.dispose();
 			}
 			else {
-				final GifImage gif = GifDecoder.read(new FileInputStream("./files/RankingSystem/"+theme_id+"/Skins/"+skin.getSkinDescription()+"."+skin.getFileType()));
+				final GifImage gif = GifDecoder.read(new FileInputStream((skin.getSource() == null ? "./files/RankingSystem/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				var frames = gif.getFrameCount();
 				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(IniFileReader.getTempDirectory()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
 				int profileW = gif.getWidth();
@@ -460,8 +538,7 @@ public class RankingMethods extends ListenerAdapter {
 					g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 					g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-					if(skin.getBarX() > 0 || skin.getBarY() > 0)
-						g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
+					g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
 					if(skin.getIconX() > 0 || skin.getIconY() > 0)
 						g.drawImage(blurImage(level), skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
 					if(skin.getAvatarX() > 0 || skin.getAvatarY() > 0)
@@ -533,32 +610,66 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			final File file1 = new File(IniFileReader.getTempDirectory()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-			if(file1.length() > 8000000 && e.getGuild().getBoostCount() < 15) {
-				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
-					try {
-						String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("profile", "profile_compressed")};
-						final var output = GifOptimizer.startGifOptimization(args);
-						if(output == null) {
+			if(file1.length() > (FileUtils.ONE_MB*8)) {
+				final String uploadedFile = Imgur.uploadFile(file1);
+				if(uploadedFile != null) {
+					e.getChannel().sendMessage(uploadedFile).queue();
+				}
+				else if(skin.getFileType().equals("gif")) {
+					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
+						try {
+							String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("profile", "profile_compressed")};
+							final var output = GifOptimizer.startGifOptimization(args);
+							if(output == null) {
+								file1.delete();
+								message.delete().queue();
+								final File file2 = new File(IniFileReader.getTempDirectory()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+								try {
+									e.getChannel().sendFile(file2, "profile."+skin.getFileType()).queue(complete -> {
+										file2.delete();
+									});
+								} catch(IllegalArgumentException e1) {
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+									logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
+									file2.delete();
+								}
+							}
+						} catch(IOException | DataFormatException e1) {
+							e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
+							logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
 							file1.delete();
 							message.delete().queue();
-							final File file2 = new File(IniFileReader.getTempDirectory()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-							try {
-								e.getChannel().sendFile(file2, "profile."+skin.getFileType()).queue(complete -> {
-									file2.delete();
-								});
-							} catch(IllegalArgumentException e1) {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
-								logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
-								file2.delete();
-							}
 						}
-					} catch(IOException | DataFormatException e1) {
-						e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
-						logger.error("Compression error for file {}", skin.getSkinDescription()+skin.getFileType(), e1);
-						file1.delete();
-						message.delete().queue();
+					});
+				}
+				else {
+					BufferedImage image = ImageIO.read(file1);
+					File file2 = new File(IniFileReader.getTempDirectory()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+					OutputStream os = new FileOutputStream(file2);
+					Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(skin.getFileType());
+					ImageWriter writer = writers.next();
+					ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+					writer.setOutput(ios);
+					ImageWriteParam param = writer.getDefaultWriteParam();
+					param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+					param.setCompressionQuality(0.05f);
+					writer.write(null, new IIOImage(image, null, null), param);
+					
+					os.close();
+					ios.close();
+					writer.dispose();
+					
+					file1.delete();
+					try {
+						e.getChannel().sendFile(file2, "profile."+skin.getFileType()).queue(complete -> {
+							file2.delete();
+						});
+					} catch(IllegalArgumentException e1) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.IMAGE_SEND_ERR)).build()).queue();
+						logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
+						file2.delete();
 					}
-				});
+				}
 			}
 			else {
 				e.getChannel().sendFile(file1, "profile."+skin.getFileType()).complete();
@@ -569,7 +680,7 @@ public class RankingMethods extends ListenerAdapter {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).queue();
-			logger.error("Profile couldn't be drawn for guild {}", e.getGuild().getIdLong(), e1);
+			logger.error("Profile couldn't be drawn in guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	

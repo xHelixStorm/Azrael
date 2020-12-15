@@ -44,7 +44,7 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearRankSkins();
 		Hashes.clearChannels();
 		
-		logger.info("Temporary Hashes have been cleared!");
+		logger.info("Temporary cache has been cleared");
 		
 		//clear any outdated tweet logs
 		Azrael.SQLDeleteTweetLog();

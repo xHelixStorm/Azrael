@@ -18,7 +18,6 @@ public class Guilds {
 	private boolean ranking_state;
 	private long max_experience;
 	private boolean max_exp_enabled;
-	private int theme_id;
 	private String currency;
 	private long randomshop_price;
 	private long start_currency;
@@ -119,9 +118,6 @@ public class Guilds {
 	}
 	public void setMaxExpEnabled(boolean _max_exp_enabled) {
 		this.max_exp_enabled = _max_exp_enabled;
-	}
-	public void setThemeID(int _theme_id) {
-		this.theme_id = _theme_id;
 	}
 	public void setCurrency(String _currency) {
 		this.currency = _currency;
@@ -309,9 +305,6 @@ public class Guilds {
 	}
 	public boolean getMaxExpEnabled() {
 		return this.max_exp_enabled;
-	}
-	public int getThemeID() {
-		return this.theme_id;
 	}
 	public String getCurrency() {
 		return this.currency;

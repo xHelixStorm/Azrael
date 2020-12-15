@@ -32,7 +32,7 @@ public class Web implements CommandPublic, CommandPrivate {
 
 	@Override
 	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("User {} has used Web command!", e.getAuthor().getId());
+		logger.trace("User {} has used Web command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 
 	@Override
@@ -77,6 +77,6 @@ public class Web implements CommandPublic, CommandPrivate {
 
 	@Override
 	public void executed(boolean success, PrivateMessageReceivedEvent e) {
-		logger.trace("User {} has used Web command!", e.getAuthor().getId());
+		logger.trace("User {} has used Web command", e.getAuthor().getId());
 	}
 }

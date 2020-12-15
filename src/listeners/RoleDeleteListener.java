@@ -34,10 +34,10 @@ public class RoleDeleteListener extends ListenerAdapter {
 			//When a role gets deleted from a guild, delete it from table
 			var deleted = DiscordRoles.SQLDeleteRole(e.getRole().getIdLong(), e.getGuild().getIdLong());
 			if(deleted > 0) {
-				logger.debug("role id {} has been deleted from guild {}", e.getRole().getName(), e.getGuild().getName());
+				logger.info("role {} deleted in guild {}", e.getRole().getId(), e.getGuild().getId());
 			}
 			else {
-				logger.error("role id {} couldn't be deleted for guild {} in table DiscordRoles.roles", e.getRole().getName(), e.getGuild().getName() );
+				logger.error("role {} couldn't be deleted in guild {}", e.getRole().getId(), e.getGuild().getId() );
 			}
 			
 			//check if a ranking role has been deleted
@@ -49,13 +49,13 @@ public class RoleDeleteListener extends ListenerAdapter {
 					if(RankingSystem.SQLremoveSingleRole(e.getRole().getIdLong(), e.getGuild().getIdLong()) == 0) {
 						EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR));
 						STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.DELETE_RANK_ROLE_ERR), Channel.LOG.getType());
-						logger.error("Role {} couldn't be removed from RankingSystem.roles table in guild {}", e.getRole().getId(), e.getGuild().getId());
+						logger.error("Ranking role {} couldn't be deleted in guild {}", e.getRole().getId(), e.getGuild().getId());
 					}
 				}
 				else {
 					EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR));
 					STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.DELETE_RANK_ROLE_ERR), Channel.LOG.getType());
-					logger.error("The role {} couldn't be set to 0 in RankingSystem.user_details upon role delete in guild {}", e.getRole().getId(), e.getGuild().getId());
+					logger.error("Unlocked ranking role {} couldn't be removed from users after role deletion in guild {}", e.getRole().getId(), e.getGuild().getId());
 				}
 			}
 		}).start();

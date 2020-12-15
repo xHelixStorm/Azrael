@@ -2048,7 +2048,7 @@ public class Competitive {
 	}
 	
 	public static CompMap SQLgetMap(long _guild_id, String _map) {
-		logger.trace("SQLgetMap launched. Passed params {}", _guild_id, _map);
+		logger.trace("SQLgetMap launched. Passed params {}, {}", _guild_id, _map);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;

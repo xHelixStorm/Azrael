@@ -78,7 +78,7 @@ public class Deny implements CommandPublic {
 										}
 										else {
 											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.KICK_MEMBERS.getName()).build()).queue();
-											logger.error("MANAGE_ROLES permission required to to assign roles in guild {}", e.getGuild().getId());
+											logger.error("MANAGE_ROLES permission required to assign roles in guild {}", e.getGuild().getId());
 										}
 									}
 									else {
@@ -103,7 +103,7 @@ public class Deny implements CommandPublic {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Category {} doesn't exist anymore for guild {}", verification.getCategoryID(), e.getGuild().getId());
+					logger.error("Category {} doesn't exist anymore in guild {}", verification.getCategoryID(), e.getGuild().getId());
 				}
 			}
 			else {

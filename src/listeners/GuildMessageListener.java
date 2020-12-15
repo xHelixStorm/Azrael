@@ -47,6 +47,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.MessageType;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import rankingSystem.RankingThreadExecution;
@@ -92,7 +93,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(e.getMessage().getContentRaw().startsWith(GuildIni.getCommandPrefix(e.getGuild().getIdLong())) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
 						var prefixLength = GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length();
 						if(!CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength), e, null))) {
-							logger.warn("Command {} doesn't exist!", e.getMessage().getContentRaw());
+							logger.warn("Command {} doesn't exist in guild {}", e.getMessage().getContentRaw(), e.getGuild().getId());
 						}
 					}
 					
@@ -100,7 +101,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(currentChannel != null && currentChannel.getTxtRemoval() && e.getMessage().getAttachments().size() == 0) {
 						Hashes.addTempCache("message-removed_gu"+guild_id+"ch"+channel_id+"us"+user_id, new Cache(10000));
 						e.getMessage().delete().reason("Text comment without screenshot not allowed!").queue(success -> {}, error -> {
-							logger.warn("Message already removed!");
+							logger.warn("Message {} has been already removed in guild {}", e.getMessageId(), e.getGuild().getId());
 						});
 					}
 					
@@ -150,7 +151,7 @@ public class GuildMessageListener extends ListenerAdapter {
 								ShopExecution.displayShop(e, "ite", "");
 							}
 							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WEAPONS))) {
-								ShopExecution.displayWeaponCategories(e, guild_settings.getThemeID());
+								ShopExecution.displayWeaponCategories(e);
 							}
 							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SKILLS))) {
 								ShopExecution.displaySkills(e, guild_settings);
@@ -158,7 +159,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						}
 						//display details of the currently selected item or skin
 						else if(shop.getAdditionalInfo().matches("(lev|ran|pro|ico|ite)") && !shop.getAdditionalInfo2().contains("%") && !shop.getAdditionalInfo2().contains("$") && !shop.getAdditionalInfo2().contains("#")) {
-							if(!message.matches("[^\\d]*") && message.length() <= 9) {
+							if(message.replaceAll("[0-9]*", "").trim().length() == 0 && message.length() <= 9) {
 								ShopExecution.displaySingleItem(e, shop.getAdditionalInfo(), shop.getAdditionalInfo2().split("-"), guild_settings, Integer.parseInt(message)-1);
 							}
 						}
@@ -265,16 +266,18 @@ public class GuildMessageListener extends ListenerAdapter {
 					//include vote up and vote down reactions, if it's a vote channel
 					if(currentChannel != null && currentChannel.getChannel_Type() != null && currentChannel.getChannel_Type().equals(Channel.VOT.getType()) && e.getGuild().getSelfMember().getIdLong() != e.getMember().getUser().getIdLong()) {
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION))) {
-							e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsup:").getUnicode()).queue();
-							e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsdown:").getUnicode()).queue();
-							
-							//Run google service, if enabled
-							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-								GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "VOTE", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), null, 0, 0, GoogleEvent.VOTE.id);
+							if(e.getMessage().getType() != MessageType.CHANNEL_PINNED_ADD) {
+								e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsup:").getUnicode()).queue();
+								e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsdown:").getUnicode()).queue();
+								
+								//Run google service, if enabled
+								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+									GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.VOTE.id, e.getChannel().getId()), e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "VOTE", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), null, 0, 0, GoogleEvent.VOTE.id);
+								}
 							}
 						}
 						else {
-							logger.error("MESSAGE_ADD_REACTION permission missing for votes in guild {}", e.getGuild().getId());
+							logger.error("MESSAGE_ADD_REACTION permission required to vote on text channel {} in guild {}", e.getChannel(), e.getGuild().getId());
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_ADD_REACTION.getName())+e.getChannel().getName(), Channel.LOG.getType());
 						}
 					}
@@ -307,7 +310,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 						}
 						else {
-							logger.warn("MESSAGE_ADD_REACTION permission required to to browse through pages by reacting for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+							logger.warn("MESSAGE_ADD_REACTION permission required to browse through the randomshop pages by reacting on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 						}
 						Hashes.clearTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 					}
@@ -440,11 +443,11 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-selection")) {
 								if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE)))
-									GoogleSpreadsheetsExecution.create(e, (lcMessage.length() > 7 ? message.substring(7) : null), key);
+									GoogleSpreadsheetsExecution.create(e, (lcMessage.length() > 7 ? message.substring(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE).length()+1) : null), key);
 								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD)))
-									GoogleSpreadsheetsExecution.add(e, (lcMessage.length() > 4 ? message.substring(4) : null), key);
+									GoogleSpreadsheetsExecution.add(e, (lcMessage.length() > 4 ? message.substring(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD).length()+1) : null), key);
 								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE)))
-									GoogleSpreadsheetsExecution.remove(e, (lcMessage.length() > 7 ? message.substring(7) : null), key);
+									GoogleSpreadsheetsExecution.remove(e, (lcMessage.length() > 7 ? message.substring(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE).length()+1) : null), key);
 								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_EVENTS)))
 									GoogleSpreadsheetsExecution.events(e, key);
 								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_SHEET)))
@@ -678,7 +681,7 @@ public class GuildMessageListener extends ListenerAdapter {
 								//check if the user has an item to boost the experience points
 								int percent_multiplier;
 								try {
-									percent_multiplier = Integer.parseInt(RankingSystem.SQLExpBoosterExistsInInventory(user_id, guild_id, guild_settings.getThemeID()).replaceAll("[^0-9]*", ""));
+									percent_multiplier = Integer.parseInt(RankingSystem.SQLExpBoosterExistsInInventory(user_id, guild_id).replaceAll("[^0-9]*", ""));
 								} catch(NumberFormatException nfe) {
 									percent_multiplier = 0;
 								}
@@ -702,7 +705,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required for text channel {} in guild {} to censor messages", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required to censor messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				//if url censoring is enabled but no language has been applied, use english as default and run the url censoring thread
@@ -714,7 +717,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required for text channel {} in guild {} to censor messages", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required to censor messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				//check if the channel log and cache log is enabled and if one of the two or bot is/are enabled then write message to file or/and log to system cache
@@ -758,7 +761,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log messages of watched users", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to log messages of watched users on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				//print an error if the cache log is not enabled
@@ -771,23 +774,26 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required for text channel {} in guild {} to log messages of watched users", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to log messages of watched users on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				
 				//Run google service, if enabled
 				if(!e.getMember().getUser().isBot() && GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-					//log low priority messages to google spreadsheets
-					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
-						e.getChannel().retrieveMessageById(e.getMessageId()).queueAfter(10, TimeUnit.SECONDS, m -> {
-							StringBuilder urls = new StringBuilder();
-							for(final var attachment : e.getMessage().getAttachments()) {
-								urls.append(attachment.getProxyUrl()+"\n");
-							}
-							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "COMMENT", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim(), 0, 0, GoogleEvent.COMMENT.id);
-						}, err -> {
-							//message was removed
-						});
+					final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.COMMENT.id, e.getChannel().getId());
+					if(array != null && !array[0].equals("empty")) {
+						//log low priority messages to google spreadsheets
+						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
+							e.getChannel().retrieveMessageById(e.getMessageId()).queueAfter(10, TimeUnit.SECONDS, m -> {
+								StringBuilder urls = new StringBuilder();
+								for(final var attachment : e.getMessage().getAttachments()) {
+									urls.append(attachment.getProxyUrl()+"\n");
+								}
+								GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "COMMENT", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim(), 0, 0, GoogleEvent.COMMENT.id);
+							}, err -> {
+								//message was removed
+							});
+						}
 					}
 				}
 			}).start();

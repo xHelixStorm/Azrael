@@ -153,11 +153,11 @@ public class WriteEditExecution {
 				long role_id = roles.get(input-1);
 				if(DiscordRoles.SQLInsertReaction(Long.parseLong(cache.getAdditionalInfo2()), cache.getAdditionalInfo3(), role_id) > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_COMPLETE)).build()).queue();
-					logger.debug("The user {} has set a reaction role with the role id {} on message id in guild {}", e.getMember().getUser().getId(), role_id, cache.getAdditionalInfo2(), e.getGuild().getId());
+					logger.info("User {} has added the reaction role {} on message {} and emoji {} as reaction in guild {}", e.getMember().getUser().getId(), role_id, cache.getAdditionalInfo2(), cache.getAdditionalInfo3(), e.getGuild().getId());
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Reaction role couldn't be inserted into DiscordRoles.reactions with message id {}, emoji {} and role id {} in guild {}", cache.getAdditionalInfo2(), cache.getAdditionalInfo3(), role_id, e.getGuild().getId());
+					logger.error("Reaction role couldn't be set to message {}, emoji {} and role {} in guild {}", cache.getAdditionalInfo2(), cache.getAdditionalInfo3(), role_id, e.getGuild().getId());
 				}
 			}
 			else {
@@ -175,12 +175,12 @@ public class WriteEditExecution {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_REACTIONS_CLEAR)).build()).queue();
 					Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					DiscordRoles.SQLDeleteReactions(Long.parseLong(cache.getAdditionalInfo3()));
-					logger.debug("The user {} has cleared all reactions from message id {} in guild {}", e.getMember().getUser().getId(), cache.getAdditionalInfo3(), e.getGuild().getId());
+					logger.info("User {} has cleared all reactions and roles from message {} in guild {}", e.getMember().getUser().getId(), cache.getAdditionalInfo3(), e.getGuild().getId());
 				});
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_MANAGE.getName()).build()).queue();
-				logger.error("MANAGE_MESSAGES permission required for channel {} in guild {} to remove reactions from a message", cache.getAdditionalInfo2(), e.getGuild().getId());
+				logger.error("MANAGE_MESSAGES permission required for channel {} to remove reactions from a message in guild {}", cache.getAdditionalInfo2(), e.getGuild().getId());
 			}
 		});
 	}

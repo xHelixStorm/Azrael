@@ -14,10 +14,12 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import commands.CustomCmd;
 import constructors.Cache;
 import constructors.Guilds;
 import constructors.Messages;
 import constructors.Patchnote;
+import core.CommandHandler;
 import core.Hashes;
 import enums.Channel;
 import enums.Translation;
@@ -47,7 +49,7 @@ import util.STATIC;
 /**
  * First event that gets executed on start up and on successful login to Discord
  * 
- * collect themes, roles, settings, etc before the Bot is fully operational for taking
+ * collect roles, settings, etc before the Bot is fully operational for taking
  * commands, restart timers for muted users and start timers for regular check ups and 
  * clean ups
  * @author xHelixStorm
@@ -93,54 +95,64 @@ public class ReadyListener extends ListenerAdapter {
 			//verify that the guild is registered in the database, if not insert the current guild into the database
 			if(Azrael.SQLgetGuild(guild.getIdLong()) == 0) {
 				if(Azrael.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
-					logger.error("Azrael.guild is empty and couldn't be filled! for guild {}", guild.getId());
+					logger.error("General guild information couldn't be saved in guild {}", guild.getId());
 				}
 			}
 			//verify that the guild is registered in the discord roles database and do the same step
 			if(DiscordRoles.SQLgetGuild(guild.getIdLong()) == 0) {
 				if(DiscordRoles.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
-					logger.error("DiscordRoles.guilds is empty and couldn't be filled! for guild {}", guild.getId());
+					logger.error("Guild roles information couldn't be saved in guild {}", guild.getId());
 				}
 			}
 			//verify that the guild is registered in the ranking system database and do the same step
 			if(RankingSystem.SQLgetGuild(guild.getIdLong()) == null) {
 				if(RankingSystem.SQLInsertGuild(guild.getIdLong(), guild.getName(), false) == 0) {
-					logger.error("RankingSystem.guild is empty and couldn't be filled! for guild {}", guild.getId());
+					logger.error("Guild ranking information couldn't be saved in guild {}", guild.getId());
 				}
 			}
 			//verify that the guild is registered in the patch notes database and do the same step
 			if(Patchnotes.SQLgetGuild(guild.getIdLong()) == 0) {
 				if(Patchnotes.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
-					logger.error("Patchnotes.guilds is empty and couldn't be filled! for guild {}", guild.getId());
+					logger.error("Guild patchnotes information couldn't be saved in guild {}", guild.getId());
 				}
 			}
 			//Retrieve all registered channels and throw warning, if no channel has been registered. If found, check for the log and bot channel
 			var channels = Azrael.SQLgetChannels(guild.getIdLong());
 			if(channels == null) {
-				logger.warn("Channel information from Azrael.channels couldn't be retrieved and cached for guild {}", guild.getId());
+				logger.warn("Channel information couldn't be retrieved and cached in guild {}", guild.getId());
 			}
 			//retrieve all registered discord roles, if empty insert the roles into the database and throw an error if this fails as well
 			if(DiscordRoles.SQLgetRoles(guild.getIdLong()).size() == 0) {
 				var result = DiscordRoles.SQLInsertRoles(guild.getIdLong(), guild.getRoles());
 				if(result != null && result.length > 0 && result[0] == 1) {
-					logger.debug("Roles information from DiscordRoles.roles couldn't be retrieved and cached for guild {}. Hence all available roles have been inserted as default roles.", guild.getId());
+					logger.info("Not registered information of all guild roles have been saved in guild {}", guild.getId());
 					DiscordRoles.SQLgetRoles(guild.getIdLong());
 				}
 				else {
-					logger.error("Roles for DiscordRoles.roles couldn't be inserted for guild {}", guild.getId());
+					logger.error("Roles couldn't be saved in guild {}", guild.getId());
 				}
 			}
 			//retrieve all settings for the guild
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild.getIdLong());
 			if(guild_settings == null) {
-				logger.error("Guild information from RankingSystem.guilds couldn't be retrieved and cached in guild {}", guild.getId());
+				logger.error("Guild ranking information couldn't be retrieved and cached in guild {}", guild.getId());
 			}
 			//if the ranking system is enabled, retrieve all registered ranking roles and initialize guild ranking
 			if(guild_settings != null && guild_settings.getRankingState()) {
 				if(RankingSystem.SQLgetRoles(guild.getIdLong()).size() == 0) {
-					logger.warn("Roles from RankingSystem.roles couldn't be called and cached in guild {}", guild.getId());
+					logger.warn("Ranking roles couldn't be called and cached in guild {}", guild.getId());
 				}
 				Hashes.initializeGuildRanking(guild.getIdLong());
+			}
+			//retrieve all custom commands
+			final var customCommands = Azrael.SQLgetCustomCommands(guild.getIdLong());
+			if(customCommands != null && customCommands.size() > 0) {
+				for(final String command : customCommands) {
+					CommandHandler.commandsPublic.put(command, new CustomCmd());
+				}
+			}
+			else if(customCommands == null) {
+				logger.error("Custom commands couldn't be retrieved in guild {}", guild.getId());
 			}
 			//retrieve all registered rss feeds and start the timer to make these display on the server
 			ParseSubscription.runTask(e.getJDA(), guild.getIdLong());
@@ -156,6 +168,7 @@ public class ReadyListener extends ListenerAdapter {
 			
 			//retrieve private patch notes
 			var published = false;
+			//TODO: Text should be translated
 			if(priv_notes != null && GuildIni.getPrivatePatchNotes(guild.getIdLong())) {
 				EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle(STATIC.getTranslation2(guild, Translation.PATCHNOTES_LATEST_TITLE));
 				final var result = STATIC.writeToRemoteChannel(guild, messageBuild, "Bot patch notes version **"+STATIC.getVersion()+"** "+priv_notes.getDate()+"\n"+priv_notes.getMessage1(), Channel.LOG.getType());
@@ -192,7 +205,7 @@ public class ReadyListener extends ListenerAdapter {
 					try {
 						json = new JSONObject(FileSetting.readFile(tempDirectory+"message_pool"+guild.getId()+".json"));
 					} catch(JSONException e1) {
-						logger.error("Error in retrieving message pool from guild {}", guild.getId(), e1);
+						logger.error("Error in retrieving message pool of past session in guild {}", guild.getId(), e1);
 					}
 					if(json != null) {
 						final JSONObject messages = json;
@@ -246,6 +259,7 @@ public class ReadyListener extends ListenerAdapter {
 		executor.execute(new CollectUsersGuilds(e, null));
 		e.getJDA().getGuilds().parallelStream().forEach(g -> {
 			//print bot is now operational message in all servers
+			//TODO: translate message
 			if(GuildIni.getNotifications(g.getIdLong()))
 				STATIC.writeToRemoteChannel(g, null, "Bot is now operational!", Channel.LOG.getType());
 			executor.execute(new RoleExtend(g));

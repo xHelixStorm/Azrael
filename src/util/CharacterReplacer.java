@@ -7,8 +7,8 @@ private static String parseMessage;
 	
 	public static String replace(String message, ArrayList<String> filter_lang) {
 		if(message != null && filter_lang.size() == 1) {
+			message = message.replaceAll("[\\.\\?!,\"+@#$%^&*\\(\\)\\{\\}\\]\\[\\/\\-\\_\\|\\=§‘’`„°•—–¿¡₩€¢¥£-​]", "");
 			if(filter_lang.contains("eng") || filter_lang.contains("ger")) {
-				message = message.replaceAll("[\\.\\?!,\"+@#$%^&*\\(\\)\\{\\}\\]\\[\\/\\-\\_\\|\\=§‘’`„°•—–¿¡₩€¢¥£-​]", "");
 				message = message.replaceAll("[ÀÁÂÃÅÆàáâãåæĀāĂăΑАаӒӓĄą]", "a");
 				message = message.replaceAll("[ΒВЬ]", "b");
 				message = message.replaceAll("[ĆćĈĉĊċČčϹСⅭϲсⅽçÇ]", "c");
@@ -38,6 +38,10 @@ private static String parseMessage;
 			parseMessage = message;
 		}
 		return parseMessage;
+	}
+	
+	public static String simpleReplace(String message) {
+		return message.replaceAll("[\\.\\?!,\"+@#$%^&*\\(\\)\\{\\}\\]\\[\\/\\-\\_\\|\\=§‘’`„°•—–¿¡₩€¢¥£-​]", "");
 	}
 	
 	private static String [] exceptions = {

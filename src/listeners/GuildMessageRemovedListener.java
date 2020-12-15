@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.TimeZone;
 
@@ -81,7 +82,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 									//only execute if the current action log hasn't been read before and that the user id of the removed message is the same from the audit log. Also verify that the audit log isn't older than the Bot boot
 									final long entryCreated = entry.getTimeCreated().toEpochSecond();
 									//retrieve the boot time considering the offset and daylight saving
-									final long bootTime = STATIC.getBootTime().toEpochSecond()-(TimeZone.getDefault().useDaylightTime() ? (TimeZone.getDefault().getRawOffset()/1000)+3600 : TimeZone.getDefault().getRawOffset()/1000);
+									final long bootTime = STATIC.getBootTime().toEpochSecond()-(TimeZone.getDefault().useDaylightTime() ? (Calendar.ZONE_OFFSET/1000) : 0);
 									//System.currentTimeMilis() doesn't consider offset and daylight saving. Hence no convertion required
 									if(!Hashes.containsActionlog(entry.getId()+entry.getOptionByName("count")) && (firstMessage.getUserID() == entry.getTargetIdLong() || firstMessage.getUserID() == 0) && entryCreated > bootTime && ((entryCreated - (System.currentTimeMillis())/1000) * -1) < T5MINUTES) {
 										//add action log a read and allow a message to be printed afterwards
@@ -176,7 +177,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.DELETE_PERMISSION_ERR)+Permission.VIEW_AUDIT_LOGS.getName(), Channel.TRA.getType());
-						logger.warn("VIEW AUDIT LOG permission missing in guild {}!", e.getGuild().getId());
+						logger.warn("VIEW AUDIT LOG permission required to retrieve the user who deleted a message in guild {}", e.getGuild().getId());
 					}
 					
 					//Log additional removed messages from users that are being watched with watch level 1
@@ -195,7 +196,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 							}
 							else {
 								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+textChannel.getAsMention(), Channel.LOG.getType());
-								logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to display the message of a watched member for channel {} in guild {}", textChannel.getId(), e.getGuild().getId());
+								logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to display the message of a watched member on channel {} in guild {}", textChannel.getId(), e.getGuild().getId());
 							}
 						}
 					}
@@ -233,7 +234,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 								}
 							} catch (Exception e1) {
 								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-								logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
+								logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
 							}
 						}
 					}

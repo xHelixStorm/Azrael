@@ -43,7 +43,7 @@ public class Hashes {
     private static final Set<String> actionlog = new LinkedHashSet<String>();
     private static final ConcurrentMap<Long, Guilds> status = new ConcurrentHashMap<Long, Guilds>();
     private static final ConcurrentMap<Long, ArrayList<Roles>> ranking_roles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
-    private static final LinkedHashMap<String, ArrayList<Level>> ranking_levels = new LinkedHashMap<String, ArrayList<Level>>();
+    private static final LinkedHashMap<Long, ArrayList<Level>> ranking_levels = new LinkedHashMap<Long, ArrayList<Level>>();
     private static final ConcurrentMap<Long, ArrayList<Roles>> reaction_roles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
     private static final ConcurrentMap<Long, Long> reaction_message = new ConcurrentHashMap<Long, Long>();
     private static final ConcurrentMap<Integer, Quizes> quiz = new ConcurrentHashMap<Integer, Quizes>();
@@ -72,10 +72,10 @@ public class Hashes {
     private static final ConcurrentMap<Long, Thread> heavyCensoringThread = new ConcurrentHashMap<Long, Thread>();
     private static final ConcurrentMap<String, SpamDetection> spamDetection = new ConcurrentHashMap<String, SpamDetection>();
     private static final ConcurrentMap<Long, String> languages = new ConcurrentHashMap<Long, String>();
-    private static final ConcurrentMap<Integer, UserLevel> level_skins = new ConcurrentHashMap<Integer, UserLevel>();
-    private static final ConcurrentMap<Integer, UserRank> rank_skins = new ConcurrentHashMap<Integer, UserRank>();
-    private static final ConcurrentMap<Integer, UserProfile> profile_skins = new ConcurrentHashMap<Integer, UserProfile>();
-    private static final ConcurrentMap<Integer, UserIcon> icon_skins = new ConcurrentHashMap<Integer, UserIcon>();
+    private static final ConcurrentMap<Long, ConcurrentHashMap<Integer, UserLevel>> level_skins = new ConcurrentHashMap<Long, ConcurrentHashMap<Integer, UserLevel>>();
+    private static final ConcurrentMap<Long, ConcurrentHashMap<Integer, UserRank>> rank_skins = new ConcurrentHashMap<Long, ConcurrentHashMap<Integer, UserRank>>();
+    private static final ConcurrentMap<Long, ConcurrentHashMap<Integer, UserProfile>> profile_skins = new ConcurrentHashMap<Long, ConcurrentHashMap<Integer, UserProfile>>();
+    private static final ConcurrentMap<Long, ConcurrentHashMap<Integer, UserIcon>> icon_skins = new ConcurrentHashMap<Long, ConcurrentHashMap<Integer, UserIcon>>();
     private static final ConcurrentMap<String, Integer> subscription_status = new ConcurrentHashMap<String, Integer>();
     private static final ConcurrentMap<Long, ArrayList<CategoryConf>> categories = new ConcurrentHashMap<Long, ArrayList<CategoryConf>>();
     
@@ -131,7 +131,7 @@ public class Hashes {
 	public static void addRankingRoles(Long _key, ArrayList<Roles> _details) {
 		ranking_roles.put(_key, _details);
 	}
-	public static void addRankingLevels(String _key, ArrayList<Level> _levels) {
+	public static void addRankingLevels(Long _key, ArrayList<Level> _levels) {
 		ranking_levels.put(_key, _levels);
 	}
 	public static void addReactionRoles(Long _key, ArrayList<Roles> _roles) {
@@ -218,17 +218,53 @@ public class Hashes {
 	public static void setLanguage(Long _key, String _lang) {
 		languages.put(_key, _lang);
 	}
-	public static void addLevelSkin(Integer _key, UserLevel _userLevel) {
-		level_skins.put(_key, _userLevel);
+	public static void addLevelSkin(Long _key, Integer _key2, UserLevel _userLevel) {
+		if(!level_skins.containsKey(_key)) {
+			ConcurrentHashMap<Integer, UserLevel> map = new ConcurrentHashMap<Integer, UserLevel>();
+			map.put(_key2, _userLevel);
+			level_skins.put(_key, map);
+		}
+		else {
+			final var map = level_skins.get(_key);
+			map.put(_key2, _userLevel);
+			level_skins.put(_key, map);
+		}
 	}
-	public static void addRankSkin(Integer _key, UserRank _userRank) {
-		rank_skins.put(_key, _userRank);
+	public static void addRankSkin(Long _key, Integer _key2, UserRank _userRank) {
+		if(!rank_skins.containsKey(_key)) {
+			ConcurrentHashMap<Integer, UserRank> map = new ConcurrentHashMap<Integer, UserRank>();
+			map.put(_key2, _userRank);
+			rank_skins.put(_key, map);
+		}
+		else {
+			final var map = rank_skins.get(_key);
+			map.put(_key2, _userRank);
+			rank_skins.put(_key, map);
+		}
 	}
-	public static void addProfileSkin(Integer _key, UserProfile _userProfile) {
-		profile_skins.put(_key, _userProfile);
+	public static void addProfileSkin(Long _key, Integer _key2, UserProfile _userProfile) {
+		if(!profile_skins.containsKey(_key)) {
+			ConcurrentHashMap<Integer, UserProfile> map = new ConcurrentHashMap<Integer, UserProfile>();
+			map.put(_key2, _userProfile);
+			profile_skins.put(_key, map);
+		}
+		else {
+			final var map = profile_skins.get(_key);
+			map.put(_key2, _userProfile);
+			profile_skins.put(_key, map);
+		}
 	}
-	public static void addIconSkin(Integer _key, UserIcon _userIcon) {
-		icon_skins.put(_key, _userIcon);
+	public static void addIconSkin(Long _key, Integer _key2, UserIcon _userIcon) {
+		if(!icon_skins.containsKey(_key)) {
+			ConcurrentHashMap<Integer, UserIcon> map = new ConcurrentHashMap<Integer, UserIcon>();
+			map.put(_key2, _userIcon);
+			icon_skins.put(_key, map);
+		}
+		else {
+			final var map = icon_skins.get(_key);
+			map.put(_key2, _userIcon);
+			icon_skins.put(_key, map);
+		}
 	}
 	public static void addSubscriptionStatus(String _key, Integer _value) {
 		subscription_status.put(_key, _value);
@@ -273,7 +309,7 @@ public class Hashes {
 	public static ArrayList<Roles> getRankingRoles(Long _key) {
 		return ranking_roles.get(_key);
 	}
-	public static ArrayList<Level> getRankingLevels(String _key) {
+	public static ArrayList<Level> getRankingLevels(Long _key) {
 		return ranking_levels.get(_key);
 	}
 	public static ArrayList<Roles> getReactionRoles(Long _key) {
@@ -373,16 +409,40 @@ public class Hashes {
 	public static String getLanguage(long _key) {
 		return languages.get(_key);
 	}
-	public static UserLevel getLevelSkin(int _key) {
+	public static UserLevel getLevelSkin(Long _key, Integer _key2) {
+		if(level_skins.containsKey(_key))
+			return level_skins.get(_key).get(_key2);
+		else
+			return null;
+	}
+	public static ConcurrentHashMap<Integer, UserLevel> getLevelSkins(Long _key) {
 		return level_skins.get(_key);
 	}
-	public static UserRank getRankSkin(int _key) {
+	public static UserRank getRankSkin(Long _key, Integer _key2) {
+		if(rank_skins.containsKey(_key))
+			return rank_skins.get(_key).get(_key2);
+		else
+			return null;
+	}
+	public static ConcurrentHashMap<Integer, UserRank> getRankSkins(Long _key) {
 		return rank_skins.get(_key);
 	}
-	public static UserProfile getProfileSkin(int _key) {
+	public static UserProfile getProfileSkin(Long _key, Integer _key2) {
+		if(profile_skins.containsKey(_key))
+			return profile_skins.get(_key).get(_key2);
+		else
+			return null;
+	}
+	public static ConcurrentHashMap<Integer, UserProfile> getProfileSkins(Long _key) {
 		return profile_skins.get(_key);
 	}
-	public static UserIcon getIconSkin(int _key) {
+	public static UserIcon getIconSkin(Long _key, Integer _key2) {
+		if(icon_skins.containsKey(_key))
+			return icon_skins.get(_key).get(_key2);
+		else
+			return null;
+	}
+	public static ConcurrentHashMap<Integer, UserIcon> getIconSkins(Long _key) {
 		return icon_skins.get(_key);
 	}
 	public static Integer getSubscriptionStatus(String _key) {
@@ -544,14 +604,26 @@ public class Hashes {
 	public static void clearLevelSkins() {
 		level_skins.clear();
 	}
+	public static void clearLevelSkins(Long _key) {
+		level_skins.remove(_key);
+	}
 	public static void clearRankSkins() {
 		rank_skins.clear();
+	}
+	public static void clearRankSkins(Long _key) {
+		rank_skins.remove(_key);
 	}
 	public static void clearProfileSkins() {
 		profile_skins.clear();
 	}
+	public static void clearProfileSkins(Long _key) {
+		profile_skins.remove(_key);
+	}
 	public static void clearIconSkins() {
 		icon_skins.clear();
+	}
+	public static void clearIconSkins(Long _key) {
+		icon_skins.remove(_key);
 	}
 	public static void removeSubscriptionStatus(String _key) {
 		subscription_status.remove(_key);

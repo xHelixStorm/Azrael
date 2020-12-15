@@ -76,7 +76,7 @@ public class Leaderboard implements CommandPublic {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Top 10 ELO ranking couldn't be retrieved from Azrael.user_stats in guild {}", e.getGuild().getId());
+				logger.error("Top 10 ELO ranking couldn't be retrieved in guild {}", e.getGuild().getId());
 			}
 		}
 		else {

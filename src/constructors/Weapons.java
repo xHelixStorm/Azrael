@@ -10,6 +10,7 @@ public class Weapons {
 	private String stat_description;
 	private int category_id;
 	private String category_description;
+	private int overlay_level;
 	private String overlay_name;
 	private boolean enabled;
 	private String fullDescription;
@@ -69,7 +70,7 @@ public class Weapons {
 	private int attack4_ammo_usage;
 	private String attack4_description;
 	
-	public Weapons(int _weapon_id, String _description, long _price, String _weapon_abbv, int _skin, int _stat, String _stat_description, int _category_id, String _category_description, String _overlay_name, boolean _enabled, String _fullDescription, String _thumbnail, boolean _skill, boolean _close_range, boolean _long_range, int _magazine, int _ammunition, int _base_damage,
+	public Weapons(int _weapon_id, String _description, long _price, String _weapon_abbv, int _skin, int _stat, String _stat_description, int _category_id, String _category_description, int _overlay_level, String _overlay_name, boolean _enabled, String _fullDescription, String _thumbnail, boolean _skill, boolean _close_range, boolean _long_range, int _magazine, int _ammunition, int _base_damage,
 				   String _attack1_name, int _attack1_damage_plus, int _attack1_damage_plus_percent, int _attack1_damage_drop, int _attack1_damage_drop_percent, int _attack1_hit_chance_close, int _attack1_hit_chance_medium, int _attack1_hit_chance_distant, int _attack1_sp_consumption, int _attack1_ammo_usage, String _attack1_description,
 				   String _attack2_name, int _attack2_damage_plus, int _attack2_damage_plus_percent, int _attack2_damage_drop, int _attack2_damage_drop_percent, int _attack2_hit_chance_close, int _attack2_hit_chance_medium, int _attack2_hit_chance_distant, int _attack2_sp_consumption, int _attack2_ammo_usage, String _attack2_description,
 				   String _attack3_name, int _attack3_damage_plus, int _attack3_damage_plus_percent, int _attack3_damage_drop, int _attack3_damage_drop_percent, int _attack3_hit_chance_close, int _attack3_hit_chance_medium, int _attack3_hit_chance_distant, int _attack3_sp_consumption, int _attack3_ammo_usage, String _attack3_description,
@@ -84,6 +85,7 @@ public class Weapons {
 		this.stat_description = _stat_description;
 		this.category_id = _category_id;
 		this.category_description = _category_description;
+		this.overlay_level = _overlay_level;
 		this.overlay_name = _overlay_name;
 		this.enabled = _enabled;
 		this.fullDescription = _fullDescription;
@@ -170,6 +172,9 @@ public class Weapons {
 	}
 	public String getCategoryDescription() {
 		return this.category_description;
+	}
+	public int getOverlayLevel() {
+		return this.overlay_level;
 	}
 	public String getOverlayName() {
 		return this.overlay_name;

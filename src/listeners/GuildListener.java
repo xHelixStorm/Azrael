@@ -3,7 +3,10 @@ package listeners;
 import java.awt.Color;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.EnumSet;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -59,7 +62,7 @@ public class GuildListener extends ListenerAdapter {
 			final EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_TITLE));
 			final EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_TITLE));
 			final EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR));
-			logger.trace("{} has joined the guild {}", e.getUser().getId(), e.getGuild().getId());
+			logger.trace("User {} has joined in guild {}", e.getUser().getId(), e.getGuild().getId());
 			boolean excludeChannelCreation = false;
 			long user_id = e.getMember().getUser().getIdLong();
 			String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
@@ -72,7 +75,7 @@ public class GuildListener extends ListenerAdapter {
 			//insert or update the name of the user into Azrael.users
 			if(Azrael.SQLInsertUser(user_id, user_name, STATIC.getLanguage2(e.getGuild()), e.getMember().getUser().getEffectiveAvatarUrl()) == 0) {
 				STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
-				logger.error("User {} couldn't be inserted into the table Azrael.users for guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+				logger.error("Information of user {} couldn't saved in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			}
 			//insert or update the join_date
 			final int insertJoinDateResult = Azrael.SQLInsertJoinDate(user_id, guild_id, e.getMember().getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE));
@@ -80,12 +83,12 @@ public class GuildListener extends ListenerAdapter {
 				//Update the join date, if no rows have been inserted with the insert statement and no error has been thrown
 				if(Azrael.SQLUpdateJoinDate(user_id, guild_id, e.getMember().getTimeJoined().format(DateTimeFormatter.ISO_LOCAL_DATE)) == 0) {
 					STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
-					logger.error("The join date of user {} couldn't be updated into the table Azrael.join_dates for guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+					logger.error("The join date of user {} couldn't be updated in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 				}
 			}
 			else if(insertJoinDateResult == -1) {
 				STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
-				logger.error("The join date of user {} couldn't be inserted into the table Azrael.join_dates for guild {}", e.getMember().getUser().getId(), e.getGuild().getName());
+				logger.error("The join date of user {} couldn't be saved in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			}
 			//retrieve current guild settings
 			Guilds guild_settings = RankingSystem.SQLgetGuild(guild_id);
@@ -96,7 +99,7 @@ public class GuildListener extends ListenerAdapter {
 				}
 				else {
 					STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_3).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
-					logger.error("Failed to insert joined user into RankingSystem.users in guild {}", e.getGuild().getId());
+					logger.error("Ranking information of user {} couldn't be saved on join in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					RankingSystem.SQLInsertActionLog("high", user_id, guild_id, "User wasn't inserted into user table", "This user couldn't be inserted into the user table. Please verify the name of this user and eventually insert it manually into the table!");
 				}
 			}
@@ -105,8 +108,24 @@ public class GuildListener extends ListenerAdapter {
 			Bancollect warnedUser = Azrael.SQLgetData(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 			muted = warnedUser.getMuted();
 			//print join message, if the user is not muted and if the printing of join messages is allowed
-			if(GuildIni.getJoinMessage(guild_id)) {
-				STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
+			final boolean joinMessage = GuildIni.getJoinMessage(guild_id);
+			final boolean newAccountOnJoin = GuildIni.getNewAccountOnJoin(guild_id);
+			if(joinMessage || newAccountOnJoin) {
+				if(!newAccountOnJoin)
+					STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
+				else {
+					//TODO: check logic again during daylight saving 
+					final long createdAgo = System.currentTimeMillis() - ((e.getMember().getTimeCreated().toEpochSecond()*1000) + (TimeZone.getDefault().useDaylightTime() ? Calendar.ZONE_OFFSET : 0));
+					final long hours = TimeUnit.MILLISECONDS.toHours(createdAgo);
+					final long minutes = (TimeUnit.MILLISECONDS.toMinutes(createdAgo)%60);
+					//display accounts which are not older than a day only
+					if(hours < 24) {
+						STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setFooter(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_NEW).replaceFirst("\\{\\}", ""+hours).replace("{}", ""+minutes)), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
+					}
+					else if(joinMessage) {
+						STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
+					}
+				}
 			}
 			
 			//retrieve the unmute time if available and if not, check if the user is marked as muted and if muted, reassign the mute role regardless
@@ -134,13 +153,13 @@ public class GuildListener extends ListenerAdapter {
 					//throw an error and set the user to not muted and joined, if the permission is missing but is still muted
 					if(Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false) > 0) {
 						if(Azrael.SQLUpdateGuildLeft(user_id, guild_id, false) == 0) {
-							logger.error("Guild left state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild_id);
+							logger.error("The status of the muted user {} couldn't be updated to rejoined in guild {}", user_id, guild_id);
 						}
 					}
 					else
-						logger.error("Mute end state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild_id);
+						logger.error("Mute state of user {} couldn't be terminated on end in guild {}", user_id, guild_id);
 					STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_PERMISSION_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)+Permission.MANAGE_ROLES.getName(), Channel.LOG.getType());
-					logger.warn("MANAGE ROLES permission missing to mute a user in guild {}!", e.getGuild().getId());
+					logger.warn("MANAGE ROLES permission required to mute a user in guild {}", e.getGuild().getId());
 				}
 			}
 			else {
@@ -148,11 +167,11 @@ public class GuildListener extends ListenerAdapter {
 				if(muted) {
 					if(Azrael.SQLUpdateMutedOnEnd(user_id, guild_id, false, false) > 0) {
 						if(Azrael.SQLUpdateGuildLeft(user_id, guild_id, false) == 0) {
-							logger.error("Guild left state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild_id);
+							logger.error("The status of the muted user {} couldn't be updated to rejoined in guild {}", user_id, guild_id);
 						}
 					}
 					else
-						logger.error("Mute end state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild_id);
+						logger.error("Mute state of user {} couldn't be terminated on end in guild {}", user_id, guild_id);
 				}
 				//Assign an unlocked ranking role after verifying that the ranking system is enabled
 				if(guild_settings.getRankingState()) {
@@ -184,7 +203,7 @@ public class GuildListener extends ListenerAdapter {
 								var timestamp = new Timestamp(System.currentTimeMillis());
 								if(Azrael.SQLInsertData(e.getUser().getIdLong(), e.getGuild().getIdLong(), Azrael.SQLgetMaxWarning(e.getGuild().getIdLong()), 1, timestamp, timestamp, false, false) == 0) {
 									STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_5).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
-									logger.error("The perm mute flag for user {} in guild {} couldn't be inserted into Azrael.bancollect", user_id, guild_id);
+									logger.error("User {} couldn't be labeled as permanently muted in guild {}", user_id, guild_id);
 								}
 								e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(mute_role.getRole_ID())).queue();
 								var mute_time = (long)Azrael.SQLgetWarning(guild_id, Azrael.SQLgetData(user_id, guild_id).getWarningID()+1).getTimer();
@@ -199,7 +218,7 @@ public class GuildListener extends ListenerAdapter {
 								if(Azrael.SQLgetData(user_id, guild_id).getWarningID() != 0) {
 									if(Azrael.SQLUpdateUnmute(user_id, guild_id, timestamp, unmute_timestamp, true, true) == 0) {
 										STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_6).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
-										logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, guild_id);
+										logger.error("The unmute timer couldn't be updated for user {} in guild {}", user_id, guild_id);
 									}
 									else {
 										Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getReporter(), rejoinAction.getReason()));
@@ -209,7 +228,7 @@ public class GuildListener extends ListenerAdapter {
 								else {
 									if(Azrael.SQLInsertData(user_id, guild_id, 1, 1, timestamp, unmute_timestamp, true, true) == 0) {
 										STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_7).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
-										logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", user_id, guild_id);
+										logger.error("User {} couldn't be labeled as muted in guild {}", user_id, guild_id);
 									}
 									else {
 										Hashes.addTempCache("mute_time_gu"+guild_id+"us"+user_id, new Cache(""+mute_time, rejoinAction.getReporter(), rejoinAction.getReason()));
@@ -228,7 +247,7 @@ public class GuildListener extends ListenerAdapter {
 					//remove the completed join task
 					if(Azrael.SQLDeleteRejoinTask(user_id, guild_id) == 0) {
 						STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_4).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id)+Permission.MANAGE_ROLES.getName(), Channel.LOG.getType());
-						logger.error("Rejoin task couldn't be removed from table Azrael.reminder for user {} in guild {}", user_id, guild_id);
+						logger.error("Rejoin task mute couldn't be removed for user {} in guild {}", user_id, guild_id);
 					}
 				}
 				//ban a joined user
@@ -258,7 +277,7 @@ public class GuildListener extends ListenerAdapter {
 					}
 					if(Azrael.SQLDeleteRejoinTask(user_id, guild_id) == 0) {
 						STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_8).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
-						logger.error("Rejoin task couldn't be removed from table Azrael.reminder for user {} in guild {}", user_id, guild_id);
+						logger.error("Rejoin task ban couldn't be removed for user {} in guild {}", user_id, guild_id);
 					}
 				}
 			}
@@ -266,7 +285,7 @@ public class GuildListener extends ListenerAdapter {
 				//throw rejoin task error here, if it's null
 				if(rejoinAction == null) {
 					STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR_9).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
-					logger.error("Rejoin tasks couldn't be verified for the user {} in guild {} from table Azrael.reminder", user_id, guild_id);
+					logger.error("Rejoin tasks couldn't be verified for user {} in guild {}", user_id, guild_id);
 				}
 				
 				//verify if additional verification actions are required
@@ -287,16 +306,16 @@ public class GuildListener extends ListenerAdapter {
 						Hashes.addTempCache("nickname_add_gu"+guild_id+"us"+user_id, new Cache(60000));
 						e.getGuild().modifyNickname(e.getMember(), nickname).queue();
 						STATIC.writeToRemoteChannel(e.getGuild(), nick_assign, STATIC.getTranslation2(e.getGuild(), Translation.NAME_STAFF).replaceFirst("\\{\\}", user_name).replace("{}", nickname), Channel.LOG.getType());
-						logger.info("Impersonation attempt found from {} in guild {}", user_id, guild_id);
+						logger.info("Impersonation attempt found from user {} in guild {}", user_id, guild_id);
 						Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild_id, nickname);
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-							GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), "Impersonating a staff member!", null, null, "RENAMED", null, null, null, e.getMember().getEffectiveName(), nickname, 0, null, null, 0, 0, GoogleEvent.RENAME.id);
+							GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.RENAME.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), "Impersonating a staff member!", null, null, "RENAMED", null, null, null, e.getMember().getEffectiveName(), nickname, 0, null, null, 0, 0, GoogleEvent.RENAME.id);
 						}
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), nick_assign, STATIC.getTranslation2(e.getGuild(), Translation.NAME_STAFF_ERR).replaceFirst("\\{\\}", user_name)+Permission.NICKNAME_MANAGE.getName(), Channel.LOG.getType());
-						logger.warn("Lacking MANAGE NICKNAME permission in guild {}", e.getGuild().getId());
+						logger.warn("MANAGE NICKNAME permission required to assign nicknames in guild {}", e.getGuild().getId());
 					}
 					//set flag to signal that the current name is not allowed
 					badName = true;
@@ -314,16 +333,16 @@ public class GuildListener extends ListenerAdapter {
 								Hashes.addTempCache("nickname_add_gu"+guild_id+"us"+user_id, new Cache(60000));
 								e.getGuild().modifyNickname(e.getMember(), nickname).queue();
 								STATIC.writeToRemoteChannel(e.getGuild(), nick_assign, STATIC.getTranslation2(e.getGuild(), Translation.NAME_ASSIGN).replaceFirst("\\{\\}", user_name).replace("{}", nickname), Channel.LOG.getType());
-								logger.info("Improper name found from {} in guild {}", user_id, guild_id);
+								logger.info("Improper name found from user {} in guild {}", user_id, guild_id);
 								Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild_id, nickname);
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_REASON), null, null, "RENAMED", null, null, null, e.getMember().getEffectiveName(), nickname, 0, null, null, 0, 0, GoogleEvent.RENAME.id);
+									GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.RENAME.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_REASON), null, null, "RENAMED", null, null, null, e.getMember().getEffectiveName(), nickname, 0, null, null, 0, 0, GoogleEvent.RENAME.id);
 								}
 							}
 							else {
 								STATIC.writeToRemoteChannel(e.getGuild(), nick_assign, STATIC.getTranslation2(e.getGuild(), Translation.NAME_ASSIGN_ERR).replaceFirst("\\{\\}", user_name)+Permission.NICKNAME_MANAGE.getName(), Channel.LOG.getType());
-								logger.warn("Lacking MANAGE NICKNAME permission in guild {}", e.getGuild().getId());
+								logger.warn("MANAGE NICKNAME permission required to assign nicknames in guild {}", e.getGuild().getId());
 							}
 							//set flag to signal that the current name is not allowed
 							badName = true;
@@ -346,13 +365,13 @@ public class GuildListener extends ListenerAdapter {
 								Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), 0, "");
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), null, null, "KICK", null, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.KICK.id);
+									GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.KICK.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), null, null, "KICK", null, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.KICK.id);
 								}
 							}
 							else {
 								nick_assign.setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR));
 								STATIC.writeToRemoteChannel(e.getGuild(), nick_assign, STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_PERMISSION_ERR).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", word.getName().toUpperCase())+Permission.KICK_MEMBERS.getName(), Channel.LOG.getType());
-								logger.warn("Lacking KICK MEMBERS permission in guild {}", e.getGuild().getId());
+								logger.warn("KICK MEMBERS permission required to kick users {} in guild {}", e.getGuild().getId());
 							}
 						}
 					}
@@ -364,19 +383,19 @@ public class GuildListener extends ListenerAdapter {
 				else {
 					if(nickname != null && Azrael.SQLgetNickname(user_id, guild_id).length() > 0) {
 						if(Azrael.SQLUpdateNickname(user_id, guild_id, nickname) == 0) {
-							logger.error("User nickname of {} couldn't be updated in Azrael.nickname", user_id);
+							logger.error("User nickname of {} couldn't be updated in guild {}", user_id, guild_id);
 						}
 						else {
-							logger.debug("{} received the nickname {} in guild {}", user_id, nickname, guild_id);
+							logger.info("User {} received the nickname {} in guild {}", user_id, nickname, guild_id);
 							Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild_id, nickname);
 						}
 					}
 					else if(nickname != null) {
 						if(Azrael.SQLInsertNickname(user_id, guild_id, nickname) == 0) {
-							logger.error("User nickname of {} couldn't be inserted into Azrael.nickname", user_id);
+							logger.error("User nickname of {} couldn't be saved in guild {}", user_id, guild_id);
 						}
 						else {
-							logger.debug("{} received the nickname {} in guild {}", user_id, nickname, guild_id);
+							logger.info("User {} received the nickname {} in guild {}", user_id, nickname, guild_id);
 							Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", user_id, guild_id, nickname);
 						}
 					}
@@ -415,11 +434,11 @@ public class GuildListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.MISSING_PERMISSION_IN_2).replace("{}", Permission.MANAGE_CHANNEL.getName()+" and "+Permission.MANAGE_PERMISSIONS.getName())+category.getName(), Channel.LOG.getType());
-						logger.warn("MANAGE_CHANNEL and MANAGE_PERMISSIONS for category {} required to create verification channels for guild {}", verification.getCategoryID(), guild.getId());
+						logger.warn("MANAGE_CHANNEL and MANAGE_PERMISSIONS for category {} required to create verification channels in guild {}", verification.getCategoryID(), guild.getId());
 					}
 				}
 				else {
-					logger.warn("Category {} doesn't exist anymore for guild {}", verification.getCategoryID(), guild.getId());
+					logger.warn("Category {} doesn't exist anymore in guild {}", verification.getCategoryID(), guild.getId());
 				}
 			}
 		}

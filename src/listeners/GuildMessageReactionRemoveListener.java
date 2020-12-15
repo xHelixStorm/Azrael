@@ -19,6 +19,7 @@ import fileManagement.GuildIni;
 import google.GoogleSheets;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.DiscordRoles;
@@ -43,7 +44,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 	public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent e) {
 		new Thread(() -> {
 			//no action should be taken, if a bot has added a reaction
-			if(!UserPrivs.isUserBot(e.getGuild().getMember(e.getUser()))) {
+			if(e.getUser() != null && !UserPrivs.isUserBot(e.getGuild().getMember(e.getUser()))) {
 				//any action below won't apply for muted users
 				if(!UserPrivs.isUserMuted(e.getGuild().getMember(e.getUser()))) {
 					//verify that the custom server reactions is enabled
@@ -77,8 +78,11 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 											if(reactions[i].length() > 0 && (reactionName.equals(reactions[i]) || EmojiParser.parseToAliases(reactionName).replaceAll(":", "").equals(reactions[i]))) {
 												//check if the bot has the manage roles permission
 												if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-													e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(i).getRole_ID())).queue();
-													logger.debug("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+													final Role role = e.getGuild().getRoleById(reactionRoles.get(i).getRole_ID());
+													if(role != null) {
+														e.getGuild().removeRoleFromMember(e.getMember(), role).queue();
+														logger.info("User {} removed the role {} from itself by reacting in guild {}", e.getUser().getId(), role.getId(), e.getGuild().getId());
+													}
 												}
 												else
 													printPermissionError(e);
@@ -94,8 +98,11 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 											if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 												//A tenth emote possibility doesn't exist
 												if(emote != 9) {
-													e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
-													logger.debug("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+													final Role role = e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID());
+													if(role != null) {
+														e.getGuild().removeRoleFromMember(e.getMember(), role).queue();
+														logger.info("User {} removed the role {} from itself by reacting in guild {}", e.getUser().getId(), role.getId(), e.getGuild().getId());
+													}
 												}
 											}
 											else
@@ -105,19 +112,24 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 									else {
 										int emote = STATIC.returnEmote(reactionName);
 										//check if the bot has the manage roles permission
-										if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+										if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 											//A tenth emote possibility doesn't exist
 											if(emote != 9) {
-												e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID())).queue();
-												logger.debug("{} got a role removed upon reacting in guild {}", e.getUser().getId(), e.getGuild().getId());
+												final Role role = e.getGuild().getRoleById(reactionRoles.get(emote).getRole_ID());
+												if(role != null) {
+													e.getGuild().removeRoleFromMember(e.getMember(), role).queue();
+													logger.info("User {} removed the role {} from itself by reacting in guild {}", e.getUser().getId(), role.getId(), e.getGuild().getId());
+												}
 											}
+										}
+											
 										else
 											printPermissionError(e);
 									}
 								}
 							}
 							else
-								logger.error("Reaction roles couldn't be retrieved from DiscordRoles.roles in guild {}", e.getGuild().getId());
+								logger.error("Reaction roles couldn't be retrieved in guild {}", e.getGuild().getId());
 						}
 						//check if a role has to be removed
 						long role_id = 0;
@@ -196,7 +208,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 									}
 								} catch (Exception e1) {
 									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-									logger.error("Google Spreadsheet webservice error in guild {}", e.getGuild().getIdLong(), e1);
+									logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
 								}
 							}
 						}
@@ -212,6 +224,6 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 	 */
 	private static void printPermissionError(GuildMessageReactionRemoveEvent e) {
 		STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName(), Channel.LOG.getType());
-		logger.warn("MANAGE ROLES permission missing to remove reaction roles in guild {}!", e.getGuild().getId());
+		logger.warn("MANAGE ROLES permission required to remove reaction roles in guild {}", e.getGuild().getId());
 	}
 }

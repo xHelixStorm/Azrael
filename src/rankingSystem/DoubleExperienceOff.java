@@ -20,10 +20,10 @@ public class DoubleExperienceOff extends TimerTask {
 	@Override
 	public void run() {
 		Hashes.addTempCache("doubleExp", new Cache(0, "off"));
-		logger.debug("Double experience has been turned off globaly!");
+		logger.info("Double experience has been turned off globaly");
 	}
 	
-	public static void runTask(){
+	public static void runTask() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.DAY_OF_WEEK, Weekday.getDay(IniFileReader.getDoubleExpEnd()));
 		calendar.set(Calendar.HOUR_OF_DAY, 23);

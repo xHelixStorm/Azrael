@@ -100,7 +100,7 @@ public class Join implements CommandPublic {
 				final var result2 = Competitive.SQLgetCompServers(e.getGuild().getIdLong());
 				if(result2 == null) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Registered servers couldn't be retrieved from Azrael.comp_servers for guild {}", e.getGuild().getId());
+					logger.error("Registered servers couldn't be retrieved in guild {}", e.getGuild().getId());
 					return false;
 				}
 				else if(result2.size() == 0) {
@@ -133,7 +133,7 @@ public class Join implements CommandPublic {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Registered servers couldn't be retrieved from Azrael.comp_servers for guild {}", e.getGuild().getId());
+				logger.error("Registered servers couldn't be retrieved in guild {}", e.getGuild().getId());
 			}
 			return false;
 		}
@@ -208,7 +208,7 @@ public class Join implements CommandPublic {
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Username couldn't be retrieved from Azrael.user_stats for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+							logger.error("Username couldn't be retrieved for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 						}
 					}
 					else {
@@ -220,7 +220,7 @@ public class Join implements CommandPublic {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Matchmaking member limit couldn't be retrieved from Azrael.guild for guild {}", e.getGuild().getId());
+					logger.error("Matchmaking member limit couldn't be retrieved in guild {}", e.getGuild().getId());
 				}
 			}
 			else if(result > 0) {
@@ -236,7 +236,7 @@ public class Join implements CommandPublic {
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("It couldn't be verified if an already existing matchmaking room exists for type {} in guild {}", type, e.getGuild().getId());
+			logger.error("It couldn't be verified if an already existing matchmaking room exists with type {} in guild {}", type, e.getGuild().getId());
 		}
 	}
 	
@@ -345,7 +345,7 @@ public class Join implements CommandPublic {
 						map = Competitive.SQLgetMap(room.getMapID());
 						if(map == null) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_ERR_4)).build()).queue();
-							logger.error("Map details couldn't be retrieved from Azrael.comp_maps for map {} in guild {}", room.getMapID(), e.getGuild().getId());
+							logger.error("Map details couldn't be retrieved for map {} in guild {}", room.getMapID(), e.getGuild().getId());
 						}
 					}
 					
@@ -382,7 +382,7 @@ public class Join implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Teams for room {} in Azrael.matchmaking_members couldn't be updated in guild {}", room.getRoomID(), e.getGuild().getId());
+						logger.error("Teams for room {} couldn't be updated in guild {}", room.getRoomID(), e.getGuild().getId());
 					}
 				}
 				case 2 -> {
@@ -436,7 +436,7 @@ public class Join implements CommandPublic {
 						map = Competitive.SQLgetMap(room.getMapID());
 						if(map == null) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_ERR_4)).build()).queue();
-							logger.error("Map details couldn't be retrieved from Azrael.comp_maps for map {} in guild {}", room.getMapID(), e.getGuild().getId());
+							logger.error("Map details couldn't be retrieved for map {} in guild {}", room.getMapID(), e.getGuild().getId());
 						}
 					}
 					
@@ -466,14 +466,14 @@ public class Join implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Leaders for room {} in Azrael.matchmaking_members couldn't be updated in guild {}", room.getRoomID(), e.getGuild().getId());
+						logger.error("Leaders for room {} couldn't be updated in guild {}", room.getRoomID(), e.getGuild().getId());
 					}
 				}
 			}
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Users in the room {} couldn't be retrieved from Azrael.matchmaking_view for guild {}", room.getRoomID(), e.getGuild().getId());
+			logger.error("Users in the room {} couldn't be retrieved in guild {}", room.getRoomID(), e.getGuild().getId());
 		}
 	}
 }

@@ -225,7 +225,7 @@ public class Display implements CommandPublic{
 			final var dailiesLevel = GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), dailiesLevel) || adminPermission) {
 				//retrieve all daily rewards from table
-				for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id, RankingSystem.SQLgetGuild(guild_id).getThemeID())) {
+				for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id)) {
 					out.append("**"+daily.getDescription()+"**\n"+STATIC.getTranslation(e.getMember(), Translation.DISPLAY_PROBABILITY)+daily.getWeight()+"%\n\n");
 				}
 				e.getChannel().sendMessage((out.length() > 0) ? messageBuild.setDescription(out.toString()).build() : error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
@@ -365,12 +365,21 @@ public class Display implements CommandPublic{
 				out.append("Set winners room subcommand command: "+GuildIni.getRoomWinnerLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Reopen rooms room subcommand: "+GuildIni.getRoomReopenLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Stats command: "+GuildIni.getStatsLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Leaderboard command: "+GuildIni.getLeaderboardLevel(e.getGuild().getIdLong()));
-				out.append("Accept command: "+GuildIni.getAcceptLevel(e.getGuild().getIdLong()));
-				out.append("Deny command: "+GuildIni.getDenyLevel(e.getGuild().getIdLong()));
+				out.append("Leaderboard command: "+GuildIni.getLeaderboardLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Accept command: "+GuildIni.getAcceptLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Deny command: "+GuildIni.getDenyLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Language command: "+GuildIni.getLanguageLevel(e.getGuild().getIdLong()));
 				//print second part
 				e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
+				//print third part (custom commands)
+				out.setLength(0);
+				final var commands = Azrael.SQLgetCustomCommands2(guild_id);
+				if(commands != null && commands.size() > 0) {
+					for(final var command : commands) {
+						out.append(command.getCommand().replaceFirst(command.getCommand().substring(0, 1), command.getCommand().substring(0, 1).toUpperCase())+" command: "+command.getLevel()+"\n");
+					}
+					e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
+				}
 			}
 			else{
 				UserPrivs.throwNotEnoughPrivilegeError(e, commandsLevel);

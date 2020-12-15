@@ -188,7 +188,7 @@ public class UserExecution {
 										String pastebin_link = Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES), out.toString(), e.getGuild().getIdLong());
 										message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES)).setDescription(pastebin_link);
 									} catch (IllegalStateException | LoginException | PasteException e2) {
-										logger.warn("Error on creating paste in guild {}!", e.getGuild().getId(), e2);
+										logger.error("Error on creating a pastebin page in guild {}", e.getGuild().getId(), e2);
 										message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_NAMES_ERR));
 									}
 								}
@@ -206,7 +206,7 @@ public class UserExecution {
 										message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES)).setDescription(pastebin_link);
 									} catch (IllegalStateException | LoginException | PasteException e2) {
 										message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_NICKNAMES_ERR));
-										logger.warn("Error on creating paste in guild {}!", e.getGuild().getId(), e2);
+										logger.error("Error on creating a pastebin page in guild {}!", e.getGuild().getId(), e2);
 									}
 								}
 								e.getChannel().sendMessage(message.build()).queue();
@@ -230,11 +230,11 @@ public class UserExecution {
 								message.setDescription(out);
 								if(out.length() > 0)e.getChannel().sendMessage(message.build()).queue();
 							}
-							logger.debug("{} has displayed information of the user {}", e.getMember().getUser().getId(), cache.getAdditionalInfo());
+							logger.info("User {} has displayed server information of user {}", e.getMember().getUser().getId(), cache.getAdditionalInfo());
 						}
 						else {
 							e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_ERR)).build()).queue();
-							logger.error("User information from Azrael.users couldn't be retrieved in guild {}", e.getGuild().getId());
+							logger.error("Information of user {} couldn't be retrieved in guild {}", cache.getAdditionalInfo(), e.getGuild().getId());
 						}
 					}
 					else {
@@ -259,14 +259,14 @@ public class UserExecution {
 						else {
 							message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_HISTORY.getName()).build()).queue();
-							logger.warn("MESSAGE HISTORY permission required for deleting messages in guild {}!", e.getGuild().getId());
+							logger.warn("MESSAGE HISTORY permission required for deleting messages in guild {}", e.getGuild().getId());
 							Hashes.clearTempCache(key);
 						}
 					}
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_MANAGE.getName()).build()).queue();
-						logger.warn("MANAGE MESSAGES permission required for deleting messages in guild {}!", e.getGuild().getId());
+						logger.warn("MANAGE MESSAGES permission required for deleting messages in guild {}", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 				}
@@ -319,7 +319,7 @@ public class UserExecution {
 						else {
 							message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
-							logger.warn("MANAGE ROLES permission required to mute a user in guild {}!", e.getGuild().getId());
+							logger.warn("MANAGE ROLES permission required to mute a user in guild {}", e.getGuild().getId());
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -388,14 +388,17 @@ public class UserExecution {
 												Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, e.getGuild().getIdLong(), "Permanent mute terminated");
 												//Run google service, if enabled
 												if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
-													final String NA = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
-													String role_id = NA;
-													String role_name = NA;
-													if(role != null) {
-														role_id = role.getId();
-														role_name = role.getName();
+													final String [] array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE.id, "");
+													if(array != null && !array[0].equals("empty")) {
+														final String NA = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
+														String role_id = NA;
+														String role_name = NA;
+														if(role != null) {
+															role_id = role.getId();
+															role_name = role.getName();
+														}
+														GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", ""+user_id, timestamp, member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
 													}
-													GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, timestamp, member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
 												}
 											}
 											else {
@@ -409,10 +412,13 @@ public class UserExecution {
 											Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, e.getGuild().getIdLong(), "Permanent mute terminated");
 											//Run google service, if enabled
 											if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
-												final String NA = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
-												var user = Azrael.SQLgetUserThroughID(""+user_id);
-												String username = (user != null ? user.getUserName() : NA);
-												GoogleUtils.handleSpreadsheetRequest(e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), username, username.replaceAll("#[0-9]{4}$", ""), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, null, null, "UNMUTED", null, "", "", null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
+												final String [] array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE.id, "");
+												if(array != null && !array[0].equals("empty")) {
+													final String NA = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
+													var user = Azrael.SQLgetUserThroughID(""+user_id);
+													String username = (user != null ? user.getUserName() : NA);
+													GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), username, username.replaceAll("#[0-9]{4}$", ""), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, null, null, "UNMUTED", null, "", "", null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
+												}
 											}
 										}
 									}
@@ -430,7 +436,7 @@ public class UserExecution {
 								EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 								e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNMUTE_IS_BANNED)).build()).queue();
 							}
-							logger.debug("{} has used the unmute action on {} in guild {}", e.getMember().getUser().getId(), cache.getAdditionalInfo(), e.getGuild().getId());
+							logger.info("User {} has used the unmute action on user {} in guild {}", e.getMember().getUser().getId(), cache.getAdditionalInfo(), e.getGuild().getId());
 						}
 						else {
 							UserPrivs.throwNotEnoughPrivilegeError(e, unmuteLevel);
@@ -478,7 +484,7 @@ public class UserExecution {
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.BAN_MEMBERS.getName()).build()).queue();
-						logger.warn("BAN MEMBERS permission required to ban a user in guild {}!", e.getGuild().getId());
+						logger.warn("BAN MEMBERS permission required to ban a user in guild {}", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 				}
@@ -513,7 +519,7 @@ public class UserExecution {
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.BAN_MEMBERS.getName()).build()).queue();
-						logger.warn("BAN MEMBERS permission required to unban a user in guild {}!", e.getGuild().getId());
+						logger.warn("BAN MEMBERS permission required to unban a user in guild {}", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 				}
@@ -555,7 +561,7 @@ public class UserExecution {
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.KICK_MEMBERS.getName()).build()).queue();
-						logger.warn("KICK MEMBERS permission required to kick a user in guild {}!", e.getGuild().getId());
+						logger.warn("KICK MEMBERS permission required to kick a user in guild {}", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 				}
@@ -667,13 +673,13 @@ public class UserExecution {
 									//Successful unwatch operation
 									Hashes.removeWatchlist(e.getGuild().getId()+"-"+user_id);
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNWATCH)).build()).queue();
-									logger.debug("The user {} has been removed from the watchlist for the guild {}", user_id, e.getGuild().getId());
+									logger.info("User {} has removed the user {} from the watchlist in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
 								}
 								else {
 									//Error DB update
 									message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED);
 									e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR));
-									logger.error("An internal error occurred! User {} in guild {} couldn't be inserted into Azrael.watchlist", user_id, e.getGuild().getId());
+									logger.error("User {} couldn't be removed from the watchlist in guild {}", user_id, e.getGuild().getId());
 								}
 							}
 							else if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUserUseWatchChannelLevel(e.getGuild().getIdLong()))) {
@@ -682,13 +688,13 @@ public class UserExecution {
 									//Successful unwatch operation
 									Hashes.removeWatchlist(e.getGuild().getId()+"-"+user_id);
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNWATCH)).build()).queue();
-									logger.debug("The user {} has been removed from the watchlist for the guild {}", user_id, e.getGuild().getId());
+									logger.info("User {} has removed the user {} from the watchlist in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
 								}
 								else {
 									//Error DB update
 									message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED);
 									e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR));
-									logger.error("An internal error occurred! User {} in guild {} couldn't be inserted into Azrael.watchlist", user_id, e.getGuild().getId());
+									logger.error("User {} couldn't be removed from the watchlist in guild {}", user_id, e.getGuild().getId());
 								}
 							}
 							else {
@@ -756,7 +762,7 @@ public class UserExecution {
 						}
 						else {
 							denied.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
-							e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).queue();
+							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -775,7 +781,7 @@ public class UserExecution {
 						}
 						else {
 							denied.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
-							e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).queue();
+							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 							Hashes.clearTempCache(key);
 						}
 					}
@@ -834,31 +840,31 @@ public class UserExecution {
 							if(warning_id == 0) {
 								if(Azrael.SQLDeleteData(user_id, e.getGuild().getIdLong()) > 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_WARNING_CLEAR)).build()).queue();
-									logger.debug("{} has cleared the warnings from {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
+									logger.info("User {} has cleared the warnings of user {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
 								}
 								else {
 									e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("The warnings of the user {} in guild {} couldn't be cleared", user_id, e.getGuild().getId());
+									logger.error("The warnings of user {} couldn't be cleared in guild {}", user_id, e.getGuild().getId());
 								}
 							}
 							else if(warning_id <= max_warning_id) {
 								if(Azrael.SQLUpdateWarning(user_id, e.getGuild().getIdLong(), warning_id) > 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_WARNING_UPDATED)).build()).queue();
-									logger.debug("{} has set the warning level to {} from {} in guild {}", e.getMember().getUser().getId(), warning_id, user_id, e.getGuild().getId());
+									logger.info("User {} has set the warning value to {} for user {} in guild {}", e.getMember().getUser().getId(), warning_id, user_id, e.getGuild().getId());
 								}
 								else {
 									e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("Warning on user {} couldn't be updated on Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
+									logger.error("Warning value of user {} couldn't be updated to {} in guild {}", user_id, warning_id, e.getGuild().getId());
 								}
 							}
 							else {
 								if(Azrael.SQLUpdateWarning(user_id, e.getGuild().getIdLong(), max_warning_id) > 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_WARNING_UPDATED_LIMIT)).build()).queue();
-									logger.debug("{} has set the warning level to {} from {} in guild {}", e.getMember().getUser().getId(), max_warning_id, user_id, e.getGuild().getId());
+									logger.info("User {} has set the warning value to {} for user {} in guild {}", e.getMember().getUser().getId(), max_warning_id, user_id, e.getGuild().getId());
 								}
 								else {
 									e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("Warning on user {} couldn't be updated on Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
+									logger.error("Warning value of user {} couldn't be updated to {} in guild {}", user_id, max_warning_id, e.getGuild().getId());
 								}
 							}
 						}
@@ -869,27 +875,26 @@ public class UserExecution {
 								if(warning_id <= max_warning_id) {
 									if(Azrael.SQLInsertData(user_id, e.getGuild().getIdLong(), warning_id, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false) > 0) {
 										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_WARNING_UPDATED)).build()).queue();
-										logger.debug("{} has set the warning level to {} from {} in guild {}", e.getMember().getUser().getId(), warning_id, user_id, e.getGuild().getId());
+										logger.info("User {} has set the warning value to {} for user {} in guild {}", e.getMember().getUser().getId(), warning_id, user_id, e.getGuild().getId());
 									}
 									else {
 										e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.error("Warning on user {} couldn't be inserted in Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
+										logger.error("Warning value of user {} couldn't be updated to {} in guild {}", user_id, warning_id, e.getGuild().getId());
 									}
 								}
 								else {
 									if(Azrael.SQLInsertData(user_id, e.getGuild().getIdLong(), max_warning_id, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), false, false) > 0) {
 										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_WARNING_UPDATED_LIMIT)).build()).queue();
-										logger.debug("{} has set the warning level to {} from {} in guild {}", e.getMember().getUser().getId(), max_warning_id, user_id, e.getGuild().getId());
+										logger.info("User {} has set the warning value to {} for user {} in guild {}", e.getMember().getUser().getId(), max_warning_id, user_id, e.getGuild().getId());
 									}
 									else {
 										e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.error("Warning on user {} couldn't be inserted in Azrael.bancollect in guild {}", user_id, e.getGuild().getId());
+										logger.error("Warning value of user {} couldn't be updated to {} in guild {}", user_id, max_warning_id, e.getGuild().getId());
 									}
 								}
 							}
 							else {
 								e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_WARNING_NEVER_WARNED)).build()).queue();
-								logger.warn("{} got no available warnings to be edited in guild {}", user_id, e.getGuild().getId());
 							}
 						}
 					}
@@ -957,7 +962,7 @@ public class UserExecution {
 								var timestamp = new Timestamp(System.currentTimeMillis());
 								if(Azrael.SQLInsertData(member.getUser().getIdLong(), e.getGuild().getIdLong(), Azrael.SQLgetMaxWarning(e.getGuild().getIdLong()), 1, timestamp, timestamp, false, false) == 0) {
 									e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("The perm mute flag for user {} in guild {} couldn't be inserted into Azrael.bancollect", user_id, e.getGuild().getId());
+									logger.error("The perm mute flag couldn't be set for user {} in guild {}", user_id, e.getGuild().getId());
 								}
 							}
 							e.getGuild().addRoleToMember(e.getGuild().getMemberById(user_id), e.getGuild().getRoleById(mute_role_id.getRole_ID())).queue();
@@ -974,7 +979,7 @@ public class UserExecution {
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
-						logger.warn("MANAGE ROLES permission required to mute a user in guild {}!", e.getGuild().getId());
+						logger.warn("MANAGE ROLES permission required to mute a user in guild {}", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 				}
@@ -1014,19 +1019,19 @@ public class UserExecution {
 							if(Azrael.SQLgetData(user_id, e.getGuild().getIdLong()).getWarningID() != 0) {
 								if(Azrael.SQLUpdateUnmute(user_id, e.getGuild().getIdLong(), timestamp, unmute_timestamp, true, true) == 0) {
 									e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("The unmute timer couldn't be updated from user {} in guild {} for the table Azrael.bancollect", user_id, e.getGuild().getId());
+									logger.error("The unmute timer couldn't be updated to {} for user {} in guild {}", unmute_timestamp, user_id, e.getGuild().getId());
 								}
 							}
 							else {
 								if(Azrael.SQLInsertData(user_id, e.getGuild().getIdLong(), 1, 1, timestamp, unmute_timestamp, true, true) == 0) {
 									e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("muted user {} couldn't be inserted into Azrael.bancollect for guild {}", user_id, e.getGuild().getName());
+									logger.error("The muted user {} couldn't be labeled as muted in guild {}", user_id, e.getGuild().getId());
 								}
 							}
 							e.getGuild().addRoleToMember(e.getGuild().getMemberById(user_id), e.getGuild().getRoleById(mute_role_id.getRole_ID())).reason(cache.getAdditionalInfo2()).queue();
 							Azrael.SQLInsertHistory(e.getGuild().getMemberById(user_id).getUser().getIdLong(), e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), (mute_time/1000/60), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_ORDER_1)).build()).queue();
-							logger.debug("{} has muted {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
+							logger.info("User {} has muted user {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
 							checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key);
 						}
 						else {
@@ -1099,7 +1104,7 @@ public class UserExecution {
 								}
 							});
 							Azrael.SQLInsertHistory(user_id, e.getGuild().getIdLong(), "ban", reason, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
-							logger.debug("{} has banned {} from guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
+							logger.info("User {} has banned user {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
 							checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key);
 						}
 						else {
@@ -1111,7 +1116,7 @@ public class UserExecution {
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.BAN_MEMBERS.getName()).build()).queue();
-						logger.warn("BAN MEMBERS permission required to ban a user in guild {}!", e.getGuild().getId());
+						logger.warn("BAN MEMBERS permission required to ban a user in guild {}", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 				}
@@ -1152,7 +1157,7 @@ public class UserExecution {
 							}
 						});
 						Azrael.SQLInsertHistory(e.getGuild().getMemberById(user_id).getUser().getIdLong(), e.getGuild().getIdLong(), "ban", _message, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
-						logger.debug("{} has banned {} in guild {}", e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), e.getGuild().getId());
+						logger.info("User {} has banned user {} in guild {}", e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), e.getGuild().getId());
 						checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key);
 					}
 					else {
@@ -1164,7 +1169,7 @@ public class UserExecution {
 				else {
 					message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.BAN_MEMBERS).build()).queue();
-					logger.warn("BAN MEMBERS permission required to ban a user in guild {}!", e.getGuild().getId());
+					logger.warn("BAN MEMBERS permission required to ban a user in guild {}", e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
 			}
@@ -1194,13 +1199,13 @@ public class UserExecution {
 							e.getGuild().unban(ban.getUser()).reason(reason).queue();
 						});
 						Azrael.SQLInsertHistory(user_id, e.getGuild().getIdLong(), "unban", reason, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
-						logger.debug("{} has unbanned {} from guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
+						logger.info("User {} has unbanned user {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.BAN_MEMBERS).build()).queue();
-						logger.warn("BAN MEMBERS permission required to unban a user in guild {}!", e.getGuild().getId());
+						logger.warn("BAN MEMBERS permission required to unban a user in guild {}", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 				}
@@ -1213,13 +1218,13 @@ public class UserExecution {
 						e.getGuild().unban(ban.getUser()).reason(_message).queue();
 					});
 					Azrael.SQLInsertHistory(user_id, e.getGuild().getIdLong(), "unban", _message, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
-					logger.debug("{} has unbanned {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
+					logger.info("User {} has unbanned user {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
 				else {
 					message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.BAN_MEMBERS.getName()).build()).queue();
-					logger.warn("BAN MEMBERS permission required to unban a user in guild {}!", e.getGuild().getId());
+					logger.warn("BAN MEMBERS permission required to unban a user in guild {}", e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
 			}
@@ -1252,7 +1257,7 @@ public class UserExecution {
 									});
 							});
 							Azrael.SQLInsertHistory(e.getGuild().getMemberById(user_id).getUser().getIdLong(), e.getGuild().getIdLong(), "kick", reason, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
-							logger.debug("{} has kicked {} from guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getName());
+							logger.info("User {} has kicked user {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
 							checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key);
 						}
 						else {
@@ -1290,7 +1295,7 @@ public class UserExecution {
 								});
 						});
 						Azrael.SQLInsertHistory(e.getGuild().getMemberById(user_id).getUser().getIdLong(), e.getGuild().getIdLong(), "kick", _message, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
-						logger.debug("{} has kicked {} from guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getName());
+						logger.info("User {} has kicked user {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getName());
 						checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key);
 					}
 					else {
@@ -1301,7 +1306,7 @@ public class UserExecution {
 				else {
 					message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED);
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.KICK_MEMBERS).build()).queue();
-					logger.warn("KICK MEMBERS permission required to kick a user in guild {}!", e.getGuild().getId());
+					logger.warn("KICK MEMBERS permission required to kick a user in guild {}", e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
 			}
@@ -1321,7 +1326,7 @@ public class UserExecution {
 										Azrael.SQLInsertHistory(user_id, e.getGuild().getIdLong(), "roleAdd", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), 0, role.getName());
 										Azrael.SQLInsertActionLog("MEMBER_ROLE_ADD", user_id, e.getGuild().getIdLong(), "Role add "+role.getName());
 										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_ASSIGN_ADD).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator()).replaceFirst("\\{\\}", member.getUser().getId()).replaceFirst("\\{\\}", role.getName()).replace("{}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator())).build()).queue();
-										logger.debug("The user {} has received the role {} by the bot in guild {}", user_id, role_id, e.getGuild().getId());
+										logger.info("User {} has assigned the role {} to user {} in guild {}", e.getMember().getUser().getId(), role_id, user_id, e.getGuild().getId());
 										Hashes.clearTempCache(key);
 									});
 								}
@@ -1368,7 +1373,7 @@ public class UserExecution {
 										Azrael.SQLInsertHistory(user_id, e.getGuild().getIdLong(), "roleRemove", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), 0, role.getName());
 										Azrael.SQLInsertActionLog("MEMBER_ROLE_REMOVE", user_id, e.getGuild().getIdLong(), "Role Remove "+role.getName());
 										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REMOVE_RETRACT).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator()).replaceFirst("\\{\\}", member.getUser().getId()).replaceFirst("\\{\\}", role.getName()).replace("{}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator())).build()).queue();
-										logger.debug("The user {} got the role {} retracted by the bot in guild {}", user_id, role_id, e.getGuild().getId());
+										logger.info("User {} has removed the role {} from user {} in guild {}", e.getMember().getUser().getId(), role_id, user_id, e.getGuild().getId());
 										Hashes.clearTempCache(key);
 									});
 								}
@@ -1418,23 +1423,23 @@ public class UserExecution {
 							case "1" -> {
 								if(Azrael.SQLInsertWatchlist(user_id, e.getGuild().getIdLong(), 1, watchChannel, higherPrivileges) == 0) {
 									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("{} couldn't be inserted into Azrael.watchlist for guild {}", user_id, e.getGuild().getId());
+									logger.error("User {} couldn't be added to the watch list with level 1 in guild {}", user_id, e.getGuild().getId());
 									return;
 								}
 								else {
 									Hashes.addWatchlist(e.getGuild().getId()+"-"+user_id, new Watchlist(1, watchChannel, higherPrivileges));
-									logger.debug("User {} has been added to the watchlist for guild {}", user_id, e.getGuild().getId());
+									logger.info("User {} has added user {} to the watch list with level 1 in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
 								}
 							}
 							case "2" -> {
 								if(Azrael.SQLInsertWatchlist(user_id, e.getGuild().getIdLong(), 2, watchChannel, higherPrivileges) == 0) {
 									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("{} couldn't be inserted into Azrael.watchlist for guild {}", user_id, e.getGuild().getId());
+									logger.error("User {} couldn't be added to the watch list with level 2 in guild {}", user_id, e.getGuild().getId());
 									return;
 								}
 								else {
 									Hashes.addWatchlist(e.getGuild().getId()+"-"+user_id, new Watchlist(2, watchChannel, higherPrivileges));
-									logger.debug("User {} has been added to the watchlist for guild {}", user_id, e.getGuild().getId());
+									logger.info("User {} has added user {} to the watch list with level 2 in guild {}", user_id, e.getGuild().getId());
 								}
 							}
 							default  -> { return; }
@@ -1455,23 +1460,23 @@ public class UserExecution {
 							case "1" -> {
 								if(Azrael.SQLInsertWatchlist(user_id, e.getGuild().getIdLong(), 1, trash_channel.getChannel_ID(), false) == 0) {
 									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("{} couldn't be inserted into Azrael.watchlist for guild {}", user_id, e.getGuild().getId());
+									logger.error("User {} couldn't be added to the watch list with level 1 in guild {}", user_id, e.getGuild().getId());
 									return;
 								}
 								else {
 									Hashes.addWatchlist(e.getGuild().getId()+"-"+user_id, new Watchlist(1, trash_channel.getChannel_ID(), false));
-									logger.debug("User {} has been added to the watchlist for guild {}", user_id, e.getGuild().getId());
+									logger.info("User {} has added user {} to the watch list with level 1 in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
 								}
 							}
 							case "2" -> {
 								if(Azrael.SQLInsertWatchlist(user_id, e.getGuild().getIdLong(), 2, trash_channel.getChannel_ID(), false) == 0) {
 									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("{} couldn't be inserted into Azrael.watchlist for guild {}", user_id, e.getGuild().getId());
+									logger.error("User {} couldn't be added to the watch list with level 2 in guild {}", user_id, e.getGuild().getId());
 									return;
 								}
 								else {
 									Hashes.addWatchlist(e.getGuild().getId()+"-"+user_id, new Watchlist(2, trash_channel.getChannel_ID(), false));
-									logger.debug("User {} has been added to the watchlist for guild {}", user_id, e.getGuild().getId());
+									logger.info("User {} has added user {} to the watch list with level 2 in guild {}", user_id, e.getGuild().getId());
 								}
 							}
 							default  -> { return; }
@@ -1497,7 +1502,7 @@ public class UserExecution {
 					long assign_role = 0;
 					boolean toBreak = false;
 					var roles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
-					for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild_settings.getThemeID())) {
+					for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong())) {
 						if((user_details.getExperience() + experience) >= ranks.getExperience()) {
 							totExperience = ranks.getExperience();
 							level = ranks.getLevel();
@@ -1545,16 +1550,16 @@ public class UserExecution {
 							}
 							else {
 								e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
-								logger.warn("MANAGE ROLES permission missing to assign a ranking role in guild {}!", e.getGuild().getId());
+								logger.warn("MANAGE ROLES permission required to assign a ranking role in guild {}", e.getGuild().getId());
 							}
 						}
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_GIFT_EXP_ADDED)).build()).queue();
-						logger.debug("{} has gifted {} experience points to {} in guild {}", e.getMember().getUser().getId(), _message, user_id, e.getGuild().getId());
+						logger.info("User {} has gifted {} experience points to user {} in guild {}", e.getMember().getUser().getId(), _message, user_id, e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {
 						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("RankingSystem.user_details table couldn't be updated with the latest experience and level information in guild {}", e.getGuild().getId());
+						logger.error("The amount of {} experience points couldn't be gifted to user {} in guild {}", _message, user_id, e.getGuild().getId());
 					}
 				}
 			}
@@ -1569,7 +1574,7 @@ public class UserExecution {
 					long assign_role = 0;
 					boolean toBreak = false;
 					var roles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
-					for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild_settings.getThemeID())) {
+					for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong())) {
 						if(experience >= ranks.getExperience()) {
 							totExperience = ranks.getExperience();
 							level = ranks.getLevel();
@@ -1617,16 +1622,16 @@ public class UserExecution {
 							}
 							else {
 								e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
-								logger.warn("MANAGE ROLES permission missing to assign a ranking role in guild {}!", e.getGuild().getId());
+								logger.warn("MANAGE ROLES permission required to assign a ranking role in guild {}", e.getGuild().getId());
 							}
 						}
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_SET_EXP_UPDATED)).build()).queue();
-						logger.debug("{} has set {} experience points to {} in guild {}", e.getMember().getUser().getId(), _message, user_id, e.getGuild().getId());
+						logger.info("User {} has set {} experience points to user {} in guild {}", e.getMember().getUser().getId(), _message, user_id, e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {
 						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("RankingSystem.user_details table couldn't be updated with the latest experience and level information in guild {}", e.getGuild().getId());
+						logger.error("The amount of {} experience points couldn't be set for user {} in guild {}", _message, user_id, e.getGuild().getId());
 					}
 				}
 			}
@@ -1640,7 +1645,7 @@ public class UserExecution {
 						long assign_role = 0;
 						boolean toBreak = false;
 						var roles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
-						for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong(), guild_settings.getThemeID())) {
+						for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong())) {
 							var role = roles.parallelStream().filter(f -> f.getLevel() == ranks.getLevel()).findAny().orElse(null);
 							if(role != null && toBreak == false) {
 								assign_role = role.getRole_ID();
@@ -1683,16 +1688,16 @@ public class UserExecution {
 								}
 								else {
 									e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
-									logger.warn("MANAGE ROLES permission missing to assign a ranking role in guild {}!", e.getGuild().getId());
+									logger.warn("MANAGE ROLES permission required to assign a ranking role in guild {}", e.getGuild().getId());
 								}
 							}
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_LEVEL_UPDATED)).build()).queue();
-							logger.debug("{} has set the level {} to {} in guild {}", e.getMember().getUser().getId(), _message, user_id, e.getGuild().getId());
+							logger.info("User {} has set the level {} to user {} in guild {}", e.getMember().getUser().getId(), _message, user_id, e.getGuild().getId());
 							Hashes.clearTempCache(key);
 						}
 						else {
 							e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("RankingSystem.user_details table couldn't be updated with the latest experience and level information in guild {}", e.getGuild().getId());
+							logger.error("The user {} couldn't receive the level {} in guild {}", user_id, _message, e.getGuild().getId());
 						}
 					}
 					else {
@@ -1700,6 +1705,7 @@ public class UserExecution {
 					}
 				}
 			}
+			//TODO: check why it doesn't work in any other language than english
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("gift-currency")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
@@ -1710,12 +1716,12 @@ public class UserExecution {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Money gifted", "User received money in value of "+currency+" "+guild_settings.getCurrency());
 						Hashes.addRanking(e.getGuild().getIdLong(), user_details.getUser_ID(), user_details);
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_GIFT_CUR_ADDED)).build()).queue();
-						logger.debug("{} has gifted {} currency value to {} in guild {}", e.getMember().getUser().getId(), _message, user_id, e.getGuild().getId());
+						logger.info("User {} has gifted {} money to user {} in guild {}", e.getMember().getUser().getId(), _message, user_id, e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {
 						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("RankingSystem.user_details table couldn't be updated with the latest currency information in guild {}", e.getGuild().getId());
+						logger.error("The amount of {} money couldn't be gifted to user {} in guild {}", _message, user_id, e.getGuild().getId());
 					}
 				}
 			}
@@ -1729,12 +1735,12 @@ public class UserExecution {
 						RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Money set", "Currency value for the user has been changed to "+currency+" "+guild_settings.getCurrency());
 						Hashes.addRanking(e.getGuild().getIdLong(), user_details.getUser_ID(), user_details);
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_SET_CUR_UPDATED)).build()).queue();
-						logger.debug("{} has set {} currency value to {} in guild {}", e.getMember().getUser().getId(), _message, user_id, e.getGuild().getId());
+						logger.info("User {} has set {} money to user {} in guild {}", e.getMember().getUser().getId(), _message, user_id, e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
 					else {
 						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("RankingSystem.user_details table couldn't be updated with the latest currency information in guild {}", e.getGuild().getId());
+						logger.error("Currency of user {} couldn't be set to {} in guild {}", user_id, _message, e.getGuild().getId());
 					}
 				}
 			}
@@ -1808,7 +1814,7 @@ public class UserExecution {
 									if(channelErr.contains(currentMessage.getChannelID())) {
 										error.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS));
 										e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_MANAGE+" and "+Permission.MESSAGE_HISTORY.getName())+channel.getAsMention()).build()).queue();
-										logger.warn("MESSAGE_MANAGE and MESSAGE_HISTORY permissions rewquired to retrieve and delete messages in channel {} for guild {}", channel.getId(), e.getGuild().getId());
+										logger.warn("MESSAGE_MANAGE and MESSAGE_HISTORY permissions required to retrieve and delete messages in channel {} in guild {}", channel.getId(), e.getGuild().getId());
 										channelErr.add(currentMessage.getChannelID());
 									}
 									hash_counter--;
@@ -1826,13 +1832,13 @@ public class UserExecution {
 								String paste_link = Pastebin.unlistedPermanentPaste(userMessage.getUserName()+" ("+userMessage.getUserID()+") "+e.getGuild().getId(), hash_counter+" messages from "+userMessage.getUserName()+" ("+userMessage.getUserID()+") have been removed:\n\n"+collected_messages.toString(), e.getGuild().getIdLong());
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_REMOVED)+paste_link).build()).queue();
 								Azrael.SQLInsertActionLog("MESSAGES_DELETED", user_id, e.getGuild().getIdLong(), paste_link);
-								logger.debug("{} has bulk deleted messages from {} in guild {}", e.getMember().getUser().getId(), userMessage.getUserID(), e.getGuild().getId());
+								logger.info("User {} has deleted {} messages of user {} in guild {}", e.getMember().getUser().getId(), hash_counter, userMessage.getUserID(), e.getGuild().getId());
 							} catch(IllegalStateException | LoginException | PasteException e2) {
-								logger.warn("Error on creating paste in guild {}", e.getGuild().getId(), e2);
+								logger.error("Error in creating a pastebin page in guild {}", e.getGuild().getId(), e2);
 								error.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
 								e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR)).build()).queue();
 							} catch(RuntimeException e2) {
-								logger.warn("New Paste couldn't be created!", e2);
+								logger.warn("New pastebin page couldn't be created in guild {}", e.getGuild().getId(), e2);
 								error.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
 								e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR_2)).build()).queue();
 							}
@@ -1846,7 +1852,7 @@ public class UserExecution {
 					}
 					else {
 						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_MANAGE.getName()).build()).queue();
-						logger.warn("MANAGE MESSAGES permission for message deletions is missing in guild {}!", e.getGuild().getId());
+						logger.warn("MANAGE MESSAGES permission for message deletions is missing in guild {}", e.getGuild().getId());
 					}
 				}
 				else {

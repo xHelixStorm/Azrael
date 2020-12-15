@@ -28,9 +28,8 @@ public class DrawDaily {
 	
 	public static void draw(GuildMessageReceivedEvent e, String obtained, Guilds guild_settings) {
 		try {
-			var theme_id = guild_settings.getThemeID();
-			BufferedImage daily = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/daily_blank.png"));
-			BufferedImage reward = ImageIO.read(new File("./files/RankingSystem/"+theme_id+"/Dailies/"+obtained+".png"));
+			BufferedImage daily = ImageIO.read(new File("./files/RankingSystem/Dailies/daily_blank.png"));
+			BufferedImage reward = ImageIO.read(new File("./files/RankingSystem/Dailies/"+obtained+".png"));
 			
 			final int rewardX = guild_settings.getDailyRewardX();
 			final int rewardY = guild_settings.getDailyRewardY();
@@ -68,7 +67,7 @@ public class DrawDaily {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_1)+obtained).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_1)+obtained).queue();
-			logger.error("Error on drawing the daily reward in guild {}", e.getGuild().getId(), ioe);
+			logger.error("Daily reward couldn't be printed for user {} and reward {} in guild {}", e.getMember().getUser().getId(), obtained, e.getGuild().getId(), ioe);
 		}
 	}
 	

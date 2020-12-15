@@ -83,7 +83,7 @@ public class Daily implements CommandPublic {
 						exclude_cod = true;
 					//retrieve guild settings and all registered daily items which a user can win
 					constructors.Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-					List<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong(), guild_settings.getThemeID());
+					List<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong());
 					//check that any items are registered for the daily
 					if(daily_items.size() > 0) {
 						var tot_weight = 0;
@@ -145,22 +145,22 @@ public class Daily implements CommandPublic {
 							}
 							//if it's a experience boost reward, add it to inventory and activate it, if the action is set to 'use'
 							else if(list.get(random).getType().equals("exp")) {
-								var item_id = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), guild_settings.getThemeID()).parallelStream().filter(i -> i.getShopDescription().equals(list.get(random).getDescription())).findAny().orElse(null).getItemID();
+								var item_id = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong()).parallelStream().filter(i -> i.getShopDescription().equals(list.get(random).getDescription())).findAny().orElse(null).getItemID();
 								if(list.get(random).getAction().equals("keep")) {
-									InventoryContent inventory = RankingSystem.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), list.get(random).getDescription(), "perm", guild_settings.getThemeID());
+									InventoryContent inventory = RankingSystem.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), list.get(random).getDescription(), "perm");
 									if(inventory != null)
-										editedRows = RankingSystem.SQLInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, inventory.getNumber()+1, "perm", guild_settings.getThemeID());
+										editedRows = RankingSystem.SQLInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, inventory.getNumber()+1, "perm");
 									else
-										editedRows = RankingSystem.SQLInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, 1, "perm", guild_settings.getThemeID());
+										editedRows = RankingSystem.SQLInsertInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, 1, "perm");
 								}
 								else if(list.get(random).getAction().equals("use")) {
-									InventoryContent inventory = RankingSystem.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), list.get(random).getDescription(), "limit", guild_settings.getThemeID());
+									InventoryContent inventory = RankingSystem.SQLgetNumberAndExpirationFromInventory(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), list.get(random).getDescription(), "limit");
 									try {
 										Timestamp timestamp3 = new Timestamp(inventory.getExpiration().getTime()+1000*60*60*24);
-										editedRows = RankingSystem.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, inventory.getNumber()+1, "limit", timestamp3, guild_settings.getThemeID());
+										editedRows = RankingSystem.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, inventory.getNumber()+1, "limit", timestamp3);
 									} catch(NullPointerException npe){
 										Timestamp timestamp4 = new Timestamp(time+1000*60*60*24);
-										editedRows = RankingSystem.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, 1, "limit", timestamp4, guild_settings.getThemeID());
+										editedRows = RankingSystem.SQLInsertInventoryWithLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), item_id, timestamp, 1, "limit", timestamp4);
 									}
 								}
 							}
@@ -191,18 +191,18 @@ public class Daily implements CommandPublic {
 							//if the inventory has been updated, set the daily for this user and the current day as opened
 							if(editedRows > 0) {
 								if(RankingSystem.SQLInsertDailiesUsage(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), timestamp, timestamp2) > 0) {
-									logger.debug("{} received {} out of the Daily command", e.getMember().getUser().getId(), list.get(random).getDescription());
+									logger.info("{} received {} out of the Daily command in guild {}", e.getMember().getUser().getId(), list.get(random).getDescription(), e.getGuild().getId());
 									RankingSystem.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily retrieved", list.get(random).getDescription());
 								}
 								else {
 									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_2)+e.getMember().getAsMention(), Channel.LOG.getType());
-									logger.error("used dailies from {} couldn't be marked in RankingSystem.dailies_usage table", e.getMember().getUser().getId());
+									logger.error("used dailies from {} couldn't be marked as used in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily retrieval not marked", list.get(random).getDescription());
 								}
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_3)).build()).queue();
-								logger.error("{} couldn't be inserted into inventory", list.get(random).getDescription());
+								logger.error("{} couldn't be inserted into inventory in guild {}", list.get(random).getDescription(), e.getGuild().getId());
 								RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily item couldn't be inserted to inventory", "An insert error occurred for the following item "+list.get(random).getDescription());
 							}
 							list.clear();

@@ -19,7 +19,7 @@ public class LowerHeavyCensoring implements Runnable {
 
 	@Override
 	public void run() {
-		logger.debug("LowerHeavyCensoring thread started in guild {}", e.getGuild().getId());
+		logger.trace("LowerHeavyCensoring thread started in guild {}", e.getGuild().getId());
 		Hashes.addHeavyCensoringThread(e.getGuild().getIdLong(), Thread.currentThread());
 		try {
 			Thread.sleep(60000);
@@ -33,11 +33,12 @@ public class LowerHeavyCensoring implements Runnable {
 							STATIC.writeToRemoteChannel(e.getGuild(), null, STATIC.getTranslation2(e.getGuild(), Translation.HEAVY_CENSORING_SOFT), Channel.LOG.getType());
 						}
 					}
+					logger.info("Heavy censoring threshold is now at {} in guild {}", count, e.getGuild().getId());
 				}
 				Thread.sleep(60000);
 			}
 		} catch (InterruptedException e1) {
-			logger.debug("LowerHeavyCensoring thread interrupted in guild {}", e.getGuild().getId());
+			logger.trace("LowerHeavyCensoring thread interrupted in guild {}", e.getGuild().getId());
 		}
 	}
 	

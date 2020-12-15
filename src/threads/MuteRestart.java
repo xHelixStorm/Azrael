@@ -80,22 +80,22 @@ public class MuteRestart implements Runnable {
 				else {
 					if(Azrael.SQLUpdateMutedOnEnd(user_id, guild.getIdLong(), false, false) > 0) {
 						if(Azrael.SQLUpdateGuildLeft(user_id, guild.getIdLong(), false) == 0) {
-							logger.error("Guild left state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild.getIdLong());
+							logger.error("Guild left state couldn't be update for user {} in guild {}", user_id, guild.getIdLong());
 						}
 						Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild.getIdLong(), "Mute role removed");
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
 							final String NA = STATIC.getTranslation2(guild, Translation.NOT_AVAILABLE);
-							GoogleUtils.handleSpreadsheetRequest(guild, "", ""+user_id, timestamp, user_name, effectiveName, "", "", NA, null, null, "UNMUTED", null, NA, NA, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
+							GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), guild, "", ""+user_id, timestamp, user_name, effectiveName, "", "", NA, null, null, "UNMUTED", null, NA, NA, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
 						}
 					}
 					else
-						logger.error("Mute end state couldn't be update in Azrael.bancollect for user {} in guild {}", user_id, guild.getIdLong());
+						logger.error("Mute end state couldn't be updated for user {} in guild {}", user_id, guild.getIdLong());
 				}
 			}			
 		} catch (InterruptedException e2) {
 			//executed when H!user unmute was used to interrupt the Thread.sleep
-			logger.info("The mute of {} ing guild {} has been interrupted!", user_id, guild.getId());
+			logger.info("The mute of user {} has been interrupted in guild {}", user_id, guild.getId());
 			//verify that the user is not banned and still labeled as muted before printing a message and before updating the unmute time
 			if(!Azrael.SQLisBanned(user_id, guild.getIdLong())) {
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -138,7 +138,7 @@ public class MuteRestart implements Runnable {
 						role_id = role.getId();
 						role_name = role.getName();
 					}
-					GoogleUtils.handleSpreadsheetRequest(guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, effectiveName, reporter_name, reporter_username, NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
+					GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, effectiveName, reporter_name, reporter_username, NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
 				}
 			}
 		}

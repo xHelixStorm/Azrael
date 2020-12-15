@@ -40,7 +40,7 @@ public class SubscribeExecution {
 				if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
 					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
 				Hashes.clearFeeds();
-				logger.debug("{} RSS link has been registered for guild {}", feed, e.getGuild().getId());
+				logger.info("User {} has registered the RSS url {} in guild {}", e.getMember().getUser().getId(), feed, e.getGuild().getId());
 			}
 			else if(result == 0) {
 				message.setColor(Color.RED);
@@ -49,7 +49,7 @@ public class SubscribeExecution {
 			else {
 				message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("{} RSS link couldn't be registered for guild {}", feed, e.getGuild().getId());
+				logger.error("The RSS url {} couldn't be registered in guild {}", feed, e.getGuild().getId());
 			}
 		}
 		else if(STATIC.getTwitterFactory() != null) {
@@ -60,7 +60,7 @@ public class SubscribeExecution {
 				if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
 					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
 				Hashes.clearFeeds();
-				logger.debug("{} Hashtag has been registered for guild {}", feed, e.getGuild().getId());
+				logger.info("User {} has registered the Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), feed, e.getGuild().getId());
 			}
 			else if(result == 0) {
 				message.setColor(Color.RED);
@@ -69,7 +69,7 @@ public class SubscribeExecution {
 			else {
 				message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("{} Hashtag couldn't be registered for guild {}", feed, e.getGuild().getId());
+				logger.error("The Twitter Hashtag {} couldn't be registered in guild {}", feed, e.getGuild().getId());
 			}
 		}
 		else {
@@ -88,12 +88,12 @@ public class SubscribeExecution {
 				Hashes.removeFeeds(e.getGuild().getIdLong());
 				Hashes.removeSubscriptionStatus(e.getGuild().getId()+"_"+url);
 				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_REMOVED)).build()).queue();
-				logger.debug("{} rss feed has been deleted from guild {}", url, e.getGuild().getId());
+				logger.info("User {} has removed the RSS url {} in guild {}", e.getMember().getUser().getId(), url, e.getGuild().getId());
 			}
 			else {
 				message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("{} rss feed couldn't be removed from guild {}", url, e.getGuild().getId());
+				logger.error("The RSS url {} couldn't be removed in guild {}", url, e.getGuild().getId());
 			}
 		}
 		else {
@@ -122,11 +122,11 @@ public class SubscribeExecution {
 		if(Azrael.SQLUpdateRSSFormat(rss.get(feed).getURL(), e.getGuild().getIdLong(), EmojiParser.parseToAliases(format)) > 0) {
 			Hashes.removeFeeds(e.getGuild().getIdLong());
 			e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_FORMAT_UPDATED)).build()).queue();
-			logger.debug("{} has updated the format of an rss feed in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			logger.info("User {} has updated the display format of the RSS url {} in guild {}", e.getMember().getUser().getId(), rss.get(feed).getURL(), e.getGuild().getId());
 		}
 		else {
 			e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-			logger.error("Format couldn't be updated for the url {} in guild {}", rss.get(feed).getURL(), e.getGuild().getId());
+			logger.error("The display format of RSS url {} couldn't be updated in guild {}", rss.get(feed).getURL(), e.getGuild().getId());
 		}
 	}
 	
@@ -156,73 +156,73 @@ public class SubscribeExecution {
 		boolean printMessage = false;
 		if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE_PICTURES))) {
 			if(Azrael.SQLUpdateRSSPictures(tweet.getURL(), e.getGuild().getIdLong(), true) > 0) {
-				logger.debug("Pictures enabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+				logger.info("User {} has allowed pictures to be displayed for the Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
 				printMessage = true;
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Pictures couldn't be enabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+				logger.error("Pictures couldn't be allowed for the Twitter hashtag {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 		}
 		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE_VIDEOS))) {
 			if(Azrael.SQLUpdateRSSVideos(tweet.getURL(), e.getGuild().getIdLong(), true) > 0) {
-				logger.debug("Videos enabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+				logger.info("User {} has allowed videos to be displayed for the Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
 				printMessage = true;
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Videos couldn't be enabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+				logger.error("Videos couldn't be allowed for Twitter hashtag {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 		}
 		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE_TEXT))) {
 			if(Azrael.SQLUpdateRSSText(tweet.getURL(), e.getGuild().getIdLong(), true) > 0) {
-				logger.debug("Text enabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+				logger.info("User {} has allowed text messages to be displayed for Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
 				printMessage = true;
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Text couldn't be enabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+				logger.error("Text messages couldn't be allowed for Twitter hashtag {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 		}
 		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE_PICTURES))) {
 			if(Azrael.SQLUpdateRSSPictures(tweet.getURL(), e.getGuild().getIdLong(), false) > 0) {
-				logger.debug("Pictures disabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+				logger.info("User {} has disallowed pictures to be displayed for Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
 				printMessage = true;
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Pictures couldn't be disabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+				logger.error("Pictures couldn't be disallowed for Twitter hashtag {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 		}
 		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE_VIDEOS))) {
 			if(Azrael.SQLUpdateRSSVideos(tweet.getURL(), e.getGuild().getIdLong(), false) > 0) {
-				logger.debug("Videos disabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+				logger.info("User {} has disallowed videos to be displayed for Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
 				printMessage = true;
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Videos couldn't be disabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+				logger.error("Videos couldn't be disallowed for Twitter hashtag {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 		}
 		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE_TEXT))) {
 			if(Azrael.SQLUpdateRSSText(tweet.getURL(), e.getGuild().getIdLong(), false) > 0) {
-				logger.debug("Text disabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+				logger.info("User {} has disallowed text messages to be displayed for Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
 				printMessage = true;
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Text couldn't be disabled for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+				logger.error("Text messages couldn't be disallowed for Twitter hashtag {} in guild {}", tweet.getURL(), e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
 		}
@@ -232,14 +232,14 @@ public class SubscribeExecution {
 				final String hashtag = lcMessage.substring(10);
 				final int result = Azrael.SQLInsertChildTweet(tweet.getURL(), hashtag, e.getGuild().getIdLong()); 
 				if(result > 0) {
-					logger.debug("Child hashtag {} was added for parent hashtag {} in guild {}", hashtag, tweet.getURL(), e.getGuild().getId());
+					logger.info("User {} has added the child hashtag {} to the parent hashtag {} in guild {}", e.getMember().getUser().getId(), hashtag, tweet.getURL(), e.getGuild().getId());
 				}
 				else if(result == 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_OPTION_BOUND)+tweet.getURL()).build()).queue();
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Child hashtags couldn't be added for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+					logger.error("Child hashtag {} couldn't be added to the parent hashtag {} in guild {}", hashtag, tweet.getURL(), e.getGuild().getId());
 				}
 			}
 			else if(lcMessage.matches(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_CHILD)+" #[a-z0-9]{1,}[^\\s]*")) {
@@ -247,14 +247,14 @@ public class SubscribeExecution {
 				final String hashtag = lcMessage.substring(13);
 				final int result = Azrael.SQLDeleteChildTweet(tweet.getURL(), hashtag, e.getGuild().getIdLong());
 				if(result > 0) {
-					logger.debug("Child hashtag {} was removed for parent hashtag {} in guild {}", hashtag, tweet.getURL(), e.getGuild().getId());
+					logger.info("User {} has removed the child hashtag {} from the parent hashtag {} in guild {}", hashtag, tweet.getURL(), e.getGuild().getId());
 				}
 				else if(result == 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_OPTION_NOT_BOUND)+tweet.getURL()).build()).queue();
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Child hashtags couldn't be removed for tweet {} in guild {}", tweet.getURL(), e.getGuild().getId());
+					logger.error("Child hashtag {} couldn't be removed for the parent hashtag {} in guild {}", hashtag, tweet.getURL(), e.getGuild().getId());
 				}
 			}
 			else {
@@ -300,11 +300,13 @@ public class SubscribeExecution {
 				final var result = Azrael.SQLUpdateRSSChannel(subscription.getURL(), e.getGuild().getIdLong(), textChannel.getIdLong());
 				if(result > 0) {
 					e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_ADDED)).build()).queue();
+					logger.info("User {} has set the alternative print channel {} for the Twitter hashtag or RSS url {} in guild {}", e.getMember().getUser().getId(), textChannel.getId(), subscription.getURL(), e.getGuild().getId());
 					Hashes.removeFeeds(e.getGuild().getIdLong());
 					Hashes.clearTempCache(key);
 				}
 				else {
 					e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("Alternative print channel {} couldn't be set for Twitter hashtag or RSS url {} in guild {}", textChannel.getId(), subscription.getURL(), e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
 			}
