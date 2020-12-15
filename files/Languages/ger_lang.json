@@ -949,6 +949,7 @@
 	"join_permission_err":			"Der beigetretene Benutzer **{}** mit der ID Nummer **{}** konnte nicht gemutet werden, weil die folgende Berechtigung fehlt: ",
 	"join_permission_err_2":		"Der beigetretene Benutzer **{}** mit der ID Nummer **{}** konnte nicht gebannt werden, weil die folgende Berechtigung fehlt: ",
 	"join_verify":					"Willkommen zu {} {}\nSie wurden in unserem Warteraum platziert. Ein verfügbarer Administrator oder Moderator wird Sie in kürze verifizieren.",
+	"join_new":						"Vor {} Stunden und {} Minuten erstellt",
 	
 	"name_title":					"Ein nicht erlaubter Name gefunden!",
 	"name_reason":					"Benutzer umbenannt wegen momentaner Zensur Einstellungen!",

@@ -41,6 +41,7 @@ public class GuildIni {
 		general.put("EditedMessage", "false");
 		general.put("EditedMessageHistory", "false");
 		general.put("Notifications", "false");
+		general.put("NewAccountOnJoin", "false");
 		fileContent.put("General", general);
 		
 		//collect all Google variables
@@ -443,6 +444,10 @@ public class GuildIni {
 	public static boolean getNotifications(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "Notifications", boolean.class);
+	}
+	public static boolean getNewAccountOnJoin(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "NewAccountOnJoin", boolean.class);
 	}
 	
 	public static boolean getGoogleFunctionalitiesEnabled(long guild_id) {

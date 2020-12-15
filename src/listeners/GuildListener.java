@@ -3,7 +3,10 @@ package listeners;
 import java.awt.Color;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.EnumSet;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -105,8 +108,24 @@ public class GuildListener extends ListenerAdapter {
 			Bancollect warnedUser = Azrael.SQLgetData(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 			muted = warnedUser.getMuted();
 			//print join message, if the user is not muted and if the printing of join messages is allowed
-			if(GuildIni.getJoinMessage(guild_id)) {
-				STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
+			final boolean joinMessage = GuildIni.getJoinMessage(guild_id);
+			final boolean newAccountOnJoin = GuildIni.getNewAccountOnJoin(guild_id);
+			if(joinMessage || newAccountOnJoin) {
+				if(!newAccountOnJoin)
+					STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
+				else {
+					//TODO: check logic again during daylight saving 
+					final long createdAgo = System.currentTimeMillis() - ((e.getMember().getTimeCreated().toEpochSecond()*1000) + (TimeZone.getDefault().useDaylightTime() ? Calendar.ZONE_OFFSET : 0));
+					final long hours = TimeUnit.MILLISECONDS.toHours(createdAgo);
+					final long minutes = (TimeUnit.MILLISECONDS.toMinutes(createdAgo)%60);
+					//display accounts which are not older than a day only
+					if(hours < 24) {
+						STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setFooter(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_NEW).replaceFirst("\\{\\}", ""+hours).replace("{}", ""+minutes)), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
+					}
+					else if(joinMessage) {
+						STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
+					}
+				}
 			}
 			
 			//retrieve the unmute time if available and if not, check if the user is marked as muted and if muted, reassign the mute role regardless

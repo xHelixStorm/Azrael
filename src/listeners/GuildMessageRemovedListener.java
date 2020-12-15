@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.TimeZone;
 
@@ -81,7 +82,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 									//only execute if the current action log hasn't been read before and that the user id of the removed message is the same from the audit log. Also verify that the audit log isn't older than the Bot boot
 									final long entryCreated = entry.getTimeCreated().toEpochSecond();
 									//retrieve the boot time considering the offset and daylight saving
-									final long bootTime = STATIC.getBootTime().toEpochSecond()-(TimeZone.getDefault().useDaylightTime() ? (TimeZone.getDefault().getRawOffset()/1000)+3600 : TimeZone.getDefault().getRawOffset()/1000);
+									final long bootTime = STATIC.getBootTime().toEpochSecond()-(TimeZone.getDefault().useDaylightTime() ? (Calendar.ZONE_OFFSET/1000) : 0);
 									//System.currentTimeMilis() doesn't consider offset and daylight saving. Hence no convertion required
 									if(!Hashes.containsActionlog(entry.getId()+entry.getOptionByName("count")) && (firstMessage.getUserID() == entry.getTargetIdLong() || firstMessage.getUserID() == 0) && entryCreated > bootTime && ((entryCreated - (System.currentTimeMillis())/1000) * -1) < T5MINUTES) {
 										//add action log a read and allow a message to be printed afterwards

@@ -949,6 +949,7 @@
 	"join_permission_err":			"The joined user **{}** with the ID number **{}** couldn't be muted because the following permission is required: ",
 	"join_permission_err_2":		"The joined user **{}** with the ID number **{}** couldn't be banned because the following permission is required: ",
 	"join_verify":					"Welcome to {} {}\nYou have been placed in our holding room. An available administrator or moderator will verify you shortly.",
+	"join_new":						"Created {} hours and {} minutes ago",
 	
 	"name_title":					"Not allowed name found!",
 	"name_reason":					"Renamed due to current name censor settings!",

@@ -951,6 +951,7 @@ public enum Translation {
 	JOIN_PERMISSION_ERR			("join_permission_err"),
 	JOIN_PERMISSION_ERR_2		("join_permission_err_2"),
 	JOIN_VERIFY					("join_verify"),
+	JOIN_NEW					("join_new"),
 	
 	NAME_TITLE					("name_title"),
 	NAME_REASON					("name_reason"),
