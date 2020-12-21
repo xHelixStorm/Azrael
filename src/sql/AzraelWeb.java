@@ -28,18 +28,18 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		}
 	}
 	
-	public static int SQLInsertActionLog(long _user_id, String _address, String _event, String _info) {
-		logger.trace("SQLInsertLoginInfo launched. Passed params {}, {}, {}, {}", _user_id, _address, _event, _info);
+	public static int SQLInsertActionLog(long user_id, String address, String event, String info) {
+		logger.trace("SQLInsertLoginInfo launched. Passed params {}, {}, {}, {}", user_id, address, event, info);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
 			String sql = ("INSERT INTO action_log (user_id, address, event, info) VALUES (?, ?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
-			stmt.setString(2, _address);
-			stmt.setString(3, _event);
-			stmt.setString(4, _info);
+			stmt.setLong(1, user_id);
+			stmt.setString(2, address);
+			stmt.setString(3, event);
+			stmt.setString(4, info);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertLoginInfo Exception", e);
@@ -50,16 +50,16 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		}
 	}
 	
-	public static int SQLInsertLoginInfo(long _user_id, int _type) {
-		logger.trace("SQLInsertLoginInfo launched. Passed params {}, {}", _user_id, _type);
+	public static int SQLInsertLoginInfo(long user_id, int type) {
+		logger.trace("SQLInsertLoginInfo launched. Passed params {}, {}", user_id, type);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
 			String sql = ("INSERT INTO login (user_id, type) VALUES (?, ?) ON DUPLICATE KEY UPDATE type=VALUES(type)");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
-			stmt.setInt(2, _type);
+			stmt.setLong(1, user_id);
+			stmt.setInt(2, type);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertLoginInfo Exception", e);
@@ -70,17 +70,17 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		}
 	}
 	
-	public static int SQLInsertLoginInfo(long _user_id, int _type, String _code) {
-		logger.trace("SQLInsertLoginInfo launched. Passed params {}, {}, {}", _user_id, _type, _code);
+	public static int SQLInsertLoginInfo(long user_id, int type, String code) {
+		logger.trace("SQLInsertLoginInfo launched. Passed params {}, {}, {}", user_id, type, code);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
 			String sql = ("INSERT INTO login (user_id, type, code) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE code=VALUES(code)");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
-			stmt.setInt(2, _type);
-			stmt.setString(3, _code);
+			stmt.setLong(1, user_id);
+			stmt.setInt(2, type);
+			stmt.setString(3, code);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertLoginInfo Exception", e);
@@ -92,22 +92,22 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 	}
 	
 	@SuppressWarnings("resource")
-	public static void SQLCodeUsageLog(long _user_id, String _address) {
-		logger.trace("SQLCodeUsageLog launched. Passed params {}", _user_id);
+	public static void SQLCodeUsageLog(long user_id, String address) {
+		logger.trace("SQLCodeUsageLog launched. Passed params {}", user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
 			String sql = ("UPDATE code_usage_log SET count = (count+1) WHERE user_id = ? AND address = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
-			stmt.setString(2, _address);
+			stmt.setLong(1, user_id);
+			stmt.setString(2, address);
 			final int result = stmt.executeUpdate();
 			if(result == 0) {
 				sql = ("INSERT INTO code_usage_log (user_id, address, count) VALUES (?, ?, 1)");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setLong(1, _user_id);
-				stmt.setString(2, _address);
+				stmt.setLong(1, user_id);
+				stmt.setString(2, address);
 				stmt.executeUpdate();
 			}
 		} catch (SQLException e) {
@@ -118,8 +118,8 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		}
 	}
 	
-	public static int SQLgetLoginType(long _user_id) {
-		logger.trace("SQLgetLoginType launched. Passed params {}", _user_id);
+	public static int SQLgetLoginType(long user_id) {
+		logger.trace("SQLgetLoginType launched. Passed params {}", user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -127,7 +127,7 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
 			String sql = ("SELECT auth_type FROM users WHERE user_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
+			stmt.setLong(1, user_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getInt(1);

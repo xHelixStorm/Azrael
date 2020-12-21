@@ -87,8 +87,8 @@ public class Patchnotes {
 		}
 	}
 	
-	public static void SQLInsertPublishedPatchnotes(long _guild_id) {
-		logger.trace("SQLInsertPublishedPatchnotes launched. Params passed {}", _guild_id);
+	public static void SQLInsertPublishedPatchnotes(long guild_id) {
+		logger.trace("SQLInsertPublishedPatchnotes launched. Params passed {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -96,7 +96,7 @@ public class Patchnotes {
 			String sql = ("INSERT INTO published (fk_version_number, fk_guild_id) VALUES(?, ?)");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
-			stmt.setLong(2, _guild_id);
+			stmt.setLong(2, guild_id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertPublishedPatchnotes Exception", e);
@@ -106,8 +106,8 @@ public class Patchnotes {
 		}
 	}
 	
-	public static boolean SQLcheckPublishedPatchnotes(long _guild_id) {
-		logger.trace("SQLcheckPublishedPatchnotes launched. Params passed {}", _guild_id);
+	public static boolean SQLcheckPublishedPatchnotes(long guild_id) {
+		logger.trace("SQLcheckPublishedPatchnotes launched. Params passed {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -116,7 +116,7 @@ public class Patchnotes {
 			String sql = ("SELECT * FROM published WHERE fk_version_number = ? AND fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setString(1, STATIC.getVersion());
-			stmt.setLong(2, _guild_id);
+			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				return true;
@@ -132,8 +132,8 @@ public class Patchnotes {
 		}
 	}
 	
-	public static long SQLgetGuild(long _guild_id) {
-		logger.trace("SQLgetGuild launched. Passed params {}", _guild_id);
+	public static long SQLgetGuild(long guild_id) {
+		logger.trace("SQLgetGuild launched. Passed params {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -141,7 +141,7 @@ public class Patchnotes {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("SELECT guild_id FROM guilds WHERE guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				return rs.getLong(1);
@@ -157,16 +157,16 @@ public class Patchnotes {
 		}
 	}
 	
-	public static int SQLInsertGuild(long _guild_id, String _name) {
-		logger.trace("SQLInsertGuilds launched. Params passed {}, {}", _guild_id, _name);
+	public static int SQLInsertGuild(long guild_id, String name) {
+		logger.trace("SQLInsertGuilds launched. Params passed {}, {}", guild_id, name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("INSERT INTO guilds (guild_id, name) VALUES(?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setString(2, _name);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, name);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertGuilds Exception", e);
@@ -177,8 +177,8 @@ public class Patchnotes {
 		}
 	}
 	
-	public static boolean SQLcheckPublishedBotPatchnotes(long _guild_id) {
-		logger.trace("SQLcheckPublishedBotPatchnotes launched. Params passed {}", _guild_id);
+	public static boolean SQLcheckPublishedBotPatchnotes(long guild_id) {
+		logger.trace("SQLcheckPublishedBotPatchnotes launched. Params passed {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -186,7 +186,7 @@ public class Patchnotes {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("SELECT * FROM published WHERE fk_guild_id = ? LIMIT 1");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				return true;
@@ -272,8 +272,8 @@ public class Patchnotes {
 		}
 	}
 	
-	public static ArrayList<Patchnote> SQLgetGamePatchnotesArray(long _guild_id) {
-		logger.trace("SQLgetGamePatchnotesArray launched. Params passed {}", _guild_id);
+	public static ArrayList<Patchnote> SQLgetGamePatchnotesArray(long guild_id) {
+		logger.trace("SQLgetGamePatchnotesArray launched. Params passed {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -282,7 +282,7 @@ public class Patchnotes {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
 			String sql = ("SELECT message1, message2, date, title FROM game_notes WHERE fk_guild_id = ? ORDER BY date desc LIMIT 10");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				patchnotes.add(

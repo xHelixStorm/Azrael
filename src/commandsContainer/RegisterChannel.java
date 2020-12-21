@@ -63,7 +63,7 @@ public class RegisterChannel {
 		e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_TXT_HELP)).build()).queue();
 	}
 	
-	public static void runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission) {
+	public static void runCommand(GuildMessageReceivedEvent e, long guild_id, String [] args, boolean adminPermission) {
 		String channel;
 		long channel_id;
 		String channel_type;
@@ -71,42 +71,37 @@ public class RegisterChannel {
 		final var commandLevel = GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong());
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss|wat|del|edi|vot|co1|co2|co3)");
-			Matcher matcher = pattern.matcher(_args[1]);
-			if(_args.length > 2 && matcher.find()) {
+			Matcher matcher = pattern.matcher(args[1]);
+			if(args.length > 2 && matcher.find()) {
 				channel_type = matcher.group();
-				channel = _args[2].replaceAll("[^0-9]*", "");
+				channel = args[2].replaceAll("[^0-9]*", "");
 				if(channel.length() == 18) {
 					channel_id = Long.parseLong(channel);
 					var result = 0;
-					//TODO: replace single sql operations into transactions
 					switch(channel_type) {
 						case "eng", "ger", "fre", "tur", "rus", "spa", "por", "ita", "all" -> {
-							Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
-							Azrael.SQLDeleteChannel_Filter(channel_id);
-							result = Azrael.SQLInsertChannel_Filter(channel_id, channel_type);
+							result = Azrael.SQLRegisterLanguageChannel(guild_id, channel_id, channel_type);
 						}
 						case "bot", "co1", "co2", "co3", "vot" -> {
-							Azrael.SQLDeleteChannel_Filter(channel_id);
-							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
+							result = Azrael.SQLRegisterSpecialChannel(guild_id, channel_id, channel_type);
 							
 						}
 						case "log", "tra", "rea", "qui", "rss", "wat", "del", "edi" -> {
-							Azrael.SQLDeleteChannelType(channel_type, _guild_id);
-							result = Azrael.SQLInsertChannel_Conf(channel_id, _guild_id, channel_type);
+							result = Azrael.SQLRegisterUniqueChannel(guild_id, channel_id, channel_type);
 						}
 					}
-					Hashes.removeChannels(_guild_id);
+					Hashes.removeChannels(guild_id);
 					if(result > 0) {
-						logger.info("User {} has registered channel {} as {} channel in guild {}", e.getMember().getUser().getId(), channel_id, channel_type, _guild_id);
+						logger.info("User {} has registered channel {} as {} channel in guild {}", e.getMember().getUser().getId(), channel_id, channel_type, guild_id);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
 						if(channel_type.equals("rea")) {
 							//use the temp cache to append reactions after the bot sends a message
-							if(Azrael.SQLUpdateReaction(_guild_id, true) > 0) {
+							if(Azrael.SQLUpdateReaction(guild_id, true) > 0) {
 								ReactionMessage.print(e, channel_id);
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("Role reactions couldn't be automatically enabled in guild {}", _guild_id);
+								logger.error("Role reactions couldn't be automatically enabled in guild {}", guild_id);
 							}
 						}
 						else if(channel_type.equals("rss") && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong())) {
@@ -115,7 +110,7 @@ public class RegisterChannel {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Channel {} couldn't be saved as channel type {} in guild {}", channel_id, channel_type, _guild_id);
+						logger.error("Channel {} couldn't be saved as channel type {} in guild {}", channel_id, channel_type, guild_id);
 					}
 				}
 				else {

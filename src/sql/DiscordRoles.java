@@ -32,8 +32,8 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static long SQLgetGuild(long _guild_id) {
-		logger.trace("SQLgetGuild launched. Passed params {}", _guild_id);
+	public static long SQLgetGuild(long guild_id) {
+		logger.trace("SQLgetGuild launched. Passed params {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -41,7 +41,7 @@ public class DiscordRoles {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("SELECT guild_id FROM guilds WHERE guild_id= ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				return rs.getLong(1);
@@ -57,16 +57,16 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static int SQLInsertGuild(long _guild_id, String _guild_name) {
-		logger.trace("SQLInsertGuild launched. Passed params {}, {}", _guild_id, _guild_name);
+	public static int SQLInsertGuild(long guild_id, String guild_name) {
+		logger.trace("SQLInsertGuild launched. Passed params {}, {}", guild_id, guild_name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("INSERT INTO guilds(guild_id, name) VALUES(?,?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setString(2, _guild_name);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, guild_name);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertGuild Exception", e);
@@ -77,20 +77,20 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static int SQLInsertRole(long _guild_id, long _role_id, int _level, String _role_name, String _category_abv, boolean _persistant) {
-		logger.trace("SQLInsertRole launched. Passed params {}, {}, {}, {}, {}, {}", _guild_id, _role_id, _level, _role_name, _category_abv, _persistant);
+	public static int SQLInsertRole(long guild_id, long role_id, int level, String role_name, String category_abv, boolean persistant) {
+		logger.trace("SQLInsertRole launched. Passed params {}, {}, {}, {}, {}, {}", guild_id, role_id, level, role_name, category_abv, persistant);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("INSERT INTO roles(role_id, name, level, fk_category_abv, fk_guild_id, persistant) VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name), level=VALUES(level), fk_category_abv=VALUES(fk_category_abv), persistant=VALUES(persistant)");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _role_id);
-			stmt.setString(2, _role_name);
-			stmt.setInt(3, _level);
-			stmt.setString(4, _category_abv);
-			stmt.setLong(5, _guild_id);
-			stmt.setBoolean(6, _persistant);
+			stmt.setLong(1, role_id);
+			stmt.setString(2, role_name);
+			stmt.setInt(3, level);
+			stmt.setString(4, category_abv);
+			stmt.setLong(5, guild_id);
+			stmt.setBoolean(6, persistant);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertRole Exception", e);
@@ -101,8 +101,8 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static int[] SQLInsertRoles(long _guild_id, List<Role> roles) {
-		logger.trace("SQLInsertRoles launched. Passed params {}, roles array", _guild_id);
+	public static int[] SQLInsertRoles(long guild_id, List<Role> roles) {
+		logger.trace("SQLInsertRoles launched. Passed params {}, roles array", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -116,7 +116,7 @@ public class DiscordRoles {
 					stmt.setString(2, role.getName());
 					stmt.setInt(3, 0);
 					stmt.setString(4, "def");
-					stmt.setLong(5, _guild_id);
+					stmt.setLong(5, guild_id);
 					stmt.setBoolean(6, false);
 					stmt.addBatch();
 				}
@@ -133,15 +133,15 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static int SQLUpdateAllRoles(long _guild_id) {
-		logger.trace("SQLUpdateAllRoles launched. Passed params {}", _guild_id);
+	public static int SQLUpdateAllRoles(long guild_id) {
+		logger.trace("SQLUpdateAllRoles launched. Passed params {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("UPDATE roles SET level = 0, persistant = 0, fk_category_abv = 'def' WHERE fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt.setLong(1, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateAllRoles Exception", e);
@@ -152,17 +152,17 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static int SQLUpdateLevel(long _guild_id, long _role_id, int _level) {
-		logger.trace("SQLInsertRole launched. Passed params {}, {}, {}", _guild_id, _role_id, _level);
+	public static int SQLUpdateLevel(long guild_id, long role_id, int level) {
+		logger.trace("SQLInsertRole launched. Passed params {}, {}, {}", guild_id, role_id, level);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("UPDATE roles SET level = ? WHERE role_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _level);
-			stmt.setLong(2, _role_id);
-			stmt.setLong(3, _guild_id);
+			stmt.setInt(1, level);
+			stmt.setLong(2, role_id);
+			stmt.setLong(3, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertRole Exception", e);
@@ -174,10 +174,10 @@ public class DiscordRoles {
 	}
 
 	
-	public static ArrayList<Roles> SQLgetRoles(long _guild_id) {
-		final var cachedRoles = Hashes.getDiscordRole(_guild_id);
+	public static ArrayList<Roles> SQLgetRoles(long guild_id) {
+		final var cachedRoles = Hashes.getDiscordRole(guild_id);
 		if(cachedRoles == null) {
-			logger.trace("SQLgetRoles launched. Passed params {}", _guild_id);
+			logger.trace("SQLgetRoles launched. Passed params {}", guild_id);
 			ArrayList<Roles> roles = new ArrayList<Roles>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -186,7 +186,7 @@ public class DiscordRoles {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 				String sql = ("SELECT * FROM all_roles WHERE guild_id = ?");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setLong(1, _guild_id);
+				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
 					Roles roleDetails = new Roles(
@@ -199,7 +199,7 @@ public class DiscordRoles {
 					);
 					roles.add(roleDetails);
 				}
-				Hashes.addDiscordRole(_guild_id, roles);
+				Hashes.addDiscordRole(guild_id, roles);
 				return roles;
 			} catch (SQLException e) {
 				logger.error("SQLgetRoles Exception", e);
@@ -213,10 +213,10 @@ public class DiscordRoles {
 		return cachedRoles;
 	}
 	
-	public static ArrayList<Roles> SQLgetReactionRoles(long _guild_id) {
-		final var roles = Hashes.getReactionRoles(_guild_id);
+	public static ArrayList<Roles> SQLgetReactionRoles(long guild_id) {
+		final var roles = Hashes.getReactionRoles(guild_id);
 		if(roles == null) {
-			logger.trace("SQLgetReactionRoles launched. Passed params {}", _guild_id);
+			logger.trace("SQLgetReactionRoles launched. Passed params {}", guild_id);
 			ArrayList<Roles> reactionRoles = new ArrayList<Roles>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -225,7 +225,7 @@ public class DiscordRoles {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 				String sql = ("SELECT * FROM all_roles WHERE guild_id = ? AND category_abv = \"rea\"");
 				stmt = myConn.prepareStatement(sql);
-				stmt.setLong(1, _guild_id);
+				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
 					reactionRoles.add(new Roles(
@@ -237,7 +237,7 @@ public class DiscordRoles {
 						rs.getBoolean(7)
 					));
 				}
-				Hashes.addReactionRoles(_guild_id, reactionRoles);
+				Hashes.addReactionRoles(guild_id, reactionRoles);
 				return reactionRoles;
 			} catch (SQLException e) {
 				logger.error("SQLgetReactionRoles Exception", e);
@@ -251,17 +251,17 @@ public class DiscordRoles {
 		return roles;
 	}
 	
-	public static int SQLUpdateRoleName(long _guild_id, long _role_id, String _name) {
-		logger.trace("SQLUpdateRoleName launched. Passed params {}, {}, {}", _guild_id, _role_id, _name);
+	public static int SQLUpdateRoleName(long guild_id, long role_id, String name) {
+		logger.trace("SQLUpdateRoleName launched. Passed params {}, {}, {}", guild_id, role_id, name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("UPDATE roles SET name = ? WHERE role_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _name);
-			stmt.setLong(2, _role_id);
-			stmt.setLong(3, _guild_id);
+			stmt.setString(1, name);
+			stmt.setLong(2, role_id);
+			stmt.setLong(3, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateRoleName Exception", e);
@@ -300,16 +300,16 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static int SQLDeleteRole(long _role_id, long _guild_id) {
-		logger.trace("SQLDeleteRole launched. Passed params {}, {}", _role_id, _guild_id);
+	public static int SQLDeleteRole(long role_id, long guild_id) {
+		logger.trace("SQLDeleteRole launched. Passed params {}, {}", role_id, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("DELETE FROM roles WHERE role_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _role_id);
-			stmt.setLong(2, _guild_id);
+			stmt.setLong(1, role_id);
+			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteRole Exception", e);
@@ -320,16 +320,16 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static int SQLUpdateRole(long _role_id, long _guild_id) {
-		logger.trace("SQLUpdateRole launched. Passed params {}, {}", _role_id, _guild_id);
+	public static int SQLUpdateRole(long role_id, long guild_id) {
+		logger.trace("SQLUpdateRole launched. Passed params {}, {}", role_id, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("UPDATE roles SET level = 0, persistant = 0, fk_category_abv = 'def' WHERE role_id = ? && fk_guild_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _role_id);
-			stmt.setLong(2, _guild_id);
+			stmt.setLong(1, role_id);
+			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateRole Exception", e);
@@ -340,17 +340,17 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static int SQLInsertReaction(long _message_id, String _emoji, long _role_id) {
-		logger.trace("SQLInsertReaction launched. Passed params {}, {}, {}", _message_id, _emoji, _role_id);
+	public static int SQLInsertReaction(long message_id, String emoji, long role_id) {
+		logger.trace("SQLInsertReaction launched. Passed params {}, {}, {}", message_id, emoji, role_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("INSERT INTO reactions (message_id, emoji, role_id) VALUES(?, ?, ?)");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _message_id);
-			stmt.setString(2, _emoji);
-			stmt.setLong(3, _role_id);
+			stmt.setLong(1, message_id);
+			stmt.setString(2, emoji);
+			stmt.setLong(3, role_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertReaction Exception", e);
@@ -361,8 +361,8 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static long SQLgetReactionRole(long _message_id, String _emoji) {
-		logger.trace("SQLgetReactionRole launched. Passed params {}", _message_id, _emoji);
+	public static long SQLgetReactionRole(long message_id, String emoji) {
+		logger.trace("SQLgetReactionRole launched. Passed params {}", message_id, emoji);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -370,8 +370,8 @@ public class DiscordRoles {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("SELECT role_id FROM reactions WHERE message_id = ? and emoji = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _message_id);
-			stmt.setString(2, _emoji);
+			stmt.setLong(1, message_id);
+			stmt.setString(2, emoji);
 			rs = stmt.executeQuery();
 			if(rs.next()){
 				return rs.getLong(1);
@@ -387,15 +387,15 @@ public class DiscordRoles {
 		}
 	}
 	
-	public static int SQLDeleteReactions(long _message_id) {
-		logger.trace("SQLDeleteReactions launched. Passed params {}", _message_id);
+	public static int SQLDeleteReactions(long message_id) {
+		logger.trace("SQLDeleteReactions launched. Passed params {}", message_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
 			String sql = ("DELETE FROM reactions WHERE message_id = ?");
 			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _message_id);
+			stmt.setLong(1, message_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteReactions Exception", e);
