@@ -482,6 +482,7 @@ public enum Translation {
 	MUTE_ERR					("mute_err"),
 	
 	PATCHNOTES_HELP				("patchnotes_help"),
+	PATCHNOTES_VERSION			("patchnotes_version"),
 	PATCHNOTES_NOT_AVAILABLE	("patchnotes_not_available"),
 	PATCHNOTES_NOT_FOUND		("patchnotes_not_found"),
 	PATCHNOTES_CHOICE_1			("patchnotes_choice_1"),

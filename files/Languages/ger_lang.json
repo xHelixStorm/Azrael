@@ -480,6 +480,7 @@
 	"mute_err":						"Bitte geben Sie einen oder mehrere existierende Benutzernamen oder Benutzer-IDs an und dann, falls gewünscht, einen Grund!",
 	
 	"patchnotes_help":				"Bitte schreiben Sie einen der folgenden Titel als letzten Parameter, um die Patch-Notizen anzuzeigen.\n\n",
+	"patchnotes_version":			"Bot Patch-Notizen Version: ",
 	"patchnotes_not_available":		"Keine Patch-Notizen verfügbar!",
 	"patchnotes_not_found":			"Patch-Notizen nicht gefunden!",
 	"patchnotes_choice_1":			"Bitte wählen Sie zwischen *öffentlich* und *privat* Patch-Notizen!",
@@ -766,7 +767,7 @@
 	"user_found_15":				"**erfahrung-schenken**: Verschenken Sie Erfahrungspunkte.\n",
 	"user_found_16":				"**erfahrung-setzen**: Setzen einen Wert für die Erfahrungspunkte.\n",
 	"user_found_17":				"**level-setzen**: Vergeben Sie einen Level.\n",
-	"user_found_18":				"**geld-verschenken**: Verschenken Sie Geld.\n",
+	"user_found_18":				"**geld-schenken**: Verschenken Sie Geld.\n",
 	"user_found_19":				"**geld-setzen**: Setzen Sie eine bestimmte Menge an Geld.",
 	"user_not_found":				"Benutzer nicht gefunden! Bitte probieren Sie es noch einmal!",
 	"user_exit":					"Befehl abgebrochen!",

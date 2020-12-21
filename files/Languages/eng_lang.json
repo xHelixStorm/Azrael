@@ -480,6 +480,7 @@
 	"mute_err":						"Please provide one or more existing usernames or user IDs and then a reason if desired!",
 	
 	"patchnotes_help":				"Please write one of the following titles as last parameter to display the patch notes.\n\n",
+	"patchnotes_version":			"Bot patch notes version: ",
 	"patchnotes_not_available":		"No patch notes available!",
 	"patchnotes_not_found":			"Patch notes not found!",
 	"patchnotes_choice_1":			"Please choose between *public* and *private* patch notes!",

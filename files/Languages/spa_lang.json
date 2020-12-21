@@ -480,6 +480,7 @@
 	"mute_err":						"¡Por favor, proporciona uno o más nombres de usuario existentes o ID de usuario y luego una razón si lo deseas!",
 	
 	"patchnotes_help":				"Escribe uno de los siguientes títulos como último parámetro para mostrar las notas del parche.\n\n",
+	"patchnotes_version":			"Bot patch notes version: ",
 	"patchnotes_not_available":		"¡No hay notas de parche disponibles!",
 	"patchnotes_not_found":			"¡Notas de parche no encontradas!",
 	"patchnotes_choice_1":			"¡Por favor, elige entre notas del parche *public* y *private*",

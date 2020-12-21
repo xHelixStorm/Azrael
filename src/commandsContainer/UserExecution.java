@@ -1705,7 +1705,6 @@ public class UserExecution {
 					}
 				}
 			}
-			//TODO: check why it doesn't work in any other language than english
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("gift-currency")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
