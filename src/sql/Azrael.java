@@ -25,6 +25,7 @@ import constructors.GoogleSheet;
 import constructors.GoogleSheetColumn;
 import constructors.History;
 import constructors.NameFilter;
+import constructors.Quizes;
 import constructors.RSS;
 import constructors.RejoinTask;
 import constructors.User;
@@ -3856,6 +3857,81 @@ public class Azrael {
 		}
 	}
 	
+	public static boolean SQLgetQuizData(long guild_id) {
+		logger.trace("SQLgetQuizData launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("SELECT * FROM quiz WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, guild_id);
+			rs = stmt.executeQuery();
+			boolean success =  false;
+			while(rs.next()) {
+				Quizes quiz = new Quizes();
+				quiz.setReward(rs.getString(3));
+				quiz.setAnswer1(rs.getString(4));
+				quiz.setAnswer2(rs.getString(5));
+				quiz.setAnswer3(rs.getString(6));
+				quiz.setHint1(rs.getString(7));
+				quiz.setHint2(rs.getString(8));
+				quiz.setHint3(rs.getString(9));
+				quiz.setUsed(rs.getBoolean(10));
+				Hashes.addQuiz(guild_id, rs.getInt(2), quiz);
+				success = true;
+			}
+			return success;
+		} catch (SQLException e) {
+			logger.error("SQLgetQuizData Exception", e);
+			return false;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteQuizData(long guild_id) {
+		logger.trace("SQLDeleteQuizData launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("DELETE FROM quiz WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteQuizData Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateUsedQuizReward(long guild_id, String reward) {
+		logger.trace("SQLUpdateUsedQuizReward launched. Params passed {}, {}", guild_id, reward);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			String sql = ("UPDATE quiz SET used = 1 WHERE fk_guild_id = ? and reward = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, reward);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateUsedQuizReward Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	//Transactions
 	@SuppressWarnings("resource")
 	public static int SQLLowerTotalWarning(long guild_id, int warning_id) {
@@ -4244,6 +4320,74 @@ public class Azrael {
 			return result;
 		} catch (SQLException e) {
 			logger.error("SQLRegisterUniqueChannel Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	@SuppressWarnings("resource")
+	public static int SQLOverwriteQuizData(long guild_id) {
+		logger.trace("SQLOverwriteQuizData launched. Passed params {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn.setAutoCommit(false);
+			String sql = ("DELETE FROM quiz WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(sql);
+			stmt.setLong(1, guild_id);
+			stmt.executeUpdate();
+			
+			sql = ("INSERT INTO quiz (fk_guild_id, number, reward, answer1, answer2, answer3, hint1, hint2, hint3) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			stmt = myConn.prepareStatement(sql);
+			int index = 1;
+			for(final var quiz : Hashes.getWholeQuiz(guild_id).values()) {
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, index);
+				if(quiz.getReward() != null)
+					stmt.setString(3, quiz.getReward());
+				else
+					stmt.setNull(3, Types.VARCHAR);
+				if(quiz.getAnswer1() != null)
+					stmt.setString(4, quiz.getAnswer1());
+				else
+					stmt.setNull(4, Types.VARCHAR);
+				if(quiz.getAnswer2() != null)
+					stmt.setString(5, quiz.getAnswer2());
+				else
+					stmt.setNull(5, Types.VARCHAR);
+				if(quiz.getAnswer3() != null)
+					stmt.setString(6, quiz.getAnswer3());
+				else
+					stmt.setNull(6, Types.VARCHAR);
+				if(quiz.getHint1() != null)
+					stmt.setString(7, quiz.getHint1());
+				else
+					stmt.setNull(7, Types.VARCHAR);
+				if(quiz.getHint2() != null)
+					stmt.setString(8, quiz.getHint2());
+				else
+					stmt.setNull(8, Types.VARCHAR);
+				if(quiz.getHint3() != null)
+					stmt.setString(9, quiz.getHint3());
+				else
+					stmt.setNull(9, Types.VARCHAR);
+				
+				stmt.addBatch();
+			}
+			final var result = stmt.executeBatch();
+			if(result[0] != -1) {
+				myConn.commit();
+				return 1;
+			}
+			else {
+				myConn.rollback();
+				return 0;
+			}
+		} catch (SQLException e) {
+			logger.error("SQLOverwriteQuizData Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

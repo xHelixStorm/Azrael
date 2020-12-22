@@ -1,7 +1,6 @@
 package commandsContainer;
 
 import java.awt.Color;
-import java.io.File;
 import java.net.MalformedURLException;
 
 import org.jpaste.exceptions.PasteException;
@@ -12,22 +11,21 @@ import org.slf4j.LoggerFactory;
 import constructors.Quizes;
 import core.Hashes;
 import enums.Translation;
-import fileManagement.FileSetting;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import sql.Azrael;
 import util.Pastebin;
 import util.STATIC;
 
 public class QuizExecution {
 	private static final Logger logger = LoggerFactory.getLogger(QuizExecution.class);
 	
-	//TODO: full overhaul required
-	public static void registerRewards(GuildMessageReceivedEvent e, String _link) {
+	public static void registerRewards(GuildMessageReceivedEvent e, String link) {
 		//check if it is a link that was inserted and if yes call readPublicPasteLink and then
 		//split the returned String in an array
-		if(_link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _link.startsWith("http")) {
+		if(link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && link.startsWith("http")) {
 			try {
-				String [] rewards = Pastebin.readPublicPasteLink(_link).split("[\\r\\n]+");
+				String [] rewards = Pastebin.readPublicPasteLink(link).split("[\\r\\n]+");
 				int index = 1;
 				boolean interrupted = false;
 				Quizes quiz;
@@ -35,14 +33,14 @@ public class QuizExecution {
 				for(String reward: rewards) {
 					if(reward.length() > 0) {
 						if(!reward.equals("START") && !reward.matches("(1|2|3|4|5|6|7|8|9)[0-9]*[.][\\s\\d\\w?!.\\,/+-]*")) {
-							if(Hashes.getQuiz(index) == null) {
+							if(Hashes.getQuiz(e.getGuild().getIdLong(), index) == null) {
 								quiz = new Quizes();
 							}
 							else {
-								quiz = Hashes.getQuiz(index);
+								quiz = Hashes.getQuiz(e.getGuild().getIdLong(), index);
 							}
 							quiz.setReward(reward);
-							Hashes.addQuiz(index, quiz);
+							Hashes.addQuiz(e.getGuild().getIdLong(), index, quiz);
 							index++;
 						}
 						else {
@@ -53,37 +51,43 @@ public class QuizExecution {
 				}
 				//if the HashMap is bigger than the current index, then either clear the rest of the HashMap
 				//or set the reward field to blank in case questions exist
-				if(interrupted == false) {
-					clearRewards(index);
+				if(!interrupted) {
+					clearRewards(e, index);
 				}
 
 				//print message that it either worked or that an error occurred. Print error if there's any
-				if(interrupted == false) {
+				if(!interrupted) {
 					String integrity = IntegrityCheck(e);
 					if(integrity.equals("0")) {
-						e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.QUIZ_REWARDS_REGISTERED)).queue();
-						logger.info("User {} has registered the quiz rewards with the pastebin url {} in guild {}", e.getMember().getUser().getId(), _link, e.getGuild().getId());
+						//Overwrite table
+						if(Azrael.SQLOverwriteQuizData(e.getGuild().getIdLong()) == 1) {
+							e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.QUIZ_REWARDS_REGISTERED)).queue();
+							logger.info("User {} has registered the quiz rewards with the pastebin url {} in guild {}", e.getMember().getUser().getId(), link, e.getGuild().getId());
+						}
+						else {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("Quiz rewards couldn't be saved in guild {}", e.getGuild().getId());
+						}
 					}
 					else {
-						//TODO: check wtf I did here
 						try {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)+"\n"+Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR), integrity, e.getGuild().getIdLong())).build()).queue();
 							logger.error("Quiz rewards couldn't be registered in guild {}", e.getGuild().getId());
 						} catch (IllegalStateException | LoginException | PasteException e1) {
-							logger.warn("Error on creating pastebin page in guild {}", e.getGuild().getId(), e1);
+							logger.warn("Error on creating pastebin page for quiz rewards in guild {}", e.getGuild().getId(), e1);
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						}
-						clearRewards(1);
+						clearRewards(e, 1);
 					}
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).build()).queue();
-					clearRewards(1);
+					clearRewards(e, 1);
 				}
 			} catch (MalformedURLException | RuntimeException e2) {
 				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-				logger.error("Reading pastebin url {} failed in guild {}", _link, e.getGuild().getId(), e2);
+				logger.error("Reading pastebin url {} failed in guild {}", link, e.getGuild().getId(), e2);
 			}
 		}
 		else {
@@ -93,23 +97,17 @@ public class QuizExecution {
 		}
 	}
 	
-	public static void registerQuestions(GuildMessageReceivedEvent e, String _link, boolean _readFile) {
+	public static void registerQuestions(GuildMessageReceivedEvent e, String link) {
 		//check if it is a link that was inserted and if yes call readPublicPasteLink and then
 		//split the returned String in an array. Or if it's being registered from a file, the file should be checked
-		if((_link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _link.startsWith("http") && _readFile == false)
-				|| (new File("./files/QuizBackup/quizsettings.azr").exists() && _readFile == true)) {
+		if(link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && link.startsWith("http")) {
 			String [] content = null;
-			if(_readFile == false) {
-				try {
-					content = Pastebin.readPublicPasteLink(_link).split("[\\r\\n]+");
-				} catch (MalformedURLException | RuntimeException e1) {
-					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
-					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-					logger.error("Reading paste pastebin {} failed in guild {}", _link, e.getGuild().getId(), e1);
-				}
-			}
-			else {
-				content = FileSetting.readFileIntoFixedArray("./files/QuizBackup/quizsettings.azr");
+			try {
+				content = Pastebin.readPublicPasteLink(link).split("[\\r\\n]+");
+			} catch (MalformedURLException | RuntimeException e1) {
+				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
+				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
+				logger.error("Reading paste pastebin {} failed in guild {}", link, e.getGuild().getId(), e1);
 			}
 			
 			if(content != null && content.length > 0) {
@@ -122,13 +120,13 @@ public class QuizExecution {
 				for(String line : content) {
 					if(line.length() > 0) {
 						if(line.contains("START")) {
-							if(Hashes.getQuiz(index) == null) {
+							if(Hashes.getQuiz(e.getGuild().getIdLong(), index) == null) {
 								if(index != 1) {
 									quiz = new Quizes();
 								}
 							}
 							else {
-								quiz = Hashes.getQuiz(index);
+								quiz = Hashes.getQuiz(e.getGuild().getIdLong(), index);
 							}
 						}
 						else if(line.matches("(1|2|3|4|5|6|7|8|9)[0-9]*[.][\\s\\d\\w?!.\\,/+-]*")) {
@@ -158,110 +156,48 @@ public class QuizExecution {
 							rewards++;
 						}
 						else if(line.contains("END")) {
-							Hashes.addQuiz(index, quiz);
+							Hashes.addQuiz(e.getGuild().getIdLong(), index, quiz);
 							index++;
 						}
 					}
 				}
 				//if the HashMap is bigger than the current index, then either clear the rest of the HashMap
 				//or set the unneeded fields to blank, if they aren't entirely empty
-				clearQuestions(index);
+				clearQuestions(e, index);
 				
 				String integrity = IntegrityCheck(e);
 				if(integrity.equals("0")) {
-					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.QUIZ_QUESTIONS_REGISTERED)).queue();
-					logger.info("Quiz questions have been registered in guild {}", e.getGuild().getId());
+					//Overwrite table
+					if(Azrael.SQLOverwriteQuizData(e.getGuild().getIdLong()) == 1) {
+						e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.QUIZ_QUESTIONS_REGISTERED)).queue();
+						logger.info("User {} has registered quiz questions with the pastebin url {} in guild {}", e.getMember().getUser().getId(), link, e.getGuild().getId());
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Quiz question couldn't be saved in guild {}", e.getGuild().getId());
+					}
 				}
 				else {
 					try {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)+"\n"+Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR), integrity, e.getGuild().getIdLong())).build()).queue();
-						logger.error("Internal pastebin error in registering questions for the quiz in guild {}", e.getGuild().getId());
+						logger.error("Quiz questions couldn't be registered in guild {}", e.getGuild().getId());
 					} catch (IllegalStateException | LoginException | PasteException e1) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.warn("Error on creating paste in guild {}!", e.getGuild().getId(), e1);
+						logger.warn("Error on creating paste in guild {}", e.getGuild().getId(), e1);
 					}
-					clearQuestions(1);
+					clearQuestions(e, 1);
 				}
 			}
-			else if(_readFile) {
+			else {
 				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_SETTINGS)).build()).queue();
-				logger.warn("Quiz backup file doesn't exist");
+				logger.warn("Quiz information couldn't be retrieved from pastebin url {} in guild {}", link, e.getGuild().getId());
 			}
 		}
 		else {
-			if(!_readFile) {
-				EmbedBuilder error = new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_URL)).setColor(Color.RED);
-				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.URL_INVALID)).build()).queue();
-				logger.warn("Wrong pastebin link has been inserted for the question registration in guild {}", e.getGuild().getId());
-			}
-			else {
-				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
-				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_SETTINGS)).build()).queue();
-				logger.warn("Quiz backup file doesn't exist");
-			}
-		}
-	}
-	
-	public static void saveQuestions(GuildMessageReceivedEvent e) {
-		//Iterate through the HashMap values and write all information into a file
-		StringBuilder sb = new StringBuilder();
-		final String noQuestions = STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_QUESTIONS);
-		final String noRewards = STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_REWARDS_FOUND);
-		for(Quizes quiz : Hashes.getWholeQuiz().values()) {
-			if(quiz.getQuestion().length() > 0) {
-				sb.append("START\n");
-				sb.append(quiz.getQuestion()+"\n");
-			}
-			else {
-				sb.setLength(0);
-				sb.append(noQuestions);
-				break;
-			}
-			if(quiz.getAnswer1().length() > 0) {
-				sb.append(":"+quiz.getAnswer1()+"\n");
-			}
-			if(quiz.getAnswer2().length() > 0) {
-				sb.append(":"+quiz.getAnswer2()+"\n");
-			}
-			if(quiz.getAnswer3().length() > 0) {
-				sb.append(":"+quiz.getAnswer3()+"\n");
-			}
-			if(quiz.getHint1().length() > 0) {
-				sb.append(";"+quiz.getHint1()+"\n");
-			}
-			if(quiz.getHint2().length() > 0) {
-				sb.append(";"+quiz.getHint2()+"\n");
-			}
-			if(quiz.getHint3().length() > 0) {
-				sb.append(";"+quiz.getHint3()+"\n");
-			}
-			if(quiz.getReward().length() > 0) {
-				sb.append("="+quiz.getReward()+"\n");
-				sb.append("END\n");
-			}
-			else {
-				sb.setLength(0);
-				sb.append(noRewards);
-				break;
-			}
-		}
-		
-		if(!sb.toString().equals(noQuestions) && !sb.toString().equals(noRewards)) {
-			new File("./files/QuizBackup").mkdirs();
-			FileSetting.createFile("./files/QuizBackup/quizsettings"+e.getGuild().getId()+".azr", sb.toString());
-			e.getChannel().sendMessage("Quiz settings have been saved successfully!").queue();
-			logger.info("The settings for the quiz have been registered in guild {}", e.getGuild().getId());
-		}
-		else if(sb.toString().equals(noQuestions)) {
-			EmbedBuilder error = new EmbedBuilder().setTitle("Questions missing!").setColor(Color.RED);
-			e.getChannel().sendMessage(error.setDescription("A backup from the settings couldn't be created because the questions are missing. Please register them first").build()).queue();
-			logger.warn("Quiz backup file couldn't be created due to the missing questions in guild {}", e.getGuild().getId());
-		}
-		else if(sb.toString().equals(noRewards)) {
-			EmbedBuilder error = new EmbedBuilder().setTitle("Rewards missing!").setColor(Color.RED);
-			e.getChannel().sendMessage(error.setDescription("A backup from the settings couldn't be created because the rewards are missing. Please register them first").build()).queue();
-			logger.warn("Quiz backup file couldn't be created due to the missing rewards in guild {}", e.getGuild().getId());
+			EmbedBuilder error = new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_URL)).setColor(Color.RED);
+			e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.URL_INVALID)).build()).queue();
+			logger.warn("Pastebin url {} may be invalid to retrieve quiz information in guild {}", link, e.getGuild().getId());
 		}
 	}
 	
@@ -270,32 +206,32 @@ public class QuizExecution {
 		StringBuilder sb = new StringBuilder();
 		boolean errorFound = false;
 		
-		for(int i = 0; i < Hashes.getWholeQuiz().size(); i++) {
-			Quizes quiz = Hashes.getQuiz(index);
+		for(int i = 0; i < Hashes.getWholeQuiz(e.getGuild().getIdLong()).size(); i++) {
+			Quizes quiz = Hashes.getQuiz(e.getGuild().getIdLong(), index);
 			if(errorFound == true) {
 				sb.append("\n");
 				errorFound = false;
 			}
 			//check if questions are inserted and write into the error log when a question
 			//in between is missing. For example question 1 and 3 are there but not 2.
-			if(quiz.getQuestion().length() > 0) {
+			if(quiz.getQuestion() != null) {
 				if(Integer.parseInt(quiz.getQuestion().replaceAll("[^0-9](.)[\\s\\d\\w?!.\\,/+-]*", "") ) != index) {
 					sb.append(STATIC.getTranslation(e.getMember(), Translation.QUIZ_ERR_1).replace("{}", ""+index));
 					errorFound = true;
 				}
 				//check if at least one answer is available for this question. Else throw error
-				if(quiz.getAnswer1().length() == 0 && quiz.getAnswer2().length() == 0 && quiz.getAnswer3().length() == 0) {
+				if(quiz.getAnswer1() == null && quiz.getAnswer2() == null && quiz.getAnswer3() == null) {
 					sb.append(STATIC.getTranslation(e.getMember(), Translation.QUIZ_ERR_2).replace("{}", ""+index));
 					errorFound = true;
 				}
 			}
 			else if(quiz.getQuestion().length() == 0) {
 				//check if answers and hints are inserted while there's no question
-				if(quiz.getAnswer1().length() > 0 || quiz.getAnswer2().length() > 0 || quiz.getAnswer3().length() > 0) {
+				if(quiz.getAnswer1() != null || quiz.getAnswer2() != null || quiz.getAnswer3() != null) {
 					sb.append(STATIC.getTranslation(e.getMember(), Translation.QUIZ_ERR_3).replace("{}", ""+index));
 					errorFound = true;
 				}
-				if(quiz.getHint1().length() > 0 || quiz.getHint2().length() > 0 || quiz.getHint3().length() > 0) {
+				if(quiz.getHint1() != null || quiz.getHint2() != null || quiz.getHint3() != null) {
 					sb.append(STATIC.getTranslation(e.getMember(), Translation.QUIZ_ERR_4).replace("{}", ""+index));
 					errorFound = true;
 				}
@@ -303,8 +239,8 @@ public class QuizExecution {
 			
 			//check if rewards are available and if questions are available but no rewards,
 			//then write into error log.
-			if(quiz.getReward().length() > 0) {
-				if(Hashes.getQuiz(index-1) != null && Hashes.getQuiz(index-1).getQuestion().length() > 0 && quiz.getQuestion().length() == 0) {
+			if(quiz.getReward() != null) {
+				if(Hashes.getQuiz(e.getGuild().getIdLong(), (index-1)) != null && Hashes.getQuiz(e.getGuild().getIdLong(), (index-1)).getQuestion().length() > 0 && quiz.getQuestion().length() == 0) {
 					sb.append(STATIC.getTranslation(e.getMember(), Translation.QUIZ_ERR_5).replace("{}", ""+index));
 					errorFound = true;
 				}
@@ -320,35 +256,36 @@ public class QuizExecution {
 		}
 	}
 	
-	private static void clearRewards(int index) {
+	private static void clearRewards(GuildMessageReceivedEvent e, int index) {
 		Quizes quiz;
-		for(int i = index-1; i <= Hashes.getWholeQuiz().size()+1; i++) {
-			quiz = Hashes.getQuiz(index);
+		for(int i = index-1; i <= Hashes.getWholeQuiz(e.getGuild().getIdLong()).size()+1; i++) {
+			quiz = Hashes.getQuiz(e.getGuild().getIdLong(), index);
 			if(quiz != null && quiz.getQuestion().length() > 0) {
-				quiz.setReward("");
+				quiz.setReward(null);
+				quiz.setUsed(false);
 			}
 			else {
-				Hashes.removeQuiz(index);
+				Hashes.removeQuiz(e.getGuild().getIdLong(), index);
 			}
 			index++;
 		}
 	}
 	
-	private static void clearQuestions(int index) {
+	private static void clearQuestions(GuildMessageReceivedEvent e, int index) {
 		Quizes quiz;
-		for(int i = index-1; i < Hashes.getWholeQuiz().size(); i++) {
-			quiz = Hashes.getQuiz(index);
+		for(int i = index-1; i < Hashes.getWholeQuiz(e.getGuild().getIdLong()).size(); i++) {
+			quiz = Hashes.getQuiz(e.getGuild().getIdLong(), index);
 			if(quiz != null && quiz.getReward().length() > 0) {
-				quiz.setQuestion("");
-				quiz.setAnswer1("");
-				quiz.setAnswer2("");
-				quiz.setAnswer3("");
-				quiz.setHint1("");
-				quiz.setHint2("");
-				quiz.setHint3("");
+				quiz.setQuestion(null);
+				quiz.setAnswer1(null);
+				quiz.setAnswer2(null);
+				quiz.setAnswer3(null);
+				quiz.setHint1(null);
+				quiz.setHint2(null);
+				quiz.setHint3(null);
 			}
 			else {
-				Hashes.removeQuiz(index);
+				Hashes.removeQuiz(e.getGuild().getIdLong(), index);
 			}
 			index++;
 		}

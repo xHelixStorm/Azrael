@@ -93,7 +93,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(e.getMessage().getContentRaw().startsWith(GuildIni.getCommandPrefix(e.getGuild().getIdLong())) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
 						var prefixLength = GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length();
 						if(!CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength), e, null))) {
-							logger.warn("Command {} doesn't exist in guild {}", e.getMessage().getContentRaw(), e.getGuild().getId());
+							logger.debug("Command {} doesn't exist in guild {}", e.getMessage().getContentRaw(), e.getGuild().getId());
 						}
 					}
 					
@@ -400,25 +400,29 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(runquiz != null) {
 						String content = runquiz.getAdditionalInfo();
 						//continue as long a question shouldn't be skipped or the quiz shouldn't be interrupted
-						if(!content.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SKIP_QUESTION)) || !content.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
+						if(!content.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_SKIP_QUESTION)) || !content.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
 							//verify that there is a registered quiz channel
 							var qui_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.QUI.getType())).findAny().orElse(null);
 							if(qui_channel != null && qui_channel.getChannel_ID() == e.getChannel().getIdLong() && !e.getMember().getUser().isBot() && !UserPrivs.isUserBot(e.getMember())) {
 								//check if an administrator or moderator wishes to skip a question or interrupt all questions
 								if(UserPrivs.isUserAdmin(e.getMember()) || UserPrivs.isUserMod(e.getMember()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
-									if(message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SKIP_QUESTION)) || message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
-										Hashes.addTempCache("quiztime"+e.getGuild().getId(), new Cache(0, message));
+									if(message.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_SKIP_QUESTION)) || message.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
+										RunQuiz.quizState.put(e.getGuild().getIdLong(), message);
+										STATIC.killThread("quiz_gu"+e.getGuild().getId());
 									}
 								}
 								if(!(content.length() == 7) || !(content.length() == 8)) {
+									final String answer1 = Hashes.getQuiz(e.getGuild().getIdLong(), Integer.parseInt(content)).getAnswer1();
+									final String answer2 = Hashes.getQuiz(e.getGuild().getIdLong(), Integer.parseInt(content)).getAnswer2();
+									final String answer3 = Hashes.getQuiz(e.getGuild().getIdLong(), Integer.parseInt(content)).getAnswer3();
 									//check if the given answer is the same of one of three provided possible answers
-									if(Hashes.getQuiz(Integer.parseInt(content)).getAnswer1().trim().equalsIgnoreCase(message) ||
-									   Hashes.getQuiz(Integer.parseInt(content)).getAnswer2().trim().equalsIgnoreCase(message) ||
-									   Hashes.getQuiz(Integer.parseInt(content)).getAnswer3().trim().equalsIgnoreCase(message)) {
+									if((answer1 != null && answer1.trim().equalsIgnoreCase(message)) ||
+									   (answer2 != null && answer2.trim().equalsIgnoreCase(message)) ||
+									   (answer3 != null && answer3.trim().equalsIgnoreCase(message))) {
 										//check if this user had won something before during the same quiz session
 										Integer hash = Hashes.getQuizWinners(e.getMember());
 										if(hash == null) {
-											Hashes.addTempCache("quiztime"+e.getGuild().getId(), new Cache(0, e.getMember().getUser().getId()));
+											RunQuiz.quizState.put(e.getGuild().getIdLong(), e.getMember().getUser().getId());
 										}
 									}
 								}
