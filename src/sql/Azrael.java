@@ -3864,7 +3864,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM quiz WHERE fk_guild_id = ?");
+			String sql = ("SELECT * FROM quiz WHERE fk_guild_id = ? ORDER BY number ASC");
 			stmt = myConn.prepareStatement(sql);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
