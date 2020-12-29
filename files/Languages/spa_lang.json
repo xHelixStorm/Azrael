@@ -681,6 +681,7 @@
 	"shop_price":					"Price",
 	"shop_return":					"Return",
 	"shop_sell":					"Sell",
+	"shop_attacks":					"Attacks",
 	"shop_purchase":				"Purchase",
 	"shop_return_message":			"Return to the selection page",
 	"shop_inspect_err":				"Please write one of the visible numbers for further inspection!",

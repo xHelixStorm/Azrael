@@ -67,14 +67,14 @@ public class PurchaseExecution {
 				if(editedRows > 0) {
 					user_details.setCurrency(new_currency);
 					Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
-					logger.info("User {} has purchased {} with value {} in guild {}", e.getMember().getUser().getId(), weapon.getDescription()+" "+weapon.getStatDescription(), weapon.getPrice(), e.getGuild().getId());
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASED).replace("{}", weapon.getDescription()+" "+weapon.getStatDescription())).build()).queue();
+					logger.info("User {} has purchased {} with value {} in guild {}", e.getMember().getUser().getId(), weapon.getDescription()+(weapon.getStatDescription() != null ? " "+weapon.getStatDescription() : ""), weapon.getPrice(), e.getGuild().getId());
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASED).replace("{}", weapon.getDescription()+(weapon.getStatDescription() != null ? " "+weapon.getStatDescription() : ""))).build()).queue();
 					ShopExecution.displayShopWeapons(e, weapon.getCategoryDescription());
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Weapon {} couldn't be purchased by user {} in guild {}", weapon.getDescription()+" "+weapon.getStatDescription(), e.getMember().getUser().getId(), e.getGuild().getId());
-					RankingSystem.SQLInsertActionLog("critical", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "purchase interrupted", "An error occurred while purchasing "+weapon.getDescription()+" "+weapon.getStatDescription());
+					logger.error("Weapon {} couldn't be purchased by user {} in guild {}", weapon.getDescription()+(weapon.getStatDescription() != null ? " "+weapon.getStatDescription() : ""), e.getMember().getUser().getId(), e.getGuild().getId());
+					RankingSystem.SQLInsertActionLog("critical", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "purchase interrupted", "An error occurred while purchasing "+weapon.getDescription()+(weapon.getStatDescription() != null ? " "+weapon.getStatDescription() : ""));
 					Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}

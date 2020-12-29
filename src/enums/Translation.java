@@ -683,6 +683,7 @@ public enum Translation {
 	SHOP_PRICE					("shop_price"),
 	SHOP_RETURN					("shop_return"),
 	SHOP_SELL					("shop_sell"),
+	SHOP_ATTACKS				("shop_attacks"),
 	SHOP_PURCHASE				("shop_purchase"),
 	SHOP_RETURN_MESSAGE			("shop_return_message"),
 	SHOP_INSPECT_ERR			("shop_inspect_err"),

@@ -154,7 +154,7 @@ public class ShopExecution {
 				var index = 1;
 				for(Weapons weapon : filteredContent) {
 					weapons += (weapons.length() == 0 ? "" : "-")+weapon.getWeaponID();
-					builder.append(index+": *_"+weapon.getDescription()+" "+weapon.getStatDescription()+"_*\n");
+					builder.append(index+": *_"+weapon.getDescription()+(weapon.getStatDescription() != null ? " "+weapon.getStatDescription() : "")+"_*\n");
 					priceBuilder.append("*_"+weapon.getPrice()+" "+guild_settings.getCurrency()+"_*\n");
 					index++;
 				}
@@ -183,8 +183,18 @@ public class ShopExecution {
 				EmbedBuilder embed = new EmbedBuilder();
 				if(shopItem.getThumbnail().contains("http"))
 					embed.setThumbnail(shopItem.getThumbnail());
-				embed.setDescription("**"+shopItem.getDescription()+" "+shopItem.getStatDescription()+"**\n"+(shopItem.getFullDescription() != null && shopItem.getFullDescription().length() > 0 ? shopItem.getFullDescription() : ""));
+				embed.setDescription("**"+shopItem.getDescription()+(shopItem.getStatDescription() != null ? " "+shopItem.getStatDescription() : "")+"**\n"+(shopItem.getFullDescription() != null && shopItem.getFullDescription().length() > 0 ? shopItem.getFullDescription() : ""));
 				embed.setColor(Color.BLUE);
+				if(shopItem.getAttackDesc1() != null || shopItem.getAttackDesc2() != null || shopItem.getAttackDesc3() != null) {
+					StringBuilder out = new StringBuilder();
+					if(shopItem.getAttackDesc1() != null)
+						out.append("- "+shopItem.getAttackDesc1()+"\n");
+					if(shopItem.getAttackDesc2() != null)
+						out.append("- "+shopItem.getAttackDesc2()+"\n");
+					if(shopItem.getAttackDesc3() != null)
+						out.append("- "+shopItem.getAttackDesc3());
+					embed.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_ATTACKS), out.toString(), false);
+				}
 				embed.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASE), shopItem.getPrice()+" "+guild_settings.getCurrency(), true);
 				embed.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_RETURN), STATIC.getTranslation(e.getMember(), Translation.SHOP_RETURN_MESSAGE), true);
 				e.getChannel().sendMessage(embed.build()).queue();

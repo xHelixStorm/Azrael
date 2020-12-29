@@ -93,7 +93,13 @@ public class UnbanListener extends ListenerAdapter {
 			
 			//Run google service, if enabled
 			if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-				GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNBAN.id, ""), e.getGuild(), "", ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), reason, null, null, "UNBAN", null, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.UNBAN.id);
+				String reporterName = "";
+				String reporterEffectiveName = "";
+				if(member != null) {
+					reporterName = member.getUser().getName()+"#"+member.getUser().getDiscriminator();
+					reporterEffectiveName = member.getEffectiveName();
+				}
+				GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNBAN.id, ""), e.getGuild(), "", ""+user_id, timestamp, e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), reporterName, reporterEffectiveName, reason, null, null, "UNBAN", null, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.UNBAN.id);
 			}
 		}).start();
 	}

@@ -128,7 +128,7 @@ public class UserExecution {
 						if(user != null) {
 							user = Azrael.SQLgetJoinDatesFromUser(user_id, e.getGuild().getIdLong(), user);
 							message.setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE));
-							if(user.getAvatar() != null)
+							if(user.getAvatar() != null && user.getAvatar().length() > 0 && user.getAvatar().startsWith("http"))
 								message.setThumbnail(user.getAvatar());
 							message.setAuthor(user.getUserName()+ " "+STATIC.getTranslation(e.getMember(), Translation.USER_INFO_ID)+": "+cache.getAdditionalInfo());
 							Bancollect warnedUser = Azrael.SQLgetData(user_id, e.getGuild().getIdLong());
