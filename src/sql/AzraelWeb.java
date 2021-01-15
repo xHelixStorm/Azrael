@@ -34,8 +34,7 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
-			String sql = ("INSERT INTO action_log (user_id, address, event, info) VALUES (?, ?, ?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelWebStatements.SQLInsertActionLog);
 			stmt.setLong(1, user_id);
 			stmt.setString(2, address);
 			stmt.setString(3, event);
@@ -56,8 +55,7 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
-			String sql = ("INSERT INTO login (user_id, type) VALUES (?, ?) ON DUPLICATE KEY UPDATE type=VALUES(type)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelWebStatements.SQLInsertLoginInfo);
 			stmt.setLong(1, user_id);
 			stmt.setInt(2, type);
 			return stmt.executeUpdate();
@@ -76,8 +74,7 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
-			String sql = ("INSERT INTO login (user_id, type, code) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE code=VALUES(code)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelWebStatements.SQLInsertLoginInfo);
 			stmt.setLong(1, user_id);
 			stmt.setInt(2, type);
 			stmt.setString(3, code);
@@ -98,14 +95,12 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
-			String sql = ("UPDATE code_usage_log SET count = (count+1) WHERE user_id = ? AND address = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelWebStatements.SQLCodeUsageLog);
 			stmt.setLong(1, user_id);
 			stmt.setString(2, address);
 			final int result = stmt.executeUpdate();
 			if(result == 0) {
-				sql = ("INSERT INTO code_usage_log (user_id, address, count) VALUES (?, ?, 1)");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelWebStatements.SQLCodeUsageLog2);
 				stmt.setLong(1, user_id);
 				stmt.setString(2, address);
 				stmt.executeUpdate();
@@ -125,8 +120,7 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
-			String sql = ("SELECT auth_type FROM users WHERE user_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelWebStatements.SQLgetLoginType);
 			stmt.setLong(1, user_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {

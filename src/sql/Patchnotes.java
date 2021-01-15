@@ -36,8 +36,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("SELECT message1, message2, date FROM priv_notes WHERE version_number = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetPrivatePatchnotes);
 			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
 			if(rs.next()){
@@ -65,8 +64,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("SELECT message1, message2, date FROM publ_notes WHERE version_number = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetPublicPatchnotes);
 			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
 			if(rs.next()){
@@ -93,8 +91,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("INSERT INTO published (fk_version_number, fk_guild_id) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(PatchnotesStatements.SQLInsertPublishedPatchnotes);
 			stmt.setString(1, STATIC.getVersion());
 			stmt.setLong(2, guild_id);
 			stmt.executeUpdate();
@@ -113,8 +110,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("SELECT * FROM published WHERE fk_version_number = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(PatchnotesStatements.SQLcheckPublishedPatchnotes);
 			stmt.setString(1, STATIC.getVersion());
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -139,8 +135,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("SELECT guild_id FROM guilds WHERE guild_id= ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetGuild);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
@@ -163,8 +158,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("INSERT INTO guilds (guild_id, name) VALUES(?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(PatchnotesStatements.SQLInsertGuild);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, name);
 			return stmt.executeUpdate();
@@ -184,8 +178,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("SELECT * FROM published WHERE fk_guild_id = ? LIMIT 1");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(PatchnotesStatements.SQLcheckPublishedBotPatchnotes);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()){
@@ -210,8 +203,7 @@ public class Patchnotes {
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("SELECT message1, message2, date, version_number FROM priv_notes ORDER BY date desc LIMIT 10");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetPrivatePatchnotesArray);
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				patchnotes.add(
@@ -245,8 +237,7 @@ public class Patchnotes {
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("SELECT message1, message2, date, version_number FROM publ_notes ORDER BY date desc LIMIT 10");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetPublicPatchnotesArray);
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				patchnotes.add(
@@ -280,8 +271,7 @@ public class Patchnotes {
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			String sql = ("SELECT message1, message2, date, title FROM game_notes WHERE fk_guild_id = ? ORDER BY date desc LIMIT 10");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetGamePatchnotesArray);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()){

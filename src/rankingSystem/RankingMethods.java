@@ -151,38 +151,40 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			final File file1 = new File(IniFileReader.getTempDirectory()+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-			if(file1.length() > (FileUtils.ONE_MB*8)) {
-				//before attempting file compression, check if it can be uploaded to Imgur
-				final String uploadedFile = Imgur.uploadFile(file1);
-				if(uploadedFile != null) {
-					e.getChannel().sendMessage(uploadedFile).queue();
-				}
-				else if(skin.getFileType().equals("gif")) {
-					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
-						try {
-							String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("level", "level_compressed")};
-							final var output = GifOptimizer.startGifOptimization(args);
-							if(output == null) {
+			if(file1.length() > (FileUtils.ONE_MB*8) || skin.getFileType().equals("gif")) {
+				if(skin.getFileType().equals("gif")) {
+					//before attempting file compression, check if it can be uploaded to Imgur
+					final String uploadedFile = Imgur.uploadFile(file1);
+					if(uploadedFile != null) {
+						e.getChannel().sendMessage(uploadedFile).queue();
+					}
+					else {
+						e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
+							try {
+								String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("level", "level_compressed")};
+								final var output = GifOptimizer.startGifOptimization(args);
+								if(output == null) {
+									file1.delete();
+									message.delete().queue();
+									final File file2 = new File(IniFileReader.getTempDirectory()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+									try {
+										e.getChannel().sendFile(file2, "level_up."+skin.getFileType()).queue(complete -> {
+											file2.delete();
+										});
+									} catch(IllegalArgumentException e1) {
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+										logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
+										file2.delete();
+									}
+								}
+							} catch(IOException | DataFormatException e1) {
+								logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
 								file1.delete();
 								message.delete().queue();
-								final File file2 = new File(IniFileReader.getTempDirectory()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-								try {
-									e.getChannel().sendFile(file2, "level_up."+skin.getFileType()).queue(complete -> {
-										file2.delete();
-									});
-								} catch(IllegalArgumentException e1) {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
-									logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
-									file2.delete();
-								}
+								e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
 							}
-						} catch(IOException | DataFormatException e1) {
-							logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
-							file1.delete();
-							message.delete().queue();
-							e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
-						}
-					});
+						});
+					}
 				}
 				else {
 					BufferedImage image = ImageIO.read(file1);
@@ -214,8 +216,9 @@ public class RankingMethods extends ListenerAdapter {
 				}
 			}
 			else {
-				e.getChannel().sendFile(file1, "level_up."+skin.getFileType()).complete();
-				file1.delete();
+				e.getChannel().sendFile(file1, "level_up."+skin.getFileType()).queue(complete -> {
+					file1.delete();
+				});
 			}
 		} catch (IOException e1) {
 			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
@@ -333,38 +336,40 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			final File file1 = new File(IniFileReader.getTempDirectory()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-			if(file1.length() > (FileUtils.ONE_MB*8)) {
-				//before attempting file compression, check if it can be uploaded to Imgur
-				final String uploadedFile = Imgur.uploadFile(file1);
-				if(uploadedFile != null) {
-					e.getChannel().sendMessage(uploadedFile).queue();
-				}
-				else if(skin.getFileType().equals("gif")) {
-					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
-						try {
-							String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("rank", "rank_compressed")};
-							final var output = GifOptimizer.startGifOptimization(args);
-							if(output == null) {
+			if(file1.length() > (FileUtils.ONE_MB*8) || skin.getFileType().equals("gif")) {
+				if(skin.getFileType().equals("gif")) {
+					//before attempting file compression, check if it can be uploaded to Imgur
+					final String uploadedFile = Imgur.uploadFile(file1);
+					if(uploadedFile != null) {
+						e.getChannel().sendMessage(uploadedFile).queue();
+					}
+					else {
+						e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
+							try {
+								String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("rank", "rank_compressed")};
+								final var output = GifOptimizer.startGifOptimization(args);
+								if(output == null) {
+									file1.delete();
+									message.delete().queue();
+									final File file2 = new File(IniFileReader.getTempDirectory()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+									try {
+										e.getChannel().sendFile(file2, "rank."+skin.getFileType()).queue(complete -> {
+											file2.delete();
+										});
+									} catch(IllegalArgumentException e1) {
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+										logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
+										file2.delete();
+									}
+								}
+							} catch(IOException | DataFormatException e1) {
+								e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
+								logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
 								file1.delete();
 								message.delete().queue();
-								final File file2 = new File(IniFileReader.getTempDirectory()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-								try {
-									e.getChannel().sendFile(file2, "rank."+skin.getFileType()).queue(complete -> {
-										file2.delete();
-									});
-								} catch(IllegalArgumentException e1) {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
-									logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
-									file2.delete();
-								}
 							}
-						} catch(IOException | DataFormatException e1) {
-							e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
-							logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
-							file1.delete();
-							message.delete().queue();
-						}
-					});
+						});
+					}
 				}
 				else {
 					BufferedImage image = ImageIO.read(file1);
@@ -396,8 +401,9 @@ public class RankingMethods extends ListenerAdapter {
 				}
 			}
 			else {
-				e.getChannel().sendFile(file1, "rank."+skin.getFileType()).complete();
-				file1.delete();
+				e.getChannel().sendFile(file1, "rank."+skin.getFileType()).queue(complete -> {
+					file1.delete();
+				});
 			}
 		} catch (IOException e1) {
 			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
@@ -610,37 +616,40 @@ public class RankingMethods extends ListenerAdapter {
 				writer.close();
 			}
 			final File file1 = new File(IniFileReader.getTempDirectory()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-			if(file1.length() > (FileUtils.ONE_MB*8)) {
-				final String uploadedFile = Imgur.uploadFile(file1);
-				if(uploadedFile != null) {
-					e.getChannel().sendMessage(uploadedFile).queue();
-				}
-				else if(skin.getFileType().equals("gif")) {
-					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
-						try {
-							String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("profile", "profile_compressed")};
-							final var output = GifOptimizer.startGifOptimization(args);
-							if(output == null) {
+			if(file1.length() > (FileUtils.ONE_MB*8) || skin.getFileType().equals("gif")) {
+				if(skin.getFileType().equals("gif")) {
+					//before attempting file compression, check if it can be uploaded to Imgur
+					final String uploadedFile = Imgur.uploadFile(file1);
+					if(uploadedFile != null) {
+						e.getChannel().sendMessage(uploadedFile).queue();
+					}
+					else {
+						e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESSION)).queue(message -> {
+							try {
+								String [] args = {file1.getCanonicalPath(), file1.getCanonicalPath().replace("profile", "profile_compressed")};
+								final var output = GifOptimizer.startGifOptimization(args);
+								if(output == null) {
+									file1.delete();
+									message.delete().queue();
+									final File file2 = new File(IniFileReader.getTempDirectory()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+									try {
+										e.getChannel().sendFile(file2, "profile."+skin.getFileType()).queue(complete -> {
+											file2.delete();
+										});
+									} catch(IllegalArgumentException e1) {
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+										logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
+										file2.delete();
+									}
+								}
+							} catch(IOException | DataFormatException e1) {
+								e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
+								logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
 								file1.delete();
 								message.delete().queue();
-								final File file2 = new File(IniFileReader.getTempDirectory()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
-								try {
-									e.getChannel().sendFile(file2, "profile."+skin.getFileType()).queue(complete -> {
-										file2.delete();
-									});
-								} catch(IllegalArgumentException e1) {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
-									logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
-									file2.delete();
-								}
 							}
-						} catch(IOException | DataFormatException e1) {
-							e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
-							logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
-							file1.delete();
-							message.delete().queue();
-						}
-					});
+						});
+					}
 				}
 				else {
 					BufferedImage image = ImageIO.read(file1);

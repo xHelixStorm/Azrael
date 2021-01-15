@@ -194,6 +194,7 @@ public class UserExecution {
 								}
 								e.getChannel().sendMessage(message.build()).queue();
 								message.clear();
+								out.setLength(0);
 								for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, e.getGuild().getIdLong())) {
 									out.append("[`"+description+"`] ");
 								}

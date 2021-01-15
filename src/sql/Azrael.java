@@ -64,8 +64,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("INSERT INTO action_log (event, target_id, guild_id, description, timestamp) VALUES(?, ?, ?, ?, ?)");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLInsertActionLog);
 				stmt.setString(1, event);
 				stmt.setLong(2, target_id);
 				stmt.setLong(3, guild_id);
@@ -87,8 +86,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO history (fk_user_id, fk_guild_id, type, reason, time, penalty, info) VALUES(?, ?, ?, ?, ?, "+(penalty != 0 ? "?" : "NULL")+", ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement((penalty != 0 ? AzraelStatements.SQLInsertHistory : AzraelStatements.SQLInsertHistory2));
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, type);
@@ -118,8 +116,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT type, reason, time, penalty, info FROM history WHERE fk_user_id = ? && fk_guild_id = ? ORDER BY time desc");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetHistory);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -152,8 +149,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT COUNT(*) FROM action_log WHERE target_id = ? && guild_id = ? && event = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSingleActionEventCount);
 			stmt.setLong(1, target_id);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, event);
@@ -180,8 +176,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT description FROM action_log WHERE target_id = ? && (guild_id = ? || guild_id = 0) && (event = ? || event = ?) GROUP BY description LIMIT 50");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetDoubleActionEventDescriptions);
 			stmt.setLong(1, target_id);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, event);
@@ -209,8 +204,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT description FROM action_log WHERE target_id = ? && guild_id = ? && event = ? GROUP BY description LIMIT 50");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSingleActionEventDescriptions);
 			stmt.setLong(1, target_id);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, event);
@@ -236,8 +230,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT description, timestamp FROM action_log WHERE target_id = ? && guild_id = ? && (event = \"MEMBER_KICK\" || event = \"MEMBER_BAN_ADD\" || event = \"MEMBER_BAN_REMOVE\" || event = \"MEMBER_MUTE_ADD\" || event = \"MEMBER_ROLE_ADD\" || event = \"MEMBER_ROLE_REMOVE\") ORDER BY timestamp desc LIMIT 30");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCriticalActionEvents);
 			stmt.setLong(1, target_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -263,8 +256,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT timestamp, description FROM action_log WHERE target_id = ? && guild_id = ? && event = ? ORDER BY timestamp desc LIMIT 30");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSingleActionEventDescriptionsOrdered);
 			stmt.setLong(1, target_id);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, event);
@@ -289,8 +281,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO users (user_id, name, lang, avatar_url) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertUser);
 			stmt.setLong(1, user_id);
 			stmt.setString(2, name);
 			stmt.setString(3, lang);
@@ -312,8 +303,7 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip, "&rewriteBatchedStatements=true"), username, password);
 			myConn.setAutoCommit(false); 
-			String sql = ("INSERT INTO users (user_id, name, lang, avatar_url) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), avatar_url=VALUES(avatar_url)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLBulkInsertUsers);
 			for(Member member : members) {
 				stmt.setLong(1, member.getUser().getIdLong());
 				stmt.setString(2, member.getUser().getName()+"#"+member.getUser().getDiscriminator());
@@ -337,8 +327,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE users SET avatar_url = ? WHERE user_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateAvatar);
 			stmt.setString(1, avatar);
 			stmt.setLong(2, user_id);
 			return stmt.executeUpdate();
@@ -357,8 +346,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT IGNORE INTO join_dates (fk_user_id, fk_guild_id, first_join, join_date) VALUES(?,?,1,?), (?,?,0,?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertJoinDate);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, join_date);
@@ -382,8 +370,7 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip, "&rewriteBatchedStatements=true"), username, password);
 			myConn.setAutoCommit(false); 
-			String sql = ("INSERT IGNORE INTO join_dates (fk_user_id, fk_guild_id, first_join, join_date) VALUES (?, ?, ?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLBulkInsertJoinDates);
 			for(int i = 0; i <= 1; i++) {
 				for(Member member : members) {
 					stmt.setLong(1, member.getUser().getIdLong());
@@ -409,8 +396,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE join_dates SET join_date = ? WHERE fk_user_id = ? AND fk_guild_id = ? AND first_join = 0");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateJoinDate);
 			stmt.setString(1, join_date);
 			stmt.setLong(2, user_id);
 			stmt.setLong(3, guild_id);
@@ -431,8 +417,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT user_id, name FROM users WHERE name = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetUser);
 			stmt.setString(1, name);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
@@ -455,8 +440,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM users WHERE user_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetUserThroughID);
 			stmt.setString(1, user_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -481,8 +465,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT join_date FROM join_dates WHERE fk_user_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetJoinDatesFromUser);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -510,8 +493,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE users SET name = ? WHERE user_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateUser);
 			stmt.setString(1, name);
 			stmt.setLong(2, user_id);
 			return stmt.executeUpdate();
@@ -533,8 +515,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT lang FROM users WHERE user_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetUserLang);
 				stmt.setLong(1, user_id);
 				rs = stmt.executeQuery();
 				if(rs.next()) {
@@ -560,8 +541,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE users SET lang = ? WHERE user_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateUserLanguage);
 			stmt.setString(1, language);
 			stmt.setLong(2, user_id);
 			return stmt.executeUpdate();
@@ -581,8 +561,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT guild_id FROM guild WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGuild);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
@@ -606,8 +585,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT language FROM guild WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetLanguage);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
@@ -630,8 +608,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE guild SET language = ? WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateLanguage);
 			stmt.setString(1, language);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -650,8 +627,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO guild (guild_id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertGuild);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, guild_name);
 			return stmt.executeUpdate();
@@ -671,8 +647,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT nickname FROM nickname WHERE fk_user_id= ? && fk_guild_id= ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetNickname);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -696,8 +671,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO nickname VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nickname=VALUES(nickname)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertNickname);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, nickname);
@@ -717,8 +691,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE nickname SET nickname = ? WHERE fk_user_id = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateNickname);
 			stmt.setString(1, nickname);
 			stmt.setLong(2, user_id);
 			stmt.setLong(3, guild_id);
@@ -738,8 +711,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM nickname WHERE fk_user_id = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteNickname);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -759,8 +731,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetData);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -785,8 +756,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT muted FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetMuted);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -811,8 +781,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT custom_time FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCustomMuted);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -837,8 +806,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT fk_ban_id FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLisBanned);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -866,8 +834,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT fk_warning_id FROM bancollect WHERE fk_user_id= ? && fk_guild_id= ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetWarning);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -885,14 +852,38 @@ public class Azrael {
 		}
 	}
 	
+	public static Warning SQLgetWarning(long guild_id, int warning_id) {
+		logger.trace("SQLgetWarning launched. Passed params {}, {}", guild_id, warning_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetWarning2);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, warning_id);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return new Warning(rs.getInt(1), rs.getDouble(2), rs.getString(3));
+			}
+			return new Warning();
+		} catch (SQLException e) {
+			logger.error("SQLgetWarning Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static int SQLInsertData(long user_id, long guild_id, int warning_id, int ban_id, Timestamp timestamp, Timestamp unmute, boolean muted, boolean custom_time) {
 		logger.trace("SQLInsertData launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}", user_id, guild_id, warning_id, ban_id, timestamp, unmute, muted, custom_time);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO bancollect VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0) ON DUPLICATE KEY UPDATE fk_warning_id=VALUES(fk_warning_id), fk_ban_id=VALUES(fk_ban_id), timestamp=VALUES(timestamp), unmute=VALUES(unmute), muted=VALUES(muted), custom_time=VALUES(custom_time), guild_left=VALUES(guild_left)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertData);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			stmt.setInt(3, warning_id);
@@ -917,8 +908,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM bancollect WHERE fk_user_id = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteData);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -937,8 +927,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE bancollect SET muted = ? WHERE fk_user_id = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateMuted);
 			stmt.setBoolean(1, muted);
 			stmt.setLong(2, user_id);
 			stmt.setLong(3, guild_id);
@@ -958,8 +947,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE bancollect SET muted = ?, custom_time = ? WHERE fk_user_id = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateMutedAndCustomMuted);
 			stmt.setBoolean(1, muted);
 			stmt.setBoolean(2, custom_time);
 			stmt.setLong(3, user_id);
@@ -980,8 +968,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE bancollect SET muted = ?, custom_time = ? WHERE fk_user_id = ? && fk_guild_id = ? && muted = 1");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateMutedOnEnd);
 			stmt.setBoolean(1, muted);
 			stmt.setBoolean(2, custom_time);
 			stmt.setLong(3, user_id);
@@ -1002,8 +989,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE bancollect SET guild_left = ? WHERE fk_user_id = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateGuildLeft);
 			stmt.setBoolean(1, guildLeft);
 			stmt.setLong(2, user_id);
 			stmt.setLong(3, guild_id);
@@ -1017,32 +1003,6 @@ public class Azrael {
 		}
 	}
 	
-	public static Warning SQLgetWarning(long guild_id, int warning_id) {
-		logger.trace("SQLgetWarning launched. Passed params {}, {}", guild_id, warning_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT warning_id, mute_time, description FROM warnings WHERE fk_guild_id = ? && warning_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, guild_id);
-			stmt.setInt(2, warning_id);
-			rs = stmt.executeQuery();
-			if(rs.next()) {
-				return new Warning(rs.getInt(1), rs.getDouble(2), rs.getString(3));
-			}
-			return new Warning();
-		} catch (SQLException e) {
-			logger.error("SQLgetWarning Exception", e);
-			return null;
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static int SQLgetMaxWarning(long guild_id) {
 		logger.trace("SQLgetMaxWarning launched. Passed params {}", guild_id);
 		Connection myConn = null;
@@ -1050,8 +1010,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT MAX(warning_id) FROM warnings WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetMaxWarning);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
@@ -1074,46 +1033,27 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = "";
 			switch(warning_id) {
 				case 1 -> {
-					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
-							+ "(?, 0, 0, \"no warning\"),"
-							+ "(?, 1, 0, \"first warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
-					stmt = myConn.prepareStatement(sql);
+					stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWarning);
 					stmt.setLong(1, guild_id);
 					stmt.setLong(2, guild_id);
 				}
 				case 2 -> {
-					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
-							+ "(?, 0, 0, \"no warning\"),"
-							+ "(?, 1, 0, \"first warning\"),"
-							+ "(?, 2, 0, \"second warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
-					stmt = myConn.prepareStatement(sql);
+					stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWarning2);
 					stmt.setLong(1, guild_id);
 					stmt.setLong(2, guild_id);
 					stmt.setLong(3, guild_id);
 				}
 				case 3 -> {
-					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
-							+ "(?, 0, 0, \"no warning\"),"
-							+ "(?, 1, 0, \"first warning\"),"
-							+ "(?, 2, 0, \"second warning\"),"
-							+ "(?, 3, 0, \"third warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
-					stmt = myConn.prepareStatement(sql);
+					stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWarning3);
 					stmt.setLong(1, guild_id);
 					stmt.setLong(2, guild_id);
 					stmt.setLong(3, guild_id);
 					stmt.setLong(4, guild_id);
 				}
 				case 4 -> {
-					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
-							+ "(?, 0, 0, \"no warning\"),"
-							+ "(?, 1, 0, \"first warning\"),"
-							+ "(?, 2, 0, \"second warning\"),"
-							+ "(?, 3, 0, \"third warning\"),"
-							+ "(?, 4, 0, \"fourth warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
-					stmt = myConn.prepareStatement(sql);
+					stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWarning4);
 					stmt.setLong(1, guild_id);
 					stmt.setLong(2, guild_id);
 					stmt.setLong(3, guild_id);
@@ -1121,14 +1061,7 @@ public class Azrael {
 					stmt.setLong(5, guild_id);
 				}
 				case 5 -> {
-					sql = ("INSERT INTO warnings (fk_guild_id, warning_id, mute_time, description) VALUES"
-							+ "(?, 0, 0, \"no warning\"),"
-							+ "(?, 1, 0, \"first warning\"),"
-							+ "(?, 2, 0, \"second warning\"),"
-							+ "(?, 3, 0, \"third warning\"),"
-							+ "(?, 4, 0, \"fourth warning\"),"
-							+ "(?, 5, 0, \"fifth warning\") ON DUPLICATE KEY UPDATE description=VALUES(description)");
-					stmt = myConn.prepareStatement(sql);
+					stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWarning5);
 					stmt.setLong(1, guild_id);
 					stmt.setLong(2, guild_id);
 					stmt.setLong(3, guild_id);
@@ -1153,8 +1086,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE bancollect SET fk_warning_id = ? WHERE fk_user_id = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateWarning);
 			stmt.setInt(1, warning_id);
 			stmt.setLong(2, user_id);
 			stmt.setLong(3, guild_id);
@@ -1174,8 +1106,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE warnings SET mute_time = ? WHERE fk_guild_id = ? && warning_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateMuteTimeOfWarning);
 			stmt.setLong(1, mute_time);
 			stmt.setLong(2, guild_id);
 			stmt.setInt(3, warning_id);
@@ -1195,8 +1126,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE bancollect SET timestamp = ?, unmute = ?, muted = ?, custom_time = ? WHERE fk_user_id = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateUnmute);
 			stmt.setTimestamp(1, timestamp);
 			stmt.setTimestamp(2, unmute);
 			stmt.setBoolean(3, muted);
@@ -1219,8 +1149,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE bancollect SET unmute = ? WHERE fk_user_id = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateUnmute2);
 			stmt.setTimestamp(1, unmute);
 			stmt.setLong(2, user_id);
 			stmt.setLong(3, guild_id);
@@ -1240,8 +1169,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE bancollect SET fk_ban_id = ? WHERE fk_user_id = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateBan);
 			stmt.setInt(1, ban_id);
 			stmt.setLong(2, user_id);
 			stmt.setLong(3, guild_id);
@@ -1261,8 +1189,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO channels (channel_id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChannels);
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, channel_name);
 			return stmt.executeUpdate();
@@ -1282,8 +1209,7 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false); 
-			String sql = ("INSERT INTO channels (channel_id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLBulkInsertChannels);
 			for(final var channel : textChannels) {
 				stmt.setLong(1, channel.getIdLong());
 				stmt.setString(2, channel.getName());
@@ -1305,8 +1231,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM channels WHERE channel_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteChannels);
 			stmt.setLong(1, channel_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -1324,8 +1249,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_channel_type, fk_guild_id, url_censoring, txt_removal) VALUES (?, ?, ?, 0, 0) ON DUPLICATE KEY UPDATE fk_channel_type = VALUES(fk_channel_type)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChannel_Conf);
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, channel_type);
 			stmt.setLong(3, guild_id);
@@ -1345,8 +1269,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM channel_conf WHERE fk_channel_id = ? and fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteChannelConf);
 			stmt.setLong(1, channel_id);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -1365,8 +1288,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM channel_conf WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteAllChannelConfs);
 			stmt.setLong(1, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -1384,8 +1306,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_guild_id, url_censoring, txt_removal) VALUES (?, ?, ?, 0) ON DUPLICATE KEY UPDATE url_censoring = VALUES(url_censoring)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChannel_ConfURLCensoring);
 			stmt.setLong(1, channel_id);
 			stmt.setLong(2, guild_id);
 			stmt.setBoolean(3, url_censoring);
@@ -1405,8 +1326,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_guild_id, url_censoring, txt_removal) VALUES (?, ?, 0, ?) ON DUPLICATE KEY UPDATE txt_removal = VALUES(txt_removal)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChannel_ConfTXTCensoring);
 			stmt.setLong(1, channel_id);
 			stmt.setLong(2, guild_id);
 			stmt.setBoolean(3, txt_removal);
@@ -1426,8 +1346,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM channel_conf WHERE fk_channel_type = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteChannelType);
 			stmt.setString(1, channel_type);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -1450,8 +1369,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT * FROM all_channels WHERE guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetChannels);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -1489,8 +1407,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM channeltypes");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetChannelTypes);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				Channels channelProperties = new Channels();
@@ -1516,8 +1433,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT reactions FROM guild WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCommandExecutionReaction);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
@@ -1540,8 +1456,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE guild SET reactions = ? WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateReaction);
 			stmt.setBoolean(1, reactions);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -1563,9 +1478,8 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT * FROM channel_filter WHERE fk_channel_id = ?");
 				ArrayList<String> filter_lang = new ArrayList<String>();
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetChannel_Filter);
 				stmt.setLong(1, channel_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -1595,15 +1509,12 @@ public class Azrael {
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 				ArrayList<String> filter_words = new ArrayList<String>();
-				String sql;
 				if(filter_lang.equals("all")) {
-					sql = ("SELECT word FROM filter WHERE fk_guild_id = ?");
-					stmt = myConn.prepareStatement(sql);
+					stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilter);
 					stmt.setLong(1, guild_id);
 				}
 				else{
-					sql = ("SELECT word FROM filter WHERE fk_lang_abbrv = ? && fk_guild_id = ?");
-					stmt = myConn.prepareStatement(sql);
+					stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilter2);
 					stmt.setString(1, filter_lang);
 					stmt.setLong(2, guild_id);
 				}
@@ -1632,17 +1543,9 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			var sql = "";
 			if(!lang.equals("all"))
-				sql = ("INSERT IGNORE INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES(?, ?, ?)");
+				sql = AzraelStatements.SQLInsertWordFilter;
 			else {
-				sql = ("INSERT IGNORE INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES"
-						+ "(?, \"eng\", ?),"
-						+ "(?, \"ger\", ?),"
-						+ "(?, \"fre\", ?),"
-						+ "(?, \"tur\", ?),"
-						+ "(?, \"rus\", ?),"
-						+ "(?, \"spa\", ?),"
-						+ "(?, \"por\", ?),"
-						+ "(?, \"ita\", ?)");
+				sql = AzraelStatements.SQLInsertWordFilter2;
 			}
 			stmt = myConn.prepareStatement(sql);
 			if(!lang.equals("all")) {
@@ -1685,8 +1588,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM filter WHERE word = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteWordFilterAllLang);
 			stmt.setString(1, word);
 			stmt.setLong(2, guild_id);
 			stmt.executeUpdate();
@@ -1706,8 +1608,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM filter WHERE word = ? "+(!lang.equals("all") ? "&& fk_lang_abbrv = ? " : "")+"&& fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement((!lang.equals("all") ? AzraelStatements.SQLDeleteWordFilter : AzraelStatements.SQLDeleteWordFilter2));
 			stmt.setString(1, word);
 			if(!lang.equals("all")) {
 				stmt.setString(2, lang);
@@ -1735,8 +1636,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT name FROM staff_name_filter WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetStaffNames);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -1762,8 +1662,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO staff_name_filter (name, fk_guild_id) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertStaffName);
 			stmt.setString(1, word.toLowerCase());
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -1782,8 +1681,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM staff_name_filter WHERE name = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteStaffNames);
 			stmt.setString(1, word.toLowerCase());
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -1805,14 +1703,12 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
-				String sql = ("DELETE FROM staff_name_filter WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceStaffNames);
 				stmt.setLong(1, guild_id);
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT IGNORE INTO staff_name_filter (name, fk_guild_id) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql2);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceStaffNames2);
 			for(String word : words) {
 				stmt.setString(1, word.toLowerCase());
 				stmt.setLong(2, guild_id);
@@ -1842,8 +1738,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO channel_filter (fk_channel_id, fk_lang_abbrv) VALUES (?,?) ON DUPLICATE KEY UPDATE fk_lang_abbrv = VALUES(fk_lang_abbrv)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChannel_Filter);
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, filter_lang);
 			return stmt.executeUpdate();
@@ -1862,8 +1757,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM channel_filter WHERE fk_channel_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteChannel_Filter);
 			stmt.setLong(1, channel_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -1885,8 +1779,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT name FROM names WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetFunnyNames);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -1912,8 +1805,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO names (name, fk_guild_id) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertFunnyNames);
 			stmt.setString(1, word);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -1932,8 +1824,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM names WHERE name = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteFunnyNames);
 			stmt.setString(1, word);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -1956,8 +1847,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT word, kick FROM name_filter WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetNameFilter);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -1983,8 +1873,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO name_filter (word, kick, fk_guild_id) VALUES(?, ?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertNameFilter);
 			stmt.setString(1, word.toLowerCase());
 			stmt.setBoolean(2, kick);
 			stmt.setLong(3, guild_id);
@@ -2004,8 +1893,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM name_filter WHERE word = ? && fk_guild_id = ? && kick = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteNameFilter);
 			stmt.setString(1, word);
 			stmt.setLong(2, guild_id);
 			stmt.setBoolean(3, kick);
@@ -2026,8 +1914,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT name FROM names WHERE fk_guild_id = ? ORDER BY RAND() LIMIT 1");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetRandomName);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
@@ -2054,8 +1941,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT translation FROM languages_translation WHERE lang2 = ? AND lang != \"all\"");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilterLanguages);
 				stmt.setString(1, lang);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -2080,8 +1966,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT IGNORE INTO rss (url, fk_guild_id, format, type, videos, pictures, text) VALUES (?, ?, ?, ?, 1, 1, 1)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertRSS);
 			stmt.setString(1, url);
 			stmt.setLong(2, guild_id);
 			if(type == 1)
@@ -2107,8 +1992,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT child_tweet FROM sub_tweets WHERE fk_guild_id = ? && parent_tweet = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubTweets);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, tweet);
 			rs = stmt.executeQuery();
@@ -2136,8 +2020,7 @@ public class Azrael {
 			try {
 				ArrayList<RSS> feeds = new ArrayList<RSS>();
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT url, format, type, videos, pictures, text, channel_id FROM rss WHERE fk_guild_id = ? ORDER BY timestamp asc");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptions);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -2176,8 +2059,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT url, format, type, videos, pictures, text, channel_id FROM rss WHERE fk_guild_id = ? AND type = ? ORDER BY timestamp asc");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptions);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, type);
 			rs = stmt.executeQuery();
@@ -2213,8 +2095,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE rss SET pictures = ? WHERE url = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSPictures);
 			stmt.setBoolean(1, option);
 			stmt.setString(2, url);
 			stmt.setLong(3, guild_id);
@@ -2234,8 +2115,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE rss SET videos = ? WHERE url = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSVideos);
 			stmt.setBoolean(1, option);
 			stmt.setString(2, url);
 			stmt.setLong(3, guild_id);
@@ -2255,8 +2135,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE rss SET text = ? WHERE url = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSText);
 			stmt.setBoolean(1, option);
 			stmt.setString(2, url);
 			stmt.setLong(3, guild_id);
@@ -2276,8 +2155,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT IGNORE INTO sub_tweets (parent_tweet, child_tweet, fk_guild_id) VALUES(?, ?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChildTweet);
 			stmt.setString(1, urlParent);
 			stmt.setString(2, urlChild);
 			stmt.setLong(3, guild_id);
@@ -2297,8 +2175,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM sub_tweets WHERE parent_tweet = ? AND child_tweet = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteChildTweet);
 			stmt.setString(1, urlParent);
 			stmt.setString(2, urlChild);
 			stmt.setLong(3, guild_id);
@@ -2318,8 +2195,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM rss WHERE url = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteRSSFeed);
 			stmt.setString(1, url);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -2338,8 +2214,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE rss SET format = ? WHERE url = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSFormat);
 			stmt.setString(1, format);
 			stmt.setString(2, url);
 			stmt.setLong(3, guild_id);
@@ -2359,8 +2234,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE rss SET channel_id = ? WHERE url = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSChannel);
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, url);
 			stmt.setLong(3, guild_id);
@@ -2384,8 +2258,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT url FROM url_blacklist WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetURLBlacklist);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -2410,8 +2283,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO url_blacklist (url, fk_guild_id) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertURLBlacklist);
 			stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -2430,8 +2302,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM url_blacklist WHERE url = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteURLBlacklist);
 			stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -2454,8 +2325,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT url FROM url_whitelist WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetURLWhitelist);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -2480,8 +2350,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO url_whitelist (url, fk_guild_id) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertURLWhitelist);
 			stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replaceAll("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -2500,8 +2369,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM url_whitelist WHERE url = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteURLWhitelist);
 			stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -2524,8 +2392,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT username FROM tweet_blacklist WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetTweetBlacklist);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -2550,8 +2417,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO tweet_blacklist (username, fk_guild_id) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertTweetBlacklist);
 			stmt.setString(1, (username.startsWith("@") ? username : "@"+username));
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -2570,8 +2436,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM tweet_blacklist WHERE username = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteTweetBlacklist);
 			stmt.setString(1, (username.startsWith("@") ? username : "@"+username));
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -2594,8 +2459,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT * FROM watchlist WHERE fk_user_id = ? AND fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetWatchlist);
 				stmt.setLong(1, user_id);
 				stmt.setLong(2, guild_id);
 				rs = stmt.executeQuery();
@@ -2623,8 +2487,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM watchlist");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetWholeWatchlist);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				Hashes.addWatchlist(rs.getString(2)+"-"+rs.getString(1), new Watchlist(rs.getInt(3), rs.getLong(4), rs.getBoolean(5)));
@@ -2646,8 +2509,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM watchlist WHERE fk_guild_id = ? && higher_privileges = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetWholeWatchlist2);
 			stmt.setLong(1, guild_id);
 			stmt.setBoolean(2, highPrivileges);
 			rs = stmt.executeQuery();
@@ -2671,8 +2533,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO watchlist (fk_user_id, fk_guild_id, level, watch_channel, higher_privileges) VALUES(?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE level=VALUES(level), watch_channel=VALUES(watch_channel), higher_privileges=VALUES(higher_privileges)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWatchlist);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			stmt.setInt(3, level);
@@ -2694,8 +2555,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM watchlist WHERE fk_user_id = ? && fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteWatchlist);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -2716,8 +2576,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM google_apis_setup_view WHERE fk_guild_id = ? AND fk_api_id = ? ORDER BY timestamp asc");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleAPISetupOnGuildAndAPI);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, api_id);
 			rs = stmt.executeQuery();
@@ -2741,8 +2600,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO google_apis_setup (file_id, fk_guild_id, title, fk_api_id) VALUES(?, ?, ?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertGoogleAPISetup);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, title);
@@ -2763,8 +2621,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM google_apis_setup WHERE file_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteGoogleAPISetup);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -2785,8 +2642,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT fk_event_id FROM google_file_to_event WHERE fk_file_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleLinkedEvents);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -2812,8 +2668,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT fk_event_id FROM google_file_to_event INNER JOIN google_event_types ON fk_event_id = event_id WHERE fk_file_id = ? AND fk_guild_id = ? AND restrictable = 1");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleLinkedEventsRestrictions);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -2839,8 +2694,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM google_event_types WHERE support_spreadsheets = 1");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleEventsSupportSpreadsheet);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				events.add(new GoogleEvents(rs.getInt(1), rs.getString(2), rs.getBoolean(3), rs.getBoolean(4), rs.getBoolean(5), rs.getBoolean(6), rs.getBoolean(7)));
@@ -2862,8 +2716,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO google_file_to_event (fk_guild_id, fk_file_id, fk_event_id) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE fk_event_id=VALUES(fk_event_id)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchInsertGoogleFileToEventLink);
 			for(final int event: events) {
 				stmt.setLong(1, guild_id);
 				stmt.setString(2, file_id);
@@ -2887,8 +2740,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE google_file_to_event SET channel_id = ? WHERE fk_guild_id = ? AND fk_file_id = ? AND fk_event_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateGoogleChannelRestriction);
 			stmt.setLong(1, channel_id);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, file_id);
@@ -2909,8 +2761,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE google_file_to_event SET channel_id = ? WHERE fk_guild_id = ? AND fk_file_id = ? AND fk_event_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateGoogleRemoveChannelRestriction);
 			stmt.setNull(1, Types.BIGINT);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, file_id);
@@ -2931,8 +2782,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM google_spreadsheet_sheet WHERE fk_file_id = ? AND fk_event_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchDeleteGoogleSpreadsheetSheet);
 			for(final int event: events) {
 				stmt.setString(1, file_id);
 				stmt.setInt(2, event);
@@ -2956,8 +2806,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO google_spreadsheet_sheet (fk_guild_id, fk_file_id, fk_event_id, sheet_row_start) VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE sheet_row_start=VALUES(sheet_row_start)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertGoogleSpreadsheetSheet);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, file_id);
 			stmt.setInt(3, event_id);
@@ -2980,8 +2829,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT fk_event_id, sheet_row_start FROM google_spreadsheet_sheet WHERE fk_file_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleSpreadsheetSheets);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -3005,8 +2853,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM google_spreadsheet_sheet WHERE fk_file_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteGoogleSpreadsheetSheet);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -3025,8 +2872,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM google_spreadsheet_mapping WHERE fk_file_id = ? AND fk_event_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchDeleteGoogleSpreadsheetMapping);
 			for(final int event: events) {
 				stmt.setString(1, file_id);
 				stmt.setInt(2, event);
@@ -3050,8 +2896,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM google_spreadsheet_mapping WHERE fk_file_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteGoogleSpreadsheetMapping);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -3070,8 +2915,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM google_file_to_event WHERE fk_file_id = ? AND fk_event_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchDeleteGoogleFileToEvent);
 			for(final int event: events) {
 				stmt.setString(1, file_id);
 				stmt.setInt(2, event);
@@ -3095,8 +2939,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM google_file_to_event WHERE fk_file_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteGoogleFileToEvent);
 			stmt.setString(1, file_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -3116,8 +2959,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM google_events_to_dd WHERE fk_api_id = ? AND fk_event_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleEventsToDD);
 			stmt.setInt(1, api_id);
 			stmt.setInt(2, event_id);
 			rs = stmt.executeQuery();
@@ -3135,35 +2977,13 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLDeleteGoogleSpreadsheetMapping(String file_id, int event_id, long guild_id) {
-		logger.trace("SQLDeleteGoogleSpreadsheetMapping launched. Passed params {}, {}, {}", file_id, event_id, guild_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM google_spreadsheet_mapping WHERE fk_file_id = ? AND fk_event_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, file_id);
-			stmt.setInt(2, event_id);
-			stmt.setLong(3, guild_id);
-			return stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLDeleteGoogleSpreadsheetMapping Exception", e);
-			return -1;
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static int [] SQLBatchInsertGoogleSpreadsheetMapping(String file_id, int event_id, long guild_id, List<Integer> dd_items, List<String> dd_formats) {
 		logger.trace("SQLBatchInsertGoogleSpreadsheetMapping launched. Passed params {}, {}, {}, array1, array2, array3", file_id, event_id, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO google_spreadsheet_mapping (fk_guild_id, fk_file_id, fk_event_id, column_number, fk_dd_id, format) VALUES(?, ?, ?, ?, ?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchInsertGoogleSpreadsheetMapping);
 			for(int columnNumber = 0; columnNumber < dd_items.size(); columnNumber++) {
 				stmt.setLong(1, guild_id);
 				stmt.setString(2, file_id);
@@ -3192,8 +3012,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT fk_dd_id, format, column_number FROM google_spreadsheet_mapping WHERE fk_file_id = ? AND fk_event_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleSpreadsheetMapping);
 			stmt.setString(1, file_id);
 			stmt.setInt(2, event_id);
 			stmt.setLong(3, guild_id);
@@ -3219,8 +3038,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT file_id, sheet_row_start, channel_id, force_restriction FROM google_files_and_events WHERE guild_id = ? AND api_id = ? AND event_id = ? AND (channel_id = ? OR channel_id IS NULL OR channel_id = 0) ORDER BY channel_id desc LIMIT 1");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleFilesAndEvent);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, api_id);
 			stmt.setInt(3, event_id);
@@ -3252,8 +3070,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO reminder (fk_user_id, fk_guild_id, type, reason, reporter, time) VALUES(?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE type=VALUES(type), reason=VALUES(reason), reporter=VALUES(reporter), time=VALUES(time)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertReminder);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, type);
@@ -3277,8 +3094,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM reminder WHERE fk_user_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetRejoinTask);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -3302,8 +3118,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM reminder WHERE fk_user_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteRejoinTask);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -3324,8 +3139,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT lang, translation FROM languages_translation WHERE lang2 = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetLanguages);
 			stmt.setString(1, lang);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -3350,8 +3164,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT lang, translation FROM languages_translation WHERE lang2 = ? AND translated = 1");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetTranslatedLanguages);
 			stmt.setString(1, lang);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -3375,8 +3188,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM languages_translation WHERE lang = ? AND lang2 = ? AND translated = 1");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLisLanguageTranslated);
 			stmt.setString(1, lang);
 			stmt.setString(2, lang2);
 			rs = stmt.executeQuery();
@@ -3400,8 +3212,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO tweet_log (message_id, tweet_id) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertTweetLog);
 			stmt.setLong(1, message_id);
 			stmt.setLong(2, tweet_id);
 			return stmt.executeUpdate();
@@ -3420,8 +3231,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE tweet_log SET deleted = 1 WHERE message_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateTweetLogDeleted);
 			stmt.setLong(1, message_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -3440,8 +3250,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT deleted FROM tweet_log WHERE tweet_id = ? AND deleted = 1");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLIsTweetDeleted);
 			stmt.setLong(1, tweet_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -3464,8 +3273,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE tweet_log SET timestamp = SYSDATE() WHERE tweet_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateTweetTimestamp);
 			stmt.setLong(1, tweet_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -3483,8 +3291,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM tweet_log WHERE DATE_ADD(timestamp, INTERVAL 7 DAY) <= SYSDATE()");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteTweetLog);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLDeleteTweetLog Exception", e);
@@ -3502,8 +3309,7 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false); 
-			String sql = ("INSERT INTO categories (category_id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLBulkInsertCategories);
 			for(final var category : categories) {
 				stmt.setLong(1, category.getIdLong());
 				stmt.setString(2, category.getName());
@@ -3529,8 +3335,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				String sql = ("SELECT fk_category_id, fk_category_type FROM category_conf WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetCategories);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -3559,8 +3364,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO categories (category_id, name) VALUES(?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertCategory);
 			stmt.setLong(1, category_id);
 			stmt.setString(2, name);
 			return stmt.executeUpdate();
@@ -3579,8 +3383,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM categories WHERE category_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteCategory);
 			stmt.setLong(1, category_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -3598,8 +3401,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE categories SET name = ? WHERE category_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateCategoryName);
 			stmt.setString(1, name);
 			stmt.setLong(2, category_id);
 			return stmt.executeUpdate();
@@ -3618,8 +3420,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO category_conf(fk_category_id, fk_category_type, fk_guild_id) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE fk_category_type=VALUES(fk_category_type)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertCategoryConf);
 			stmt.setLong(1, category_id);
 			stmt.setString(2, categoryType);
 			stmt.setLong(3, guild_id);
@@ -3639,8 +3440,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM category_conf WHERE fk_category_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteCategoryConf);
 			stmt.setLong(1, category_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -3658,8 +3458,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM category_conf WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteAllCategoryConfs);
 			stmt.setLong(1, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -3679,8 +3478,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM category_types");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCategoryTypes);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				categories.add(new constructors.Category(
@@ -3706,8 +3504,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM custom_commands WHERE fk_guild_id = ? AND command = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCustomCommand);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, command);
 			rs = stmt.executeQuery();
@@ -3741,8 +3538,7 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			ArrayList<String> commands = new ArrayList<String>();
-			String sql = ("SELECT command FROM custom_commands WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCustomCommands);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -3767,8 +3563,7 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			ArrayList<CustomCommand> commands = new ArrayList<CustomCommand>();
-			String sql = ("SELECT * FROM custom_commands WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCustomCommands2);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -3803,8 +3598,7 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			HashSet<String> channels = new HashSet<String>();
-			String sql = ("SELECT * FROM custom_commands_restrictions WHERE fk_guild_id = ? AND command = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCustomCommandRestrictions);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, command);
 			rs = stmt.executeQuery();
@@ -3838,8 +3632,7 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			ArrayList<Long> roles = new ArrayList<Long>();
-			String sql = ("SELECT role_id FROM custom_commands_roles WHERE fk_guild_id = ? AND command = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCustomCommandRoles);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, command);
 			rs = stmt.executeQuery();
@@ -3864,8 +3657,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM quiz WHERE fk_guild_id = ? ORDER BY number ASC");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetQuizData);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			boolean success =  false;
@@ -3899,8 +3691,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM quiz WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteQuizData);
 			stmt.setLong(1, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -3918,8 +3709,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE quiz SET used = 1 WHERE fk_guild_id = ? and reward = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateUsedQuizReward);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, reward);
 			return stmt.executeUpdate();
@@ -3941,15 +3731,13 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("UPDATE bancollect SET fk_warning_id = ? WHERE fk_guild_id = ? && fk_warning_id > ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLLowerTotalWarning);
 			stmt.setInt(1, warning_id);
 			stmt.setLong(2, guild_id);
 			stmt.setInt(3, warning_id);
 			stmt.executeUpdate();
 
-			String sql2 = ("DELETE FROM warnings WHERE warning_id > ?");
-			stmt = myConn.prepareStatement(sql2);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLLowerTotalWarning2);
 			stmt.setInt(1, warning_id);
 			var editedRows = stmt.executeUpdate();
 			myConn.commit();
@@ -3977,15 +3765,13 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
-				String sql = ("DELETE FROM filter WHERE fk_lang_abbrv = ? && fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceWordFilter);
 				stmt.setString(1, lang);
 				stmt.setLong(2, guild_id);
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT IGNORE INTO filter (word, fk_lang_abbrv, fk_guild_id) VALUES(?, ?, ?)");
-			stmt = myConn.prepareStatement(sql2);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceWordFilter2);
 			
 			for(String word : words) {
 				stmt.setString(1, CharacterReplacer.simpleReplace(word.toLowerCase()));
@@ -4020,15 +3806,13 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
-				String sql = ("DELETE FROM name_filter WHERE fk_guild_id = ? && kick = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceNameFilter);
 				stmt.setLong(1, guild_id);
 				stmt.setBoolean(2, kick);
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT IGNORE INTO name_filter (word, kick, fk_guild_id) VALUES(?, ?, ?)");
-			stmt = myConn.prepareStatement(sql2);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceNameFilter2);
 			
 			for(String word : words) {
 				stmt.setString(1, word);
@@ -4063,13 +3847,11 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
-				String sql = ("DELETE FROM names WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceFunnyNames);
 				stmt.setLong(1, guild_id);
 			}
 			
-			String sql2 = ("INSERT IGNORE INTO names (name, fk_guild_id) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql2);;
+			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceFunnyNames2);;
 			
 			for(String word : words) {
 				stmt.setString(1, word);
@@ -4103,14 +3885,12 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
-				String sql = ("DELETE FROM url_blacklist WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceURLBlacklist);
 				stmt.setLong(1, guild_id);
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT IGNORE INTO url_blacklist (url, fk_guild_id) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql2);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceURLBlacklist2);
 			for(String url : urls) {
 				stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 				stmt.setLong(2, guild_id);
@@ -4143,14 +3923,12 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
-				String sql = ("DELETE FROM url_whitelist WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceURLWhitelist);
 				stmt.setLong(1, guild_id);
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT IGNORE INTO url_whitelist (url, fk_guild_id) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql2);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceURLWhitelist2);
 			for(String url : urls) {
 				stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 				stmt.setLong(2, guild_id);
@@ -4183,14 +3961,12 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			if(delete) {
-				String sql = ("DELETE FROM tweet_blacklist WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceTweetBlacklist);
 				stmt.setLong(1, guild_id);
 				stmt.executeUpdate();
 			}
 			
-			String sql2 = ("INSERT IGNORE INTO tweet_blacklist (username, fk_guild_id) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql2);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceTweetBlacklist2);
 			for(String username : usernames) {
 				stmt.setString(1, username);
 				stmt.setLong(2, guild_id);
@@ -4222,21 +3998,18 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("INSERT INTO channel_conf (fk_channel_id, fk_channel_type, fk_guild_id, url_censoring, txt_removal) VALUES (?, ?, ?, 0, 0) ON DUPLICATE KEY UPDATE fk_channel_type = VALUES(fk_channel_type)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLRegisterLanguageChannel);
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, channel_type);
 			stmt.setLong(3, guild_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				sql = ("DELETE FROM channel_filter WHERE fk_channel_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLRegisterLanguageChannel2);
 				stmt.setLong(1, channel_id);
 				stmt.executeUpdate();
 				
-				sql = ("INSERT INTO channel_filter (fk_channel_id, fk_lang_abbrv) VALUES (?,?) ON DUPLICATE KEY UPDATE fk_lang_abbrv = VALUES(fk_lang_abbrv)");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLRegisterLanguageChannel3);
 				stmt.setLong(1, channel_id);
 				stmt.setString(2, channel_type);
 				result = stmt.executeUpdate();
@@ -4264,13 +4037,11 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("DELETE FROM channel_filter WHERE fk_channel_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLRegisterSpecialChannel);
 			stmt.setLong(1, channel_id);
 			stmt.executeUpdate();
 			
-			sql = ("INSERT INTO channel_conf (fk_channel_id, fk_channel_type, fk_guild_id, url_censoring, txt_removal) VALUES (?, ?, ?, 0, 0) ON DUPLICATE KEY UPDATE fk_channel_type = VALUES(fk_channel_type)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLRegisterSpecialChannel2);
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, channel_type);
 			stmt.setLong(3, guild_id);
@@ -4299,14 +4070,12 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("DELETE FROM channel_conf WHERE fk_channel_type = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLRegisterUniqueChannel);
 			stmt.setString(1, channel_type);
 			stmt.setLong(2, guild_id);
 			stmt.executeUpdate();
 			
-			sql = ("INSERT INTO channel_conf (fk_channel_id, fk_channel_type, fk_guild_id, url_censoring, txt_removal) VALUES (?, ?, ?, 0, 0) ON DUPLICATE KEY UPDATE fk_channel_type = VALUES(fk_channel_type)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLRegisterUniqueChannel2);
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, channel_type);
 			stmt.setLong(3, guild_id);
@@ -4335,13 +4104,11 @@ public class Azrael {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("DELETE FROM quiz WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLOverwriteQuizData);
 			stmt.setLong(1, guild_id);
 			stmt.executeUpdate();
 			
-			sql = ("INSERT INTO quiz (fk_guild_id, number, reward, answer1, answer2, answer3, hint1, hint2, hint3) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLOverwriteQuizData2);
 			int index = 1;
 			for(final var quiz : Hashes.getWholeQuiz(guild_id).values()) {
 				stmt.setLong(1, guild_id);

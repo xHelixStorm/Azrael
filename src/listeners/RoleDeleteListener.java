@@ -46,7 +46,7 @@ public class RoleDeleteListener extends ListenerAdapter {
 				//set the current role of everyone to 0
 				if(RankingSystem.SQLUpdateCurrentRole(e.getGuild().getIdLong(), 0) > 0) {
 					//then delete role from table
-					if(RankingSystem.SQLremoveSingleRole(e.getRole().getIdLong(), e.getGuild().getIdLong()) == 0) {
+					if(RankingSystem.SQLDeleteRole(e.getRole().getIdLong(), e.getGuild().getIdLong()) == 0) {
 						EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR));
 						STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.DELETE_RANK_ROLE_ERR), Channel.LOG.getType());
 						logger.error("Ranking role {} couldn't be deleted in guild {}", e.getRole().getId(), e.getGuild().getId());

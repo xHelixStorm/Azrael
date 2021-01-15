@@ -4,13 +4,18 @@ import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.time.OffsetDateTime;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -20,6 +25,9 @@ import java.util.Timer;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -73,7 +81,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.33.529";
+	private static final String VERSION = "7.33.530";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -97,6 +105,7 @@ public class STATIC {
 	private static TwitterFactory twitterFactory = null;
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
+	private static final String AESSECRET = IniFileReader.getAESSecret();
 	
 	public static String getVersion() {
 		return VERSION;
@@ -758,5 +767,32 @@ public class STATIC {
 			return true;
 		}
 		return false;
+	}
+	
+	public static String decrypt(final String encryptedMessage) {
+		MessageDigest sha = null;
+		try {
+			byte [] key = AESSECRET.getBytes("UTF-8");
+			sha = MessageDigest.getInstance("SHA-1");
+			key = sha.digest(key);
+			key = Arrays.copyOf(key, 16);
+			final SecretKeySpec secret = new SecretKeySpec(key, "AES");
+			try {
+				Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+				cipher.init(Cipher.DECRYPT_MODE, secret);
+				return new String(cipher.doFinal(Base64.getDecoder().decode(encryptedMessage)));
+			} catch (NoSuchPaddingException e) {
+				logger.error("Decryption padding not available", e);
+			} catch (InvalidKeyException e) {
+				logger.error("Decryption key invalid", e);
+			} catch (Exception e) {
+				logger.error("Message couldn't be decrypted", e);
+			}
+		} catch (UnsupportedEncodingException e) {
+			logger.error("AES secret not available", e);
+		} catch (NoSuchAlgorithmException e) {
+			logger.error("Algorithm is not supported", e);
+		}
+		return null;
 	}
 }

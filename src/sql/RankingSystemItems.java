@@ -44,8 +44,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("UPDATE users SET "+(slot == 1 ? "weapon1" : (slot == 2 ? "weapon2" : "weapon3"))+" = NULL WHERE user_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(slot == 1 ? RankingSystemItemsStatements.SQLRemoveEquippedWeapon : (slot == 2 ? RankingSystemItemsStatements.SQLRemoveEquippedWeapon2 : RankingSystemItemsStatements.SQLRemoveEquippedWeapon3));
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -64,8 +63,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("UPDATE users SET skill = NULL WHERE user_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLRemoveEquippedSkill);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -84,8 +82,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("UPDATE users SET "+(slot == 1 ? "weapon1" : (slot == 2 ? "weapon2" : "weapon3"))+" = ? WHERE user_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(slot == 1 ? RankingSystemItemsStatements.SQLEquipWeapon : (slot == 2 ? RankingSystemItemsStatements.SQLEquipWeapon2 : RankingSystemItemsStatements.SQLEquipWeapon3));
 			stmt.setInt(1, item_id);
 			stmt.setLong(2, user_id);
 			stmt.setLong(3, guild_id);
@@ -105,8 +102,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("UPDATE users SET "+(slot == 1 ? "weapon1" : (slot == 2 ? "weapon2" : "weapon3"))+" = NULL WHERE user_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(slot == 1 ? RankingSystemItemsStatements.SQLUnequipWeapon : (slot == 2 ? RankingSystemItemsStatements.SQLUnequipWeapon2 : RankingSystemItemsStatements.SQLUnequipWeapon3));
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -125,8 +121,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("UPDATE users SET weapon1 = NULL, weapon2 = NULL, weapon3 = NULL, skill = NULL WHERE user_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLUnequipWholeEquipment);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
@@ -145,8 +140,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("UPDATE users SET skill = ? WHERE user_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLEquipSkill);
 			stmt.setInt(1, item_id);
 			stmt.setLong(2, user_id);
 			stmt.setLong(3, guild_id);
@@ -168,8 +162,7 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT number FROM inventory WHERE fk_user_id = ? AND fk_guild_id =  ? AND fk_weapon_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetNumberOfWeaponID);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			stmt.setInt(3, weapon_id);
@@ -196,8 +189,7 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT weapon_id FROM weapon_shop_content WHERE fk_guild_id = ? AND weapon_abbv = ? AND weapon_stat = ? ORDER BY RAND() LIMIT 1");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetRandomWeaponIDByAbbv);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, abbv);
 			stmt.setInt(3, stat_id);
@@ -223,8 +215,7 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT weapon_id FROM weapon_shop_content INNER JOIN weapon_category ON fk_category_id = category_id AND weapon_shop_content.fk_guild_id = weapon_category.fk_guild_id WHERE weapon_shop_content.fk_guild_id = ? AND name = ?  AND weapon_stat = ? ORDER BY RAND() LIMIT 1");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetRandomWeaponIDByCategory);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, category);
 			stmt.setInt(3, stat_id);
@@ -256,8 +247,7 @@ public class RankingSystemItems {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-				String sql = ("SELECT DISTINCT(name) FROM weapon_category WHERE fk_guild_id = ? "+(overrideSkill == false ? "AND skill = 0" : ""));
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement((!overrideSkill ? RankingSystemItemsStatements.SQLgetWeaponCategories : RankingSystemItemsStatements.SQLgetWeaponCategories2));
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
@@ -288,8 +278,7 @@ public class RankingSystemItems {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-				String sql = ("SELECT abbv, description FROM weapon_abbreviation WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetWeaponAbbvs);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
@@ -321,8 +310,7 @@ public class RankingSystemItems {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-				String sql = ("SELECT stat_id, stat FROM weapon_stats WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetWeaponStats);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
@@ -354,8 +342,7 @@ public class RankingSystemItems {
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-				String sql = ("SELECT * FROM all_weapons WHERE guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetWholeWeaponShop);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()){
@@ -491,8 +478,7 @@ public class RankingSystemItems {
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				//TODO: add missing ability field
-				String sql = ("SELECT skill_id, description, full_description, price, thumbnail, enabled FROM skill_shop_content WHERE fk_guild_id = ?");
-				stmt = myConn.prepareStatement(sql);
+				stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetSkills);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -526,13 +512,7 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = "";
-			if(weapon) 
-				sql = ("SELECT number, expires FROM inventory INNER JOIN weapon_shop_content ON fk_weapon_id = weapon_id AND inventory.fk_guild_id = weapon_shop_content.fk_guild_id WHERE fk_user_id = ? AND fk_weapon_id = ? AND fk_status = ? AND weapon_shop_content.fk_guild_id = ?");
-			
-			else 
-				sql = ("SELECT number, expires FROM inventory INNER JOIN skill_shop_content ON fk_skill_id = skill_id AND inventory.fk_guild_id = skill_shop_content.fk_guild_id WHERE fk_user_id = ? AND fk_skill_id = ? AND fk_status = ? AND skill_shop_content.fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement((weapon ? RankingSystemItemsStatements.SQLgetNumberAndExpirationFromInventory : RankingSystemItemsStatements.SQLgetNumberAndExpirationFromInventory2));
 			stmt.setLong(1, user_id);
 			stmt.setInt(2, item_id);
 			stmt.setString(3, status);
@@ -562,8 +542,7 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT u."+(slot == 1 ? "weapon1" : (slot == 2 ? "weapon2" : "weapon3"))+", w.description, s.stat FROM users u LEFT JOIN inventory i ON u.user_id = i.fk_user_id AND u.fk_guild_id = i.fk_guild_id AND u."+(slot == 1 ? "weapon1" : (slot == 2 ? "weapon2" : "weapon3"))+" = i.fk_weapon_id LEFT JOIN weapon_shop_content w ON w.weapon_id = i.fk_weapon_id LEFT JOIN weapon_stats s ON w.weapon_stat = s.stat_id AND w.fk_guild_id = s.fk_guild_id WHERE u.user_id = ? AND u.fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement((slot == 1 ? RankingSystemItemsStatements.SQLgetEquippedWeaponDescription : (slot == 2 ? RankingSystemItemsStatements.SQLgetEquippedWeaponDescription2 : RankingSystemItemsStatements.SQLgetEquippedWeaponDescription3)));
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -593,8 +572,7 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT u.skill, s.description FROM users u LEFT JOIN inventory i ON u.user_id = i.fk_user_id AND u.fk_guild_id = i.fk_guild_id AND u.skill = i.fk_skill_id LEFT JOIN skill_shop_content s ON s.skill_id = i.fk_skill_id AND s.fk_guild_id = i.fk_guild_id WHERE u.user_id = ? AND u.fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetEquippedSkillDescription);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
@@ -625,8 +603,7 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT w.weapon_id, w.description, s.stat, w.weapon_abbv FROM inventory i INNER JOIN weapon_shop_content w ON i.fk_weapon_id = w.weapon_id LEFT JOIN weapon_stats s ON w.weapon_stat = s.stat_id AND w.fk_guild_id = s.fk_guild_id WHERE i.fk_user_id = ? && i.fk_guild_id = ? && w.description = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLfilterInventoryWeapons);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, "%"+item+"%");
@@ -658,8 +635,7 @@ public class RankingSystemItems {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			String sql = ("SELECT i.fk_skill_id, s.description FROM inventory i INNER JOIN skill_shop_content s ON i.fk_skill_id = s.skill_id AND i.fk_guild_id = s.fk_guild_id WHERE i.fk_user_id = ? && i.fk_guild_id = ? && s.description = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLfilterInventorySkills);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
 			stmt.setString(3, "%"+item+"%");
@@ -690,19 +666,13 @@ public class RankingSystemItems {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("UPDATE user_details SET currency = ? WHERE fk_user_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLUpdateCurrencyAndInsertTimedInventory);
 			stmt.setLong(1, currency);
 			stmt.setLong(2, user_id);
 			stmt.setLong(3, guild_id);
 			stmt.executeUpdate();
 			
-			String sql2 = "";
-			if(weapon)
-				sql2 = ("INSERT INTO inventory (fk_user_id, fk_weapon_id, position, number, fk_status, expires, fk_guild_id) VALUES(?, ?, ?, ?, \"limit\", ?, ?) ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number), expires=VALUES(expires)");
-			else
-				sql2 = ("INSERT INTO inventory (fk_user_id, fk_skill_id, position, number, fk_status, expires, fk_guild_id) VALUES(?, ?, ?, ?, \"limit\", ?, ?) ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number), expires=VALUES(expires)");
-			stmt = myConn.prepareStatement(sql2);
+			stmt = myConn.prepareStatement((weapon ? RankingSystemItemsStatements.SQLUpdateCurrencyAndInsertTimedInventory2 : RankingSystemItemsStatements.SQLUpdateCurrencyAndInsertTimedInventory3));
 			stmt.setLong(1, user_id);
 			stmt.setInt(2, item_id);
 			stmt.setTimestamp(3, new Timestamp(position));
@@ -734,15 +704,13 @@ public class RankingSystemItems {
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("UPDATE user_details SET currency = ? WHERE fk_user_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLUpdateCurrencyAndInsertWeaponRandomshop);
 			stmt.setLong(1, currency);
 			stmt.setLong(2, user_id);
 			stmt.setLong(3, guild_id);
 			stmt.executeUpdate();
 			
-			String sql2 = ("INSERT INTO inventory (fk_user_id, fk_weapon_id, position, number, fk_status, fk_guild_id) SELECT ?, weapon_id, ?, ?, 'perm', fk_guild_id FROM weapon_shop_content WHERE weapon_id = ? AND fk_guild_id = ? ON DUPLICATE KEY UPDATE position=VALUES(position), number=VALUES(number)");
-			stmt = myConn.prepareStatement(sql2);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLUpdateCurrencyAndInsertWeaponRandomshop2);
 			stmt.setLong(1, user_id);
 			stmt.setTimestamp(2, timestamp);
 			stmt.setInt(3, number);
