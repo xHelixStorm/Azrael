@@ -880,9 +880,10 @@
 	"user_kick_left":				"Action cannot be executed. User has already left the server.",
 	"user_register_complete":		"Users registration complete!",
 	
-	"write_help":					"Write a message into another text channel which then can be updated with the *edit* command!\nMention the text channel or write out the channel ID as first parameter to begin!",
+	"write_help":					"Write a message into another text channel which then can be updated with the *edit* command!\nMention the text channel or write out the channel ID as first parameter to begin! If you wish to delay the message, write the minutes as second parameter.",
 	"write_update":					"Now please submit your message!",
 	"write_sent":					"Message sent!",
+	"write_delayed":				"New message delayed for {} minutes!",
 	"write_too_long":				"Message can't be longer than 2000 letters!",
 	"write_no_screens":				"Screenshots are not allowed!",
 	

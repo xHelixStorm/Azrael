@@ -3,6 +3,7 @@ package commandsContainer;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ import util.STATIC;
  *
  */
 
-public class WriteEditExecution {
+public class WriteEditExecution implements Runnable {
 	private final static Logger logger = LoggerFactory.getLogger(WriteEditExecution.class);
 	
 	public static void writeHelp(GuildMessageReceivedEvent e, Cache cache) {
@@ -37,10 +38,18 @@ public class WriteEditExecution {
 			if(message.length() <= 2000) {
 				TextChannel textChannel = e.getGuild().getTextChannelById(cache.getAdditionalInfo2());
 				if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ATTACH_FILES))) {
-					e.getGuild().getTextChannelById(cache.getAdditionalInfo2()).sendMessage(message).queue(success -> {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.WRITE_SENT)).build()).queue();
+					if(cache.getAdditionalInfo3().length() == 0) {
+						e.getGuild().getTextChannelById(cache.getAdditionalInfo2()).sendMessage(message).queue(success -> {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.WRITE_SENT)).build()).queue();
+							Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+						});
+					}
+					else {
+						//Delay to send the message
+						new Thread(new WriteEditExecution(e, textChannel.getIdLong(), message, Long.parseLong(cache.getAdditionalInfo3()))).start();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.WRITE_DELAYED)).build()).queue();
 						Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-					});
+					}
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_WRITE.getName()).build()).queue();
@@ -183,5 +192,28 @@ public class WriteEditExecution {
 				logger.error("MANAGE_MESSAGES permission required for channel {} to remove reactions from a message in guild {}", cache.getAdditionalInfo2(), e.getGuild().getId());
 			}
 		});
+	}
+	
+	private GuildMessageReceivedEvent e;
+	private long channel_id;
+	private String message;
+	private long delay;
+	
+	public WriteEditExecution(GuildMessageReceivedEvent _e, long _channel_id, String _message, long _delay) {
+		this.e = _e;
+		this.channel_id = _channel_id;
+		this.message = _message;
+		this.delay = _delay;
+	}
+
+	@Override
+	public void run() {
+		final long guild_id = e.getGuild().getIdLong();
+		try {
+			Thread.sleep(TimeUnit.MINUTES.toMillis(delay));
+		} catch (InterruptedException e) {
+			logger.trace("Delay timer interrupted for guild {}", guild_id, e);
+		}
+		e.getGuild().getTextChannelById(channel_id).sendMessage(message).queue();
 	}
 }

@@ -885,6 +885,7 @@ public enum Translation {
 	WRITE_HELP					("write_help"),
 	WRITE_UPDATE				("write_update"),
 	WRITE_SENT					("write_sent"),
+	WRITE_DELAYED				("write_delayed"),
 	WRITE_TOO_LONG				("write_too_long"),
 	WRITE_NO_SCREENS			("write_no_screens"),
 	

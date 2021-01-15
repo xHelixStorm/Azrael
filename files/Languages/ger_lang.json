@@ -880,9 +880,10 @@
 	"user_kick_left":				"Aktion konnte nicht ausgeführt werden. Der Benutzer hat den Server bereits verlassen.",
 	"user_register_complete":		"Benutzer Registrierung abgeschlossen!",
 	
-	"write_help":					"Schreiben Sie eine Nachricht in einen anderen Textkanal, das auch mit den *edit* Befehl wieder editiert werden kann!\nAls ersten Parameter, erwähnen Sie den Textkanal oder schreiben Sie eine Textkanal ID, zum Beginnen!",
+	"write_help":					"Schreiben Sie eine Nachricht in einen anderen Textkanal, das auch mit den *edit* Befehl wieder editiert werden kann!\nAls ersten Parameter, erwähnen Sie den Textkanal oder schreiben Sie eine Textkanal ID, zum Beginnen! Wenn Sie die Nachricht verzögern möchten, schreiben Sie die Minuten als zweiten Parameter.",
 	"write_update":					"Verfassen Sie jetzt eine Nachricht!",
 	"write_sent":					"Nachricht gesendet!",
+	"write_delayed":				"Nachricht wird um {} Minuten verzögert!",
 	"write_too_long":				"Nachricht kann nicht länger als 2000 Zeichen sein!",
 	"write_no_screens":				"Bilder sind nicht erlaubt!",
 	
