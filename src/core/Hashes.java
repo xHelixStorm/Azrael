@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -79,6 +80,7 @@ public class Hashes {
     private static final ConcurrentMap<Long, ConcurrentHashMap<Integer, UserIcon>> icon_skins = new ConcurrentHashMap<Long, ConcurrentHashMap<Integer, UserIcon>>();
     private static final ConcurrentMap<String, Integer> subscription_status = new ConcurrentHashMap<String, Integer>();
     private static final ConcurrentMap<Long, ArrayList<CategoryConf>> categories = new ConcurrentHashMap<Long, ArrayList<CategoryConf>>();
+    private static final ConcurrentMap<Long, ArrayList<Timer>> schedules = new ConcurrentHashMap<Long, ArrayList<Timer>>();
     
     public static void initializeGuildMessagePool(Long key, final int max_message_pool_size) {
     	LinkedHashMap<Long, ArrayList<Messages>> message_pool = new LinkedHashMap<Long, ArrayList<Messages>>() {
@@ -282,6 +284,9 @@ public class Hashes {
 	public static void addCategories(Long key, ArrayList<CategoryConf> cat) {
 		categories.put(key, cat);
 	}
+	public static void addSchedule(Long key, ArrayList<Timer> timer) {
+		schedules.put(key, timer);
+	}
 	
 	public static ArrayList<Messages> getMessagePool(long key, long message_id) {
 		final var message_pool = guild_message_pool.get(key);
@@ -463,6 +468,9 @@ public class Hashes {
 	}
 	public static ArrayList<CategoryConf> getCategories(Long key) {
 		return categories.get(key);
+	}
+	public static ArrayList<Timer> getSchedules(Long key) {
+		return schedules.get(key);
 	}
 	
 	public static void removeMessagePool(final long key, long message_id) {
@@ -655,5 +663,8 @@ public class Hashes {
 	}
 	public static void clearCategories() {
 		categories.clear();
+	}
+	public static void removeSchedules(Long key) {
+		schedules.remove(key);
 	}
 }

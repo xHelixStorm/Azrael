@@ -151,6 +151,7 @@
 	"param_none":					"keinen",
 	"param_restrict":				"begrenzen",
 	"param_language":				"sprache",
+	"param_complete":				"fertig",
 
 	"lang_eng":						"Englisch",
 	"lang_ger":						"Deutsch",
@@ -1265,5 +1266,25 @@
 	"deny_done":					"Die Verifizierung für den Benutzer {} mit der ID Nummer {} wurde abgelehnt und darf den Server nicht betreten!",
 	
 	"language_help":				"Wähle eines der unten stehenden Sprachen zusammen mit den Befehl aus um die Bot Sprache zu ändern, zB. für die Antworten auf Befehlen!",
-	"language_changed":				"Bot Sprache wurde geändert!"
+	"language_changed":				"Bot Sprache wurde geändert!",
+	
+	"schedule_help":				"Schreiben Sie einen der folgenden Parameter, um entweder aktuell geplante Nachrichten anzuzeigen, eine neue geplante Nachricht zu erstellen oder eine geplante Nachricht zu löschen! Schreiben Sie **verlassen**, um den Befehl zu unterbrechen\n",
+	"schedule_exited":				"Schedule Befehl unterbrochen!",
+	"schedule_display":				"Geben Sie die Nummer eines der geplanten Nachrichten ein, um die Nachricht anzuzeigen!\n\n",
+	"schedule_time":				"Uhrzeit",
+	"schedule_channel":				"Kanal",
+	"schedule_enabled":				"AKTIVIERT",
+	"schedule_disabled":			"DEAKTIVIERT",
+	"schedule_create":				"Für den ersten Schritt schreiben Sie bitte eine Nachricht, die geplant werden muss!",
+	"schedule_create2":				"Geben Sie nun bitte eine Text-Kanal-Erwähnung oder ID an, in der die Nachricht eingeplant werden soll!",
+	"schedule_create3":				"Schreiben Sie im nächsten Schritt die **{}** Uhrzeit im Format 'hhmmss'!",
+	"schedule_create4":				"Für den letzten Schritt können Sie einen der folgenden abgekürzten Wochentage eingeben, um die geplante Nachricht für diesen Tag entweder zu aktivieren oder zu deaktivieren! Sobald dies geschehen ist, schreiben Sie *fertig*, um die Einrichtung abzuschließen!",
+	"schedule_create5":				"Nachrichten Planung abgeschlossen!",
+	"schedule_remove":				"Geben Sie die Nummer einer der geplanten Aufgaben ein, um die ausgewählte geplante Nachricht zu entfernen!\n\n",
+	"schedule_remove2":				"Geplante Nachricht entfernt!",
+	"schedule_err":					"Keine geplante Nachrichten gefunden!",
+	"schedule_err2":				"Textkanal existiert nicht. Bitte versuchen Sie es erneut!",
+	"schedule_err3":				"Dieser Textkanal benötigt die Berechtigung MESSAGE_WRITE, um Nachrichten zu planen! Bitte setzen Sie diese Berechtigung für den Bot und versuchen Sie es dann erneut oder wählen Sie einen anderen Textkanal!",
+	"schedule_message":				"Geplante Nachricht konnte nicht an Kanal {} gesendet werden, da die Berechtigung MESSAGE_WRITE zum Senden einer Nachricht erforderlich ist!",
+	"schedule_message2":			"Geplante Nachricht konnte nicht an Kanal {} gesendet werden, da der Textkanal nicht mehr existiert!"
 }

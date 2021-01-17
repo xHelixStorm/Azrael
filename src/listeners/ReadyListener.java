@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commands.CustomCmd;
+import commands.ScheduleExecution;
 import constructors.Cache;
 import constructors.Guilds;
 import constructors.Messages;
@@ -195,6 +196,9 @@ public class ReadyListener extends ListenerAdapter {
 			var doubleExp = GuildIni.getDoubleExperienceMode(guild.getIdLong());
 			if(!doubleExp.equals("auto"))
 				Hashes.addTempCache("doubleExp_gu"+guild.getId(), new Cache(0, doubleExp));
+			
+			//run scheduled messages timers
+			ScheduleExecution.startTimers(guild);
 			
 			//initialize Message pool cache and load saved messages, if available
 			Hashes.initializeGuildMessagePool(guild.getIdLong(), 10000);

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiManager;
 
+import commands.ScheduleExecution;
 import commandsContainer.ClanExecution;
 import commandsContainer.FilterExecution;
 import commandsContainer.GoogleSpreadsheetsExecution;
@@ -652,6 +653,47 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					else {
 						Hashes.clearTempCache("room_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+					}
+					
+					final var schedule = Hashes.getTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+					if(schedule != null && schedule.getExpiration() - System.currentTimeMillis() > 0) {
+						if(!message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
+							if(schedule.getAdditionalInfo().length() == 0) {
+								if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
+									ScheduleExecution.display(e, schedule);
+								}
+								else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE))) {
+									ScheduleExecution.create(e, schedule);
+								}
+								else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
+									ScheduleExecution.remove(e, schedule);
+								}
+							}
+							else if(schedule.getAdditionalInfo().equals("display")) {
+								ScheduleExecution.displayMessage(e, schedule, message);
+							}
+							else if(schedule.getAdditionalInfo().equals("create")) {
+								if(schedule.getAdditionalInfo2().length() == 0) {
+									ScheduleExecution.createMessage(e, schedule, message);
+								}
+								else if(schedule.getAdditionalInfo2().equals("channel")) {
+									ScheduleExecution.createChannel(e, schedule, message);
+								}
+								else if(schedule.getAdditionalInfo2().equals("time")) {
+									ScheduleExecution.createTime(e, schedule, message);
+								}
+								else if(schedule.getAdditionalInfo2().equals("days")) {
+									ScheduleExecution.createDays(e, schedule, message);
+								}
+							}
+							else if(schedule.getAdditionalInfo().equals("remove")) {
+								ScheduleExecution.removeMessage(e, schedule, message);
+							}
+						}
+						else {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_EXITED)).build()).queue();
+							Hashes.clearTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+						}
 					}
 				});
 				

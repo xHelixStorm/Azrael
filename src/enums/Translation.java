@@ -153,6 +153,7 @@ public enum Translation {
 	PARAM_NONE					("param_none"),
 	PARAM_RESTRICT				("param_restrict"),
 	PARAM_LANGUAGE				("param_language"),
+	PARAM_COMPLETE				("param_complete"),
 	
 	LANG_ENG					("lang_eng"),
 	LANG_GER					("lang_ger"),
@@ -1267,7 +1268,27 @@ public enum Translation {
 	DENY_DONE					("deny_done"),
 	
 	LANGUAGE_HELP				("language_help"),
-	LANGUAGE_CHANGED			("language_changed");
+	LANGUAGE_CHANGED			("language_changed"),
+	
+	SCHEDULE_HELP				("schedule_help"),
+	SCHEDULE_EXITED				("schedule_exited"),
+	SCHEDULE_DISPLAY			("schedule_display"),
+	SCHEDULE_TIME				("schedule_time"),
+	SCHEDULE_CHANNEL			("schedule_channel"),
+	SCHEDULE_ENABLED			("schedule_enabled"),
+	SCHEDULE_DISABLED			("schedule_disabled"),
+	SCHEDULE_CREATE				("schedule_create"),
+	SCHEDULE_CREATE2			("schedule_create2"),
+	SCHEDULE_CREATE3			("schedule_create3"),
+	SCHEDULE_CREATE4			("schedule_create4"),
+	SCHEDULE_CREATE5			("schedule_create5"),
+	SCHEDULE_REMOVE				("schedule_remove"),
+	SCHEDULE_REMOVE2			("schedule_remove2"),
+	SCHEDULE_ERR				("schedule_err"),
+	SCHEDULE_ERR2				("schedule_err2"),
+	SCHEDULE_ERR3				("schedule_err3"),
+	SCHEDULE_MESSAGE			("schedule_message"),
+	SCHEDULE_MESSAGE2			("schedule_message2");
 	
 	private String value;
 	

@@ -138,6 +138,7 @@ public class GuildIni {
 		commands.put("Accept", "false");
 		commands.put("Deny", "false");
 		commands.put("Language", "false");
+		commands.put("Schedule", "false");
 		fileContent.put("Commands", commands);
 		
 		//collect all CommandLevels variables
@@ -251,6 +252,7 @@ public class GuildIni {
 		commandLevels.put("Accept", "20");
 		commandLevels.put("Deny", "20");
 		commandLevels.put("Language", "1");
+		commandLevels.put("Schedule", "20");
 		fileContent.put("CommandLevels", commandLevels);
 	}
 	
@@ -1191,5 +1193,13 @@ public class GuildIni {
 	public static int getLanguageLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "Language", int.class);
+	}
+	public static boolean getScheduleCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Schedule", boolean.class);
+	}
+	public static int getScheduleLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Schedule", int.class);
 	}
 }

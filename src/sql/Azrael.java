@@ -28,6 +28,7 @@ import constructors.NameFilter;
 import constructors.Quizes;
 import constructors.RSS;
 import constructors.RejoinTask;
+import constructors.Schedule;
 import constructors.User;
 import constructors.Warning;
 import constructors.Watchlist;
@@ -3718,6 +3719,90 @@ public class Azrael {
 			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<Schedule> SQLgetScheduledMessages(long guild_id) {
+		logger.trace("SQLgetScheduledMessages launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			ArrayList<Schedule> schedules = new ArrayList<Schedule>();
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement("SELECT * FROM schedules WHERE fk_guild_id = ?");
+			stmt.setLong(1, guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				schedules.add(new Schedule(
+					rs.getInt(1),
+					rs.getLong(3),
+					rs.getString(4),
+					rs.getInt(5),
+					rs.getBoolean(6),
+					rs.getBoolean(7),
+					rs.getBoolean(8),
+					rs.getBoolean(9),
+					rs.getBoolean(10),
+					rs.getBoolean(11),
+					rs.getBoolean(12)
+				));
+			}
+			return schedules;
+		} catch(SQLException e) {
+			logger.error("SQLgetScheduledMessages Exception", e);
+			return null;
+		} finally {
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		    try { rs.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLInsertScheduledMessage(long guild_id, Schedule schedule) {
+		logger.trace("SQLInsertScheduledMessage launched. Params passed {}, {}", guild_id, schedule);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement("INSERT INTO schedules (fk_guild_id, fk_channel_id, message, time, monday, tuesday, wednesday, thursday, friday, saturday, sunday) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, schedule.getChannel_id());
+			stmt.setString(3, schedule.getMessage());
+			stmt.setInt(4, schedule.getTime());
+			stmt.setBoolean(5, schedule.isMonday());
+			stmt.setBoolean(6, schedule.isTuesday());
+			stmt.setBoolean(7, schedule.isWednesday());
+			stmt.setBoolean(8, schedule.isThursday());
+			stmt.setBoolean(9, schedule.isFriday());
+			stmt.setBoolean(10, schedule.isSaturday());
+			stmt.setBoolean(11, schedule.isSunday());
+			return stmt.executeUpdate();
+		} catch(SQLException e) {
+			logger.error("SQLInsertScheduledMessage Exception", e);
+			return 0;
+		} finally {
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteScheduledMessageTask(long guild_id, int schedule_id) {
+		logger.trace("SQLDeleteScheduledMessageTask launched. Params passed {}, {}", guild_id, schedule_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement("DELETE FROM schedules WHERE fk_guild_id = ? AND schedule_id = ?");
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, schedule_id);
+			return stmt.executeUpdate();
+		} catch(SQLException e) {
+			logger.error("SQLDeleteScheduledMessageTask Exception", e);
+			return 0;
+		} finally {
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
