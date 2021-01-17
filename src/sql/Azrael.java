@@ -3731,7 +3731,7 @@ public class Azrael {
 		try {
 			ArrayList<Schedule> schedules = new ArrayList<Schedule>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			stmt = myConn.prepareStatement("SELECT * FROM schedules WHERE fk_guild_id = ?");
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetScheduledMessages);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -3766,7 +3766,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			stmt = myConn.prepareStatement("INSERT INTO schedules (fk_guild_id, fk_channel_id, message, time, monday, tuesday, wednesday, thursday, friday, saturday, sunday) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertScheduledMessage);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, schedule.getChannel_id());
 			stmt.setString(3, schedule.getMessage());
@@ -3794,7 +3794,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			stmt = myConn.prepareStatement("DELETE FROM schedules WHERE fk_guild_id = ? AND schedule_id = ?");
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteScheduledMessageTask);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, schedule_id);
 			return stmt.executeUpdate();

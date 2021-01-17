@@ -237,7 +237,7 @@ public class ScheduleExecution {
 				MessageSchedule.runTask(guild, schedule);
 			}
 		}
-		else {
+		else if(schedules == null) {
 			logger.error("Scheduled message couldn't be retrieved in guild {}", guild.getId());
 		}
 	}
