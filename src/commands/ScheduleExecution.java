@@ -151,6 +151,7 @@ public class ScheduleExecution {
 			if(Azrael.SQLInsertScheduledMessage(e.getGuild().getIdLong(), schedule) > 0) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_CREATE5)).build()).queue();
 				Hashes.clearTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+				restartTimers(e.getGuild());
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -201,6 +202,7 @@ public class ScheduleExecution {
 			final var schedule = schedules.get(index);
 			if(Azrael.SQLDeleteScheduledMessageTask(e.getGuild().getIdLong(), schedule.getSchedule_id()) > 0) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_REMOVE2)).build()).queue();
+				restartTimers(e.getGuild());
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
