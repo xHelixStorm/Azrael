@@ -36,7 +36,7 @@ public class Imgur {
 			    
 			    //create base64 image
 			    byteArray = new ByteArrayOutputStream();
-			    is = new URL("file://" + file.getPath()).openStream();
+			    is = file.toURI().toURL().openStream();
 			    byte [] byteChunk = new byte[4096];
 			    int n;
 			    

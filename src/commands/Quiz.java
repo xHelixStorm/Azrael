@@ -1,7 +1,6 @@
 package commands;
 
 import java.awt.Color;
-import java.io.File;
 import java.util.EnumSet;
 
 import org.slf4j.Logger;
@@ -71,71 +70,58 @@ public class Quiz implements CommandPublic {
 			//register quiz questions when we have 2 parameters
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER_QUESTIONS))) {
 				logger.info("{} performed the registration of questions and rewards for the Quiz in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
-				QuizExecution.registerQuestions(e, args[1], false);
+				QuizExecution.registerQuestions(e, args[1]);
 			}
 			//clear all questions and rewards
 			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CLEAR))) {
-				Hashes.clearQuiz();
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_CLEAR)).build()).queue();
-				logger.info("{} cleared all quiz questions and rewards in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+				if(Azrael.SQLDeleteQuizData(e.getGuild().getIdLong()) >= 0) {
+					Hashes.clearQuiz(e.getGuild().getIdLong());
+					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_CLEAR)).build()).queue();
+					logger.info("{} cleared all quiz questions and rewards in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+				}
+				else {
+					e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("Quiz data couldn't be cleared in guild {}", e.getGuild().getId());
+				}
 			}
 			//start the quiz in the dedicated channel
 			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RUN))) {
-				if(Hashes.getWholeQuiz().size() > 0) {
-					//check that both questions and rewards have been set
-					if(Hashes.getQuiz(1).getQuestion().length() == 0) {
-						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_Q_AND_A)).build()).queue();
-					}
-					else if(Hashes.getQuiz(1).getReward().length() == 0) {
-						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_REWARDS)).build()).queue();
-					}
-					else {
-						final var qui_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.QUI.getType())).findAny().orElse(null);
-						//confirm that a quiz channel exists and then print the message to choose a mode
-						if(qui_channel != null) {
-							//verify that the permissions are set
-							final TextChannel textChannel = e.getGuild().getTextChannelById(qui_channel.getChannel_ID());
-							if(textChannel != null && (e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))) {
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_RUN_HELP)).build()).queue();
-								//write to cache to remind the bot that we're waiting for input
-								Hashes.addTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, e.getMember().getUser().getId()));
-							}
-							else {
-								e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_MISSING_PERMISSION)).build()).queue();
-							}
+				if(Azrael.SQLgetQuizData(e.getGuild().getIdLong())) {
+					final var registeredQuiz = Hashes.getWholeQuiz(e.getGuild().getIdLong());
+					if(registeredQuiz != null && registeredQuiz.size() > 0 && registeredQuiz.values().parallelStream().filter(f -> !f.isUsed()).findAny().orElse(null) != null) {
+						//check that both questions and rewards have been set
+						if(Hashes.getQuiz(e.getGuild().getIdLong(), 1).getQuestion().length() == 0) {
+							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_Q_AND_A)).build()).queue();
+						}
+						else if(Hashes.getQuiz(e.getGuild().getIdLong(), 1).getReward().length() == 0) {
+							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_REWARDS)).build()).queue();
 						}
 						else {
-							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NOT_QUIZ_CHANNEL)).build()).queue();
+							final var qui_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.QUI.getType())).findAny().orElse(null);
+							//confirm that a quiz channel exists and then print the message to choose a mode
+							if(qui_channel != null) {
+								//verify that the permissions are set
+								final TextChannel textChannel = e.getGuild().getTextChannelById(qui_channel.getChannel_ID());
+								if(textChannel != null && (e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))) {
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_RUN_HELP)).build()).queue();
+									//write to cache to remind the bot that we're waiting for input
+									Hashes.addTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, e.getMember().getUser().getId()));
+								}
+								else {
+									e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_MISSING_PERMISSION)).build()).queue();
+								}
+							}
+							else {
+								e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NOT_QUIZ_CHANNEL)).build()).queue();
+							}
 						}
+					}
+					else {
+						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_QA_REWARDS)).build()).queue();
 					}
 				}
 				else {
 					e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_QA_REWARDS)).build()).queue();
-				}
-			}
-			//TODO: Save to table and not to file
-			//to save the registered rewards and questions
-			else if(args[0].equalsIgnoreCase("save")) {
-				if(Hashes.getWholeQuiz().size() > 0) {
-					//save all settings to file
-					QuizExecution.saveQuestions(e);
-					logger.debug("{} has saved the quiz questions and rewards to file", e.getMember().getUser().getId());
-				}
-				else {
-					e.getChannel().sendMessage("There is nothing to save. Please use register-rewards and register-questions before this parameter is used.").queue();
-				}
-			}
-			//TODO: load settings from table
-			//load all settings from file
-			else if(args[0].equalsIgnoreCase("load")) {
-				File file = new File("./files/QuizBackup/quizsettings"+e.getGuild().getId()+".azr");
-				//verify that the file exists
-				if(file.exists()) {
-					QuizExecution.registerQuestions(e, "", true);
-					logger.debug("{} has loaded the quiz questions and rewards from file", e.getMember().getUser().getId());
-				}
-				else {
-					e.getChannel().sendMessage("No saved settings have been found. Please save them first.").queue();
 				}
 			}
 		}

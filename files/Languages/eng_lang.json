@@ -151,6 +151,7 @@
 	"param_none":					"none",
 	"param_restrict":				"restrict",
 	"param_language":				"language",
+	"param_complete":				"complete",
 
 	"lang_eng":						"English",
 	"lang_ger":						"German",
@@ -278,6 +279,7 @@
 	"command_accept":			 	"- **{}accept**\nAccept a waiting user into the server.\n",
 	"command_deny":				 	"- **{}deny**\nDeny a waiting user from joining the server.\n",
 	"command_language":		 		"- **{}language**\nChange the Bot language.\n",
+	"command_schedule":				"- **{}schedule**\nSchedule a daily message on a channel during a specified time.\n",
 	"commands_disabled":		 	"All commands are disabled!",
 	
 	"daily_reward":				 	"Congratulations! You have unlocked the following reward:\n",
@@ -480,6 +482,7 @@
 	"mute_err":						"Please provide one or more existing usernames or user IDs and then a reason if desired!",
 	
 	"patchnotes_help":				"Please write one of the following titles as last parameter to display the patch notes.\n\n",
+	"patchnotes_version":			"Bot patch notes version: ",
 	"patchnotes_not_available":		"No patch notes available!",
 	"patchnotes_not_found":			"Patch notes not found!",
 	"patchnotes_choice_1":			"Please choose between *public* and *private* patch notes!",
@@ -680,6 +683,7 @@
 	"shop_price":					"Price",
 	"shop_return":					"Return",
 	"shop_sell":					"Sell",
+	"shop_attacks":					"Attacks",
 	"shop_purchase":				"Purchase",
 	"shop_return_message":			"Return to the selection page",
 	"shop_inspect_err":				"Please write one of the visible numbers for further inspection!",
@@ -878,9 +882,10 @@
 	"user_kick_left":				"Action cannot be executed. User has already left the server.",
 	"user_register_complete":		"Users registration complete!",
 	
-	"write_help":					"Write a message into another text channel which then can be updated with the *edit* command!\nMention the text channel or write out the channel ID as first parameter to begin!",
+	"write_help":					"Write a message into another text channel which then can be updated with the *edit* command!\nMention the text channel or write out the channel ID as first parameter to begin! If you wish to delay the message, write the minutes as second parameter.",
 	"write_update":					"Now please submit your message!",
 	"write_sent":					"Message sent!",
+	"write_delayed":				"New message delayed for {} minutes!",
 	"write_too_long":				"Message can't be longer than 2000 letters!",
 	"write_no_screens":				"Screenshots are not allowed!",
 	
@@ -1262,5 +1267,25 @@
 	"deny_done":					"The verification for the user **{}** with the ID number **{}** has been denied from joining the server!",
 	
 	"language_help":				"Choose one of the available languages below together with the command to change the language of the Bot, eg. command replies!",
-	"language_changed":				"Bot language has been changed!"
+	"language_changed":				"Bot language has been changed!",
+	
+	"schedule_help":				"Write one of the parameters below either to display currently scheduled messages, to create a new scheduled message or to delete a scheduled message! Write **exit** to interrupt the command\n",
+	"schedule_exited":				"Schedule command interrupted!",
+	"schedule_display":				"Type the number of one of the scheduled tasks to display the message!\n\n",
+	"schedule_time":				"Time",
+	"schedule_channel":				"Channel",
+	"schedule_enabled":				"ENABLED",
+	"schedule_disabled":			"DISABLED",
+	"schedule_create":				"For the first step, please write a message that has to be scheduled!",
+	"schedule_create2":				"Now please provide a text channel mention or id, for the message to be scheduled in!",
+	"schedule_create3":				"For the next step, write the **{}** time in the format of 'hhmmss'!",
+	"schedule_create4":				"For the last step, you can write one of the abbreviated days of the week below to either enable or disable the scheduled message for that day! Once done, write *complete* to finish the setup!",
+	"schedule_create5":				"Message schedule comeplete!",
+	"schedule_remove":				"Type the number of one of the scheduled tasks to remove the selected scheduled message!\n\n",
+	"schedule_remove2":				"Scheduled message removed!",
+	"schedule_err":					"No scheduled messages found!",
+	"schedule_err2":				"Text channel doesn't exist, please try again!",
+	"schedule_err3":				"This text channel requires the MESSAGE_WRITE permission to schedule messages! Please set this permission for the Bot and then try again or select a different text channel!",
+	"schedule_message":				"Scheduled message couldn't be sent to channel {} because the MESSAGE_WRITE permission is required to send a message!",
+	"schedule_message2":			"Scheduled message couldn't be sent to channel {} because the text channel doesn't exist anymore!"
 }

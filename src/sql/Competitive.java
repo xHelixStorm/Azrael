@@ -38,16 +38,15 @@ public class Competitive {
 	}
 	
 	//comp_servers
-	public static int SQLInsertCompServer(long _guild_id, String _server) {
-		logger.trace("SQLInsertCompServer launched. Passed params {}, {}", _guild_id, _server);
+	public static int SQLInsertCompServer(long guild_id, String server) {
+		logger.trace("SQLInsertCompServer launched. Passed params {}, {}", guild_id, server);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT IGNORE INTO comp_servers (fk_guild_id, server) VALUES(?, ?)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setString(2, _server);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertCompServer);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, server);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertCompServer Exception", e);
@@ -58,16 +57,15 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLRemoveCompServer(long _guild_id, String _server) {
-		logger.trace("SQLRemoveCompServer launched. Passed params {}, {}", _guild_id, _server);
+	public static int SQLRemoveCompServer(long guild_id, String server) {
+		logger.trace("SQLRemoveCompServer launched. Passed params {}, {}", guild_id, server);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("DELETE FROM comp_servers WHERE fk_guild_id = ? AND server = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setString(2, _server);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLRemoveCompServer);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, server);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLRemoveCompServer Exception", e);
@@ -78,17 +76,16 @@ public class Competitive {
 		}
 	}
 	
-	public static ArrayList<String> SQLgetCompServers(long _guild_id) {
-		logger.trace("SQLgetCompServers launched. Passed params {}, {}", _guild_id);
+	public static ArrayList<String> SQLgetCompServers(long guild_id) {
+		logger.trace("SQLgetCompServers launched. Passed params {}, {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			ArrayList<String> servers = new ArrayList<String>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT server FROM comp_servers WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetCompServers);
+			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				servers.add(rs.getString(1));
@@ -105,17 +102,16 @@ public class Competitive {
 	}
 	
 	//user_stats
-	public static int SQLUserStatExists(long _guild_id, long _user_id) {
-		logger.trace("SQLUserStatExists launched. Passed params {}, {}", _guild_id, _user_id);
+	public static int SQLUserStatExists(long guild_id, long user_id) {
+		logger.trace("SQLUserStatExists launched. Passed params {}, {}", guild_id, user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM user_stats WHERE fk_guild_id = ? AND fk_user_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUserStatExists);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return 1;
@@ -131,17 +127,16 @@ public class Competitive {
 		}
 	}
 	
-	public static String SQLgetServerFromUserStat(long _guild_id, long _user_id) {
-		logger.trace("SQLUserStatExists launched. Passed params {}, {}", _guild_id, _user_id);
+	public static String SQLgetServerFromUserStat(long guild_id, long user_id) {
+		logger.trace("SQLUserStatExists launched. Passed params {}, {}", guild_id, user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT server FROM user_stats WHERE fk_guild_id = ? AND fk_user_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetServerFromUserStat);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getString(1);
@@ -157,17 +152,16 @@ public class Competitive {
 		}
 	}
 	
-	public static UserStats SQLgetUserStats(long _guild_id, long _user_id) {
-		logger.trace("SQLUserStatExists launched. Passed params {}, {}", _guild_id, _user_id);
+	public static UserStats SQLgetUserStats(long guild_id, long user_id) {
+		logger.trace("SQLUserStatExists launched. Passed params {}, {}", guild_id, user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM user_stats WHERE fk_guild_id = ? AND fk_user_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetUserStats);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new UserStats(
@@ -192,17 +186,16 @@ public class Competitive {
 		}
 	}
 	
-	public static ArrayList<String> SQLgetRanking(long _guild_id) {
-		logger.trace("SQLgetRanking launched. Passed params {}", _guild_id);
+	public static ArrayList<String> SQLgetRanking(long guild_id) {
+		logger.trace("SQLgetRanking launched. Passed params {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			ArrayList<String> rankList = new ArrayList<String>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT `fk_user_id`, @curRank := @curRank + 1 AS Rank, elo FROM `user_stats`, (SELECT @curRank := 0) r WHERE fk_guild_id = ? ORDER BY `elo` DESC");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetRanking);
+			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				rankList.add(rs.getString(1)+"-"+rs.getString(2)+"-"+rs.getString(3));
@@ -218,17 +211,16 @@ public class Competitive {
 		}
 	}
 	
-	public static ArrayList<String> SQLgetRankingTop10(long _guild_id) {
-		logger.trace("SQLgetRankingTop10 launched. Passed params {}", _guild_id);
+	public static ArrayList<String> SQLgetRankingTop10(long guild_id) {
+		logger.trace("SQLgetRankingTop10 launched. Passed params {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			ArrayList<String> rankList = new ArrayList<String>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT name, elo FROM user_stats WHERE fk_guild_id = ? ORDER BY elo DESC LIMIT 10");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetRankingTop10);
+			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				rankList.add(rs.getString(1)+"-"+rs.getString(2));
@@ -244,17 +236,16 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLisNameTaken(long _guild_id, String _name) {
-		logger.trace("SQLisNameTaken launched. Passed params {}, {}, {}", _guild_id, _name);
+	public static int SQLisNameTaken(long guild_id, String name) {
+		logger.trace("SQLisNameTaken launched. Passed params {}, {}, {}", guild_id, name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM user_stats WHERE fk_guild_id = ? AND name = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setString(2, _name);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLisNameTaken);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, name);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return 1;
@@ -270,17 +261,16 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLInsertUserStat(long _guild_id, long _user_id, String _name) {
-		logger.trace("SQLInsertUserStat launched. Passed params {}, {}, {}", _guild_id, _user_id, _name);
+	public static int SQLInsertUserStat(long guild_id, long user_id, String name) {
+		logger.trace("SQLInsertUserStat launched. Passed params {}, {}, {}", guild_id, user_id, name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO user_stats (fk_guild_id, fk_user_id, name) VALUES(?, ?, ?)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
-			stmt.setString(3, _name);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertUserStat);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			stmt.setString(3, name);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertUserStat Exception", e);
@@ -291,16 +281,15 @@ public class Competitive {
 		}
 	}
 	
-	public static void SQLUpdateServerFromUserStats(long _guild_id, String _server) {
-		logger.trace("SQLUpdateServerFromUserStats launched. Passed params {}, {}", _guild_id, _server);
+	public static void SQLUpdateServerFromUserStats(long guild_id, String server) {
+		logger.trace("SQLUpdateServerFromUserStats launched. Passed params {}, {}", guild_id, server);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE user_stats SET server = NULL WHERE fk_guild_id = ? AND server = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setString(2, _server);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateServerFromUserStats);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, server);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateServerFromUserStats Exception", e);
@@ -310,17 +299,16 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLUpdateSelectedServerInUserStats(long _guild_id, long _user_id, String _server) {
-		logger.trace("SQLUpdateSelectedServerInUserStats launched. Passed params {}, {}, {}", _guild_id, _user_id, _server);
+	public static int SQLUpdateSelectedServerInUserStats(long guild_id, long user_id, String server) {
+		logger.trace("SQLUpdateSelectedServerInUserStats launched. Passed params {}, {}, {}", guild_id, user_id, server);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE user_stats SET server = ? WHERE fk_guild_id = ? AND fk_user_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _server);
-			stmt.setLong(2, _guild_id);
-			stmt.setLong(3, _user_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateSelectedServerInUserStats);
+			stmt.setString(1, server);
+			stmt.setLong(2, guild_id);
+			stmt.setLong(3, user_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateSelectedServerInUserStats Exception", e);
@@ -331,17 +319,16 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLUpdateNameInUserStats(long _guild_id, long _user_id, String _newName) {
-		logger.trace("SQLUpdateNameInUserStats launched. Passed params {}, {}, {}", _guild_id, _user_id, _newName);
+	public static int SQLUpdateNameInUserStats(long guild_id, long user_id, String newName) {
+		logger.trace("SQLUpdateNameInUserStats launched. Passed params {}, {}, {}", guild_id, user_id, newName);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE user_stats SET name = ? WHERE fk_guild_id = ? AND fk_user_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _newName);
-			stmt.setLong(2, _guild_id);
-			stmt.setLong(3, _user_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateNameInUserStats);
+			stmt.setString(1, newName);
+			stmt.setLong(2, guild_id);
+			stmt.setLong(3, user_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateNameInUserStats Exception", e);
@@ -352,17 +339,16 @@ public class Competitive {
 		}
 	}
 	
-	public static String SQLgetUsernameFromUserStats(long _guild_id, long _user_id) {
-		logger.trace("SQLgetUsernameFromUserStats launched. Passed params {}, {}", _guild_id, _user_id);
+	public static String SQLgetUsernameFromUserStats(long guild_id, long user_id) {
+		logger.trace("SQLgetUsernameFromUserStats launched. Passed params {}, {}", guild_id, user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT name FROM user_stats WHERE fk_guild_id = ? AND fk_user_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetUsernameFromUserStats);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getString(1);
@@ -379,16 +365,15 @@ public class Competitive {
 	}
 	
 	//guild
-	public static int SQLgetMaxClanMembers(long _guild_id) {
-		logger.trace("SQLgetMaxClanMembers launched. Passed params {}", _guild_id);
+	public static int SQLgetMaxClanMembers(long guild_id) {
+		logger.trace("SQLgetMaxClanMembers launched. Passed params {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT clan_members FROM guild WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMaxClanMembers);
+			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getInt(1);
@@ -404,16 +389,15 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLUpdateMaxClanMembers(long _guild_id, int _members) {
-		logger.trace("SQLUpdateMaxClanMembers launched. Passed params {}, {}", _guild_id, _members);
+	public static int SQLUpdateMaxClanMembers(long guild_id, int members) {
+		logger.trace("SQLUpdateMaxClanMembers launched. Passed params {}, {}", guild_id, members);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE guild SET clan_members = ? WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _members);
-			stmt.setLong(2, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateMaxClanMembers);
+			stmt.setInt(1, members);
+			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateMaxClanMembers Exception", e);
@@ -424,16 +408,15 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLgetMatchmakingMembers(long _guild_id) {
-		logger.trace("SQLgetMatchmakingMembers launched. Passed params {}", _guild_id);
+	public static int SQLgetMatchmakingMembers(long guild_id) {
+		logger.trace("SQLgetMatchmakingMembers launched. Passed params {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT matchmaking_members FROM guild WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMatchmakingMembers);
+			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getInt(1);
@@ -449,16 +432,50 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLUpdateMatchmakingMembers(long _guild_id, int _members) {
-		logger.trace("SQLUpdateMatchmakingMembers launched. Passed params {}, {}", _guild_id, _members);
+	public static ArrayList<Member> SQLgetMatchmakingMembers(long guild_id, int room_id) {
+		logger.trace("SQLgetMatchmakingMembers launched. Passed params {}, {}", guild_id, room_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			ArrayList<Member> members = new ArrayList<Member>();
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMatchmakingMembers);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, room_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				members.add(new Member(
+					rs.getLong(1),
+					rs.getInt(2),
+					rs.getString(3),
+					rs.getString(4),
+					rs.getInt(5),
+					rs.getInt(6),
+					rs.getBoolean(7),
+					rs.getBoolean(8)
+				));
+			}
+			return members;
+		} catch (SQLException e) {
+			logger.error("SQLgetMatchmakingMembers Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateMatchmakingMembers(long guild_id, int members) {
+		logger.trace("SQLUpdateMatchmakingMembers launched. Passed params {}, {}", guild_id, members);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE guild SET matchmaking_members = ? WHERE guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _members);
-			stmt.setLong(2, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateMatchmakingMembers);
+			stmt.setInt(1, members);
+			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateMatchmakingMembers Exception", e);
@@ -470,17 +487,16 @@ public class Competitive {
 	}
 	
 	//clan_members
-	public static int SQLgetClanMemberLevel(long _user_id, long _guild_id) {
-		logger.trace("SQLgetClanMemberLevel launched. Passed params {}, {}", _user_id, _guild_id);
+	public static int SQLgetClanMemberLevel(long user_id, long guild_id) {
+		logger.trace("SQLgetClanMemberLevel launched. Passed params {}, {}", user_id, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT member_level from clan_members WHERE fk_user_id = ? AND fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
-			stmt.setLong(2, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanMemberLevel);
+			stmt.setLong(1, user_id);
+			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getInt(1);
@@ -496,18 +512,17 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLUpdateClanMemberLevel(long _guild_id, long _user_id, int _clan_id, int _level) {
-		logger.trace("SQLUpdateClanMemberLevel launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _level);
+	public static int SQLUpdateClanMemberLevel(long guild_id, long user_id, int clan_id, int level) {
+		logger.trace("SQLUpdateClanMemberLevel launched. Passed params {}, {}, {}, {}", guild_id, user_id, clan_id, level);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE clan_members SET member_level = ? WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_clan_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _level);
-			stmt.setLong(2, _guild_id);
-			stmt.setLong(3, _user_id);
-			stmt.setInt(4, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateClanMemberLevel);
+			stmt.setInt(1, level);
+			stmt.setLong(2, guild_id);
+			stmt.setLong(3, user_id);
+			stmt.setInt(4, clan_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateClanMemberLevel Exception", e);
@@ -518,18 +533,17 @@ public class Competitive {
 		}
 	}
 	
-	public static ArrayList<Long> SQLgetClanManagement(long _guild_id, int _clan_id) {
-		logger.trace("SQLgetClanManagement launched. Passed params {}, {}", _guild_id, _clan_id);
+	public static ArrayList<Long> SQLgetClanManagement(long guild_id, int clan_id) {
+		logger.trace("SQLgetClanManagement launched. Passed params {}, {}", guild_id, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			ArrayList<Long> management = new ArrayList<Long>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT fk_user_id from clan_members WHERE fk_guild_id = ? AND fk_clan_id = ? AND (member_level = 2 OR member_level = 3)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanManagement);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, clan_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				management.add(rs.getLong(1));
@@ -546,34 +560,31 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLInsertClanMember(long _guild_id, long _user_id, int _clan_id) {
-		logger.trace("SQLInsertClanMember launched. Passed params {}, {}", _guild_id, _user_id, _clan_id);
+	public static int SQLInsertClanMember(long guild_id, long user_id, int clan_id) {
+		logger.trace("SQLInsertClanMember launched. Passed params {}, {}", guild_id, user_id, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("INSERT INTO clan_members (fk_guild_id, fk_user_id, fk_clan_id) VALUES(?, ?, ?)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
-			stmt.setInt(3, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertClanMember);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			stmt.setInt(3, clan_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql2 = ("UPDATE clans SET members = (members + 1) WHERE fk_guild_id = ? AND clan_id = ?");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, _clan_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertClanMember2);
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, clan_id);
 				result = stmt.executeUpdate();
 			}
 			
 			if(result > 0) {
-				String sql3 = ("UPDATE user_stats SET fk_clan_id = ? WHERE fk_guild_id = ? AND fk_user_id = ?");
-				stmt = myConn.prepareStatement(sql3);
-				stmt.setInt(1, _clan_id);
-				stmt.setLong(2, _guild_id);
-				stmt.setLong(3, _user_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertClanMember3);
+				stmt.setInt(1, clan_id);
+				stmt.setLong(2, guild_id);
+				stmt.setLong(3, user_id);
 				result = stmt.executeUpdate();
 			}
 			
@@ -592,33 +603,30 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLRemoveClanMember(long _guild_id, long _user_id, int _clan_id) {
-		logger.trace("SQLRemoveClanMember launched. Passed params {}, {}, {}", _guild_id, _user_id, _clan_id);
+	public static int SQLRemoveClanMember(long guild_id, long user_id, int clan_id) {
+		logger.trace("SQLRemoveClanMember launched. Passed params {}, {}, {}", guild_id, user_id, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("DELETE FROM clan_members WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_clan_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
-			stmt.setInt(3, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLRemoveClanMember);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			stmt.setInt(3, clan_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql2 = ("UPDATE clans SET members = (members - 1) WHERE fk_guild_id = ? AND clan_id = ?");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, _clan_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLRemoveClanMember2);
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, clan_id);
 				result = stmt.executeUpdate();
 			}
 			
 			if(result > 0) {
-				String sql3 = ("UPDATE user_stats SET fk_clan_id = NULL WHERE fk_guild_id = ? AND fk_user_id = ?");
-				stmt = myConn.prepareStatement(sql3);
-				stmt.setLong(1, _guild_id);
-				stmt.setLong(2, _user_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLRemoveClanMember3);
+				stmt.setLong(1, guild_id);
+				stmt.setLong(2, user_id);
 				result = stmt.executeUpdate();
 			}
 			
@@ -637,26 +645,24 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLDelegateOwnership(long _guild_id, long _user_id_target, long _user_id_self, int _clan_id) {
-		logger.trace("SQLDelegateOwnership launched. Passed params {}, {}, {}, {}", _guild_id, _user_id_target, _user_id_self, _clan_id);
+	public static int SQLDelegateOwnership(long guild_id, long user_id_target, long user_id_self, int clan_id) {
+		logger.trace("SQLDelegateOwnership launched. Passed params {}, {}, {}, {}", guild_id, user_id_target, user_id_self, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("UPDATE clan_members SET member_level = 3 WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_clan_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id_target);
-			stmt.setInt(3, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLDelegateOwnership);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id_target);
+			stmt.setInt(3, clan_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql2 = ("UPDATE clan_members SET member_level = 1 WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_clan_id = ?");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setLong(1, _guild_id);
-				stmt.setLong(2, _user_id_self);
-				stmt.setInt(3, _clan_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLDelegateOwnership2);
+				stmt.setLong(1, guild_id);
+				stmt.setLong(2, user_id_self);
+				stmt.setInt(3, clan_id);
 				result = stmt.executeUpdate();
 			}
 			
@@ -675,33 +681,30 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLDisbandClan(long _guild_id, long _user_id, int _clan_id) {
-		logger.trace("SQLDisbandClan launched. Passed params {}, {}, {}", _guild_id, _user_id, _clan_id);
+	public static int SQLDisbandClan(long guild_id, long user_id, int clan_id) {
+		logger.trace("SQLDisbandClan launched. Passed params {}, {}, {}", guild_id, user_id, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("DELETE FROM clan_members WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_clan_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
-			stmt.setInt(3, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLDisbandClan);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			stmt.setInt(3, clan_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql2 = ("DELETE FROM clans WHERE fk_guild_id = ? AND clan_id = ?");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, _clan_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLDisbandClan2);
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, clan_id);
 				result = stmt.executeUpdate();
 			}
 			
 			if(result > 0) {
-				String sql3 = ("UPDATE user_stats SET fk_clan_id = NULL WHERE fk_guild_id = ? AND fk_user_id = ?");
-				stmt = myConn.prepareStatement(sql3);
-				stmt.setLong(1, _guild_id);
-				stmt.setLong(2, _user_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLDisbandClan3);
+				stmt.setLong(1, guild_id);
+				stmt.setLong(2, user_id);
 				result = stmt.executeUpdate();
 			}
 			
@@ -721,23 +724,21 @@ public class Competitive {
 	
 	//clans
 	@SuppressWarnings("resource")
-	public static int SQLCreateClan(long _guild_id, long _user_id, String _name) {
-		logger.trace("SQLCreateClan launched. Passed params {}, {}, {}", _guild_id, _user_id, _name);
+	public static int SQLCreateClan(long guild_id, long user_id, String name) {
+		logger.trace("SQLCreateClan launched. Passed params {}, {}, {}", guild_id, user_id, name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
-			String sql = ("INSERT INTO clans (fk_guild_id, name, members, matches, wins, losses) VALUES(?, ?, 1, 0, 0, 0)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setString(2, _name);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLCreateClan);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, name);
 			int result = stmt.executeUpdate();
 			
-			String sql2 = ("SELECT clan_id FROM clans WHERE fk_guild_id = ? AND name = ?");
-			stmt = myConn.prepareStatement(sql2);
-			stmt.setLong(1, _guild_id);
-			stmt.setString(2, _name);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLCreateClan2);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, name);
 			ResultSet rs = stmt.executeQuery();
 			int clan_id = 0;
 			if(rs.next()) {
@@ -745,20 +746,18 @@ public class Competitive {
 			}
 			
 			if(result > 0) {
-				String sql3 = ("INSERT INTO clan_members (fk_clan_id, fk_guild_id, fk_user_id, member_level) VALUES(?, ?, ?, 3)");
-				stmt = myConn.prepareStatement(sql3);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLCreateClan3);
 				stmt.setInt(1, clan_id);
-				stmt.setLong(2, _guild_id);
-				stmt.setLong(3, _user_id);
+				stmt.setLong(2, guild_id);
+				stmt.setLong(3, user_id);
 				result = stmt.executeUpdate();
 			}
 			
 			if(result > 0) {
-				String sql4 = ("UPDATE user_stats SET fk_clan_id = ? WHERE fk_guild_id = ? AND fk_user_id = ?");
-				stmt = myConn.prepareStatement(sql4);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLCreateClan4);
 				stmt.setInt(1, clan_id);
-				stmt.setLong(2, _guild_id);
-				stmt.setLong(3, _user_id);
+				stmt.setLong(2, guild_id);
+				stmt.setLong(3, user_id);
 				result = stmt.executeUpdate();
 			}
 			
@@ -776,17 +775,16 @@ public class Competitive {
 		}
 	}
 	
-	public static ArrayList<Clan> SQLgetClans(long _guild_id) {
-		logger.trace("SQLgetClans launched. Passed params {}", _guild_id);
+	public static ArrayList<Clan> SQLgetClans(long guild_id) {
+		logger.trace("SQLgetClans launched. Passed params {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			ArrayList<Clan> clans = new ArrayList<Clan>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM clans WHERE fk_guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClans);
+			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				clans.add(new Clan(
@@ -811,17 +809,16 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLgetClanID(long _guild_id, String _name) {
-		logger.trace("SQLgetClanID launched. Passed params {}, {}", _guild_id, _name);
+	public static int SQLgetClanID(long guild_id, String name) {
+		logger.trace("SQLgetClanID launched. Passed params {}, {}", guild_id, name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT clan_id FROM clans WHERE fk_guild_id = ? AND name = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setString(2, _name);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanID);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, name);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getInt(1);
@@ -837,17 +834,16 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLgetClanMemberNumber(long _guild_id, int _clan_id) {
-		logger.trace("SQLgetClanMemberNumber launched. Passed params {}, {}", _guild_id, _clan_id);
+	public static int SQLgetClanMemberNumber(long guild_id, int clan_id) {
+		logger.trace("SQLgetClanMemberNumber launched. Passed params {}, {}", guild_id, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT members FROM clans WHERE fk_guild_id = ? AND clan_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanMemberNumber);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, clan_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getInt(1);
@@ -863,17 +859,16 @@ public class Competitive {
 		}
 	}
 	
-	public static String SQLgetClanName(long _guild_id, int _clan_id) {
-		logger.trace("SQLgetClanName launched. Passed params {}, {}", _guild_id, _clan_id);
+	public static String SQLgetClanName(long guild_id, int clan_id) {
+		logger.trace("SQLgetClanName launched. Passed params {}, {}", guild_id, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT name FROM clans WHERE fk_guild_id = ? AND clan_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanName);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, clan_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getString(1);
@@ -889,17 +884,16 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLUpdateClanMark(long _guild_id, int _clan_id, String _url) {
-		logger.trace("SQLUpdateClanMark launched. Passed params {}, {}, {}", _guild_id, _clan_id, _url);
+	public static int SQLUpdateClanMark(long guild_id, int clan_id, String url) {
+		logger.trace("SQLUpdateClanMark launched. Passed params {}, {}, {}", guild_id, clan_id, url);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE clans SET clan_mark = ? WHERE fk_guild_id = ? AND clan_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _url);
-			stmt.setLong(2, _guild_id);
-			stmt.setInt(3, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateClanMark);
+			stmt.setString(1, url);
+			stmt.setLong(2, guild_id);
+			stmt.setInt(3, clan_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateClanMark Exception", e);
@@ -911,19 +905,18 @@ public class Competitive {
 	}
 	
 	//clan_reservations
-	public static int SQLInsertClanReservation(long _guild_id, long _user_id, int _clan_id, int _type, long _channel_id) {
-		logger.trace("SQLInsertClanReservation launched. Passed params {}, {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _type, _channel_id);
+	public static int SQLInsertClanReservation(long guild_id, long user_id, int clan_id, int type, long channel_id) {
+		logger.trace("SQLInsertClanReservation launched. Passed params {}, {}, {}, {}, {}", guild_id, user_id, clan_id, type, channel_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("INSERT INTO clan_reservations (fk_guild_id, fk_user_id, fk_clan_id, type, channel_id) VALUES(?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE type=VALUES(type), done=VALUES(done), action=0, channel_id=VALUES(channel_id)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
-			stmt.setInt(3, _clan_id);
-			stmt.setInt(4, _type);
-			stmt.setLong(5, _channel_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertClanReservation);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			stmt.setInt(3, clan_id);
+			stmt.setInt(4, type);
+			stmt.setLong(5, channel_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertClanReservation Exception", e);
@@ -934,19 +927,18 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLgetClanReservationType(long _guild_id, long _user_id, int _clan_id, boolean _done) {
-		logger.trace("SQLgetClanReservationType launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _done);
+	public static int SQLgetClanReservationType(long guild_id, long user_id, int clan_id, boolean done) {
+		logger.trace("SQLgetClanReservationType launched. Passed params {}, {}, {}, {}", guild_id, user_id, clan_id, done);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT type FROM clan_reservations WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_clan_id = ? AND done = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
-			stmt.setInt(3, _clan_id);
-			stmt.setBoolean(4, _done);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanReservationType);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			stmt.setInt(3, clan_id);
+			stmt.setBoolean(4, done);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getInt(1);
@@ -962,19 +954,18 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLgetClanReservationAction(long _guild_id, long _user_id, int _clan_id, boolean _done) {
-		logger.trace("SQLgetClanReservationType launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _done);
+	public static int SQLgetClanReservationAction(long guild_id, long user_id, int clan_id, boolean done) {
+		logger.trace("SQLgetClanReservationType launched. Passed params {}, {}, {}, {}", guild_id, user_id, clan_id, done);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT action FROM clan_reservations WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_clan_id = ? AND done = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
-			stmt.setInt(3, _clan_id);
-			stmt.setBoolean(4, _done);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanReservationAction);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			stmt.setInt(3, clan_id);
+			stmt.setBoolean(4, done);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getInt(1);
@@ -990,19 +981,18 @@ public class Competitive {
 		}
 	}
 	
-	public static ClanReservation SQLgetClanReservation(long _guild_id, int _clan_id, int _type, boolean _done) {
-		logger.trace("SQLgetClanReservation launched. Passed params {}, {}, {}, {}", _guild_id, _clan_id, _type, _done);
+	public static ClanReservation SQLgetClanReservation(long guild_id, int clan_id, int type, boolean done) {
+		logger.trace("SQLgetClanReservation launched. Passed params {}, {}, {}, {}", guild_id, clan_id, type, done);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM clan_reservations WHERE fk_guild_id = ? AND fk_clan_id = ? AND type = ? AND done = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _clan_id);
-			stmt.setInt(3, _type);
-			stmt.setBoolean(4, _done);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanReservation);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, clan_id);
+			stmt.setInt(3, type);
+			stmt.setBoolean(4, done);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new ClanReservation(
@@ -1027,18 +1017,17 @@ public class Competitive {
 		}
 	}
 	
-	public static ClanReservation SQLgetClanReservation(long _guild_id, long _user_id, int _clan_id) {
-		logger.trace("SQLgetClanReservation launched. Passed params {}, {}, {}, {}, {}", _guild_id, _user_id, _clan_id);
+	public static ClanReservation SQLgetClanReservation(long guild_id, long user_id, int clan_id) {
+		logger.trace("SQLgetClanReservation launched. Passed params {}, {}, {}, {}, {}", guild_id, user_id, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM clan_reservations WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_clan_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
-			stmt.setInt(3, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanReservation);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			stmt.setInt(3, clan_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new ClanReservation(
@@ -1063,19 +1052,18 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLUpdateClanReservationAction(long _guild_id, long _user_id, int _clan_id, int _type, int _action) {
-		logger.trace("SQLInsertClanReservation launched. Passed params {}, {}, {}, {}, {}", _guild_id, _user_id, _clan_id, _type, _action);
+	public static int SQLUpdateClanReservationAction(long guild_id, long user_id, int clan_id, int type, int action) {
+		logger.trace("SQLInsertClanReservation launched. Passed params {}, {}, {}, {}, {}", guild_id, user_id, clan_id, type, action);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE clan_reservations SET done = 1, action = ? WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_clan_id = ? AND type = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _action);
-			stmt.setLong(2, _guild_id);
-			stmt.setLong(3, _user_id);
-			stmt.setInt(4, _clan_id);
-			stmt.setInt(5, _type);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateClanReservationAction);
+			stmt.setInt(1, action);
+			stmt.setLong(2, guild_id);
+			stmt.setLong(3, user_id);
+			stmt.setInt(4, clan_id);
+			stmt.setInt(5, type);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertClanReservation Exception", e);
@@ -1087,18 +1075,17 @@ public class Competitive {
 	}
 	
 	//matchmaking_rooms
-	public static Room SQLgetMatchmakingRoom(long _guild_id, int _type, int _status) {
-		logger.trace("SQLgetMatchmakingRoom launched. Passed params {}, {}, {}", _guild_id, _type, _status);
+	public static Room SQLgetMatchmakingRoom(long guild_id, int type, int status) {
+		logger.trace("SQLgetMatchmakingRoom launched. Passed params {}, {}, {}", guild_id, type, status);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM matchmaking_rooms WHERE fk_guild_id = ? AND type = ? AND status = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _type);
-			stmt.setInt(3, _status);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMatchmakingRoom);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, type);
+			stmt.setInt(3, status);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new Room(
@@ -1127,17 +1114,16 @@ public class Competitive {
 		}
 	}
 	
-	public static Room SQLgetMatchmakingRoom(long _guild_id, int _room_id) {
-		logger.trace("SQLgetMatchmakingRoom launched. Passed params {}, {}", _guild_id, _room_id);
+	public static Room SQLgetMatchmakingRoom(long guild_id, int room_id) {
+		logger.trace("SQLgetMatchmakingRoom launched. Passed params {}, {}", guild_id, room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM matchmaking_rooms WHERE fk_guild_id = ? AND room_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _room_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMatchmakingRoom);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, room_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new Room(
@@ -1166,20 +1152,19 @@ public class Competitive {
 		}
 	}
 	
-	public static Room SQLgetMatchmakingRoom(long _guild_id, int _clan_id, int _type, int _status) {
-		logger.trace("SQLgetMatchmakingRoom launched. Passed params {}, {}, {}, {}", _guild_id, _clan_id, _type, _status);
+	public static Room SQLgetMatchmakingRoom(long guild_id, int clan_id, int type, int status) {
+		logger.trace("SQLgetMatchmakingRoom launched. Passed params {}, {}, {}, {}", guild_id, clan_id, type, status);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM matchmaking_rooms WHERE fk_guild_id = ? AND (fk_clan_id_1 = ? OR fk_clan_id_2 = ?) AND type = ? AND status = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _clan_id);
-			stmt.setInt(3, _clan_id);
-			stmt.setInt(4, _type);
-			stmt.setInt(5, _status);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMatchmakingRoom);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, clan_id);
+			stmt.setInt(3, clan_id);
+			stmt.setInt(4, type);
+			stmt.setInt(5, status);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new Room(
@@ -1208,17 +1193,16 @@ public class Competitive {
 		}
 	}
 	
-	public static ArrayList<Room> SQLgetOngoingMatchmakingRooms(long _guild_id) {
-		logger.trace("SQLgetOngoingMatchmakingRooms launched. Passed params {}", _guild_id);
+	public static ArrayList<Room> SQLgetOngoingMatchmakingRooms(long guild_id) {
+		logger.trace("SQLgetOngoingMatchmakingRooms launched. Passed params {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			ArrayList<Room> rooms = new ArrayList<Room>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM matchmaking_rooms WHERE fk_guild_id = ? AND (status = 2 OR status = 4)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetOngoingMatchmakingRooms);
+			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				rooms.add(new Room(
@@ -1247,19 +1231,18 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLisClanMatchmakingRoomOngoing(long _guild_id, int _type, int _clan_id) {
-		logger.trace("SQLisClanMatchmakingRoomOngoing launched. Passed params {}, {}, {}", _guild_id, _type, _clan_id);
+	public static int SQLisClanMatchmakingRoomOngoing(long guild_id, int type, int clan_id) {
+		logger.trace("SQLisClanMatchmakingRoomOngoing launched. Passed params {}, {}, {}", guild_id, type, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM matchmaking_rooms WHERE fk_guild_id = ? AND type = ? AND status < 3 AND (fk_clan_id_1 = ? OR fk_clan_id_2 = ?)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _type);
-			stmt.setInt(3, _clan_id);
-			stmt.setInt(4, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLisClanMatchmakingRoomOngoing);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, type);
+			stmt.setInt(3, clan_id);
+			stmt.setInt(4, clan_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return 1;
@@ -1276,8 +1259,8 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLCreateMatchmakingRoom(long _guild_id, long _user_id, int _type, int _map) {
-		logger.trace("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _type, _map);
+	public static int SQLCreateMatchmakingRoom(long guild_id, long user_id, int type, int map) {
+		logger.trace("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}", guild_id, user_id, type, map);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1285,8 +1268,7 @@ public class Competitive {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			
-			String sql = ("SELECT MAX(room_id) FROM matchmaking_rooms");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLCreateMatchmakingRoom);
 			rs = stmt.executeQuery();
 			int room_id = 0;
 			if(rs.next()) {
@@ -1294,22 +1276,20 @@ public class Competitive {
 			}
 			room_id++;
 			
-			String sql2 = ("INSERT INTO matchmaking_rooms (fk_guild_id, room_id, type, members, fk_map_id) VALUES(?, ?, ?, 1, ?)");
-			stmt = myConn.prepareStatement(sql2);
-			stmt.setLong(1, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLCreateMatchmakingRoom2);
+			stmt.setLong(1, guild_id);
 			stmt.setInt(2, room_id);
-			stmt.setInt(3, _type);
-			if(_map > 0)
-				stmt.setInt(4, _map);
+			stmt.setInt(3, type);
+			if(map > 0)
+				stmt.setInt(4, map);
 			else
 				stmt.setNull(4, Types.INTEGER);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql3 = ("INSERT INTO matchmaking_members (fk_guild_id, fk_user_id, fk_room_id) VALUES(?, ?, ?)");
-				stmt = myConn.prepareStatement(sql3);
-				stmt.setLong(1, _guild_id);
-				stmt.setLong(2, _user_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLCreateMatchmakingRoom3);
+				stmt.setLong(1, guild_id);
+				stmt.setLong(2, user_id);
 				stmt.setInt(3, room_id);
 				result = stmt.executeUpdate();
 			}
@@ -1333,8 +1313,8 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLCreateClanMatchmakingRoom(long _guild_id, int _type, int _map, int _clan_id_1, int _clan_id_2) {
-		logger.trace("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}, {}", _guild_id, _type, _map, _clan_id_1, _clan_id_2);
+	public static int SQLCreateClanMatchmakingRoom(long guild_id, int type, int map, int clan_id_1, int clan_id_2) {
+		logger.trace("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}, {}", guild_id, type, map, clan_id_1, clan_id_2);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1342,8 +1322,7 @@ public class Competitive {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			
-			String sql = ("SELECT MAX(room_id) FROM matchmaking_rooms");
-			stmt = myConn.prepareStatement(sql);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLCreateClanMatchmakingRoom);
 			rs = stmt.executeQuery();
 			int room_id = 0;
 			if(rs.next()) {
@@ -1351,16 +1330,15 @@ public class Competitive {
 			}
 			room_id++;
 			
-			String sql2 = ("INSERT INTO matchmaking_rooms (fk_guild_id, room_id, type, members, fk_map_id, status, fk_clan_id_1, fk_clan_id_2) VALUES(?, ?, ?, 0, ?, 1, ?, ?)");
-			stmt = myConn.prepareStatement(sql2);
-			stmt.setLong(1, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLCreateClanMatchmakingRoom2);
+			stmt.setLong(1, guild_id);
 			stmt.setInt(2, room_id);
-			stmt.setInt(3, _type);
-			stmt.setInt(4, _map);
-			stmt.setInt(5, _clan_id_1);
-			stmt.setInt(6, _clan_id_2);
-			if(_map > 0)
-				stmt.setInt(4, _map);
+			stmt.setInt(3, type);
+			stmt.setInt(4, map);
+			stmt.setInt(5, clan_id_1);
+			stmt.setInt(6, clan_id_2);
+			if(map > 0)
+				stmt.setInt(4, map);
 			else
 				stmt.setNull(4, Types.INTEGER);
 			final int result = stmt.executeUpdate();
@@ -1384,25 +1362,23 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLDeleteMatchmakingRoom(long _guild_id, int _room_id) {
-		logger.trace("SQLDeleteMatchmakingRoom launched. Passed params {}, {}", _guild_id, _room_id);
+	public static int SQLDeleteMatchmakingRoom(long guild_id, int room_id) {
+		logger.trace("SQLDeleteMatchmakingRoom launched. Passed params {}, {}", guild_id, room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			
-			String sql = ("DELETE FROM matchmaking_members WHERE fk_guild_id = ? AND fk_room_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _room_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLDeleteMatchmakingRoom);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, room_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql2 = ("DELETE FROM matchmaking_rooms WHERE fk_guild_id = ? AND room_id = ?");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, _room_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLDeleteMatchmakingRoom2);
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, room_id);
 				result = stmt.executeUpdate();
 			}
 			
@@ -1421,26 +1397,24 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLJoinRoom(long _guild_id, long _user_id, int _room_id) {
-		logger.trace("SQLJoinRoom launched. Passed params {}, {}, {}", _guild_id, _user_id, _room_id);
+	public static int SQLJoinRoom(long guild_id, long user_id, int room_id) {
+		logger.trace("SQLJoinRoom launched. Passed params {}, {}, {}", guild_id, user_id, room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			
-			String sql = ("INSERT INTO matchmaking_members (fk_guild_id, fk_user_id, fk_room_id) VALUES(?, ?, ?)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
-			stmt.setInt(3, _room_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLJoinRoom);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			stmt.setInt(3, room_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql2 = ("UPDATE matchmaking_rooms SET members = (members+1) WHERE fk_guild_id = ? AND room_id = ?");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, _room_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLJoinRoom2);
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, room_id);
 				result = stmt.executeUpdate();
 			}
 			
@@ -1459,27 +1433,25 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLJoinRoom(long _guild_id, long _user_id, int _room_id, int _team) {
-		logger.trace("SQLJoinRoom launched. Passed params {}, {}, {}, {}", _guild_id, _user_id, _room_id, _team);
+	public static int SQLJoinRoom(long guild_id, long user_id, int room_id, int team) {
+		logger.trace("SQLJoinRoom launched. Passed params {}, {}, {}, {}", guild_id, user_id, room_id, team);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			
-			String sql = ("INSERT INTO matchmaking_members (fk_guild_id, fk_user_id, fk_room_id, team) VALUES(?, ?, ?, ?)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
-			stmt.setInt(3, _room_id);
-			stmt.setInt(4, _team);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLJoinRoom);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			stmt.setInt(3, room_id);
+			stmt.setInt(4, team);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql2 = ("UPDATE matchmaking_rooms SET members = (members+1) WHERE fk_guild_id = ? AND room_id = ?");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, _room_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLJoinRoom2);
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, room_id);
 				result = stmt.executeUpdate();
 			}
 			
@@ -1498,28 +1470,26 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLUpdateTeams(long _guild_id, int _room_id, Member [] _team1, Member [] _team2) {
-		logger.trace("SQLUpdateTeams launched. Passed params {}, {} and arrays", _guild_id, _room_id);
+	public static int SQLUpdateTeams(long guild_id, int room_id, Member [] team1, Member [] team2) {
+		logger.trace("SQLUpdateTeams launched. Passed params {}, {} and arrays", guild_id, room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			
-			String sql = ("UPDATE matchmaking_rooms SET status = 2 WHERE fk_guild_id = ? AND room_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _room_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateTeams);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, room_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql2 = ("UPDATE matchmaking_members SET team = 1 WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_room_id = ?");
-				stmt = myConn.prepareStatement(sql2);
-				for(int i = 0; i < _team1.length; i++) {
-					if(_team1[i] != null) {
-						stmt.setLong(1, _guild_id);
-						stmt.setLong(2, _team1[i].getUserID());
-						stmt.setInt(3, _room_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateTeams2);
+				for(int i = 0; i < team1.length; i++) {
+					if(team1[i] != null) {
+						stmt.setLong(1, guild_id);
+						stmt.setLong(2, team1[i].getUserID());
+						stmt.setInt(3, room_id);
 						stmt.addBatch();
 					}
 				}
@@ -1529,13 +1499,12 @@ public class Competitive {
 					return 0;
 				}
 				
-				String sql3 = ("UPDATE matchmaking_members SET team = 2 WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_room_id = ?");
-				stmt = myConn.prepareStatement(sql3);
-				for(int i = 0; i < _team2.length; i++) {
-					if(_team2[i] != null) {
-						stmt.setLong(1, _guild_id);
-						stmt.setLong(2, _team2[i].getUserID());
-						stmt.setInt(3, _room_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateTeams3);
+				for(int i = 0; i < team2.length; i++) {
+					if(team2[i] != null) {
+						stmt.setLong(1, guild_id);
+						stmt.setLong(2, team2[i].getUserID());
+						stmt.setInt(3, room_id);
 						stmt.addBatch();
 					}
 				}
@@ -1558,35 +1527,32 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLUpdateTeams(long _guild_id, int _room_id, long _user_id_1, long _user_id_2) {
-		logger.trace("SQLUpdateTeams launched. Passed params {}, {}, {}, {}", _guild_id, _room_id, _user_id_1, _user_id_2);
+	public static int SQLUpdateTeams(long guild_id, int room_id, long user_id_1, long user_id_2) {
+		logger.trace("SQLUpdateTeams launched. Passed params {}, {}, {}, {}", guild_id, room_id, user_id_1, user_id_2);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			
-			String sql = ("UPDATE matchmaking_rooms SET status = 2 WHERE fk_guild_id = ? AND room_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _room_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateTeams4);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, room_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql2 = ("UPDATE matchmaking_members SET team = 1, leader = 1, picker = 1 WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_room_id = ?");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setLong(1, _guild_id);
-				stmt.setLong(2, _user_id_1);
-				stmt.setInt(3, _room_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateTeams5);
+				stmt.setLong(1, guild_id);
+				stmt.setLong(2, user_id_1);
+				stmt.setInt(3, room_id);
 				result = stmt.executeUpdate();
 			}
 			
 			if(result > 0) {
-				String sql3 = ("UPDATE matchmaking_members SET team = 2, leader = 1 WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_room_id = ?");
-				stmt = myConn.prepareStatement(sql3);
-				stmt.setLong(1, _guild_id);
-				stmt.setLong(2, _user_id_2);
-				stmt.setInt(3, _room_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateTeams6);
+				stmt.setLong(1, guild_id);
+				stmt.setLong(2, user_id_2);
+				stmt.setInt(3, room_id);
 				result = stmt.executeUpdate();
 			}
 			
@@ -1604,18 +1570,17 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLUpdateRoomMessageID(long _guild_id, int _room_id, long _channel_id, long _message_id) {
-		logger.trace("SQLUpdateRoomMessageID launched. Passed params {}, {}, {}, {}", _guild_id, _room_id, _channel_id, _message_id);
+	public static int SQLUpdateRoomMessageID(long guild_id, int room_id, long channel_id, long message_id) {
+		logger.trace("SQLUpdateRoomMessageID launched. Passed params {}, {}, {}, {}", guild_id, room_id, channel_id, message_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE matchmaking_rooms SET channel_id = ?, message_id = ? WHERE fk_guild_id = ? AND room_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _channel_id);
-			stmt.setLong(2, _message_id);
-			stmt.setLong(3, _guild_id);
-			stmt.setInt(4, _room_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateRoomMessageID);
+			stmt.setLong(1, channel_id);
+			stmt.setLong(2, message_id);
+			stmt.setLong(3, guild_id);
+			stmt.setInt(4, room_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateRoomMessageID Exception", e);
@@ -1626,17 +1591,16 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLUpdateMatchmakingRoomMap(long _guild_id, int _room_id, int _map_id) {
-		logger.trace("SQLUpdateMatchmakingRoomMap launched. Passed params {}, {}, {}", _guild_id, _room_id, _map_id);
+	public static int SQLUpdateMatchmakingRoomMap(long guild_id, int room_id, int map_id) {
+		logger.trace("SQLUpdateMatchmakingRoomMap launched. Passed params {}, {}, {}", guild_id, room_id, map_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE matchmaking_rooms SET fk_map_id = ? WHERE fk_guild_id = ? AND room_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _map_id);
-			stmt.setLong(2, _guild_id);
-			stmt.setInt(3, _room_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateMatchmakingRoomMap);
+			stmt.setLong(1, map_id);
+			stmt.setLong(2, guild_id);
+			stmt.setInt(3, room_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateMatchmakingRoomMap Exception", e);
@@ -1647,17 +1611,16 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLUpdateMatchmakingRoomStatus(long _guild_id, int _room_id, int _status) {
-		logger.trace("SQLUpdateMatchmakingRoomStatus launched. Passed params {}, {}, {}", _guild_id, _room_id, _status);
+	public static int SQLUpdateMatchmakingRoomStatus(long guild_id, int room_id, int status) {
+		logger.trace("SQLUpdateMatchmakingRoomStatus launched. Passed params {}, {}, {}", guild_id, room_id, status);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("UPDATE matchmaking_rooms SET status = ? WHERE fk_guild_id = ? AND room_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _status);
-			stmt.setLong(2, _guild_id);
-			stmt.setInt(3, _room_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateMatchmakingRoomStatus);
+			stmt.setInt(1, status);
+			stmt.setLong(2, guild_id);
+			stmt.setInt(3, room_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateMatchmakingRoomStatus Exception", e);
@@ -1669,101 +1632,91 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLsetWinner(long _guild_id, int _room_id, int _team, boolean _clans) {
-		logger.trace("SQLsetWinner launched. Passed params {}, {}, {}, {}", _guild_id, _room_id, _team, _clans);
+	public static int SQLsetWinner(long guild_id, int room_id, int team, boolean clans) {
+		logger.trace("SQLsetWinner launched. Passed params {}, {}, {}, {}", guild_id, room_id, team, clans);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			
-			String sql = ("UPDATE matchmaking_rooms SET winner = ?, status = 3 WHERE fk_guild_id = ? AND room_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _team);
-			stmt.setLong(2, _guild_id);
-			stmt.setInt(3, _room_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLsetWinner);
+			stmt.setInt(1, team);
+			stmt.setLong(2, guild_id);
+			stmt.setInt(3, room_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql2 = ("INSERT INTO comp_elo_log (fk_guild_id, fk_user_id, fk_room_id, elo_before, elo_after) SELECT guild_id, user_id, room_id, elo, (elo+10) FROM matchmaking_view WHERE guild_id = ? AND room_id = ? AND team = ?");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, _room_id);
-				stmt.setInt(3, _team);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLsetWinner2);
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, room_id);
+				stmt.setInt(3, team);
 				result = stmt.executeUpdate();
 			}
 			
 			if(result > 0) {
-				String sql3 = ("INSERT INTO comp_elo_log (fk_guild_id, fk_user_id, fk_room_id, elo_before, elo_after) SELECT guild_id, user_id, room_id, elo, (CASE WHEN (elo-7) > 0 THEN (elo-7) ELSE 0 END) FROM matchmaking_view WHERE guild_id = ? AND room_id = ? AND team != ?");
-				stmt = myConn.prepareStatement(sql3);
-				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, _room_id);
-				stmt.setInt(3, _team);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLsetWinner3);
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, room_id);
+				stmt.setInt(3, team);
 				result = stmt.executeUpdate();
 			}
 			
 			if(result > 0) {
-				String sql4 = ("UPDATE user_stats SET games = (games+1), wins = (wins+1), elo = (elo+10) WHERE fk_guild_id = ? AND fk_user_id IN(SELECT fk_user_id FROM matchmaking_members WHERE fk_room_id = ? AND team = ? AND fk_guild_id = ?)");
-				stmt = myConn.prepareStatement(sql4);
-				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, _room_id);
-				stmt.setInt(3, _team);
-				stmt.setLong(4, _guild_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLsetWinner4);
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, room_id);
+				stmt.setInt(3, team);
+				stmt.setLong(4, guild_id);
 				result = stmt.executeUpdate();
 			}
 						
 			if(result > 0) {
-				String sql5 = ("UPDATE user_stats SET games = (games+1), losses = (losses+1), elo = (elo-7) WHERE fk_guild_id = ? AND fk_user_id IN(SELECT fk_user_id FROM matchmaking_members WHERE fk_room_id = ? AND team != ? AND fk_guild_id = ?)");
-				stmt = myConn.prepareStatement(sql5);
-				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, _room_id);
-				stmt.setInt(3, _team);
-				stmt.setLong(4, _guild_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLsetWinner5);
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, room_id);
+				stmt.setInt(3, team);
+				stmt.setLong(4, guild_id);
 				result = stmt.executeUpdate();
 			}
 			
-			if(_team == 1 && _clans) {
+			if(team == 1 && clans) {
 				if(result > 0) {
-					String sql6 = ("UPDATE clans SET matches = (matches+1), wins = (wins+1) WHERE fk_guild_id = ? AND clan_id IN(SELECT fk_clan_id_1 FROM matchmaking_rooms WHERE room_id = ? AND fk_guild_id = ?)");
-					stmt = myConn.prepareStatement(sql6);
-					stmt.setLong(1, _guild_id);
-					stmt.setInt(2, _room_id);
-					stmt.setLong(3, _guild_id);
+					stmt = myConn.prepareStatement(CompetitiveStatements.SQLsetWinner6);
+					stmt.setLong(1, guild_id);
+					stmt.setInt(2, room_id);
+					stmt.setLong(3, guild_id);
 					result = stmt.executeUpdate();
 				}
 				
 				if(result > 0) {
-					String sql7 = ("UPDATE clans SET matches = (matches+1), losses = (losses+1) WHERE fk_guild_id = ? AND clan_id IN(SELECT fk_clan_id_2 FROM matchmaking_rooms WHERE room_id = ? AND fk_guild_id = ?)");
-					stmt = myConn.prepareStatement(sql7);
-					stmt.setLong(1, _guild_id);
-					stmt.setInt(2, _room_id);
-					stmt.setLong(3, _guild_id);
+					stmt = myConn.prepareStatement(CompetitiveStatements.SQLsetWinner7);
+					stmt.setLong(1, guild_id);
+					stmt.setInt(2, room_id);
+					stmt.setLong(3, guild_id);
 					result = stmt.executeUpdate();
 				}
 			}
-			else if(_team == 2 && _clans) {
+			else if(team == 2 && clans) {
 				if(result > 0) {
-					String sql6 = ("UPDATE clans SET matches = (matches+1), wins = (wins+1) WHERE fk_guild_id = ? AND clan_id IN(SELECT fk_clan_id_2 FROM matchmaking_rooms WHERE room_id = ? AND fk_guild_id = ?)");
-					stmt = myConn.prepareStatement(sql6);
-					stmt.setLong(1, _guild_id);
-					stmt.setInt(2, _room_id);
-					stmt.setLong(3, _guild_id);
+					stmt = myConn.prepareStatement(CompetitiveStatements.SQLsetWinner8);
+					stmt.setLong(1, guild_id);
+					stmt.setInt(2, room_id);
+					stmt.setLong(3, guild_id);
 					result = stmt.executeUpdate();
 				}
 				
 				if(result > 0) {
-					String sql7 = ("UPDATE clans SET matches = (matches+1), losses = (losses+1) WHERE fk_guild_id = ? AND clan_id IN(SELECT fk_clan_id_1 FROM matchmaking_rooms WHERE room_id = ? AND fk_guild_id = ?)");
-					stmt = myConn.prepareStatement(sql7);
-					stmt.setLong(1, _guild_id);
-					stmt.setInt(2, _room_id);
-					stmt.setLong(3, _guild_id);
+					stmt = myConn.prepareStatement(CompetitiveStatements.SQLsetWinner9);
+					stmt.setLong(1, guild_id);
+					stmt.setInt(2, room_id);
+					stmt.setLong(3, guild_id);
 					result = stmt.executeUpdate();
 				}
 			}
 			
-			String sql6 = ("UPDATE user_stats SET elo = 0 WHERE fk_guild_id = ? AND elo < 0");
-			stmt = myConn.prepareStatement(sql6);
-			stmt.setLong(1, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLsetWinner10);
+			stmt.setLong(1, guild_id);
 			stmt.executeUpdate();
 			
 			if(result > 0)
@@ -1781,85 +1734,77 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLrevertWinner(long _guild_id, int _room_id, int _team, boolean _clans) {
-		logger.trace("SQLrevertWinner launched. Passed params {}, {}, {}, {}", _guild_id, _room_id, _team, _clans);
+	public static int SQLrevertWinner(long guild_id, int room_id, int team, boolean clans) {
+		logger.trace("SQLrevertWinner launched. Passed params {}, {}, {}, {}", guild_id, room_id, team, clans);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			
-			String sql = ("UPDATE matchmaking_rooms SET winner = NULL, status = 4 WHERE fk_guild_id = ? AND room_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _room_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLrevertWinner);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, room_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql2 = ("UPDATE user_stats a SET a.games = (a.games-1), a.wins = (a.wins-1), a.elo = (a.elo-(SELECT (b.elo_after-b.elo_before) FROM comp_elo_log b WHERE b.fk_guild_id = a.fk_guild_id AND b.fk_user_id = a.fk_user_id AND b.fk_room_id = ?)) WHERE a.fk_guild_id = ? AND a.fk_user_id IN(SELECT c.fk_user_id FROM matchmaking_members c WHERE c.fk_room_id = ? AND c.team = ? AND c.fk_guild_id = ?)");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setInt(1, _room_id);
-				stmt.setLong(2, _guild_id);
-				stmt.setInt(3, _room_id);
-				stmt.setInt(4, _team);
-				stmt.setLong(5, _guild_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLrevertWinner2);
+				stmt.setInt(1, room_id);
+				stmt.setLong(2, guild_id);
+				stmt.setInt(3, room_id);
+				stmt.setInt(4, team);
+				stmt.setLong(5, guild_id);
 				result = stmt.executeUpdate();
 			}
 			
 			if(result > 0) {
-				String sql3 = ("UPDATE user_stats a SET a.games = (a.games-1), a.losses = (a.losses-1), a.elo = (a.elo-(SELECT (b.elo_after-b.elo_before) FROM comp_elo_log b WHERE b.fk_guild_id = a.fk_guild_id AND b.fk_user_id = a.fk_user_id AND b.fk_room_id = ?)) WHERE a.fk_guild_id = ? AND a.fk_user_id IN(SELECT c.fk_user_id FROM matchmaking_members c WHERE c.fk_room_id = ? AND c.team != ? AND c.fk_guild_id = ?)");
-				stmt = myConn.prepareStatement(sql3);
-				stmt.setInt(1, _room_id);
-				stmt.setLong(2, _guild_id);
-				stmt.setInt(3, _room_id);
-				stmt.setInt(4, _team);
-				stmt.setLong(5, _guild_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLrevertWinner3);
+				stmt.setInt(1, room_id);
+				stmt.setLong(2, guild_id);
+				stmt.setInt(3, room_id);
+				stmt.setInt(4, team);
+				stmt.setLong(5, guild_id);
 				result = stmt.executeUpdate();
 			}
 			
 			if(result > 0) {
-				String sql4 = ("DELETE FROM comp_elo_log WHERE fk_guild_id = ? AND fk_room_id = ?");
-				stmt = myConn.prepareStatement(sql4);
-				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, _room_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLrevertWinner4);
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, room_id);
 				result = stmt.executeUpdate();
 			}
 			
-			if(_team == 1 && _clans) {
+			if(team == 1 && clans) {
 				if(result > 0) {
-					String sql5 = ("UPDATE clans SET matches = (matches-1), wins = (wins-1) WHERE fk_guild_id = ? AND clan_id IN(SELECT fk_clan_id_1 FROM matchmaking_rooms WHERE room_id = ? AND fk_guild_id = ?)");
-					stmt = myConn.prepareStatement(sql5);
-					stmt.setLong(1, _guild_id);
-					stmt.setInt(2, _room_id);
-					stmt.setLong(3, _guild_id);
+					stmt = myConn.prepareStatement(CompetitiveStatements.SQLrevertWinner5);
+					stmt.setLong(1, guild_id);
+					stmt.setInt(2, room_id);
+					stmt.setLong(3, guild_id);
 					result = stmt.executeUpdate();
 				}
 				
 				if(result > 0) {
-					String sql6 = ("UPDATE clans SET matches = (matches-1), losses = (losses-1) WHERE fk_guild_id = ? AND clan_id IN(SELECT fk_clan_id_2 FROM matchmaking_rooms WHERE room_id = ? AND fk_guild_id = ?)");
-					stmt = myConn.prepareStatement(sql6);
-					stmt.setLong(1, _guild_id);
-					stmt.setInt(2, _room_id);
-					stmt.setLong(3, _guild_id);
+					stmt = myConn.prepareStatement(CompetitiveStatements.SQLrevertWinner6);
+					stmt.setLong(1, guild_id);
+					stmt.setInt(2, room_id);
+					stmt.setLong(3, guild_id);
 					result = stmt.executeUpdate();
 				}
 			}
-			else if(_team == 2 && _clans) {
+			else if(team == 2 && clans) {
 				if(result > 0) {
-					String sql5 = ("UPDATE clans SET matches = (matches-1), wins = (wins-1) WHERE fk_guild_id = ? AND clan_id IN(SELECT fk_clan_id_2 FROM matchmaking_rooms WHERE room_id = ? AND fk_guild_id = ?)");
-					stmt = myConn.prepareStatement(sql5);
-					stmt.setLong(1, _guild_id);
-					stmt.setInt(2, _room_id);
-					stmt.setLong(3, _guild_id);
+					stmt = myConn.prepareStatement(CompetitiveStatements.SQLrevertWinner7);
+					stmt.setLong(1, guild_id);
+					stmt.setInt(2, room_id);
+					stmt.setLong(3, guild_id);
 					result = stmt.executeUpdate();
 				}
 				
 				if(result > 0) {
-					String sql6 = ("UPDATE clans SET matches = (matches-1), losses = (losses-1) WHERE fk_guild_id = ? AND clan_id IN(SELECT fk_clan_id_1 FROM matchmaking_rooms WHERE room_id = ? AND fk_guild_id = ?)");
-					stmt = myConn.prepareStatement(sql6);
-					stmt.setLong(1, _guild_id);
-					stmt.setInt(2, _room_id);
-					stmt.setLong(3, _guild_id);
+					stmt = myConn.prepareStatement(CompetitiveStatements.SQLrevertWinner8);
+					stmt.setLong(1, guild_id);
+					stmt.setInt(2, room_id);
+					stmt.setLong(3, guild_id);
 					result = stmt.executeUpdate();
 				}
 			}
@@ -1880,37 +1825,34 @@ public class Competitive {
 	
 	//matchmaking_members
 	@SuppressWarnings("resource")
-	public static int SQLPickMember(long _guild_id, int _room_id, long _user_id, long _leader_id, int _team) {
-		logger.trace("SQLPickMember launched. Passed params {}, {}, {}, {}, {}", _guild_id, _room_id, _user_id, _leader_id, _team);
+	public static int SQLPickMember(long guild_id, int room_id, long user_id, long leader_id, int team) {
+		logger.trace("SQLPickMember launched. Passed params {}, {}, {}, {}, {}", guild_id, room_id, user_id, leader_id, team);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			
-			String sql = ("UPDATE matchmaking_members SET team = ? WHERE fk_guild_id = ? AND fk_room_id = ? AND fk_user_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _team);
-			stmt.setLong(2, _guild_id);
-			stmt.setInt(3, _room_id);
-			stmt.setLong(4, _user_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLPickMember);
+			stmt.setInt(1, team);
+			stmt.setLong(2, guild_id);
+			stmt.setInt(3, room_id);
+			stmt.setLong(4, user_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql2 = ("UPDATE matchmaking_members SET picker = 1 WHERE fk_guild_id = ? AND fk_user_id != ? AND fk_room_id = ? AND leader = 1");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setLong(1, _guild_id);
-				stmt.setLong(2, _leader_id);
-				stmt.setInt(3, _room_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLPickMember2);
+				stmt.setLong(1, guild_id);
+				stmt.setLong(2, leader_id);
+				stmt.setInt(3, room_id);
 				result = stmt.executeUpdate();
 			}
 			
 			if(result > 0) {
-				String sql3 = ("UPDATE matchmaking_members SET picker = 0 WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_room_id = ?");
-				stmt = myConn.prepareStatement(sql3);
-				stmt.setLong(1, _guild_id);
-				stmt.setLong(2, _leader_id);
-				stmt.setInt(3, _room_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLPickMember3);
+				stmt.setLong(1, guild_id);
+				stmt.setLong(2, leader_id);
+				stmt.setInt(3, room_id);
 				result = stmt.executeUpdate();
 			}
 			
@@ -1930,8 +1872,8 @@ public class Competitive {
 	
 	//comp_maps
 	@SuppressWarnings("resource")
-	public static int SQLInsertMap(long _guild_id, String _mapName, String _url) {
-		logger.trace("SQLInsertMap launched. Passed params {}, {}, {}", _guild_id, _mapName, _url);
+	public static int SQLInsertMap(long guild_id, String mapName, String url) {
+		logger.trace("SQLInsertMap launched. Passed params {}, {}, {}", guild_id, mapName, url);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1939,10 +1881,9 @@ public class Competitive {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			
-			String sql = ("SELECT * FROM comp_maps WHERE fk_guild_id = ? AND name = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setString(2, _mapName);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertMap);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, mapName);
 			rs = stmt.executeQuery();
 			boolean exists = false;
 			if(rs.next()) {
@@ -1951,24 +1892,22 @@ public class Competitive {
 			
 			int result = 0;
 			if(exists) {
-				String sql2 = ("UPDATE comp_maps SET name = ?, img = ? WHERE fk_guild_id = ? AND name = ?");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setString(1, _mapName);
-				if(_url != null)
-					stmt.setString(2, _url);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertMap2);
+				stmt.setString(1, mapName);
+				if(url != null)
+					stmt.setString(2, url);
 				else
 					stmt.setNull(2, Types.VARCHAR);
-				stmt.setLong(3, _guild_id);
-				stmt.setString(4, _mapName);
+				stmt.setLong(3, guild_id);
+				stmt.setString(4, mapName);
 				result = stmt.executeUpdate();
 			}
 			else {
-				String sql2 = ("INSERT INTO comp_maps (fk_guild_id, name, img) VALUES(?, ?, ?)");
-				stmt = myConn.prepareStatement(sql2);
-				stmt.setLong(1, _guild_id);
-				stmt.setString(2, _mapName);
-				if(_url != null)
-					stmt.setString(3, _url);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertMap3);
+				stmt.setLong(1, guild_id);
+				stmt.setString(2, mapName);
+				if(url != null)
+					stmt.setString(3, url);
 				else
 					stmt.setNull(3, Types.VARCHAR);
 				result = stmt.executeUpdate();
@@ -1989,16 +1928,15 @@ public class Competitive {
 		}
 	}
 	
-	public static CompMap SQLgetRandomMap(long _guild_id) {
-		logger.trace("SQLgetRandomMap launched. Passed params {}, {}", _guild_id);
+	public static CompMap SQLgetRandomMap(long guild_id) {
+		logger.trace("SQLgetRandomMap launched. Passed params {}, {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT map_id, name, img FROM comp_maps WHERE fk_guild_id = ? ORDER BY RAND() limit 1");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetRandomMap);
+			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new CompMap(
@@ -2018,16 +1956,15 @@ public class Competitive {
 		}
 	}
 	
-	public static CompMap SQLgetMap(int _map_id) {
-		logger.trace("SQLgetMap launched. Passed params {}", _map_id);
+	public static CompMap SQLgetMap(int map_id) {
+		logger.trace("SQLgetMap launched. Passed params {}", map_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT map_id, name, img FROM comp_maps WHERE map_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setInt(1, _map_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMap);
+			stmt.setInt(1, map_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new CompMap(
@@ -2047,17 +1984,16 @@ public class Competitive {
 		}
 	}
 	
-	public static CompMap SQLgetMap(long _guild_id, String _map) {
-		logger.trace("SQLgetMap launched. Passed params {}, {}", _guild_id, _map);
+	public static CompMap SQLgetMap(long guild_id, String map) {
+		logger.trace("SQLgetMap launched. Passed params {}, {}", guild_id, map);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT map_id, name, img FROM comp_maps WHERE fk_guild_id = ? AND name = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setString(2, _map);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMap2);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, map);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new CompMap(
@@ -2078,17 +2014,16 @@ public class Competitive {
 	}
 	
 	//Joins
-	public static ClanMember SQLgetClanDetails(long _user_id, long _guild_id) {
-		logger.trace("SQLgetClanDetails launched. Passed params {}, {}", _user_id, _guild_id);
+	public static ClanMember SQLgetClanDetails(long user_id, long guild_id) {
+		logger.trace("SQLgetClanDetails launched. Passed params {}, {}", user_id, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM clan_view WHERE user_id = ? and guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _user_id);
-			stmt.setLong(2, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanDetails);
+			stmt.setLong(1, user_id);
+			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new ClanMember(
@@ -2119,17 +2054,16 @@ public class Competitive {
 		}
 	}
 	
-	public static ClanMember SQLgetClanDetailsByName(String _name, long _guild_id) {
-		logger.trace("SQLgetClanDetailsByName launched. Passed params {}, {}", _name, _guild_id);
+	public static ClanMember SQLgetClanDetailsByName(String name, long guild_id) {
+		logger.trace("SQLgetClanDetailsByName launched. Passed params {}, {}", name, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM clan_view WHERE username = ? and guild_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setString(1, _name);
-			stmt.setLong(2, _guild_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanDetailsByName);
+			stmt.setString(1, name);
+			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new ClanMember(
@@ -2160,18 +2094,17 @@ public class Competitive {
 		}
 	}
 	
-	public static ArrayList<ClanMember> SQLgetClanMembers(long _guild_id, int _clan_id) {
-		logger.trace("SQLgetClanMembers launched. Passed params {}, {}", _guild_id, _clan_id);
+	public static ArrayList<ClanMember> SQLgetClanMembers(long guild_id, int clan_id) {
+		logger.trace("SQLgetClanMembers launched. Passed params {}, {}", guild_id, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			ArrayList<ClanMember> clanMembers = new ArrayList<ClanMember>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM clan_view WHERE guild_id = ? AND clan_id = ? ORDER BY member_level desc, join_date asc");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanMembers);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, clan_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				clanMembers.add(new ClanMember(
@@ -2202,18 +2135,17 @@ public class Competitive {
 		}
 	}
 	
-	public static ArrayList<ClanMember> SQLgetClanMembersStaff(long _guild_id, int _clan_id) {
-		logger.trace("SQLgetClanMembersStaff launched. Passed params {}, {}", _guild_id, _clan_id);
+	public static ArrayList<ClanMember> SQLgetClanMembersStaff(long guild_id, int clan_id) {
+		logger.trace("SQLgetClanMembersStaff launched. Passed params {}, {}", guild_id, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			ArrayList<ClanMember> clanMembers = new ArrayList<ClanMember>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT * FROM clan_view WHERE guild_id = ? AND clan_id = ? AND member_level > 1");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _clan_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanMembersStaff);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, clan_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				clanMembers.add(new ClanMember(
@@ -2244,17 +2176,16 @@ public class Competitive {
 		}
 	}
 	
-	public static int SQLisUserInRoom(long _guild_id, long _user_id) {
-		logger.trace("SQLisUserInRoom launched. Passed params {}, {}", _guild_id, _user_id);
+	public static int SQLisUserInRoom(long guild_id, long user_id) {
+		logger.trace("SQLisUserInRoom launched. Passed params {}, {}", guild_id, user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT room_id FROM matchmaking_view WHERE guild_id = ? AND user_id = ? AND (status = 1 OR status = 2)");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLisUserInRoom);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getInt(1);
@@ -2271,26 +2202,24 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLLeaveRoom(long _guild_id, long _user_id, int _room_id) {
-		logger.trace("SQLLeaveRoom launched. Passed params {}, {}, {}", _guild_id, _user_id, _room_id);
+	public static int SQLLeaveRoom(long guild_id, long user_id, int room_id) {
+		logger.trace("SQLLeaveRoom launched. Passed params {}, {}, {}", guild_id, user_id, room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			myConn.setAutoCommit(false);
 			
-			String sql = ("DELETE FROM matchmaking_members WHERE fk_guild_id = ? AND fk_user_id = ? AND fk_room_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setLong(2, _user_id);
-			stmt.setInt(3, _room_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLLeaveRoom);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			stmt.setInt(3, room_id);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
-				String sql3 = ("UPDATE matchmaking_rooms SET members = (members-1) WHERE fk_guild_id = ? AND room_id = ?");
-				stmt = myConn.prepareStatement(sql3);
-				stmt.setLong(1, _guild_id);
-				stmt.setInt(2, _room_id);
+				stmt = myConn.prepareStatement(CompetitiveStatements.SQLLeaveRoom2);
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, room_id);
 				result = stmt.executeUpdate();
 			}
 			if(result > 0)
@@ -2307,54 +2236,17 @@ public class Competitive {
 		}
 	}
 	
-	public static ArrayList<Member> SQLgetMatchmakingMembers(long _guild_id, int _room_id) {
-		logger.trace("SQLgetMatchmakingMembers launched. Passed params {}, {}", _guild_id, _room_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			ArrayList<Member> members = new ArrayList<Member>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT user_id, room_id, username, server, elo, team, leader, picker FROM matchmaking_view WHERE guild_id = ? AND room_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _room_id);
-			rs = stmt.executeQuery();
-			while(rs.next()) {
-				members.add(new Member(
-					rs.getLong(1),
-					rs.getInt(2),
-					rs.getString(3),
-					rs.getString(4),
-					rs.getInt(5),
-					rs.getInt(6),
-					rs.getBoolean(7),
-					rs.getBoolean(8)
-				));
-			}
-			return members;
-		} catch (SQLException e) {
-			logger.error("SQLgetMatchmakingMembers Exception", e);
-			return null;
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static Member SQLRetrievePicker(long _guild_id, int _room_id, int _status) {
-		logger.trace("SQLRetrievePicker launched. Passed params {}, {}, {}", _guild_id, _room_id, _status);
+	public static Member SQLRetrievePicker(long guild_id, int room_id, int status) {
+		logger.trace("SQLRetrievePicker launched. Passed params {}, {}, {}", guild_id, room_id, status);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT user_id, room_id, username, server, elo, team, leader, picker FROM matchmaking_view WHERE guild_id = ? AND room_id = ? AND status = ? AND leader = 1 AND picker = 1");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _room_id);
-			stmt.setInt(3, _status);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLRetrievePicker);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, room_id);
+			stmt.setInt(3, status);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new Member(
@@ -2379,19 +2271,18 @@ public class Competitive {
 		}
 	}
 	
-	public static Member SQLRetrieveMember(long _guild_id, int _room_id, int _status, long _user_id) {
-		logger.trace("SQLRetrieveMember launched. Passed params {}, {}, {}, {}, {}", _guild_id, _room_id, _status, _user_id);
+	public static Member SQLRetrieveMember(long guild_id, int room_id, int status, long user_id) {
+		logger.trace("SQLRetrieveMember launched. Passed params {}, {}, {}, {}, {}", guild_id, room_id, status, user_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT user_id, room_id, username, server, elo, team, leader, picker FROM matchmaking_view WHERE guild_id = ? AND room_id = ? AND status = ? AND user_id = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _room_id);
-			stmt.setInt(3, _status);
-			stmt.setLong(4, _user_id);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLRetrieveMember);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, room_id);
+			stmt.setInt(3, status);
+			stmt.setLong(4, user_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new Member(
@@ -2416,19 +2307,18 @@ public class Competitive {
 		}
 	}
 	
-	public static Member SQLRetrieveMember(long _guild_id, int _room_id, int _status, String _username) {
-		logger.trace("SQLRetrieveMember launched. Passed params {}, {}, {}, {}, {}", _guild_id, _room_id, _status, _username);
+	public static Member SQLRetrieveMember(long guild_id, int room_id, int status, String username) {
+		logger.trace("SQLRetrieveMember launched. Passed params {}, {}, {}, {}, {}", guild_id, room_id, status, username);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			String sql = ("SELECT user_id, room_id, username, server, elo, team, leader, picker FROM matchmaking_view WHERE guild_id = ? AND room_id = ? AND status = ? AND username = ?");
-			stmt = myConn.prepareStatement(sql);
-			stmt.setLong(1, _guild_id);
-			stmt.setInt(2, _room_id);
-			stmt.setInt(3, _status);
-			stmt.setString(4, _username);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLRetrieveMember);
+			stmt.setLong(1, guild_id);
+			stmt.setInt(2, room_id);
+			stmt.setInt(3, status);
+			stmt.setString(4, username);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new Member(

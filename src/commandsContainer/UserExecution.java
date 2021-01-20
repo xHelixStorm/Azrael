@@ -128,7 +128,7 @@ public class UserExecution {
 						if(user != null) {
 							user = Azrael.SQLgetJoinDatesFromUser(user_id, e.getGuild().getIdLong(), user);
 							message.setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE));
-							if(user.getAvatar() != null)
+							if(user.getAvatar() != null && user.getAvatar().length() > 0 && user.getAvatar().startsWith("http"))
 								message.setThumbnail(user.getAvatar());
 							message.setAuthor(user.getUserName()+ " "+STATIC.getTranslation(e.getMember(), Translation.USER_INFO_ID)+": "+cache.getAdditionalInfo());
 							Bancollect warnedUser = Azrael.SQLgetData(user_id, e.getGuild().getIdLong());
@@ -194,6 +194,7 @@ public class UserExecution {
 								}
 								e.getChannel().sendMessage(message.build()).queue();
 								message.clear();
+								out.setLength(0);
 								for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, e.getGuild().getIdLong())) {
 									out.append("[`"+description+"`] ");
 								}
@@ -1705,7 +1706,6 @@ public class UserExecution {
 					}
 				}
 			}
-			//TODO: check why it doesn't work in any other language than english
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("gift-currency")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
 					Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());

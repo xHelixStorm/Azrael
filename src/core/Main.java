@@ -48,6 +48,7 @@ import commands.Register;
 import commands.Remove;
 import commands.RoleReaction;
 import commands.Room;
+import commands.Schedule;
 import commands.Subscribe;
 import commands.Set;
 import commands.Shop;
@@ -246,6 +247,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("accept", new Accept());
 		CommandHandler.commandsPublic.put("deny", new Deny());
 		CommandHandler.commandsPublic.put("language", new Language());
+		CommandHandler.commandsPublic.put("schedule", new Schedule());
 	}
 	
 	public static void addPrivateCommands() {

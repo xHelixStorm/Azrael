@@ -1,5 +1,6 @@
 package listeners;
 
+import commands.ScheduleExecution;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -24,10 +25,13 @@ public class ReconnectedListener extends ListenerAdapter{
 	public void onReconnect(ReconnectedEvent e) {
 		//clear all timers
 		STATIC.killAllTimers();
-		//restart timers for the double experience event
+		//restart all timers
 		if(IniFileReader.getDoubleExpEnabled()) {
 			DoubleExperienceStart.runTask(null, e, null, null);
 			DoubleExperienceOff.runTask();
+		}
+		for(final var guild : e.getJDA().getGuilds()) {
+			ScheduleExecution.restartTimers(guild);
 		}
 		//clear temporary Hashes
 		ClearHashes.runTask();

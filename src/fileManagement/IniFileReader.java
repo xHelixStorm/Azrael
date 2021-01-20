@@ -107,7 +107,6 @@ public class IniFileReader {
 			return temp;
 		}
 	}
-	
 	public static boolean getLinuxScreen() {
 		Ini ini = readConfig();
 		return ini.get("Bot", "LinuxScreen", boolean.class);
@@ -119,6 +118,10 @@ public class IniFileReader {
 	public static String getWebURL() {
 		Ini ini = readConfig();
 		return ini.get("Bot", "WebUrl");
+	}
+	public static String getAESSecret() {
+		Ini ini = readConfig();
+		return ini.get("Bot", "AESSecret");
 	}
 	
 	public static String getPastebinDeveloperKey() {

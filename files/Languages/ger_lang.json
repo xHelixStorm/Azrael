@@ -151,6 +151,7 @@
 	"param_none":					"keinen",
 	"param_restrict":				"begrenzen",
 	"param_language":				"sprache",
+	"param_complete":				"fertig",
 
 	"lang_eng":						"Englisch",
 	"lang_ger":						"Deutsch",
@@ -278,6 +279,7 @@
 	"command_accept":			 	"- **{}accept**\nAkzeptiere einen wartenden Benutzer in den Server.\n",
 	"command_deny":				 	"- **{}deny**\nKicke einen wartenden Benutzer vom Server.\n",
 	"command_language":		 		"- **{}language**\nÄndere die Bot Sprache.\n",
+	"command_schedule":				"- **{}schedule**\nPlane eine tägliche Nachricht, die um eine selbst definierte Uhrzeit versendet wird.\n",
 	"commands_disabled":		 	"Alle Befehle sind deaktiviert!",
 	
 	"daily_reward":				 	"Herzlichen Glückwunsch! Sie haben die folgende Belohnung freigeschaltet:\n",
@@ -480,6 +482,7 @@
 	"mute_err":						"Bitte geben Sie einen oder mehrere existierende Benutzernamen oder Benutzer-IDs an und dann, falls gewünscht, einen Grund!",
 	
 	"patchnotes_help":				"Bitte schreiben Sie einen der folgenden Titel als letzten Parameter, um die Patch-Notizen anzuzeigen.\n\n",
+	"patchnotes_version":			"Bot Patch-Notizen Version: ",
 	"patchnotes_not_available":		"Keine Patch-Notizen verfügbar!",
 	"patchnotes_not_found":			"Patch-Notizen nicht gefunden!",
 	"patchnotes_choice_1":			"Bitte wählen Sie zwischen *öffentlich* und *privat* Patch-Notizen!",
@@ -680,6 +683,7 @@
 	"shop_price":					"Preis",
 	"shop_return":					"Zurück",
 	"shop_sell":					"Verkaufen",
+	"shop_attacks":					"Angriffe",
 	"shop_purchase":				"Kaufen",
 	"shop_return_message":			"Zurück zur Auswahlseite",
 	"shop_inspect_err":				"Bitte schreiben Sie eine der sichtbaren Zahlen zur weiteren Inspektion!",
@@ -766,7 +770,7 @@
 	"user_found_15":				"**erfahrung-schenken**: Verschenken Sie Erfahrungspunkte.\n",
 	"user_found_16":				"**erfahrung-setzen**: Setzen einen Wert für die Erfahrungspunkte.\n",
 	"user_found_17":				"**level-setzen**: Vergeben Sie einen Level.\n",
-	"user_found_18":				"**geld-verschenken**: Verschenken Sie Geld.\n",
+	"user_found_18":				"**geld-schenken**: Verschenken Sie Geld.\n",
 	"user_found_19":				"**geld-setzen**: Setzen Sie eine bestimmte Menge an Geld.",
 	"user_not_found":				"Benutzer nicht gefunden! Bitte probieren Sie es noch einmal!",
 	"user_exit":					"Befehl abgebrochen!",
@@ -878,9 +882,10 @@
 	"user_kick_left":				"Aktion konnte nicht ausgeführt werden. Der Benutzer hat den Server bereits verlassen.",
 	"user_register_complete":		"Benutzer Registrierung abgeschlossen!",
 	
-	"write_help":					"Schreiben Sie eine Nachricht in einen anderen Textkanal, das auch mit den *edit* Befehl wieder editiert werden kann!\nAls ersten Parameter, erwähnen Sie den Textkanal oder schreiben Sie eine Textkanal ID, zum Beginnen!",
+	"write_help":					"Schreiben Sie eine Nachricht in einen anderen Textkanal, das auch mit den *edit* Befehl wieder editiert werden kann!\nAls ersten Parameter, erwähnen Sie den Textkanal oder schreiben Sie eine Textkanal ID, zum Beginnen! Wenn Sie die Nachricht verzögern möchten, schreiben Sie die Minuten als zweiten Parameter.",
 	"write_update":					"Verfassen Sie jetzt eine Nachricht!",
 	"write_sent":					"Nachricht gesendet!",
+	"write_delayed":				"Nachricht wird um {} Minuten verzögert!",
 	"write_too_long":				"Nachricht kann nicht länger als 2000 Zeichen sein!",
 	"write_no_screens":				"Bilder sind nicht erlaubt!",
 	
@@ -1262,5 +1267,25 @@
 	"deny_done":					"Die Verifizierung für den Benutzer {} mit der ID Nummer {} wurde abgelehnt und darf den Server nicht betreten!",
 	
 	"language_help":				"Wähle eines der unten stehenden Sprachen zusammen mit den Befehl aus um die Bot Sprache zu ändern, zB. für die Antworten auf Befehlen!",
-	"language_changed":				"Bot Sprache wurde geändert!"
+	"language_changed":				"Bot Sprache wurde geändert!",
+	
+	"schedule_help":				"Schreiben Sie einen der folgenden Parameter, um entweder aktuell geplante Nachrichten anzuzeigen, eine neue geplante Nachricht zu erstellen oder eine geplante Nachricht zu löschen! Schreiben Sie **verlassen**, um den Befehl zu unterbrechen\n",
+	"schedule_exited":				"Schedule Befehl unterbrochen!",
+	"schedule_display":				"Geben Sie die Nummer eines der geplanten Nachrichten ein, um die Nachricht anzuzeigen!\n\n",
+	"schedule_time":				"Uhrzeit",
+	"schedule_channel":				"Kanal",
+	"schedule_enabled":				"AKTIVIERT",
+	"schedule_disabled":			"DEAKTIVIERT",
+	"schedule_create":				"Für den ersten Schritt schreiben Sie bitte eine Nachricht, die geplant werden muss!",
+	"schedule_create2":				"Geben Sie nun bitte eine Text-Kanal-Erwähnung oder ID an, in der die Nachricht eingeplant werden soll!",
+	"schedule_create3":				"Schreiben Sie im nächsten Schritt die **{}** Uhrzeit im Format 'hhmmss'!",
+	"schedule_create4":				"Für den letzten Schritt können Sie einen der folgenden abgekürzten Wochentage eingeben, um die geplante Nachricht für diesen Tag entweder zu aktivieren oder zu deaktivieren! Sobald dies geschehen ist, schreiben Sie *fertig*, um die Einrichtung abzuschließen!",
+	"schedule_create5":				"Nachrichten Planung abgeschlossen!",
+	"schedule_remove":				"Geben Sie die Nummer einer der geplanten Aufgaben ein, um die ausgewählte geplante Nachricht zu entfernen!\n\n",
+	"schedule_remove2":				"Geplante Nachricht entfernt!",
+	"schedule_err":					"Keine geplante Nachrichten gefunden!",
+	"schedule_err2":				"Textkanal existiert nicht. Bitte versuchen Sie es erneut!",
+	"schedule_err3":				"Dieser Textkanal benötigt die Berechtigung MESSAGE_WRITE, um Nachrichten zu planen! Bitte setzen Sie diese Berechtigung für den Bot und versuchen Sie es dann erneut oder wählen Sie einen anderen Textkanal!",
+	"schedule_message":				"Geplante Nachricht konnte nicht an Kanal {} gesendet werden, da die Berechtigung MESSAGE_WRITE zum Senden einer Nachricht erforderlich ist!",
+	"schedule_message2":			"Geplante Nachricht konnte nicht an Kanal {} gesendet werden, da der Textkanal nicht mehr existiert!"
 }

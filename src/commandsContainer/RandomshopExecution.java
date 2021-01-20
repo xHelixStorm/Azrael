@@ -183,7 +183,7 @@ public class RandomshopExecution {
 							//draw won item from the Randomshop
 							final int weapon = weapon_id;
 							RandomshopRewardDrawer.drawReward(e, RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong()).parallelStream().filter(w -> w.getWeaponID() == weapon).findAny().orElse(null), user_details.getCurrency(), guild_settings, extend);
-							Hashes.addTempCache("randomshop_play_"+e.getMember().getUser().getId(), new Cache(180000, input));
+							Hashes.addTempCache("randomshop_play_"+e.getMember().getUser().getId(), new Cache(600000, input));
 						}
 						else if(weapon_id > 0) {
 							EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));

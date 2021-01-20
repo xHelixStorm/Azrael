@@ -147,7 +147,7 @@ public class FilterExecution {
 						}
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
 						cache.updateDescription("display-word-filter").setExpiration(180000);
-						Hashes.addTempCache(key, cache.setExpiration(180000));
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
@@ -157,7 +157,7 @@ public class FilterExecution {
 						}
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
 						cache.updateDescription("insert-word-filter").setExpiration(180000);
-						Hashes.addTempCache(key, cache.setExpiration(180000));
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
@@ -167,7 +167,7 @@ public class FilterExecution {
 						}
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
 						cache.updateDescription("remove-word-filter").setExpiration(180000);
-						Hashes.addTempCache(key, cache.setExpiration(180000));
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
@@ -177,7 +177,7 @@ public class FilterExecution {
 						}
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
 						cache.updateDescription("add-load-word-filter").setExpiration(180000);
-						Hashes.addTempCache(key, cache.setExpiration(180000));
+						Hashes.addTempCache(key, cache);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
@@ -187,7 +187,7 @@ public class FilterExecution {
 						}
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
 						cache.updateDescription("load-word-filter").setExpiration(180000);
-						Hashes.addTempCache(key, cache.setExpiration(180000));
+						Hashes.addTempCache(key, cache);
 					}
 				}
 				case "name-filter" -> {

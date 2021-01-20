@@ -43,10 +43,20 @@ public class Write implements CommandPublic {
 		if(args.length == 0) {
 			e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.WRITE_HELP)).build()).queue();
 		}
-		else if (args.length == 1) {
+		else if (args.length >= 1 && args.length <= 2) {
 			String channel_id = args[0].replaceAll("[<>#]", "");
 			if(e.getGuild().getTextChannelById(channel_id) != null) {
-				Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "W", channel_id));
+				String delay = "";
+				if(args.length == 2) {
+					if(args[1].replaceAll("[0-9]*", "").length() == 0) {
+						delay = args[1];
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+						return;
+					}
+				}
+				Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "W", channel_id, delay));
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TEXT_CHANNEL_NOT_EXISTS)).build()).queue();

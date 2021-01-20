@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commands.CustomCmd;
+import commands.ScheduleExecution;
 import constructors.Cache;
 import constructors.Guilds;
 import constructors.Messages;
@@ -168,10 +169,9 @@ public class ReadyListener extends ListenerAdapter {
 			
 			//retrieve private patch notes
 			var published = false;
-			//TODO: Text should be translated
 			if(priv_notes != null && GuildIni.getPrivatePatchNotes(guild.getIdLong())) {
 				EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle(STATIC.getTranslation2(guild, Translation.PATCHNOTES_LATEST_TITLE));
-				final var result = STATIC.writeToRemoteChannel(guild, messageBuild, "Bot patch notes version **"+STATIC.getVersion()+"** "+priv_notes.getDate()+"\n"+priv_notes.getMessage1(), Channel.LOG.getType());
+				final var result = STATIC.writeToRemoteChannel(guild, messageBuild, STATIC.getTranslation2(guild, Translation.PATCHNOTES_VERSION)+"**"+STATIC.getVersion()+"** "+priv_notes.getDate()+"\n"+priv_notes.getMessage1(), Channel.LOG.getType());
 				if(result) {
 					if(priv_notes.getMessage2() != null && priv_notes.getMessage2().length() > 0)
 						STATIC.writeToRemoteChannel(guild, messageBuild, priv_notes.getMessage2(), Channel.LOG.getType());
@@ -181,7 +181,7 @@ public class ReadyListener extends ListenerAdapter {
 			//retrieve public patch notes
 			if(publ_notes != null && GuildIni.getPublicPatchNotes(guild.getIdLong())) {
 				EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle(STATIC.getTranslation2(guild, Translation.PATCHNOTES_LATEST_TITLE));
-				final var result = STATIC.writeToRemoteChannel(guild, messageBuild, "Bot patch notes version **"+STATIC.getVersion()+"** "+publ_notes.getDate()+"\n"+publ_notes.getMessage1(), Channel.BOT.getType());
+				final var result = STATIC.writeToRemoteChannel(guild, messageBuild, STATIC.getTranslation2(guild, Translation.PATCHNOTES_VERSION)+"**"+STATIC.getVersion()+"** "+publ_notes.getDate()+"\n"+publ_notes.getMessage1(), Channel.BOT.getType());
 				if(result) {
 					STATIC.writeToRemoteChannel(guild, messageBuild, publ_notes.getMessage2(), Channel.BOT.getType());
 					published = true;
@@ -196,6 +196,9 @@ public class ReadyListener extends ListenerAdapter {
 			var doubleExp = GuildIni.getDoubleExperienceMode(guild.getIdLong());
 			if(!doubleExp.equals("auto"))
 				Hashes.addTempCache("doubleExp_gu"+guild.getId(), new Cache(0, doubleExp));
+			
+			//run scheduled messages timers
+			ScheduleExecution.startTimers(guild);
 			
 			//initialize Message pool cache and load saved messages, if available
 			Hashes.initializeGuildMessagePool(guild.getIdLong(), 10000);

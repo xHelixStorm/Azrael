@@ -48,12 +48,12 @@ public class RandomshopRewardDrawer {
 			e.getChannel().sendFile(file1, "reward.png").complete();
 			file1.delete();
 			
-			e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_REWARD).replaceFirst("\\{\\}", weapon.getDescription()+" "+weapon.getStatDescription()+" "+(time > 0 ? TimeUnit.MILLISECONDS.toDays(time)+STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_DAYS) : STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_PERM))).replace("{}", ""+currency)).queue();
+			e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_REWARD).replaceFirst("\\{\\}", weapon.getDescription()+(weapon.getStatDescription() != null ? " "+weapon.getStatDescription() : "")+" "+(time > 0 ? TimeUnit.MILLISECONDS.toDays(time)+STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_DAYS) : STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_PERM))).replace("{}", ""+currency)).queue();
 		} catch(IOException e1) {
 			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR_2)+weapon.getDescription()+" "+weapon.getStatDescription()).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR_2)+weapon.getDescription()+(weapon.getStatDescription() != null ? " "+weapon.getStatDescription() : "")).build()).queue();
 			else
-				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR_2)+weapon.getDescription()+" "+weapon.getStatDescription()).queue();
+				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_ERR_2).replace("{}", weapon.getDescription()+(weapon.getStatDescription() != null ? " "+weapon.getStatDescription() : ""))).queue();
 			logger.error("An error occurred while printing the random shop prize {} in guild {}", weapon.getDescription(), e.getGuild().getId(), e1);
 		}
 	}
