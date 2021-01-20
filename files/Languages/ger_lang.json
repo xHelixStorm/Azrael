@@ -279,6 +279,7 @@
 	"command_accept":			 	"- **{}accept**\nAkzeptiere einen wartenden Benutzer in den Server.\n",
 	"command_deny":				 	"- **{}deny**\nKicke einen wartenden Benutzer vom Server.\n",
 	"command_language":		 		"- **{}language**\nÄndere die Bot Sprache.\n",
+	"command_schedule":				"- **{}schedule**\nPlane eine tägliche Nachricht, die um eine selbst definierte Uhrzeit versendet wird.\n",
 	"commands_disabled":		 	"Alle Befehle sind deaktiviert!",
 	
 	"daily_reward":				 	"Herzlichen Glückwunsch! Sie haben die folgende Belohnung freigeschaltet:\n",

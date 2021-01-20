@@ -15,7 +15,7 @@ public class CommandList {
 		boolean entertainment = false;
 		boolean other = false;
 		
-		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getSubscribeCommand(guild_id) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoringCommand(guild_id) || GuildIni.getMuteCommand(guild_id) || GuildIni.getGoogleCommand(guild_id) || GuildIni.getWriteCommand(guild_id) || GuildIni.getEditCommand(guild_id) || GuildIni.getAcceptCommand(guild_id) || GuildIni.getDenyCommand(guild_id))) {
+		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getSubscribeCommand(guild_id) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoringCommand(guild_id) || GuildIni.getMuteCommand(guild_id) || GuildIni.getGoogleCommand(guild_id) || GuildIni.getWriteCommand(guild_id) || GuildIni.getEditCommand(guild_id) || GuildIni.getAcceptCommand(guild_id) || GuildIni.getDenyCommand(guild_id) || GuildIni.getScheduleCommand(guild_id))) {
 			administration = true;
 		}
 		
@@ -44,6 +44,7 @@ public class CommandList {
 			if(GuildIni.getEditCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_EDIT).replace("{}", prefix));
 			if(GuildIni.getAcceptCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ACCEPT).replace("{}", prefix));
 			if(GuildIni.getDenyCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DENY).replace("{}", prefix));
+			if(GuildIni.getScheduleCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SCHEDULE).replace("{}", prefix));
 		}
 		if(entertainment == true && type == 2) {
 			if(GuildIni.getPugCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PUG).replace("{}", prefix));

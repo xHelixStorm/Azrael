@@ -279,6 +279,7 @@
 	"command_accept":			 	"- **{}accept**\nAccept a waiting user into the server.\n",
 	"command_deny":				 	"- **{}deny**\nDeny a waiting user from joining the server.\n",
 	"command_language":		 		"- **{}language**\nChange the Bot language.\n",
+	"command_schedule":				"- **{}schedule**\nSchedule a daily message on a channel during a specified time.\n",
 	"commands_disabled":		 	"All commands are disabled!",
 	
 	"daily_reward":				 	"Congratulations! You have unlocked the following reward:\n",

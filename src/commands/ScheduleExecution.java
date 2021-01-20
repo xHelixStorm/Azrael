@@ -125,6 +125,7 @@ public class ScheduleExecution {
 	public static void createDays(GuildMessageReceivedEvent e, Cache cache, String message) {
 		constructors.Schedule schedule = (constructors.Schedule)cache.getObject();
 		if(!message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_COMPLETE))) {
+			boolean block = false;
 			switch(message.toLowerCase()) {
 				case "mo" -> schedule.setMonday((schedule.isMonday() ? false : true));
 				case "tu" -> schedule.setTuesday((schedule.isTuesday() ? false : true));
@@ -133,19 +134,22 @@ public class ScheduleExecution {
 				case "fr" -> schedule.setFriday((schedule.isFriday() ? false : true));
 				case "sa" -> schedule.setSaturday((schedule.isSaturday() ? false : true));
 				case "su" -> schedule.setSunday((schedule.isSunday() ? false : true));
+				default   -> block = true;
 			}
-			final String enabled = STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_ENABLED);
-			final String disabled = STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_DISABLED);
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(
-				  "**MO**: "+(schedule.isMonday() ? enabled : disabled)
-				+ " **TU**: "+(schedule.isTuesday() ? enabled : disabled)
-				+ " **WE**: "+(schedule.isWednesday() ? enabled : disabled)
-				+ " **TH**: "+(schedule.isThursday() ? enabled : disabled)
-				+ " **FR**: "+(schedule.isFriday() ? enabled : disabled)
-				+ " **SA**: "+(schedule.isSaturday() ? enabled : disabled)
-				+ " **SU**: "+(schedule.isSunday() ? enabled : disabled)
-			).build()).queue();
-			Hashes.addTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000).updateDescription2("days").setObject(schedule));
+			if(!block) {
+				final String enabled = STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_ENABLED);
+				final String disabled = STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_DISABLED);
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(
+					  "**MO**: "+(schedule.isMonday() ? enabled : disabled)
+					+ " **TU**: "+(schedule.isTuesday() ? enabled : disabled)
+					+ " **WE**: "+(schedule.isWednesday() ? enabled : disabled)
+					+ " **TH**: "+(schedule.isThursday() ? enabled : disabled)
+					+ " **FR**: "+(schedule.isFriday() ? enabled : disabled)
+					+ " **SA**: "+(schedule.isSaturday() ? enabled : disabled)
+					+ " **SU**: "+(schedule.isSunday() ? enabled : disabled)
+				).build()).queue();
+				Hashes.addTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000).updateDescription2("days").setObject(schedule));
+			}
 		}
 		else {
 			if(Azrael.SQLInsertScheduledMessage(e.getGuild().getIdLong(), schedule) > 0) {

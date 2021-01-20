@@ -32,7 +32,8 @@ public enum WeaponEffect {
 	PULL			(26, "PULL"),
 	FOLLOWUP		(27, "FOLLOWUP"),
 	INTERRUPT		(28, "INTERRUPT"),
-	FOUR_SHOT		(29, "FOUR_SHOT");
+	FOUR_SHOT		(29, "FOUR_SHOT"),
+	CHARGE			(30, "CHARGE");
 	
 	/**
 	 * Maps defined here to retrieve Enum either by id or description
