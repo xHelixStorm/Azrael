@@ -13,6 +13,7 @@ import constructors.Skins;
 import constructors.Weapons;
 import core.Hashes;
 import enums.Translation;
+import enums.WeaponEffect;
 import fileManagement.IniFileReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -185,8 +186,8 @@ public class ShopExecution {
 					embed.setThumbnail(shopItem.getThumbnail());
 				embed.setDescription("**"+shopItem.getDescription()+(shopItem.getStatDescription() != null ? " "+shopItem.getStatDescription() : "")+"**\n"+(shopItem.getFullDescription() != null && shopItem.getFullDescription().length() > 0 ? shopItem.getFullDescription() : ""));
 				embed.setColor(Color.BLUE);
+				StringBuilder out = new StringBuilder();
 				if(shopItem.getAttackDesc1() != null || shopItem.getAttackDesc2() != null || shopItem.getAttackDesc3() != null) {
-					StringBuilder out = new StringBuilder();
 					if(shopItem.getAttackDesc1() != null)
 						out.append("- "+shopItem.getAttackDesc1()+"\n");
 					if(shopItem.getAttackDesc2() != null)
@@ -194,6 +195,106 @@ public class ShopExecution {
 					if(shopItem.getAttackDesc3() != null)
 						out.append("- "+shopItem.getAttackDesc3());
 					embed.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_ATTACKS), out.toString(), false);
+				}
+				out.setLength(0);
+				out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_BASE_DAMAGE)+shopItem.getBaseDamage()+"\n");
+				out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_MAGAZINE)+shopItem.getMagazine()+"\n");
+				embed.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_STATS), out.toString(), false);
+				if(shopItem.getAttack1Name() != null) {
+					out.setLength(0);
+					if(shopItem.getAttack1DamagePlus() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_DAMAGE_PLUS)+shopItem.getAttack1DamagePlus()+"%\n");
+					if(shopItem.getAttack1DamageDrop() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_DAMAGE_DROP)+shopItem.getAttack1DamageDrop()+"%\n");
+					if(shopItem.getAttack1DamageDropDistance() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_DISTANCE_DMG_DROP)+shopItem.getAttack1DamageDropDistance()+"%\n");
+					if(shopItem.getAttack1Description().equals(WeaponEffect.BLOCK.desc) || shopItem.getAttack1Description().equals(WeaponEffect.COUNTER.desc)) {
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ABILITY_ACTIVATION)+shopItem.getAttack1HitChanceClose()+"%\n");
+					}
+					else if(shopItem.getAttack1HitChanceClose() > 0 || shopItem.getAttack1HitChanceMedium() > 0 || shopItem.getAttack1HitChanceDistant() > 0) {
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ACCURACY_CLOSE)+shopItem.getAttack1HitChanceClose()+"%\n");
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ACCURACY_MEDIUM)+shopItem.getAttack1HitChanceMedium()+"%\n");
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ACCURACY_FAR)+shopItem.getAttack1HitChanceDistant()+"%\n");
+					}
+					if(shopItem.getAttack1AmmoUsage() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_AMMO_USE)+shopItem.getAttack1AmmoUsage()+"\n");
+					if(shopItem.getAttack1SPConsumption() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_SP_CONSUMPTION)+shopItem.getAttack1SPConsumption()+"\n");
+					if(shopItem.getSpecial1Name() != null)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_SPECIAL_EFFECT)+WeaponEffect.valueOfDesc(shopItem.getSpecial1Description()).desc2);
+					embed.addField(WeaponEffect.valueOfDesc(shopItem.getAttack1Description()).desc2, out.toString(), false);
+				}
+				if(shopItem.getAttack2Name() != null) {
+					out.setLength(0);
+					if(shopItem.getAttack2DamagePlus() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_DAMAGE_PLUS)+shopItem.getAttack2DamagePlus()+"%\n");
+					if(shopItem.getAttack2DamageDrop() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_DAMAGE_DROP)+shopItem.getAttack2DamageDrop()+"%\n");
+					if(shopItem.getAttack2DamageDropDistance() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_DISTANCE_DMG_DROP)+shopItem.getAttack2DamageDropDistance()+"%\n");
+					if(shopItem.getAttack2Description().equals(WeaponEffect.BLOCK.desc) || shopItem.getAttack2Description().equals(WeaponEffect.COUNTER.desc)) {
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ABILITY_ACTIVATION)+shopItem.getAttack2HitChanceClose()+"%\n");
+					}
+					else if(shopItem.getAttack2HitChanceClose() > 0 || shopItem.getAttack2HitChanceMedium() > 0 || shopItem.getAttack2HitChanceDistant() > 0) {
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ACCURACY_CLOSE)+shopItem.getAttack2HitChanceClose()+"%\n");
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ACCURACY_MEDIUM)+shopItem.getAttack2HitChanceMedium()+"%\n");
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ACCURACY_FAR)+shopItem.getAttack2HitChanceDistant()+"%\n");
+					}
+					if(shopItem.getAttack2AmmoUsage() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_AMMO_USE)+shopItem.getAttack2AmmoUsage()+"\n");
+					if(shopItem.getAttack2SPConsumption() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_SP_CONSUMPTION)+shopItem.getAttack2SPConsumption()+"\n");
+					if(shopItem.getSpecial2Name() != null)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_SPECIAL_EFFECT)+WeaponEffect.valueOfDesc(shopItem.getSpecial2Description()).desc2);
+					embed.addField(WeaponEffect.valueOfDesc(shopItem.getAttack2Description()).desc2, out.toString(), false);
+				}
+				if(shopItem.getAttack3Name() != null) {
+					out.setLength(0);
+					if(shopItem.getAttack3DamagePlus() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_DAMAGE_PLUS)+shopItem.getAttack3DamagePlus()+"%\n");
+					if(shopItem.getAttack3DamageDrop() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_DAMAGE_DROP)+shopItem.getAttack3DamageDrop()+"%\n");
+					if(shopItem.getAttack3DamageDropDistance() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_DISTANCE_DMG_DROP)+shopItem.getAttack3DamageDropDistance()+"%\n");
+					if(shopItem.getAttack3Description().equals(WeaponEffect.BLOCK.desc) || shopItem.getAttack3Description().equals(WeaponEffect.COUNTER.desc)) {
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ABILITY_ACTIVATION)+shopItem.getAttack3HitChanceClose()+"%\n");
+					}
+					else if(shopItem.getAttack3HitChanceClose() > 0 || shopItem.getAttack3HitChanceMedium() > 0 || shopItem.getAttack3HitChanceDistant() > 0) {
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ACCURACY_CLOSE)+shopItem.getAttack3HitChanceClose()+"%\n");
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ACCURACY_MEDIUM)+shopItem.getAttack3HitChanceMedium()+"%\n");
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ACCURACY_FAR)+shopItem.getAttack3HitChanceDistant()+"%\n");
+					}
+					if(shopItem.getAttack3AmmoUsage() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_AMMO_USE)+shopItem.getAttack3AmmoUsage()+"\n");
+					if(shopItem.getAttack3SPConsumption() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_SP_CONSUMPTION)+shopItem.getAttack3SPConsumption()+"\n");
+					if(shopItem.getSpecial3Name() != null)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_SPECIAL_EFFECT)+WeaponEffect.valueOfDesc(shopItem.getSpecial3Description()).desc2);
+					embed.addField(WeaponEffect.valueOfDesc(shopItem.getAttack3Description()).desc2, out.toString(), false);
+				}
+				if(shopItem.getAttack4Name() != null) {
+					out.setLength(0);
+					if(shopItem.getAttack4DamagePlus() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_DAMAGE_PLUS)+shopItem.getAttack4DamagePlus()+"%\n");
+					if(shopItem.getAttack4DamageDrop() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_DAMAGE_DROP)+shopItem.getAttack4DamageDrop()+"%\n");
+					if(shopItem.getAttack4DamageDropDistance() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_DISTANCE_DMG_DROP)+shopItem.getAttack4DamageDropDistance()+"%\n");
+					if(shopItem.getAttack4Description().equals(WeaponEffect.BLOCK.desc) || shopItem.getAttack4Description().equals(WeaponEffect.COUNTER.desc)) {
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ABILITY_ACTIVATION)+shopItem.getAttack4HitChanceClose()+"%\n");
+					}
+					else if(shopItem.getAttack4HitChanceClose() > 0 || shopItem.getAttack4HitChanceMedium() > 0 || shopItem.getAttack4HitChanceDistant() > 0) {
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ACCURACY_CLOSE)+shopItem.getAttack4HitChanceClose()+"%\n");
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ACCURACY_MEDIUM)+shopItem.getAttack4HitChanceMedium()+"%\n");
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_ACCURACY_FAR)+shopItem.getAttack4HitChanceDistant()+"%\n");
+					}
+					if(shopItem.getAttack4AmmoUsage() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_AMMO_USE)+shopItem.getAttack4AmmoUsage()+"\n");
+					if(shopItem.getAttack4SPConsumption() > 0)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_SP_CONSUMPTION)+shopItem.getAttack4SPConsumption()+"\n");
+					if(shopItem.getSpecial4Name() != null)
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_SPECIAL_EFFECT)+WeaponEffect.valueOfDesc(shopItem.getSpecial4Description()).desc2);
+					embed.addField(WeaponEffect.valueOfDesc(shopItem.getAttack4Description()).desc2, out.toString(), false);
 				}
 				embed.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_PURCHASE), shopItem.getPrice()+" "+guild_settings.getCurrency(), true);
 				embed.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_RETURN), STATIC.getTranslation(e.getMember(), Translation.SHOP_RETURN_MESSAGE), true);
