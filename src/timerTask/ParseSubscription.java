@@ -51,41 +51,42 @@ public class ParseSubscription extends TimerTask{
 					return;
 				}
 				var rss_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.RSS.getType())).findAny().orElse(null);
-				if(rss_channel != null) {
-					if(feeds.size() > 0) {
-						logger.info("Fetching subscriptions in guild {}", guild.getId());
-						for(RSS rss : feeds) {
-							new Thread(() -> {
-								long channel_id;
-								boolean defaultChannel = true;
-								TextChannel textChannel = guild.getTextChannelById(rss.getChannelID()); 
-								if(textChannel != null) {
-									channel_id = textChannel.getIdLong();
-									defaultChannel = false;
-								}
-								else {
-									channel_id = rss_channel.getChannel_ID();
-								}
-								try {
-									logger.trace("Retrieving subscription {} in guild {}", rss.getURL(), e.getGuildById(guild_id).getId());
-									boolean success = false;
-									if(rss.getType() == 1)
-										success = BasicModel.ModelParse(STATIC.retrieveWebPageCode(rss.getURL()), guild, rss, channel_id, defaultChannel);
-									else if(rss.getType() == 2)
-										success = TwitterModel.ModelParse(guild, rss, channel_id, defaultChannel);
-									if(success)
-										Hashes.addSubscriptionStatus(guild.getId()+"_"+rss.getURL(), 0);
-									else
-										incrementSubscriptionStatus(guild, rss.getURL());
-								} catch(SocketTimeoutException e1){
-									logger.warn("Timeout on subscription {}", rss.getURL());
+				if(rss_channel != null || feeds.parallelStream().filter(f -> f.getChannelID() > 0).findAny().orElse(null) != null) {
+					logger.info("Fetching subscriptions in guild {}", guild.getId());
+					for(RSS rss : feeds) {
+						new Thread(() -> {
+							long channel_id;
+							boolean defaultChannel = true;
+							TextChannel textChannel = guild.getTextChannelById(rss.getChannelID()); 
+							if(textChannel != null) {
+								channel_id = textChannel.getIdLong();
+								defaultChannel = false;
+							}
+							else if(rss_channel != null) {
+								channel_id = rss_channel.getChannel_ID();
+							}
+							else {
+								return;
+							}
+							try {
+								logger.trace("Retrieving subscription {} in guild {}", rss.getURL(), e.getGuildById(guild_id).getId());
+								boolean success = false;
+								if(rss.getType() == 1)
+									success = BasicModel.ModelParse(STATIC.retrieveWebPageCode(rss.getURL()), guild, rss, channel_id, defaultChannel);
+								else if(rss.getType() == 2)
+									success = TwitterModel.ModelParse(guild, rss, channel_id, defaultChannel);
+								if(success)
+									Hashes.addSubscriptionStatus(guild.getId()+"_"+rss.getURL(), 0);
+								else
 									incrementSubscriptionStatus(guild, rss.getURL());
-								} catch (Exception e1) {
-									logger.error("Error on retrieving subscription {}", rss.getURL(), e1);
-									incrementSubscriptionStatus(guild, rss.getURL());
-								}
-							}).start();
-						}
+							} catch(SocketTimeoutException e1){
+								logger.warn("Timeout on subscription {}", rss.getURL());
+								incrementSubscriptionStatus(guild, rss.getURL());
+							} catch (Exception e1) {
+								logger.error("Error on retrieving subscription {}", rss.getURL(), e1);
+								incrementSubscriptionStatus(guild, rss.getURL());
+							}
+						}).start();
 					}
 				}
 				else {

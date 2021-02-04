@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.google.api.services.youtube.model.SearchListResponse;
 
 import core.UserPrivs;
+import enums.Channel;
 import enums.CommandAction;
 import enums.Translation;
 import fileManagement.GuildIni;
@@ -208,7 +209,7 @@ public class CustomCmd implements CommandPublic {
 					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.MESSAGE_WRITE)))
 						e.getGuild().getTextChannelById(textChannel.getIdLong()).sendMessage(out).queue();
 					else 
-						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName())+textChannel.getAsMention(), "log");
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName())+textChannel.getAsMention(), Channel.LOG.getType());
 				}
 			}
 			else {

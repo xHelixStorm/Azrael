@@ -139,15 +139,21 @@ public class Matchmaking implements CommandPublic {
 				logger.error("Random map couldn't be retrieved in guild {}", e.getGuild().getId());
 				return;
 			}
-			//create the matchmaking room
-			final int room_id = Competitive.SQLCreateMatchmakingRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), type, map.getMapID()); 
-			if(room_id > 0) {
-				final int members = Competitive.SQLgetMatchmakingMembers(e.getGuild().getIdLong());
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CREATED).replaceFirst("\\{\\}", ""+room_id).replace("{}", ""+members)).build()).queue();
+			//Retrieve room size limit
+			final int members = Competitive.SQLgetMatchmakingMembers(e.getGuild().getIdLong());
+			if(members > 1) {
+				//create the matchmaking room
+				final int room_id = Competitive.SQLCreateMatchmakingRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), type, map.getMapID(), members);
+				if(room_id > 0) {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CREATED).replaceFirst("\\{\\}", ""+room_id).replace("{}", ""+members)).build()).queue();
+				}
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("Matchmaking room couldn't be created in guild {}", e.getGuild().getId());
+				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Matchmaking room couldn't be created in guild {}", e.getGuild().getId());
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_ERR_12)).build()).queue();
 			}
 		}
 		else if(result > 0) {

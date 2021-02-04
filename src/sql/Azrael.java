@@ -2060,7 +2060,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptions);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptions2);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, type);
 			rs = stmt.executeQuery();

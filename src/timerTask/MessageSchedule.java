@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import constructors.Schedule;
 import core.Hashes;
+import enums.Channel;
 import enums.Translation;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -66,11 +67,11 @@ public class MessageSchedule extends TimerTask {
 				textChannel.sendMessage(schedule.getMessage()).queue();
 			}
 			else {
-				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.SCHEDULE_MESSAGE).replace("{}", ""+schedule.getChannel_id()), "log");
+				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.SCHEDULE_MESSAGE).replace("{}", ""+schedule.getChannel_id()), Channel.LOG.getType());
 			}
 		}
 		else {
-			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.SCHEDULE_MESSAGE2).replace("{}", ""+schedule.getChannel_id()), "log");
+			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(guild, Translation.SCHEDULE_MESSAGE2).replace("{}", ""+schedule.getChannel_id()), Channel.LOG.getType());
 		}
 	}
 

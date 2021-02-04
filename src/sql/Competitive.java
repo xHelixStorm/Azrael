@@ -440,7 +440,7 @@ public class Competitive {
 		try {
 			ArrayList<Member> members = new ArrayList<Member>();
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMatchmakingMembers);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMatchmakingMembers2);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, room_id);
 			rs = stmt.executeQuery();
@@ -1259,8 +1259,8 @@ public class Competitive {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLCreateMatchmakingRoom(long guild_id, long user_id, int type, int map) {
-		logger.trace("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}", guild_id, user_id, type, map);
+	public static int SQLCreateMatchmakingRoom(long guild_id, long user_id, int type, int map, int member_limit) {
+		logger.trace("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}, {}", guild_id, user_id, type, map, member_limit);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -1284,6 +1284,7 @@ public class Competitive {
 				stmt.setInt(4, map);
 			else
 				stmt.setNull(4, Types.INTEGER);
+			stmt.setInt(5, member_limit);
 			int result = stmt.executeUpdate();
 			
 			if(result > 0) {
