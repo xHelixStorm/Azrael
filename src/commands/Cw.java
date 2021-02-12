@@ -76,15 +76,14 @@ public class Cw implements CommandPublic {
 									team = 1;
 								else if(room.getClanID2() == member.getClanID())
 									team = 2;
-								final int members = Competitive.SQLgetMatchmakingMembers(e.getGuild().getIdLong());
-								if(members > 0) {
-									if(room.getMembers()+1 <= members) {
+								if(room.getMemberLimit() > 0) {
+									if(room.getMembers()+1 <= room.getMemberLimit()) {
 										final String username = Competitive.SQLgetUsernameFromUserStats(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong());
 										if(username != null) {
 											final var map = Competitive.SQLgetMap(room.getMapID());
 											if(map != null) {
 												if(Competitive.SQLJoinRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), room.getRoomID(), team) > 0) {
-													e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_QUEUE).replaceFirst("\\{\\}", username).replaceFirst("\\{\\}", ""+room.getRoomID()).replaceFirst("\\{\\}", ""+(room.getMembers()+1)).replace("{}", ""+members)).build()).queue();
+													e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_QUEUE).replaceFirst("\\{\\}", username).replaceFirst("\\{\\}", ""+room.getRoomID()).replaceFirst("\\{\\}", ""+(room.getMembers()+1)).replace("{}", ""+room.getMemberLimit())).build()).queue();
 													//print room details
 													if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_HISTORY))) {
 														if(room.getMessageID() != 0) {
@@ -158,10 +157,9 @@ public class Cw implements CommandPublic {
 									if(username != null) {
 										final var map = Competitive.SQLgetMap(room.getMapID());
 										if(map != null) {
-											final int members = Competitive.SQLgetMatchmakingMembers(e.getGuild().getIdLong());
 											if((room.getMembers()-1) > 0) {
 												if(Competitive.SQLLeaveRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), room_id) > 0) {
-													e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_SUCCESS).replaceFirst("\\{\\}", username).replaceFirst("\\{\\}", ""+(room.getMembers()-1)).replace("{}", ""+members)).build()).queue();
+													e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_SUCCESS).replaceFirst("\\{\\}", username).replaceFirst("\\{\\}", ""+(room.getMembers()-1)).replace("{}", ""+room.getMemberLimit())).build()).queue();
 													//print room details
 													if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_HISTORY))) {
 														if(room.getMessageID() != 0) {
@@ -188,7 +186,7 @@ public class Cw implements CommandPublic {
 											else {
 												//delete the matchmaking room, if no one is queueing
 												if(Competitive.SQLDeleteMatchmakingRoom(e.getGuild().getIdLong(), room_id) > 0) {
-													e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_SUCCESS).replaceFirst("\\{\\}", username).replaceFirst("\\{\\}", ""+(room.getMembers()-1)).replace("{}", ""+members)).build()).queue();
+													e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_SUCCESS).replaceFirst("\\{\\}", username).replaceFirst("\\{\\}", ""+(room.getMembers()-1)).replace("{}", ""+room.getMemberLimit())).build()).queue();
 													e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_CLOSE_ROOM)).build()).queue();
 												}
 											}

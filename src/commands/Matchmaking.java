@@ -36,14 +36,14 @@ public class Matchmaking implements CommandPublic {
 	public void action(String[] args, GuildMessageReceivedEvent e) {
 		if(Join.profilePage(e, false)) {
 			final var this_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
-			if(this_channel != null && (this_channel.getChannel_Type().equals(Channel.CO1.getType()) || this_channel.getChannel_Type().equals(Channel.CO2.getType()))) {
+			if(this_channel != null && (this_channel.getChannel_Type().equals(Channel.CO1.getType()) || this_channel.getChannel_Type().equals(Channel.CO2.getType()) || this_channel.getChannel_Type().equals(Channel.CO4.getType()) || this_channel.getChannel_Type().equals(Channel.CO5.getType()))) {
 				final String channelType = this_channel.getChannel_Type();
 				switch(channelType) {
-					case "co1" -> {
+					case "co1", "co4" -> {
 						//regular matchmaking room
 						regular(e);
 					}
-					case "co2" -> {
+					case "co2", "co5" -> {
 						//matchmaking room with picking
 						picking(e);
 					}
@@ -143,9 +143,14 @@ public class Matchmaking implements CommandPublic {
 			final int members = Competitive.SQLgetMatchmakingMembers(e.getGuild().getIdLong());
 			if(members > 1) {
 				//create the matchmaking room
-				final int room_id = Competitive.SQLCreateMatchmakingRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), type, map.getMapID(), members);
+				final int room_id = Competitive.SQLCreateMatchmakingRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), type, map.getMapID(), members, e.getChannel().getIdLong());
 				if(room_id > 0) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CREATED).replaceFirst("\\{\\}", ""+room_id).replace("{}", ""+members)).build()).queue();
+					EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CREATED).replaceFirst("\\{\\}", ""+room_id).replace("{}", ""+members));
+					if(Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && (f.getChannel_Type().equals(Channel.CO4.getType()) || f.getChannel_Type().equals(Channel.CO5.getType()))).findAny().orElse(null) != null) {
+						final String prefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+						embed.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), prefix+"master\n"+prefix+"restrict\n"+prefix+"start", false);
+					}
+					e.getChannel().sendMessage(embed.build()).queue();
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();

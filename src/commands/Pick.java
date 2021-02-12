@@ -30,7 +30,7 @@ public class Pick implements CommandPublic {
 			final var room = Competitive.SQLgetMatchmakingRoom(e.getGuild().getIdLong(), room_id);
 			if(room != null && room.getRoomID() != 0) {
 				//confirm that its the same channel where the queue has been filled and also that the room status is 2
-				if(room.getStatus() == 2 && room.getType() == 2 && room.getChannelID() == e.getChannel().getIdLong()) {
+				if(room.getStatus() == 2 && room.getType() == 2 && room.getChannelID() == e.getChannel().getIdLong() && (room.getLastJoined().getTime()+1800000)-System.currentTimeMillis() > 0) {
 					final var picker = Competitive.SQLRetrievePicker(e.getGuild().getIdLong(), room.getRoomID(), 2);
 					if(picker != null) {
 						//double check that the current user is the picker
@@ -38,10 +38,10 @@ public class Pick implements CommandPublic {
 							if(args.length == 0) {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PICK_HELP)).build()).queue();
 							}
-							else if(args.length == 1) {
+							else {
 								String firstParam = args[0].replaceAll("[<@!>]", "");
 								Member member = null;
-								if(firstParam.replaceAll("[0-9]*", "").length() == 0) {
+								if(args.length == 1 && firstParam.replaceAll("[0-9]*", "").length() == 0  && e.getGuild().getMemberById(args[0]) != null) {
 									long user_id = Long.parseLong(firstParam);
 									member = Competitive.SQLRetrieveMember(e.getGuild().getIdLong(), room.getRoomID(), 2, user_id);
 								}
@@ -90,9 +90,6 @@ public class Pick implements CommandPublic {
 										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PICK_ERR_3).replace("{}", member.getUsername())).build()).queue();
 									}
 								}
-							}
-							else {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 							}
 						}
 						else {

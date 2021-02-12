@@ -152,6 +152,7 @@
 	"param_restrict":				"restrict",
 	"param_language":				"language",
 	"param_complete":				"complete",
+	"param_max":					"max",
 
 	"lang_eng":						"English",
 	"lang_ger":						"German",
@@ -1019,7 +1020,7 @@
 	"role_mute_dm":					"You have been muted from **{}**. The mute will last for **{}**. Please refrain from rejoining the server, since the mute role will be reapplied again! Thank you for your understanding.\nThis is an automated reply. You'll receive no reply by writing in direct message! ",
 	"role_mute_dm_2":				"You have been muted from **{}**. The mute will last for **{}** (Warning {}). Please refrain from rejoining the server, since the mute role will be reapplied again! Thank you for your understanding.\nThis is an automated reply. You'll receive no reply by writing in direct message! ",
 	"role_mute_dm_3":				"You have been muted permanently from **{}**. Please refrain from rejoining the server, since the mute role will be reapplied again! Thank you for your understanding.\nThis is an automated reply. You'll receive no reply by writing in direct message! ",
-	"role_ban_dm":					"You have been banned from **{}**, since you have exceeded the maximal amount of allowed warnings. Thank you for your understanding. Thank you for your understanding.\nThis is an automated reply. You'll receive no reply by writing in direct message! ",
+	"role_ban_dm":					"You have been banned from **{}**, since you have exceeded the maximal amount of allowed warnings. Thank you for your understanding.\nThis is an automated reply. You'll receive no reply by writing in direct message! ",
 	"role_dm_locked":				"User couldn't be warned regarding the mute because the user's direct messages is locked!",
 	"role_ban_dm_locked":			"User couldn't be warned regarding the ban because the user's direct messages is locked!",
 	"role_hours":					" hours",
@@ -1171,8 +1172,10 @@
 	"matchmaking_started":			"**STARTED**",
 	
 	"leave_success":				"{} has left the queue! ({}/{})",
+	"leave_master":					"{} has become the room master of room {}!",
 	"leave_err":					"You're currently not queueing in a room!",
 	"leave_err_2":					"You cannot leave the room, when the queue is full!",
+	"leave_err_3":					"An internal error occurred! Room master couldn't be given to another member of the same room!",
 	"leave_close_room":				"Room has been closed because all members have left the queue!",
 	
 	"queue_success":				"These users are queued!\n\n",
@@ -1197,6 +1200,7 @@
 	"cw_err_4":						"Clan war challenge is currently still being verified and another challenge can't be sent during this time!",
 	"cw_err_5":						"You cannot send a new clan war invitation while your clan is engaged in a clan war!",
 	"cw_err_6":						"This clan is currently engaged in a clan war and cannot accept another challenge invitation! Please try later again!",
+	"cw_err_7":						"You need to be a deputy member to use this command!",
 	"cw_expired":					"Challenge has expired!",
 	"cw_war_accepted":				"Clan war request of **{}** accepted!",
 	"cw_war_accepted_2":			"Clan **{}** has accepted the clan war request of clan **{}**! Members of both clans can now join room number {}.",
@@ -1300,5 +1304,17 @@
 	"schedule_err2":				"Text channel doesn't exist, please try again!",
 	"schedule_err3":				"This text channel requires the MESSAGE_WRITE permission to schedule messages! Please set this permission for the Bot and then try again or select a different text channel!",
 	"schedule_message":				"Scheduled message couldn't be sent to channel {} because the MESSAGE_WRITE permission is required to send a message!",
-	"schedule_message2":			"Scheduled message couldn't be sent to channel {} because the text channel doesn't exist anymore!"
+	"schedule_message2":			"Scheduled message couldn't be sent to channel {} because the text channel doesn't exist anymore!",
+	
+	"master_help":					"To change the room master, mention the user or type their registered name!",
+	"master_title":					"Room Master",
+	"master_passed":				"**{}** is now the room master of room {}!",
+	"master_err":					"You're not the room master of room {}! Action denied!",
+	
+	"restrict_help":				"Restrict the current room to less members by writing an even number together with the command! To return it to default, use the *max* parameter!",
+	"restrict_success":				"Room {} has been restricted to {} members!",
+	"restrict_err":					"Write an even number together with the command to restrict the amount of users who can join the room! To reset this option, write *max* as parameter!",
+	"restrict_err2":				"Restriction not possible! There are more users inside the room than the specified value!",
+	
+	"start_err":					"There are not enough members to start the match in room {}! At least {} members required!"
 }

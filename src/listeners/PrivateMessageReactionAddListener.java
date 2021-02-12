@@ -166,21 +166,28 @@ public class PrivateMessageReactionAddListener extends ListenerAdapter {
 														if(challengerClanName != null) {
 															final var challengeClan = Competitive.SQLgetClanDetails(e.getUser().getIdLong(), guild_id);
 															if(challengeClan != null && challengeClan.getClanID() != 0) {
-																final int room_id = Competitive.SQLCreateClanMatchmakingRoom(guild_id, 3, map_id, clan_id, challengeClan.getClanID()); 
-																if(room_id > 0) {
-																	m.delete().queue();
-																	e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getUser(), Translation.CW_WAR_ACCEPTED).replace("{}", challengerClanName)).build()).queue();
-																	Guild guild = e.getJDA().getGuildById(guild_id);
-																	TextChannel textChannel = guild.getTextChannelById(reservation.getChannelID());
-																	if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))
-																		textChannel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getJDA().getGuildById(guild_id), Translation.CW_WAR_ACCEPTED_2).replaceFirst("\\{\\}", challengeClan.getClanName()).replaceFirst("\\{\\}", challengerClanName).replace("{}", ""+room_id)).build()).queue();
-																	else
-																		logger.warn("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permission required to display the clan war reply on channel {} in guild {}", textChannel.getId(), guild.getId());
-																	Competitive.SQLUpdateClanReservationAction(guild_id, user_id, clan_id, reservation.getType(), 1);
+																final var members = Competitive.SQLgetMatchmakingMembers(guild_id);
+																if(members > 0) {
+																	final int room_id = Competitive.SQLCreateClanMatchmakingRoom(guild_id, 3, map_id, clan_id, challengeClan.getClanID(), members); 
+																	if(room_id > 0) {
+																		m.delete().queue();
+																		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getUser(), Translation.CW_WAR_ACCEPTED).replace("{}", challengerClanName)).build()).queue();
+																		Guild guild = e.getJDA().getGuildById(guild_id);
+																		TextChannel textChannel = guild.getTextChannelById(reservation.getChannelID());
+																		if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))
+																			textChannel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getJDA().getGuildById(guild_id), Translation.CW_WAR_ACCEPTED_2).replaceFirst("\\{\\}", challengeClan.getClanName()).replaceFirst("\\{\\}", challengerClanName).replace("{}", ""+room_id)).build()).queue();
+																		else
+																			logger.warn("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permission required to display the clan war reply on channel {} in guild {}", textChannel.getId(), guild.getId());
+																		Competitive.SQLUpdateClanReservationAction(guild_id, user_id, clan_id, reservation.getType(), 1);
+																	}
+																	else {
+																		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getUser(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getUser(), Translation.GENERAL_ERROR)).build()).queue();
+																		logger.error("A new clan matchmaking room couldn't be created in guild {}", guild_id);
+																	}
 																}
 																else {
 																	e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getUser(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getUser(), Translation.GENERAL_ERROR)).build()).queue();
-																	logger.error("A new clan matchmaking room couldn't be created in guild {}", guild_id);
+																	logger.error("Member limit for a matchmaking room couldn't be retrieved in guild {}", guild_id);
 																}
 															}
 															else {

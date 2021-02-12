@@ -152,6 +152,7 @@
 	"param_restrict":				"begrenzen",
 	"param_language":				"sprache",
 	"param_complete":				"fertig",
+	"param_max":					"max",
 
 	"lang_eng":						"Englisch",
 	"lang_ger":						"Deutsch",
@@ -162,8 +163,8 @@
 	"lang_por":						"Portugiesisch",
 	"lang_ita":						"Italienisch",
 	
-	"not_bot_channel": 			 	" Ich darf in diesem Kanal keine Befehle ausführen, bitte schreiben Sie es noch einmal in ",
-	"wrong_channel":				" Ich darf in diesem Kanal diesen Befehltyp nicht ausführen, bitten schreiben Sie es noch einmal in ",
+	"not_bot_channel": 			 	" Ich darf im diesem Kanal keine Befehle ausführen, bitte schreiben Sie es noch einmal in ",
+	"wrong_channel":				" Ich darf im diesem Kanal diesen Befehl nicht ausführen, bitten schreiben Sie es noch einmal in ",
 	"not_quiz_channel":				"Es wurde noch kein Quiz-Kanal registriert!",
 	"no_tra_channel":				"Ein Papierkorb-Kanal muss registriert werden, bevor diese Funktionalität genutzt werden kann!",
 	"no_roles":						"Keine Rollen verfügbar!",
@@ -1071,7 +1072,7 @@
 	
 	"join_no_profile":				"Sie müssen einen Profilseite erstellen bevor dieses Befehl benutzt werden kann. Vervollständigen Sie ihren Profil mit der Angabe ihres *Benutzernamen*.",
 	"join_no_profile_2":			"Sie müssen einen Profilseite erstellen bevor dieses Befehl benutzt werden kann. Starten Sie mit der Angabe ihres *Benutzernamen*. Danach nennen Sie den namen des Servers, wo Sie hautpsächlich Spielen.",
-	"join_profile_created":			"Willkommen **{}**! Sie sind nun in der Lagen Matchmaking Räume zu erstellen und bereits erstellte Räume beizutreten!",
+	"join_profile_created":			"Willkommen **{}**! Sie sind nun in der Lage Matchmaking Räume zu erstellen und bereits erstellte Räume beizutreten!",
 	"join_profile_created_2":		"Willkommen **{}**! Um ihre Profilseite zu vervollständigen, geben Sie an im welchem Server Sie primör Spielen. Diese Server sind verfügbar:\n\n",
 	"join_no_server":				"Bitte eines der oben genannten Server auswählen!",
 	"join_server_added":			"Profilseite erstellt! Sie können nun den Befehl erneut benutzen!",
@@ -1172,8 +1173,10 @@
 	
 	
 	"leave_success":				"{} hat den Warteraum verlassen! ({}/{})",
+	"leave_master":					"{} ist jetzt der Raum Master vom Raum {}!",
 	"leave_err":					"Sie befinden sich momentan nicht in einen Warteraum!",
 	"leave_err_2":					"Sie können den Raum nicht verlassen, sobald der Warteraum voll ist!",
+	"leave_err_3":					"Einen internen Fehler ist aufgetreten! Der Raum Master konnte nicht an einen anderen Raum Mitglied vergeben werden!",
 	"leave_close_room":				"Raum wurde geschlossen, weil alle Mitglieder den Warteraum verlassen haben!",
 	
 	"queue_success":				"Die Benutzer befinden sich im Warteraum!\n\n",
@@ -1198,6 +1201,7 @@
 	"cw_err_4":						"Klan Krieg Herausforderung muss noch akzeptiert oder abgelehnt werden. Momentan kann keinen anderen Klan herausgefordert werden!",
 	"cw_err_5":						"Sie können keinen anderen Klan herausfordern, wenn ihr Klan gerade in einen Klan Krieg involviert ist!",
 	"cw_err_6":						"Dieser Klan ist momentan in einen Klan Krieg involviert und kann keine Herausforderung annehmen! Bitte versuchen Sie es später erneut!",
+	"cw_err_7":						"Sie haben nicht genügend Berechtigungen, im ihrem Klan, um dieses Befehl zu benutzen!",
 	"cw_expired":					"Herausforderung abgelaufen!",
 	"cw_war_accepted":				"Klan Krieg Anfrage von **{}** akzeptiert!",
 	"cw_war_accepted_2":			"Klan **{}** hat die Herausforderung von **{}** angenommen! Der Klan Krieg beginnt! Mitglieder beider Klans können den Raum {} beitreten.",
@@ -1300,5 +1304,17 @@
 	"schedule_err2":				"Textkanal existiert nicht. Bitte versuchen Sie es erneut!",
 	"schedule_err3":				"Dieser Textkanal benötigt die Berechtigung MESSAGE_WRITE, um Nachrichten zu planen! Bitte setzen Sie diese Berechtigung für den Bot und versuchen Sie es dann erneut oder wählen Sie einen anderen Textkanal!",
 	"schedule_message":				"Geplante Nachricht konnte nicht an Kanal {} gesendet werden, da die Berechtigung MESSAGE_WRITE zum Senden einer Nachricht erforderlich ist!",
-	"schedule_message2":			"Geplante Nachricht konnte nicht an Kanal {} gesendet werden, da der Textkanal nicht mehr existiert!"
+	"schedule_message2":			"Geplante Nachricht konnte nicht an Kanal {} gesendet werden, da der Textkanal nicht mehr existiert!",
+	
+	"master_help":					"Um den Master des Raumes zu ändern, erwähne denjenigen oder schreibe dessen registrierten Namen!",
+	"master_title":					"Raum Master",
+	"master_passed":				"**{}** ist jetzt der Raum Master vom Raum {}!",
+	"master_err":					"Du bist nicht der Master vom Raum {}! Aktion abgebrochen!",
+	
+	"restrict_help":				"Begrenzen Sie den Raum auf weniger Benutzer, indem man eine gerade Zahl zusammen mit den Befehl schreibt! Um die vorherige Auswahl zurückzusetzen, benutzen Sie den *max* Parameter!",
+	"restrict_success":				"Raum {} wurde auf {} Benutzer begrenzt!",
+	"restrict_err":					"Schreiben Sie eine gerade Zahl um die Anzahl der Benutzer, die den Raum betreten können, zu begrenzen! Um die Auswahl zurückzusetzen, schreiben Sie *max* als Parameter!",
+	"restrict_err2":				"Begrenzung nicht möglich! Es haben mehr Benutzer den Raum betretet, als den angegebenen Wert!",
+	
+	"start_err":					"Es sind nicht genug Spieler vorhanden um den Raum {} zu starten!"
 }

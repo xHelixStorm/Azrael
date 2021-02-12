@@ -9,8 +9,9 @@ public class Member {
 	private int team;
 	private boolean leader;
 	private boolean picker;
+	private boolean master;
 	
-	public Member(long _user_id, int _room_id, String _username, String _server, int _elo, int _team, boolean _leader, boolean _picker) {
+	public Member(long _user_id, int _room_id, String _username, String _server, int _elo, int _team, boolean _leader, boolean _picker, boolean _master) {
 		this.user_id = _user_id;
 		this.room_id = _room_id;
 		this.username = _username;
@@ -19,6 +20,7 @@ public class Member {
 		this.team = _team;
 		this.leader = _leader;
 		this.picker = _picker;
+		this.master = _master;
 	}
 	
 	public long getUserID() {
@@ -44,5 +46,8 @@ public class Member {
 	}
 	public boolean isPicker() {
 		return this.picker;
+	}
+	public boolean isMaster() {
+		return this.master;
 	}
 }

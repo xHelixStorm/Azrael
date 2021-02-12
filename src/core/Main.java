@@ -32,6 +32,7 @@ import commands.Join;
 import commands.Language;
 import commands.Leaderboard;
 import commands.Leave;
+import commands.Master;
 import commands.Matchmaking;
 import commands.Meow;
 import commands.Mute;
@@ -46,6 +47,7 @@ import commands.Rank;
 import commands.Reboot;
 import commands.Register;
 import commands.Remove;
+import commands.Restrict;
 import commands.RoleReaction;
 import commands.Room;
 import commands.Schedule;
@@ -53,6 +55,7 @@ import commands.Subscribe;
 import commands.Set;
 import commands.Shop;
 import commands.ShutDown;
+import commands.Start;
 import commands.Stats;
 import commands.Top;
 import commands.Use;
@@ -248,6 +251,9 @@ public class Main {
 		CommandHandler.commandsPublic.put("deny", new Deny());
 		CommandHandler.commandsPublic.put("language", new Language());
 		CommandHandler.commandsPublic.put("schedule", new Schedule());
+		CommandHandler.commandsPublic.put("master", new Master());
+		CommandHandler.commandsPublic.put("restrict", new Restrict());
+		CommandHandler.commandsPublic.put("start", new Start());
 	}
 	
 	public static void addPrivateCommands() {

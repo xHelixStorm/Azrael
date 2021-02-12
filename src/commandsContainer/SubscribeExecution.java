@@ -303,6 +303,9 @@ public class SubscribeExecution {
 					logger.info("User {} has set the alternative print channel {} for the Twitter hashtag or RSS url {} in guild {}", e.getMember().getUser().getId(), textChannel.getId(), subscription.getURL(), e.getGuild().getId());
 					Hashes.removeFeeds(e.getGuild().getIdLong());
 					Hashes.clearTempCache(key);
+					if(!ParseSubscription.timerIsRunning(e.getGuild().getIdLong())) {
+						ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
+					}
 				}
 				else {
 					e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();

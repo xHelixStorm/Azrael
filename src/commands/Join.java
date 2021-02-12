@@ -64,7 +64,7 @@ public class Join implements CommandPublic {
 		final var all_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
 		
 		if(clanCheck) {
-			var clan_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.CO3.getType())).collect(Collectors.toList());
+			var clan_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.CO3.getType()) || f.getChannel_Type().equals(Channel.CO6.getType()))).collect(Collectors.toList());
 			var this_channel = clan_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 			if(this_channel == null && clan_channels.size() > 0) {
 				e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.WRONG_CHANNEL)+STATIC.getChannels(clan_channels)).queue();
@@ -73,7 +73,7 @@ public class Join implements CommandPublic {
 		}
 		
 		var bot_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
-		var com_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.CO1.getType()) || f.getChannel_Type().equals(Channel.CO2.getType()))).collect(Collectors.toList());
+		var com_channels = all_channels.parallelStream().filter(f -> f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.CO1.getType()) || f.getChannel_Type().equals(Channel.CO2.getType()) || f.getChannel_Type().equals(Channel.CO4.getType()) || f.getChannel_Type().equals(Channel.CO5.getType()))).collect(Collectors.toList());
 		var this_bot_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		var this_com_channel = com_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		
@@ -146,14 +146,14 @@ public class Join implements CommandPublic {
 	public static void joinMatchmaking(GuildMessageReceivedEvent e, String [] args) {
 		//join an existing matchmaking room
 		final var this_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
-		if(this_channel != null && (this_channel.getChannel_Type().equals(Channel.CO1.getType()) || this_channel.getChannel_Type().equals(Channel.CO2.getType()))) {
+		if(this_channel != null && (this_channel.getChannel_Type().equals(Channel.CO1.getType()) || this_channel.getChannel_Type().equals(Channel.CO2.getType()) || this_channel.getChannel_Type().equals(Channel.CO4.getType()) || this_channel.getChannel_Type().equals(Channel.CO5.getType()))) {
 			final String channelType = this_channel.getChannel_Type();
 			switch(channelType) {
-				case "co1" -> {
+				case "co1", "co4" -> {
 					//regular matchmaking room
 					join(e, 1);
 				}
-				case "co2" -> {
+				case "co2", "co5" -> {
 					//matchmaking room with picking
 					join(e, 2);
 				}
@@ -186,7 +186,8 @@ public class Join implements CommandPublic {
 			//verify that the user hasn't already joined a different room type
 			final int result = Competitive.SQLisUserInRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong());
 			if(result == 0) {
-				final int members = Competitive.SQLgetMatchmakingMembers(e.getGuild().getIdLong());
+				//Consider the restriction settings
+				final int members = room.getMemberLimit();
 				if(members > 0) {
 					//check if the queue is already full
 					if(room.getMembers()+1 <= members) {
@@ -240,7 +241,7 @@ public class Join implements CommandPublic {
 		}
 	}
 	
-	private static void queueFull(GuildMessageReceivedEvent e, Room room, int roomLimit) {
+	static void queueFull(GuildMessageReceivedEvent e, Room room, int roomLimit) {
 		final var queue = Competitive.SQLgetMatchmakingMembers(e.getGuild().getIdLong(), room.getRoomID());
 		if(queue != null && queue.size() > 0) {
 			//shuffle the queue
@@ -262,6 +263,7 @@ public class Join implements CommandPublic {
 					Map<String, Integer> serverCount = new HashMap<String, Integer>();
 					Member [] team1 = new Member[teamSize];
 					Member [] team2 = new Member[teamSize];
+					Member master = null;
 					int pointer1 = 0;
 					int pointer2 = 0;
 					int team1Elo = 0;
@@ -269,6 +271,9 @@ public class Join implements CommandPublic {
 					for(int i = 0; i < queue.size(); i++) {
 						Member currentMember = null;
 						for(final var member : queue) {
+							if(member.isMaster()) {
+								master = member;
+							}
 							if(!sortedMembers.contains(member)) {
 								if(currentMember == null)
 									currentMember = member;
@@ -375,7 +380,10 @@ public class Join implements CommandPublic {
 						final String iniTeamName2 = GuildIni.getCompetitiveTeam2(e.getGuild().getIdLong());
 						message.addField((iniTeamName1.length() > 0 ? iniTeamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1)), team1Out.toString()+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_AVG_ELO)+avgEloTeam1, true);
 						message.addField((iniTeamName2.length() > 0 ? iniTeamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2)), team2Out.toString()+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_AVG_ELO)+avgEloTeam2, true);
-						message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+GuildIni.getCommandPrefix(e.getGuild().getIdLong())+"changemap`", false);
+						if(master != null)
+							message.addField(STATIC.getTranslation(e.getMember(), Translation.MASTER_TITLE), ":crown: "+master.getUsername(), false);
+						if(room.getMapID() != 0)
+							message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+GuildIni.getCommandPrefix(e.getGuild().getIdLong())+"changemap`", false);
 						e.getChannel().sendMessage(message.build()).queueAfter(3, TimeUnit.SECONDS, m -> {
 							Competitive.SQLUpdateRoomMessageID(e.getGuild().getIdLong(), room.getRoomID(), e.getChannel().getIdLong(), m.getIdLong());
 						});
@@ -390,7 +398,11 @@ public class Join implements CommandPublic {
 					Map<String, Integer> serverCount = new HashMap<String, Integer>();
 					Member captain1 = null;
 					Member captain2 = null;
+					Member master = null;
 					for(final var member : queue) {
+						if(member.isMaster()) {
+							master = member;
+						}
 						if(captain1 == null) {
 							captain1 = member;
 						}
@@ -459,7 +471,9 @@ public class Join implements CommandPublic {
 						}
 						message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_PLAYER_POOL), out.toString(), false);
 						String commandPrefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
-						message.addField("Commands", STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+commandPrefix+"changemap`\n"+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_PICK_USER)+"`"+commandPrefix+"pick "+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_USERNAME)+"`", false);
+						if(master != null)
+							message.addField(STATIC.getTranslation(e.getMember(), Translation.MASTER_TITLE), ":crown: "+master.getUsername(), false);
+						message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), (room.getMapID() != 0 ? STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+commandPrefix+"changemap`\n"+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_PICK_USER)+"`" : "")+commandPrefix+"pick "+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_USERNAME)+"`", false);
 						e.getChannel().sendMessage(message.build()).queueAfter(3, TimeUnit.SECONDS, m -> {
 							Competitive.SQLUpdateRoomMessageID(e.getGuild().getIdLong(), room.getRoomID(), e.getChannel().getIdLong(), m.getIdLong());
 						});

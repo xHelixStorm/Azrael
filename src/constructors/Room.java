@@ -11,6 +11,7 @@ public class Room {
 	private int clan_id_1;
 	private int clan_id_2;
 	private int map_id;
+	private int member_limit;
 	private Timestamp created;
 	private Timestamp last_joined;
 	private long channel_id;
@@ -20,13 +21,14 @@ public class Room {
 		//empty constructor
 	}
 	
-	public Room(int _room_id, int _type, int _members, int _status, int _winner, int _clan_id_1, int _clan_id_2, int _map_id, Timestamp _created, Timestamp _last_joined, long _channel_id, long _message_id) {
+	public Room(int _room_id, int _type, int _members, int _status, int _winner, int _clan_id_1, int _clan_id_2, int _map_id, int _member_limit, Timestamp _created, Timestamp _last_joined, long _channel_id, long _message_id) {
 		this.room_id = _room_id;
 		this.type = _type;
 		this.members = _members;
 		this.status = _status;
 		this.winner = _winner;
 		this.map_id = _map_id;
+		this.member_limit = _member_limit;
 		this.clan_id_1 = _clan_id_1;
 		this.clan_id_2 = _clan_id_2;
 		this.created = _created;
@@ -58,6 +60,9 @@ public class Room {
 	}
 	public int getMapID() {
 		return this.map_id;
+	}
+	public int getMemberLimit() {
+		return this.member_limit;
 	}
 	public Timestamp getCreated() {
 		return this.created;

@@ -1,10 +1,12 @@
 package commands;
 
 import java.awt.Color;
+import java.util.Comparator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constructors.Member;
 import core.UserPrivs;
 import enums.Translation;
 import fileManagement.GuildIni;
@@ -40,13 +42,30 @@ public class Leave implements CommandPublic {
 			if(room != null && room.getRoomID() > 0) {
 				if(room.getStatus() == 1) {
 					if((room.getLastJoined().getTime()+1800000)-System.currentTimeMillis() > 0) {
-						final String username = Competitive.SQLgetUsernameFromUserStats(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong());
-						if(username != null) {
-							final int members = Competitive.SQLgetMatchmakingMembers(e.getGuild().getIdLong());
+						final var user = Competitive.SQLRetrieveMember(e.getGuild().getIdLong(), room.getRoomID(), room.getStatus(), e.getMember().getUser().getIdLong());
+						if(user != null) {
 							if((room.getMembers()-1) > 0) {
 								//leave the room
 								if(Competitive.SQLLeaveRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), room_id) > 0) {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_SUCCESS).replaceFirst("\\{\\}", username).replaceFirst("\\{\\}", ""+(room.getMembers()-1)).replace("{}", ""+members)).build()).queue();
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_SUCCESS).replaceFirst("\\{\\}", user.getUsername()).replaceFirst("\\{\\}", ""+(room.getMembers()-1)).replace("{}", ""+room.getMemberLimit())).build()).queue();
+									//give away room master to next member with highest elo
+									if(user.isMaster() && room.getMembers()-1 > 0) {
+										final var roomMembers = Competitive.SQLgetMatchmakingMembers(e.getGuild().getIdLong(), room.getRoomID());
+										if(roomMembers != null && roomMembers.size() > 0) {
+											final var toMember = roomMembers.parallelStream().max(Comparator.comparingInt(Member::getElo)).get();
+											if(Competitive.SQLUpdateRoomMaster(e.getGuild().getIdLong(), toMember.getUserID(), room.getRoomID()) > 0) {
+												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.LEAVE_MASTER).replaceFirst("\\{\\}", toMember.getUsername()).replace("{}", ""+room.getRoomID())).build()).queue();
+											}
+											else {
+												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_ERR_3)).build()).queue();
+												logger.error("User {} couldn't become the room master of room {} in guild {}", toMember.getUserID(), room.getRoomID(), e.getGuild().getId());
+											}
+										}
+										else {
+											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_ERR_3)).build()).queue();
+											logger.error("Matchmaking room members couldn't be retrieved in guild {}", e.getGuild().getId());
+										}
+									}
 								}
 								else {
 									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -56,14 +75,14 @@ public class Leave implements CommandPublic {
 							else {
 								//delete the matchmaking room, if no one is queueing
 								if(Competitive.SQLDeleteMatchmakingRoom(e.getGuild().getIdLong(), room_id) > 0) {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_SUCCESS).replaceFirst("\\{\\}", username).replaceFirst("\\{\\}", ""+(room.getMembers()-1)).replace("{}", ""+members)).build()).queue();
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_SUCCESS).replaceFirst("\\{\\}", user.getUsername()).replaceFirst("\\{\\}", ""+(room.getMembers()-1)).replace("{}", ""+room.getMemberLimit())).build()).queue();
 									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEAVE_CLOSE_ROOM)).build()).queue();
 								}
 							}
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Username couldn't be retrieved for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+							logger.error("Leaving user {} couldn't be retrieved in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 						}
 					}
 					else {

@@ -154,6 +154,7 @@ public enum Translation {
 	PARAM_RESTRICT				("param_restrict"),
 	PARAM_LANGUAGE				("param_language"),
 	PARAM_COMPLETE				("param_complete"),
+	PARAM_MAX					("param_max"),
 	
 	LANG_ENG					("lang_eng"),
 	LANG_GER					("lang_ger"),
@@ -1173,8 +1174,10 @@ public enum Translation {
 	MATCHMAKING_STARTED			("matchmaking_started"),
 	
 	LEAVE_SUCCESS				("leave_success"),
+	LEAVE_MASTER				("leave_master"),
 	LEAVE_ERR					("leave_err"),
 	LEAVE_ERR_2					("leave_err_2"),
+	LEAVE_ERR_3					("leave_err_3"),
 	LEAVE_CLOSE_ROOM			("leave_close_room"),
 	
 	QUEUE_SUCCESS				("queue_success"),
@@ -1199,6 +1202,7 @@ public enum Translation {
 	CW_ERR_4					("cw_err_4"),
 	CW_ERR_5					("cw_err_5"),
 	CW_ERR_6					("cw_err_6"),
+	CW_ERR_7					("cw_err_7"),
 	CW_EXPIRED					("cw_expired"),
 	CW_WAR_ACCEPTED				("cw_war_accepted"),
 	CW_WAR_ACCEPTED_2			("cw_war_accepted_2"),
@@ -1302,7 +1306,19 @@ public enum Translation {
 	SCHEDULE_ERR2				("schedule_err2"),
 	SCHEDULE_ERR3				("schedule_err3"),
 	SCHEDULE_MESSAGE			("schedule_message"),
-	SCHEDULE_MESSAGE2			("schedule_message2");
+	SCHEDULE_MESSAGE2			("schedule_message2"),
+	
+	MASTER_HELP					("master_help"),
+	MASTER_TITLE				("master_title"),
+	MASTER_PASSED				("master_passed"),
+	MASTER_ERR					("master_err"),
+	
+	RESTRICT_HELP				("restrict_help"),
+	RESTRICT_SUCCESS			("restrict_success"),
+	RESTRICT_ERR				("restrict_err"),
+	RESTRICT_ERR2				("restrict_err2"),
+	
+	START_ERR					("start_err");
 	
 	private String value;
 	
