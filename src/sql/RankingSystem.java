@@ -884,8 +884,9 @@ public class RankingSystem {
 					levelSkin.setNameLengthLimit(rs.getInt(15));
 					levelSkin.setTextFontSize(rs.getInt(16));
 					levelSkin.setNameFontSize(rs.getInt(17));
-					levelSkin.setLine(rs.getInt(18));
-					levelSkin.setSource(rs.getString(19));
+					levelSkin.setFont(rs.getString(18));
+					levelSkin.setLine(rs.getInt(19));
+					levelSkin.setSource(rs.getString(20));
 					levelList.add(levelSkin);
 					Hashes.addLevelSkin(guild_id, levelSkin.getSkin(), levelSkin);
 				}
@@ -958,8 +959,9 @@ public class RankingSystem {
 					rankSkin.setNameLengthLimit(rs.getInt(26));
 					rankSkin.setTextFontSize(rs.getInt(27));
 					rankSkin.setNameFontSize(rs.getInt(28));
-					rankSkin.setLine(rs.getInt(29));
-					rankSkin.setSource(rs.getString(30));
+					rankSkin.setFont(rs.getString(29));
+					rankSkin.setLine(rs.getInt(30));
+					rankSkin.setSource(rs.getString(31));
 					Hashes.addRankSkin(guild_id, rankSkin.getSkin(), rankSkin);
 					skinList.add(rankSkin);
 				}
@@ -1041,8 +1043,9 @@ public class RankingSystem {
 					profileSkin.setTextFontSize(rs.getInt(35));
 					profileSkin.setNameFontSize(rs.getInt(36));
 					profileSkin.setDescriptionMode(rs.getInt(37));
-					profileSkin.setLine(rs.getInt(38));
-					profileSkin.setSource(rs.getString(39));
+					profileSkin.setFont(rs.getString(38));
+					profileSkin.setLine(rs.getInt(39));
+					profileSkin.setSource(rs.getString(40));
 					Hashes.addProfileSkin(guild_id, profileSkin.getSkin(), profileSkin);
 					skinList.add(profileSkin);
 				}

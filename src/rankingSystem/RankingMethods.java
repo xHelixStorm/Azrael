@@ -62,6 +62,7 @@ public class RankingMethods extends ListenerAdapter {
 		}
 		
 		try {
+			final String font = (skin.getFont() != null ? skin.getFont() : "Nexa Bold");
 			BufferedImage rank = ImageIO.read(new File((skinIcon.getSource() == null ? "./files/RankingSystem/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
 			String name = e.getMember().getEffectiveName();
 			int characterCounter = name.length();
@@ -109,11 +110,11 @@ public class RankingMethods extends ListenerAdapter {
 				g.setColor(color);
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 				if(skin.getLevelX() > 0 || skin.getLevelY() > 0) {
-					g.setFont(new Font("Nexa Bold", Font.BOLD, skin.getTextFontSize()));
+					g.setFont(new Font(font, Font.BOLD, skin.getTextFontSize()));
 					g.drawString(levelS1+""+levelS2, getCenteredString(levelS1+""+levelS2, skin.getLevelX(), g), skin.getLevelY());
 				}
 				if(skin.getNameX() > 0 || skin.getNameY() > 0) {
-					g.setFont(new Font("Nexa Bold", Font.BOLD, skin.getNameFontSize()));
+					g.setFont(new Font(font, Font.BOLD, skin.getNameFontSize()));
 					g.drawString(name, skin.getNameX(), skin.getNameY());
 				}
 				ImageIO.write(overlay, skin.getFileType(), new File(IniFileReader.getTempDirectory()+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType()));
@@ -138,11 +139,11 @@ public class RankingMethods extends ListenerAdapter {
 					g.setColor(color);
 					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 					if(skin.getLevelX() > 0 || skin.getLevelY() > 0) {
-						g.setFont(new Font("Nexa Bold", Font.BOLD, skin.getTextFontSize()));
+						g.setFont(new Font(font, Font.BOLD, skin.getTextFontSize()));
 						g.drawString(levelS1+""+levelS2, getCenteredString(levelS1+""+levelS2, skin.getLevelX(), g), skin.getLevelY());
 					}
 					if(skin.getNameX() > 0 || skin.getNameY() > 0) {
-						g.setFont(new Font("Nexa Bold", Font.BOLD, skin.getNameFontSize()));
+						g.setFont(new Font(font, Font.BOLD, skin.getNameFontSize()));
 						g.drawString(name, skin.getNameX(), skin.getNameY());
 					}
 					writer.writeToSequence(overlay);
@@ -238,7 +239,8 @@ public class RankingMethods extends ListenerAdapter {
 			return;
 		}
 		
-		try{
+		try {
+			final String font = (skin.getFont() != null ? skin.getFont() : "Nexa Bold");
 			BufferedImage experienceBar;
 			if(_experience != 0 && skin.getBarColor() > 0) {
 				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+skin.getBarColor()+"_"+100+".png"));
@@ -280,7 +282,7 @@ public class RankingMethods extends ListenerAdapter {
 					g.drawImage(avatarPicture, skin.getAvatarX(), skin.getAvatarY(), skin.getAvatarWidth(), skin.getAvatarHeight(), null);
 				Color color = new Color(skin.getColorR(), skin.getColorG(), skin.getColorB());
 				g.setColor(color);
-				g.setFont(new Font("Nexa Bold", Font.PLAIN, skin.getTextFontSize()));
+				g.setFont(new Font(font, Font.PLAIN, skin.getTextFontSize()));
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 				if(skin.getExpTextX() > 0 || skin.getExpTextY() > 0)
 					g.drawString("Exp:", skin.getExpTextX(), skin.getExpTextY());
@@ -290,7 +292,7 @@ public class RankingMethods extends ListenerAdapter {
 				if(skin.getPlacementX() > 0 || skin.getPlacementY() > 0)
 					g.drawString("Rank:  #"+rankString, skin.getPlacementX(), skin.getPlacementY());
 				if(skin.getNameX() > 0 || skin.getNameY() > 0) {
-					g.setFont(new Font("Nexa Bold", Font.BOLD, skin.getNameFontSize()));
+					g.setFont(new Font(font, Font.BOLD, skin.getNameFontSize()));
 					g.drawString(name, skin.getNameX(), skin.getNameY());
 				}
 				
@@ -316,7 +318,7 @@ public class RankingMethods extends ListenerAdapter {
 						g.drawImage(avatarPicture, skin.getAvatarX(), skin.getAvatarY(), skin.getAvatarWidth(), skin.getAvatarHeight(), null);
 					Color color = new Color(skin.getColorR(), skin.getColorG(), skin.getColorB());
 					g.setColor(color);
-					g.setFont(new Font("Nexa Bold", Font.PLAIN, skin.getTextFontSize()));
+					g.setFont(new Font(font, Font.PLAIN, skin.getTextFontSize()));
 					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 					if(skin.getExpTextX() > 0 || skin.getExpTextY() > 0)
 						g.drawString("Exp:", skin.getExpTextX(), skin.getExpTextY());
@@ -326,7 +328,7 @@ public class RankingMethods extends ListenerAdapter {
 					if(skin.getPlacementX() > 0 || skin.getPlacementY() > 0)
 						g.drawString("Rank:  #"+rankString, skin.getPlacementX(), skin.getPlacementY());
 					if(skin.getNameX() > 0 || skin.getNameY() > 0) {
-						g.setFont(new Font("Nexa Bold", Font.BOLD, skin.getNameFontSize()));
+						g.setFont(new Font(font, Font.BOLD, skin.getNameFontSize()));
 						g.drawString(name, skin.getNameX(), skin.getNameY());
 					}
 					
@@ -423,7 +425,8 @@ public class RankingMethods extends ListenerAdapter {
 			return;
 		}
 		
-		try{
+		try {
+			final String font = (skin.getFont() != null ? skin.getFont() : "Nexa Bold");
 			BufferedImage experienceBar;
 			if(_experiencePercentage != 0 && skin.getBarColor() > 0) {
 				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+skin.getBarColor()+"_"+100+".png"));
@@ -468,7 +471,7 @@ public class RankingMethods extends ListenerAdapter {
 					g.drawImage(avatarPicture, skin.getAvatarX(), skin.getAvatarY(), skin.getAvatarWidth(), skin.getAvatarHeight(), null);
 				Color color = new Color(skin.getColorR(), skin.getColorG(), skin.getColorB());
 				g.setColor(color);
-				g.setFont(new Font("Nexa Bold", Font.PLAIN, skin.getTextFontSize()));
+				g.setFont(new Font(font, Font.PLAIN, skin.getTextFontSize()));
 				if(skin.getExpTextX() > 0 || skin.getExpTextY() > 0) {
 					g.drawString("Exp:", skin.getExpTextX(), skin.getExpTextY());
 				}
@@ -523,7 +526,7 @@ public class RankingMethods extends ListenerAdapter {
 					g.drawString(currentExperienceString+"/"+insertDots(rankUpExperience), getRightString(""+currentExperienceString, skin.getExpReachX(), g), skin.getExpReachY());
 				}
 				if(skin.getNameX() > 0 || skin.getNameY() > 0) {
-					g.setFont(new Font("Nexa Bold", Font.BOLD, skin.getNameFontSize()));
+					g.setFont(new Font(font, Font.BOLD, skin.getNameFontSize()));
 					g.drawString(name, skin.getNameX(), skin.getNameY());
 				}
 				
@@ -551,7 +554,7 @@ public class RankingMethods extends ListenerAdapter {
 						g.drawImage(avatarPicture, skin.getAvatarX(), skin.getAvatarY(), skin.getAvatarWidth(), skin.getAvatarHeight(), null);
 					Color color = new Color(skin.getColorR(), skin.getColorG(), skin.getColorB());
 					g.setColor(color);
-					g.setFont(new Font("Nexa Bold", Font.PLAIN, skin.getTextFontSize()));
+					g.setFont(new Font(font, Font.PLAIN, skin.getTextFontSize()));
 					if(skin.getExpTextX() > 0 || skin.getExpTextY() > 0) {
 						g.drawString("Exp:", skin.getExpTextX(), skin.getExpTextY());
 					}
@@ -606,7 +609,7 @@ public class RankingMethods extends ListenerAdapter {
 						g.drawString(currentExperienceString+"/"+insertDots(rankUpExperience), getRightString(""+currentExperienceString, skin.getExpReachX(), g), skin.getExpReachY());
 					}
 					if(skin.getNameX() > 0 || skin.getNameY() > 0) {
-						g.setFont(new Font("Nexa Bold", Font.BOLD, skin.getNameFontSize()));
+						g.setFont(new Font(font, Font.BOLD, skin.getNameFontSize()));
 						g.drawString(name, skin.getNameX(), skin.getNameY());
 					}
 					

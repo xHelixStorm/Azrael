@@ -81,7 +81,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.34.538";
+	private static final String VERSION = "7.34.539";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -143,19 +143,17 @@ public class STATIC {
 	 */
 	
 	public static String getTranslation(Member member, Translation event) {
-		//retrieve language. In case non was found, search on the db and if it fails use default language
+		//retrieve language. In case none was found, search on the db and if it fails use default language
 		String lang = Azrael.SQLgetUserLang(member.getUser().getIdLong());
 		if(lang == null) {
-			lang = Hashes.getLanguage(member.getGuild().getIdLong());
+			lang = Azrael.SQLgetLanguage(member.getGuild().getIdLong());
 			if(lang == null) {
-				lang = Azrael.SQLgetLanguage(member.getGuild().getIdLong());
-				if(lang == null) {
-					lang = "eng";
-					Hashes.setLanguage(member.getGuild().getIdLong(), lang);
-				}
-				else
-					Hashes.setLanguage(member.getGuild().getIdLong(), lang);
+				lang = "eng";
+				Hashes.setLanguage(member.getUser().getIdLong(), lang);
+				Hashes.setLanguage(member.getGuild().getIdLong(), lang);
 			}
+			else
+				Hashes.setLanguage(member.getUser().getIdLong(), lang);
 		}
 		
 		return getMessage(lang, event);
@@ -181,13 +179,8 @@ public class STATIC {
 		//retrieve language. In case non was found, search on the db and if it fails use default language
 		String lang = Azrael.SQLgetUserLang(user.getIdLong());
 		if(lang == null) {
-			lang = Azrael.SQLgetLanguage(user.getIdLong());
-			if(lang == null) {
-				lang = "eng";
-				Hashes.setLanguage(user.getIdLong(), lang);
-			}
-			else
-				Hashes.setLanguage(user.getIdLong(), lang);
+			lang = "eng";
+			Hashes.setLanguage(user.getIdLong(), lang);
 		}
 		
 		return getMessage(lang, event);

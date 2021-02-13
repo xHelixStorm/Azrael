@@ -43,6 +43,7 @@ public class UserRank {
 	private String fileType;
 	private int line;
 	private String source;
+	private String font;
 	
 	public int getNameLengthLimit() {
 		return nameLengthLimit;
@@ -140,6 +141,10 @@ public class UserRank {
 	public String getSource() {
 		return source;
 	}
+	public String getFont() {
+		return font;
+	}
+	
 	public void setNameLengthLimit(int nameLengthLimit) {
 		this.nameLengthLimit = nameLengthLimit;
 	}
@@ -235,5 +240,8 @@ public class UserRank {
 	}
 	public void setSource(String source) {
 		this.source = source;
+	}
+	public void setFont(String font) {
+		this.font = font;
 	}
 }
