@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.sql.Timestamp;
 import java.util.EnumSet;
 
@@ -98,10 +99,19 @@ import util.STATIC;
 
 public class Main {
 	static {System.setProperty("logback.configurationFile", "./logback.xml");}
-	public static JDABuilder builder;
+	private final static Logger logger = LoggerFactory.getLogger(Main.class);
+	private static JDABuilder builder;
 	
 	@SuppressWarnings({ "static-access", "deprecation" })
 	public static void main(String [] args) {
+		
+		//set default uncaught exception handler
+		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				logger.error("Uncaught exception on thread {}: ", t, e);
+			}
+		});
 		
 		Logger logger = LoggerFactory.getLogger(Main.class);
 		boolean [] dir = new boolean[3];
