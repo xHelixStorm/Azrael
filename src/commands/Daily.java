@@ -137,11 +137,21 @@ public class Daily implements CommandPublic {
 							//if it's a currency reward, add it directly to the total currency of the user and update the db
 							if(list.get(random).getType().equals("cur")) {
 								Ranking user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
-								user_details.setCurrency(user_details.getCurrency()+Long.parseLong(list.get(random).getDescription().replaceAll("[^0-9]*", "")));
-								user_details.setLastUpdate(timestamp);
-								editedRows = RankingSystem.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), user_details.getLastUpdate());
-								if(editedRows > 0)
-									Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
+								//look up the amount to update the currency
+								final var reward = list.get(random);
+								final var itemEffects = RankingSystem.SQLgetItemEffects(e.getGuild().getIdLong());
+								if(!itemEffects.isEmpty() && itemEffects.containsKey(reward.getDescription())) {
+									user_details.setCurrency(user_details.getCurrency()+itemEffects.get(reward.getDescription()));
+									user_details.setLastUpdate(timestamp);
+									editedRows = RankingSystem.SQLUpdateCurrency(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), user_details.getCurrency(), user_details.getLastUpdate());
+									if(editedRows > 0)
+										Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
+								}
+								else {
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Currency couldn't be updated for user {} with the daily reward {} in guild {}", e.getMember().getUser().getId(), reward.getDescription(), e.getGuild().getId());
+									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Currency from daily not updated", reward.getDescription());
+								}
 							}
 							//if it's a experience boost reward, add it to inventory and activate it, if the action is set to 'use'
 							else if(list.get(random).getType().equals("exp")) {

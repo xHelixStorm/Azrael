@@ -1,6 +1,7 @@
 package core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -81,6 +82,7 @@ public class Hashes {
     private static final ConcurrentMap<String, Integer> subscription_status = new ConcurrentHashMap<String, Integer>();
     private static final ConcurrentMap<Long, ArrayList<CategoryConf>> categories = new ConcurrentHashMap<Long, ArrayList<CategoryConf>>();
     private static final ConcurrentMap<Long, ArrayList<Timer>> schedules = new ConcurrentHashMap<Long, ArrayList<Timer>>();
+    private static final ConcurrentMap<Long, HashMap<String, Long>> itemEffect = new ConcurrentHashMap<Long, HashMap<String, Long>>();
     
     public static void initializeGuildMessagePool(Long key, final int max_message_pool_size) {
     	LinkedHashMap<Long, ArrayList<Messages>> message_pool = new LinkedHashMap<Long, ArrayList<Messages>>() {
@@ -287,6 +289,9 @@ public class Hashes {
 	public static void addSchedule(Long key, ArrayList<Timer> timer) {
 		schedules.put(key, timer);
 	}
+	public static void addItemEffects(Long key, HashMap<String, Long> items) {
+		itemEffect.put(key, items);
+	}
 	
 	public static ArrayList<Messages> getMessagePool(long key, long message_id) {
 		final var message_pool = guild_message_pool.get(key);
@@ -471,6 +476,9 @@ public class Hashes {
 	}
 	public static ArrayList<Timer> getSchedules(Long key) {
 		return schedules.get(key);
+	}
+	public static HashMap<String, Long> getItemEffects(Long key) {
+		return itemEffect.get(key);
 	}
 	
 	public static void removeMessagePool(final long key, long message_id) {
@@ -666,5 +674,8 @@ public class Hashes {
 	}
 	public static void removeSchedules(Long key) {
 		schedules.remove(key);
+	}
+	public static void clearItemEffects() {
+		itemEffect.clear();
 	}
 }

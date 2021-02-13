@@ -725,15 +725,17 @@ public class GuildMessageListener extends ListenerAdapter {
 								}
 								
 								//check if the user has an item to boost the experience points
-								int percent_multiplier;
-								try {
-									percent_multiplier = Integer.parseInt(RankingSystem.SQLExpBoosterExistsInInventory(user_id, guild_id).replaceAll("[^0-9]*", ""));
-								} catch(NumberFormatException nfe) {
-									percent_multiplier = 0;
+								long percentMultiplier = 0;
+								final var itemEffects = RankingSystem.SQLgetItemEffects(guild_id);
+								for(final var booster : RankingSystem.SQLExpBoosterExistsInInventory(user_id, guild_id)) {
+									if(!itemEffects.isEmpty() && itemEffects.containsKey(booster))
+										percentMultiplier += itemEffects.get(booster);
+									else
+										logger.error("Booster setup of {} is incomplete in guild {}", booster, guild_id);
 								}
 								
 								//run method to gain experience points or level up
-								RankingThreadExecution.setProgress(e, user_id, guild_id, message, roleAssignLevel, role_id, percent_multiplier, user_details, guild_settings);
+								RankingThreadExecution.setProgress(e, user_id, guild_id, message, roleAssignLevel, role_id, percentMultiplier, user_details, guild_settings);
 							}
 						}
 					}

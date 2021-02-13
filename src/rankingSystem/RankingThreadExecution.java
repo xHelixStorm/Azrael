@@ -42,10 +42,10 @@ import util.STATIC;
 public class RankingThreadExecution {
 	private final static Logger logger = LoggerFactory.getLogger(RankingThreadExecution.class);
 	
-	public static void setProgress(GuildMessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, int percent_multiplier, Ranking user_details, Guilds guild_settings) {
+	public static void setProgress(GuildMessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, long percentMultiplier, Ranking user_details, Guilds guild_settings) {
 		//delete all expired items from the inventory (e.g experience booster)
 		RankingSystem.SQLDeleteInventory();
-		int multiplier = 1;
+		double multiplier = 1;
 		
 		long experience = user_details.getExperience();
 		int currentExperience = user_details.getCurrentExperience();
@@ -71,6 +71,9 @@ public class RankingThreadExecution {
 		else if(messageLength >= 41 && messageLength <= 50) {adder = ThreadLocalRandom.current().nextInt(41, 51);}
 		else if(messageLength > 50) {adder = ThreadLocalRandom.current().nextInt(51, 71);}
 		
+		//if a booster is enabled, increase the multiplier and multiply the experience to gain
+		multiplier += (percentMultiplier > 0 ? (double)(percentMultiplier/100) : 0);
+		
 		//increase the multiplier if double experience is enabled 
 		var doubleExperience = Hashes.getTempCache("doubleExp");
 		var doubleExperienceGuild = Hashes.getTempCache("doubleExp_gu"+guild_id);
@@ -80,8 +83,6 @@ public class RankingThreadExecution {
 			}
 		}
 		
-		//if a booster is enabled, increase the multiplier and multiply the experience to gain
-		multiplier += multiplier*(percent_multiplier/100);
 		adder *= multiplier;
 		
 		//increase the current experience and total experience with the gained experience

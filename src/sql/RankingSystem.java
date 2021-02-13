@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -2158,6 +2159,36 @@ public class RankingSystem {
 		return dailyItems;
 	}
 	
+	public static HashMap<String, Long> SQLgetItemEffects(long guild_id) {
+		final var effects = Hashes.getItemEffects(guild_id);
+		if(effects == null || effects.isEmpty()) {
+			logger.trace("SQLgetDailiesAndType launched. Params passed {}", guild_id);
+			HashMap<String, Long> itemEffects = new HashMap<String, Long>();
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetitemEffects);
+				stmt.setLong(1, guild_id);
+				rs = stmt.executeQuery();
+				while(rs.next()) {
+					itemEffects.put(rs.getString(1), rs.getLong(2));
+				}
+				Hashes.addItemEffects(guild_id, itemEffects);
+				return itemEffects;
+			} catch (SQLException e) {
+				logger.error("SQLgetDailiesAndType Exception", e);
+				return itemEffects;
+			} finally {
+				try { rs.close(); } catch (Exception e) { /* ignored */ }
+			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+		return effects;
+	}
+	
 	//Transaction
 	@SuppressWarnings("resource")
 	public static int SQLUpdateCurrencyAndInsertInventory(long user_id, long guild_id, long currency, int item_id, Timestamp position, int number) {
@@ -2311,26 +2342,26 @@ public class RankingSystem {
 	}
 	
 	//EXISTS
-	public static String SQLExpBoosterExistsInInventory(long user_id, long guild_id) {
+	public static ArrayList<String> SQLExpBoosterExistsInInventory(long user_id, long guild_id) {
 		logger.trace("SQLExpBoosterExistsInInventory launched. Passed params {}, {}", user_id, guild_id);
+		final ArrayList<String> boosters = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-			var description = "0";
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLExpBoosterExistsInInventory);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);
 			stmt.setLong(3, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
-				description = rs.getString(1);
+				boosters.add(rs.getString(1));
 			}
-			return description;
+			return boosters;
 		} catch (SQLException e) {
 			logger.error("SQLExpBoosterExistsInInventory Exception", e);
-			return "0";
+			return boosters;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
