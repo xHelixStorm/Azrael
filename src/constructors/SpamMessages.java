@@ -8,15 +8,18 @@ package constructors;
 
 public class SpamMessages {
 	private String message;
+	private long message_id;
 	private long channel_id;
 	
 	/**
 	 * Constructor
 	 * @param _message
+	 * @param _message_id
 	 * @param _channel_id
 	 */
-	public SpamMessages(String _message, long _channel_id) {
+	public SpamMessages(String _message, long _message_id, long _channel_id) {
 		this.message = _message;
+		this.message_id = _message_id;
 		this.channel_id = _channel_id;
 	}
 	
@@ -27,6 +30,15 @@ public class SpamMessages {
 	
 	public String getMessage() {
 		return this.message;
+	}
+	
+	/**
+	 * Retrieve the message id
+	 * @return message_id
+	 */
+	
+	public long getMessageID() {
+		return this.message_id;
 	}
 	
 	/**

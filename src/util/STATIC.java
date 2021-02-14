@@ -13,7 +13,9 @@ import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.sql.Timestamp;
 import java.time.OffsetDateTime;
+import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
@@ -81,7 +83,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.34.541";
+	private static final String VERSION = "7.34.542";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -589,6 +591,7 @@ public class STATIC {
 										final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
 										Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
 										Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+										deleteSpamMessages(e, cache);
 										return true;
 									}
 								}
@@ -610,19 +613,19 @@ public class STATIC {
 					var spamMessages = Hashes.getSpamDetection(user_id+"_"+guild_id);
 					if(spamMessages == null) {
 						spamMessages = new SpamDetection(GuildIni.getMessageExpires(guild_id));
-						spamMessages.put(lcMessage, channel_id);
+						spamMessages.put(lcMessage, e.getMessageIdLong(), channel_id);
 					}
 					else if(!spamMessages.isExpired()) {
 						if(spamMessages.getMessages().get(0).getMessage().equalsIgnoreCase(lcMessage))
-							spamMessages.put(lcMessage, channel_id);
+							spamMessages.put(lcMessage, e.getMessageIdLong(), channel_id);
 						else {
 							spamMessages.clear();
-							spamMessages.put(lcMessage, channel_id);
+							spamMessages.put(lcMessage, e.getMessageIdLong(), channel_id);
 						}
 					}
 					else {
 						spamMessages.clear();
-						spamMessages.put(lcMessage, channel_id);
+						spamMessages.put(lcMessage, e.getMessageIdLong(), channel_id);
 					}
 					
 					//warn the user if the messages limit has been hit or directly mute if the user starts to spam a different message
@@ -631,7 +634,7 @@ public class STATIC {
 						if(cache == null) {
 							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 								e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
-							Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage));
+							Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage).setObject(spamMessages));
 						}
 						else {
 							if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
@@ -643,6 +646,7 @@ public class STATIC {
 										final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
 										Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
 										Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+										deleteSpamMessages(e, cache);
 										return true;
 									}
 								}
@@ -667,7 +671,7 @@ public class STATIC {
 							if(cache == null) {
 								if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 									e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
-								Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage));
+								Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage).setObject(spamMessages));
 							}
 							else {
 								if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
@@ -679,6 +683,7 @@ public class STATIC {
 											final long penalty = (long) Azrael.SQLgetWarning(guild_id, warning+1).getTimer();
 											Azrael.SQLInsertHistory(user_id, guild_id, "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON_2), penalty, "");
 											Hashes.clearTempCache("spamDetection_gu"+guild_id+"us"+user_id);
+											deleteSpamMessages(e, cache);
 											return true;
 										}
 									}
@@ -699,6 +704,34 @@ public class STATIC {
 			}
 		}
 		return false;
+	}
+	
+	private static void deleteSpamMessages(GuildMessageReceivedEvent e, Cache cache) {
+		//delete all spammed messages
+		if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_MANAGE) || setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_MANAGE))) {
+			e.getMessage().delete().queue(m -> {
+				//inform what messages are being deleted
+				EmbedBuilder out = new EmbedBuilder().setTimestamp((TemporalAccessor) new Timestamp(System.currentTimeMillis())).setTitle(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")");
+				final var printMessage = STATIC.getTranslation2(e.getGuild(), Translation.DELETE_SPAM)+"\n"+e.getMessage().getContentRaw();
+				writeToRemoteChannel(e.getGuild(), out, (printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"..."), Channel.TRA.getType());
+				final SpamDetection messages = (SpamDetection) cache.getObject();
+				for(final var curMessage : messages.getMessages()) {
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY) || setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY))) {
+						e.getGuild().getTextChannelById(curMessage.getChannelID()).retrieveMessageById(curMessage.getMessage()).queue(m2 -> {
+							m2.delete().queue();
+						}, err -> {
+							logger.warn("Spammed message from user {} in channel {} has been already deleted in guild {}", e.getMember().getUser().getId(), curMessage.getChannelID(), e.getGuild().getId());
+						});
+					}
+					else {
+						logger.warn("Spammed messages from user {} in channel {} couldn't be deleted because MESSAGE_MANAGE or MESSAGE_HISTORY permission are required in guild {}", e.getMember().getUser().getId(), curMessage.getChannelID(), e.getGuild().getId());
+					}
+				}
+			});
+		}
+		else {
+			logger.warn("Spammed messages from user {} in channel {} couldn't be deleted because MESSAGE_MANAGE permission is required in guild {}", e.getMember().getUser().getId(), e.getChannel().getId(), e.getGuild().getId());
+		}
 	}
 	
 	public static boolean writeToRemoteChannel(final Guild guild, final EmbedBuilder embed, final String message, final String channelType) {

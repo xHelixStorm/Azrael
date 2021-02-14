@@ -1005,6 +1005,7 @@
 	"delete_edited_message":		"¡**Mensaje editado**! ",
 	"delete_message":				"**Mensaje**! ",
 	"delete_tweet":					"**Tweet** ",
+	"delete_spam":					"**Spam Messages** detected!",
 	"delete_removed_by":			"Eliminado por ",
 	"delete_self":					"El usuario ha eliminado su propio ",
 	"delete_permission_err":		"¡Mensaje eliminado detectado! No se pudieron mostrar más detalles porque se requiere el siguiente permiso: ",

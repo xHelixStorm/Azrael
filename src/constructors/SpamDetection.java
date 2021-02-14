@@ -61,8 +61,8 @@ public class SpamDetection {
 	 * @param _channel_id
 	 */
 	
-	public void put(String _message, long _channel_id) {
-		messages.add(new SpamMessages(_message, _channel_id));
+	public void put(String _message, long _message_id, long _channel_id) {
+		messages.add(new SpamMessages(_message, _message_id, _channel_id));
 		time = System.currentTimeMillis()+expires;
 		count++;
 	}

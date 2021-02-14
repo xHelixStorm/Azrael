@@ -1004,7 +1004,8 @@
 	
 	"delete_edited_message":		"**Editierte Nachricht**! ",
 	"delete_message":				"**Nachricht**! ",
-	"delete_tweet":					"Tweet ",
+	"delete_tweet":					"**Tweet** ",
+	"delete_spam":					"**Spam Nachrichten** entdeckt!",
 	"delete_removed_by":			"Entfernt von ",
 	"delete_self":					"Selbst gelöschte ",
 	"delete_permission_err":		"Gelöschte Nachricht entdeckt! Mehr Informationen konnten nicht angezeigt werden, weil die folgende Berechtigung fehlt: ",

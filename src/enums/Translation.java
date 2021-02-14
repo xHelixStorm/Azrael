@@ -1007,6 +1007,7 @@ public enum Translation {
 	DELETE_EDITED_MESSAGE		("delete_edited_message"),
 	DELETE_MESSAGE				("delete_message"),
 	DELETE_TWEET				("delete_tweet"),
+	DELETE_SPAM					("delete_spam"),
 	DELETE_REMOVED_BY			("delete_removed_by"),
 	DELETE_SELF					("delete_self"),
 	DELETE_PERMISSION_ERR		("delete_permission_err"),
