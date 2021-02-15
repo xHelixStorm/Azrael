@@ -323,7 +323,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						//check if the user wishes to close the rss window
 						if(!message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
 							//register a rss feed if selected
-							if(task.equals("register") && ((message.startsWith("http") && rss.getAdditionalInfo2().equals("1")) || (message.startsWith("#") && rss.getAdditionalInfo2().equals("2")))) {
+							if(task.equals("register") && ((message.startsWith("http") && rss.getAdditionalInfo2().equals("1")) || ((message.startsWith("#") || message.startsWith("@")) && rss.getAdditionalInfo2().equals("2")))) {
 								Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 								SubscribeExecution.registerFeed(e, message, Integer.parseInt(rss.getAdditionalInfo2()));
 							}

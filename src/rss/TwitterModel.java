@@ -49,16 +49,25 @@ public class TwitterModel {
 				TwitterFactory tf = STATIC.getTwitterFactory();
 				if(tf != null) {
 					Twitter twitter = tf.getInstance();
-					Query query = new Query(rss.getURL());
-					QueryResult result;
-					result = twitter.search(query);
-					List<Status> tweets;
-					if(result.getTweets().size() > 0)
-						success = true;
-					if(result.getTweets().size() >= 30)
-						tweets = result.getTweets().subList(0, 29);
-					else
-						tweets = result.getTweets().subList(0, result.getTweets().size());
+					List<Status> tweets = new ArrayList<Status>();
+					if(rss.getURL().startsWith("#")) {
+						Query query = new Query(rss.getURL());
+						QueryResult result;
+						result = twitter.search(query);
+						if(result.getTweets().size() > 0)
+							success = true;
+						if(result.getTweets().size() >= 30)
+							tweets = result.getTweets().subList(0, 29);
+						else
+							tweets = result.getTweets().subList(0, result.getTweets().size());
+					}
+					else if(rss.getURL().startsWith("@")) {
+						tweets = twitter.getUserTimeline(rss.getURL());
+						if(tweets.size() > 0)
+							success = true;
+						if(tweets.size() > 30)
+							tweets.subList(0, 29);
+					}
 			        final String pattern = "https:\\/\\/t.co\\/[\\w\\d]*";
 			        for (Status tweet : tweets) {
 			        	if(!tweet.isRetweet()) {
