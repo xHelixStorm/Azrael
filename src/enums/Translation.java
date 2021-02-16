@@ -1319,7 +1319,42 @@ public enum Translation {
 	RESTRICT_ERR				("restrict_err"),
 	RESTRICT_ERR2				("restrict_err2"),
 	
-	START_ERR					("start_err");
+	START_ERR					("start_err"),
+	
+	UPDATE_TEXT_CREATED			("update_text_created"),
+	UPDATE_VOICE_CREATED		("update_voice_created"),
+	UPDATE_ROLE_CREATED			("update_role_created"),
+	UPDATE_CREATED				("update_created"),
+	UPDATE_TEXT_RENAMED			("update_text_renamed"),
+	UPDATE_VOICE_RENAMED		("update_voice_renamed"),
+	UPDATE_ROLE_RENAMED			("update_role_renamed"),
+	UPDATE_RENAMED				("update_renamed"),
+	UPDATE_TEXT_REMOVED			("update_text_removed"),
+	UPDATE_VOICE_REMOVED		("update_voice_removed"),
+	UPDATE_ROLE_REMOVED			("update_role_removed"),
+	UPDATE_REMOVED				("update_removed"),
+	UPDATE_TEXT_NSFW			("update_text_nsfw"),
+	UPDATE_NSFW					("update_nsfw"),
+	UPDATE_TEXT_POSITION		("update_text_position"),
+	UPDATE_VOICE_POSITION		("update_voice_position"),
+	UPDATE_ROLE_POSITION		("update_role_position"),
+	UPDATE_POSITION				("update_position"),
+	UPDATE_TEXT_SLOWMODE		("update_text_slowmode"),
+	UPDATE_SLOWMODE				("update_slowmode"),
+	UPDATE_TEXT_TOPIC			("update_text_topic"),
+	UPDATE_TOPIC_OLD			("update_topic_old"),
+	UPDATE_TOPIC_NEW			("update_topic_new"),
+	UPDATE_VOICE_BITRATE		("update_voice_bitrate"),
+	UPDATE_BITRATE				("update_bitrate"),
+	UPDATE_VOICE_USER_LIMIT		("update_voice_user_limit"),
+	UPDATE_USER_LIMIT			("update_user_limit"),
+	UPDATE_ROLE_COLOR			("update_role_color"),
+	UPDATE_COLOR				("update_color"),
+	UPDATE_ROLE_PERMISSIONS		("update_role_permissions"),
+	UPDATE_PERMISSIONS_ADDED	("update_permissions_added"),
+	UPDATE_PERMISSIONS_REMOVED	("update_permissions_removed"),
+	UPDATE_ENABLED				("update_enabled"),
+	UPDATE_DISABLED				("update_disabled");
 	
 	private String value;
 	

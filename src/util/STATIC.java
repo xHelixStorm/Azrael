@@ -13,9 +13,8 @@ import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
-import java.sql.Timestamp;
 import java.time.OffsetDateTime;
-import java.time.temporal.TemporalAccessor;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
@@ -83,7 +82,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.34.542";
+	private static final String VERSION = "7.35.543";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -711,7 +710,7 @@ public class STATIC {
 		if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_MANAGE) || setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_MANAGE))) {
 			e.getMessage().delete().queue(m -> {
 				//inform what messages are being deleted
-				EmbedBuilder out = new EmbedBuilder().setTimestamp((TemporalAccessor) new Timestamp(System.currentTimeMillis())).setTitle(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")");
+				EmbedBuilder out = new EmbedBuilder().setTimestamp(ZonedDateTime.now()).setTitle(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")");
 				final var printMessage = STATIC.getTranslation2(e.getGuild(), Translation.DELETE_SPAM)+"\n"+e.getMessage().getContentRaw();
 				writeToRemoteChannel(e.getGuild(), out, (printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"..."), Channel.TRA.getType());
 				final SpamDetection messages = (SpamDetection) cache.getObject();

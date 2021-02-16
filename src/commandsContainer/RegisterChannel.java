@@ -70,7 +70,7 @@ public class RegisterChannel {
 		
 		final var commandLevel = GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong());
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss|wat|del|edi|vot|co1|co2|co3|co4|co5|co6)");
+			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|rea|qui|rss|wat|del|edi|vot|co1|co2|co3|co4|co5|co6|upd)");
 			Matcher matcher = pattern.matcher(args[1]);
 			if(args.length > 2 && matcher.find()) {
 				channel_type = matcher.group();
@@ -84,9 +84,8 @@ public class RegisterChannel {
 						}
 						case "bot", "co1", "co2", "co3", "co4", "co5", "co6", "vot" -> {
 							result = Azrael.SQLRegisterSpecialChannel(guild_id, channel_id, channel_type);
-							
 						}
-						case "log", "tra", "rea", "qui", "rss", "wat", "del", "edi" -> {
+						case "log", "tra", "rea", "qui", "rss", "wat", "del", "edi", "upd" -> {
 							result = Azrael.SQLRegisterUniqueChannel(guild_id, channel_id, channel_type);
 						}
 					}

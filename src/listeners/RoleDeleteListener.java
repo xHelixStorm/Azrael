@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.time.ZonedDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,8 @@ public class RoleDeleteListener extends ListenerAdapter {
 					logger.error("Unlocked ranking role {} couldn't be removed from users after role deletion in guild {}", e.getRole().getId(), e.getGuild().getId());
 				}
 			}
+			
+			STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_ROLE_REMOVED)).addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_REMOVED), e.getRole().getName(), false).setFooter(e.getRole().getId()).setTimestamp(ZonedDateTime.now()), null, Channel.UPD.getType());
 		}).start();
 	}
 }

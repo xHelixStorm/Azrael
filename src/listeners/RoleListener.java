@@ -10,6 +10,9 @@ package listeners;
 
 import java.awt.Color;
 import java.sql.Timestamp;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +32,9 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.api.events.role.update.RoleUpdateColorEvent;
+import net.dv8tion.jda.api.events.role.update.RoleUpdatePermissionsEvent;
+import net.dv8tion.jda.api.events.role.update.RoleUpdatePositionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.RankingSystem;
 import sql.DiscordRoles;
@@ -324,6 +330,42 @@ public class RoleListener extends ListenerAdapter {
 				}
 			}
 		}).start();
+	}
+	
+	@Override
+	public void onRoleUpdateColor(RoleUpdateColorEvent e) {
+		STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_ROLE_COLOR)+e.getRole().getAsMention()).addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_COLOR), e.getOldColor().getRGB()+" > "+e.getNewColor().getRGB(), false).setFooter(e.getRole().getId()).setTimestamp(ZonedDateTime.now()), null, Channel.UPD.getType());
+	}
+	
+	@Override
+	public void onRoleUpdatePosition(RoleUpdatePositionEvent e) {
+		STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_ROLE_POSITION)+e.getRole().getAsMention()).addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_POSITION), e.getOldPosition()+" > "+e.getNewPosition(), false).setFooter(e.getRole().getId()).setTimestamp(ZonedDateTime.now()), null, Channel.UPD.getType());
+	}
+	
+	@Override
+	public void onRoleUpdatePermissions(RoleUpdatePermissionsEvent e) {
+		List<String> newPermissions = new ArrayList<String>();
+		List<String> oldPermissions = new ArrayList<String>();
+		e.getNewPermissions().forEach(p -> newPermissions.add(p.getName()));
+		e.getOldPermissions().forEach(p -> oldPermissions.add(p.getName()));
+		
+		StringBuilder newFilteredPermissions = new StringBuilder();
+		for(final var permission : newPermissions) {
+			if(!oldPermissions.contains(permission))
+				newFilteredPermissions.append(permission.replaceAll("_", " ")+"\n");
+		}
+		StringBuilder oldFilteredPermissions = new StringBuilder();
+		for(final var permission : oldPermissions) {
+			if(!newPermissions.contains(permission))
+				oldFilteredPermissions.append(permission.replaceAll("_", " ")+"\n");
+		}
+		
+		EmbedBuilder embed = new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_ROLE_PERMISSIONS)+e.getRole().getAsMention()).setFooter(e.getRole().getId()).setTimestamp(ZonedDateTime.now());
+		if(newFilteredPermissions.length() > 0)
+			embed.addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_PERMISSIONS_ADDED), newFilteredPermissions.toString(), false);
+		if(oldFilteredPermissions.length() > 0)
+			embed.addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_PERMISSIONS_REMOVED), oldFilteredPermissions.toString(), false);
+		STATIC.writeToRemoteChannel(e.getGuild(), embed, null, Channel.UPD.getType());
 	}
 	
 	private Object [] getReporterFromAuditLog(GuildMemberRoleAddEvent e) {

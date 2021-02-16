@@ -90,6 +90,7 @@ import listeners.ShutdownListener;
 import listeners.StatusListener;
 import listeners.TextChannelListener;
 import listeners.UnbanListener;
+import listeners.VoiceChannelListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -298,7 +299,8 @@ public class Main {
 			new TextChannelListener(),
 			new RoleNameUpdateListener(),
 			new PrivateMessageReactionAddListener(),
-			new CategoryListener()
+			new CategoryListener(),
+			new VoiceChannelListener()
 		);
 	}
 }
