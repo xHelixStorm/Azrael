@@ -764,7 +764,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						new Thread(new LanguageFilter(e, filter_lang, allChannels)).start();
 						//if url censoring is enabled, also run the url censoring thread
 						if(currentChannel != null && currentChannel.getURLCensoring())
-							new Thread(new URLFilter(e, null, filter_lang, allChannels)).start();
+							new Thread(new URLFilter(e.getMessage(), e.getMember(), filter_lang, allChannels)).start();
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
@@ -776,7 +776,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE))) {
 						ArrayList<String> lang = new ArrayList<String>();
 						lang.add("eng");
-						new Thread(new URLFilter(e, null, filter_lang, allChannels)).start();
+						new Thread(new URLFilter(e.getMessage(), e.getMember(), filter_lang, allChannels)).start();
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());

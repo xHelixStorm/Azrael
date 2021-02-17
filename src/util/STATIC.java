@@ -60,7 +60,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import sql.Azrael;
 import sql.DiscordRoles;
 import twitter4j.TwitterFactory;
@@ -82,7 +81,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.36.545";
+	private static final String VERSION = "7.36.546";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -416,39 +415,36 @@ public class STATIC {
 	}
 	
 	//Called by LanguageFilter and LanguageEditFilter class. Keeps track of removed messages, warns the user accordingly and mutes when the limit has been reached
-	public static void handleRemovedMessages(GuildMessageReceivedEvent e, GuildMessageUpdateEvent e2, String [] output) {
-		Member member = (e != null ? e.getMember() : e2.getMember());
-		Guild guild = (e != null ? e.getGuild() : e2.getGuild());
-		TextChannel channel = (e != null ? e.getChannel() : e2.getChannel());
-		logger.debug("Message removed from user {} in guild {}", member.getUser().getId(), guild.getId());
-		var muteRole = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
+	public static void handleRemovedMessages(Member member, TextChannel channel, String [] output) {
+		logger.debug("Message removed from user {} in guild {}", member.getUser().getId(), member.getGuild().getId());
+		var muteRole = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 		if(muteRole == null) {
-			if(guild.getSelfMember().hasPermission(channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(guild, channel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+			if(member.getGuild().getSelfMember().hasPermission(channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(member.getGuild(), channel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 				channel.sendMessage(member.getAsMention()+" "+output[0]).queue();
 		}
 		else {
-			var cache = Hashes.getTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId());
+			var cache = Hashes.getTempCache("report_gu"+member.getGuild().getId()+"us"+member.getUser().getId());
 			if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
-				if(guild.getSelfMember().hasPermission(channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(guild, channel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+				if(member.getGuild().getSelfMember().hasPermission(channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(member.getGuild(), channel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 					channel.sendMessage(member.getAsMention()+" "+output[0]).queue();
-				Hashes.addTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId(), new Cache(300000, "1"));
+				Hashes.addTempCache("report_gu"+member.getGuild().getId()+"us"+member.getUser().getId(), new Cache(300000, "1"));
 			}
 			else if(cache != null) {
 				if(cache.getAdditionalInfo().equals("1")) {
-					if(guild.getSelfMember().hasPermission(channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(guild, channel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
+					if(member.getGuild().getSelfMember().hasPermission(channel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(member.getGuild(), channel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 						channel.sendMessage(member.getAsMention()+" "+output[1]).queue();
-					Hashes.addTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId(), new Cache(300000, "2"));
+					Hashes.addTempCache("report_gu"+member.getGuild().getId()+"us"+member.getUser().getId(), new Cache(300000, "2"));
 				}
 				else if(cache.getAdditionalInfo().equals("2")) {
-					if(guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-						Azrael.SQLInsertHistory(member.getUser().getIdLong(), guild.getIdLong(), "mute", STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_MUTE_REASON), 0, "");
-						guild.addRoleToMember(member, guild.getRoleById(muteRole.getRole_ID())).reason("User muted after censoring 3 messages").queue();
+					if(member.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+						Azrael.SQLInsertHistory(member.getUser().getIdLong(), member.getGuild().getIdLong(), "mute", STATIC.getTranslation2(member.getGuild(), Translation.CENSOR_MUTE_REASON), 0, "");
+						member.getGuild().addRoleToMember(member, member.getGuild().getRoleById(muteRole.getRole_ID())).reason("User muted after censoring 3 messages").queue();
 					}
 					else {
-						writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_ROLE_ADD_ERR)+Permission.MANAGE_ROLES, Channel.LOG.getType());
-						logger.warn("MANAGE ROLES permission required to mute members in guild {}", guild.getId());
+						writeToRemoteChannel(member.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(member.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(member.getGuild(), Translation.CENSOR_ROLE_ADD_ERR)+Permission.MANAGE_ROLES, Channel.LOG.getType());
+						logger.warn("MANAGE ROLES permission required to mute members in guild {}", member.getGuild().getId());
 					}
-					Hashes.clearTempCache("report_gu"+guild.getId()+"us"+member.getUser().getId());
+					Hashes.clearTempCache("report_gu"+member.getGuild().getId()+"us"+member.getUser().getId());
 				}
 			}
 		}

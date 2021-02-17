@@ -73,7 +73,7 @@ public class LanguageFilter implements Runnable {
 						e.getMessage().delete().reason("Message removed due to bad manner!").queue(success -> {}, error -> {
 							logger.warn("Message {} already removed in guild {}", e.getMessageId(), e.getGuild().getId());
 						});
-						STATIC.handleRemovedMessages(e, null, output);
+						STATIC.handleRemovedMessages(e.getMember(), e.getChannel(), output);
 						var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.TRA.getType())).findAny().orElse(null);
 						if(tra_channel != null) {
 							final TextChannel textChannel = e.getGuild().getTextChannelById(tra_channel.getChannel_ID());
