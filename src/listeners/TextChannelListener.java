@@ -86,7 +86,7 @@ public class TextChannelListener extends ListenerAdapter {
 	
 	@Override
 	public void onTextChannelUpdateTopic(TextChannelUpdateTopicEvent e) {
-		STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_TEXT_TOPIC)+e.getChannel().getAsMention()).addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_TOPIC_OLD), (e.getOldTopic() != null ? e.getOldTopic() : ""), false).addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_TOPIC_NEW), (e.getNewTopic() != null ? e.getNewTopic() : ""), false).setFooter(e.getChannel().getId()).setTimestamp(ZonedDateTime.now()), null, Channel.UPD.getType());
+		STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_TEXT_TOPIC)+e.getChannel().getAsMention()).addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_TOPIC_OLD), (e.getOldTopic() != null ? e.getOldTopic() : " "), false).addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_TOPIC_NEW), (e.getNewTopic() != null ? e.getNewTopic() : " "), false).setFooter(e.getChannel().getId()).setTimestamp(ZonedDateTime.now()), null, Channel.UPD.getType());
 	}
 	
 	private static void insertOrUpdateChannel(TextChannelCreateEvent e1, TextChannelUpdateNameEvent e2) {
