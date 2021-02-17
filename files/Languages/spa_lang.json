@@ -153,6 +153,7 @@
 	"param_language":				"language",
 	"param_complete":				"complete",
 	"param_max":					"max",
+	"param_exclude":				"exclude",
 	
 	"lang_eng":						"Inglés",
 	"lang_ger":						"Alemán",
@@ -171,6 +172,7 @@
 	"level_system_not_enabled":	 	"¡El sistema de niveles debe estar habilitado antes de poder usar este comando!",
 	"not_available":			 	"N/A",
 	"param_not_found":			 	"¡No se encontró el parámetro! ¡Inténtalo de nuevo!",
+	"param_not_found_2":			"¡No se encontró el parámetro **{}**! ¡Inténtalo de nuevo!",
 	"default_reason":				"¡No se ha proporcionado ninguna razón!",
 	"already_muted":				"¡El usuario **{}** ya está silenciado!",
 	"low_privileges":				"¡El usuario **{}** no puede ser silenciado porque los privilegios del rol actual son muy bajos!",
@@ -1352,5 +1354,14 @@
 	"update_permissions_added":		"Permissions added",
 	"update_permissions_removed":	"Permissions removed",
 	"update_enabled":				"Enabled",
-	"update_disabled":				"Disabled"
+	"update_disabled":				"Disabled",
+	
+	"prune_help":					"This command offers a more advanced prune functionality to kick members from the server!\nWrite user ids or role ids as parameters to kick the selected groups of users. If there are exceptions, write *exclude* and list user groups to exclude! To select all members on the server, use the *all* parameter!\n\nThe command will ask for a final confirmation and show a brief overview before the selected members get kicked from the server.",
+	"prune_confirmation":			"Either write **YES** to confirm your choice or write **NO** to abort the command within 3 minutes!\n\nTotal members selected: **{}**\nTotal members excluded: **{}**",
+	"prune_sel_members":			"Selected Members",
+	"prune_sel_roles":				"Selected Roles",
+	"prune_exc_members":			"Excluded Members",
+	"prune_exc_roles":				"Excluded Roles",
+	"prune_complete":				"Out of {} members, {} have been kicked, {} excluded and {} couldn't be kicked due to missing hierargic permissions or because of leaving members!\nAction completed!",
+	"prune_abort":					"Prune command aborted!"
 }

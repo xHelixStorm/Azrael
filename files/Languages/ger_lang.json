@@ -153,6 +153,7 @@
 	"param_language":				"sprache",
 	"param_complete":				"fertig",
 	"param_max":					"max",
+	"param_exclude":				"ausnahmen",
 
 	"lang_eng":						"Englisch",
 	"lang_ger":						"Deutsch",
@@ -171,6 +172,7 @@
 	"level_system_not_enabled":	 	"Das Stufensystem muss aktiviert werden, bevor dieser Befehl verwendet werden kann!",
 	"not_available":			 	"N/A",
 	"param_not_found":			 	"Parameter nicht gefunden! Bitte versuchen Sie es erneut!",
+	"param_not_found_2":			"Parameter **{}** nicht gefunden! Bitte versuchen Sie es erneut!",
 	"default_reason":				"Es wurde kein Grund angegeben!",
 	"already_muted":				"Der Benutzer **{}** ist bereits geblockt worden!",
 	"low_privileges":				"Der Benutzer **{}** kann nicht blockiert werden, weil die aktuellen Rollenprivilegien zu niedrig sind!",
@@ -1352,5 +1354,14 @@
 	"update_permissions_added":		"Berechtigungen hinzugefügt",
 	"update_permissions_removed":	"Berechtigungen entfernt",
 	"update_enabled":				"Aktiviert",
-	"update_disabled":				"Deaktiviert"
+	"update_disabled":				"Deaktiviert",
+	
+	"prune_help":					"Dieser Befehl bietet eine erweiterte Prune-Funktionalität, um Mitglieder vom Server zu kicken!\nSchreiben Sie Benutzer-IDs oder Rollen-IDs als Parameter, um die ausgewählten Benutzergruppen auszuschließen. Wenn es Ausnahmen gibt, schreiben Sie *ausnahmen* und listen Sie die auszuschließenden Benutzergruppen auf! Um alle Mitglieder auf den Server auszuwählen, benutzen Sie den *alle* Parameter!\n\nDer Befehl fragt nach einer abschließenden Bestätigung und zeigt eine kurze Übersicht, bevor die ausgewählten Mitglieder vom Server gekickt werden.",
+	"prune_confirmation":			"Schreiben Sie entweder **JA** um die Auswähl zu bestätigen oder **NEIN** zum Abbrechen innerhalb von 3 Minuten!\n\nMitglieder gesamt ausgewählt: **{}**\nMitglieder gesamt ausgeschlossen: **{}**",
+	"prune_sel_members":			"Ausgewählte Benutzer",
+	"prune_sel_roles":				"Ausgewählte Rollen",
+	"prune_exc_members":			"Ausgeschlossene Benutzer",
+	"prune_exc_roles":				"Ausgeschlossene Rollen",
+	"prune_complete":				"Von gesamt {} Mitglieder, {} wurden gekickt, {} wurden vom Kick ausgeschlossen und {} konnten nicht gekickt werden wegen fehlende hierarchische Berechtigungen oder weil diese den Server verlassen haben!\nAktion abgeschlossen!",
+	"prune_abort":					"Prune Befehl abgebrochen!"
 }

@@ -109,6 +109,37 @@ public class Azrael {
 		}
 	}
 	
+	public static void SQLBulkInsertHistory(List<Member> members, long guild_id, String type, String reason, long penalty, String info) {
+		logger.trace("SQLBulkInsertHistory launched. Passed params Member list, {}, {}, {}, {}, {}", guild_id, type, reason, penalty, info);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement((penalty != 0 ? AzraelStatements.SQLBulkInsertHistory : AzraelStatements.SQLBulkInsertHistory2));
+			for(final Member member : members) {
+				stmt.setLong(1, member.getUser().getIdLong());
+				stmt.setLong(2, guild_id);
+				stmt.setString(3, type);
+				stmt.setString(4, reason);
+				stmt.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+				if(penalty != 0) {
+					stmt.setLong(6, penalty);
+					stmt.setString(7, info);
+				}
+				else {
+					stmt.setString(6, info);
+				}
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+		} catch (SQLException e) {
+			logger.error("SQLBulkInsertHistory Exception", e);
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static ArrayList<History> SQLgetHistory(long user_id, long guild_id) {
 		logger.trace("SQLgetHistory launched. Passed params {}, {}", user_id, guild_id);
 		ArrayList<History> history = new ArrayList<History>();

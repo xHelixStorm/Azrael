@@ -153,6 +153,7 @@
 	"param_language":				"language",
 	"param_complete":				"complete",
 	"param_max":					"max",
+	"param_exclude":				"exclude",
 
 	"lang_eng":						"English",
 	"lang_ger":						"German",
@@ -171,6 +172,7 @@
 	"level_system_not_enabled":	 	"The level system needs to be enabled before this command can be used!",
 	"not_available":			 	"N/A",
 	"param_not_found":			 	"Parameter not found! Please try again!",
+	"param_not_found_2":			"Parameter **{}** not found! Please try again!",
 	"default_reason":				"No reason has been provided!",
 	"already_muted":				"The user **{}** is already muted!",
 	"low_privileges":				"The user **{}** can't be muted because the current role privileges are too low!",
@@ -1352,5 +1354,14 @@
 	"update_permissions_added":		"Permissions added",
 	"update_permissions_removed":	"Permissions removed",
 	"update_enabled":				"Enabled",
-	"update_disabled":				"Disabled"
+	"update_disabled":				"Disabled",
+	
+	"prune_help":					"This command offers a more advanced prune functionality to kick members from the server!\nWrite user ids or role ids as parameters to kick the selected groups of users. If there are exceptions, write *exclude* and list user groups to exclude! To select all members on the server, use the *all* parameter!\n\nThe command will ask for a final confirmation and show a brief overview before the selected members get kicked from the server.",
+	"prune_confirmation":			"Either write **YES** to confirm your choice or write **NO** to abort the command within 3 minutes!\n\nTotal members selected: **{}**\nTotal members excluded: **{}**",
+	"prune_sel_members":			"Selected Members",
+	"prune_sel_roles":				"Selected Roles",
+	"prune_exc_members":			"Excluded Members",
+	"prune_exc_roles":				"Excluded Roles",
+	"prune_complete":				"Out of {} members, {} have been kicked, {} excluded and {} couldn't be kicked due to missing hierargic permissions or because of leaving members!\nAction completed!",
+	"prune_abort":					"Prune command aborted!"
 }

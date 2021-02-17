@@ -20,6 +20,7 @@ import commandsContainer.ClanExecution;
 import commandsContainer.FilterExecution;
 import commandsContainer.GoogleSpreadsheetsExecution;
 import commandsContainer.JoinExecution;
+import commandsContainer.PruneExecution;
 import commandsContainer.PurchaseExecution;
 import commandsContainer.RegisterRole;
 import commandsContainer.RoomExecution;
@@ -693,6 +694,20 @@ public class GuildMessageListener extends ListenerAdapter {
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_EXITED)).build()).queue();
 							Hashes.clearTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+						}
+					}
+					
+					final var prune = Hashes.getTempCache("prune_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+					if(prune != null && prune.getExpiration() - System.currentTimeMillis() > 0) {
+						if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_YES))) {
+							//Execute prune
+							PruneExecution.runTask(e, prune);
+							Hashes.clearTempCache("prune_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+						}
+						else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {
+							//Abort prune
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_ABORT)).build()).queue();
+							Hashes.clearTempCache("prune_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 						}
 					}
 				});

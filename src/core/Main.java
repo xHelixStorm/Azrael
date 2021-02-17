@@ -40,6 +40,7 @@ import commands.Mute;
 import commands.Patchnotes;
 import commands.Pick;
 import commands.Profile;
+import commands.Prune;
 import commands.Pug;
 import commands.Queue;
 import commands.Quiz;
@@ -265,6 +266,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("master", new Master());
 		CommandHandler.commandsPublic.put("restrict", new Restrict());
 		CommandHandler.commandsPublic.put("start", new Start());
+		CommandHandler.commandsPublic.put("prune", new Prune());
 	}
 	
 	public static void addPrivateCommands() {

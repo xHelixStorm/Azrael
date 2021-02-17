@@ -155,6 +155,7 @@ public enum Translation {
 	PARAM_LANGUAGE				("param_language"),
 	PARAM_COMPLETE				("param_complete"),
 	PARAM_MAX					("param_max"),
+	PARAM_EXCLUDE				("param_exclude"),
 	
 	LANG_ENG					("lang_eng"),
 	LANG_GER					("lang_ger"),
@@ -173,6 +174,7 @@ public enum Translation {
 	LEVEL_SYSTEM_NOT_ENABLED	("level_system_not_enabled"),
 	NOT_AVAILABLE				("not_available"),
 	PARAM_NOT_FOUND				("param_not_found"),
+	PARAM_NOT_FOUND_2			("param_not_found_2"),
 	DEFAULT_REASON				("default_reason"),
 	ALREADY_MUTED				("already_muted"),
 	LOW_PRIVILEGES				("low_privileges"),
@@ -1354,7 +1356,16 @@ public enum Translation {
 	UPDATE_PERMISSIONS_ADDED	("update_permissions_added"),
 	UPDATE_PERMISSIONS_REMOVED	("update_permissions_removed"),
 	UPDATE_ENABLED				("update_enabled"),
-	UPDATE_DISABLED				("update_disabled");
+	UPDATE_DISABLED				("update_disabled"),
+	
+	PRUNE_HELP					("prune_help"),
+	PRUNE_CONFIRMATION			("prune_confirmation"),
+	PRUNE_SEL_MEMBERS			("prune_sel_members"),
+	PRUNE_SEL_ROLES				("prune_sel_roles"),
+	PRUNE_EXC_MEMBERS			("prune_exc_members"),
+	PRUNE_EXC_ROLES				("prune_exc_roles"),
+	PRUNE_COMPLETE				("prune_complete"),
+	PRUNE_ABORT					("prune_abort");
 	
 	private String value;
 	
