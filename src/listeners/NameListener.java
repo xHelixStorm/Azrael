@@ -68,12 +68,12 @@ public class NameListener extends ListenerAdapter {
 							if(guild.getSelfMember().hasPermission(Permission.NICKNAME_MANAGE)) {
 								//retrieve a random nickname and assign to the user
 								String nickname = Azrael.SQLgetRandomName(guild.getIdLong());
-								e.getJDA().getGuildById(guild.getIdLong()).modifyNickname(member, nickname).queue();
+								guild.modifyNickname(member, nickname).queue();
 								Hashes.addTempCache("nickname_add_gu"+guild.getId()+"us"+user_id, new Cache(60000));
 								updateNickname(member, nickname);
 								message.setColor(Color.RED).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation2(guild, Translation.NAME_STAFF_TITLE));
 								STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.NAME_STAFF_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", nickname), Channel.LOG.getType());
-								Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild.getIdLong(), newname);
+								Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild.getIdLong(), nickname);
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
 									GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.RENAME.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_STAFF_IMPERSONATION), null, null, "RENAMED", null, null, null, oldname, newname, 0, null, null, 0, 0, GoogleEvent.RENAME.id);
@@ -104,7 +104,7 @@ public class NameListener extends ListenerAdapter {
 										updateNickname(member, nickname);
 										message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(guild, Translation.NAME_TITLE));
 										STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.NAME_ASSIGN_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", nickname), Channel.LOG.getType());
-										Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild.getIdLong(), newname);
+										Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild.getIdLong(), nickname);
 										//Run google service, if enabled
 										if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
 											GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.RENAME.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_REASON), null, null, "RENAMED", null, null, null, oldname, newname, 0, null, null, 0, 0, GoogleEvent.RENAME.id);
