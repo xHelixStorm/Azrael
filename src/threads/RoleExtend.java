@@ -73,7 +73,7 @@ public class RoleExtend implements Runnable {
 				}
 			}
 			//display the amount of users that are still muted
-			if(banHammerFound == true) {
+			if(banHammerFound == true && GuildIni.getNotifications(guild.getIdLong())) {
 				logger.info("{} muted users found on startup in guild {}", i, guild.getId());
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_TITLE));
 				STATIC.writeToRemoteChannel(guild, message, i+STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT)+(GuildIni.getOverrideBan(guild.getIdLong()) ? STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_EXCLUDED) : ""), Channel.LOG.getType());
