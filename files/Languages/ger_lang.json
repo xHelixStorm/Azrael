@@ -283,6 +283,8 @@
 	"command_deny":				 	"- **{}deny**\nKicke einen wartenden Benutzer vom Server.\n",
 	"command_language":		 		"- **{}language**\nÄndere die Bot Sprache.\n",
 	"command_schedule":				"- **{}schedule**\nPlane eine tägliche Nachricht, die um eine selbst definierte Uhrzeit versendet wird.\n",
+	"command_prune":				"- **{}prune**\nKicken Sie eine große Gruppe von Mitgliedern vom Server.\n",
+	"command_warn":					"- **{}warn**\nFormulieren Sie den Grund für eine Warnung und senden Sie ihn in einer privaten Nachricht an einen Benutzer.\n",
 	"commands_disabled":		 	"Alle Befehle sind deaktiviert!",
 	
 	"daily_reward":				 	"Herzlichen Glückwunsch! Sie haben die folgende Belohnung freigeschaltet:\n",

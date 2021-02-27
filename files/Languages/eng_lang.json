@@ -283,6 +283,8 @@
 	"command_deny":				 	"- **{}deny**\nDeny a waiting user from joining the server.\n",
 	"command_language":		 		"- **{}language**\nChange the Bot language.\n",
 	"command_schedule":				"- **{}schedule**\nSchedule a daily message on a channel during a specified time.\n",
+	"command_prune":				"- **{}prune**\nKick a big group of members from the server.\n",
+	"command_warn":					"- **{}warn**\nFormulate the reason for a warning and send it to a user in private message.\n",
 	"commands_disabled":		 	"All commands are disabled!",
 	
 	"daily_reward":				 	"Congratulations! You have unlocked the following reward:\n",

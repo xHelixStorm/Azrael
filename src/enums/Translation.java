@@ -285,6 +285,8 @@ public enum Translation {
 	COMMAND_DENY				("command_deny"),
 	COMMAND_LANGUAGE			("command_language"),
 	COMMAND_SCHEDULE			("command_schedule"),
+	COMMAND_PRUNE				("command_prune"),
+	COMMAND_WARN				("command_warn"),
 	COMMANDS_DISABLED			("commands_disabled"),
 	
 	DAILY_REWARD				("daily_reward"),
