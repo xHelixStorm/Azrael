@@ -81,7 +81,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.37.552";
+	private static final String VERSION = "7.37.553";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -712,7 +712,7 @@ public class STATIC {
 				final SpamDetection messages = (SpamDetection) cache.getObject();
 				for(final var curMessage : messages.getMessages()) {
 					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY) || setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY))) {
-						e.getGuild().getTextChannelById(curMessage.getChannelID()).retrieveMessageById(curMessage.getMessage()).queue(m2 -> {
+						e.getGuild().getTextChannelById(curMessage.getChannelID()).retrieveMessageById(curMessage.getMessageID()).queue(m2 -> {
 							m2.delete().queue();
 						}, err -> {
 							logger.warn("Spammed message from user {} in channel {} has been already deleted in guild {}", e.getMember().getUser().getId(), curMessage.getChannelID(), e.getGuild().getId());
