@@ -793,6 +793,7 @@ public enum Translation {
 	USER_FOUND_18				("user_found_18"),
 	USER_FOUND_19				("user_found_19"),
 	USER_NOT_FOUND				("user_not_found"),
+	USER_EXAMPLE				("user_example"),
 	USER_EXIT					("user_exit"),
 	USER_LEFT					("user_left"),
 	USER_NUMBER					("user_number"),

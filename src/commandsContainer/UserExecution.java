@@ -64,15 +64,29 @@ public class UserExecution {
 		String raw_input = _input;
 		String user_name = null;
 		
-		if(raw_input.length() != 18 && raw_input.length() != 17) {
-			final User user = Azrael.SQLgetUser(name);
+		if(name.replaceAll("[0-9]*", "").length() > 0) {
+			final User user = Azrael.SQLgetUser(name, e.getGuild().getIdLong());
 			if(user != null) {
 				raw_input = ""+user.getUserID();
 				user_name = user.getUserName();
 			}
+			else {
+				final var users = Azrael.SQLgetPossibleUsers(name, e.getGuild().getIdLong());
+				if(users != null && users.size() > 0) {
+					StringBuilder out = new StringBuilder();
+					out.append(STATIC.getTranslation(e.getMember(), Translation.USER_EXAMPLE));
+					for(final var curUser : users) {
+						if(out.length() > 2000)
+							break;
+						out.append(curUser.getUserName()+" ("+curUser.getUserID()+")\n");
+					}
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(out.toString()).build()).queue();
+					return;
+				}
+			}
 		}
 		else {
-			User user = Azrael.SQLgetUserThroughID(raw_input);
+			User user = Azrael.SQLgetUserThroughID(raw_input, e.getGuild().getIdLong());
 			if(user != null) {
 				user = Azrael.SQLgetJoinDatesFromUser(Long.parseLong(raw_input), e.getGuild().getIdLong(), user);
 				user_name = user.getUserName();
@@ -80,26 +94,31 @@ public class UserExecution {
 		}
 		
 		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17) && user_name != null && user_name.length() > 0) {
-			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_1).replace("{}", user_name)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_2)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_3)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_4)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_5)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_6)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_7)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_8)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_9)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_10)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_11)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_12)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_13)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_14)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_15)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_16)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_17)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_18)
-				+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_19))
-				.build()).queue();
+			StringBuilder out = new StringBuilder();
+			out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_1).replace("{}", user_name)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_2)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_3)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_4)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_5)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_6)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_7)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_8)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_9)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_10)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_11)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_12)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_13)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_14));
+			final var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
+			if(guild_settings != null && guild_settings.getRankingState()) {
+				out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_15)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_16)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_17)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_18)
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_19));
+			}
+			message.setDescription(out.toString());
+			e.getChannel().sendMessage(message.build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, raw_input));
 		}
 		else {
@@ -124,7 +143,7 @@ public class UserExecution {
 				if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_INFORMATION))) {
 					final var informationLevel = GuildIni.getUserInformationLevel(e.getGuild().getIdLong());
 					if(UserPrivs.comparePrivilege(e.getMember(), informationLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-						User user = Azrael.SQLgetUserThroughID(cache.getAdditionalInfo());
+						User user = Azrael.SQLgetUserThroughID(cache.getAdditionalInfo(), e.getGuild().getIdLong());
 						if(user != null) {
 							user = Azrael.SQLgetJoinDatesFromUser(user_id, e.getGuild().getIdLong(), user);
 							message.setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE));
@@ -416,7 +435,7 @@ public class UserExecution {
 												final String [] array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE.id, "");
 												if(array != null && !array[0].equals("empty")) {
 													final String NA = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
-													var user = Azrael.SQLgetUserThroughID(""+user_id);
+													var user = Azrael.SQLgetUserThroughID(""+user_id, e.getGuild().getIdLong());
 													String username = (user != null ? user.getUserName() : NA);
 													GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), username, username.replaceAll("#[0-9]{4}$", ""), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, null, null, "UNMUTED", null, "", "", null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
 												}

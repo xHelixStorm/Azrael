@@ -442,8 +442,8 @@ public class Azrael {
 		}
 	}
 	
-	public static User SQLgetUser(String name) {
-		logger.trace("SqlgetUser launched. Passed params {}", name);
+	public static User SQLgetUser(String name, long guild_id) {
+		logger.trace("SqlgetUser launched. Passed params {}, {}", name, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -451,6 +451,7 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetUser);
 			stmt.setString(1, name);
+			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return new User(rs.getLong(1), rs.getString(2));
@@ -465,8 +466,8 @@ public class Azrael {
 		}
 	}
 	
-	public static User SQLgetUserThroughID(String user_id) {
-		logger.trace("SQLgetUserThroughID launched. Passed params {}", user_id);
+	public static User SQLgetUserThroughID(String user_id, long guild_id) {
+		logger.trace("SQLgetUserThroughID launched. Passed params {}, {}", user_id, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -474,6 +475,7 @@ public class Azrael {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetUserThroughID);
 			stmt.setString(1, user_id);
+			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				return new User(rs.getLong(1), rs.getString(2), rs.getString(4));
@@ -481,6 +483,31 @@ public class Azrael {
 			return null;
 		} catch (SQLException e) {
 			logger.error("SQLgetUserThroughID Exception", e);
+			return null;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<User> SQLgetPossibleUsers(String name, long guild_id) {
+		logger.trace("SQLgetPossibleUsers launched. Passed params {}, {}", name, guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			ArrayList<User> users = new ArrayList<User>();
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetPossibleUsers);
+			stmt.setString(1, name);
+			stmt.setLong(2, guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				users.add(new User(rs.getLong(1), rs.getString(2)));
+			}
+			return users;
+		} catch (SQLException e) {
+			logger.error("SQLgetPossibleUsers Exception", e);
 			return null;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

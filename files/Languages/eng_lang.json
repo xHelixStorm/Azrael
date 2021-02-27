@@ -791,6 +791,7 @@
 	"user_found_18":				"**gift-currency**: Gift money.\n",
 	"user_found_19":				"**set-currency**: Set amount of money.",
 	"user_not_found":				"User not found! Please try again!",
+	"user_example":					"Are you looking for one of those users below?\n\n",
 	"user_exit":					"Command aborted!",
 	"user_left":					"User has left the server!",
 	"user_number":					"Please write one of the displayed numbers!",

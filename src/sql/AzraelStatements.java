@@ -20,8 +20,9 @@ class AzraelStatements {
 	final static String SQLInsertJoinDate = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jG1gt6cCrYeAIjTlG7t/4YjKXz6yVjO1ao6TDvpIRZIVBzu9nndwmvVKMf3lpaX3wVX6cei0sjjxeStxwLebd+h6B1z2yVrUl12LqYh6oeqsU9ntGeoSJJcsJEZPCqlexA==");
 	final static String SQLBulkInsertJoinDates = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jG1gt6cCrYeAIjTlG7t/4YjKXz6yVjO1ao6TDvpIRZIVBzu9nndwmvVKMf3lpaX3wVX6cei0sjjxeStxwLebd+hcX9Av7QrG8lCiVRrjJY6NO3w2Hbbqpnu1zFHQ0WdLfw==");
 	final static String SQLUpdateJoinDate = STATIC.decrypt("HCKbsQoTl3LTcoshi0Vn90UtgZw9yyvQ7lxraQoP3pzHbAgxw3rANXjk5Vm9lp2JA5EEStGUYPCgC4+L5q4cZe/Qkbb/vw6+uguUb4Kzt0fkC/gOBHmrpLjofD7MG3PZ");
-	final static String SQLgetUser = STATIC.decrypt("rYxhi8Qp/P54z0LDgjoLz4EQAM2IConxCRExb1RkySaXv8aFBwNM0bnyzTLq7O9U");
-	final static String SQLgetUserThroughID = STATIC.decrypt("lvWEIWeeYi0nPQco1jAxpSTwke3zMJzQFPA7FZzXV1MBsMyt83gJm76MplNuldCh");
+	final static String SQLgetUser = STATIC.decrypt("rYxhi8Qp/P54z0LDgjoLz4EQAM2IConxCRExb1RkySZE+yon/1lC2WvJr2G57JSpYQLvpDVHa7m3YJ/bLxyaqOD7uplkgVPX3QwBMeO0Nnt2ISEkTzubWJQgsIUJ0E8zOKewolf9yR+f7vBosRDHuobpZNLAA/XuC0GCtRIeWrs18u70DKAp2Sql/jVtdU/+");
+	final static String SQLgetUserThroughID = STATIC.decrypt("lvWEIWeeYi0nPQco1jAxpSTwke3zMJzQFPA7FZzXV1NLnbzLZRIX6Ng2PTG8JvBRF1M32dtqXwKTsM6ZdfsyA2HHwJazjv3ls87uB4qvcCmO/XOtleNmq5RcVN7vGsKsAwb3nvxZpUoa+bhBYrm7b9xHSszMIq9vbC4joqobldU=");
+	final static String SQLgetPossibleUsers = STATIC.decrypt("rYxhi8Qp/P54z0LDgjoLz4EQAM2IConxCRExb1RkySZNZ3+b1du29CD/Jg2+pMgQhR2ZQhb5oNJvVfVMUZ1pYq/W3KhAfXG6si9CoDfE59Lg+7qZZIFT190MATHjtDZ7diEhJE87m1iUILCFCdBPMzinsKJX/ckfn+7waLEQx7qG6WTSwAP17gtBgrUSHlq7NfLu9AygKdkqpf41bXVP/g==");
 	final static String SQLgetJoinDatesFromUser = STATIC.decrypt("Qx4v4pf0OSkkTLBiG0gsBRHYMJU8WxYJELa3sYrsNtLk7PL89f9aMvx/jtvFr9CsEBM5j5jhkdrh6R0eYs+4hovSUEhwRra4xX9NSK4G58jRGEWz/HKXYJF8YrAWLdiPe0I4CHijTVKU6ptUTalFPQ==");
 	final static String SQLUpdateUser = STATIC.decrypt("uPW/TSgy8Kse1ag2ojCPp/kAzTj5ONpEtnV3ahqi8Ffa+APcLeFrBHagUQ4ihIQT");
 	final static String SQLgetUserLang = STATIC.decrypt("yaDV9i0FwkEy6ufxtq3eNq60jMxwnMP+RedT3ChdCDC6+8+bMT1m6Drj81rz/7w8");

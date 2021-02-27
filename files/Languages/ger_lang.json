@@ -791,6 +791,7 @@
 	"user_found_18":				"**geld-schenken**: Verschenken Sie Geld.\n",
 	"user_found_19":				"**geld-setzen**: Setzen Sie eine bestimmte Menge an Geld.",
 	"user_not_found":				"Benutzer nicht gefunden! Bitte probieren Sie es noch einmal!",
+	"user_example":					"Suchen Sie einen der unten genannten Benutzer?\n\n",
 	"user_exit":					"Befehl abgebrochen!",
 	"user_left":					"Benutzer hat den Server verlassen!",
 	"user_number":					"Bitte schreiben Sie eines der angezeigten Nummern!",
