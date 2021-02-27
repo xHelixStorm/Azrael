@@ -81,10 +81,12 @@ public class Pastebin {
 		return link.getLink().toString();
 	}
 	
-	public static String readPublicPasteLink(String _link) throws MalformedURLException, RuntimeException {
+	public static String readPasteLink(String _link, long guild_id) throws MalformedURLException, RuntimeException {
+		String[] credentials = GuildIni.getPastebinCredentials(guild_id);
+		
 		//read the developerKey into account
 		String developerKey = IniFileReader.getPastebinDeveloperKey();
-		PastebinAccount account = new PastebinAccount(developerKey);
+		PastebinAccount account = new PastebinAccount(developerKey, credentials[0], credentials[1]);
 		
 		//convert String URL and fetch the content of the link
 		URL url = new URL(_link);

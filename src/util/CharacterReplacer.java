@@ -8,7 +8,7 @@ private static String parseMessage;
 	public static String replace(String message, ArrayList<String> filter_lang) {
 		if(message != null && filter_lang.size() == 1) {
 			message = message.replaceAll("[\\.\\?!,\"+@#$%^&*\\(\\)\\{\\}\\]\\[\\/\\-\\_\\|\\=§‘’`„°•—–¿¡₩€¢¥£\\-​]", "");
-			if(filter_lang.contains("eng") || filter_lang.contains("ger")) {
+			if(filter_lang.contains("eng")) {
 				message = message.replaceAll("[ÀÁÂÃÅÆàáâãåæĀāĂăΑАаӒӓĄą]", "a");
 				message = message.replaceAll("[ΒВЬ]", "b");
 				message = message.replaceAll("[ĆćĈĉĊċČčϹСⅭϲсⅽçÇ]", "c");

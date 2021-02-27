@@ -48,7 +48,7 @@ public class SetGiveawayItems {
 		//verify pastebin link and save the content into array
 		else if(param.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && param.startsWith("http")) {
 			try {
-				String [] rewards = Pastebin.readPublicPasteLink(param).split("[\\r\\n]+");
+				String [] rewards = Pastebin.readPasteLink(param, e.getGuild().getIdLong()).split("[\\r\\n]+");
 				//calculate the next beginning of the month
 				Timestamp timestamp = calculateMonth();
 				

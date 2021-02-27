@@ -607,7 +607,7 @@ public class FilterExecution {
 				case "load-name-filter", "add-load-name-filter" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
-							String [] words = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
+							String [] words = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
 							var querryResult = Azrael.SQLReplaceNameFilter(words, false, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
@@ -683,7 +683,7 @@ public class FilterExecution {
 				case "load-name-kick", "add-load-name-kick" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
-							String [] words = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
+							String [] words = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
 							var querryResult = Azrael.SQLReplaceNameFilter(words, true, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
@@ -760,7 +760,7 @@ public class FilterExecution {
 				case "load-funny-names", "add-load-funny-names" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
-							String [] words = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
+							String [] words = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
 							var querryResult = Azrael.SQLReplaceFunnyNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
@@ -837,7 +837,7 @@ public class FilterExecution {
 				case "load-staff-names", "add-load-staff-names" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
-							String [] words = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
+							String [] words = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
 							var querryResult = Azrael.SQLReplaceStaffNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(querryResult == 0) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
@@ -921,7 +921,7 @@ public class FilterExecution {
 				case "add-load-url-blacklist", "load-url-blacklist" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
-							String [] url = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
+							String [] url = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
 							List<String> checkedURLs = new ArrayList<String>();
 							for(var link : url) {
 								if(link.matches("^(http:\\/\\/|https:\\/\\/)[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}$")) {
@@ -1021,7 +1021,7 @@ public class FilterExecution {
 				case "add-load-url-whitelist", "load-url-whitelist" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
-							String [] url = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
+							String [] url = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
 							List<String> checkedURLs = new ArrayList<String>();
 							for(var link : url) {
 								if(link.matches("^(http:\\/\\/|https:\\/\\/)[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}$")) {
@@ -1113,7 +1113,7 @@ public class FilterExecution {
 				case "add-load-tweet-blacklist", "load-tweet-blacklist" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
-							String [] usernames = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
+							String [] usernames = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
 							List<String> checkedUsernames = new ArrayList<String>();
 							for(var username : usernames) {
 								if(username.startsWith("@")) {
@@ -1265,7 +1265,7 @@ public class FilterExecution {
 			var langAbbreviation = lang;
 			String[] words;
 			try {
-				words = Pastebin.readPublicPasteLink(_message).split("[\\r\\n]+");
+				words = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
 				var querryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, e.getGuild().getIdLong(), replace);
 				if(querryResult == 0) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();

@@ -25,7 +25,7 @@ public class QuizExecution {
 		//split the returned String in an array
 		if(link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && link.startsWith("http")) {
 			try {
-				String [] rewards = Pastebin.readPublicPasteLink(link).split("[\\r\\n]+");
+				String [] rewards = Pastebin.readPasteLink(link, e.getGuild().getIdLong()).split("[\\r\\n]+");
 				int index = 1;
 				boolean interrupted = false;
 				Quizes quiz;
@@ -103,7 +103,7 @@ public class QuizExecution {
 		if(link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && link.startsWith("http")) {
 			String [] content = null;
 			try {
-				content = Pastebin.readPublicPasteLink(link).split("[\\r\\n]+");
+				content = Pastebin.readPasteLink(link, e.getGuild().getIdLong()).split("[\\r\\n]+");
 			} catch (MalformedURLException | RuntimeException e1) {
 				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
