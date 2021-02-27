@@ -1667,11 +1667,11 @@ public class RankingSystem {
 		final var levelList = Hashes.getRankingLevels(guild_id);
 		if(levelList == null) {
 			logger.trace("SQLgetLevels launched. Passed params {}", guild_id);
-			ArrayList<Level> levels = new ArrayList<Level>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
+				ArrayList<Level> levels = new ArrayList<Level>();
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetLevels);
 				stmt.setLong(1, guild_id);
@@ -1683,7 +1683,7 @@ public class RankingSystem {
 				return levels;
 			} catch (SQLException e) {
 				logger.error("SQLgetLevels Exception", e);
-				return levels;
+				return null;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
