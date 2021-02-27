@@ -1275,6 +1275,7 @@
 	"web_create":					"Bitte folgen Sie diese URL um sich auf der Bot Webseite anzumelden!\n",
 	"web_not_allowed":				"Sie haben die direkte Login Methode über den Bot deaktiviert. Bitte melden Sie sich direkt auf der Webseite an mit diese URL und ändern Sie die Login Einstellungen um diese Login Methode verwenden zu können!\n",
 	"web_code":						"Benutzen Sie diesen Schlüssel um sich auf der Webseite anzumelden. Dieser Schlüssel ist nur für 5 Minuten gültig. Falls Sie keine Anmelde Anfrage versendet haben, nehmen Sie bitte Kontakt zu einen Administrator auf!\n**{}**",
+	"web_confirm":					"Hier erhalten Sie die Angefragte Konto Bestätigung URL für Azrael Web!\n",
 	
 	"accept_no_wait":				"Eine Kategorie zum Verifizieren und eine verfiziert Rolle müssen registriert werden bevor dieses Befehl verwendet werden kann!",
 	"accept_help":					"Erwähnen Sie einen Benutzer oder schreiben Sie eine Benutzer ID um den Benutzer zu verfizieren! Alle Benutzer die verifiziert werden erhalten die verifiziert Rolle!",

@@ -1277,6 +1277,7 @@ public enum Translation {
 	WEB_CREATE					("web_create"),
 	WEB_NOT_ALLOWED				("web_not_allowed"),
 	WEB_CODE					("web_code"),
+	WEB_CONFIRM					("web_confirm"),
 	
 	ACCEPT_NO_WAIT				("accept_no_wait"),
 	ACCEPT_HELP					("accept_help"),

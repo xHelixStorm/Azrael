@@ -37,6 +37,9 @@ public class HandlerPOST {
 				case "webLogin" -> {
 					webLogin(e, out, json);
 				}
+				case "confirm" -> {
+					confirm(e, out, json);
+				}
 			}
 		}
 	}
@@ -56,7 +59,7 @@ public class HandlerPOST {
 			return false;
 		}
 		final String type = (String)json.get("type");
-		if(!type.equals("shutdown") && !type.equals("google") && !type.equals("webLogin")) {
+		if(!type.equals("shutdown") && !type.equals("google") && !type.equals("webLogin") && !type.equals("confirm")) {
 			WebserviceUtils.return502(out, "Invalid Type.", false);
 			return false;
 		}
@@ -110,7 +113,46 @@ public class HandlerPOST {
 			}
 			else {
 				final String ip = json.getString("ip");
-				if(!ip.matches("[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}")) {
+				if(!ip.matches("([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}|::1)")) {
+					WebserviceUtils.return502(out, "Source address invalid.", false);
+					return false;
+				}
+			}
+		}
+		if(type.equals("confirm")) {
+			if(!json.has("user_id")) {
+				WebserviceUtils.return502(out, "User ID required to request the web login.", false);
+				return false;
+			}
+			else {
+				final String user_id = (String) json.get("user_id");
+				if(user_id.replaceAll("[0-9]*", "").length() != 0) {
+					WebserviceUtils.return502(out, "User id is not numeric.", false);
+					return false;
+				}
+				else if(user_id.length() != 17 && user_id.length() != 18) {
+					WebserviceUtils.return502(out, "The user id needs to be either 17 or 18 digits long.", false);
+					return false;
+				}
+			}
+			if(!json.has("body") && json.get("body") instanceof JSONObject) {
+				WebserviceUtils.return502(out, "Body with confirmation token required.", false);
+				return false;
+			}
+			else {
+				final JSONObject body = (JSONObject) json.get("body");
+				if(!body.has("confirmToken")) {
+					WebserviceUtils.return502(out, "Confirmation token required inside body.", false);
+					return false;
+				}
+			}
+			if(!json.has("ip")) {
+				WebserviceUtils.return502(out, "Source address not found.", false);
+				return false;
+			}
+			else {
+				final String ip = json.getString("ip");
+				if(!ip.matches("([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}|::1)")) {
 					WebserviceUtils.return502(out, "Source address invalid.", false);
 					return false;
 				}
@@ -219,6 +261,42 @@ public class HandlerPOST {
 			WebserviceUtils.return502(out, "Please insert your discord name and not the one of the Bot!", true);
 			AzraelWeb.SQLCodeUsageLog(user_id, address);
 			AzraelWeb.SQLInsertActionLog(user_id, address, "CODE_GENERATION_ATTEMPT", "Attempted to message the main Bot.");
+		}
+	}
+	
+	private static void confirm(ReadyEvent e, PrintWriter  out, JSONObject json) {
+		final long user_id = json.getLong("user_id");
+		final JSONObject body = (JSONObject)json.get("body");
+		final String confirmToken = body.getString("confirmToken");
+		final String address = json.getString("ip");
+		Guild guild = e.getJDA().getGuilds().parallelStream().filter(g -> g.getMemberById(user_id) != null).findAny().orElse(null);
+		if(guild != null) {
+			Member member = guild.getMemberById(user_id);
+			if(member != null) {
+				if(!member.getUser().isBot()) {
+					final var channel = member.getUser().openPrivateChannel().complete();
+					try {
+						channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_CONFIRM)+IniFileReader.getWebURL()+"/account/confirm.php?key="+confirmToken).build()).queue();
+						AzraelWeb.SQLInsertActionLog(user_id, address, "ACCOUNT_CONFIRMATION_SENT", "Confirmation sent.");
+						WebserviceUtils.return200(out, "Success", true);
+					} catch(Exception exc) {
+						WebserviceUtils.return500(out, "Direct messages are locked for this user!", true);
+						AzraelWeb.SQLInsertActionLog(user_id, address, "ACCOUNT_CONFIRMATION_ATTEMPT", "Destination user has locked direct messages.");
+					}
+				}
+				else {
+					WebserviceUtils.return404(out, "User not found!", true);
+					AzraelWeb.SQLInsertActionLog(user_id, address, "ACCOUNT_CONFIRMATION_ATTEMPT", "User not found.");
+				}
+			}
+			else {
+				WebserviceUtils.return404(out, "User not found!", true);
+				AzraelWeb.SQLInsertActionLog(user_id, address, "ACCOUNT_CONFIRMATION_ATTEMPT", "User not found.");
+			}
+		}
+		else {
+			WebserviceUtils.return404(out, "User not found!", true);
+			AzraelWeb.SQLInsertActionLog(user_id, address, "ACCOUNT_CONFIRMATION_ATTEMPT", "User not found.");
 		}
 	}
 }

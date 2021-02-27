@@ -1275,6 +1275,7 @@
 	"web_create":					"Follow this link to complete your registration and to be able to access the website for the Bot!\n",
 	"web_not_allowed":				"You have disabled the direct login method for the website. Please login directly on the website through this link and change the login settings to use this login method!\n",
 	"web_code":						"Use this key to login into the website. The key is valid for 5 minutes. If you didn't request the login, please contact an administrator!\n**{}**",
+	"web_confirm":					"Here the requested confirmation URL for Azrael Web!\n",
 	
 	"accept_no_wait":				"A verification category and a verified role needs to be registered to use this command!",
 	"accept_help":					"Mention a user or write the user ID of that user to complete the verification! Every verified user will receive the verified role!",
