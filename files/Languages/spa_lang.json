@@ -1364,5 +1364,13 @@
 	"prune_exc_members":			"Excluded Members",
 	"prune_exc_roles":				"Excluded Roles",
 	"prune_complete":				"Out of {} members, {} have been kicked, {} excluded and {} couldn't be kicked due to missing hierargic permissions or because of leaving members!\nAction completed!",
-	"prune_abort":					"Prune command aborted!"
+	"prune_abort":					"Prune command aborted!",
+	
+	"warn_help":					"Write a warning message to a user by mentioning the user or by writing the user id as first parameter and then the reason starting with the second parameter! The user will receive the warning reason in private message!",
+	"warn_sent":					"You're receiving a warning for **{}** from {}. Please correct your behaviour or your punishment will become more severe!",
+	"warn_sent_2":					"Warning has been sent to {}!",
+	"warn_err":						"User {} got his private messages locked and couldn't receive your warning!",
+	"warn_err_2":					"You can't send a warning message to a user who has higher privileges than the Bot! Action denied!",
+	"warn_err_3":					"You can't warn yourself! Action denied!",
+	"warn_err_4":					"Please mention a user or write a user id for the first parameter! Action interrupted!"
 }

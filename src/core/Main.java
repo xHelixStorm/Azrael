@@ -62,6 +62,7 @@ import commands.Stats;
 import commands.Top;
 import commands.Use;
 import commands.User;
+import commands.Warn;
 import commands.Web;
 import commands.Write;
 import fileManagement.IniFileReader;
@@ -267,6 +268,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("restrict", new Restrict());
 		CommandHandler.commandsPublic.put("start", new Start());
 		CommandHandler.commandsPublic.put("prune", new Prune());
+		CommandHandler.commandsPublic.put("warn", new Warn());
 	}
 	
 	public static void addPrivateCommands() {

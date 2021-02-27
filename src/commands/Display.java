@@ -369,6 +369,9 @@ public class Display implements CommandPublic{
 				out.append("Accept command: "+GuildIni.getAcceptLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Deny command: "+GuildIni.getDenyLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Language command: "+GuildIni.getLanguageLevel(e.getGuild().getIdLong()));
+				out.append("Schedule command: "+GuildIni.getScheduleLevel(e.getGuild().getIdLong()));
+				out.append("Prune command: "+GuildIni.getPruneLevel(e.getGuild().getIdLong()));
+				out.append("Warn command: "+GuildIni.getWarnLevel(e.getGuild().getIdLong()));
 				//print second part
 				e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
 				//print third part (custom commands)

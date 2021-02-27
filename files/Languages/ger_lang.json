@@ -1364,5 +1364,13 @@
 	"prune_exc_members":			"Ausgeschlossene Benutzer",
 	"prune_exc_roles":				"Ausgeschlossene Rollen",
 	"prune_complete":				"Von gesamt {} Mitglieder, {} wurden gekickt, {} wurden vom Kick ausgeschlossen und {} konnten nicht gekickt werden wegen fehlende hierarchische Berechtigungen oder weil diese den Server verlassen haben!\nAktion abgeschlossen!",
-	"prune_abort":					"Prune Befehl abgebrochen!"
+	"prune_abort":					"Prune Befehl abgebrochen!",
+	
+	"warn_help":					"Schreiben Sie eine Warnung an einen Benutzer, indem Sie den Benutzer erwähnen oder indem Sie die Benutzer-ID als ersten Parameter und dann den Grund ab dem zweiten Parameter schreiben! Der Benutzer erhält den Warngrund in einer privaten Nachricht!",
+	"warn_sent":					"Sie erhalten eine Verwarnung für **{}** von {}. Bitte korrigieren Sie Ihr Verhalten, sonst wird Ihre Strafe härter ausfallen!",
+	"warn_sent_2":					"Warnung wurde an {} gesendet!",
+	"warn_err":						"Benutzer {} hat seine privaten Nachrichten gesperrt und konnte Ihre Warnung nicht erhalten!",
+	"warn_err_2":					"Sie können keine Warnung an einen Benutzer senden, der höhere Berechtigungen hat als der Bot! Aktion verweigert!",
+	"warn_err_3":					"Sie können sich nicht selbst warnen! Aktion verweigert!",
+	"warn_err_4":					"Bitte erwähnen Sie einen Benutzer oder schreiben Sie eine Benutzer-ID für den ersten Parameter! Aktion abgebrochen!"
 }

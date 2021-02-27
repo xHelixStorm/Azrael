@@ -1366,7 +1366,14 @@ public enum Translation {
 	PRUNE_EXC_MEMBERS			("prune_exc_members"),
 	PRUNE_EXC_ROLES				("prune_exc_roles"),
 	PRUNE_COMPLETE				("prune_complete"),
-	PRUNE_ABORT					("prune_abort");
+	PRUNE_ABORT					("prune_abort"),
+	WARN_HELP					("warn_help"),
+	WARN_SENT					("warn_sent"),
+	WARN_SENT_2					("warn_sent_2"),
+	WARN_ERR					("warn_err"),
+	WARN_ERR_2					("warn_err_2"),
+	WARN_ERR_3					("warn_err_3"),
+	WARN_ERR_4					("warn_err_4");
 	
 	private String value;
 	
