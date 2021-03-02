@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 
 import org.jpaste.exceptions.PasteException;
 import org.jpaste.pastebin.exceptions.LoginException;
+import org.jpaste.pastebin.exceptions.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public class QuizExecution {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).build()).queue();
 					clearRewards(e, 1);
 				}
-			} catch (MalformedURLException | RuntimeException e2) {
+			} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
 				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 				logger.error("Reading pastebin url {} failed in guild {}", link, e.getGuild().getId(), e2);
@@ -104,7 +105,7 @@ public class QuizExecution {
 			String [] content = null;
 			try {
 				content = Pastebin.readPasteLink(link, e.getGuild().getIdLong()).split("[\\r\\n]+");
-			} catch (MalformedURLException | RuntimeException e1) {
+			} catch (MalformedURLException | RuntimeException | LoginException | ParseException e1) {
 				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 				logger.error("Reading paste pastebin {} failed in guild {}", link, e.getGuild().getId(), e1);

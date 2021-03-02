@@ -163,6 +163,7 @@
 	"lang_spa":						"Spanish",
 	"lang_por":						"Portuguese",
 	"lang_ita":						"Italian",
+	"lang_ara":						"Arab",
 	
 	"not_bot_channel": 			 	" I'm not allowed to execute commands in this channel, please write it again in ",
 	"wrong_channel":				" I'm not allowed to execute this command type in this channel, please write it again in ",

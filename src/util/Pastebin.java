@@ -9,6 +9,7 @@ import org.jpaste.pastebin.PastebinLink;
 import org.jpaste.pastebin.PastebinPaste;
 import org.jpaste.pastebin.account.PastebinAccount;
 import org.jpaste.pastebin.exceptions.LoginException;
+import org.jpaste.pastebin.exceptions.ParseException;
 
 import fileManagement.GuildIni;
 import fileManagement.IniFileReader;
@@ -81,12 +82,29 @@ public class Pastebin {
 		return link.getLink().toString();
 	}
 	
-	public static String readPasteLink(String _link, long guild_id) throws MalformedURLException, RuntimeException {
+	public static String readPasteLink(String _link, long guild_id) throws MalformedURLException, RuntimeException, LoginException, ParseException {
 		String[] credentials = GuildIni.getPastebinCredentials(guild_id);
 		
 		//read the developerKey into account
 		String developerKey = IniFileReader.getPastebinDeveloperKey();
-		PastebinAccount account = new PastebinAccount(developerKey, credentials[0], credentials[1]);
+		PastebinAccount account = null;
+		if(credentials[0].length() > 0 && credentials[1].length() > 0) {
+			//private pastes
+			account = new PastebinAccount(developerKey, credentials[0], credentials[1]);
+			account.login();
+			
+			PastebinLink[] pastes = account.getPastes(1000);
+			for(final var paste : pastes) {
+				if(paste.getLink().toString().equals(_link)) {
+					paste.fetchContent();
+					return paste.getPaste().getContents();
+				}
+			}
+		}
+		else {
+			//public and unlisted pastes
+			account = new PastebinAccount(developerKey);
+		}
 		
 		//convert String URL and fetch the content of the link
 		URL url = new URL(_link);

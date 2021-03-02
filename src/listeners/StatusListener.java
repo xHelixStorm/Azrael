@@ -22,14 +22,14 @@ public class StatusListener extends ListenerAdapter {
 		new Thread(() -> {
 			//if enabled in config file, check how many users are online and set it as currently playing
 			if(IniFileReader.getCountMembers() && (e.getNewOnlineStatus().toString().equals("OFFLINE") || e.getNewOnlineStatus().toString().equals("ONLINE"))) {
-				e.getJDA().getPresence().setActivity(Activity.of(ActivityType.DEFAULT, e.getGuild().getMembers().parallelStream().filter(f -> f.getOnlineStatus() == OnlineStatus.ONLINE || f.getOnlineStatus() == OnlineStatus.IDLE || f.getOnlineStatus() == OnlineStatus.DO_NOT_DISTURB).count()+" Discord Members online"));
+				e.getJDA().getPresence().setActivity(Activity.of(ActivityType.CUSTOM_STATUS, e.getGuild().getMembers().parallelStream().filter(f -> f.getOnlineStatus() == OnlineStatus.ONLINE || f.getOnlineStatus() == OnlineStatus.IDLE || f.getOnlineStatus() == OnlineStatus.DO_NOT_DISTURB).count()+" Discord Members online"));
 			}
 			else {
 				//set the game message if provided
 				final String message = IniFileReader.getGameMessage();
 				if(message != null && message.length() > 0 && !message.equals(oldActivity)) {
 					oldActivity = message;
-					e.getJDA().getPresence().setActivity(Activity.of(ActivityType.DEFAULT, IniFileReader.getGameMessage()));
+					e.getJDA().getPresence().setActivity(Activity.of(ActivityType.CUSTOM_STATUS, IniFileReader.getGameMessage()));
 				}
 			}
 		}).start();

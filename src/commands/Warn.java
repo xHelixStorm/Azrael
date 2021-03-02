@@ -49,7 +49,7 @@ public class Warn implements CommandPublic {
 							}
 							final String reason = out.toString().trim();
 							member.getUser().openPrivateChannel().queue(channel -> {
-								channel.sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation(member, Translation.WARN_SENT).replaceFirst("\\{\\}", reason).replace("{}", e.getGuild().getName())).build()).queue(success -> {
+								channel.sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.WARN_SENT).replaceFirst("\\{\\}", reason).replace("{}", e.getGuild().getName())).build()).queue(success -> {
 									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.WARN_SENT_2).replace("{}", member.getUser().getName()+"#"+member.getUser().getDiscriminator())).build()).queue();
 									Azrael.SQLInsertHistory(member.getUser().getIdLong(), e.getGuild().getIdLong(), "warning", reason, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
 									logger.info("User {} has sent a warning message to user {} in guild {}", e.getMember().getUser().getId(), member.getUser().getId(), e.getGuild().getId());

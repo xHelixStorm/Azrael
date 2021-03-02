@@ -35,28 +35,34 @@ public class ShopExecution {
 		final var content = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), true);
 		if(content != null) {
 			List<Skins> filteredContent = content.parallelStream().filter(f -> f.getSkinType().equals(_type)).collect(Collectors.toList());
-			StringBuilder builder = new StringBuilder();
-			StringBuilder priceBuilder = new StringBuilder();
-			var items = "";
-			var index = 1;
-			
-			for(Skins skin_info : filteredContent) {
-				items += (items.length() == 0 ? "" : "-")+skin_info.getItemID();
-				String price;
-				if(skin_info.getShopDescription().equals(_description)){price = STATIC.getTranslation(e.getMember(), Translation.SHOP_DEFAULT);}
-				else{price = skin_info.getPrice()+" "+guild_settings.getCurrency();}
-				if(RankingSystem.SQLgetItemID(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), skin_info.getItemID()) != 0 && !skin_info.getSkinType().equals("ite")){price = STATIC.getTranslation(e.getMember(), Translation.SHOP_BOUGHT);}
-				builder.append(index+": *_"+skin_info.getShopDescription()+"_*\n");
-				priceBuilder.append("*_"+price+"_*\n");
-				index++;
+			if(filteredContent.size() > 0) {
+				StringBuilder builder = new StringBuilder();
+				StringBuilder priceBuilder = new StringBuilder();
+				var items = "";
+				var index = 1;
+				
+				for(Skins skin_info : filteredContent) {
+					items += (items.length() == 0 ? "" : "-")+skin_info.getItemID();
+					String price;
+					if(skin_info.getShopDescription().equals(_description)){price = STATIC.getTranslation(e.getMember(), Translation.SHOP_DEFAULT);}
+					else{price = skin_info.getPrice()+" "+guild_settings.getCurrency();}
+					if(RankingSystem.SQLgetItemID(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), skin_info.getItemID()) != 0 && !skin_info.getSkinType().equals("ite")){price = STATIC.getTranslation(e.getMember(), Translation.SHOP_BOUGHT);}
+					builder.append(index+": *_"+skin_info.getShopDescription()+"_*\n");
+					priceBuilder.append("*_"+price+"_*\n");
+					index++;
+				}
+				EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail());
+				message.addField(filteredContent.get(0).getSkinDescription(), STATIC.getTranslation(e.getMember(), Translation.SHOP_SHOW), false);
+				message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_DESCRIPTION), builder.toString(), true);
+				message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_PRICE), priceBuilder.toString(), true);
+				
+				e.getChannel().sendMessage(message.build()).queue();
+				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, _type, items));
 			}
-			EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail());
-			message.addField(filteredContent.get(0).getSkinDescription(), STATIC.getTranslation(e.getMember(), Translation.SHOP_SHOW), false);
-			message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_DESCRIPTION), builder.toString(), true);
-			message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_PRICE), priceBuilder.toString(), true);
-			
-			e.getChannel().sendMessage(message.build()).queue();
-			Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, _type, items));
+			else {
+				//TODO: if a section is empty, throw error
+				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
+			}
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -119,21 +125,27 @@ public class ShopExecution {
 	public static void displayWeaponCategories(GuildMessageReceivedEvent e) {
 		final var categoriesList = RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), false);
 		if(categoriesList != null) {
-			StringBuilder builder = new StringBuilder();
-			var categories = "";
-			boolean first = true;
-			for(String category : categoriesList) {
-				categories += (categories.length() == 0 ? "" : "-")+category;
-				if(first) {
-					builder.append("**"+category+"**");
-					first = false;
+			if(categoriesList.size() > 0) {
+				StringBuilder builder = new StringBuilder();
+				var categories = "";
+				boolean first = true;
+				for(String category : categoriesList) {
+					categories += (categories.length() == 0 ? "" : "-")+category;
+					if(first) {
+						builder.append("**"+category+"**");
+						first = false;
+					}
+					else {
+						builder.append(", **"+category+"**");
+					}
 				}
-				else {
-					builder.append(", **"+category+"**");
-				}
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail()).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_DISPLAY_WEP)+builder.toString()).build()).queue();
+				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "wea", categories));
 			}
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail()).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_DISPLAY_WEP)+builder.toString()).build()).queue();
-			Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "wea", categories));
+			else {
+				//TODO: if a section is empty, throw error
+				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
+			}
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -166,6 +178,10 @@ public class ShopExecution {
 				
 				e.getChannel().sendMessage(message.build()).queue();
 				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "wea-"+_type, weapons));
+			}
+			else {
+				//TODO: if a section is empty, throw error
+				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
 			}
 		}
 		else {
@@ -318,22 +334,28 @@ public class ShopExecution {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail());
 		var skills = RankingSystemItems.SQLgetSkills(e.getGuild().getIdLong());
 		if(skills != null) {
-			StringBuilder builder = new StringBuilder();
-			StringBuilder priceBuilder = new StringBuilder();
-			var skill = "";
-			var index = 1;
-			for(final var key : skills) {
-				skill += (skill.length() == 0 ? "" : "-")+key.getSkillId();
-				builder.append(index+": *_"+key.getDescription()+"_*\n");
-				priceBuilder.append("*_"+key.getPrice()+" "+guild_settings.getCurrency()+"_*\n");
-				index++;
+			if(skills.size() > 0) {
+				StringBuilder builder = new StringBuilder();
+				StringBuilder priceBuilder = new StringBuilder();
+				var skill = "";
+				var index = 1;
+				for(final var key : skills) {
+					skill += (skill.length() == 0 ? "" : "-")+key.getSkillId();
+					builder.append(index+": *_"+key.getDescription()+"_*\n");
+					priceBuilder.append("*_"+key.getPrice()+" "+guild_settings.getCurrency()+"_*\n");
+					index++;
+				}
+				message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_SKILLS), STATIC.getTranslation(e.getMember(), Translation.SHOP_SHOW), false);
+				message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_DESCRIPTION), builder.toString(), true);
+				message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_PRICE), priceBuilder.toString(), true);
+				
+				e.getChannel().sendMessage(message.build()).queue();
+				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "ski", skill));
 			}
-			message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_SKILLS), STATIC.getTranslation(e.getMember(), Translation.SHOP_SHOW), false);
-			message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_DESCRIPTION), builder.toString(), true);
-			message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_PRICE), priceBuilder.toString(), true);
-			
-			e.getChannel().sendMessage(message.build()).queue();
-			Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "ski", skill));
+			else {
+				//TODO: if a section is empty, throw error
+				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
+			}
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();

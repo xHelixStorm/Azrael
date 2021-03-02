@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.jpaste.exceptions.PasteException;
 import org.jpaste.pastebin.exceptions.LoginException;
+import org.jpaste.pastebin.exceptions.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -636,7 +637,7 @@ public class FilterExecution {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
 								logger.error("Changes on the name filter couldn't be rolled back on error in guild {}", e.getGuild().getId());
 							}
-						} catch (MalformedURLException | RuntimeException e2) {
+						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 							logger.error("Reading pastebin url {} for the name filter failed in guild {}", _message, e.getGuild().getId(), e2);
@@ -713,7 +714,7 @@ public class FilterExecution {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
 								logger.error("Changes on the name kick list couldn't be rolled back on error in guild {}", e.getGuild().getId());
 							}
-						} catch (MalformedURLException | RuntimeException e2) {
+						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 							logger.error("Reading pastebin url {} for the name kick list failed in guild {}", _message, e.getGuild().getId(), e2);
@@ -789,7 +790,7 @@ public class FilterExecution {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
 								logger.error("Changes on the funky names list couldn't be rolled back on error in guild {}", e.getGuild().getId());
 							}
-						} catch (MalformedURLException | RuntimeException e2) {
+						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 							logger.error("Reading pastebin url {} for the funky names list failed in guild {}", _message, e.getGuild().getId(), e2);
@@ -866,7 +867,7 @@ public class FilterExecution {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
 								logger.error("Changes on the staff names list couldn't be rolled back on error in guild {}", e.getGuild().getId());
 							}
-						} catch (MalformedURLException | RuntimeException e2) {
+						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 							logger.error("Reading pastebin url {} for the staff names list failed in guild {}", _message, e.getGuild().getId(), e2);
@@ -966,7 +967,7 @@ public class FilterExecution {
 								message.setColor(Color.RED);
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_URL)).build()).queue();
 							}
-						} catch (MalformedURLException | RuntimeException e2) {
+						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 							logger.error("Reading pastebin url {} for the url blacklist failed in guild {}", _message, e.getGuild().getId(), e2);
@@ -1066,7 +1067,7 @@ public class FilterExecution {
 								message.setColor(Color.RED);
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_URL)).build()).queue();
 							}
-						} catch (MalformedURLException | RuntimeException e2) {
+						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 							logger.error("Reading pastebin url {} for the url blacklist failed in guild {}", _message, e.getGuild().getId(), e2);
@@ -1158,7 +1159,7 @@ public class FilterExecution {
 								message.setColor(Color.RED);
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_NICK)).build()).queue();
 							}
-						} catch (MalformedURLException | RuntimeException e2) {
+						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 							logger.error("Reading pastebin url {} for the tweet blacklist failed in guild {}", _message, e.getGuild().getId(), e2);
@@ -1193,6 +1194,7 @@ public class FilterExecution {
 				case "spa" 	-> {langAbbreviation = "spa";  definitiveLang = STATIC.getTranslation(e.getMember(), Translation.LANG_SPA);}
 				case "por"	-> {langAbbreviation = "por";  definitiveLang = STATIC.getTranslation(e.getMember(), Translation.LANG_POR);}
 				case "ita" 	-> {langAbbreviation = "ita";  definitiveLang = STATIC.getTranslation(e.getMember(), Translation.LANG_ITA);}
+				case "ara" 	-> {langAbbreviation = "ara";  definitiveLang = STATIC.getTranslation(e.getMember(), Translation.LANG_ARA);}
 			}
 			
 			if(!langAbbreviation.isBlank()) {
@@ -1295,7 +1297,7 @@ public class FilterExecution {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
 					logger.error("Changes on the {} word filter couldn't be rolled back on error in guild {}", lang, e.getGuild().getId());
 				}
-			} catch (MalformedURLException | RuntimeException e2) {
+			} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
 				message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 				logger.error("Reading pastebin url {} for the {} word filter failed in guild {}", _message, lang, e.getGuild().getId(), e2);
@@ -1326,6 +1328,8 @@ public class FilterExecution {
 			Hashes.removeQuerryResult("por_"+e.getGuild().getId());
 		if(lang.equals("ita") || (allowAll && lang.equals("all")))
 			Hashes.removeQuerryResult("ita_"+e.getGuild().getId());
+		if(lang.equals("ara") || (allowAll && lang.equals("all")))
+			Hashes.removeQuerryResult("ara_"+e.getGuild().getId());
 	}
 	
 	private static List<String> checkDuplicates(String [] words) {

@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 
+import org.jpaste.pastebin.exceptions.LoginException;
+import org.jpaste.pastebin.exceptions.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +66,7 @@ public class SetGiveawayItems {
 					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					logger.error("Giveaway rewards couldn't be saved with the pastebin url {} in guild {}", param, e.getGuild().getId());
 				}
-			} catch (MalformedURLException | RuntimeException e1) {
+			} catch (MalformedURLException | RuntimeException | LoginException | ParseException e1) {
 				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
 				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR_2)).build()).queue();
 				logger.error("Reading pastebin url {} failed in guild {}", param, e.getGuild().getId(), e1);

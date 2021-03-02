@@ -165,6 +165,7 @@ public enum Translation {
 	LANG_SPA					("lang_spa"),
 	LANG_POR					("lang_por"),
 	LANG_ITA					("lang_ita"),
+	LANG_ARA					("lang_ara"),
 	
 	NOT_BOT_CHANNEL				("not_bot_channel"),
 	WRONG_CHANNEL				("wrong_channel"),
