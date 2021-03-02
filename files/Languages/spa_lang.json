@@ -678,7 +678,14 @@
 	"set_language_success":			"El idioma del servidor ha sido actualizado con éxito.",
 	
 	"shop_title":					"Bienvenido, pase.",
-	"shop_help":					"¡Bienvenido a mi tienda! ¡Echa un vistazo! Escriba la sección que desea ver más de cerca y escriba *exit* cuando quiera irse. !\n\n*LEVEL UPS*:\n¡Ver y comprar skins para subir de nivel!\n*RANKS*:\n¡Ver y comprar skins de rango!\n*PROFILES*:\nVer y comprar skins de perfil\n*ICONS*:\n¡Ver  y comprar skins de iconos que se muestran en los rangos y skins de perfil!\n*ITEMS*:\nVea y compre artículos como los potenciadores de experiencia.\n*WEAPONS*:\n¡Mira y compra armas para llenar tu arsenal!\n*SKILLS*:\n¡Ver y comprar habilidades!",
+	"shop_help":					"¡Bienvenido a mi tienda! ¡Echa un vistazo! Escriba la sección que desea ver más de cerca y escriba *exit* cuando quiera irse. !\n\n",
+	"shop_help_2":					"*LEVEL UPS*:\n¡Ver y comprar skins para subir de nivel!\n",
+	"shop_help_3":					"*RANKS*:\n¡Ver y comprar skins de rango!\n",
+	"shop_help_4":					"*PROFILES*:\nVer y comprar skins de perfil\n",
+	"shop_help_5":					"*ICONS*:\n¡Ver  y comprar skins de iconos que se muestran en los rangos y skins de perfil!\n",
+	"shop_help_6":					"*ITEMS*:\nVea y compre artículos como los potenciadores de experiencia.\n",
+	"shop_help_7":					"*WEAPONS*:\n¡Mira y compra armas para llenar tu arsenal!\n",
+	"shop_help_8":					"*SKILLS*:\n¡Ver y comprar habilidades!",
 	"shop_purchased":				"Has comprado con éxito **{}**",
 	"shop_not_enough_cur":			"¡No tienes suficiente dinero para esta compra!",
 	"shop_sold":					"¡La selección se ha vendido!",
@@ -710,6 +717,7 @@
 	"shop_weapons":					"Armas: ",
 	"shop_skills":					"Skills",
 	"shop_title_exit":				"¡Gracias por la visita! ¡Nos vemos de nuevo!",
+	"shop_emtpy":					"Actualmente, no hay nada en stock. Por favor, inténtelo más tarde.",
 	
 	"shutdown":						"**¡Cortando ahora! ¡Nos vemos pronto!",
 	"shutdown_prep":				"¡Secuencia de apagado iniciada!",

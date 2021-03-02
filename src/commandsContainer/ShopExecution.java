@@ -59,10 +59,6 @@ public class ShopExecution {
 				e.getChannel().sendMessage(message.build()).queue();
 				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, _type, items));
 			}
-			else {
-				//TODO: if a section is empty, throw error
-				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
-			}
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -142,10 +138,6 @@ public class ShopExecution {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail()).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_DISPLAY_WEP)+builder.toString()).build()).queue();
 				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "wea", categories));
 			}
-			else {
-				//TODO: if a section is empty, throw error
-				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
-			}
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -178,10 +170,6 @@ public class ShopExecution {
 				
 				e.getChannel().sendMessage(message.build()).queue();
 				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "wea-"+_type, weapons));
-			}
-			else {
-				//TODO: if a section is empty, throw error
-				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
 			}
 		}
 		else {
@@ -340,10 +328,12 @@ public class ShopExecution {
 				var skill = "";
 				var index = 1;
 				for(final var key : skills) {
-					skill += (skill.length() == 0 ? "" : "-")+key.getSkillId();
-					builder.append(index+": *_"+key.getDescription()+"_*\n");
-					priceBuilder.append("*_"+key.getPrice()+" "+guild_settings.getCurrency()+"_*\n");
-					index++;
+					if(key.getEnabled()) {
+						skill += (skill.length() == 0 ? "" : "-")+key.getSkillId();
+						builder.append(index+": *_"+key.getDescription()+"_*\n");
+						priceBuilder.append("*_"+key.getPrice()+" "+guild_settings.getCurrency()+"_*\n");
+						index++;
+					}
 				}
 				message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_SKILLS), STATIC.getTranslation(e.getMember(), Translation.SHOP_SHOW), false);
 				message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_DESCRIPTION), builder.toString(), true);
@@ -351,10 +341,6 @@ public class ShopExecution {
 				
 				e.getChannel().sendMessage(message.build()).queue();
 				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "ski", skill));
-			}
-			else {
-				//TODO: if a section is empty, throw error
-				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
 			}
 		}
 		else {

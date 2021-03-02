@@ -678,7 +678,14 @@
 	"set_language_success":			"Die Server Sprache wurde erfolgreich aktualisiert!",
 	
 	"shop_title":					"Willkommen, treten Sie ein!",
-	"shop_help":					"Willkommen in meinem Geschäft! Schauen Sie sich um! Schreiben Sie den Abschnitt aus, den Sie sich näher ansehen möchten, und schreiben Sie *verlassen*, wenn Sie gehen möchten!\n\n*LEVEL UPS*:\nInspizieren und Kaufen Sie Level-Up-Bilder!\n*RÄNGE*:\nInspizieren und Kaufen Sie Rang-Bilder!\n*PROFILE*:\nInspizieren und Kaufen Sie Profil-Bilder!\n*SYMBOLE*:\nInspizieren und kaufen Sie Symbole, die zusammen mit anderen Bild-Arten verwendet werden!\n*GEGENSTÄNDE*:\nInspizieren und kaufen Sie Gegenstände wie einen Erfahrung-Booster!\n*WAFFEN*:\nInspizieren und kaufen Sie Waffen für ihren Arsenal!\n*FERTIGKEITEN*:\nInspizieren und kaufen Sie Fertigkeiten!",
+	"shop_help":					"Willkommen in meinem Geschäft! Schauen Sie sich um! Schreiben Sie den Abschnitt aus, den Sie sich näher ansehen möchten, und schreiben Sie *verlassen*, wenn Sie gehen möchten!\n\n",
+	"shop_help_2":					"*LEVEL UPS*:\nInspizieren und Kaufen Sie Level-Up-Bilder!\n",
+	"shop_help_3":					"*RÄNGE*:\nInspizieren und Kaufen Sie Rang-Bilder!\n",
+	"shop_help_4":					"*PROFILE*:\nInspizieren und Kaufen Sie Profil-Bilder!\n",
+	"shop_help_5":					"*SYMBOLE*:\nInspizieren und kaufen Sie Symbole, die zusammen mit anderen Bild-Arten verwendet werden!\n",
+	"shop_help_6":					"*GEGENSTÄNDE*:\nInspizieren und kaufen Sie Gegenstände wie einen Erfahrung-Booster!\n",
+	"shop_help_7":					"*WAFFEN*:\nInspizieren und kaufen Sie Waffen für ihren Arsenal!\n",
+	"shop_help_8":					"*FERTIGKEITEN*:\nInspizieren und kaufen Sie Fertigkeiten!",
 	"shop_purchased":				"Sie haben erfolfreich **{}** gekauft!",
 	"shop_not_enough_cur":			"Sie haben nicht genug Geld für diesen Kauf!",
 	"shop_sold":					"Auswahl wurde verkauft!",
@@ -710,6 +717,7 @@
 	"shop_weapons":					"Waffen: ",
 	"shop_skills":					"Fertigkeiten",
 	"shop_title_exit":				"Danke für den Besuch! Kehre bald zurück!",
+	"shop_emtpy":					"Derzeit ist nichts auf Lager. Bitte versuchen Sie es später noch einmal!",
 	
 	"shutdown":						"**Bot fährt jetzt herunter! Bis später!**",
 	"shutdown_prep":				"Abschaltsequenz eingeleitet!",

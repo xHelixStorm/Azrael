@@ -678,7 +678,14 @@
 	"set_language_success":			"Server language has been updated successfully!",
 	
 	"shop_title":					"Welcome, step in!",
-	"shop_help":					"Welcome to my shop! Have a look around! Write out the section that you wish to take a closer look into and type *exit* when you wish to leave!\n\n*LEVEL UPS*:\nView and purchase level up skins!\n*RANKS*:\nView and purchase rank skins!\n*PROFILES*:\nView and purchase profile skins!\n*ICONS*:\nView and purchase icon skins which are shown on ranks and profile skins!\n*ITEMS*:\nView and purchase items such as experience boosters!\n*WEAPONS*:\nView and purchase weapons to fill your arsenal!\n*SKILLS*:\nView and purchase skills!",
+	"shop_help":					"Welcome to my shop! Have a look around! Write out the section that you wish to take a closer look into and type *exit* when you wish to leave!\n\n",
+	"shop_help_2":					"*LEVEL UPS*:\nView and purchase level up skins!\n",
+	"shop_help_3":					"*RANKS*:\nView and purchase rank skins!\n",
+	"shop_help_4":					"*PROFILES*:\nView and purchase profile skins!\n",
+	"shop_help_5":					"*ICONS*:\nView and purchase icon skins which are shown on ranks and profile skins!\n",
+	"shop_help_6":					"*ITEMS*:\nView and purchase items such as experience boosters!\n",
+	"shop_help_7":					"*WEAPONS*:\nView and purchase weapons to fill your arsenal!\n",
+	"shop_help_8":					"*SKILLS*:\nView and purchase skills!",
 	"shop_purchased":				"You have successfully purchased **{}**!",
 	"shop_not_enough_cur":			"You don't have enough money for this purchase!",
 	"shop_sold":					"Selection has been sold!",
@@ -710,6 +717,7 @@
 	"shop_weapons":					"Weapons: ",
 	"shop_skills":					"Skills",
 	"shop_title_exit":				"Thanks for the visit! See you again!",
+	"shop_emtpy":					"Currently, there's nothing in stock. Please try again later!",
 	
 	"shutdown":						"**Shutting down now! See you soon!**",
 	"shutdown_prep":				"Shutdown sequence initiated!",

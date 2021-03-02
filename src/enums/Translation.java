@@ -681,6 +681,13 @@ public enum Translation {
 	
 	SHOP_TITLE					("shop_title"),
 	SHOP_HELP					("shop_help"),
+	SHOP_HELP_2					("shop_help_2"),
+	SHOP_HELP_3					("shop_help_3"),
+	SHOP_HELP_4					("shop_help_4"),
+	SHOP_HELP_5					("shop_help_5"),
+	SHOP_HELP_6					("shop_help_6"),
+	SHOP_HELP_7					("shop_help_7"),
+	SHOP_HELP_8					("shop_help_8"),
 	SHOP_PURCHASED				("shop_purchased"),
 	SHOP_NOT_ENOUGH_CUR			("shop_not_enough_cur"),
 	SHOP_SOLD					("shop_sold"),
@@ -712,6 +719,7 @@ public enum Translation {
 	SHOP_WEAPONS				("shop_weapons"),
 	SHOP_SKILLS					("shop_skills"),
 	SHOP_TITLE_EXIT				("shop_title_exit"),
+	SHOP_EMPTY					("shop_emtpy"),
 	
 	SHUTDOWN					("shutdown"),
 	SHUTDOWN_PREP				("shutdown_prep"),
