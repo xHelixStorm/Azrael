@@ -392,15 +392,20 @@ public class RoleListener extends ListenerAdapter {
 		if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 			//get role exceptions to not remove
 			final var verRole = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("ver")).findAny().orElse(null);
+			ArrayList<Role> roles = new ArrayList<Role>();
 			//remove all roles on mute role reassign except for the mute role itself
 			for(Role role : e.getMember().getRoles()) {
 				if(role.getIdLong() != mute_id && (verRole == null || (verRole != null && role.getIdLong() != verRole.getRole_ID()))) {
+					roles.add(role);
 					e.getGuild().removeRoleFromMember(e.getMember(), role).queue(
 						//don't remove the role, if it can't be removed. Like booster role
 						success -> logger.trace("Role {} removed from user {} during a mute in guild {}", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId()),
 						error -> logger.info("Role {} could not be removed from user {} during a mute in guild {}", role.getId(), e.getMember().getUser().getId(), e.getGuild().getId())
 					);
 				}
+			}
+			if(roles.size() > 0 && GuildIni.getReassignRolesAfterMute(e.getGuild().getIdLong())) {
+				DiscordRoles.SQLInsertReassignRoles(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), roles);
 			}
 		}
 		else {

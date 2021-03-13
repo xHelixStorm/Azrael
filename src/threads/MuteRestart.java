@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import sql.Azrael;
+import sql.DiscordRoles;
 import util.STATIC;
 
 public class MuteRestart implements Runnable {
@@ -70,6 +71,20 @@ public class MuteRestart implements Runnable {
 					if(guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 						guild.removeRoleFromMember(member, mute_role).queue(r -> {
 							if(assignedRole != 0 && ranking_state == true){guild.addRoleToMember(member, guild.getRoleById(assignedRole)).queue();}
+							//retrieve all other roles to reassign, if enabled
+							if(GuildIni.getReassignRolesAfterMute(guild.getIdLong())) {
+								final var roles = DiscordRoles.SQLgetReassignRoles(member.getUser().getIdLong(), guild.getIdLong());
+								if(roles != null && roles.size() > 0) {
+									for(final var role : roles) {
+										final Role serverRole = guild.getRoleById(role);
+										if(serverRole != null && guild.getSelfMember().canInteract(serverRole)) {
+											guild.addRoleToMember(member, serverRole).queue();
+										}
+									}
+								}
+								else if(roles == null)
+									logger.error("Removed roles after a mute couldn't be retrieved for user {} in guild {}", member.getUser().getId(), guild.getId());
+							}
 						});
 					}
 					else {
@@ -110,6 +125,20 @@ public class MuteRestart implements Runnable {
 						if(assignedRole != 0) role = guild.getRoleById(assignedRole);
 						guild.removeRoleFromMember(member, mute_role).queue(r -> {
 							if(assignedRole != 0 && ranking_state == true) guild.addRoleToMember(member, guild.getRoleById(assignedRole)).queue();
+							//retrieve all other roles to reassign, if enabled
+							if(GuildIni.getReassignRolesAfterMute(guild.getIdLong())) {
+								final var roles = DiscordRoles.SQLgetReassignRoles(member.getUser().getIdLong(), guild.getIdLong());
+								if(roles != null && roles.size() > 0) {
+									for(final var curRole : roles) {
+										final Role serverRole = guild.getRoleById(curRole);
+										if(serverRole != null && guild.getSelfMember().canInteract(serverRole)) {
+											guild.addRoleToMember(member, serverRole).queue();
+										}
+									}
+								}
+								else if(roles == null)
+									logger.error("Removed roles after a mute couldn't be retrieved for user {} in guild {}", member.getUser().getId(), guild.getId());
+							}
 						});
 					}
 					else {

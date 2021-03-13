@@ -62,7 +62,7 @@ public class SetWarning {
 				if(value < max_warning) {
 					if(Azrael.SQLUpdateMuteTimeOfWarning(e.getGuild().getIdLong(), value, (Long.parseLong(_message)*60*1000)) > 0) {
 						message.setColor(Color.BLUE);
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_WARNING_2).replaceFirst("\\{\\}", _message).replace("{}", ""+(value+1))).build()).queue();
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_WARNING_2).replaceFirst("\\{\\}", ""+value).replace("{}", ""+(value+1))).build()).queue();
 						logger.info("The timer of warning {} has been updated to {} in guild {}", value, _message, e.getGuild().getId());
 						cache.updateDescription(""+(value+1)).setExpiration(180000);
 						Hashes.addTempCache(key, cache);

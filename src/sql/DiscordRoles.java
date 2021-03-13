@@ -390,4 +390,67 @@ public class DiscordRoles {
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
+	
+	@SuppressWarnings("resource")
+	public static void SQLInsertReassignRoles(long user_id, long guild_id, ArrayList<Role> roles) {
+		logger.trace("SQLInsertReassignRoles launched. Passed params {}, {}, roles array", user_id, guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
+			myConn.setAutoCommit(false);
+			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLInsertReassignRoles);
+			stmt.setLong(1, user_id);
+			stmt.setLong(2, guild_id);
+			stmt.executeUpdate();
+			
+			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLInsertReassignRoles2);
+			for(final var role : roles) {
+				stmt.setLong(1, user_id);
+				stmt.setLong(2, role.getIdLong());
+				stmt.setLong(3, guild_id);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			myConn.commit();
+		} catch (SQLException e) {
+			logger.error("SQLInsertReassignRoles Exception", e);
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	@SuppressWarnings("resource")
+	public static ArrayList<Long> SQLgetReassignRoles(long user_id, long guild_id) {
+		logger.trace("SQLgetReassignRoles launched. Passed params {}, {}", user_id, guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			ArrayList<Long> roles = new ArrayList<Long>();
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("DiscordRoles", ip), username, password);
+			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLgetReassignRoles);
+			stmt.setLong(1, user_id);
+			stmt.setLong(2, guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				roles.add(rs.getLong(1));
+			}
+			if(roles.size() > 0) {
+				stmt = myConn.prepareStatement(DiscordRolesStatements.SQLgetReassignRoles2);
+				stmt.setLong(1, user_id);
+				stmt.setLong(2, guild_id);
+				stmt.executeUpdate();
+			}
+			return roles;
+		} catch (SQLException e) {
+			logger.error("SQLgetReassignRoles Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
 }

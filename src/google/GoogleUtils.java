@@ -4,11 +4,14 @@ import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +48,8 @@ public class GoogleUtils {
 	private static final List<String> SCOPESSHEETS = Collections.singletonList(SheetsScopes.SPREADSHEETS);
 	private static final List<String> SCOPESDRIVE = Collections.singletonList(DriveScopes.DRIVE);
 	private static final List<String> SCOPESYOUTUBE = Collections.singletonList(YouTubeScopes.YOUTUBE_READONLY);
+	
+	private static final ConcurrentHashMap<String, Integer> timeoutRepeat = new ConcurrentHashMap<String, Integer>();
 	
 	/**
 	 * Retrieve credentials
@@ -255,12 +260,38 @@ public class GoogleUtils {
 					if(values.size() > 0) {
 						try {
 							GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
+						} catch(SocketTimeoutException e1) {
+							boolean resend = false;
+							if(!timeoutRepeat.containsKey(file_id)) {
+								timeoutRepeat.put(file_id, 1);
+								resend = true;
+							}
+							else {
+								final int attempts = timeoutRepeat.get(file_id);
+								timeoutRepeat.put(file_id, (attempts+1));
+								if(attempts <= 5)
+									resend = true;
+							}
+							if(resend) {
+								logger.warn("Timeout error attempt {}, values couldn't be added into spreadsheet on for file id {} and event {} in guild {}", timeoutRepeat.get(file_id), file_id, action, guild.getId());
+								try {
+									Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+								} catch (InterruptedException e) {
+									//assume that interruptions will never occur
+								}
+								//recursive call
+								handleSpreadsheetRequest(event, guild, channel_id, user_id, timestamp, name, effectiveName, reporterName, reporterEffectiveName, reason, time, warning_id, action, unmute_timestamp, role_id, role_name, oldname, newname, message_id, message, screenshots, up_vote, down_vote, event_id);
+							}
+							else {
+								logger.warn("Timeout error after 5 attempts, values couldn't be added into spreadsheet for file id {} and event {} in guild {}", file_id, action, guild.getId());
+								STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)), e1.getMessage(), Channel.LOG.getType());
+							}
 						} catch (IOException e1) {
 							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)), e1.getMessage(), Channel.LOG.getType());
-							logger.error("Values couldn't be added into spredsheet for file id {} and event {} in guild {}", file_id, action, guild.getId(), e1);
+							logger.error("Values couldn't be added into spreadsheet for file id {} and event {} in guild {}", file_id, action, guild.getId(), e1);
 						} catch (Exception e1) {
 							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)), e1.getMessage(), Channel.LOG.getType());
-							logger.error("Values couldn't be added into spredsheet on for file id {} and event {} in guild {}", file_id, action, guild.getId(), e1);
+							logger.error("Values couldn't be added into spreadsheet on for file id {} and event {} in guild {}", file_id, action, guild.getId(), e1);
 						}
 					}
 				}
@@ -334,6 +365,32 @@ public class GoogleUtils {
 					if(values.size() > 0) {
 						try {
 							GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
+						} catch(SocketTimeoutException e1) {
+							boolean resend = false;
+							if(!timeoutRepeat.containsKey(file_id)) {
+								timeoutRepeat.put(file_id, 1);
+								resend = true;
+							}
+							else {
+								final int attempts = timeoutRepeat.get(file_id);
+								timeoutRepeat.put(file_id, (attempts+1));
+								if(attempts <= 5)
+									resend = true;
+							}
+							if(resend) {
+								logger.warn("Timeout error attempt {}, values couldn't be added into spreadsheet on for file id {} and event {} in guild {}", timeoutRepeat.get(file_id), file_id, action, guild.getId());
+								try {
+									Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+								} catch (InterruptedException e) {
+									//assume that interruptions will never occur
+								}
+								//recursive call
+								handleSpreadsheetRequest(event, guild, channel_id, user_id, timestamp, name, action, ping, member_count, guilds_count, event_id);
+							}
+							else {
+								logger.warn("Timeout error after 5 attempts, values couldn't be added into spreadsheet for file id {} and event {} in guild {}", file_id, action, guild.getId());
+								STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)), e1.getMessage(), Channel.LOG.getType());
+							}
 						} catch (IOException e1) {
 							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)), e1.getMessage(), Channel.LOG.getType());
 							logger.error("Values couldn't be added into spredsheet for file id {} and event {} in guild {}", file_id, action, guild.getId(), e1);

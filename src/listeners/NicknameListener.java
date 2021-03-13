@@ -46,11 +46,12 @@ public class NicknameListener extends ListenerAdapter {
 				String nickname = e.getNewNickname();
 				//if the nickname has been removed, delete from table
 				if(nickname == null) {
-					if(Azrael.SQLDeleteNickname(user_id, guild_id) > 0) {
+					final var result = Azrael.SQLDeleteNickname(user_id, guild_id);
+					if(result > 0) {
 						logger.info("User {} got the nickname {} removed in guild {}", e.getUser().getId(), e.getOldNickname(), e.getGuild().getId());
 						Azrael.SQLInsertActionLog("MEMBER_NICKNAME_CLEAR", user_id, guild_id, "<cleared name>");
 					}
-					else {
+					else if(result == -1) {
 						logger.error("The nickname {} couldn't be deleted for user {} in guild {}", nickname, user_id, guild_id);
 					}
 				}

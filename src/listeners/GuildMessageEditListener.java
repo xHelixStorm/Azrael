@@ -78,7 +78,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 							new Thread(new LanguageEditFilter(e, filter_lang, allChannels)).start();
 							//if url censoring is allowed, execute that filter as well
 							if(allChannels.parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getURLCensoring()).findAny().orElse(null) != null)
-								new Thread(new URLFilter(e.getMessage(), e.getMember(), filter_lang, allChannels)).start();
+								new Thread(new URLFilter(e.getMessage(), e.getMessage().getMember(), filter_lang, allChannels)).start();
 						}
 						else {
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
@@ -88,7 +88,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 					//if the url censoring is enabled but no languages to filter have been set, start the url censoring anyway
 					else if(allChannels.parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getURLCensoring()).findAny().orElse(null) != null) {
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE))) {
-							new Thread(new URLFilter(e.getMessage(), e.getMember(), filter_lang, allChannels)).start();
+							new Thread(new URLFilter(e.getMessage(), e.getMessage().getMember(), filter_lang, allChannels)).start();
 						}
 						else {
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
@@ -108,7 +108,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 					}
 					//print the edited message either in an edit or trash channel
 					else {
-						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setAuthor(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE))
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setAuthor(e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator()+" ("+e.getMessage().getMember().getUser().getId()+")").setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE))
 							, (e.getMessage().getContentRaw().length() <= 2048 ? e.getMessage().getContentRaw() : e.getMessage().getContentRaw().substring(0, 2040)+"...")
 							, Channel.EDI.getType(), Channel.TRA.getType());
 					}
@@ -116,14 +116,14 @@ public class GuildMessageEditListener extends ListenerAdapter {
 				
 				//check if the channel log and cache log is enabled and if one of the two or bot is/are enabled then write message to file or/and log to system cache
 				var log = GuildIni.getChannelAndCacheLog(e.getGuild().getIdLong());
-				if((log[0] || log[1]) && !e.getMember().getUser().isBot() && !UserPrivs.isUserBot(e.getMember())) {
+				if((log[0] || log[1]) && e.getMessage().getMember() != null && !e.getMessage().getMember().getUser().isBot() && !UserPrivs.isUserBot(e.getMessage().getMember())) {
 					StringBuilder image_url = new StringBuilder();
 					for(Attachment attch : e.getMessage().getAttachments()){
 						image_url.append((e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? "("+attch.getProxyUrl()+")" : "\n("+attch.getProxyUrl()+")");
 					}
 					Messages collectedMessage = new Messages();
-					collectedMessage.setUserID(e.getMember().getUser().getIdLong());
-					collectedMessage.setUsername(e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
+					collectedMessage.setUserID(e.getMessage().getMember().getUser().getIdLong());
+					collectedMessage.setUsername(e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator());
 					collectedMessage.setGuildID(e.getGuild().getIdLong());
 					collectedMessage.setChannelID(channel_id);
 					collectedMessage.setChannelName(e.getChannel().getName());
@@ -132,7 +132,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 					collectedMessage.setTime(ZonedDateTime.now());
 					collectedMessage.setIsEdit(true); // note: flag set to true for edited message
 					
-					if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "EDIT ["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
+					if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "EDIT ["+collectedMessage.getTime().toString()+" - "+e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator()+" ("+e.getMessage().getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
 					if(log[1]) {
 						if(messages != null) {
 							messages.add(collectedMessage);
@@ -168,7 +168,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 				}
 				
 				//check if the current user is being watched and that the cache log is enabled
-				var watchedMember = Azrael.SQLgetWatchlist(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+				var watchedMember = Azrael.SQLgetWatchlist(e.getMessage().getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 				var sentMessage = Hashes.getMessagePool(e.getGuild().getIdLong(), e.getMessageIdLong());
 				//if the watched member level equals 2, then print all written messages from that user in a separate channel
 				if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
@@ -191,7 +191,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
 						textChannel.sendMessage(new EmbedBuilder()
 								.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED)
-								.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_WATCH_ERR).replace("{}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator())).build()).queue();
+								.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_WATCH_ERR).replace("{}", e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator())).build()).queue();
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
@@ -277,7 +277,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 				}
 				
 				//Run google service, if enabled
-				if(!e.getMember().getUser().isBot() && GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+				if(!e.getMessage().getMember().getUser().isBot() && GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
 					final String [] array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.COMMENT.id, e.getChannel().getId());
 					if(array != null && !array[0].equals("empty")) {
 						//log low priority messages to google spreadsheets
@@ -287,7 +287,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 								for(final var attachment : e.getMessage().getAttachments()) {
 									urls.append(attachment.getProxyUrl()+"\n");
 								}
-								GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), e.getChannel().getId(), ""+e.getMember().getUser().getId(), new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "COMMENT", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim(), 0, 0, GoogleEvent.COMMENT.id);
+								GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), e.getChannel().getId(), ""+e.getMessage().getMember().getUser().getId(), new Timestamp(System.currentTimeMillis()), e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator(), e.getMessage().getMember().getEffectiveName(), null, null, null, null, null, "COMMENT", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim(), 0, 0, GoogleEvent.COMMENT.id);
 							}, err -> {
 								//message was removed
 							});

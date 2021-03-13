@@ -29,6 +29,8 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sql.Azrael;
+import sql.DiscordRoles;
+import sql.RankingSystem;
 import util.STATIC;
 
 public class RoleTimer extends ListenerAdapter implements Runnable {
@@ -106,10 +108,26 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 					if(e.getGuild().getMember(e.getMember().getUser()) != null) {
 						//verify that the user has the manage roles permission before removing the mute role
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+							final var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 							//write into cache for RoleRemovedListener to use for any google API operation
 							if(assignedRole != 0)Hashes.addTempCache("unmute_gu"+guild_id+"us"+user_id, new Cache(60000, "", ""+assignedRole));
 							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue(r -> {
-								if(assignedRole != 0)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
+								if(assignedRole != 0 && guild_settings != null && guild_settings.getRankingState())
+									e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
+								//retrieve all other roles to reassign, if enabled
+								if(GuildIni.getReassignRolesAfterMute(e.getGuild().getIdLong())) {
+									final var roles = DiscordRoles.SQLgetReassignRoles(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+									if(roles != null && roles.size() > 0) {
+										for(final var role : roles) {
+											final Role serverRole = e.getGuild().getRoleById(role);
+											if(serverRole != null && e.getGuild().getSelfMember().canInteract(serverRole)) {
+												e.getGuild().addRoleToMember(e.getMember(), serverRole).queue();
+											}
+										}
+									}
+									else if(roles == null)
+										logger.error("Removed roles after a mute couldn't be retrieved for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+								}
 							});
 						}
 						else {
@@ -147,9 +165,26 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 					if(e.getGuild().getMember(e.getMember().getUser()) != null) {
 						//verify that the user has the manage roles permission before removing the mute role
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-							if(assignedRole != 0) role = e.getGuild().getRoleById(assignedRole);
+							final var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
+							if(assignedRole != 0 && guild_settings != null && guild_settings.getRankingState()) 
+								role = e.getGuild().getRoleById(assignedRole);
 							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(mute_id)).queue(r -> {
-								if(assignedRole != 0)e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
+								if(assignedRole != 0 && guild_settings != null && guild_settings.getRankingState())
+									e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(assignedRole)).queue();
+								//retrieve all other roles to reassign, if enabled
+								if(GuildIni.getReassignRolesAfterMute(e.getGuild().getIdLong())) {
+									final var roles = DiscordRoles.SQLgetReassignRoles(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+									if(roles != null && roles.size() > 0) {
+										for(final var curRole : roles) {
+											final Role serverRole = e.getGuild().getRoleById(curRole);
+											if(serverRole != null && e.getGuild().getSelfMember().canInteract(serverRole)) {
+												e.getGuild().addRoleToMember(e.getMember(), serverRole).queue();
+											}
+										}
+									}
+									else if(roles == null)
+										logger.error("Removed roles after a mute couldn't be retrieved for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+								}
 							});
 						}
 						else {
