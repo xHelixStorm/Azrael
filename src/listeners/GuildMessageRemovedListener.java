@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.net.SocketTimeoutException;
 import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.TimeZone;
@@ -15,6 +16,7 @@ import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.GuildIni;
 import google.GoogleSheets;
+import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
@@ -203,43 +205,51 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 				}
 			}
 			//Run google service if enabled
-			if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
-				if(Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.VOT.getType())).findAny().orElse(null) != null) {
-					final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
-					if(sheet != null && !sheet[0].equals("empty")) {
-						final String file_id = sheet[0];
-						final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
-						if((sheet[2] == null || sheet[2].length() == 0) || sheet[2].equals(e.getChannel().getId())) {
-							try {
-								final var service = GoogleSheets.getSheetsClientService();
-								final var response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
-								int currentRow = 0;
-								for(var row : response.getValues()) {
-									currentRow++;
-									if(row.parallelStream().filter(f -> {
-										String cell = (String)f;
-										if(cell.equals(e.getMessageId()))
-											return true;
-										else
-											return false;
-										}).findAny().orElse(null) != null) {
-										STATIC.killThread("vote"+e.getMessageId());
-										final var file = GoogleSheets.getSpreadsheet(service, file_id);
-										final var retrievedSheet = file.getSheets().parallelStream().filter(f -> f.getProperties().getTitle().equals(row_start)).findAny().orElse(null);
-										if(retrievedSheet != null) {
-											GoogleSheets.deleteRowOnSpreadsheet(service, file_id, currentRow, retrievedSheet.getProperties().getSheetId());
-										}
-										break;
+			runVoteSpreadsheetService(e);
+		}).start();
+	}
+	
+	private static void runVoteSpreadsheetService(GuildMessageDeleteEvent e) {
+		if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+			if(Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.VOT.getType())).findAny().orElse(null) != null) {
+				final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
+				if(sheet != null && !sheet[0].equals("empty")) {
+					final String file_id = sheet[0];
+					final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
+					if((sheet[2] == null || sheet[2].length() == 0) || sheet[2].equals(e.getChannel().getId())) {
+						try {
+							final var service = GoogleSheets.getSheetsClientService();
+							final var response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
+							int currentRow = 0;
+							for(var row : response.getValues()) {
+								currentRow++;
+								if(row.parallelStream().filter(f -> {
+									String cell = (String)f;
+									if(cell.equals(e.getMessageId()))
+										return true;
+									else
+										return false;
+									}).findAny().orElse(null) != null) {
+									STATIC.killThread("vote"+e.getMessageId());
+									final var file = GoogleSheets.getSpreadsheet(service, file_id);
+									final var retrievedSheet = file.getSheets().parallelStream().filter(f -> f.getProperties().getTitle().equals(row_start)).findAny().orElse(null);
+									if(retrievedSheet != null) {
+										GoogleSheets.deleteRowOnSpreadsheet(service, file_id, currentRow, retrievedSheet.getProperties().getSheetId());
 									}
+									break;
 								}
-							} catch (Exception e1) {
-								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-								logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
 							}
+						} catch(SocketTimeoutException e1) {
+							if(GoogleUtils.timeoutHandler(e.getGuild(), file_id, GoogleEvent.VOTE.name(), e1)) {
+								runVoteSpreadsheetService(e);
+							}
+						} catch (Exception e1) {
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
+							logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
 						}
 					}
 				}
 			}
-		}).start();
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package threads;
 
 import java.awt.Color;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -12,8 +13,10 @@ import org.slf4j.LoggerFactory;
 import com.vdurmont.emoji.EmojiManager;
 
 import enums.Channel;
+import enums.GoogleEvent;
 import enums.Translation;
 import google.GoogleSheets;
+import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -21,7 +24,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import util.STATIC;
 
 public class DelayedVoteUpdate implements Runnable {
-	private Logger logger = LoggerFactory.getLogger(DelayedVoteUpdate.class);
+	private static Logger logger = LoggerFactory.getLogger(DelayedVoteUpdate.class);
 	
 	private final String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
 	private final String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
@@ -64,11 +67,7 @@ public class DelayedVoteUpdate implements Runnable {
 							else if(downVoteColumn > 0 && reaction.getReactionEmote().getName().equals(thumbsdown))
 								values.set(downVoteColumn-1, Arrays.asList(""+(reaction.getCount()-1)));
 						}
-						try {
-							GoogleSheets.overwriteRowOnSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, row);
-						} catch (Exception e) {
-							logger.error("Google Webservice error for event VOTE in guild {}", guild.getId(), e);
-						}
+						overwriteRowOnSpreadsheet(guild, file_id, values, row);
 					});
 				}
 				else {
@@ -87,4 +86,15 @@ public class DelayedVoteUpdate implements Runnable {
 		STATIC.removeThread(Thread.currentThread());
 	}
 
+	private static void overwriteRowOnSpreadsheet(Guild guild, String file_id, List<List<Object>> values, String row) {
+		try {
+			GoogleSheets.overwriteRowOnSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, row);
+		} catch(SocketTimeoutException e) {
+			if(GoogleUtils.timeoutHandler(guild, file_id, GoogleEvent.VOTE.name(), e)) {
+				overwriteRowOnSpreadsheet(guild, file_id, values, row);
+			}
+		} catch (Exception e) {
+			logger.error("Google Webservice error for event VOTE in guild {}", guild.getId(), e);
+		}
+	}
 }

@@ -469,6 +469,7 @@
 	"google_sheet_restrict_add":	"Text channel restriction has been added for this event and spreadsheet!",
 	"google_sheet_no_link":			"An internal error has occurred! Google Spreadsheet couldn't be linked to the Bot.",
 	"google_exit":					"Google command terminated!",
+	"google_timeout":				"Google service request timeout {}/5. Action will be reattempted in 5 seconds.",
 	
 	"heavy_censoring_help":		 	"Add either *enable* or *disable* to the command to operate this functionality! If Heavy Censoring is enabled and a text channel is censoring at least one language, the following messages will be removed:\n- *Messages which contain only one letter*.\n- *Messages which contain screenshots*.\n- *Messages which are repeated multiple times*.\n- *Messages which don't contain any normal letter or digits (e.g. unicodes)*.\n\nIf this functionality removes a large number of messages and the threshold of 30 has been reached, it will warn users with a mute after removing a message! The counter for the threshold increases for *every removed message* and *decreases automatically by 1* after every minute. Use the *reset* parameter to manually reset this counter to 0!",
 	"heavy_censoring_enabled":	 	"Heavy Censoring has been enabled!",

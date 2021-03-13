@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.net.SocketTimeoutException;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiManager;
 
+import constructors.Channels;
 import constructors.Messages;
 import core.Hashes;
 import core.UserPrivs;
@@ -200,81 +202,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 				}
 				
 				//Run google service, if enabled
-				if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong()) && allChannels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.VOT.getType())).findAny().orElse(null) != null) {
-					final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
-					if(sheet != null && !sheet[0].equals("empty")) {
-						final String file_id = sheet[0];
-						final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
-						if((sheet[2] == null || sheet[2].length() == 0) || sheet[2].equals(e.getChannel().getId())) {
-							try {
-								final var service = GoogleSheets.getSheetsClientService();
-								final var response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
-								int currentRow = 0;
-								for(var row : response.getValues()) {
-									currentRow++;
-									if(row.parallelStream().filter(f -> {
-										String cell = (String)f;
-										if(cell.equals(e.getMessageId()))
-											return true;
-										else
-											return false;
-										}).findAny().orElse(null) != null) {
-										//retrieve the saved mapping for the vote event
-										final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id, e.getGuild().getIdLong());
-										if(columns != null && columns.size() > 0) {
-											//find out where the up_vote and down_vote columns are and mark them
-											int columnUpVote = 0;
-											int columnDownVote = 0;
-											int columnMessage = 0;
-											for(final var column : columns) {
-												if(column.getItem() == GoogleDD.UP_VOTE)
-													columnUpVote = column.getColumn();
-												else if(column.getItem() == GoogleDD.DOWN_VOTE)
-													columnDownVote = column.getColumn();
-												else if(column.getItem() == GoogleDD.MESSAGE)
-													columnMessage = column.getColumn();
-											}
-											if(columnMessage != 0) {
-												ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-												String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
-												String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
-												int countThumbsUp = 0;
-												int countThumbsDown = 0;
-												for(final var reaction : e.getMessage().getReactions()) {
-													if(columnUpVote > 0 && reaction.getReactionEmote().getName().equals(thumbsup))
-														countThumbsUp = reaction.getCount()-1;
-													else if(columnDownVote > 0 && reaction.getReactionEmote().getName().equals(thumbsdown))
-														countThumbsDown = reaction.getCount()-1;
-												}
-												//build update array
-												int columnCount = 0;
-												for(final var column : row) {
-													columnCount ++;
-													if(columnCount == columnUpVote)
-														values.add(Arrays.asList(""+countThumbsUp));
-													else if(columnCount == columnDownVote)
-														values.add(Arrays.asList(""+countThumbsDown));
-													else if(columnCount == columnMessage)
-														values.add(Arrays.asList(e.getMessage().getContentRaw()));
-													else
-														values.add(Arrays.asList(column));
-												}
-												//execute Runnable
-												STATIC.killThread("vote"+e.getMessageId());
-												GoogleSheets.overwriteRowOnSpreadsheet(service, file_id, values, row_start+"!A"+currentRow);
-											}
-										}
-										//interrupt the row search
-										break;
-									}
-								}
-							} catch (Exception e1) {
-								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-								logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
-							}
-						}
-					}
-				}
+				runVoteSpreadsheetService(e, allChannels);
 				
 				//Run google service, if enabled
 				if(!e.getMessage().getMember().getUser().isBot() && GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
@@ -296,5 +224,87 @@ public class GuildMessageEditListener extends ListenerAdapter {
 				}
 			});
 		}).start();
+	}
+	
+	private static void runVoteSpreadsheetService(GuildMessageUpdateEvent e, ArrayList<Channels> allChannels) {
+		if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong()) && allChannels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.VOT.getType())).findAny().orElse(null) != null) {
+			final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
+			if(sheet != null && !sheet[0].equals("empty")) {
+				final String file_id = sheet[0];
+				final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
+				if((sheet[2] == null || sheet[2].length() == 0) || sheet[2].equals(e.getChannel().getId())) {
+					try {
+						final var service = GoogleSheets.getSheetsClientService();
+						final var response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
+						int currentRow = 0;
+						for(var row : response.getValues()) {
+							currentRow++;
+							if(row.parallelStream().filter(f -> {
+								String cell = (String)f;
+								if(cell.equals(e.getMessageId()))
+									return true;
+								else
+									return false;
+								}).findAny().orElse(null) != null) {
+								//retrieve the saved mapping for the vote event
+								final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id, e.getGuild().getIdLong());
+								if(columns != null && columns.size() > 0) {
+									//find out where the up_vote and down_vote columns are and mark them
+									int columnUpVote = 0;
+									int columnDownVote = 0;
+									int columnMessage = 0;
+									for(final var column : columns) {
+										if(column.getItem() == GoogleDD.UP_VOTE)
+											columnUpVote = column.getColumn();
+										else if(column.getItem() == GoogleDD.DOWN_VOTE)
+											columnDownVote = column.getColumn();
+										else if(column.getItem() == GoogleDD.MESSAGE)
+											columnMessage = column.getColumn();
+									}
+									if(columnMessage != 0) {
+										ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+										String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
+										String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
+										int countThumbsUp = 0;
+										int countThumbsDown = 0;
+										for(final var reaction : e.getMessage().getReactions()) {
+											if(columnUpVote > 0 && reaction.getReactionEmote().getName().equals(thumbsup))
+												countThumbsUp = reaction.getCount()-1;
+											else if(columnDownVote > 0 && reaction.getReactionEmote().getName().equals(thumbsdown))
+												countThumbsDown = reaction.getCount()-1;
+										}
+										//build update array
+										int columnCount = 0;
+										for(final var column : row) {
+											columnCount ++;
+											if(columnCount == columnUpVote)
+												values.add(Arrays.asList(""+countThumbsUp));
+											else if(columnCount == columnDownVote)
+												values.add(Arrays.asList(""+countThumbsDown));
+											else if(columnCount == columnMessage)
+												values.add(Arrays.asList(e.getMessage().getContentRaw()));
+											else
+												values.add(Arrays.asList(column));
+										}
+										//execute Runnable
+										STATIC.killThread("vote"+e.getMessageId());
+										GoogleSheets.overwriteRowOnSpreadsheet(service, file_id, values, row_start+"!A"+currentRow);
+									}
+								}
+								//interrupt the row search
+								break;
+							}
+						}
+					} catch(SocketTimeoutException e1) {
+						if(GoogleUtils.timeoutHandler(e.getGuild(), file_id, GoogleEvent.VOTE.name(), e1)) {
+							runVoteSpreadsheetService(e, allChannels);
+						}
+					} catch (Exception e1) {
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
+						logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
+					}
+				}
+			}
+		}
 	}
 }

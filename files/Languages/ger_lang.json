@@ -469,6 +469,7 @@
 	"google_sheet_restrict_add":	"Textkanal Bindung gesetzt für dieses Event und Spreadsheet!",
 	"google_sheet_no_link":			"Ein interner Fehler ist aufgetreten! Google Tabelle konnte nicht mit dem Bot verknüpft werden.",
 	"google_exit":					"Google-Befehl beendet!",
+	"google_timeout":				"Zeitüberschreitung der Google-Dienstanforderung {}/5. Aktion wird in 5 Sekunden erneut ausgeführt.",
 	
 	"heavy_censoring_help":		 	"Fügen Sie dem Befehl entweder *aktivieren* oder *deaktivieren* hinzu, um diese Funktionalität zu bedienen! Wenn die starke Zensur aktiviert ist und ein Textkanal mindestens eine Sprache zensiert, werden die folgenden Nachrichten entfernt:\n- *Nachrichten, die nur einen Buchstaben enthalten*.\n- *Nachrichten, die Screenshots enthalten*.\n- *Nachrichten, die mehrfach wiederholt werden*.\n- *Nachrichten, die keine normalen Buchstaben oder Ziffern enthalten (z.B. Unicodes)*.\n\nWenn diese Funktion eine große Anzahl von Meldungen entfernt und der Schwellenwert von 30 erreicht ist, warnt sie die Benutzer nach dem Entfernen einer Meldung mit der Zuweisung der Stummschaltung Rolle! Der Zähler für den Schwellenwert erhöht sich für *jede entfernte Nachricht* und *verringert sich automatisch nach jeder Minute um 1*. Benutzen Sie den Parameter *zurücksetzen*, um diesen Zähler manuell auf 0 zurückzusetzen!",
 	"heavy_censoring_enabled":	 	"Die starke Zensur ist aktiv!",

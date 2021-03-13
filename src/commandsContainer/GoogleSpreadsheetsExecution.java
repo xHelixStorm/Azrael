@@ -1,6 +1,7 @@
 package commandsContainer;
 
 import java.awt.Color;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,6 +72,15 @@ public class GoogleSpreadsheetsExecution {
 					processStep = "Ownership Transfer";
 					Azrael.SQLInsertActionLog("GOOGLE_SPREADSHEET_OWNERSHIP", 0, e.getGuild().getIdLong(), email);
 					GoogleDrive.transferOwnerOfFile(GoogleDrive.getDriveClientService(), file_id, email);
+				} catch(SocketTimeoutException e1) {
+					final int counter = GoogleUtils.retrieveTimeoutAttemptCounter(e.getGuild().getId()+"create");
+					if(counter < 5) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_TIMEOUT).replace("{}", ""+(counter+1))).build()).queue();
+					}
+					if(GoogleUtils.timeoutHandler(e.getGuild(), (e.getGuild().getId()+"create"), null, e1)) {
+						create(e, title, key);
+					}
+					err = true;
 				} catch (Exception e1) {
 					logger.error("An error occurred on process step \"{}\" in guild {}", processStep, e.getGuild().getId(), e1);
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
@@ -107,7 +117,16 @@ public class GoogleSpreadsheetsExecution {
 				boolean err = false;
 				try {
 					spreadsheet = GoogleSheets.getSpreadsheet(GoogleSheets.getSheetsClientService(), file_id);
-				}catch (Exception e1) {
+				} catch(SocketTimeoutException e1) {
+					final int counter = GoogleUtils.retrieveTimeoutAttemptCounter(file_id);
+					if(counter < 5) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_TIMEOUT).replace("{}", ""+(counter+1))).build()).queue();
+					}
+					if(GoogleUtils.timeoutHandler(e.getGuild(), file_id, null, e1)) {
+						add(e, file_id, key);
+					}
+					err = true;
+				} catch (Exception e1) {
 					logger.error("An error occurred on process step \"Retrieve Spreadsheet\" in guild {}", e.getGuild().getId(), e1);
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
 					err = true;
@@ -146,7 +165,16 @@ public class GoogleSpreadsheetsExecution {
 				boolean err = false;
 				try {
 					spreadsheet = GoogleSheets.getSpreadsheet(GoogleSheets.getSheetsClientService(), file_id);
-				}catch (Exception e1) {
+				} catch(SocketTimeoutException e1) {
+					final int counter = GoogleUtils.retrieveTimeoutAttemptCounter(file_id);
+					if(counter < 5) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_TIMEOUT).replace("{}", ""+(counter+1))).build()).queue();
+					}
+					if(GoogleUtils.timeoutHandler(e.getGuild(), file_id, null, e1)) {
+						remove(e, file_id, key);
+					}
+					err = true;
+				} catch (Exception e1) {
 					logger.error("An error occurred on process step \"Retrieve Spreadsheet\" in guild {}", e.getGuild().getId(), e1);
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
 					err = true;

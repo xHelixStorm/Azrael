@@ -1,6 +1,7 @@
 package listeners;
 
 import java.awt.Color;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +18,7 @@ import enums.GoogleEvent;
 import enums.Translation;
 import fileManagement.GuildIni;
 import google.GoogleSheets;
+import google.GoogleUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
@@ -149,71 +151,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 				}
 				
 				//Run google service, if enabled
-				if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
-					//check if it's a vote channel
-					final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
-					final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.VOT.getType())).findAny().orElse(null);
-					if(thisChannel != null) {
-						final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
-						if(sheet != null && !sheet[0].equals("empty")) {
-							final String file_id = sheet[0];
-							final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
-							if((sheet[2] == null || sheet[2].length() == 0) || sheet[2].equals(e.getChannel().getId())) {
-								try {
-									final var response = GoogleSheets.readWholeSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, row_start);
-									int currentRow = 0;
-									for(var row : response.getValues()) {
-										currentRow++;
-										if(row.parallelStream().filter(f -> {
-											String cell = (String)f;
-											if(cell.equals(e.getMessageId()))
-												return true;
-											else
-												return false;
-											}).findAny().orElse(null) != null) {
-											//retrieve the saved mapping for the vote event
-											final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id, e.getGuild().getIdLong());
-											if(columns != null && columns.size() > 0) {
-												//find out where the up_vote and down_vote columns are and mark them
-												int columnUpVote = 0;
-												int columnDownVote = 0;
-												for(final var column : columns) {
-													if(column.getItem() == GoogleDD.UP_VOTE)
-														columnUpVote = column.getColumn();
-													else if(column.getItem() == GoogleDD.DOWN_VOTE)
-														columnDownVote = column.getColumn();
-												}
-												if(columnUpVote != 0 || columnDownVote != 0) {
-													//build update array
-													ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-													int columnCount = 0;
-													for(final var column : row) {
-														columnCount ++;
-														if(columnCount == columnUpVote)
-															values.add(Arrays.asList("<upVote>"));
-														else if(columnCount == columnDownVote)
-															values.add(Arrays.asList("<downVote>"));
-														else
-															values.add(Arrays.asList(column));
-													}
-													//execute Runnable
-													if(!STATIC.threadExists("vote"+e.getMessageId())) {
-														new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote)).start();
-													}
-												}
-											}
-											//interrupt the row search
-											break;
-										}
-									}
-								} catch (Exception e1) {
-									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-									logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
-								}
-							}
-						}
-					}
-				}
+				runVoteSpreadsheetService(e);
 			}
 		}).start();
 	}
@@ -225,5 +163,77 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 	private static void printPermissionError(GuildMessageReactionRemoveEvent e) {
 		STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName(), Channel.LOG.getType());
 		logger.warn("MANAGE ROLES permission required to remove reaction roles in guild {}", e.getGuild().getId());
+	}
+	
+	private static void runVoteSpreadsheetService(GuildMessageReactionRemoveEvent e) {
+		if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+			//check if it's a vote channel
+			final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
+			final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.VOT.getType())).findAny().orElse(null);
+			if(thisChannel != null) {
+				final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
+				if(sheet != null && !sheet[0].equals("empty")) {
+					final String file_id = sheet[0];
+					final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
+					if((sheet[2] == null || sheet[2].length() == 0) || sheet[2].equals(e.getChannel().getId())) {
+						try {
+							final var response = GoogleSheets.readWholeSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, row_start);
+							int currentRow = 0;
+							for(var row : response.getValues()) {
+								currentRow++;
+								if(row.parallelStream().filter(f -> {
+									String cell = (String)f;
+									if(cell.equals(e.getMessageId()))
+										return true;
+									else
+										return false;
+									}).findAny().orElse(null) != null) {
+									//retrieve the saved mapping for the vote event
+									final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id, e.getGuild().getIdLong());
+									if(columns != null && columns.size() > 0) {
+										//find out where the up_vote and down_vote columns are and mark them
+										int columnUpVote = 0;
+										int columnDownVote = 0;
+										for(final var column : columns) {
+											if(column.getItem() == GoogleDD.UP_VOTE)
+												columnUpVote = column.getColumn();
+											else if(column.getItem() == GoogleDD.DOWN_VOTE)
+												columnDownVote = column.getColumn();
+										}
+										if(columnUpVote != 0 || columnDownVote != 0) {
+											//build update array
+											ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+											int columnCount = 0;
+											for(final var column : row) {
+												columnCount ++;
+												if(columnCount == columnUpVote)
+													values.add(Arrays.asList("<upVote>"));
+												else if(columnCount == columnDownVote)
+													values.add(Arrays.asList("<downVote>"));
+												else
+													values.add(Arrays.asList(column));
+											}
+											//execute Runnable
+											if(!STATIC.threadExists("vote"+e.getMessageId())) {
+												new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote)).start();
+											}
+										}
+									}
+									//interrupt the row search
+									break;
+								}
+							}
+						} catch(SocketTimeoutException e1) {
+							if(GoogleUtils.timeoutHandler(e.getGuild(), file_id, GoogleEvent.VOTE.name(), e1)) {
+								runVoteSpreadsheetService(e);
+							}
+						} catch (Exception e1) {
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
+							logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
+						}
+					}
+				}
+			}
+		}
 	}
 }

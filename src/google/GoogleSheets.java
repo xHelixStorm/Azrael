@@ -1,6 +1,7 @@
 package google;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class GoogleSheets {
 	 * @throws Exception Any error along the way
 	 */
 	
-	public static Sheets getSheetsClientService() throws Exception {
+	public static Sheets getSheetsClientService() throws SocketTimeoutException, Exception {
 		//Build a new authorized API client service
 		final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 		return new Sheets.Builder(httpTransport, GoogleUtils.getJacksonFactory(), GoogleUtils.getCredentials(httpTransport, "sheets"))
@@ -42,7 +43,7 @@ public class GoogleSheets {
 	 * @throws Exception Any error along the way
 	 */
 	
-	public static Spreadsheet getSheet(final Sheets service, final String spreadsheet_id) throws Exception {
+	public static Spreadsheet getSheet(final Sheets service, final String spreadsheet_id) throws SocketTimeoutException, Exception {
 		//get Spreadsheet
 		return service.spreadsheets().get(spreadsheet_id).execute();
 	}
@@ -55,7 +56,7 @@ public class GoogleSheets {
 	 * @throws IOException
 	 */
 	
-	public static String createSpreadsheet(final Sheets service, final String title) throws IOException {
+	public static String createSpreadsheet(final Sheets service, final String title) throws SocketTimeoutException, IOException {
 		//create Spreadsheet
 		Spreadsheet spreadsheet = new Spreadsheet().setProperties(new SpreadsheetProperties().setTitle(title));
 		Spreadsheet result = service.spreadsheets().create(spreadsheet).execute();
@@ -70,7 +71,7 @@ public class GoogleSheets {
 	 * @throws IOException
 	 */
 	
-	public static Spreadsheet getSpreadsheet(final Sheets service, final String file_id) throws IOException {
+	public static Spreadsheet getSpreadsheet(final Sheets service, final String file_id) throws SocketTimeoutException, IOException {
 		Spreadsheet result = service.spreadsheets().get(file_id).execute();
 		return result;
 	}
@@ -84,7 +85,7 @@ public class GoogleSheets {
 	 * @throws IOException
 	 */
 	
-	public static ValueRange readWholeSpreadsheet(final Sheets service, final String file_id, final String sheet) throws IOException {
+	public static ValueRange readWholeSpreadsheet(final Sheets service, final String file_id, final String sheet) throws SocketTimeoutException, IOException {
 		ValueRange reponse = service.spreadsheets().values()
 			.get(file_id, sheet)
 			.execute();
@@ -102,7 +103,7 @@ public class GoogleSheets {
 	 * @throws IOException
 	 */
 	
-	public static int appendRawDataToSpreadsheet(final Sheets service, final String file_id, final List<List<Object>> list, final String rowStart) throws IOException {
+	public static int appendRawDataToSpreadsheet(final Sheets service, final String file_id, final List<List<Object>> list, final String rowStart) throws SocketTimeoutException, IOException {
 		ValueRange values = new ValueRange().setValues(list).setMajorDimension("COLUMNS");
 		AppendValuesResponse result = service.spreadsheets().values()
 			.append(file_id, rowStart, values)
@@ -122,7 +123,7 @@ public class GoogleSheets {
 	 * @throws IOException
 	 */
 	
-	public static int overwriteRowOnSpreadsheet(final Sheets service, final String file_id, final List<List<Object>> list, final String rowStart) throws IOException {
+	public static int overwriteRowOnSpreadsheet(final Sheets service, final String file_id, final List<List<Object>> list, final String rowStart) throws SocketTimeoutException, IOException {
 		ValueRange values = new ValueRange().setValues(list).setMajorDimension("COLUMNS");
 		UpdateValuesResponse result = service.spreadsheets().values()
 			.update(file_id, rowStart, values)
@@ -131,7 +132,7 @@ public class GoogleSheets {
 		return result.size();
 	}
 	
-	public static int deleteRowOnSpreadsheet(final Sheets service, final String file_id, final int rowStart, final int sheet_id) throws IOException {
+	public static int deleteRowOnSpreadsheet(final Sheets service, final String file_id, final int rowStart, final int sheet_id) throws SocketTimeoutException, IOException {
 		BatchUpdateSpreadsheetResponse result = service.spreadsheets().batchUpdate(file_id, new BatchUpdateSpreadsheetRequest()
 			.setRequests(Arrays.asList(new Request()
 					.setDeleteDimension(new DeleteDimensionRequest()

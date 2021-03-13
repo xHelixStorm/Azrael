@@ -471,6 +471,7 @@ public enum Translation {
 	GOOGLE_SHEET_RESTRICT_ADD	("google_sheet_restrict_add"),
 	GOOGLE_SHEET_NO_LINK		("google_sheet_not_link"),
 	GOOGLE_EXIT					("google_exit"),
+	GOOGLE_TIMEOUT				("google_timeout"),
 	
 	HEAVY_CENSORING_HELP		("heavy_censoring_help"),
 	HEAVY_CENSORING_ENABLED		("heavy_censoring_enabled"),

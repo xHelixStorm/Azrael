@@ -261,30 +261,8 @@ public class GoogleUtils {
 						try {
 							GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
 						} catch(SocketTimeoutException e1) {
-							boolean resend = false;
-							if(!timeoutRepeat.containsKey(file_id)) {
-								timeoutRepeat.put(file_id, 1);
-								resend = true;
-							}
-							else {
-								final int attempts = timeoutRepeat.get(file_id);
-								timeoutRepeat.put(file_id, (attempts+1));
-								if(attempts <= 5)
-									resend = true;
-							}
-							if(resend) {
-								logger.warn("Timeout error attempt {}, values couldn't be added into spreadsheet on for file id {} and event {} in guild {}", timeoutRepeat.get(file_id), file_id, action, guild.getId());
-								try {
-									Thread.sleep(TimeUnit.SECONDS.toMillis(5));
-								} catch (InterruptedException e) {
-									//assume that interruptions will never occur
-								}
-								//recursive call
+							if(timeoutHandler(guild, file_id, action, e1)) {
 								handleSpreadsheetRequest(event, guild, channel_id, user_id, timestamp, name, effectiveName, reporterName, reporterEffectiveName, reason, time, warning_id, action, unmute_timestamp, role_id, role_name, oldname, newname, message_id, message, screenshots, up_vote, down_vote, event_id);
-							}
-							else {
-								logger.warn("Timeout error after 5 attempts, values couldn't be added into spreadsheet for file id {} and event {} in guild {}", file_id, action, guild.getId());
-								STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)), e1.getMessage(), Channel.LOG.getType());
 							}
 						} catch (IOException e1) {
 							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)), e1.getMessage(), Channel.LOG.getType());
@@ -366,30 +344,8 @@ public class GoogleUtils {
 						try {
 							GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
 						} catch(SocketTimeoutException e1) {
-							boolean resend = false;
-							if(!timeoutRepeat.containsKey(file_id)) {
-								timeoutRepeat.put(file_id, 1);
-								resend = true;
-							}
-							else {
-								final int attempts = timeoutRepeat.get(file_id);
-								timeoutRepeat.put(file_id, (attempts+1));
-								if(attempts <= 5)
-									resend = true;
-							}
-							if(resend) {
-								logger.warn("Timeout error attempt {}, values couldn't be added into spreadsheet on for file id {} and event {} in guild {}", timeoutRepeat.get(file_id), file_id, action, guild.getId());
-								try {
-									Thread.sleep(TimeUnit.SECONDS.toMillis(5));
-								} catch (InterruptedException e) {
-									//assume that interruptions will never occur
-								}
-								//recursive call
+							if(timeoutHandler(guild, file_id, action, e1)) {
 								handleSpreadsheetRequest(event, guild, channel_id, user_id, timestamp, name, action, ping, member_count, guilds_count, event_id);
-							}
-							else {
-								logger.warn("Timeout error after 5 attempts, values couldn't be added into spreadsheet for file id {} and event {} in guild {}", file_id, action, guild.getId());
-								STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)), e1.getMessage(), Channel.LOG.getType());
 							}
 						} catch (IOException e1) {
 							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)), e1.getMessage(), Channel.LOG.getType());
@@ -425,6 +381,46 @@ public class GoogleUtils {
 				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_WARNING)), STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_FOUND), Channel.LOG.getType());
 				logger.warn("Spreadsheet couldn't be found for event {} in guild {}", action, guild.getId());
 			}
+		}
+		return false;
+	}
+	
+	public static int retrieveTimeoutAttemptCounter(String file_id) {
+		if(!timeoutRepeat.containsKey(file_id)) {
+			return 0;
+		}
+		else {
+			return timeoutRepeat.get(file_id);
+		}
+	}
+	
+	public static boolean timeoutHandler(Guild guild, String file_id, String action, SocketTimeoutException e) {
+		if(action == null) {
+			action = "SETUP";
+		}
+		boolean resend = false;
+		if(!timeoutRepeat.containsKey(file_id)) {
+			timeoutRepeat.put(file_id, 1);
+			resend = true;
+		}
+		else {
+			final int attempts = timeoutRepeat.get(file_id);
+			timeoutRepeat.put(file_id, (attempts+1));
+			if(attempts <= 5)
+				resend = true;
+		}
+		if(resend) {
+			logger.warn("Timeout error attempt {}, spreadsheet service request couldn't be executed on file id {} and event {} in guild {}", timeoutRepeat.get(file_id), file_id, action, guild.getId());
+			try {
+				Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+			} catch (InterruptedException e1) {
+				//assume that interruptions will never occur
+			}
+			return true;
+		}
+		else {
+			logger.error("Timeout error after 5 attempts, spreadsheet service request couldn't be executed on file id {} and event {} in guild {}", file_id, action, guild.getId());
+			STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NO_SERVICE)), e.getMessage(), Channel.LOG.getType());
 		}
 		return false;
 	}
