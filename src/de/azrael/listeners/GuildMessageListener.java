@@ -715,7 +715,7 @@ public class GuildMessageListener extends ListenerAdapter {
 				//run a separate thread for the ranking system
 				executor.execute(() -> {
 					//check if the ranking system is enabled and that there's currently no message timeout
-					if(guild_settings != null && guild_settings.getRankingState() == true && (Hashes.getCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId()) == null || guild_settings.getMessageTimeout() == 0)) {
+					if(guild_settings != null && guild_settings.getRankingState() == true && (Hashes.getCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId()) == null || guild_settings.getMessageTimeout() == 0) && !UserPrivs.isUserMuted(e.getMember())) {
 						//retrieve all details from the user
 						Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
 						if(user_details == null) {

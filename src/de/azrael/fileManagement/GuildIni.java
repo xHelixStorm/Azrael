@@ -228,8 +228,8 @@ public class GuildIni {
 		commandLevels.put("FilterURLWhitelist", "20");
 		commandLevels.put("FilterTweetBlacklist", "20");
 		commandLevels.put("Quiz", "1");
-		commandLevels.put("RoleReaction", "1");
-		commandLevels.put("Subscribe", "1");
+		commandLevels.put("RoleReaction", "20");
+		commandLevels.put("Subscribe", "20");
 		commandLevels.put("Randomshop", "1");
 		commandLevels.put("Patchnotes", "1");
 		commandLevels.put("DoubleExperience", "1");

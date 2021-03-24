@@ -68,7 +68,7 @@ public class GuildJoinListener extends ListenerAdapter {
 		ParseSubscription.runTask(e.getJDA(), guild_id);
 		
 		//set the default language for this server
-		Hashes.setLanguage(guild_id, "en");
+		Hashes.setLanguage(guild_id, "eng");
 		
 		//initialize message pool
 		Hashes.initializeGuildMessagePool(guild_id, 1000);
