@@ -1991,32 +1991,28 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetFilterLanguages(String lang) {
-		final var languages = Hashes.getFilterLang(0);
-		if(languages == null) {
-			logger.trace("SQLgetFilterLanguages launched. No params passed");
-			ArrayList<String> filter_lang = new ArrayList<String>();
-			Connection myConn = null;
-			PreparedStatement stmt = null;
-			ResultSet rs = null;
-			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilterLanguages);
-				stmt.setString(1, lang);
-				rs = stmt.executeQuery();
-				while(rs.next()) {
-					filter_lang.add(rs.getString(1));
-				}
-				Hashes.addFilterLang(0, filter_lang);
-				return filter_lang;
-			} catch (SQLException e) {
-				logger.error("SQLgetFilterLanguages Exception", e);
-			} finally {
-				try { rs.close(); } catch (Exception e) { /* ignored */ }
-			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		logger.trace("SQLgetFilterLanguages launched. No params passed");
+		ArrayList<String> filter_lang = new ArrayList<String>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilterLanguages);
+			stmt.setString(1, lang);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				filter_lang.add(rs.getString(1));
 			}
+			return filter_lang;
+		} catch (SQLException e) {
+			logger.error("SQLgetFilterLanguages Exception", e);
+			return filter_lang;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
-		return languages;
 	}
 	
 	public static int SQLInsertRSS(String url, long guild_id, int type) {
