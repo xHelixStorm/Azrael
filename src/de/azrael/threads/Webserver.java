@@ -33,6 +33,7 @@ public class Webserver implements Runnable {
 			while(true) {
 				//create a socket and lock on to it until a request has been received
 				Socket socket = connect.accept();
+				logger.info("Request on socket from {} ({})", socket.getInetAddress().getHostName(), socket.getInetAddress().getHostAddress());
 				
 				BufferedReader in = null;
 				PrintWriter out = null;
@@ -52,6 +53,7 @@ public class Webserver implements Runnable {
 							while(in.ready()) {
 								payload.append((char)in.read());
 							}
+							logger.info("Socket request method {} with message: {}", method, payload.toString());
 							if(payload.toString().contains("Content-Type:") && payload.toString().contains("application/json")) {
 								String passedJson = null;
 								if(payload.toString().contains("{")) {
@@ -72,6 +74,11 @@ public class Webserver implements Runnable {
 							}
 						}
 						else {
+							StringBuilder payload = new StringBuilder();
+							while(in.ready()) {
+								payload.append((char)in.read());
+							}
+							logger.info("Socket request method {} with message: {}", method, payload.toString());
 							WebserviceUtils.return501(out, "POST request method required", false);
 						}
 					}
@@ -95,7 +102,7 @@ public class Webserver implements Runnable {
 		} finally {
 			if(WebserviceUtils.getPort() != 0) {
 				//immediately restart webservice
-				logger.debug("Restarting webservice!");
+				logger.info("Restarting Azrael webservice!");
 				new Thread(this).start();
 			}
 		}
