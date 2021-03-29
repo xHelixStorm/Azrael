@@ -1283,7 +1283,7 @@
 	"leaderboard_rank":				"Rango: ",
 	
 	"web_wrong_channel":			"Por favor, escriba *!web* en un mensaje directo a {}!",
-	"web_redirect":					"Siga este enlace para completar el proceso de autenticación y acceder al sitio web en 3 minutos.\n",
+	"web_redirect":					"Siga este enlace para completar el proceso de autenticación y acceder al sitio web en 5 minutos.\n",
 	"web_redirect_err":				"¡Configuración incompleta! Por favor, póngase en contacto con un administrador.",
 	"web_create":					"¡Sigue este enlace para completar tu inscripción y poder acceder a la página web del Bot!\n",
 	"web_not_allowed":				"Ha desactivado el método de inicio de sesión directo para el sitio web. Por favor, inicie sesión directamente en el sitio web a través de este enlace y cambie la configuración de inicio de sesión para utilizar este método de inicio de sesión.\n",

@@ -2,6 +2,7 @@ package de.azrael.commands;
 
 import java.awt.Color;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +49,11 @@ public class Web implements CommandPublic, CommandPrivate {
 			final int auth_type = AzraelWeb.SQLgetLoginType(e.getAuthor().getIdLong());
 			if(auth_type > 0) {
 				if(auth_type == 4 || auth_type == 5) {
+					final String key = RandomStringUtils.random(15, true, true);
 					//Insert or update login table and redirect user to the website
-					final int result = AzraelWeb.SQLInsertLoginInfo(e.getAuthor().getIdLong(), 1);
+					final int result = AzraelWeb.SQLInsertLoginInfo(e.getAuthor().getIdLong(), 1, key);
 					if(result > 0) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.WEB_REDIRECT)+URL+LOGIN_ENDPOINT+e.getAuthor().getId()).build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.WEB_REDIRECT)+URL+LOGIN_ENDPOINT+e.getAuthor().getId()+"&key="+key).build()).queue();
 					}
 					else if(result == 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();

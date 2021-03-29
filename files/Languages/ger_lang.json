@@ -1283,7 +1283,7 @@
 	"leaderboard_rank":				"Rang: ",
 	
 	"web_wrong_channel":			"Bitte schreiben Sie *!web* in eine Privatnachricht zu {}!",
-	"web_redirect":					"Bitte folgen Sie diese URL um die Authentifizierung, innerhalb von 3 Minuten, zu vervollständigen und um die Webseite zu öffnen!\n",
+	"web_redirect":					"Bitte folgen Sie diese URL um die Authentifizierung, innerhalb von 5 Minuten, zu vervollständigen und um die Webseite zu öffnen!\n",
 	"web_redirect_err":				"Einstellungen sind unvollständig! Bitte nehmen Sie Kontakt zu einem Administrator auf!",
 	"web_create":					"Bitte folgen Sie diese URL um sich auf der Bot Webseite anzumelden!\n",
 	"web_not_allowed":				"Sie haben die direkte Login Methode über den Bot deaktiviert. Bitte melden Sie sich direkt auf der Webseite an mit diese URL und ändern Sie die Login Einstellungen um diese Login Methode verwenden zu können!\n",

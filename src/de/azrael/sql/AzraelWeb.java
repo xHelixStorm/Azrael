@@ -49,25 +49,6 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		}
 	}
 	
-	public static int SQLInsertLoginInfo(long user_id, int type) {
-		logger.trace("SQLInsertLoginInfo launched. Passed params {}, {}", user_id, type);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
-			stmt = myConn.prepareStatement(AzraelWebStatements.SQLInsertLoginInfo);
-			stmt.setLong(1, user_id);
-			stmt.setInt(2, type);
-			return stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLInsertLoginInfo Exception", e);
-			return -1;
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static int SQLInsertLoginInfo(long user_id, int type, String code) {
 		logger.trace("SQLInsertLoginInfo launched. Passed params {}, {}, {}", user_id, type, code);
 		Connection myConn = null;

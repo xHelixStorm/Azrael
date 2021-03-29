@@ -53,7 +53,7 @@ public class Webserver implements Runnable {
 							while(in.ready()) {
 								payload.append((char)in.read());
 							}
-							logger.info("Socket request method {} with message: {}", method, payload.toString());
+							logger.info("Socket request method {} with message:\n{}", method, payload.toString());
 							if(payload.toString().contains("Content-Type:") && payload.toString().contains("application/json")) {
 								String passedJson = null;
 								if(payload.toString().contains("{")) {
