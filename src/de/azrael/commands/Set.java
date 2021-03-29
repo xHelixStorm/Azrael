@@ -396,7 +396,7 @@ public class Set implements CommandPublic {
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIVEAWAY_ITEMS))) {
 				commandLevel = GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong());
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					SetGiveawayItems.runTask(e, args[1]);
+					SetGiveawayItems.runTask(e, args);
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);

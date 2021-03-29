@@ -168,10 +168,15 @@ class AzraelStatements {
 	final static String SQLgetCustomCommandRoles = STATIC.decrypt("oqKjhmds/dioRA35XwKhckjMPK8rxDgVpVJPHjqDA2MS1v8gHA97mTof3w/OwH1ukjM5slfTVs9dlQFeBmWqZokQugJbzhMO5OiAewoxSsE=");
 	final static String SQLgetQuizData = STATIC.decrypt("5w1x84iGEoc6YUVG9hCQl5fbQoDxPU7ePUMsvBUA0N4WOzynT3YbLEvElZCT08pXNApkSZwpYvTZFcVTucXnwQ==");
 	final static String SQLDeleteQuizData = STATIC.decrypt("+T+jBrr1AphXWv+/PFhSL+nW3THTANnwibqJxLJKmGHSzfTqoNonDM7TbktW5SAX");
+	final static String SQLUpdateUsedQuizReward = STATIC.decrypt("JLiFGdT3n816Kgo1e1QQ2jfQUDoBTWFX0UST7oryXME/PhRmKZOvWDNJjThhq3NZ5oW1NUSdGdr0bc3i0fhmig==");
 	final static String SQLgetScheduledMessages = STATIC.decrypt("04a89EVUG1vVJrJDDVwPhtDEv1wZy0ohN7XWJQ/+N/AifK/lluWazpb02tw+H4TL");
 	final static String SQLInsertScheduledMessage = STATIC.decrypt("I6bB8rw6zxmJ5TC7A24tX6I2DUWxWv5ID0/xm1bOKDjMipx23en6441YVccd5CiDb8Iq9WBtO8MTZ+KcFEFso1z/Af/ImyPqyMX/ZCLZb8oCW2/zQfvgH3nCLCmGU+Wy8oFgTVwSlTaPnzvdR8Rwgz/TDp5YZM1aZrJMbdUMeg1lhnT5PLltW0n8fhS6KiqqmW+UI/dgSbep1GFwVwinuxJngUWuGc22yzOlzoHf7tU=");
 	final static String SQLDeleteScheduledMessageTask = STATIC.decrypt("QFkq4ExQEvFvd9s2KYQRE2Y3edYH/dHiDh0f1Hz1iLr6AqGyxAeIP5iLF7L/5ipB8h4iugXf8xCr9KeVA8gqaw==");
-	final static String SQLUpdateUsedQuizReward = STATIC.decrypt("JLiFGdT3n816Kgo1e1QQ2jfQUDoBTWFX0UST7oryXME/PhRmKZOvWDNJjThhq3NZ5oW1NUSdGdr0bc3i0fhmig==");
+	final static String SQLisGiveawayAvailable = STATIC.decrypt("Z8vdI1GPXZTGqpSYi7XWwYKcsMx6C/Hc65ZptqTsNGrv0JG2/78OvroLlG+Cs7dHIAYwI65K37939sZKUyDxF+z2UeADsj9f7nxWzRgNuKQ=");
+	final static String SQLInsertGiveawayRewards = STATIC.decrypt("IN8VjKonXA7/JLOIMbzI+oUip+0EB281jZIbhJB35So4McLrwsmZUUeR8A2fVdyR5eiLkjc6emwzQKvOrxGglakOLn57Wrv7dP4/qcZu8nzLbpfATvhoKr5l7zJDfgQD9hhflWgpCA8NZkh0IqgJug==");
+	final static String SQLisGiveawayRewardAlreadySent = STATIC.decrypt("Z8vdI1GPXZTGqpSYi7XWwYKcsMx6C/Hc65ZptqTsNGrv0JG2/78OvroLlG+Cs7dH3/aFhVd1n3dpC2Vp4uY9B0dujaF1SWt8aUlDJmqAuZI=");
+	final static String SQLgetSingleGiveawayReward = STATIC.decrypt("n7nFuc+uX4k/x2EFWv15L9JAxqebXEN2+SbigLliu3OSMzmyV9NWz12VAV4GZapmCwtsqa3rXZ4m+toSHP+7HkdujaF1SWt8aUlDJmqAuZI=");
+	final static String SQLMarkGiveawayAsUsed = STATIC.decrypt("m94m//J9OS6m16Ega8jqJirwVg37I1mtYpXW6y2UogGX2R1v3chaTnCK6ueMV8XBkjM5slfTVs9dlQFeBmWqZhgZTd9S3vTJTLkciVT7U0o=");
 	final static String SQLLowerTotalWarning = STATIC.decrypt("RvG8no5GC1M2UJnjG+SRVwSQADsHCgMEFFCEV9LPN3F8eS0ma0bGhmCWutnBnhPpBbF0uh830gc/5OVdO4DCvtvBU/DDsvqBHYMXtJtiay/AcMWgiJIGubroqVwa8m5M");
 	final static String SQLLowerTotalWarning2 = STATIC.decrypt("xyWD7Rr4A3dPVvG35OGDdfwdamEgiC/v+gNA8zaDtj/NqX1KVWnYDTbDtWeuYDuD");
 	final static String SQLReplaceWordFilter = STATIC.decrypt("bg77IrFrjW2OXhzl5iBjI4bcNBEg0auhsvsBDu9oVaF9CLId3EziiYE7YsrZ6uyGInyv5Zblms6W9NrcPh+Eyw==");

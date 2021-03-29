@@ -583,6 +583,7 @@ public enum Translation {
 	REGISTER_ROLE_ERR			("register_role_err"),
 	REGISTER_ROLE_ASSIGN_START	("register_role_assign_start"),
 	REGISTER_ROLE_DONE			("register_role_done"),
+	REGISTER_ROLE_KEY			("register_role_key"),
 	
 	REMOVE_HELP					("remove_help"),
 	REMOVE_ROLE_HELP			("remove_role_help"),
@@ -1060,6 +1061,11 @@ public enum Translation {
 	ROLE_MUTE_MESSAGE_1			("role_mute_message_1"),
 	ROLE_MUTE_MESSAGE_2			("role_mute_message_2"),
 	ROLE_MUTE_MESSAGE_3			("role_mute_message_3"),
+	ROLE_KEY_MESSAGE			("role_key_message"),
+	ROLE_KEY_MESSAGE_2			("role_key_message_2"),
+	ROLE_KEY_MESSAGE_3			("role_key_message_3"),
+	ROLE_KEY_SENT				("role_key_sent"),
+	ROLE_KEY_DM_LOCKED			("role_key_dm_locked"),
 	
 	UNBAN_INFO_ERR				("unban_info_err"),
 	UNBAN_TITLE					("unban_title"),

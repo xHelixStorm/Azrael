@@ -3862,6 +3862,125 @@ public class Azrael {
 		}
 	}
 	
+	public static boolean SQLisGiveawayAvailable(long guild_id) {
+		logger.trace("SQLisGiveawayAvailable launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLisGiveawayAvailable);
+			stmt.setLong(1, guild_id);
+			stmt.setBoolean(2, false);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return true;
+			}
+			return false;
+		} catch(SQLException e) {
+			logger.error("SQLisGiveawayAvailable Exception", e);
+			return false;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLInsertGiveawayRewards(long guild_id, String [] rewards) {
+		logger.trace("SQLInsertGiveawayRewards launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertGiveawayRewards);
+			for(final String reward : rewards) {
+				stmt.setLong(1, guild_id);
+				stmt.setString(2, reward);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			return true;
+		} catch(SQLException e) {
+			logger.error("SQLInsertGiveawayRewards Exception", e);
+			return false;
+		} finally {
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLisGiveawayRewardAlreadySent(long guild_id, long user_id) {
+		logger.trace("SQLisGiveawayRewardAlreadySent launched. Params passed {}, {}", guild_id, user_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLisGiveawayRewardAlreadySent);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return true;
+			}
+			return false;
+		} catch(SQLException e) {
+			logger.error("SQLisGiveawayAvailable Exception", e);
+			return false;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static String SQLgetSingleGiveawayReward(long guild_id) {
+		logger.trace("SQLgetSingleGiveawayReward launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSingleGiveawayReward);
+			stmt.setLong(1, guild_id);
+			stmt.setBoolean(2, false);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return rs.getString(1);
+			}
+			return "";
+		} catch(SQLException e) {
+			logger.error("SQLgetSingleGiveawayReward Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLMarkGiveawayAsUsed(long guild_id, long user_id, String reward) {
+		logger.trace("SQLMarkGiveawayAsUsed launched. Params passed {}, {}, {}", guild_id, user_id, reward);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLMarkGiveawayAsUsed);
+			stmt.setLong(1, user_id);
+			stmt.setBoolean(2, true);
+			stmt.setLong(3, guild_id);
+			stmt.setString(4, reward);
+			return stmt.executeUpdate();
+		} catch(SQLException e) {
+			logger.error("SQLMarkGiveawayAsUsed Exception", e);
+			return 0;
+		} finally {
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	//Transactions
 	@SuppressWarnings("resource")
 	public static int SQLLowerTotalWarning(long guild_id, int warning_id) {

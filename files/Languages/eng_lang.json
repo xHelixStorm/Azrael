@@ -581,6 +581,7 @@
 	"register_role_err":			"The permission {} is required to assign this role to all members on the server! Please assign the required permission and resubmit your answer.",
 	"register_role_assign_start":	"Role is being assigned to all members!",
 	"register_role_done":			"Registration completed!",
+	"register_role_key":			"This role requires registered giveaway rewards! Please don't forget to upload them!",
 	
 	"remove_help":					"Remove a registered option! Write one of the following parameters together with the command for more details:\n\n- **role**:\nRemove a registered role.\n- **ranking-role**:\nRemove a registered ranking role.\n- **category**:\nRemove a registered category.\n- **text-channel**:\nRemove a registered text channel.\n- **channel-censor**:\nRemove censoring languages from a text channel.",
 	"remove_role_help":				"Insert a role ID together with the full command to remove a registered role or type *all* to remove all registerd roles!",
@@ -616,7 +617,7 @@
 	"role_reaction_disable":		"Role reactions have been disabled and all not persistent reaction roles have been removed from all users!",
 	"role_reaction_print":			"Assign yourself a unique role! React to one of the reactions below to receive your role! To have the role removed, simply react again! Here a listing with all available reactions and roles:\n\n",
 	
-	"set_help":						"Update options and functionalities by setting values! These parameters are available:\n\n- **permission-level**:\nUpdate the permission level of a role.\n- **channel-censor**:\nSet one or more censor languages for one text channel.\n- **warnings**:\nDefine the maximum number of warnings that a user can have before receiving a ban or permanent mute and set a mute time for every warning.\n- **ranking**:\nEnable and disable the level system.\n- **max-experience**:\nDefine a daily limit of obtainable experience points or enable and disable this functionality.\n- **default-level-skin**:\nDefine a default level up skin.\n- **default-rank-skin**:\nDefine a default rank skin.\n- **default-profile-skin**:\nDefine a default profile skin.\n- **default-icon-skin**:\nDefine default icon skin which the level, rank and profile skins can utilize.\n- **daily-item**:\nDefine items which can be obtained from the daily items.\n- **giveaway-items**:\nAdd giveaway rewards for the daily command.\n- **comp-server**:\nDefine servers for the competitive scene.\n- **max-clan-members**:\nSet a limit for how many members are allowed to be in a clan.\n- **matchmaking-members**:\nSet a limit for how many members can join a matchmaking room.\n- **map**:\nAdd maps which can be used for competitive commands.\n- **language**:\nChange the Bot language for the whole server.",
+	"set_help":						"Update options and functionalities by setting values! These parameters are available:\n\n- **permission-level**:\nUpdate the permission level of a role.\n- **channel-censor**:\nSet one or more censor languages for one text channel.\n- **warnings**:\nDefine the maximum number of warnings that a user can have before receiving a ban or permanent mute and set a mute time for every warning.\n- **ranking**:\nEnable and disable the level system.\n- **max-experience**:\nDefine a daily limit of obtainable experience points or enable and disable this functionality.\n- **default-level-skin**:\nDefine a default level up skin.\n- **default-rank-skin**:\nDefine a default rank skin.\n- **default-profile-skin**:\nDefine a default profile skin.\n- **default-icon-skin**:\nDefine default icon skin which the level, rank and profile skins can utilize.\n- **daily-item**:\nDefine items which can be obtained from the daily items.\n- **giveaway-items**:\nAdd giveaway rewards.\n- **comp-server**:\nDefine servers for the competitive scene.\n- **max-clan-members**:\nSet a limit for how many members are allowed to be in a clan.\n- **matchmaking-members**:\nSet a limit for how many members can join a matchmaking room.\n- **map**:\nAdd maps which can be used for competitive commands.\n- **language**:\nChange the Bot language for the whole server.",
 	"set_permission":				"Change the permission level of a role between 0 (lowest) to 100 (highest)! Write a numerical role ID as second parameter and the numerical permission level as third parameter!",
 	"set_permission_added":			"The permission level has been updated successfully for this role!",
 	"set_permission_no_level":		"Please provide a numerical permission level between 0 and 100 as third parameter!",
@@ -649,7 +650,7 @@
 	"set_daily_already_registered":	"This daily item has been already registered!",
 	"set_daily_over_the_limit":		"The provided probability exceeds the 100% limit. Current total probability: **{}**",
 	"set_daily_added":				"Daily item has been registered! Current total probability: **{}**",
-	"set_giveaway":					"Please past a pastebin link which contains all giveaway rewards for the current month. If you wish to extend the expiration of the current registered and unused giveaway rewards by one month, use the *extend* parameter.",
+	"set_giveaway":					"Please send a pastebin link which contains all giveaway rewards as third parameter. As second parameter write either 1 to register giveaway for the Daily command or 2 for users receiving the 'key' type role. To extend the expiration of the giveaways for the Daily command to next month, write *extend* as third parameter.",
 	"set_giveaway_added":			"Rewards have been registered succesfully!",
 	"set_giveaway_extended":		"Unused giveaway rewards have been extended until the end of this month!",
 	"set_giveaway_extend_err":		"No unused giveaway rewards found!",
@@ -1058,6 +1059,11 @@
 	"role_mute_message_1":			"**{}** with the ID number **{}** has been muted with a custom mute timer and will be unmuted in **{}**!\nMuted by: {}\nReason: ",
 	"role_mute_message_2":			"**{}** with the ID number **{}** has been muted and will be unmuted in **{}**!\nMuted by: {}\nReason: ",
 	"role_mute_message_3":			"**{}** with the ID number **{}** has been permanently muted until further notice!\nMuted by: {}\nReason: ",
+	"role_key_message":				"An internal error has occurred and user **{}** with the id number **{}** couldn't receive any reward upon receiving a role. Please contact an administrator!",
+	"role_key_message_2":			"User **{}** with the id number **{}** couldn't receive any reward upon receiving a role because there are no more giveaway rewards left or have not yet uploaded!",
+	"role_key_message_3":			"Congratulations! You have been chosen to receive the following reward:",
+	"role_key_sent":				"User **{}** with the id number **{}** has received the following reward:",
+	"role_key_dm_locked":			"User **{}** with the id number **{}** couldn't receive the following reward because the direct messages are locked:",
 	
 	"unban_info_err":				"\n**The user who unbaned this user couldn't be retrieved because the following permission is missing: **",
 	"unban_title":					"User unbanned!",
