@@ -116,7 +116,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 						role_id = role.getId();
 						role_name = role.getName();
 					}
-					GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE_MANUAL.id, ""), e.getGuild(), "", ""+user_id, timestamp, member_name, e.getMember().getEffectiveName(), trigger_user_name, trigger_effective_name, STATIC.getTranslation2(e.getGuild(), Translation.ROLE_REMOVE_MANUALLY_REASON), null, null, "MANUALLY_UNMUTED", null, role_id, role_name, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE_MANUAL.id);
+					GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE_MANUAL.id, ""), e.getGuild(), "", ""+user_id, timestamp, member_name, e.getMember().getEffectiveName(), trigger_user_name, trigger_effective_name, STATIC.getTranslation2(e.getGuild(), Translation.ROLE_REMOVE_MANUALLY_REASON), null, null, "MANUALLY_UNMUTED", null, role_id, role_name, null, null, 0, null, null, 0, 0, 0, GoogleEvent.UNMUTE_MANUAL.id);
 				}
 			}
 			//execute this block if the mute time has ended and the user doesn't have the mute role anymore
@@ -147,7 +147,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 						}
 						Hashes.clearTempCache("unmute_gu"+guild_id+"us"+user_id);
 					}
-					GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), member_name, e.getMember().getEffectiveName(), "", "", STATIC.getTranslation2(e.getGuild(), Translation.ROLE_REMOVE_ELAPSED_REASON), null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
+					GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), member_name, e.getMember().getEffectiveName(), "", "", STATIC.getTranslation2(e.getGuild(), Translation.ROLE_REMOVE_ELAPSED_REASON), null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, null, 0, 0, 0, GoogleEvent.UNMUTE.id);
 				}
 			}
 		}).start();

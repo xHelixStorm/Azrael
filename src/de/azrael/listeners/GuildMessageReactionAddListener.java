@@ -55,6 +55,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 	
 	private final String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
 	private final String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
+	private final String shrug = EmojiManager.getForAlias(":shrug:").getUnicode();
 	
 	@Override
 	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent e) {
@@ -336,15 +337,24 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 				//check if it's a vote channel and allow only one reaction
 				final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
 				final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
-				if(thisChannel != null && thisChannel.getChannel_Type() != null && thisChannel.getChannel_Type().equals(Channel.VOT.getType())) {
+				if(thisChannel != null && thisChannel.getChannel_Type() != null && (thisChannel.getChannel_Type().equals(Channel.VOT.getType()) || thisChannel.getChannel_Type().equals(Channel.VO2.getType()))) {
 					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE))) {
 						if(e.getReactionEmote().isEmoji()) {
 							boolean runSpreadsheet = false;
 							if(thumbsup.equals(e.getReactionEmote().getName())) {
 								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsdown, e.getUser()).queue();
+								if(thisChannel.getChannel_Type().equals(Channel.VO2.getType()))
+									e.getChannel().removeReactionById(e.getMessageIdLong(), shrug, e.getUser()).queue();
 								runSpreadsheet = true;
 							}
 							else if(thumbsdown.equals(e.getReactionEmote().getName())) {
+								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsup, e.getUser()).queue();
+								if(thisChannel.getChannel_Type().equals(Channel.VO2.getType()))
+									e.getChannel().removeReactionById(e.getMessageIdLong(), shrug, e.getUser()).queue();
+								runSpreadsheet = true;
+							}
+							else if(shrug.equals(e.getReactionEmote().getName())) {
+								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsdown, e.getUser()).queue();
 								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsup, e.getUser()).queue();
 								runSpreadsheet = true;
 							}
@@ -396,13 +406,16 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 									//find out where the up_vote and down_vote columns are and mark them
 									int columnUpVote = 0;
 									int columnDownVote = 0;
+									int columnShrugVote = 0;
 									for(final var column : columns) {
 										if(column.getItem() == GoogleDD.UP_VOTE)
 											columnUpVote = column.getColumn();
 										else if(column.getItem() == GoogleDD.DOWN_VOTE)
 											columnDownVote = column.getColumn();
+										else if(column.getItem() == GoogleDD.SHRUG_VOTE)
+											columnShrugVote = column.getColumn();
 									}
-									if(columnUpVote != 0 || columnDownVote != 0) {
+									if(columnUpVote != 0 || columnDownVote != 0 || columnShrugVote != 0) {
 										//build update array
 										ArrayList<List<Object>> values = new ArrayList<List<Object>>();
 										int columnCount = 0;
@@ -412,12 +425,14 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 												values.add(Arrays.asList("<upVote>"));
 											else if(columnCount == columnDownVote)
 												values.add(Arrays.asList("<downVote>"));
+											else if(columnCount == columnShrugVote)
+												values.add(Arrays.asList("<shrugVote>"));
 											else
 												values.add(Arrays.asList(column));
 										}
 										//execute Runnable
 										if(!STATIC.threadExists("vote"+e.getMessageId())) {
-											new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote)).start();
+											new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote, columnShrugVote)).start();
 										}
 									}
 								}

@@ -87,7 +87,7 @@ public class NicknameListener extends ListenerAdapter {
 						else {
 							logger.warn("VIEW_AUDIT_LOGS permission required to run the google event RENAMED in guild {}", guild_id);
 						}
-						GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, reporter_name, reporter_effectivename, null, null, null, "RENAMED", null, null, null, e.getOldValue(), e.getNewValue(), 0, null, null, 0, 0, GoogleEvent.RENAME_MANUAL.id);
+						GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, reporter_name, reporter_effectivename, null, null, null, "RENAMED", null, null, null, e.getOldValue(), e.getNewValue(), 0, null, null, 0, 0, 0, GoogleEvent.RENAME_MANUAL.id);
 					}
 				}
 			}

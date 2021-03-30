@@ -28,6 +28,7 @@ public class DelayedVoteUpdate implements Runnable {
 	
 	private final String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
 	private final String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
+	private final String shrug = EmojiManager.getForAlias(":shrug:").getUnicode();
 	
 	private Guild guild;
 	private List<List<Object>> values;
@@ -37,8 +38,9 @@ public class DelayedVoteUpdate implements Runnable {
 	private String row;
 	private int upVoteColumn;
 	private int downVoteColumn;
+	private int shrugVoteColumn;
 	
-	public DelayedVoteUpdate(Guild _guild, List<List<Object>> _values, long _channel_id, long _message_id, String _file_id, String _row, int _upVoteColumn, int _downVoteColumn) {
+	public DelayedVoteUpdate(Guild _guild, List<List<Object>> _values, long _channel_id, long _message_id, String _file_id, String _row, int _upVoteColumn, int _downVoteColumn, int _shrugVoteColumn) {
 		this.guild = _guild;
 		this.values = _values;
 		this.channel_id = _channel_id;
@@ -47,6 +49,7 @@ public class DelayedVoteUpdate implements Runnable {
 		this.row = _row;
 		this.upVoteColumn = _upVoteColumn;
 		this.downVoteColumn = _downVoteColumn;
+		this.shrugVoteColumn = _shrugVoteColumn;
 	}
 
 	@Override
@@ -66,6 +69,8 @@ public class DelayedVoteUpdate implements Runnable {
 								values.set(upVoteColumn-1, Arrays.asList(""+(reaction.getCount()-1)));
 							else if(downVoteColumn > 0 && reaction.getReactionEmote().getName().equals(thumbsdown))
 								values.set(downVoteColumn-1, Arrays.asList(""+(reaction.getCount()-1)));
+							else if(shrugVoteColumn > 0 && reaction.getReactionEmote().getName().equals(shrug))
+								values.set(shrugVoteColumn-1, Arrays.asList(""+(reaction.getCount()-1)));
 						}
 						overwriteRowOnSpreadsheet(guild, file_id, values, row);
 					});

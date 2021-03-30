@@ -97,7 +97,7 @@ public class GoogleUtils {
 		};
 	}
 	
-	public static void handleSpreadsheetRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, long message_id, String message, String screenshots, int up_vote, int down_vote, int event_id) {
+	public static void handleSpreadsheetRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, String action, Timestamp unmute_timestamp, String role_id, String role_name, String oldname, String newname, long message_id, String message, String screenshots, int up_vote, int down_vote, int shrug_vote, int event_id) {
 		logger.info("Initializing spreadsheet request for event {} in guild {}", action, guild.getId());
 		//If nothing has been found, don't try to write into the spreadsheet
 		if(event != null && event[0].equals("empty"))
@@ -235,6 +235,7 @@ public class GoogleUtils {
 									case MESSAGE ->				values.add(Arrays.asList(item.valueFormatter(message, column.getFormatter())));
 									case UP_VOTE -> 			values.add(Arrays.asList(item.valueFormatter(up_vote, column.getFormatter())));
 									case DOWN_VOTE -> 			values.add(Arrays.asList(item.valueFormatter(down_vote, column.getFormatter())));
+									case SHRUG_VOTE -> 			values.add(Arrays.asList(item.valueFormatter(shrug_vote, column.getFormatter())));
 									default -> {}
 								}
 							}
@@ -262,7 +263,7 @@ public class GoogleUtils {
 							GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
 						} catch(SocketTimeoutException e1) {
 							if(timeoutHandler(guild, file_id, action, e1)) {
-								handleSpreadsheetRequest(event, guild, channel_id, user_id, timestamp, name, effectiveName, reporterName, reporterEffectiveName, reason, time, warning_id, action, unmute_timestamp, role_id, role_name, oldname, newname, message_id, message, screenshots, up_vote, down_vote, event_id);
+								handleSpreadsheetRequest(event, guild, channel_id, user_id, timestamp, name, effectiveName, reporterName, reporterEffectiveName, reason, time, warning_id, action, unmute_timestamp, role_id, role_name, oldname, newname, message_id, message, screenshots, up_vote, down_vote, shrug_vote, event_id);
 							}
 						} catch (IOException e1) {
 							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.GOOGLE_SHEET_NOT_INSERTED)), e1.getMessage(), Channel.LOG.getType());

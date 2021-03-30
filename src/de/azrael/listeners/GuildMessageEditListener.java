@@ -214,7 +214,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 								for(final var attachment : e.getMessage().getAttachments()) {
 									urls.append(attachment.getProxyUrl()+"\n");
 								}
-								GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), e.getChannel().getId(), ""+e.getMessage().getMember().getUser().getId(), new Timestamp(System.currentTimeMillis()), e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator(), e.getMessage().getMember().getEffectiveName(), null, null, null, null, null, "COMMENT", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim(), 0, 0, GoogleEvent.COMMENT.id);
+								GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), e.getChannel().getId(), ""+e.getMessage().getMember().getUser().getId(), new Timestamp(System.currentTimeMillis()), e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator(), e.getMessage().getMember().getEffectiveName(), null, null, null, null, null, "COMMENT", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim(), 0, 0, 0, GoogleEvent.COMMENT.id);
 							}, err -> {
 								//message was removed
 							});
@@ -226,7 +226,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 	}
 	
 	private static void runVoteSpreadsheetService(GuildMessageUpdateEvent e, ArrayList<Channels> allChannels) {
-		if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong()) && allChannels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.VOT.getType())).findAny().orElse(null) != null) {
+		if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong()) && allChannels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.VOT.getType()) || f.getChannel_Type().equals(Channel.VO2.getType()))).findAny().orElse(null) != null) {
 			final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
 			if(sheet != null && !sheet[0].equals("empty")) {
 				final String file_id = sheet[0];
@@ -251,12 +251,15 @@ public class GuildMessageEditListener extends ListenerAdapter {
 									//find out where the up_vote and down_vote columns are and mark them
 									int columnUpVote = 0;
 									int columnDownVote = 0;
+									int columnShrugVote = 0;
 									int columnMessage = 0;
 									for(final var column : columns) {
 										if(column.getItem() == GoogleDD.UP_VOTE)
 											columnUpVote = column.getColumn();
 										else if(column.getItem() == GoogleDD.DOWN_VOTE)
 											columnDownVote = column.getColumn();
+										else if(column.getItem() == GoogleDD.SHRUG_VOTE)
+											columnShrugVote = column.getColumn();
 										else if(column.getItem() == GoogleDD.MESSAGE)
 											columnMessage = column.getColumn();
 									}
@@ -264,13 +267,17 @@ public class GuildMessageEditListener extends ListenerAdapter {
 										ArrayList<List<Object>> values = new ArrayList<List<Object>>();
 										String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
 										String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
+										String shrug = EmojiManager.getForAlias(":shrug:").getUnicode();
 										int countThumbsUp = 0;
 										int countThumbsDown = 0;
+										int countShrug = 0;
 										for(final var reaction : e.getMessage().getReactions()) {
 											if(columnUpVote > 0 && reaction.getReactionEmote().getName().equals(thumbsup))
 												countThumbsUp = reaction.getCount()-1;
 											else if(columnDownVote > 0 && reaction.getReactionEmote().getName().equals(thumbsdown))
 												countThumbsDown = reaction.getCount()-1;
+											else if(columnShrugVote > 0 && reaction.getReactionEmote().getName().equals(shrug))
+												countShrug = reaction.getCount()-1;
 										}
 										//build update array
 										int columnCount = 0;
@@ -280,6 +287,8 @@ public class GuildMessageEditListener extends ListenerAdapter {
 												values.add(Arrays.asList(""+countThumbsUp));
 											else if(columnCount == columnDownVote)
 												values.add(Arrays.asList(""+countThumbsDown));
+											else if(columnCount == columnShrugVote)
+												values.add(Arrays.asList(""+countShrug));
 											else if(columnCount == columnMessage)
 												values.add(Arrays.asList(e.getMessage().getContentRaw()));
 											else

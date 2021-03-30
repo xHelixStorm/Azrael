@@ -169,7 +169,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 		if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
 			//check if it's a vote channel
 			final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
-			final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.VOT.getType())).findAny().orElse(null);
+			final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.VOT.getType()) || f.getChannel_Type().equals(Channel.VO2.getType()))).findAny().orElse(null);
 			if(thisChannel != null) {
 				final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
 				if(sheet != null && !sheet[0].equals("empty")) {
@@ -194,13 +194,16 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 										//find out where the up_vote and down_vote columns are and mark them
 										int columnUpVote = 0;
 										int columnDownVote = 0;
+										int columnShrugVote = 0;
 										for(final var column : columns) {
 											if(column.getItem() == GoogleDD.UP_VOTE)
 												columnUpVote = column.getColumn();
 											else if(column.getItem() == GoogleDD.DOWN_VOTE)
 												columnDownVote = column.getColumn();
+											else if(column.getItem() == GoogleDD.SHRUG_VOTE)
+												columnShrugVote = column.getColumn();
 										}
-										if(columnUpVote != 0 || columnDownVote != 0) {
+										if(columnUpVote != 0 || columnDownVote != 0 || columnShrugVote != 0) {
 											//build update array
 											ArrayList<List<Object>> values = new ArrayList<List<Object>>();
 											int columnCount = 0;
@@ -210,12 +213,14 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 													values.add(Arrays.asList("<upVote>"));
 												else if(columnCount == columnDownVote)
 													values.add(Arrays.asList("<downVote>"));
+												else if(columnCount == columnShrugVote)
+													values.add(Arrays.asList("<shrugVote>"));
 												else
 													values.add(Arrays.asList(column));
 											}
 											//execute Runnable
 											if(!STATIC.threadExists("vote"+e.getMessageId())) {
-												new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote)).start();
+												new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote, columnShrugVote)).start();
 											}
 										}
 									}
