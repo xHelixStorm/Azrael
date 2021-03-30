@@ -14,7 +14,7 @@ import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
-import de.azrael.google.GoogleUtils;
+import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.AzraelWeb;
 import de.azrael.util.STATIC;
@@ -169,7 +169,7 @@ public class HandlerPOST {
 				Guild guild = e.getJDA().getGuildById(json.getLong("guild_id"));
 				if(guild != null) {
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
-						if(GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.EXPORT.id, ""), guild, "", e.getJDA().getSelfUser().getId(), new Timestamp(System.currentTimeMillis()), e.getJDA().getSelfUser().getName()+"#"+e.getJDA().getSelfUser().getDiscriminator(), "EXPORT", e.getJDA().getGatewayPing(), guild.getMemberCount(), e.getJDA().getGuilds().size(), GoogleEvent.EXPORT.id)) {
+						if(GoogleSheets.spreadsheetExportRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.EXPORT.id, ""), guild, "", e.getJDA().getSelfUser().getId(), new Timestamp(System.currentTimeMillis()), e.getJDA().getGatewayPing(), guild.getMemberCount(), e.getJDA().getGuilds().size())) {
 							WebserviceUtils.return201(out, "Data exported to google spreadsheet.", false);
 						}
 						else {
@@ -188,7 +188,7 @@ public class HandlerPOST {
 				long guilds_count = e.getJDA().getGuilds().size();
 				for(final var guild : e.getJDA().getGuilds()) {
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
-						GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.EXPORT.id, ""), guild, "", e.getJDA().getSelfUser().getId(), new Timestamp(System.currentTimeMillis()), e.getJDA().getSelfUser().getName()+"#"+e.getJDA().getSelfUser().getDiscriminator(), "EXPORT", e.getJDA().getGatewayPing(), guild.getMemberCount(), guilds_count, GoogleEvent.EXPORT.id);
+						GoogleSheets.spreadsheetExportRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.EXPORT.id, ""), guild, "", e.getJDA().getSelfUser().getId(), new Timestamp(System.currentTimeMillis()), e.getJDA().getGatewayPing(), guild.getMemberCount(), guilds_count);
 					}
 				}
 				WebserviceUtils.return200(out, "Request accepted for all guilds.", false);

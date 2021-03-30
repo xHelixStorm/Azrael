@@ -214,7 +214,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 								for(final var attachment : e.getMessage().getAttachments()) {
 									urls.append(attachment.getProxyUrl()+"\n");
 								}
-								GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), e.getChannel().getId(), ""+e.getMessage().getMember().getUser().getId(), new Timestamp(System.currentTimeMillis()), e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator(), e.getMessage().getMember().getEffectiveName(), null, null, null, null, null, "COMMENT", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim(), 0, 0, 0, GoogleEvent.COMMENT.id);
+								GoogleSheets.spreadsheetCommentRequest(array, e.getGuild(), e.getChannel().getId(), ""+e.getMessage().getMember().getUser().getId(), new Timestamp(System.currentTimeMillis()), e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator(), e.getMessage().getMember().getEffectiveName(), e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim());
 							}, err -> {
 								//message was removed
 							});

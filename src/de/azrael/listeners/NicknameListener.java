@@ -18,7 +18,7 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.GuildIni;
-import de.azrael.google.GoogleUtils;
+import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.Permission;
@@ -87,7 +87,7 @@ public class NicknameListener extends ListenerAdapter {
 						else {
 							logger.warn("VIEW_AUDIT_LOGS permission required to run the google event RENAMED in guild {}", guild_id);
 						}
-						GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, reporter_name, reporter_effectivename, null, null, null, "RENAMED", null, null, null, e.getOldValue(), e.getNewValue(), 0, null, null, 0, 0, 0, GoogleEvent.RENAME_MANUAL.id);
+						GoogleSheets.spreadsheetRenameManualRequest(array, e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), reporter_name, reporter_effectivename, e.getOldValue(), e.getNewValue());
 					}
 				}
 			}

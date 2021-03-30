@@ -28,7 +28,7 @@ import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
-import de.azrael.google.GoogleUtils;
+import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
@@ -417,7 +417,7 @@ public class UserExecution {
 															role_id = role.getId();
 															role_name = role.getName();
 														}
-														GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", ""+user_id, timestamp, member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, null, 0, 0, 0, GoogleEvent.UNMUTE.id);
+														GoogleSheets.spreadsheetUnmuteRequest(array, e.getGuild(), "", ""+user_id, timestamp, member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, role_id, role_name);
 													}
 												}
 											}
@@ -437,7 +437,7 @@ public class UserExecution {
 													final String NA = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
 													var user = Azrael.SQLgetUserThroughID(""+user_id, e.getGuild().getIdLong());
 													String username = (user != null ? user.getUserName() : NA);
-													GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), username, username.replaceAll("#[0-9]{4}$", ""), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, null, null, "UNMUTED", null, "", "", null, null, 0, null, null, 0, 0, 0, GoogleEvent.UNMUTE.id);
+													GoogleSheets.spreadsheetUnmuteRequest(array, e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), username, username.replaceAll("#[0-9]{4}$", ""), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), NA, "", "");
 												}
 											}
 										}

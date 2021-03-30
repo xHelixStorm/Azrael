@@ -44,7 +44,7 @@ import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.filter.LanguageFilter;
 import de.azrael.filter.URLFilter;
-import de.azrael.google.GoogleUtils;
+import de.azrael.google.GoogleSheets;
 import de.azrael.rankingSystem.RankingThreadExecution;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.Competitive;
@@ -276,7 +276,7 @@ public class GuildMessageListener extends ListenerAdapter {
 								
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.VOTE.id, e.getChannel().getId()), e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "VOTE", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), null, 0, 0, 0, GoogleEvent.VOTE.id);
+									GoogleSheets.spreadsheetVoteRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.VOTE.id, e.getChannel().getId()), e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getMessageIdLong(), e.getMessage().getContentRaw(), 0, 0, 0);
 								}
 							}
 						}
@@ -854,7 +854,7 @@ public class GuildMessageListener extends ListenerAdapter {
 								for(final var attachment : e.getMessage().getAttachments()) {
 									urls.append(attachment.getProxyUrl()+"\n");
 								}
-								GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), null, null, null, null, null, "COMMENT", null, null, null, null, null, e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim(), 0, 0, 0, GoogleEvent.COMMENT.id);
+								GoogleSheets.spreadsheetCommentRequest(array, e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim());
 							}, err -> {
 								//message was removed
 							});
