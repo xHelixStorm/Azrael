@@ -91,6 +91,14 @@ public class UserExecution {
 				user = Azrael.SQLgetJoinDatesFromUser(Long.parseLong(raw_input), e.getGuild().getIdLong(), user);
 				user_name = user.getUserName();
 			}
+			else if(raw_input.matches("[0-9]{17,18}") && GuildIni.getCacheLog(e.getGuild().getIdLong())) {
+				final var messages = Hashes.getMessagePool(e.getGuild().getIdLong(), Long.parseLong(raw_input));
+				if(messages != null) {
+					final var cachedMessage = messages.get(0);
+					raw_input = ""+cachedMessage.getUserID();
+					user_name = cachedMessage.getUserName();
+				}
+			}
 		}
 		
 		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17) && user_name != null && user_name.length() > 0) {
