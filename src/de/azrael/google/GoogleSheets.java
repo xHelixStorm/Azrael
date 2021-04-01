@@ -13,6 +13,8 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
+import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
+import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
 import com.google.api.services.sheets.v4.model.DimensionRange;
 import com.google.api.services.sheets.v4.model.Request;
@@ -30,6 +32,7 @@ public class GoogleSheets {
 	/**
 	 * Retrieve Sheets client service
 	 * @return Sheets service
+	 * @throws SocketTimeoutException
 	 * @throws Exception Any error along the way
 	 */
 	
@@ -46,6 +49,7 @@ public class GoogleSheets {
 	 * @param service Sheets client service
 	 * @param sheet_id ID of the spreadsheet to retrieve
 	 * @return Spreadsheet Object
+	 * @throws SocketTimeoutException
 	 * @throws Exception Any error along the way
 	 */
 	
@@ -59,6 +63,7 @@ public class GoogleSheets {
 	 * @param service Sheets client service
 	 * @param title Title for the new spreadsheet
 	 * @return spreadsheet id
+	 * @throws SocketTimeoutException
 	 * @throws IOException
 	 */
 	
@@ -74,6 +79,7 @@ public class GoogleSheets {
 	 * @param service Sheets client service
 	 * @param file_id ID of the file on google drive
 	 * @return Spreadsheet object
+	 * @throws SocketTimeoutException
 	 * @throws IOException
 	 */
 	
@@ -88,6 +94,7 @@ public class GoogleSheets {
 	 * @param file_id ID of the file on google drive
 	 * @param sheet Sheet to retrieve the rows from
 	 * @return ValueRange object with all entries
+	 * @throws SocketTimeoutException
 	 * @throws IOException
 	 */
 	
@@ -105,12 +112,16 @@ public class GoogleSheets {
 	 * @param file_id ID of the file on google drive
 	 * @param list Values in form of list
 	 * @param rowStart Sheet and row where it should start to append
+	 * @param dimension column arrangement
 	 * @return Number of updated rows
+	 * @throws SocketTimeoutException
 	 * @throws IOException
 	 */
 	
-	public static int appendRawDataToSpreadsheet(final Sheets service, final String file_id, final List<List<Object>> list, final String rowStart) throws SocketTimeoutException, IOException {
-		ValueRange values = new ValueRange().setValues(list).setMajorDimension("COLUMNS");
+	public static int appendRawDataToSpreadsheet(final Sheets service, final String file_id, final List<List<Object>> list, final String rowStart, String dimension) throws SocketTimeoutException, IOException {
+		if(dimension == null)
+			dimension = "COLUMNS";
+		ValueRange values = new ValueRange().setValues(list).setMajorDimension(dimension);
 		AppendValuesResponse result = service.spreadsheets().values()
 			.append(file_id, rowStart, values)
 			.setValueInputOption("RAW")
@@ -121,11 +132,12 @@ public class GoogleSheets {
 	
 	/**
 	 * Update row in the spreadsheet table
-	 * @param service
-	 * @param file_id
-	 * @param list
-	 * @param rowStart
-	 * @return
+	 * @param service Sheets client service
+	 * @param file_id ID of the file on google drive
+	 * @param list Values in form of list
+	 * @param rowStart Sheet and row where it should start to overwrite
+	 * @return Number of updated rows
+	 * @throws SocketTimeoutException
 	 * @throws IOException
 	 */
 	
@@ -137,6 +149,33 @@ public class GoogleSheets {
 			.execute();
 		return result.size();
 	}
+	
+	/**
+	 * Update multiple rows on the spreadsheet
+	 * @param service Sheets client service
+	 * @param file_id ID of the file on google drive
+	 * @param data Rows data with update location
+	 * @return Number of updated rows
+	 * @throws SocketTimeoutException
+	 * @throws IOException
+	 */
+	
+	public static int batchUpdateRowsOnSpreadsheet(final Sheets service, final String file_id, ArrayList<ValueRange> data) throws SocketTimeoutException, IOException {
+		BatchUpdateValuesRequest requestBody = new BatchUpdateValuesRequest().setValueInputOption("RAW").setData(data);
+		BatchUpdateValuesResponse request = service.spreadsheets().values().batchUpdate(file_id, requestBody).execute();
+		return request.size();
+	}
+	
+	/**
+	 * Delete single row on spreadsheet
+	 * @param service Sheets client service
+	 * @param file_id ID of the file on google drive
+	 * @param rowStart Row on a sheet to delete
+	 * @param sheet_id ID of the sheet
+	 * @return Number of updated rows
+	 * @throws SocketTimeoutException
+	 * @throws IOException
+	 */
 	
 	public static int deleteRowOnSpreadsheet(final Sheets service, final String file_id, final int rowStart, final int sheet_id) throws SocketTimeoutException, IOException {
 		BatchUpdateSpreadsheetResponse result = service.spreadsheets().batchUpdate(file_id, new BatchUpdateSpreadsheetRequest()
@@ -150,6 +189,38 @@ public class GoogleSheets {
 			.execute();
 		return result.size();
 	}
+	
+	/**
+	 * Delete multiple rows on the spreadsheet
+	 * @param service service Sheets client service
+	 * @param file_id ID of the file on google drive
+	 * @param requests Multiple DeleteDimension requests to delete rows on a sheet
+	 * @return Number of updated rows
+	 * @throws SocketTimeoutException
+	 * @throws IOException
+	 */
+	
+	public static int batchDeleteRowsOnSpreadsheet(final Sheets service, final String file_id, List<Request> requests) throws SocketTimeoutException, IOException {
+		BatchUpdateSpreadsheetResponse result = service.spreadsheets().batchUpdate(file_id, new BatchUpdateSpreadsheetRequest().setRequests(requests)).execute();
+		return result.size();
+	}
+	
+	/**
+	 * Google spreadsheet requests for mutes
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param name
+	 * @param effectiveName
+	 * @param reporterName
+	 * @param reporterEffectiveName
+	 * @param reason
+	 * @param time
+	 * @param warning_id
+	 * @param unmute_timestamp
+	 */
 	
 	public static void spreadsheetMuteRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, Timestamp unmute_timestamp) {
 		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.MUTE.name())) {
@@ -184,6 +255,23 @@ public class GoogleSheets {
 		}
 	}
 	
+	/**
+	 * Google spreadsheets requests for re added mutes before the mute expires
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param name
+	 * @param effectiveName
+	 * @param reporterName
+	 * @param reporterEffectiveName
+	 * @param reason
+	 * @param time
+	 * @param warning_id
+	 * @param unmute_timestamp
+	 */
+	
 	public static void spreadsheetMuteReaddRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String time, String warning_id, Timestamp unmute_timestamp) {
 		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.MUTE_READD.name())) {
 			final var columns = GoogleUtils.retrieveSpreadsheetColumns(event[0], GoogleEvent.MUTE_READD, guild);
@@ -217,6 +305,22 @@ public class GoogleSheets {
 		}
 	}
 	
+	/**
+	 * Google spreadsheet requests for mute removals on end
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param name
+	 * @param effectiveName
+	 * @param reporterName
+	 * @param reporterEffectiveName
+	 * @param reason
+	 * @param role_id
+	 * @param role_name
+	 */
+	
 	public static void spreadsheetUnmuteRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String role_id, String role_name) {
 		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.UNMUTE.name())) {
 			final var columns = GoogleUtils.retrieveSpreadsheetColumns(event[0], GoogleEvent.UNMUTE, guild);
@@ -248,6 +352,22 @@ public class GoogleSheets {
 			}
 		}
 	}
+	
+	/**
+	 * Google spreadsheet requests for manual removal of a mute
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param name
+	 * @param effectiveName
+	 * @param reporterName
+	 * @param reporterEffectiveName
+	 * @param reason
+	 * @param role_id
+	 * @param role_name
+	 */
 	
 	public static void spreadsheetUnmuteManualRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String role_id, String role_name) {
 		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.UNMUTE_MANUAL.name())) {
@@ -281,6 +401,20 @@ public class GoogleSheets {
 		}
 	}
 	
+	/**
+	 * Google spreadsheet requests for kicks
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param name
+	 * @param effectiveName
+	 * @param reporterName
+	 * @param reporterEffectiveName
+	 * @param reason
+	 */
+	
 	public static void spreadsheetKickRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason) {
 		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.KICK.name())) {
 			final var columns = GoogleUtils.retrieveSpreadsheetColumns(event[0], GoogleEvent.KICK, guild);
@@ -311,6 +445,20 @@ public class GoogleSheets {
 		}
 	}
 	
+	/**
+	 * Google spreadsheet requests for ban removals
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param name
+	 * @param effectiveName
+	 * @param reporterName
+	 * @param reporterEffectiveName
+	 * @param reason
+	 */
+	
 	public static void spreadsheetUnbanRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason) {
 		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.UNBAN.name())) {
 			final var columns = GoogleUtils.retrieveSpreadsheetColumns(event[0], GoogleEvent.UNBAN, guild);
@@ -340,6 +488,21 @@ public class GoogleSheets {
 			}
 		}
 	}
+	
+	/**
+	 * Google spreadsheet requests for bans
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param name
+	 * @param effectiveName
+	 * @param reporterName
+	 * @param reporterEffectiveName
+	 * @param reason
+	 * @param warning_id
+	 */
 	
 	public static void spreadsheetBanRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, String reporterName, String reporterEffectiveName, String reason, String warning_id) {
 		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.BAN.name())) {
@@ -372,6 +535,21 @@ public class GoogleSheets {
 		}
 	}
 	
+	/**
+	 * Google spreadsheet requests for user renames
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param name
+	 * @param reporterName
+	 * @param reporterEffectiveName
+	 * @param reason
+	 * @param oldName
+	 * @param newName
+	 */
+	
 	public static void spreadsheetRenameRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String reporterName, String reporterEffectiveName, String reason, String oldName, String newName) {
 		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.RENAME.name())) {
 			final var columns = GoogleUtils.retrieveSpreadsheetColumns(event[0], GoogleEvent.RENAME, guild);
@@ -403,6 +581,20 @@ public class GoogleSheets {
 		}
 	}
 	
+	/**
+	 * Google spreadsheet requests for manual user renames
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param name
+	 * @param reporterName
+	 * @param reporterEffectiveName
+	 * @param oldName
+	 * @param newName
+	 */
+	
 	public static void spreadsheetRenameManualRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String reporterName, String reporterEffectiveName, String oldName, String newName) {
 		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.RENAME_MANUAL.name())) {
 			final var columns = GoogleUtils.retrieveSpreadsheetColumns(event[0], GoogleEvent.RENAME_MANUAL, guild);
@@ -433,67 +625,114 @@ public class GoogleSheets {
 		}
 	}
 	
-	public static void spreadsheetVoteRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, long message_id, String message, int up_vote, int down_vote, int shrug_vote) {
+	/**
+	 * Google spreadsheet request builder for the vote event
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param name
+	 * @param effectiveName
+	 * @param message_id
+	 * @param message
+	 * @param up_vote
+	 * @param down_vote
+	 * @param shrug_vote
+	 * @return
+	 */
+	
+	public static ArrayList<List<Object>> spreadsheetVoteRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, long message_id, String message, int up_vote, int down_vote, int shrug_vote) {
 		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.VOTE.name())) {
 			final var columns = GoogleUtils.retrieveSpreadsheetColumns(event[0], GoogleEvent.VOTE, guild);
 			if(columns != null && columns.size() > 0) {
 				ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+				List<Object> row = new ArrayList<Object>();
 				for(final var column : columns) {
 					GoogleDD item = column.getItem();
 					switch(item) {
-						case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
-						case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
-						case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
-						case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
-						case ACTION ->				values.add(Arrays.asList(item.valueFormatter(GoogleEvent.VOTE.name(), column.getFormatter())));
-						case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
-						case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
-						case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
-						case MESSAGE_ID -> 			values.add(Arrays.asList(item.valueFormatter(message_id, column.getFormatter())));
-						case MESSAGE ->				values.add(Arrays.asList(item.valueFormatter(message, column.getFormatter())));
-						case UP_VOTE -> 			values.add(Arrays.asList(item.valueFormatter(up_vote, column.getFormatter())));
-						case DOWN_VOTE -> 			values.add(Arrays.asList(item.valueFormatter(down_vote, column.getFormatter())));
-						case SHRUG_VOTE -> 			values.add(Arrays.asList(item.valueFormatter(shrug_vote, column.getFormatter())));
+						case TIMESTAMP -> 			row.add(item.valueFormatter(timestamp, column.getFormatter()));
+						case USER_ID -> 			row.add(item.valueFormatter(user_id, column.getFormatter()));
+						case NAME ->				row.add(item.valueFormatter(name, column.getFormatter()));
+						case USERNAME ->			row.add(item.valueFormatter(effectiveName, column.getFormatter()));
+						case ACTION ->				row.add(item.valueFormatter(GoogleEvent.VOTE.name(), column.getFormatter()));
+						case PLACEHOLDER ->			row.add(item.valueFormatter("", column.getFormatter()));
+						case GUILD_ID ->			row.add(item.valueFormatter(guild.getId(), column.getFormatter()));
+						case GUILD_NAME ->			row.add(item.valueFormatter(guild.getName(), column.getFormatter()));
+						case MESSAGE_ID -> 			row.add(item.valueFormatter(message_id, column.getFormatter()));
+						case MESSAGE ->				row.add(item.valueFormatter(message, column.getFormatter()));
+						case UP_VOTE -> 			row.add(item.valueFormatter(up_vote, column.getFormatter()));
+						case DOWN_VOTE -> 			row.add(item.valueFormatter(down_vote, column.getFormatter()));
+						case SHRUG_VOTE -> 			row.add(item.valueFormatter(shrug_vote, column.getFormatter()));
 						default -> {}
 					}
 				}
-				final SocketTimeoutException exception = GoogleUtils.appendRawDataToSpreadsheet(guild, GoogleEvent.VOTE, values, event[0], event[1]);
-				if(exception != null && GoogleUtils.timeoutHandler(guild, event[0], GoogleEvent.VOTE.name(), exception)) {
-					spreadsheetVoteRequest(event, guild, channel_id, user_id, timestamp, name, effectiveName, message_id, message, up_vote, down_vote, shrug_vote);
-				}
+				values.add(row);
+				if(values.get(0).size() > 0)
+					return values;
 			}
 		}
+		return null;
 	}
 	
-	public static void spreadsheetCommentRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, long message_id, String message, String screenshots) {
+	/**
+	 * Google spreadsheet request builder for comments (forced channel restrictions)
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param name
+	 * @param effectiveName
+	 * @param message_id
+	 * @param message
+	 * @param screenshots
+	 * @return
+	 */
+	
+	public static ArrayList<List<Object>> spreadsheetCommentRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, long message_id, String message, String screenshots) {
 		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.COMMENT.name())) {
 			final var columns = GoogleUtils.retrieveSpreadsheetColumns(event[0], GoogleEvent.COMMENT, guild);
 			if(columns != null && columns.size() > 0) {
 				ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+				List<Object> row = new ArrayList<Object>();
 				for(final var column : columns) {
 					GoogleDD item = column.getItem();
 					switch(item) {
-						case TIMESTAMP -> 			values.add(Arrays.asList(item.valueFormatter(timestamp, column.getFormatter())));
-						case USER_ID -> 			values.add(Arrays.asList(item.valueFormatter(user_id, column.getFormatter())));
-						case NAME ->				values.add(Arrays.asList(item.valueFormatter(name, column.getFormatter())));
-						case USERNAME ->			values.add(Arrays.asList(item.valueFormatter(effectiveName, column.getFormatter())));
-						case ACTION ->				values.add(Arrays.asList(item.valueFormatter(GoogleEvent.COMMENT.name(), column.getFormatter())));
-						case PLACEHOLDER ->			values.add(Arrays.asList(item.valueFormatter("", column.getFormatter())));
-						case GUILD_ID ->			values.add(Arrays.asList(item.valueFormatter(guild.getId(), column.getFormatter())));
-						case GUILD_NAME ->			values.add(Arrays.asList(item.valueFormatter(guild.getName(), column.getFormatter())));
-						case MESSAGE_ID -> 			values.add(Arrays.asList(item.valueFormatter(message_id, column.getFormatter())));
-						case MESSAGE ->				values.add(Arrays.asList(item.valueFormatter(message, column.getFormatter())));
-						case SCREEN_URL ->			values.add(Arrays.asList(item.valueFormatter(screenshots, column.getFormatter())));
+						case TIMESTAMP -> 			row.add(item.valueFormatter(timestamp, column.getFormatter()));
+						case USER_ID -> 			row.add(item.valueFormatter(user_id, column.getFormatter()));
+						case NAME ->				row.add(item.valueFormatter(name, column.getFormatter()));
+						case USERNAME ->			row.add(item.valueFormatter(effectiveName, column.getFormatter()));
+						case ACTION ->				row.add(item.valueFormatter(GoogleEvent.COMMENT.name(), column.getFormatter()));
+						case PLACEHOLDER ->			row.add(item.valueFormatter("", column.getFormatter()));
+						case GUILD_ID ->			row.add(item.valueFormatter(guild.getId(), column.getFormatter()));
+						case GUILD_NAME ->			row.add(item.valueFormatter(guild.getName(), column.getFormatter()));
+						case MESSAGE_ID -> 			row.add(item.valueFormatter(message_id, column.getFormatter()));
+						case MESSAGE ->				row.add(item.valueFormatter(message, column.getFormatter()));
+						case SCREEN_URL ->			row.add(item.valueFormatter(screenshots, column.getFormatter()));
 						default -> {}
 					}
 				}
-				final SocketTimeoutException exception = GoogleUtils.appendRawDataToSpreadsheet(guild, GoogleEvent.COMMENT, values, event[0], event[1]);
-				if(exception != null && GoogleUtils.timeoutHandler(guild, event[0], GoogleEvent.COMMENT.name(), exception)) {
-					spreadsheetCommentRequest(event, guild, channel_id, user_id, timestamp, name, effectiveName, message_id, message, screenshots);
-				}
+				values.add(row);
+				if(values.get(0).size() > 0)
+					return values;
 			}
 		}
+		return null;
 	}
+	
+	/**
+	 * Google spreadsheet requests for rest calls in JSON format
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param ping
+	 * @param member_count
+	 * @param guilds_count
+	 * @return
+	 */
 	
 	public static boolean spreadsheetExportRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, long ping, int member_count, long guilds_count) {
 		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.EXPORT.name())) {

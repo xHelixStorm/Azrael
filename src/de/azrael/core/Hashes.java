@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
+import com.google.api.services.sheets.v4.model.Spreadsheet;
+
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.CategoryConf;
 import de.azrael.constructors.Channels;
@@ -83,6 +85,7 @@ public class Hashes {
     private static final ConcurrentMap<Long, ArrayList<CategoryConf>> categories = new ConcurrentHashMap<Long, ArrayList<CategoryConf>>();
     private static final ConcurrentMap<Long, ArrayList<Timer>> schedules = new ConcurrentHashMap<Long, ArrayList<Timer>>();
     private static final ConcurrentMap<Long, HashMap<String, Long>> itemEffect = new ConcurrentHashMap<Long, HashMap<String, Long>>();
+    private static final ConcurrentMap<String, Spreadsheet> spreadsheetProperties = new ConcurrentHashMap<String, Spreadsheet>();
     
     public static void initializeGuildMessagePool(Long key, final int max_message_pool_size) {
     	LinkedHashMap<Long, ArrayList<Messages>> message_pool = new LinkedHashMap<Long, ArrayList<Messages>>() {
@@ -292,6 +295,9 @@ public class Hashes {
 	public static void addItemEffects(Long key, HashMap<String, Long> items) {
 		itemEffect.put(key, items);
 	}
+	public static void addSpreadsheetProperty(String key, Spreadsheet spreadsheet) {
+		spreadsheetProperties.put(key, spreadsheet);
+	}
 	
 	public static ArrayList<Messages> getMessagePool(long key, long message_id) {
 		final var message_pool = guild_message_pool.get(key);
@@ -479,6 +485,9 @@ public class Hashes {
 	}
 	public static HashMap<String, Long> getItemEffects(Long key) {
 		return itemEffect.get(key);
+	}
+	public static Spreadsheet getSpreadsheetProperty(String key) {
+		return spreadsheetProperties.get(key);
 	}
 	
 	public static void removeMessagePool(final long key, long message_id) {
@@ -677,5 +686,8 @@ public class Hashes {
 	}
 	public static void clearItemEffects() {
 		itemEffect.clear();
+	}
+	public static void removeSpreadsheetProperty(String key) {
+		spreadsheetProperties.remove(key);
 	}
 }

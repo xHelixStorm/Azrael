@@ -14,6 +14,7 @@ import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.interfaces.CommandPublic;
+import de.azrael.listeners.ShutdownListener;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -40,11 +41,17 @@ public class ShutDown implements CommandPublic {
 			for(final Guild guild : e.getJDA().getGuilds()) {
 				saveCache(guild);
 			}
-			e.getChannel().sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.SHUTDOWN)).queue(m -> {
-				e.getJDA().shutdown();
-			}, err -> {
-				e.getJDA().shutdown();
-			});
+			if(STATIC.getGoogleThreadCount() == 0) {
+				e.getChannel().sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.SHUTDOWN)).queue(m -> {
+					e.getJDA().shutdown();
+				}, err -> {
+					e.getJDA().shutdown();
+				});
+			}
+			else {
+				ShutdownListener.setShutdownChannel(e.getChannel());
+				STATIC.killGoogleThreads();
+			}
 		}
 	}
 

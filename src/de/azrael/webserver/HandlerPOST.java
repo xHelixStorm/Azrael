@@ -15,6 +15,7 @@ import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
+import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.AzraelWeb;
 import de.azrael.util.STATIC;
@@ -199,7 +200,7 @@ public class HandlerPOST {
 	private static void shutdown(ReadyEvent e, PrintWriter out, JSONObject json) {
 		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
 		WebserviceUtils.return200(out, "Bot shutdown", false);
-		for(final var guild : e.getJDA().getGuilds()) {
+		e.getJDA().getGuilds().parallelStream().forEach(guild -> {
 			if(GuildIni.getNotifications(guild.getIdLong())) {
 				if(json.has("message")) {
 					STATIC.writeToRemoteChannel(guild, null, json.getString("message"), Channel.LOG.getType());
@@ -209,8 +210,13 @@ public class HandlerPOST {
 				}
 			}
 			ShutDown.saveCache(guild);
+		});
+		if(STATIC.getGoogleThreadCount() == 0)
+			e.getJDA().shutdown();
+		else {
+			ShutdownListener.setShutdownJDA(e.getJDA());
+			STATIC.killGoogleThreads();
 		}
-		e.getJDA().shutdown();
 	}
 	
 	private static void webLogin(ReadyEvent e, PrintWriter out, JSONObject json) {

@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.api.services.sheets.v4.model.ValueRange;
 import com.vdurmont.emoji.EmojiManager;
 
 import de.azrael.commands.ScheduleExecution;
@@ -49,6 +49,7 @@ import de.azrael.rankingSystem.RankingThreadExecution;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.Competitive;
 import de.azrael.sql.RankingSystem;
+import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.threads.RunQuiz;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -276,7 +277,17 @@ public class GuildMessageListener extends ListenerAdapter {
 								
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									GoogleSheets.spreadsheetVoteRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.VOTE.id, e.getChannel().getId()), e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getMessageIdLong(), e.getMessage().getContentRaw(), 0, 0, 0);
+									final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.VOTE.id, e.getChannel().getId());
+									final var values = GoogleSheets.spreadsheetVoteRequest(array, e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getMessageIdLong(), e.getMessage().getContentRaw(), 0, 0, 0);
+									if(values != null) {
+										ValueRange valueRange = new ValueRange().setValues(values);
+										if(!STATIC.threadExists("VOTE"+e.getGuild().getId()+e.getChannel().getId())) {
+											new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), array[0], e.getChannel().getId(), "add", GoogleEvent.VOTE)).start();
+										}
+										else {
+											DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "add");
+										}
+									}
 								}
 							}
 						}
@@ -849,15 +860,20 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(array != null && !array[0].equals("empty")) {
 						//log low priority messages to google spreadsheets
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
-							e.getChannel().retrieveMessageById(e.getMessageId()).queueAfter(10, TimeUnit.SECONDS, m -> {
-								StringBuilder urls = new StringBuilder();
-								for(final var attachment : e.getMessage().getAttachments()) {
-									urls.append(attachment.getProxyUrl()+"\n");
+							StringBuilder urls = new StringBuilder();
+							for(final var attachment : e.getMessage().getAttachments()) {
+								urls.append(attachment.getProxyUrl()+"\n");
+							}
+							final var values = GoogleSheets.spreadsheetCommentRequest(array, e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim());
+							if(values != null) {
+								ValueRange valueRange = new ValueRange().setValues(values);
+								if(!STATIC.threadExists("COMMENT"+e.getGuild().getId()+e.getChannel().getId())) {
+									new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), array[0], e.getChannel().getId(), "add", GoogleEvent.COMMENT)).start();
 								}
-								GoogleSheets.spreadsheetCommentRequest(array, e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim());
-							}, err -> {
-								//message was removed
-							});
+								else {
+									DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "add");
+								}
+							}
 						}
 					}
 				}

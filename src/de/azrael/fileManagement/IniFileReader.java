@@ -123,6 +123,10 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("Bot", "AESSecret");
 	}
+	public static int getDelayedGoogleRequestTime() {
+		Ini ini = readConfig();
+		return ini.get("Bot", "DelayedGoogleRequestTime", int.class);
+	}
 	
 	public static String getPastebinDeveloperKey() {
 		Ini ini = readConfig();

@@ -148,7 +148,7 @@ public class GoogleUtils {
 	static SocketTimeoutException appendRawDataToSpreadsheet(Guild guild, GoogleEvent event, ArrayList<List<Object>> values, String file_id, String sheetRowStart) {
 		if(values.size() > 0) {
 			try {
-				GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart);
+				GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, values, sheetRowStart, null);
 			} catch(SocketTimeoutException e1) {
 				return e1;
 			} catch (IOException e1) {
