@@ -208,6 +208,7 @@
 	"level_up_role_err":			"Sie konnten die neueste freigeschaltete Rolle nicht erhalten, da die folgende Berechtigung erforderlich ist: ",
 	"rss_no_feed":					"Es konnte kein RSS-Feed gefunden werden!",
 	"twitter_no_tweet":				"Keinen Tweet gefunden!",
+	"reddit_no_content":			"Keinen Reddit bezogenen Inhalt gefunden!",
 	"watching_lifted":				"Die Überwachung für den Benutzer **{}** ist aufgrund des folgenden Ereignisses aufgehoben worden: ",
 	"watching_lifted_err":			"Ein interner Fehler ist aufgetreten! Der Benutzer **{}** konnte nicht von der Überwachung ausgenommen werden!",
 	"category_not_exists":			"Die vorgesehene Kategorie existiert nicht!",

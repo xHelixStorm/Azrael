@@ -169,34 +169,36 @@ public class GuildMessageEditListener extends ListenerAdapter {
 				}
 				
 				//check if the current user is being watched and that the cache log is enabled
-				var watchedMember = Azrael.SQLgetWatchlist(e.getMessage().getMember().getUser().getIdLong(), e.getGuild().getIdLong());
-				var sentMessage = Hashes.getMessagePool(e.getGuild().getIdLong(), e.getMessageIdLong());
-				//if the watched member level equals 2, then print all written messages from that user in a separate channel
-				if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
-					TextChannel textChannel = e.getGuild().getTextChannelById(watchedMember.getWatchChannel());
-					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
-						var cachedMessage = sentMessage.get(0);
-						textChannel.sendMessage(new EmbedBuilder()
-							.setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")")
-							.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE_WATCH)).setColor(Color.WHITE)
-							.setDescription("["+cachedMessage.getUserName()+"]: "+cachedMessage.getMessage()).build()).queue();
+				if(e.getMember() != null) {
+					var watchedMember = Azrael.SQLgetWatchlist(e.getMessage().getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+					var sentMessage = Hashes.getMessagePool(e.getGuild().getIdLong(), e.getMessageIdLong());
+					//if the watched member level equals 2, then print all written messages from that user in a separate channel
+					if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
+						TextChannel textChannel = e.getGuild().getTextChannelById(watchedMember.getWatchChannel());
+						if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
+							var cachedMessage = sentMessage.get(0);
+							textChannel.sendMessage(new EmbedBuilder()
+								.setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")")
+								.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_TITLE_WATCH)).setColor(Color.WHITE)
+								.setDescription("["+cachedMessage.getUserName()+"]: "+cachedMessage.getMessage()).build()).queue();
+						}
+						else {
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
+							logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to log messages of watched users on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+						}
 					}
-					else {
-						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to log messages of watched users on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
-					}
-				}
-				//print an error if the cache log is not enabled
-				else if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage == null) {
-					TextChannel textChannel = e.getGuild().getTextChannelById(watchedMember.getWatchChannel());
-					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
-						textChannel.sendMessage(new EmbedBuilder()
-								.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED)
-								.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_WATCH_ERR).replace("{}", e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator())).build()).queue();
-					}
-					else {
-						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to log messages of watched users on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+					//print an error if the cache log is not enabled
+					else if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage == null) {
+						TextChannel textChannel = e.getGuild().getTextChannelById(watchedMember.getWatchChannel());
+						if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
+							textChannel.sendMessage(new EmbedBuilder()
+									.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED)
+									.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.EDIT_WATCH_ERR).replace("{}", e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator())).build()).queue();
+						}
+						else {
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
+							logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to log messages of watched users on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+						}
 					}
 				}
 				

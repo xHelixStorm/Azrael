@@ -22,6 +22,7 @@ import de.azrael.commandsContainer.GoogleSpreadsheetsExecution;
 import de.azrael.commandsContainer.JoinExecution;
 import de.azrael.commandsContainer.PruneExecution;
 import de.azrael.commandsContainer.PurchaseExecution;
+import de.azrael.commandsContainer.RedditExecution;
 import de.azrael.commandsContainer.RegisterRole;
 import de.azrael.commandsContainer.RoomExecution;
 import de.azrael.commandsContainer.SetWarning;
@@ -721,6 +722,37 @@ public class GuildMessageListener extends ListenerAdapter {
 							//Abort prune
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_ABORT)).build()).queue();
 							Hashes.clearTempCache("prune_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+						}
+					}
+					
+					final var reddit = Hashes.getTempCache("reddit_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+					if(reddit != null && reddit.getExpiration() - System.currentTimeMillis() > 0) {
+						if(!e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
+							if(reddit.getAdditionalInfo().equals("register")) {
+								RedditExecution.register(e, reddit);
+							}
+							else if(reddit.getAdditionalInfo().equals("format")) {
+								RedditExecution.format(e, reddit);
+							}
+							else if(reddit.getAdditionalInfo().equals("format2")) {
+								RedditExecution.formatUpdate(e, reddit);
+							}
+							else if(reddit.getAdditionalInfo().equals("channel")) {
+								RedditExecution.channel(e, reddit);
+							}
+							else if(reddit.getAdditionalInfo().equals("channel2")) {
+								RedditExecution.channelUpdate(e, reddit);
+							}
+							else if(reddit.getAdditionalInfo().equals("remove")) {
+								RedditExecution.remove(e, reddit);
+							}
+							else if(reddit.getAdditionalInfo().equals("test")) {
+								RedditExecution.test(e, reddit);
+							}
+						}
+						else {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_EXIT)).build()).queue();
+							Hashes.clearTempCache("reddit_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 						}
 					}
 				});

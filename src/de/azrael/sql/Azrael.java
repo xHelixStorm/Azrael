@@ -2028,6 +2028,8 @@ public class Azrael {
 				stmt.setString(3, "{pubDate} | {title}\n{description}\n{link}");
 			else if(type == 2)
 				stmt.setString(3, "From: **{fullName} {username}**\n{description}");
+			else if(type == 3)
+				stmt.setString(3, "From: **{author}** {pubDate}\n<{url}>\n**{title}**\n{description}\n{media}");
 			stmt.setInt(4, type);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -2137,6 +2139,43 @@ public class Azrael {
 		} catch (SQLException e) {
 			logger.error("SQLgetSubscriptions Exception", e);
 			return feeds;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<RSS> SQLgetSubscriptionsRestricted(long guild_id) {
+		logger.trace("SQLgetSubscriptionsRestricted launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			ArrayList<RSS> feeds = new ArrayList<RSS>();
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptionsRestricted);
+			stmt.setLong(1, guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				feeds.add(
+					new RSS(
+						rs.getString(1),
+						rs.getString(2),
+						rs.getInt(3),
+						rs.getBoolean(4),
+						rs.getBoolean(5),
+						rs.getBoolean(6),
+						rs.getLong(7),
+						SQLgetSubTweets(guild_id, rs.getString(1))
+					)
+				);
+			}
+			Hashes.addFeeds(guild_id, feeds);
+			return feeds;
+		} catch (SQLException e) {
+			logger.error("SQLgetSubscriptionsRestricted Exception", e);
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

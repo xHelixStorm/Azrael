@@ -149,6 +149,17 @@ public class IniFileReader {
 		return twitter;
 	}
 	
+	public static String[] getRedditKeys() {
+		Ini ini = readConfig();
+		Ini.Section tokens = ini.get("Reddit");
+		String []reddit = new String[4];
+		reddit[0] = tokens.get("username");
+		reddit[1] = tokens.get("password");
+		reddit[2] = tokens.get("client_id");
+		reddit[3] = tokens.get("client_secret");
+		return reddit;
+	}
+	
 	public static boolean getDoubleExpEnabled() {
 		var doubleExperience = STATIC.getDoubleExperience();
 		if(doubleExperience.equals("true"))

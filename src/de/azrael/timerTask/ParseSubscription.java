@@ -15,6 +15,7 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
 import de.azrael.rss.BasicModel;
+import de.azrael.rss.RedditModel;
 import de.azrael.rss.TwitterModel;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
@@ -44,8 +45,10 @@ public class ParseSubscription extends TimerTask{
 				Guild guild = e.getGuildById(guild_id);
 				if(guild == null) {
 					logger.info("Subscription thread interrupted due to the bot leaving the guild in guild {}", guild_id);
-					timers.get(guild_id).cancel();
-					timers.remove(guild_id);
+					if(timers.containsKey(guild_id)) {
+						timers.get(guild_id).cancel();
+						timers.remove(guild_id);
+					}
 					this.cancel();
 					return;
 				}
@@ -74,6 +77,8 @@ public class ParseSubscription extends TimerTask{
 									success = BasicModel.ModelParse(STATIC.retrieveWebPageCode(rss.getURL()), guild, rss, channel_id, defaultChannel);
 								else if(rss.getType() == 2)
 									success = TwitterModel.ModelParse(guild, rss, channel_id, defaultChannel);
+								else if(rss.getType() == 3)
+									success = RedditModel.fetchRedditContent(null, guild, rss, channel_id, defaultChannel);
 								if(success)
 									Hashes.addSubscriptionStatus(guild.getId()+"_"+rss.getURL(), 0);
 								else
@@ -90,16 +95,20 @@ public class ParseSubscription extends TimerTask{
 				}
 				else {
 					logger.info("Subscription task interrupted for not having any subscription channel in guild {}", guild_id);
-					timers.get(guild_id).cancel();
-					timers.remove(guild_id);
+					if(timers.containsKey(guild_id)) {
+						timers.get(guild_id).cancel();
+						timers.remove(guild_id);
+					}
 					this.cancel();
 					return;
 				}
 			}
 			else {
 				logger.info("Subscription task interrupted for not having any subscriptions in guild {}", guild_id);
-				timers.get(guild_id).cancel();
-				timers.remove(guild_id);
+				if(timers.containsKey(guild_id)) {
+					timers.get(guild_id).cancel();
+					timers.remove(guild_id);
+				}
 				this.cancel();
 				return;
 			}

@@ -208,6 +208,7 @@
 	"level_up_role_err":			"No pudiste recibir el rol desbloqueado más reciente porque se requiere el siguiente permiso: ",
 	"rss_no_feed":					"¡No se pudo encontrar la fuente RSS!",
 	"twitter_no_tweet":				"¡No se encontró ningún Tweet!",
+	"reddit_no_content":			"¡No se ha encontrado ningún contenido relacionado con Reddit!",
 	"watching_lifted":				"La observación para el usuario **{}** se quitado porque ",
 	"watching_lifted_err":			"¡Ha ocurrido un error interno! ¡No se pudo quitar la observación del usuario **{}**!",
 	"category_not_exists":			"The provided category doesn't exist!",

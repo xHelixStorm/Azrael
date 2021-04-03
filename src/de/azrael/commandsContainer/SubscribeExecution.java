@@ -39,7 +39,7 @@ public class SubscribeExecution {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_RSS_ADDED)).build()).queue();
 				if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
 					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
-				Hashes.clearFeeds();
+				Hashes.removeFeeds(e.getGuild().getIdLong());
 				logger.info("User {} has registered the RSS url {} in guild {}", e.getMember().getUser().getId(), feed, e.getGuild().getId());
 			}
 			else if(result == 0) {
@@ -59,7 +59,7 @@ public class SubscribeExecution {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_HASH_ADDED)).build()).queue();
 				if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
 					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
-				Hashes.clearFeeds();
+				Hashes.removeFeeds(e.getGuild().getIdLong());
 				logger.info("User {} has registered the Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), feed, e.getGuild().getId());
 			}
 			else if(result == 0) {
@@ -80,7 +80,7 @@ public class SubscribeExecution {
 	
 	public static void removeFeed(GuildMessageReceivedEvent e, int feed) {
 		EmbedBuilder message = new EmbedBuilder();
-		ArrayList<RSS> rss = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong());
+		ArrayList<RSS> rss = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
 		if(rss.size() >= feed+1) {
 			String url = rss.get(feed).getURL();
 			Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
@@ -102,7 +102,7 @@ public class SubscribeExecution {
 	}
 	
 	public static void currentFormat(GuildMessageReceivedEvent e, int feed, String key) {
-		ArrayList<RSS> rss = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong());
+		ArrayList<RSS> rss = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
 		if(rss.size() >= feed+1) {
 			Hashes.addTempCache(key, new Cache(180000, "updateformat"+feed));
 			if(rss.get(feed).getType() == 1)
@@ -118,7 +118,7 @@ public class SubscribeExecution {
 	
 	public static void updateFormat(GuildMessageReceivedEvent e, int feed, String format) {
 		EmbedBuilder message = new EmbedBuilder();
-		ArrayList<RSS> rss = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong());
+		ArrayList<RSS> rss = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
 		if(Azrael.SQLUpdateRSSFormat(rss.get(feed).getURL(), e.getGuild().getIdLong(), EmojiParser.parseToAliases(format)) > 0) {
 			Hashes.removeFeeds(e.getGuild().getIdLong());
 			e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_FORMAT_UPDATED)).build()).queue();
@@ -281,7 +281,7 @@ public class SubscribeExecution {
 	
 	public static void setChannel(GuildMessageReceivedEvent e, int feed, String key) {
 		EmbedBuilder message = new EmbedBuilder();
-		ArrayList<RSS> subscriptions = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong());
+		ArrayList<RSS> subscriptions = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
 		if(subscriptions.size() >= feed+1) {
 			final var subscription = subscriptions.get(feed);
 			Hashes.addTempCache(key, new Cache(180000, "set-channel", ""+feed));
@@ -295,7 +295,7 @@ public class SubscribeExecution {
 		if(channel_id.replaceAll("[0-9]*", "").length() == 0) {
 			TextChannel textChannel = e.getGuild().getTextChannelById(e.getMessage().getContentRaw().replaceAll("[<>#]*", ""));
 			if(textChannel != null) {
-				ArrayList<RSS> subscriptions = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong());
+				ArrayList<RSS> subscriptions = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
 				RSS subscription = subscriptions.get(feed);
 				final var result = Azrael.SQLUpdateRSSChannel(subscription.getURL(), e.getGuild().getIdLong(), textChannel.getIdLong());
 				if(result > 0) {
@@ -323,7 +323,7 @@ public class SubscribeExecution {
 	}
 	
 	public static void runTest(GuildMessageReceivedEvent e, int feed) {
-		ArrayList<RSS> rss = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong());
+		ArrayList<RSS> rss = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
 		if(rss.size() >= feed+1) {
 			Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 			final var foundRSS = rss.get(feed);

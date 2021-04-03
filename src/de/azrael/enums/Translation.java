@@ -210,6 +210,7 @@ public enum Translation {
 	LEVEL_UP_ROLE_ERR			("level_up_role_err"),
 	RSS_NO_FEED					("rss_no_feed"),
 	TWITTER_NO_TWEET			("twitter_no_tweet"),
+	REDDIT_NO_CONTENT			("reddit_no_content"),
 	WATCHING_LIFTED				("watching_lifted"),
 	WATCHING_LIFTED_ERR			("watching_lifted_err"),
 	CATEGORY_NOT_EXISTS			("category_not_exists"),
@@ -1392,7 +1393,26 @@ public enum Translation {
 	WARN_ERR					("warn_err"),
 	WARN_ERR_2					("warn_err_2"),
 	WARN_ERR_3					("warn_err_3"),
-	WARN_ERR_4					("warn_err_4");
+	WARN_ERR_4					("warn_err_4"),
+	
+	REDDIT_HELP					("reddit_help"),
+	REDDIT_REGISTER_HELP		("reddit_register_help"),
+	REDDIT_REGISTER_INVALID_USER("reddit_register_invalid_user"),
+	REDDIT_REGISTER_STEP_1		("reddit_register_step_1"),
+	REDDIT_REGISTER_STEP_2		("reddit_register_step_2"),
+	REDDIT_REGISTER_ERR			("reddit_register_err"),
+	REDDIT_FORMAT_STEP_1		("reddit_format_step_1"),
+	REDDIT_FORMAT_STEP_2		("reddit_format_step_2"),
+	REDDIT_FORMAT_UPDATED		("reddit_format_updated"),
+	REDDIT_CHANNEL_STEP_1		("reddit_channel_step_1"),
+	REDDIT_CHANNEL_STEP_2		("reddit_channel_step_2"),
+	REDDIT_CHANNEL_ADDED		("reddit_channel_added"),
+	REDDIT_REMOVE				("reddit_remove"),
+	REDDIT_REMOVE_ERR			("reddit_remove_err"),
+	REDDIT_REMOVE_ERR_2			("reddit_remove_err_2"),
+	REDDIT_REMOVE_DONE			("reddit_remove_done"),
+	REDDIT_TEST					("reddit_test"),
+	REDDIT_EXIT					("reddit_exit");
 	
 	private String value;
 	
