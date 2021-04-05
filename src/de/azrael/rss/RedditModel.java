@@ -39,7 +39,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class RedditModel {
 	private static final Logger logger = LoggerFactory.getLogger(RedditModel.class);
 	private static final String TOKEN_REQUEST = "https://www.reddit.com/api/v1/access_token?grant_type=password&username={}&password={}";
-	private static final String OAUTH_REQUEST = "https://oauth.reddit.com/user/";
+	private static final String OAUTH_REQUEST = "https://oauth.reddit.com/";
 	
 	private static String accessToken = null;
 	private static long tokenValidity = 0;

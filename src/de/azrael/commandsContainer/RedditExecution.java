@@ -28,11 +28,11 @@ public class RedditExecution {
 	public static void register(GuildMessageReceivedEvent e, Cache cache) {
 		RedditMethod method = RedditMethod.valueOfType(e.getMessage().getContentRaw());
 		if(method != null) {
-			final String username = cache.getAdditionalInfo2()+"/"+method.type;
-			final int result = Azrael.SQLInsertRSS(username, e.getGuild().getIdLong(), 3);
+			final String name = method.url.replace("{}", cache.getAdditionalInfo2());
+			final int result = Azrael.SQLInsertRSS(name, e.getGuild().getIdLong(), 3);
 			if(result > 0) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_REGISTER_STEP_2).replace("{}", username)).build()).queue();
-				logger.info("User {} has subscribed to the reddit username and method {} in guild {}", e.getMember().getUser().getId(), username, e.getGuild().getId());
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_REGISTER_STEP_2).replace("{}", name)).build()).queue();
+				logger.info("User {} has subscribed to the reddit username or subreddit {} in guild {}", e.getMember().getUser().getId(), name, e.getGuild().getId());
 				if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
 					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
 				Hashes.removeFeeds(e.getGuild().getIdLong());
@@ -42,7 +42,7 @@ public class RedditExecution {
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Reddit fetcher {} couldn't be registered in guild {}", username, e.getGuild().getId());
+				logger.error("Reddit fetcher {} couldn't be registered in guild {}", name, e.getGuild().getId());
 			}
 			Hashes.clearTempCache("reddit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}

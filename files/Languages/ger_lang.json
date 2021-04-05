@@ -1392,5 +1392,24 @@
 	"warn_err":						"Benutzer {} hat seine privaten Nachrichten gesperrt und konnte Ihre Warnung nicht erhalten!",
 	"warn_err_2":					"Sie können keine Warnung an einen Benutzer senden, der höhere Berechtigungen hat als der Bot! Aktion verweigert!",
 	"warn_err_3":					"Sie können sich nicht selbst warnen! Aktion verweigert!",
-	"warn_err_4":					"Bitte erwähnen Sie einen Benutzer oder schreiben Sie eine Benutzer-ID für den ersten Parameter! Aktion abgebrochen!"
+	"warn_err_4":					"Bitte erwähnen Sie einen Benutzer oder schreiben Sie eine Benutzer-ID für den ersten Parameter! Aktion abgebrochen!",
+	
+	"reddit_help":					"Der Reddit-Befehl gibt dem Benutzer die freie Kontrolle über den zu holenden Inhalt. Schreiben Sie jederzeit *verlassen*, um die Einrichtung zu unterbrechen. Diese Parameter sind verfügbar:\n\n- **registrieren**:\nRegistrieren Sie einen Benutzernamen oder den Namen des Subreddits, dem Sie folgen möchten, und entscheiden Sie dann, welche Inhalte abgerufen werden sollen!\n- **formatieren**:\nDefinieren Sie die Anzeigeoptionen des geholten Reddit-Inhalts!\n- **kanal**:\nVerwenden Sie einen bestimmten Kanal neben dem Standardkanal!\n- **entfernen**:\nEntfernen Sie ein registriertes Abonnement!\n- **testen**:\nTesten Sie ein registriertes Abonnement!",
+	"reddit_register_help":			"Geben Sie einen Benutzernamen oder einen Subreddit von Reddit zusammen mit dem Befehl ein, dann werden Sie aufgefordert, den zu holenden Inhalt auszuwählen!",
+	"reddit_register_invalid_user":	"Ungültiger Reddit-Benutzername oder Subreddit gefunden! Bitte versuchen Sie es erneut!",
+	"reddit_register_step_1":		"Schreiben Sie nun bitte eine der folgenden Abrufmethoden:\n\n",
+	"reddit_register_step_2":		"**{}** wurde erfolgreich registriert!",
+	"reddit_register_err":			"Dieses Abonnement wurde bereits registriert! Aktion abgebrochen!",
+	"reddit_format_step_1":			"Wählen Sie eines der registrierten Reddit-Abonnements aus, um die Ausgabemeldungen zu formatieren!\n\n",
+	"reddit_format_step_2":			"Dies ist das aktuelle Format für dieses Reddit-Abonnement. Geben Sie Ihr gewünschtes Format ein oder geben Sie *verlassen* ein, um abzubrechen. Schlüsselwerte sind `{pubDate}`, `{author}`, `{title}`, `{description}`, `{subreddit}`, `{url}`, `{media}`\n```",
+	"reddit_format_updated":		"Reddit-Anzeigeformat für **{}** wurde aktualisiert",
+	"reddit_channel_step_1":		"Wählen Sie eines der registrierten Reddit-Abonnements, um den abgerufenen Inhalt in einen ausgewählten Textkanal umzuleiten!\n\n",
+	"reddit_channel_step_2":		"Bitte geben Sie nun eine Textkanal-Erwähnung oder eine Textkanal-ID an, um die Ausgabe dieses Abonnements auf den ausgewählten Textkanal umzuleiten! Aktuell ausgewählter Kanal: ",
+	"reddit_channel_added":			"Dieses Reddit-Abonnement wird jetzt auf den Textkanal {} umgeleitet!",
+	"reddit_remove":				"Diese Reddit-Abonnements sind derzeit registriert. Bitte wählen Sie eines aus, um es zu entfernen!\n\n",
+	"reddit_remove_err":			"Es wurde noch nichts registriert!",
+	"reddit_remove_err_2":			"Auswahl muss zwischen 1 und {} liegen!",
+	"reddit_remove_done":			"Reddit-Abonnement {} wurde entfernt!",
+	"reddit_test":					"Diese Reddit-Abonnements sind derzeit registriert. Bitte wählen Sie eines davon zum Testen aus!\n\n",
+	"reddit_exit":					"Reddit-Befehl abgebrochen!"
 }
