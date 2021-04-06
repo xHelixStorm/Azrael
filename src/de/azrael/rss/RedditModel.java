@@ -129,7 +129,7 @@ public class RedditModel {
 						if(outMessage.length() > 0) {
 							MessageHistory history = new MessageHistory(textChannel);
 							history.retrievePast(100).queue(historyList -> {
-								if(historyList.parallelStream().filter(f -> f.getContentRaw().equals(outMessage)).findAny().orElse(null) == null)
+								if(historyList.parallelStream().filter(f -> f.getContentRaw().replaceAll("[^a-zA-Z]", "").equals(outMessage.replaceAll("[^a-zA-Z]", ""))).findAny().orElse(null) == null)
 									textChannel.sendMessage(outMessage).queue();
 							});
 						}
@@ -217,7 +217,7 @@ public class RedditModel {
 							text = text.replace(subString, foundUrl);
 					}
 				}
-				text = text.trim();
+				text = text.trim().replaceAll("&amp;", "").replaceAll("&lt;", "").replaceAll("&gt;", "");
 				description = (text.length() > 1800 ? text.substring(0, 1800)+"...": text);
 			}
 			if(data.has("created_utc") && !data.isNull("created_utc")) {
@@ -272,13 +272,13 @@ public class RedditModel {
 							text = text.replace(subString, foundUrl);
 					}
 				}
-				text = text.trim();
+				text = text.trim().replaceAll("&amp;", "").replaceAll("&lt;", "").replaceAll("&gt;", "");
 				description = (text.length() > 1800 ? text.substring(0, 1800)+"...": text)+"\n";
 				String urlTag = data.getString("url");
 				if(!urlTag.contains("www.reddit.com"))
 					description += urlTag;
 			}
-			else if(data.has("url") && !data.isNull("url") && data.has("media") && data.isNull("media")) {
+			else if(data.has("url") && !data.isNull("url")) {
 				final String urlTag = data.getString("url");
 				if(!urlTag.contains("reddit.com"))
 					description = urlTag;

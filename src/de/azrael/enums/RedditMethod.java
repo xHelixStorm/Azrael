@@ -18,7 +18,7 @@ public enum RedditMethod {
 	USER_HIDDEN			("user_hidden", "user/{}/hidden"),
 	USER_SAVED			("user_saved", "user/{}/saved"),
 	USER_GILDED			("user_gilded", "user/{}/gilded"),
-	SUBREDDIT_CONTENT	("subreddit_contentt", "r/{}");
+	SUBREDDIT_CONTENT	("subreddit_content", "r/{}");
 	
 	/**
 	 * Map defined to retrieve enum by type
