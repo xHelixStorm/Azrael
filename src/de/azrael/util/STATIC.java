@@ -83,11 +83,12 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.40.574";
+	private static final String VERSION = "7.40.575";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
 	private static final JSONObject spa_lang = new JSONObject(FileSetting.readFile("./files/Languages/spa_lang.json"));
+	private static final JSONObject rus_lang = new JSONObject(FileSetting.readFile("./files/Languages/rus_lang.json"));
 	
 	private static OffsetDateTime bootTime = null;
 	
@@ -130,6 +131,12 @@ public class STATIC {
 			case "spa" -> {
 				if(spa_lang.has(event.section()))
 					yield (String)spa_lang.getString(event.section());
+				else
+					yield "Message "+event.section()+" not found!";
+			}
+			case "rus" -> {
+				if(rus_lang.has(event.section()))
+					yield (String)rus_lang.getString(event.section());
 				else
 					yield "Message "+event.section()+" not found!";
 			}
