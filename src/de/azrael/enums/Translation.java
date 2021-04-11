@@ -1294,9 +1294,11 @@ public enum Translation {
 	WEB_WRONG_CHANNEL			("web_wrong_channel"),
 	WEB_REDIRECT				("web_redirect"),
 	WEB_REDIRECT_ERR			("web_redirect_err"),
+	WEB_LOGIN					("web_login"),
 	WEB_CREATE					("web_create"),
 	WEB_NOT_ALLOWED				("web_not_allowed"),
 	WEB_CODE					("web_code"),
+	WEB_RECOVERY				("web_recovery"),
 	WEB_CONFIRM					("web_confirm"),
 	
 	ACCEPT_NO_WAIT				("accept_no_wait"),

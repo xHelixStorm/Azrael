@@ -41,6 +41,9 @@ public class HandlerPOST {
 				case "confirm" -> {
 					confirm(e, out, json);
 				}
+				case "webRecovery" -> {
+					webRecovery(e, out, json);
+				}
 			}
 		}
 	}
@@ -60,7 +63,7 @@ public class HandlerPOST {
 			return false;
 		}
 		final String type = (String)json.get("type");
-		if(!type.equals("shutdown") && !type.equals("google") && !type.equals("webLogin") && !type.equals("confirm")) {
+		if(!type.equals("shutdown") && !type.equals("google") && !type.equals("webLogin") && !type.equals("confirm") && !type.equals("webRecovery")) {
 			WebserviceUtils.return502(out, "Invalid Type.", false);
 			return false;
 		}
@@ -144,6 +147,34 @@ public class HandlerPOST {
 				final JSONObject body = (JSONObject) json.get("body");
 				if(!body.has("confirmToken")) {
 					WebserviceUtils.return502(out, "Confirmation token required inside body.", false);
+					return false;
+				}
+			}
+			if(!json.has("ip")) {
+				WebserviceUtils.return502(out, "Source address not found.", false);
+				return false;
+			}
+			else {
+				final String ip = json.getString("ip");
+				if(!ip.matches("([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}|::1)")) {
+					WebserviceUtils.return502(out, "Source address invalid.", false);
+					return false;
+				}
+			}
+		}
+		if(type.equals("webRecovery")) {
+			if(!json.has("user_id")) {
+				WebserviceUtils.return502(out, "User ID required to request an account recovery.", false);
+				return false;
+			}
+			else {
+				final String user_id = (String) json.get("user_id");
+				if(user_id.replaceAll("[0-9]*", "").length() != 0) {
+					WebserviceUtils.return502(out, "User id is not numeric.", false);
+					return false;
+				}
+				else if(user_id.length() != 17 && user_id.length() != 18) {
+					WebserviceUtils.return502(out, "The user id needs to be either 17 or 18 digits long.", false);
 					return false;
 				}
 			}
@@ -303,6 +334,41 @@ public class HandlerPOST {
 		else {
 			WebserviceUtils.return404(out, "User not found!", true);
 			AzraelWeb.SQLInsertActionLog(user_id, address, "ACCOUNT_CONFIRMATION_ATTEMPT", "User not found.");
+		}
+	}
+	
+	private static void webRecovery(ReadyEvent e, PrintWriter out, JSONObject json) {
+		final long user_id = json.getLong("user_id");
+		final String address = json.getString("ip");
+		Guild guild = e.getJDA().getGuilds().parallelStream().filter(g -> g.getMemberById(user_id) != null).findAny().orElse(null);
+		if(guild != null) {
+			Member member = guild.getMemberById(user_id);
+			if(member != null) {
+				final String key = RandomStringUtils.random(6, true, true).toUpperCase();
+				final String displayCode = key.substring(0, 2)+"-"+key.substring(2, 4)+"-"+key.substring(4);
+				final var channel = member.getUser().openPrivateChannel().complete();
+				try {
+					channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_RECOVERY).replace("{}", displayCode)).build()).queue();
+					if(AzraelWeb.SQLInsertLoginInfo(user_id, 3, key) > 0) {
+						WebserviceUtils.return200(out, "Recovery key sent!", true);
+						AzraelWeb.SQLInsertActionLog(user_id, address, "RECOVERY_CODE_GENERATED", key);
+					}
+					else {
+						WebserviceUtils.return500(out, "An unnexpected error occurred! Please try again later!", true);
+					}
+				} catch(Exception exc) {
+					WebserviceUtils.return500(out, "Direct messages are locked for this user!", true);
+					AzraelWeb.SQLInsertActionLog(user_id, address, "RECOVERY_CODE_GENERATION_ATTEMPT", "Destination user has locked direct messages.");
+				}
+			}
+			else {
+				WebserviceUtils.return404(out, "User not found!", true);
+				AzraelWeb.SQLInsertActionLog(user_id, address, "RECOVERY_CODE_GENERATION_ATTEMPT", "User not found.");
+			}
+		}
+		else {
+			WebserviceUtils.return404(out, "User not found!", true);
+			AzraelWeb.SQLInsertActionLog(user_id, address, "RECOVERY_CODE_GENERATION_ATTEMPT", "User not found.");
 		}
 	}
 }

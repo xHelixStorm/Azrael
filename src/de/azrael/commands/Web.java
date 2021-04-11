@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 public class Web implements CommandPublic, CommandPrivate {
 	private final static Logger logger = LoggerFactory.getLogger(Web.class);
 	private final static String LOGIN_ENDPOINT = "/account/login.php?user_id=";
+	private final static String LOGIN_ENDPOINT2 = "/account/login.php";
 	private final static String CREATE_ENDPOINT = "/account/create.php?user_id=";
 	
 	@Override
@@ -46,14 +47,15 @@ public class Web implements CommandPublic, CommandPrivate {
 		final String URL = IniFileReader.getWebURL();
 		if(URL != null && URL.length() > 0) {
 			//Retrieve auth type
-			final int auth_type = AzraelWeb.SQLgetLoginType(e.getAuthor().getIdLong());
+			final int auth_type = AzraelWeb.SQLgetLoginType(e.getAuthor().getIdLong(), e.getJDA().getSelfUser().getIdLong());
 			if(auth_type > 0) {
+				final boolean defaultBot = AzraelWeb.SQLisDefaultBot(e.getJDA().getSelfUser().getIdLong());
 				if(auth_type == 4 || auth_type == 5) {
 					final String key = RandomStringUtils.random(15, true, true);
 					//Insert or update login table and redirect user to the website
 					final int result = AzraelWeb.SQLInsertLoginInfo(e.getAuthor().getIdLong(), 1, key);
 					if(result > 0) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.WEB_REDIRECT)+URL+LOGIN_ENDPOINT+e.getAuthor().getId()+"&key="+key).build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.WEB_REDIRECT)+URL+LOGIN_ENDPOINT+e.getAuthor().getId()+"&key="+key+(!defaultBot ? "&bot="+e.getJDA().getSelfUser().getId() : "")).build()).queue();
 					}
 					else if(result == 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();
@@ -61,11 +63,15 @@ public class Web implements CommandPublic, CommandPrivate {
 					}
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.WEB_NOT_ALLOWED)+URL).build()).queue();
+					if(defaultBot)
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.WEB_NOT_ALLOWED)+URL).build()).queue();
+					else
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.WEB_LOGIN)+URL+LOGIN_ENDPOINT2+"?bot="+e.getJDA().getSelfUser().getId()).build()).queue();
 				}
 			}
 			else if(auth_type == 0) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.WEB_CREATE)+URL+CREATE_ENDPOINT+e.getAuthor().getId()).build()).queue();
+				final boolean defaultBot = AzraelWeb.SQLisDefaultBot(e.getJDA().getSelfUser().getIdLong());
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.WEB_CREATE)+URL+CREATE_ENDPOINT+e.getAuthor().getId()+(!defaultBot ? "&bot="+e.getJDA().getSelfUser().getId() : "")).build()).queue();
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.GENERAL_ERROR)).build()).queue();

@@ -1292,9 +1292,11 @@
 	"web_wrong_channel":			"Please write *!web* in a direct message to {}!",
 	"web_redirect":					"Please follow this link to complete the authentication process and access the website within 5 minutes!\n",
 	"web_redirect_err":				"Setup incomplete! Please contact an administrator!",
+	"web_login":					"Use this url to login:\n",
 	"web_create":					"Follow this link to complete your registration and to be able to access the website for the Bot!\n",
 	"web_not_allowed":				"You have disabled the direct login method for the website. Please login directly on the website through this link and change the login settings to use this login method!\n",
 	"web_code":						"Use this key to login into the website. The key is valid for 5 minutes. If you didn't request the code, please contact an administrator!\n**{}**",
+	"web_recovery":					"Use this key to recover your web account. The key is valid for 5 minutes. If you didn't request the code, please contact an administrator!\n**{}**",
 	"web_confirm":					"Here the requested confirmation URL for Azrael Web!\n",
 	
 	"accept_no_wait":				"A verification category and a verified role needs to be registered to use this command!",
