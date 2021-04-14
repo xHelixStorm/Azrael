@@ -9,6 +9,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.api.services.sheets.v4.model.ValueRange;
+import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
 import de.azrael.core.UserPrivs;
@@ -21,7 +23,7 @@ import de.azrael.google.GoogleSheets;
 import de.azrael.google.GoogleUtils;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
-import de.azrael.threads.DelayedVoteUpdate;
+import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -41,6 +43,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageReactionRemoveListener.class);
+	
+	private final static String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
+	private final static String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
+	private final static String shrug = EmojiManager.getForAlias(":shrug:").getUnicode();
 	
 	@Override
 	public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent e) {
@@ -169,7 +175,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 		if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
 			//check if it's a vote channel
 			final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
-			final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.VOT.getType())).findAny().orElse(null);
+			final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.VOT.getType()) || f.getChannel_Type().equals(Channel.VO2.getType()))).findAny().orElse(null);
 			if(thisChannel != null) {
 				final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
 				if(sheet != null && !sheet[0].equals("empty")) {
@@ -177,7 +183,12 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 					final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
 					if((sheet[2] == null || sheet[2].length() == 0) || sheet[2].equals(e.getChannel().getId())) {
 						try {
-							final var response = GoogleSheets.readWholeSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, row_start);
+							ValueRange response = DelayedGoogleUpdate.getCachedValueRange("VOTE"+e.getGuild().getId()+e.getChannel().getId());
+							if(response == null) {
+								final var service = GoogleSheets.getSheetsClientService();
+								response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
+								DelayedGoogleUpdate.cacheRetrievedSheetValueRange("VOTE"+e.getGuild().getId()+e.getChannel().getId(), response);
+							}
 							int currentRow = 0;
 							for(var row : response.getValues()) {
 								currentRow++;
@@ -194,28 +205,48 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 										//find out where the up_vote and down_vote columns are and mark them
 										int columnUpVote = 0;
 										int columnDownVote = 0;
+										int columnShrugVote = 0;
 										for(final var column : columns) {
 											if(column.getItem() == GoogleDD.UP_VOTE)
 												columnUpVote = column.getColumn();
 											else if(column.getItem() == GoogleDD.DOWN_VOTE)
 												columnDownVote = column.getColumn();
+											else if(column.getItem() == GoogleDD.SHRUG_VOTE)
+												columnShrugVote = column.getColumn();
 										}
-										if(columnUpVote != 0 || columnDownVote != 0) {
+										if(columnUpVote != 0 || columnDownVote != 0 || columnShrugVote != 0) {
 											//build update array
 											ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+											int thumbsUpCount = 0;
+											int thumbsDownCount = 0;
+											int shrugCount = 0;
+											for(final var reaction : e.getChannel().retrieveMessageById(e.getMessageId()).complete().getReactions()) {
+												if(columnUpVote > 0 && reaction.getReactionEmote().getName().equals(thumbsup))
+													thumbsUpCount = reaction.getCount()-1;
+												if(columnDownVote > 0 && reaction.getReactionEmote().getName().equals(thumbsdown))
+													thumbsDownCount = reaction.getCount()-1;
+												if(columnShrugVote > 0 && reaction.getReactionEmote().getName().equals(shrug))
+													shrugCount = reaction.getCount()-1;
+											}
 											int columnCount = 0;
 											for(final var column : row) {
 												columnCount ++;
 												if(columnCount == columnUpVote)
-													values.add(Arrays.asList("<upVote>"));
+													values.add(Arrays.asList(""+thumbsUpCount));
 												else if(columnCount == columnDownVote)
-													values.add(Arrays.asList("<downVote>"));
+													values.add(Arrays.asList(""+thumbsDownCount));
+												else if(columnCount == columnShrugVote)
+													values.add(Arrays.asList(""+shrugCount));
 												else
 													values.add(Arrays.asList(column));
 											}
+											ValueRange valueRange = new ValueRange().setRange(row_start+"!A"+currentRow).setMajorDimension("COLUMNS").setValues(values);
 											//execute Runnable
-											if(!STATIC.threadExists("vote"+e.getMessageId())) {
-												new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote)).start();
+											if(!STATIC.threadExists("VOTE"+e.getGuild().getId()+e.getChannel().getId())) {
+												new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), file_id, e.getChannel().getId(), "update", GoogleEvent.VOTE)).start();
+											}
+											else {
+												DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "update");
 											}
 										}
 									}

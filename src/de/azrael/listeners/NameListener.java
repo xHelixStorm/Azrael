@@ -13,7 +13,7 @@ import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
-import de.azrael.google.GoogleUtils;
+import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -76,7 +76,7 @@ public class NameListener extends ListenerAdapter {
 								Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild.getIdLong(), nickname);
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
-									GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.RENAME.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_STAFF_IMPERSONATION), null, null, "RENAMED", null, null, null, oldname, newname, 0, null, null, 0, 0, GoogleEvent.RENAME.id);
+									GoogleSheets.spreadsheetRenameRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.RENAME.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_STAFF_IMPERSONATION), oldname, newname);
 								}
 							}
 							else {
@@ -107,7 +107,7 @@ public class NameListener extends ListenerAdapter {
 										Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild.getIdLong(), nickname);
 										//Run google service, if enabled
 										if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
-											GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.RENAME.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), null, guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_REASON), null, null, "RENAMED", null, null, null, oldname, newname, 0, null, null, 0, 0, GoogleEvent.RENAME.id);
+											GoogleSheets.spreadsheetRenameRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.RENAME.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_REASON), oldname, newname);
 										}
 									}
 									else {
@@ -134,7 +134,7 @@ public class NameListener extends ListenerAdapter {
 										Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild.getIdLong(), "kick", STATIC.getTranslation2(guild, Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), 0, "");
 										//Run google service, if enabled
 										if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
-											GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.KICK.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), member.getEffectiveName(), guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), null, null, "KICK", null, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.KICK.id);
+											GoogleSheets.spreadsheetKickRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.KICK.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), member.getEffectiveName(), guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()));
 										}
 									}
 									else {

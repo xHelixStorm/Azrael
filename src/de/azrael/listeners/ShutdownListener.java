@@ -5,10 +5,13 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -23,6 +26,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class ShutdownListener extends ListenerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(ShutdownListener.class);
+	
+	private static int shutdownCountdown = 0;
+	private static TextChannel shutdownChannel = null;
+	private static JDA shutdownJda = null;
 	
 	@Override
 	public void onShutdown(ShutdownEvent e) {
@@ -83,5 +90,30 @@ public class ShutdownListener extends ListenerAdapter {
 			params.append(" temp:"+STATIC.getTemp());
 		
 		return params.toString();
+	}
+	
+	public static synchronized void incrementShutdownCountDown() {
+		shutdownCountdown++;
+	}
+	
+	public static void setShutdownChannel(TextChannel channel) {
+		shutdownChannel = channel;
+	}
+	
+	public static void setShutdownJDA(JDA jda) {
+		shutdownJda = jda;
+	}
+	
+	public static synchronized void decreaseShutdownCountdown() {
+		shutdownCountdown--;
+		if(shutdownCountdown == 0) {
+			if(shutdownChannel != null) {
+				shutdownChannel.sendMessage(STATIC.getTranslation2(shutdownChannel.getGuild(), Translation.SHUTDOWN)).queue();
+				shutdownChannel.getJDA().shutdownNow();
+			}
+			else if(shutdownJda != null) {
+				shutdownJda.shutdownNow();
+			}
+		}
 	}
 }

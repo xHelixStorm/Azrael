@@ -1991,32 +1991,28 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetFilterLanguages(String lang) {
-		final var languages = Hashes.getFilterLang(0);
-		if(languages == null) {
-			logger.trace("SQLgetFilterLanguages launched. No params passed");
-			ArrayList<String> filter_lang = new ArrayList<String>();
-			Connection myConn = null;
-			PreparedStatement stmt = null;
-			ResultSet rs = null;
-			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilterLanguages);
-				stmt.setString(1, lang);
-				rs = stmt.executeQuery();
-				while(rs.next()) {
-					filter_lang.add(rs.getString(1));
-				}
-				Hashes.addFilterLang(0, filter_lang);
-				return filter_lang;
-			} catch (SQLException e) {
-				logger.error("SQLgetFilterLanguages Exception", e);
-			} finally {
-				try { rs.close(); } catch (Exception e) { /* ignored */ }
-			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		logger.trace("SQLgetFilterLanguages launched. No params passed");
+		ArrayList<String> filter_lang = new ArrayList<String>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilterLanguages);
+			stmt.setString(1, lang);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				filter_lang.add(rs.getString(1));
 			}
+			return filter_lang;
+		} catch (SQLException e) {
+			logger.error("SQLgetFilterLanguages Exception", e);
+			return filter_lang;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
-		return languages;
 	}
 	
 	public static int SQLInsertRSS(String url, long guild_id, int type) {
@@ -2032,6 +2028,8 @@ public class Azrael {
 				stmt.setString(3, "{pubDate} | {title}\n{description}\n{link}");
 			else if(type == 2)
 				stmt.setString(3, "From: **{fullName} {username}**\n{description}");
+			else if(type == 3)
+				stmt.setString(3, "From: **{author}** {pubDate}\n<{url}>\n**{title}**\n{description}\n{media}");
 			stmt.setInt(4, type);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -2141,6 +2139,43 @@ public class Azrael {
 		} catch (SQLException e) {
 			logger.error("SQLgetSubscriptions Exception", e);
 			return feeds;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<RSS> SQLgetSubscriptionsRestricted(long guild_id) {
+		logger.trace("SQLgetSubscriptionsRestricted launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			ArrayList<RSS> feeds = new ArrayList<RSS>();
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptionsRestricted);
+			stmt.setLong(1, guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				feeds.add(
+					new RSS(
+						rs.getString(1),
+						rs.getString(2),
+						rs.getInt(3),
+						rs.getBoolean(4),
+						rs.getBoolean(5),
+						rs.getBoolean(6),
+						rs.getLong(7),
+						SQLgetSubTweets(guild_id, rs.getString(1))
+					)
+				);
+			}
+			Hashes.addFeeds(guild_id, feeds);
+			return feeds;
+		} catch (SQLException e) {
+			logger.error("SQLgetSubscriptionsRestricted Exception", e);
+			return null;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -3859,6 +3894,125 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch(SQLException e) {
 			logger.error("SQLDeleteScheduledMessageTask Exception", e);
+			return 0;
+		} finally {
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLisGiveawayAvailable(long guild_id) {
+		logger.trace("SQLisGiveawayAvailable launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLisGiveawayAvailable);
+			stmt.setLong(1, guild_id);
+			stmt.setBoolean(2, false);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return true;
+			}
+			return false;
+		} catch(SQLException e) {
+			logger.error("SQLisGiveawayAvailable Exception", e);
+			return false;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLInsertGiveawayRewards(long guild_id, String [] rewards) {
+		logger.trace("SQLInsertGiveawayRewards launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertGiveawayRewards);
+			for(final String reward : rewards) {
+				stmt.setLong(1, guild_id);
+				stmt.setString(2, reward);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			return true;
+		} catch(SQLException e) {
+			logger.error("SQLInsertGiveawayRewards Exception", e);
+			return false;
+		} finally {
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLisGiveawayRewardAlreadySent(long guild_id, long user_id) {
+		logger.trace("SQLisGiveawayRewardAlreadySent launched. Params passed {}, {}", guild_id, user_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLisGiveawayRewardAlreadySent);
+			stmt.setLong(1, guild_id);
+			stmt.setLong(2, user_id);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return true;
+			}
+			return false;
+		} catch(SQLException e) {
+			logger.error("SQLisGiveawayAvailable Exception", e);
+			return false;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static String SQLgetSingleGiveawayReward(long guild_id) {
+		logger.trace("SQLgetSingleGiveawayReward launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSingleGiveawayReward);
+			stmt.setLong(1, guild_id);
+			stmt.setBoolean(2, false);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return rs.getString(1);
+			}
+			return "";
+		} catch(SQLException e) {
+			logger.error("SQLgetSingleGiveawayReward Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLMarkGiveawayAsUsed(long guild_id, long user_id, String reward) {
+		logger.trace("SQLMarkGiveawayAsUsed launched. Params passed {}, {}, {}", guild_id, user_id, reward);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLMarkGiveawayAsUsed);
+			stmt.setLong(1, user_id);
+			stmt.setBoolean(2, true);
+			stmt.setLong(3, guild_id);
+			stmt.setString(4, reward);
+			return stmt.executeUpdate();
+		} catch(SQLException e) {
+			logger.error("SQLMarkGiveawayAsUsed Exception", e);
 			return 0;
 		} finally {
 			try { stmt.close(); } catch (Exception e) { /* ignored */ }

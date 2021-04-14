@@ -16,6 +16,7 @@ import de.azrael.core.UserPrivs;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
+import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -101,7 +102,7 @@ public class RegisterRole {
 		long role_id;
 		
 		if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getRegisterRoleLevel(e.getGuild().getIdLong())) || adminPermission) {
-			Pattern pattern = Pattern.compile("(adm|mod|com|mut|rea|boo|ver)");
+			Pattern pattern = Pattern.compile("(adm|mod|com|mut|rea|boo|ver|key)");
 			Matcher matcher = pattern.matcher(_args[1].toLowerCase());
 			if(_args.length > 2 && matcher.find()) {
 				category_abv = matcher.group();
@@ -123,6 +124,11 @@ public class RegisterRole {
 						else if(category_abv.equals("ver")) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_NOTICE)).addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_YES), "", true).addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_NO), "", true).build()).queue();
 							Hashes.addTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "ver"));
+						}
+						else if(category_abv.equals("key")) {
+							if(!Azrael.SQLisGiveawayAvailable(_guild_id)) {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_KEY)).build()).queue();
+							}
 						}
 						DiscordRoles.SQLgetRoles(e.getGuild().getIdLong());
 					}

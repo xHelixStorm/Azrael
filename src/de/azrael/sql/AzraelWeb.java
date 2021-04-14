@@ -49,25 +49,6 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		}
 	}
 	
-	public static int SQLInsertLoginInfo(long user_id, int type) {
-		logger.trace("SQLInsertLoginInfo launched. Passed params {}, {}", user_id, type);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
-			stmt = myConn.prepareStatement(AzraelWebStatements.SQLInsertLoginInfo);
-			stmt.setLong(1, user_id);
-			stmt.setInt(2, type);
-			return stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLInsertLoginInfo Exception", e);
-			return -1;
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static int SQLInsertLoginInfo(long user_id, int type, String code) {
 		logger.trace("SQLInsertLoginInfo launched. Passed params {}, {}, {}", user_id, type, code);
 		Connection myConn = null;
@@ -113,8 +94,8 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		}
 	}
 	
-	public static int SQLgetLoginType(long user_id) {
-		logger.trace("SQLgetLoginType launched. Passed params {}", user_id);
+	public static int SQLgetLoginType(long user_id, long bot_id) {
+		logger.trace("SQLgetLoginType launched. Passed params {}, {}", user_id, bot_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -122,6 +103,7 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
 			stmt = myConn.prepareStatement(AzraelWebStatements.SQLgetLoginType);
 			stmt.setLong(1, user_id);
+			stmt.setLong(2, bot_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				return rs.getInt(1);
@@ -131,6 +113,31 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 			logger.error("SQLgetLoginType Exception", e);
 			return -1;
 		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */}
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLisDefaultBot(long bot_id) {
+		logger.trace("SQLisDefaultBot launched. Passed params {}", bot_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelWebStatements.SQLisDefaultBot);
+			stmt.setLong(1, bot_id);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return rs.getBoolean(1);
+			}
+			return false;
+		} catch (SQLException e) {
+			logger.error("SQLisDefaultBot Exception", e);
+			return false;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */}
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}

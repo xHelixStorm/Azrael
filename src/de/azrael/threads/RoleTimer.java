@@ -22,7 +22,7 @@ import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
-import de.azrael.google.GoogleUtils;
+import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
@@ -145,7 +145,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
 								final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
-								GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), e.getGuild(), "", ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), "", "", NA, null, null, "UNMUTED", null, NA, NA, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
+								GoogleSheets.spreadsheetUnmuteRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), e.getGuild(), "", ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), "", "", NA, NA, NA);
 							}
 						}
 						else
@@ -213,7 +213,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 							role_id = role.getId();
 							role_name = role.getName();
 						}
-						GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), e.getGuild(), "", ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
+						GoogleSheets.spreadsheetUnmuteRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), e.getGuild(), "", ""+user_id, timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, NA, role_id, role_name);
 					}
 				}
 			}

@@ -142,6 +142,7 @@ public class GuildIni {
 		commands.put("Schedule", "false");
 		commands.put("Prune", "false");
 		commands.put("Warn", "false");
+		commands.put("Reddit", "false");
 		fileContent.put("Commands", commands);
 		
 		//collect all CommandLevels variables
@@ -228,8 +229,8 @@ public class GuildIni {
 		commandLevels.put("FilterURLWhitelist", "20");
 		commandLevels.put("FilterTweetBlacklist", "20");
 		commandLevels.put("Quiz", "1");
-		commandLevels.put("RoleReaction", "1");
-		commandLevels.put("Subscribe", "1");
+		commandLevels.put("RoleReaction", "20");
+		commandLevels.put("Subscribe", "20");
 		commandLevels.put("Randomshop", "1");
 		commandLevels.put("Patchnotes", "1");
 		commandLevels.put("DoubleExperience", "1");
@@ -258,6 +259,7 @@ public class GuildIni {
 		commandLevels.put("Schedule", "20");
 		commandLevels.put("Prune", "20");
 		commandLevels.put("Warn", "20");
+		commandLevels.put("Reddit", "20");
 		fileContent.put("CommandLevels", commandLevels);
 	}
 	
@@ -1226,5 +1228,13 @@ public class GuildIni {
 	public static int getWarnLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "Warn", int.class);
+	}
+	public static boolean getRedditCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Reddit", boolean.class);
+	}
+	public static int getRedditLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Reddit", int.class);
 	}
 }

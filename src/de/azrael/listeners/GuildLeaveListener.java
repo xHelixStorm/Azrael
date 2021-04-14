@@ -14,7 +14,7 @@ import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
-import de.azrael.google.GoogleUtils;
+import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -65,7 +65,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 					
 					//Run google service, if enabled
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-						GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.KICK.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, (e.getMember() != null ? e.getMember().getEffectiveName() : e.getUser().getName()), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), kick_reason, null, null, "KICK", null, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.KICK.id);
+						GoogleSheets.spreadsheetKickRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.KICK.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, (e.getMember() != null ? e.getMember().getEffectiveName() : e.getUser().getName()), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), kick_reason);
 					}
 					
 					//Unwatch the kicked user, if he's being watched
@@ -92,7 +92,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 							
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-								GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.KICK.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, (e.getMember() != null ? e.getMember().getEffectiveName() : e.getUser().getName()), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), kick_reason, null, null, "KICK", null, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.KICK.id);
+								GoogleSheets.spreadsheetKickRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.KICK.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, (e.getMember() != null ? e.getMember().getEffectiveName() : e.getUser().getName()), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), kick_reason);
 							}
 							
 							//Unwatch the kicked user, if he's being watched

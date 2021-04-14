@@ -17,6 +17,7 @@ public enum Channel {
 	REA	("rea"),
 	WAT	("wat"),
 	VOT	("vot"),
+	VO2	("vo2"),
 	RSS	("rss"),
 	UPD	("upd");
 	

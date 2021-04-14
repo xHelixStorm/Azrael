@@ -123,6 +123,10 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("Bot", "AESSecret");
 	}
+	public static int getDelayedGoogleRequestTime() {
+		Ini ini = readConfig();
+		return ini.get("Bot", "DelayedGoogleRequestTime", int.class);
+	}
 	
 	public static String getPastebinDeveloperKey() {
 		Ini ini = readConfig();
@@ -143,6 +147,17 @@ public class IniFileReader {
 		twitter[2] = tokens.get("AccessToken");
 		twitter[3] = tokens.get("AccessTokenSecret");
 		return twitter;
+	}
+	
+	public static String[] getRedditKeys() {
+		Ini ini = readConfig();
+		Ini.Section tokens = ini.get("Reddit");
+		String []reddit = new String[4];
+		reddit[0] = tokens.get("username");
+		reddit[1] = tokens.get("password");
+		reddit[2] = tokens.get("client_id");
+		reddit[3] = tokens.get("client_secret");
+		return reddit;
 	}
 	
 	public static boolean getDoubleExpEnabled() {

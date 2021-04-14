@@ -14,7 +14,8 @@ import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
-import de.azrael.google.GoogleUtils;
+import de.azrael.google.GoogleSheets;
+import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.AzraelWeb;
 import de.azrael.util.STATIC;
@@ -40,6 +41,9 @@ public class HandlerPOST {
 				case "confirm" -> {
 					confirm(e, out, json);
 				}
+				case "webRecovery" -> {
+					webRecovery(e, out, json);
+				}
 			}
 		}
 	}
@@ -59,7 +63,7 @@ public class HandlerPOST {
 			return false;
 		}
 		final String type = (String)json.get("type");
-		if(!type.equals("shutdown") && !type.equals("google") && !type.equals("webLogin") && !type.equals("confirm")) {
+		if(!type.equals("shutdown") && !type.equals("google") && !type.equals("webLogin") && !type.equals("confirm") && !type.equals("webRecovery")) {
 			WebserviceUtils.return502(out, "Invalid Type.", false);
 			return false;
 		}
@@ -158,6 +162,34 @@ public class HandlerPOST {
 				}
 			}
 		}
+		if(type.equals("webRecovery")) {
+			if(!json.has("user_id")) {
+				WebserviceUtils.return502(out, "User ID required to request an account recovery.", false);
+				return false;
+			}
+			else {
+				final String user_id = (String) json.get("user_id");
+				if(user_id.replaceAll("[0-9]*", "").length() != 0) {
+					WebserviceUtils.return502(out, "User id is not numeric.", false);
+					return false;
+				}
+				else if(user_id.length() != 17 && user_id.length() != 18) {
+					WebserviceUtils.return502(out, "The user id needs to be either 17 or 18 digits long.", false);
+					return false;
+				}
+			}
+			if(!json.has("ip")) {
+				WebserviceUtils.return502(out, "Source address not found.", false);
+				return false;
+			}
+			else {
+				final String ip = json.getString("ip");
+				if(!ip.matches("([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}|::1)")) {
+					WebserviceUtils.return502(out, "Source address invalid.", false);
+					return false;
+				}
+			}
+		}
 		
 		return true;
 	}
@@ -169,7 +201,7 @@ public class HandlerPOST {
 				Guild guild = e.getJDA().getGuildById(json.getLong("guild_id"));
 				if(guild != null) {
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
-						if(GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.EXPORT.id, ""), guild, "", e.getJDA().getSelfUser().getId(), new Timestamp(System.currentTimeMillis()), e.getJDA().getSelfUser().getName()+"#"+e.getJDA().getSelfUser().getDiscriminator(), "EXPORT", e.getJDA().getGatewayPing(), guild.getMemberCount(), e.getJDA().getGuilds().size(), GoogleEvent.EXPORT.id)) {
+						if(GoogleSheets.spreadsheetExportRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.EXPORT.id, ""), guild, "", e.getJDA().getSelfUser().getId(), new Timestamp(System.currentTimeMillis()), e.getJDA().getGatewayPing(), guild.getMemberCount(), e.getJDA().getGuilds().size())) {
 							WebserviceUtils.return201(out, "Data exported to google spreadsheet.", false);
 						}
 						else {
@@ -188,7 +220,7 @@ public class HandlerPOST {
 				long guilds_count = e.getJDA().getGuilds().size();
 				for(final var guild : e.getJDA().getGuilds()) {
 					if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
-						GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.EXPORT.id, ""), guild, "", e.getJDA().getSelfUser().getId(), new Timestamp(System.currentTimeMillis()), e.getJDA().getSelfUser().getName()+"#"+e.getJDA().getSelfUser().getDiscriminator(), "EXPORT", e.getJDA().getGatewayPing(), guild.getMemberCount(), guilds_count, GoogleEvent.EXPORT.id);
+						GoogleSheets.spreadsheetExportRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.EXPORT.id, ""), guild, "", e.getJDA().getSelfUser().getId(), new Timestamp(System.currentTimeMillis()), e.getJDA().getGatewayPing(), guild.getMemberCount(), guilds_count);
 					}
 				}
 				WebserviceUtils.return200(out, "Request accepted for all guilds.", false);
@@ -199,7 +231,7 @@ public class HandlerPOST {
 	private static void shutdown(ReadyEvent e, PrintWriter out, JSONObject json) {
 		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
 		WebserviceUtils.return200(out, "Bot shutdown", false);
-		for(final var guild : e.getJDA().getGuilds()) {
+		e.getJDA().getGuilds().parallelStream().forEach(guild -> {
 			if(GuildIni.getNotifications(guild.getIdLong())) {
 				if(json.has("message")) {
 					STATIC.writeToRemoteChannel(guild, null, json.getString("message"), Channel.LOG.getType());
@@ -209,8 +241,13 @@ public class HandlerPOST {
 				}
 			}
 			ShutDown.saveCache(guild);
+		});
+		if(STATIC.getGoogleThreadCount() == 0)
+			e.getJDA().shutdown();
+		else {
+			ShutdownListener.setShutdownJDA(e.getJDA());
+			STATIC.killGoogleThreads();
 		}
-		e.getJDA().shutdown();
 	}
 	
 	private static void webLogin(ReadyEvent e, PrintWriter out, JSONObject json) {
@@ -297,6 +334,41 @@ public class HandlerPOST {
 		else {
 			WebserviceUtils.return404(out, "User not found!", true);
 			AzraelWeb.SQLInsertActionLog(user_id, address, "ACCOUNT_CONFIRMATION_ATTEMPT", "User not found.");
+		}
+	}
+	
+	private static void webRecovery(ReadyEvent e, PrintWriter out, JSONObject json) {
+		final long user_id = json.getLong("user_id");
+		final String address = json.getString("ip");
+		Guild guild = e.getJDA().getGuilds().parallelStream().filter(g -> g.getMemberById(user_id) != null).findAny().orElse(null);
+		if(guild != null) {
+			Member member = guild.getMemberById(user_id);
+			if(member != null) {
+				final String key = RandomStringUtils.random(6, true, true).toUpperCase();
+				final String displayCode = key.substring(0, 2)+"-"+key.substring(2, 4)+"-"+key.substring(4);
+				final var channel = member.getUser().openPrivateChannel().complete();
+				try {
+					channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_RECOVERY).replace("{}", displayCode)).build()).queue();
+					if(AzraelWeb.SQLInsertLoginInfo(user_id, 3, key) > 0) {
+						WebserviceUtils.return200(out, "Recovery key sent!", true);
+						AzraelWeb.SQLInsertActionLog(user_id, address, "RECOVERY_CODE_GENERATED", key);
+					}
+					else {
+						WebserviceUtils.return500(out, "An unnexpected error occurred! Please try again later!", true);
+					}
+				} catch(Exception exc) {
+					WebserviceUtils.return500(out, "Direct messages are locked for this user!", true);
+					AzraelWeb.SQLInsertActionLog(user_id, address, "RECOVERY_CODE_GENERATION_ATTEMPT", "Destination user has locked direct messages.");
+				}
+			}
+			else {
+				WebserviceUtils.return404(out, "User not found!", true);
+				AzraelWeb.SQLInsertActionLog(user_id, address, "RECOVERY_CODE_GENERATION_ATTEMPT", "User not found.");
+			}
+		}
+		else {
+			WebserviceUtils.return404(out, "User not found!", true);
+			AzraelWeb.SQLInsertActionLog(user_id, address, "RECOVERY_CODE_GENERATION_ATTEMPT", "User not found.");
 		}
 	}
 }

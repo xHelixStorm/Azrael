@@ -189,6 +189,7 @@ public class GoogleSpreadsheetsExecution {
 						logger.info("Link of the spreadsheet with the file id {} has been severed from the bot in guild {}", file_id, e.getGuild().getIdLong());
 						Azrael.SQLInsertActionLog("GOOGLE_SPREADSHEET_UNLINK", 0, e.getGuild().getIdLong(), file_id);
 						Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+						Hashes.removeSpreadsheetProperty(file_id);
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -314,6 +315,7 @@ public class GoogleSpreadsheetsExecution {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_EVENTS_ADDED)).build()).queue();
 					logger.info("Events added to file id {} in guild {}", file_id, e.getGuild().getId());
 					Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+					Hashes.removeSpreadsheetProperty(file_id);
 				}
 			}
 			else {
@@ -441,6 +443,7 @@ public class GoogleSpreadsheetsExecution {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_START_UPDATED)).build()).queue();
 				logger.info("Google spreadsheet starting point updated for spreadsheet {} and event {} with value {} in guild {}", file_id, event, startingPoint, e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+				Hashes.removeSpreadsheetProperty(file_id);
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -582,6 +585,7 @@ public class GoogleSpreadsheetsExecution {
 				if(result[0] > 0) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_DD_ADDED)).build()).queue();
 					Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+					Hashes.removeSpreadsheetProperty(file_id);
 				}
 				else if(result[0] == -1) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();

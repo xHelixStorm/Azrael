@@ -25,8 +25,9 @@ import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
+import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
-import de.azrael.google.GoogleUtils;
+import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
@@ -103,7 +104,7 @@ public class RoleListener extends ListenerAdapter {
 									reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
 									reporter_username = reporter.getEffectiveName();
 								}
-								GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE_READD.id);
+								GoogleSheets.spreadsheetMuteReaddRequest(array, e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), warnedUser.getUnmute());
 							}
 						}
 					}
@@ -140,7 +141,7 @@ public class RoleListener extends ListenerAdapter {
 								reporter_name = reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator();
 								reporter_username = reporter.getEffectiveName();
 							}
-							GoogleUtils.handleSpreadsheetRequest(array, e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), "MUTE_READDED", warnedUser.getUnmute(), null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE_READD.id);
+							GoogleSheets.spreadsheetMuteReaddRequest(array, e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter_name, reporter_username, reason, "", ""+warnedUser.getWarningID(), warnedUser.getUnmute());
 						}
 					}
 				}
@@ -201,7 +202,7 @@ public class RoleListener extends ListenerAdapter {
 						
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-							GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE.id, ""), e.getGuild(), "", e.getMember().getUser().getId(), new Timestamp(time), user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", new Timestamp(time+mute_time), null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE.id);
+							GoogleSheets.spreadsheetMuteRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE.id, ""), e.getGuild(), "", e.getMember().getUser().getId(), new Timestamp(time), user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), new Timestamp(time+mute_time));
 						}
 					}
 					//execute this block if a regular mute has been applied
@@ -250,7 +251,7 @@ public class RoleListener extends ListenerAdapter {
 							
 							//Run google service, if enabled
 							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-								GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE.id, ""), e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE.id);
+								GoogleSheets.spreadsheetMuteRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE.id, ""), e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), unmute_timestamp);
 							}
 						}
 						//ban or perm mute if the current warning exceeded the max allowed warning
@@ -302,7 +303,7 @@ public class RoleListener extends ListenerAdapter {
 								
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE.id, ""), e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, "PERMANENT", ""+(warning_id+1), "MUTED", unmute_timestamp, null, null, null, null, 0, null, null, 0, 0, GoogleEvent.MUTE.id);
+									GoogleSheets.spreadsheetMuteRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE.id, ""), e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, "PERMANENT", ""+(warning_id+1), unmute_timestamp);
 								}
 							}
 						}
@@ -329,12 +330,52 @@ public class RoleListener extends ListenerAdapter {
 					Azrael.SQLInsertActionLog("MEMBER_MUTE_ADD", user_id, guild_id, "User Muted");
 				}
 			}
+			
+			//Separate logic for users who received the key type role
+			//Complex double parallel stream filter to find the role
+			if(DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("key") && e.getMember().getRoles().parallelStream().filter(r -> r.getIdLong() == f.getRole_ID()).findAny().orElse(null) != null).findAny().orElse(null) != null) {
+				if(!Azrael.SQLisGiveawayRewardAlreadySent(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong())) {
+					final String reward = Azrael.SQLgetSingleGiveawayReward(e.getGuild().getIdLong());
+					if(reward != null && reward.length() > 0) {
+						if(Azrael.SQLMarkGiveawayAsUsed(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), reward) > 0) {
+							e.getMember().getUser().openPrivateChannel().queue(channel -> {
+								String submit = null;
+								final String content = FileSetting.readFile("files/Guilds/"+e.getGuild().getId()+"/assignMessage.txt");
+								if(content != null && content.trim().length() > 0) {
+									submit = content.trim()+"\n**"+reward+"**";
+								}
+								else {
+									submit = STATIC.getTranslation2(e.getGuild(), Translation.ROLE_KEY_MESSAGE_3)+"\n**"+reward+"**";
+								}
+								channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(submit).build()).queue(success -> {
+									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.BLUE), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_KEY_SENT).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId())+"\n**"+reward+"**", Channel.LOG.getType());
+									logger.info("User {} has received the reward {} in guild {}", e.getMember().getUser().getId(), reward, e.getGuild().getId());
+								}, error -> {
+									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.BLUE), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_KEY_DM_LOCKED).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId())+"\n**"+reward+"**", Channel.LOG.getType());
+									logger.warn("User {} couldn't receive the reward {} because the direct messages are locked in guild {}", e.getMember().getUser().getId(), reward, e.getGuild().getId());
+								});
+							});
+						}
+						else {
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_KEY_MESSAGE).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId()), Channel.LOG.getType());
+							logger.error("User {} couldn't receive any reward after receiving the role of type key in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+						}
+					}
+					else if(reward != null) {
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_KEY_MESSAGE_2).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId()), Channel.LOG.getType());
+					}
+					else {
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_KEY_MESSAGE).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId()), Channel.LOG.getType());
+						logger.error("User {} couldn't receive any reward after receiving the role of type key in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+					}
+				}
+			}
 		}).start();
 	}
 	
 	@Override
 	public void onRoleUpdateColor(RoleUpdateColorEvent e) {
-		STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_ROLE_COLOR)+e.getRole().getAsMention()).addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_COLOR), e.getOldColor().getRGB()+" > "+e.getNewColor().getRGB(), false).setFooter(e.getRole().getId()).setTimestamp(ZonedDateTime.now()), null, Channel.UPD.getType());
+		STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_ROLE_COLOR)+e.getRole().getAsMention()).addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_COLOR), (e.getOldColor() != null ? e.getOldColor().getRGB() : STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE))+" > "+e.getNewColor().getRGB(), false).setFooter(e.getRole().getId()).setTimestamp(ZonedDateTime.now()), null, Channel.UPD.getType());
 	}
 	
 	@Override

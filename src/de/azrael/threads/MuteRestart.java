@@ -17,7 +17,7 @@ import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
-import de.azrael.google.GoogleUtils;
+import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.util.STATIC;
@@ -101,7 +101,7 @@ public class MuteRestart implements Runnable {
 						//Run google service, if enabled
 						if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
 							final String NA = STATIC.getTranslation2(guild, Translation.NOT_AVAILABLE);
-							GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), guild, "", ""+user_id, timestamp, user_name, effectiveName, "", "", NA, null, null, "UNMUTED", null, NA, NA, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
+							GoogleSheets.spreadsheetUnmuteRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), guild, "", ""+user_id, timestamp, user_name, effectiveName, "", "", NA, NA, NA);
 						}
 					}
 					else
@@ -167,7 +167,7 @@ public class MuteRestart implements Runnable {
 						role_id = role.getId();
 						role_name = role.getName();
 					}
-					GoogleUtils.handleSpreadsheetRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, effectiveName, reporter_name, reporter_username, NA, null, null, "UNMUTED", null, role_id, role_name, null, null, 0, null, null, 0, 0, GoogleEvent.UNMUTE.id);
+					GoogleSheets.spreadsheetUnmuteRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, effectiveName, reporter_name, reporter_username, NA, role_id, role_name);
 				}
 			}
 		}

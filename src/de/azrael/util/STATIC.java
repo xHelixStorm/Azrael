@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
@@ -50,6 +51,7 @@ import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
+import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -81,11 +83,12 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.37.561";
+	private static final String VERSION = "7.40.575";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
 	private static final JSONObject spa_lang = new JSONObject(FileSetting.readFile("./files/Languages/spa_lang.json"));
+	private static final JSONObject rus_lang = new JSONObject(FileSetting.readFile("./files/Languages/rus_lang.json"));
 	
 	private static OffsetDateTime bootTime = null;
 	
@@ -128,6 +131,12 @@ public class STATIC {
 			case "spa" -> {
 				if(spa_lang.has(event.section()))
 					yield (String)spa_lang.getString(event.section());
+				else
+					yield "Message "+event.section()+" not found!";
+			}
+			case "rus" -> {
+				if(rus_lang.has(event.section()))
+					yield (String)rus_lang.getString(event.section());
 				else
 					yield "Message "+event.section()+" not found!";
 			}
@@ -347,6 +356,25 @@ public class STATIC {
 		else
 			return false;
 	}
+	
+	//count the number of threads which start with VOTE and COMMENT and pass them to the shutdown listener. After that, terminate the running threads
+	public static void killGoogleThreads() {
+		List<Thread> curThreads = new ArrayList<Thread>();
+		threads.forEach(t -> {
+			if(t.getName().startsWith("COMMENT") || t.getName().startsWith("VOTE")) {
+				ShutdownListener.incrementShutdownCountDown();
+				curThreads.add(t);
+			}
+		});
+		curThreads.parallelStream().forEach(t -> killThread(t.getName()));
+		
+	}
+	
+	//count number of threads which are running in sleep mode for the google request
+	public static int getGoogleThreadCount() {
+		return threads.parallelStream().filter(f -> f.getName().startsWith("COMMENT") || f.getName().startsWith("VOTE")).collect(Collectors.toList()).size();
+	}
+	
 	
 	//collect a timer into the concurrent array
 	public static void addTimer(Timer timer) {

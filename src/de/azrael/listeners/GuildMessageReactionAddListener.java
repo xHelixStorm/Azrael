@@ -10,6 +10,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.api.services.sheets.v4.model.ValueRange;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
@@ -30,7 +31,7 @@ import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.sql.RankingSystemItems;
-import de.azrael.threads.DelayedVoteUpdate;
+import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -53,8 +54,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class GuildMessageReactionAddListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageReactionAddListener.class);
 	
-	private final String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
-	private final String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
+	private final static String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
+	private final static String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
+	private final static String shrug = EmojiManager.getForAlias(":shrug:").getUnicode();
 	
 	@Override
 	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent e) {
@@ -336,15 +338,24 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 				//check if it's a vote channel and allow only one reaction
 				final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
 				final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
-				if(thisChannel != null && thisChannel.getChannel_Type() != null && thisChannel.getChannel_Type().equals(Channel.VOT.getType())) {
-					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE))) {
+				if(thisChannel != null && thisChannel.getChannel_Type() != null && (thisChannel.getChannel_Type().equals(Channel.VOT.getType()) || thisChannel.getChannel_Type().equals(Channel.VO2.getType()))) {
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY))) {
 						if(e.getReactionEmote().isEmoji()) {
 							boolean runSpreadsheet = false;
 							if(thumbsup.equals(e.getReactionEmote().getName())) {
 								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsdown, e.getUser()).queue();
+								if(thisChannel.getChannel_Type().equals(Channel.VO2.getType()))
+									e.getChannel().removeReactionById(e.getMessageIdLong(), shrug, e.getUser()).queue();
 								runSpreadsheet = true;
 							}
 							else if(thumbsdown.equals(e.getReactionEmote().getName())) {
+								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsup, e.getUser()).queue();
+								if(thisChannel.getChannel_Type().equals(Channel.VO2.getType()))
+									e.getChannel().removeReactionById(e.getMessageIdLong(), shrug, e.getUser()).queue();
+								runSpreadsheet = true;
+							}
+							else if(shrug.equals(e.getReactionEmote().getName())) {
+								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsdown, e.getUser()).queue();
 								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsup, e.getUser()).queue();
 								runSpreadsheet = true;
 							}
@@ -355,7 +366,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_MANAGE.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
-						logger.error("MESSAGE_MANAGE permission required to remove a reaction from a user on channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+						logger.error("MESSAGE_MANAGE permission required to remove a reaction from a user and MESSAGE_HISTORY to retrieve the reaction count on channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 			}
@@ -379,7 +390,12 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 				final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
 				if((sheet[2] == null || sheet[2].length() == 0) || sheet[2].equals(e.getChannel().getId())) {
 					try {
-						final var response = GoogleSheets.readWholeSpreadsheet(GoogleSheets.getSheetsClientService(), file_id, row_start);
+						ValueRange response = DelayedGoogleUpdate.getCachedValueRange("VOTE"+e.getGuild().getId()+e.getChannel().getId());
+						if(response == null) {
+							final var service = GoogleSheets.getSheetsClientService();
+							response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
+							DelayedGoogleUpdate.cacheRetrievedSheetValueRange("VOTE"+e.getGuild().getId()+e.getChannel().getId(), response);
+						}
 						int currentRow = 0;
 						for(var row : response.getValues()) {
 							currentRow++;
@@ -396,28 +412,48 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 									//find out where the up_vote and down_vote columns are and mark them
 									int columnUpVote = 0;
 									int columnDownVote = 0;
+									int columnShrugVote = 0;
 									for(final var column : columns) {
 										if(column.getItem() == GoogleDD.UP_VOTE)
 											columnUpVote = column.getColumn();
 										else if(column.getItem() == GoogleDD.DOWN_VOTE)
 											columnDownVote = column.getColumn();
+										else if(column.getItem() == GoogleDD.SHRUG_VOTE)
+											columnShrugVote = column.getColumn();
 									}
-									if(columnUpVote != 0 || columnDownVote != 0) {
+									if(columnUpVote != 0 || columnDownVote != 0 || columnShrugVote != 0) {
 										//build update array
 										ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+										int thumbsUpCount = 0;
+										int thumbsDownCount = 0;
+										int shrugCount = 0;
+										for(final var reaction : e.getChannel().retrieveMessageById(e.getMessageId()).complete().getReactions()) {
+											if(columnUpVote > 0 && reaction.getReactionEmote().getName().equals(thumbsup))
+												thumbsUpCount = reaction.getCount()-1;
+											if(columnDownVote > 0 && reaction.getReactionEmote().getName().equals(thumbsdown))
+												thumbsDownCount = reaction.getCount()-1;
+											if(columnShrugVote > 0 && reaction.getReactionEmote().getName().equals(shrug))
+												shrugCount = reaction.getCount()-1;
+										}
 										int columnCount = 0;
 										for(final var column : row) {
 											columnCount ++;
 											if(columnCount == columnUpVote)
-												values.add(Arrays.asList("<upVote>"));
+												values.add(Arrays.asList(""+thumbsUpCount));
 											else if(columnCount == columnDownVote)
-												values.add(Arrays.asList("<downVote>"));
+												values.add(Arrays.asList(""+thumbsDownCount));
+											else if(columnCount == columnShrugVote)
+												values.add(Arrays.asList(""+shrugCount));
 											else
 												values.add(Arrays.asList(column));
 										}
+										ValueRange valueRange = new ValueRange().setRange(row_start+"!A"+currentRow).setMajorDimension("COLUMNS").setValues(values);
 										//execute Runnable
-										if(!STATIC.threadExists("vote"+e.getMessageId())) {
-											new Thread(new DelayedVoteUpdate(e.getGuild(), values, e.getChannel().getIdLong(), e.getMessageIdLong(), file_id, (row_start+"!A"+currentRow), columnUpVote, columnDownVote)).start();
+										if(!STATIC.threadExists("VOTE"+e.getGuild().getId()+e.getChannel().getId())) {
+											new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), file_id, e.getChannel().getId(), "update", GoogleEvent.VOTE)).start();
+										}
+										else {
+											DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "update");
 										}
 									}
 								}

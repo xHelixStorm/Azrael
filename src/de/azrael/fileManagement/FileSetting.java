@@ -151,12 +151,16 @@ public class FileSetting {
 				createFile("files/Guilds/"+guild.getId()+"/reactionmessage.txt", "");
 			if(!new File("files/Guilds/"+guild.getId()+"/verificationmessage.txt").exists())
 				createFile("files/Guilds/"+guild.getId()+"/verificationmessage.txt", "");
+			if(!new File("files/Guilds/"+guild.getId()+"/assignmessage.txt").exists())
+				createFile("files/Guilds/"+guild.getId()+"/assignmessage.txt", "");
 		}
 		else {
 			if(!new File("files/Guilds/"+guild.getId()+"/reactionmessage.txt").exists())
 				createFile("files/Guilds/"+guild.getId()+"/reactionmessage.txt", "");
 			if(!new File("files/Guilds/"+guild.getId()+"/verificationmessage.txt").exists())
 				createFile("files/Guilds/"+guild.getId()+"/verificationmessage.txt", "");
+			if(!new File("files/Guilds/"+guild.getId()+"/assignmessage.txt").exists())
+				createFile("files/Guilds/"+guild.getId()+"/assignmessage.txt", "");
 		}
 	}
 }
