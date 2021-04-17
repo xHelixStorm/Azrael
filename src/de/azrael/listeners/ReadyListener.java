@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.commands.CustomCmd;
-import de.azrael.commands.ScheduleExecution;
+import de.azrael.commandsContainer.ScheduleExecution;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Messages;

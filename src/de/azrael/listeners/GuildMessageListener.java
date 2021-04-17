@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.vdurmont.emoji.EmojiManager;
 
-import de.azrael.commands.ScheduleExecution;
 import de.azrael.commandsContainer.ClanExecution;
 import de.azrael.commandsContainer.FilterExecution;
 import de.azrael.commandsContainer.GoogleSpreadsheetsExecution;
@@ -25,6 +24,7 @@ import de.azrael.commandsContainer.PurchaseExecution;
 import de.azrael.commandsContainer.RedditExecution;
 import de.azrael.commandsContainer.RegisterRole;
 import de.azrael.commandsContainer.RoomExecution;
+import de.azrael.commandsContainer.ScheduleExecution;
 import de.azrael.commandsContainer.SetWarning;
 import de.azrael.commandsContainer.ShopExecution;
 import de.azrael.commandsContainer.SubscribeExecution;
