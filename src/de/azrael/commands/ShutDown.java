@@ -2,6 +2,7 @@ package de.azrael.commands;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,6 +41,16 @@ public class ShutDown implements CommandPublic {
 			e.getChannel().sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.SHUTDOWN_PREP)).queue();
 			for(final Guild guild : e.getJDA().getGuilds()) {
 				saveCache(guild);
+			}
+			Invites.enableShutdownMode();
+			while(true) {
+				if(Invites.inviteStatus.isEmpty())
+					break;
+				try {
+					Thread.sleep(TimeUnit.SECONDS.toMillis(10));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 			}
 			if(STATIC.getGoogleThreadCount() == 0) {
 				e.getChannel().sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.SHUTDOWN)).queue(m -> {

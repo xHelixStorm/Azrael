@@ -38,7 +38,9 @@ public enum GoogleDD {
 	MEMBER_COUNT		(24, "MEMBER_COUNT", 0),
 	GUILDS_COUNT		(25, "GUILDS_COUNT", 0),
 	SCREEN_URL			(26, "SCREEN_URL", 0),
-	SHRUG_VOTE			(27, "SHRUG_VOTE", 0);
+	SHRUG_VOTE			(27, "SHRUG_VOTE", 0),
+	INVITE				(28, "INVITE", 0),
+	TIMESTAMP_UPDATED	(29, "TIMESTAMP_UPDATED", 1);
 	
 	/**
 	 * Maps defined here to retrieve enum either by id or value

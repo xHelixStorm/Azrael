@@ -17,6 +17,7 @@ import de.azrael.commands.About;
 import de.azrael.commands.Accept;
 import de.azrael.commands.Changemap;
 import de.azrael.commands.Clan;
+import de.azrael.commands.Invites;
 import de.azrael.commands.Cw;
 import de.azrael.commands.Daily;
 import de.azrael.commands.Deny;
@@ -271,6 +272,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("prune", new Prune());
 		CommandHandler.commandsPublic.put("warn", new Warn());
 		CommandHandler.commandsPublic.put("reddit", new Reddit());
+		CommandHandler.commandsPublic.put("invites", new Invites());
 	}
 	
 	public static void addPrivateCommands() {

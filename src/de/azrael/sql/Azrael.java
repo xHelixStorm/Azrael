@@ -3003,6 +3003,26 @@ public class Azrael {
 		}
 	}
 	
+	public static int SQLDeleteGoogleSpreadsheetMapping(String file_id, long guild_id, int event) {
+		logger.trace("SQLDeleteGoogleSpreadsheetMapping launched. Passed params {}, {}, {}", file_id, guild_id, event);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteGoogleSpreadsheetMapping2);
+			stmt.setString(1, file_id);
+			stmt.setLong(2, guild_id);
+			stmt.setInt(3, event);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteGoogleSpreadsheetMapping Exception", e);
+			return 0;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static boolean SQLBatchDeleteGoogleFileToEvent(String file_id, long guild_id, List<Integer> events) {
 		logger.trace("SQLBatchDeleteGoogleFileToEvent launched. Passed params {}, {}, array", file_id);
 		Connection myConn = null;
@@ -4013,6 +4033,100 @@ public class Azrael {
 			return stmt.executeUpdate();
 		} catch(SQLException e) {
 			logger.error("SQLMarkGiveawayAsUsed Exception", e);
+			return 0;
+		} finally {
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLBatchInsertInvites(long guild_id, ArrayList<String> invites) {
+		logger.trace("SQLBatchInsertInvites launched. Params passed {}, Array with invites", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchInsertInvites);
+			for(final String invite : invites) {
+				stmt.setString(1, invite);
+				stmt.setLong(2, guild_id);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			return true;
+		} catch(SQLException e) {
+			logger.error("SQLBatchInsertInvites Exception", e);
+			return false;
+		} finally {
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<String> SQLgetUnusedInvites(long guild_id) {
+		logger.trace("SQLgetUnusedInvites launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			ArrayList<String> invites = new ArrayList<String>();
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetUnusedInvites);
+			stmt.setLong(1, guild_id);
+			stmt.setBoolean(2, false);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				invites.add(rs.getString(1));
+			}
+			stmt.executeBatch();
+			return invites;
+		} catch(SQLException e) {
+			logger.error("SQLgetUnusedInvites Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static boolean SQLBatchDeleteInvites(long guild_id, ArrayList<String> invites) {
+		logger.trace("SQLBatchDeleteInvites launched. Params passed {}, Array with invites", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchDeleteInvites);
+			for(final String invite : invites) {
+				stmt.setString(1, invite);
+				stmt.setLong(2, guild_id);
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+			return true;
+		} catch(SQLException e) {
+			logger.error("SQLBatchDeleteInvites Exception", e);
+			return false;
+		} finally {
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateUsedinvite(long guild_id, String invite, long user_id) {
+		logger.trace("SQLBatchDeleteInvites launched. Params passed {}, {}, {}", guild_id, invite, user_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateUsedinvite);
+			stmt.setBoolean(1, true);
+			stmt.setLong(2, user_id);
+			stmt.setString(3, invite);
+			stmt.setLong(4, guild_id);
+			return stmt.executeUpdate();
+		} catch(SQLException e) {
+			logger.error("SQLBatchDeleteInvites Exception", e);
 			return 0;
 		} finally {
 			try { stmt.close(); } catch (Exception e) { /* ignored */ }

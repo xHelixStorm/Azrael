@@ -156,6 +156,7 @@ public enum Translation {
 	PARAM_COMPLETE				("param_complete"),
 	PARAM_MAX					("param_max"),
 	PARAM_EXCLUDE				("param_exclude"),
+	PARAM_STATUS				("param_status"),
 	
 	LANG_ENG					("lang_eng"),
 	LANG_GER					("lang_ger"),
@@ -289,6 +290,8 @@ public enum Translation {
 	COMMAND_SCHEDULE			("command_schedule"),
 	COMMAND_PRUNE				("command_prune"),
 	COMMAND_WARN				("command_warn"),
+	COMMAND_REDDIT				("command_reddit"),
+	COMMAND_INVITES				("command_invites"),
 	COMMANDS_DISABLED			("commands_disabled"),
 	
 	DAILY_REWARD				("daily_reward"),
@@ -983,6 +986,8 @@ public enum Translation {
 	JOIN_ERR_7					("join_err_7"),
 	JOIN_ERR_8					("join_err_8"),
 	JOIN_ERR_9					("join_err_9"),
+	JOIN_ERR_13					("join_err_13"),
+	JOIN_ERR_14					("join_err_14"),
 	JOIN_MESSAGE				("join_message"),
 	JOIN_PERMISSION_ERR			("join_permission_err"),
 	JOIN_PERMISSION_ERR_2		("join_permission_err_2"),
@@ -1414,7 +1419,23 @@ public enum Translation {
 	REDDIT_REMOVE_ERR_2			("reddit_remove_err_2"),
 	REDDIT_REMOVE_DONE			("reddit_remove_done"),
 	REDDIT_TEST					("reddit_test"),
-	REDDIT_EXIT					("reddit_exit");
+	REDDIT_EXIT					("reddit_exit"),
+	
+	INVITES_HELP				("invites_help"),
+	INVITES_CREATE				("invites_create"),
+	INVITES_CREATE_START		("invites_create_start"),
+	INVITES_CREATE_COMPLETE		("invites_create_complete"),
+	INVITES_CREATE_ERR			("invites_create_err"),
+	INVITES_CREATE_ERR_2		("invites_create_err_2"),
+	INVITES_ALREADY_RUNNING		("invites_already_running"),
+	INVITES_REMOVE_HELP			("invites_remove_help"),
+	INVITES_REMOVE_START		("invites_remove_start"),
+	INVITES_REMOVE_COMPLETE		("invites_remove_complete"),
+	INVITES_REMOVE_ERR			("invites_remove_err"),
+	INVITES_REMOVE_ERR_2		("invites_remove_err_2"),
+	INVITES_STATUS				("invites_status"),
+	INVITES_STATUS_ERR			("invites_status_err"),
+	INVITES_SHUTDOWN_MODE		("invites_shutdown_mode");
 	
 	private String value;
 	

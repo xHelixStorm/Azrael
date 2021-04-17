@@ -319,78 +319,77 @@ public class GuildMessageEditListener extends ListenerAdapter {
 			if(array != null && !array[0].equals("empty")) {
 				final String file_id = array[0];
 				final String row_start = array[1].replaceAll("![A-Z0-9]*", "");
-				if((array[2] == null || array[2].length() == 0) || array[2].equals(e.getChannel().getId())) {
-					
-				}
-				//log low priority messages to google spreadsheets
-				if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
-					try {
-						ValueRange response = DelayedGoogleUpdate.getCachedValueRange("COMMENT"+e.getGuild().getId()+e.getChannel().getId());
-						if(response == null) {
-							final var service = GoogleSheets.getSheetsClientService();
-							response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
-							DelayedGoogleUpdate.cacheRetrievedSheetValueRange("COMMENT"+e.getGuild().getId()+e.getChannel().getId(), response);
-						}
-						int currentRow = 0;
-						for(var row : response.getValues()) {
-							currentRow++;
-							if(row.parallelStream().filter(f -> {
-								String cell = (String)f;
-								if(cell.equals(e.getMessageId()))
-									return true;
-								else
-									return false;
-								}).findAny().orElse(null) != null) {
-								//retrieve the saved mapping for the comment event
-								final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.COMMENT.id, e.getGuild().getIdLong());
-								if(columns != null && columns.size() > 0) {
-									int columnMessage = 0;
-									int columnAttachment = 0;
-									for(final var column : columns) {
-										if(column.getItem() == GoogleDD.MESSAGE)
-											columnMessage = column.getColumn();
-										else  if(column.getItem() == GoogleDD.SCREEN_URL)
-											columnAttachment = column.getColumn();
-									}
-									if(columnMessage != 0) {
-										ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-										//build update array
-										int columnCount = 0;
-										for(final var column : row) {
-											columnCount ++;
-											if(columnCount == columnMessage)
-												values.add(Arrays.asList(e.getMessage().getContentRaw()));
-											else if(columnCount == columnAttachment) {
-												StringBuilder urls = new StringBuilder();
-												for(final var attachment : e.getMessage().getAttachments()) {
-													urls.append(attachment.getProxyUrl()+"\n");
-												}
-												values.add(Arrays.asList(urls.toString()));
-											}
-											else
-												values.add(Arrays.asList(column));
-										}
-										ValueRange valueRange = new ValueRange().setRange(row_start+"!A"+currentRow).setValues(values);
-										//Execute Runnable
-										if(!STATIC.threadExists("COMMENT"+e.getGuild().getId()+e.getChannel().getId())) {
-											new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), array[0], e.getChannel().getId(), "update", GoogleEvent.COMMENT)).start();
-										}
-										else {
-											DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "update");
-										}
-									}
-								}
-								//interrupt the row search
-								break;
+				if(array[2] != null && array[2].equals(e.getChannel().getId())) {
+					//log low priority messages to google spreadsheets
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
+						try {
+							ValueRange response = DelayedGoogleUpdate.getCachedValueRange("COMMENT"+e.getGuild().getId()+e.getChannel().getId());
+							if(response == null) {
+								final var service = GoogleSheets.getSheetsClientService();
+								response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
+								DelayedGoogleUpdate.cacheRetrievedSheetValueRange("COMMENT"+e.getGuild().getId()+e.getChannel().getId(), response);
 							}
+							int currentRow = 0;
+							for(var row : response.getValues()) {
+								currentRow++;
+								if(row.parallelStream().filter(f -> {
+									String cell = (String)f;
+									if(cell.equals(e.getMessageId()))
+										return true;
+									else
+										return false;
+									}).findAny().orElse(null) != null) {
+									//retrieve the saved mapping for the comment event
+									final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.COMMENT.id, e.getGuild().getIdLong());
+									if(columns != null && columns.size() > 0) {
+										int columnMessage = 0;
+										int columnAttachment = 0;
+										for(final var column : columns) {
+											if(column.getItem() == GoogleDD.MESSAGE)
+												columnMessage = column.getColumn();
+											else  if(column.getItem() == GoogleDD.SCREEN_URL)
+												columnAttachment = column.getColumn();
+										}
+										if(columnMessage != 0) {
+											ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+											//build update array
+											int columnCount = 0;
+											for(final var column : row) {
+												columnCount ++;
+												if(columnCount == columnMessage)
+													values.add(Arrays.asList(e.getMessage().getContentRaw()));
+												else if(columnCount == columnAttachment) {
+													StringBuilder urls = new StringBuilder();
+													for(final var attachment : e.getMessage().getAttachments()) {
+														urls.append(attachment.getProxyUrl()+"\n");
+													}
+													values.add(Arrays.asList(urls.toString()));
+												}
+												else
+													values.add(Arrays.asList(column));
+											}
+											ValueRange valueRange = new ValueRange().setRange(row_start+"!A"+currentRow).setMajorDimension("COLUMNS").setValues(values);
+											//Execute Runnable
+											if(!STATIC.threadExists("COMMENT"+e.getGuild().getId()+e.getChannel().getId())) {
+												new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), array[0], e.getChannel().getId(), "update", GoogleEvent.COMMENT)).start();
+											}
+											else {
+												DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "update");
+											}
+										}
+									}
+									//interrupt the row search
+									break;
+								}
+							}
+						} catch (SocketTimeoutException e1) {
+							if(GoogleUtils.timeoutHandler(e.getGuild(), file_id, GoogleEvent.COMMENT.name(), e1)) {
+								runCommentSpreadsheetService(e);
+							}
+						} catch (Exception e1) {
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
+							logger.error("Google Spreadsheet webservice error for event COMMENT in guild {}", e.getGuild().getIdLong(), e1);
 						}
-					} catch (SocketTimeoutException e1) {
-						if(GoogleUtils.timeoutHandler(e.getGuild(), file_id, GoogleEvent.COMMENT.name(), e1)) {
-							runCommentSpreadsheetService(e);
-						}
-					} catch (Exception e1) {
-						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-						logger.error("Google Spreadsheet webservice error for event COMMENT in guild {}", e.getGuild().getIdLong(), e1);
 					}
 				}
 			}

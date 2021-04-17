@@ -1,10 +1,13 @@
 package de.azrael.listeners;
 
 import java.awt.Color;
+import java.net.SocketTimeoutException;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -12,26 +15,32 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.api.services.sheets.v4.model.ValueRange;
+
 import de.azrael.constructors.Bancollect;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Ranking;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
+import de.azrael.enums.GoogleDD;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
+import de.azrael.google.GoogleUtils;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
+import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -400,6 +409,9 @@ public class GuildListener extends ListenerAdapter {
 						}
 					}
 				}
+				
+				//single use invite logic
+				handleSingleUseInvites(e.getGuild(), e.getMember());
 			}
 			
 			Azrael.SQLInsertActionLog("GUILD_MEMBER_JOIN", user_id, guild_id, user_name);
@@ -440,6 +452,138 @@ public class GuildListener extends ListenerAdapter {
 				else {
 					logger.warn("Category {} doesn't exist anymore in guild {}", verification.getCategoryID(), guild.getId());
 				}
+			}
+		}
+	}
+	
+	private static void handleSingleUseInvites(Guild guild, Member member) {
+		final var invites = Azrael.SQLgetUnusedInvites(guild.getIdLong());
+		if(invites != null && invites.size() > 0) {
+			if(guild.getSelfMember().hasPermission(Permission.MANAGE_SERVER)) {
+				guild.retrieveInvites().queue(serverInvites -> {
+					for(final var invite : invites) {
+						final Invite serverInvite = serverInvites.parallelStream().filter(f -> f.getUrl().equals(invite) && f.getUses() == 1).findAny().orElse(null);
+						if(serverInvite != null) {
+							serverInvite.delete().queue(success -> {
+								logger.info("Invite {} has been used by {} and as a result removed in guild {}", invite, member.getUser().getId(), guild.getId());
+								final var role = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV() != null && f.getCategory_ABV().equals("inv")).findAny().orElse(null);
+								if(role != null) {
+									final var serverRole = guild.getRoleById(role.getRole_ID());
+									if(serverRole != null) {
+										if(guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES) && guild.getSelfMember().canInteract(serverRole))
+											guild.addRoleToMember(member, serverRole).queue();
+										else {
+											STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.JOIN_ERR_14)+Permission.MANAGE_ROLES.getName(), Channel.LOG.getType());
+											logger.error("Permission {} required to assign roles in guild {}", Permission.MANAGE_ROLES.getName(), guild.getId());
+										}
+									}
+									else {
+										logger.warn("Role {} doesn't exist anymore in guild {}", role.getRole_ID(), guild.getId());
+									}
+								}
+							});
+							
+							if(Azrael.SQLUpdateUsedinvite(guild.getIdLong(), invite, member.getUser().getIdLong()) == 0)
+								logger.warn("Used invite {} from {} couldn't be labeled as used in guild {}", invite, member.getUser().getId(), guild.getId());
+							
+							//Google spreadsheet execution
+							if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+								handleGoogleInviteRequest(guild, member, invite);
+							}
+							break;
+						}
+					}
+				});
+			}
+			else {
+				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.JOIN_ERR_13).replace("{}", Permission.MANAGE_SERVER.getName()), Channel.LOG.getType());
+				logger.error("Permission {} required to remove already used invites in guild {}", Permission.MANAGE_SERVER.getName(), guild.getId());
+			}
+		}
+		else if(invites == null) {
+			logger.error("Single use invites couldn't be retrieved in guild {}", guild.getId());
+		}
+	}
+	
+	private static void handleGoogleInviteRequest(Guild guild, Member member, String invite) {
+		final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.INVITES.id, "");
+		if(array != null && !array[0].equals("empty")) {
+			final String file_id = array[0];
+			final String row_start = array[1].replaceAll("![A-Z0-9]*", "");
+			try {
+				ValueRange response = DelayedGoogleUpdate.getCachedValueRange("INVITES"+guild.getId());
+				if(response == null) {
+					final var service = GoogleSheets.getSheetsClientService();
+					response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
+					DelayedGoogleUpdate.cacheRetrievedSheetValueRange("INVITES"+guild.getId(), response);
+				}
+				int currentRow = 0;
+				for(var row : response.getValues()) {
+					currentRow ++;
+					if(row.parallelStream().filter(f -> {
+						String cell = (String)f;
+						if(cell.equals(invite))
+							return true;
+						else
+							return false;
+						}).findAny().orElse(null) != null) {
+						//retrieve the saved mapping for the comment event
+						final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.INVITES.id, guild.getIdLong());
+						if(columns != null && columns.size() > 0) {
+							int columnUserID = 0;
+							int columnName = 0;
+							int columnUsername = 0;
+							int columnTimestampUpdated = 0;
+							for(final var column : columns) {
+								if(column.getItem() == GoogleDD.USER_ID)
+									columnUserID = column.getColumn();
+								else  if(column.getItem() == GoogleDD.NAME)
+									columnName = column.getColumn();
+								else if(column.getItem() == GoogleDD.USERNAME)
+									columnUsername = column.getColumn();
+								else if(column.getItem() == GoogleDD.TIMESTAMP_UPDATED)
+									columnTimestampUpdated = column.getColumn();
+							}
+							if(columnUserID != 0 || columnName != 0 || columnUsername != 0 || columnTimestampUpdated != 0) {
+								ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+								List<Object> subValues = new ArrayList<Object>();
+								//build update array
+								int columnCount = 0;
+								for(final var column : row) {
+									columnCount ++;
+									if(columnCount == columnUserID)
+										subValues.add(member.getUser().getId());
+									else if(columnCount == columnName) 
+										subValues.add(member.getUser().getName()+"#"+member.getUser().getDiscriminator());
+									else if(columnCount == columnUsername)
+										subValues.add(member.getEffectiveName());
+									else if(columnCount == columnTimestampUpdated)
+										subValues.add(new Timestamp(System.currentTimeMillis()));
+									else
+										subValues.add(column);
+								}
+								values.add(subValues);
+								ValueRange valueRange = new ValueRange().setRange(row_start+"!A"+currentRow).setValues(values);
+								//Execute Runnable
+								if(!STATIC.threadExists("INVITES"+guild.getId())) {
+									new Thread(new DelayedGoogleUpdate(guild, valueRange, 0, array[0], "", "update", GoogleEvent.INVITES)).start();
+								}
+								else {
+									DelayedGoogleUpdate.handleAdditionalRequest(guild, "", valueRange, 0, "update");
+								}
+							}
+						}
+						//interrupt the row search
+						break;
+					}
+				}
+			} catch(SocketTimeoutException e) {
+				if(GoogleUtils.timeoutHandler(guild, file_id, GoogleEvent.INVITES.name(), e)) {
+					handleGoogleInviteRequest(guild, member, invite);
+				}
+			} catch (Exception e1) {
+				STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(guild, Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
+				logger.error("Google Spreadsheet webservice error for event INVITES in guild {}", guild.getIdLong(), e1);
 			}
 		}
 	}

@@ -136,6 +136,7 @@ class AzraelStatements {
 	final static String SQLDeleteGoogleSpreadsheetSheet = STATIC.decrypt("37tRMY5zIdIFqRngYuAc9nr6Y69OmU60eIiGeg7I4vS+SOB1VAYFD4zE0FKCvOvaqTE4O6/qxJ0roMefubyi3SJ8r+WW5ZrOlvTa3D4fhMs=");
 	final static String SQLBatchDeleteGoogleSpreadsheetMapping = STATIC.decrypt("37tRMY5zIdIFqRngYuAc9syyL4fyyHN7gLz40+9/RsY41eUqOYY4GAXGToUNhgwmWNvNSnMEyxgedu6oUQYdIMJvvFNxhqGEJ701jYs9WUNyYVa1zVoUgSn0YgYp2SINrvsXFe68TU8vU9wNUw2OKA==");
 	final static String SQLDeleteGoogleSpreadsheetMapping = STATIC.decrypt("37tRMY5zIdIFqRngYuAc9syyL4fyyHN7gLz40+9/RsY41eUqOYY4GAXGToUNhgwmWNvNSnMEyxgedu6oUQYdIGABe6yrXjPz2F/8fyu6QHM=");
+	final static String SQLDeleteGoogleSpreadsheetMapping2 = STATIC.decrypt("37tRMY5zIdIFqRngYuAc9syyL4fyyHN7gLz40+9/RsY41eUqOYY4GAXGToUNhgwmWNvNSnMEyxgedu6oUQYdIJIzObJX01bPXZUBXgZlqmbZZxyjwB6K5oHBDSOYhgwJrvsXFe68TU8vU9wNUw2OKA==");
 	final static String SQLBatchDeleteGoogleFileToEvent = STATIC.decrypt("37tRMY5zIdIFqRngYuAc9pu+6vUs69DPnXew9TAtOUpQIE+xxwidAePtSEaCZ+77xro7q3QSUk/Nf9/K0vH7qD5Y4nYhd011F28qN4FahSMifK/lluWazpb02tw+H4TL");
 	final static String SQLDeleteGoogleFileToEvent = STATIC.decrypt("37tRMY5zIdIFqRngYuAc9pu+6vUs69DPnXew9TAtOUpQIE+xxwidAePtSEaCZ+77EBM5j5jhkdrh6R0eYs+4hoImDU9PoiAJd9d6yldIQP8=");
 	final static String SQLgetGoogleEventsToDD = STATIC.decrypt("Zc711QCKUyv/8hN6jBRx+AFPObkYniwhg09qJQk0/styFj6+3LCauGps1V+u+hhCxro7q3QSUk/Nf9/K0vH7qLSFMmwQfR//UYlWsZp59yo=");
@@ -178,6 +179,10 @@ class AzraelStatements {
 	final static String SQLisGiveawayRewardAlreadySent = STATIC.decrypt("Z8vdI1GPXZTGqpSYi7XWwYKcsMx6C/Hc65ZptqTsNGrv0JG2/78OvroLlG+Cs7dH3/aFhVd1n3dpC2Vp4uY9B0dujaF1SWt8aUlDJmqAuZI=");
 	final static String SQLgetSingleGiveawayReward = STATIC.decrypt("n7nFuc+uX4k/x2EFWv15L9JAxqebXEN2+SbigLliu3OSMzmyV9NWz12VAV4GZapmCwtsqa3rXZ4m+toSHP+7HkdujaF1SWt8aUlDJmqAuZI=");
 	final static String SQLMarkGiveawayAsUsed = STATIC.decrypt("m94m//J9OS6m16Ega8jqJirwVg37I1mtYpXW6y2UogGX2R1v3chaTnCK6ueMV8XBkjM5slfTVs9dlQFeBmWqZhgZTd9S3vTJTLkciVT7U0o=");
+	final static String SQLBatchInsertInvites = STATIC.decrypt("unXEyhQZ4j7fSCzP5URBVNnjzNFgkgvYIoazAIcyKx5qdroQ7I715uQ+OOO8flmpGoiBn7Xpf98vjTSSNpV4kg==");
+	final static String SQLgetUnusedInvites = STATIC.decrypt("KOBR/IwGSfMUmOHMZQbLE4uM3/4ZKhVm/zFi6ivSDjpLpetZ/qAwdHFZDJNJK1t5wnhd8MvA7gbEd1cUdymb8aCHbNmjcaElyJsWwjhyJdU=");
+	final static String SQLBatchDeleteInvites = STATIC.decrypt("4vIK5ySS3+YK+QysV0fScMA9t8gn3uBt0AOqJmV2eA7Ln59FKtlMQWcQ2kzlctpD65bpDPUThBlktcfoo4FhGQ==");
+	final static String SQLUpdateUsedinvite = STATIC.decrypt("8gDFjh4cqZITUfWW6JzNSa6SMYMAObLPNF/mtUBzE+yfE940tFfwk/98U/KpDsoVSoP/LvKGwPtE70of8Z85OUSe59euXdlfn73jGlYUqn+gh2zZo3GhJcibFsI4ciXV");
 	final static String SQLLowerTotalWarning = STATIC.decrypt("RvG8no5GC1M2UJnjG+SRVwSQADsHCgMEFFCEV9LPN3F8eS0ma0bGhmCWutnBnhPpBbF0uh830gc/5OVdO4DCvtvBU/DDsvqBHYMXtJtiay/AcMWgiJIGubroqVwa8m5M");
 	final static String SQLLowerTotalWarning2 = STATIC.decrypt("xyWD7Rr4A3dPVvG35OGDdfwdamEgiC/v+gNA8zaDtj/NqX1KVWnYDTbDtWeuYDuD");
 	final static String SQLReplaceWordFilter = STATIC.decrypt("bg77IrFrjW2OXhzl5iBjI4bcNBEg0auhsvsBDu9oVaF9CLId3EziiYE7YsrZ6uyGInyv5Zblms6W9NrcPh+Eyw==");
