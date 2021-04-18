@@ -101,7 +101,7 @@ public class LanguageFilter implements Runnable {
 						if(heavyCensoring != null && heavyCensoring) {
 							var messageDeleted = false;
 							var censorMessage = Hashes.getCensorMessage(message.getGuild().getIdLong());
-							if(parseMessage.length() == 1 || (censorMessage != null && censorMessage.contains(parseMessage))) {
+							if(parseMessage.length() == 1 || (censorMessage != null && censorMessage.contains(parseMessage)) || parseMessage.matches("^[^a-zA-Z0-9]*$")) {
 								deleteHeavyCensoringMessage(message, allChannels, name, channel, getMessage);
 								messageDeleted = true;
 							}

@@ -68,7 +68,7 @@ public class RedditExecution {
 	public static void formatUpdate(GuildMessageReceivedEvent e, Cache cache) {
 		final RSS user = (RSS)cache.getObject();
 		if(Azrael.SQLUpdateRSSFormat(user.getURL(), e.getGuild().getIdLong(), EmojiParser.parseToAliases(e.getMessage().getContentRaw())) > 0) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_FORMAT_UPDATED).replace("{}", user.getFormat())).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_FORMAT_UPDATED).replace("{}", user.getURL())).build()).queue();
 			Hashes.removeFeeds(e.getGuild().getIdLong());
 			logger.info("User {} has updated the format of the Reddit subscription {} in guild {}", e.getMember().getUser().getId(), user.getURL(), e.getGuild().getId());
 		}

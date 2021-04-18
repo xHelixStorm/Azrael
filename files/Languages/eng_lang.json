@@ -154,6 +154,7 @@
 	"param_complete":				"complete",
 	"param_max":					"max",
 	"param_exclude":				"exclude",
+	"param_status":					"status",
 
 	"lang_eng":						"English",
 	"lang_ger":						"German",
@@ -287,6 +288,8 @@
 	"command_schedule":				"- **{}schedule**\nSchedule a daily message on a channel during a specified time.\n",
 	"command_prune":				"- **{}prune**\nKick a big group of members from the server.\n",
 	"command_warn":					"- **{}warn**\nFormulate the reason for a warning and send it to a user in private message.\n",
+	"command_reddit":				"- **{}reddit**\nSubscribe to a subreddit or reddit user to fetch content.\n",
+	"command_invites":				"- **{}invites**\nCreate a number of one time use invites.\n",
 	"commands_disabled":		 	"All commands are disabled!",
 	
 	"daily_reward":				 	"Congratulations! You have unlocked the following reward:\n",
@@ -981,6 +984,8 @@
 	"join_err_7":					"The user **{}** with the ID number **{}** couldn't be flagged as muted!",
 	"join_err_8":					"Rejoin Task couldn't be removed for the user **{}** with the ID number **{}**!",
 	"join_err_9":					"Rejoin Tasks couldn't be verified for the user **{}** with the ID number **{}**!",
+	"join_err_13":					"The permission {} is required in combination with single use invites! Please extend the Bot permissions.",
+	"join_err_14":					"The invite role couldn't be assigned because the following permission is missing: ",
 	"join_message":					"**{}** has joined the server!",
 	"join_permission_err":			"The joined user **{}** with the ID number **{}** couldn't be muted because the following permission is required: ",
 	"join_permission_err_2":		"The joined user **{}** with the ID number **{}** couldn't be banned because the following permission is required: ",
@@ -1413,5 +1418,22 @@
 	"reddit_remove_err_2":			"Selection must be between 1 and {}!",
 	"reddit_remove_done":			"Reddit subscription {} has been removed!",
 	"reddit_test":					"These Reddit subscriptions are currently registered. Please select one of them to test!\n\n",
-	"reddit_exit":					"Reddit command aborted!"
+	"reddit_exit":					"Reddit command aborted!",
+	
+	"invites_help":					"Use this command to create one time use invites with the parameter *create* and the number of invites to create as second parameter. Created one time use invites can also be removed with the parameter *remove*. To request the status, use the parameter *status*.\nThe command can be combined with google spreadsheet.",
+	"invites_create":				"Write the number of invites to create together with the whole command to begin the generation!",
+	"invites_create_start":			"Invites are being created. Please wait!",
+	"invites_create_complete":		"{} invites have been created!",
+	"invites_create_err":			"An internal error occurred! The created one time use invites have been created but could not be saved!",
+	"invites_create_err_2":			"The number of invites to create have to be between 1 and 1000!",
+	"invites_already_running":		"Invites are currently being created or removed. Please wait before using the command again!\nNumber of invites already created or removed: **{}**/**{}**",
+	"invites_remove_help":			"Confirm the execution with the *all* parameter by writing it together with the whole command!",
+	"invites_remove_start":			"Invites are being removed. Please wait!",
+	"invites_remove_complete":		"{} one time use invites have been removed!",
+	"invites_remove_err":			"An internal error occurred! The created one time use invites have been removed only from the Discord!",
+	"invites_remove_err_2":			"No unused one time invites have been found!",
+	"invites_status":				"Total number of processed invites: **{}**/**{}**",
+	"invites_status_err":			"No invites are being processed at this point of time!",
+	"invites_shutdown_mode":		"New invite jobs can't be started because the Bot is about to shutdown!",
+	"invites_used_by":				"Invite code **{}** has been used by the user **{}** with the id number **{}**"
 }

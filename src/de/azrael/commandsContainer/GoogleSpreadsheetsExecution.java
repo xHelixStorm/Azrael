@@ -580,7 +580,7 @@ public class GoogleSpreadsheetsExecution {
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-map-update", file_id, ""+event));
 		}
 		else if(item_ids.size() > 0) {
-			if(Azrael.SQLDeleteGoogleSpreadsheetMapping(file_id, event) != -1) {
+			if(Azrael.SQLDeleteGoogleSpreadsheetMapping(file_id, e.getGuild().getIdLong(), event) != -1) {
 				int [] result = Azrael.SQLBatchInsertGoogleSpreadsheetMapping(file_id, event, e.getGuild().getIdLong(), item_ids, item_formats);
 				if(result[0] > 0) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_DD_ADDED)).build()).queue();

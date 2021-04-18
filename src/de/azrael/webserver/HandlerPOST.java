@@ -3,10 +3,12 @@ package de.azrael.webserver;
 import java.awt.Color;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 
+import de.azrael.commands.Invites;
 import de.azrael.commands.ShutDown;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
@@ -242,6 +244,16 @@ public class HandlerPOST {
 			}
 			ShutDown.saveCache(guild);
 		});
+		Invites.enableShutdownMode();
+		while(true) {
+			if(Invites.inviteStatus.isEmpty())
+				break;
+			try {
+				Thread.sleep(TimeUnit.SECONDS.toMillis(10));
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+		}
 		if(STATIC.getGoogleThreadCount() == 0)
 			e.getJDA().shutdown();
 		else {

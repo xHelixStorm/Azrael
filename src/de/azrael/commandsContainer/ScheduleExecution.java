@@ -1,4 +1,4 @@
-package de.azrael.commands;
+package de.azrael.commandsContainer;
 
 import java.awt.Color;
 import java.util.ArrayList;

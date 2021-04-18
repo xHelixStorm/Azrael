@@ -764,4 +764,48 @@ public class GoogleSheets {
 		}
 		return false;
 	}
+	
+	/**
+	 * Google spreadsheet requests for invites created with the Invite command
+	 * @param event
+	 * @param guild
+	 * @param channel_id
+	 * @param user_id
+	 * @param timestamp
+	 * @param name
+	 * @param effectiveName
+	 * @return
+	 */
+	
+	public static ArrayList<List<Object>> spreadsheetInvitesRequest(String [] event, Guild guild, String channel_id, String user_id, Timestamp timestamp, String name, String effectiveName, List<String> invites, Timestamp timestampUpdated) {
+		if(GoogleUtils.spreadsheetRequestBody(event, guild, channel_id, GoogleEvent.INVITES.name())) {
+			final var columns = GoogleUtils.retrieveSpreadsheetColumns(event[0], GoogleEvent.INVITES, guild);
+			if(columns != null && columns.size() > 0) {
+				ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+				for(final String invite : invites) {
+					List<Object> row = new ArrayList<Object>();
+					for(final var column : columns) {
+						GoogleDD item = column.getItem();
+						switch(item) {
+							case TIMESTAMP -> 			row.add(item.valueFormatter(timestamp, column.getFormatter()));
+							case USER_ID -> 			row.add(item.valueFormatter(user_id, column.getFormatter()));
+							case NAME ->				row.add(item.valueFormatter(name, column.getFormatter()));
+							case USERNAME ->			row.add(item.valueFormatter(effectiveName, column.getFormatter()));
+							case ACTION ->				row.add(item.valueFormatter(GoogleEvent.INVITES.name(), column.getFormatter()));
+							case PLACEHOLDER ->			row.add(item.valueFormatter("", column.getFormatter()));
+							case GUILD_ID ->			row.add(item.valueFormatter(guild.getId(), column.getFormatter()));
+							case GUILD_NAME ->			row.add(item.valueFormatter(guild.getName(), column.getFormatter()));
+							case INVITE ->				row.add(item.valueFormatter(invite, column.getFormatter()));
+							case TIMESTAMP_UPDATED -> 	row.add(item.valueFormatter(timestampUpdated, column.getFormatter()));
+							default -> {}
+						}
+					}
+					values.add(row);
+				}
+				if(values.get(0).size() > 0)
+					return values;
+			}
+		}
+		return null;
+	}
 }

@@ -154,6 +154,7 @@
 	"param_complete":				"fertig",
 	"param_max":					"max",
 	"param_exclude":				"ausnahmen",
+	"param_status":					"status",
 
 	"lang_eng":						"Englisch",
 	"lang_ger":						"Deutsch",
@@ -287,6 +288,8 @@
 	"command_schedule":				"- **{}schedule**\nPlane eine tägliche Nachricht, die um eine selbst definierte Uhrzeit versendet wird.\n",
 	"command_prune":				"- **{}prune**\nKicken Sie eine große Gruppe von Mitgliedern vom Server.\n",
 	"command_warn":					"- **{}warn**\nFormulieren Sie den Grund für eine Warnung und senden Sie ihn in einer privaten Nachricht an einen Benutzer.\n",
+	"command_reddit":				"- **{}reddit**\nAbonnieren Sie ein Subreddit oder einen Reddit-Benutzer, um Inhalte abzufragen.\n",
+	"command_invites":				"- **{}invites**\nErstellen Sie eine Reihe von Einladungen zur einmaligen Verwendung.\n",
 	"commands_disabled":		 	"Alle Befehle sind deaktiviert!",
 	
 	"daily_reward":				 	"Herzlichen Glückwunsch! Sie haben die folgende Belohnung freigeschaltet:\n",
@@ -981,6 +984,8 @@
 	"join_err_7":					"Der Benutzer **{}** mit der ID Nummer **{}** konnte nicht als gemutet markiert werden!",
 	"join_err_8":					"Rückker Aufgabe konnte nicht entfernt werden für den Benutzer **{}** mit der ID Nummer **{}**!",
 	"join_err_9":					"Rückkehr Aufgabe konnte nicht verifiziert werden für den Benutzer **{}** mit der ID Nummer **{}**!",
+	"join_err_13":					"Die Berechtigung {} ist in Kombination mit Single Use Invites erforderlich! Bitte erweitern Sie die Bot-Berechtigungen.",
+	"join_err_14":					"Die Einladungsrolle konnte nicht zugewiesen werden, weil die folgende Berechtigung fehlt: ",
 	"join_message":					"**{}** ist den Server beigetreten!",
 	"join_permission_err":			"Der beigetretene Benutzer **{}** mit der ID Nummer **{}** konnte nicht gemutet werden, weil die folgende Berechtigung fehlt: ",
 	"join_permission_err_2":		"Der beigetretene Benutzer **{}** mit der ID Nummer **{}** konnte nicht gebannt werden, weil die folgende Berechtigung fehlt: ",
@@ -1413,5 +1418,22 @@
 	"reddit_remove_err_2":			"Auswahl muss zwischen 1 und {} liegen!",
 	"reddit_remove_done":			"Reddit-Abonnement {} wurde entfernt!",
 	"reddit_test":					"Diese Reddit-Abonnements sind derzeit registriert. Bitte wählen Sie eines davon zum Testen aus!\n\n",
-	"reddit_exit":					"Reddit-Befehl abgebrochen!"
+	"reddit_exit":					"Reddit-Befehl abgebrochen!",
+	
+	"invites_help":					"Verwenden Sie diesen Befehl zum Erstellen von Einladungen zur einmaligen Verwendung mit dem Parameter *erstellen* und der Anzahl der zu erstellenden Einladungen als zweitem Parameter. Erstellte Einladungen zur einmaligen Verwendung können auch mit dem Parameter *entfernen* entfernt werden. Um den Status abzufragen, verwenden Sie den Parameter *status*\nDer Befehl kann mit Google Spreadsheet kombiniert werden.",
+	"invites_create":				"Schreiben Sie die Anzahl der zu erzeugenden Einladungen zusammen mit dem gesamten Befehl, um die Erzeugung zu starten!",
+	"invites_create_start":			"Die Einladungen werden gerade erstellt. Bitte warten Sie!",
+	"invites_create_complete":		"{} Einladungen sind erstellt worden!",
+	"invites_create_err":			"Es ist ein interner Fehler aufgetreten! Die erstellten One Time Use Invites wurden erstellt, konnten aber nicht gespeichert werden!",
+	"invites_create_err_2":			"Die Anzahl der zu erstellenden Einladungen muss zwischen 1 und 1000 liegen!",
+	"invites_already_running":		"Es werden gerade Einladungen erstellt oder entfernt. Bitte warten Sie, bevor Sie den Befehl erneut verwenden!\nAnzahl der bereits erstellten oder entfernten Einladungen: **{}**/**{}**",
+	"invites_remove_help":			"Bestätigen Sie die Ausführung mit dem Parameter *alle*, indem Sie ihn zusammen mit dem gesamten Befehl schreiben!",
+	"invites_remove_start":			"Die Einladungen werden entfernt. Bitte warten Sie!",
+	"invites_remove_complete":		"Einladungen zur einmaligen Verwendung wurden entfernt!",
+	"invites_remove_err":			"Es ist ein interner Fehler aufgetreten! Die erstellten Einladungen zur einmaligen Verwendung wurden nur aus dem Discord entfernt!",
+	"invites_remove_err_2":			"Es wurden keine unbenutzten einmaligen Einladungen gefunden!",
+	"invites_status":				"Gesamtzahl der verarbeiteten Einladungen: **{}**/**{}**",
+	"invites_status_err":			"Zu diesem Zeitpunkt werden keine Einladungen bearbeitet!",
+	"invites_shutdown_mode":		"Neue Einladungsjobs können nicht gestartet werden, da der Bot kurz vor der Abschaltung steht!",
+	"invites_used_by":				"Invite code **{}** has been used by the user **{}** with the id number **{}**"
 }

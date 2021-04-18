@@ -373,6 +373,7 @@ public class Display implements CommandPublic{
 				out.append("Prune command: "+GuildIni.getPruneLevel(e.getGuild().getIdLong()));
 				out.append("Warn command: "+GuildIni.getWarnLevel(e.getGuild().getIdLong()));
 				out.append("Reddit command: "+GuildIni.getRedditLevel(e.getGuild().getIdLong()));
+				out.append("Invites command: "+GuildIni.getInvitesLevel(e.getGuild().getIdLong()));
 				//print second part
 				e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
 				//print third part (custom commands)
