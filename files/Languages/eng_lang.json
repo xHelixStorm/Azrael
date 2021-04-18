@@ -1434,5 +1434,6 @@
 	"invites_remove_err_2":			"No unused one time invites have been found!",
 	"invites_status":				"Total number of processed invites: **{}**/**{}**",
 	"invites_status_err":			"No invites are being processed at this point of time!",
-	"invites_shutdown_mode":		"New invite jobs can't be started because the Bot is about to shutdown!"
+	"invites_shutdown_mode":		"New invite jobs can't be started because the Bot is about to shutdown!",
+	"invites_used_by":				"Invite code **{}** has been used by the user **{}** with the id number **{}**"
 }

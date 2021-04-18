@@ -1435,7 +1435,8 @@ public enum Translation {
 	INVITES_REMOVE_ERR_2		("invites_remove_err_2"),
 	INVITES_STATUS				("invites_status"),
 	INVITES_STATUS_ERR			("invites_status_err"),
-	INVITES_SHUTDOWN_MODE		("invites_shutdown_mode");
+	INVITES_SHUTDOWN_MODE		("invites_shutdown_mode"),
+	INVITES_USED_BY				("invites_used_by");
 	
 	private String value;
 	

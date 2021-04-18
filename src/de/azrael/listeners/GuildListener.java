@@ -483,6 +483,8 @@ public class GuildListener extends ListenerAdapter {
 								}
 							});
 							
+							STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.GREEN), STATIC.getTranslation2(guild, Translation.INVITES_USED_BY).replaceFirst("\\{\\}", serverInvite.getCode()).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator()).replace("{}", member.getUser().getId()), Channel.LOG.getType());
+							
 							if(Azrael.SQLUpdateUsedinvite(guild.getIdLong(), invite, member.getUser().getIdLong()) == 0)
 								logger.warn("Used invite {} from {} couldn't be labeled as used in guild {}", invite, member.getUser().getId(), guild.getId());
 							
@@ -532,17 +534,26 @@ public class GuildListener extends ListenerAdapter {
 						if(columns != null && columns.size() > 0) {
 							int columnUserID = 0;
 							int columnName = 0;
+							String columnNameFormat = null;
 							int columnUsername = 0;
+							String columnUsernameFormat = null;
 							int columnTimestampUpdated = 0;
+							String columnTimestampUpdatedFormat = null;
 							for(final var column : columns) {
 								if(column.getItem() == GoogleDD.USER_ID)
 									columnUserID = column.getColumn();
-								else  if(column.getItem() == GoogleDD.NAME)
+								else  if(column.getItem() == GoogleDD.NAME) {
 									columnName = column.getColumn();
-								else if(column.getItem() == GoogleDD.USERNAME)
+									columnNameFormat = column.getFormatter();
+								}
+								else if(column.getItem() == GoogleDD.USERNAME) {
 									columnUsername = column.getColumn();
-								else if(column.getItem() == GoogleDD.TIMESTAMP_UPDATED)
+									columnUsernameFormat = column.getFormatter();
+								}
+								else if(column.getItem() == GoogleDD.TIMESTAMP_UPDATED) {
 									columnTimestampUpdated = column.getColumn();
+									columnTimestampUpdatedFormat = column.getFormatter();
+								}
 							}
 							if(columnUserID != 0 || columnName != 0 || columnUsername != 0 || columnTimestampUpdated != 0) {
 								ArrayList<List<Object>> values = new ArrayList<List<Object>>();
@@ -554,11 +565,11 @@ public class GuildListener extends ListenerAdapter {
 									if(columnCount == columnUserID)
 										subValues.add(member.getUser().getId());
 									else if(columnCount == columnName) 
-										subValues.add(member.getUser().getName()+"#"+member.getUser().getDiscriminator());
-									else if(columnCount == columnUsername)
-										subValues.add(member.getEffectiveName());
+										subValues.add(GoogleDD.NAME.valueFormatter(member.getUser().getName()+"#"+member.getUser().getDiscriminator(), columnNameFormat));
+									else if(columnCount == columnUsername) 
+										subValues.add(GoogleDD.USERNAME.valueFormatter(member.getEffectiveName(), columnUsernameFormat));
 									else if(columnCount == columnTimestampUpdated)
-										subValues.add(new Timestamp(System.currentTimeMillis()));
+										subValues.add(GoogleDD.TIMESTAMP_UPDATED.valueFormatter(new Timestamp(System.currentTimeMillis()), columnTimestampUpdatedFormat));
 									else
 										subValues.add(column);
 								}

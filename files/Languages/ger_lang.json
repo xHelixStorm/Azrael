@@ -1434,5 +1434,6 @@
 	"invites_remove_err_2":			"Es wurden keine unbenutzten einmaligen Einladungen gefunden!",
 	"invites_status":				"Gesamtzahl der verarbeiteten Einladungen: **{}**/**{}**",
 	"invites_status_err":			"Zu diesem Zeitpunkt werden keine Einladungen bearbeitet!",
-	"invites_shutdown_mode":		"Neue Einladungsjobs können nicht gestartet werden, da der Bot kurz vor der Abschaltung steht!"
+	"invites_shutdown_mode":		"Neue Einladungsjobs können nicht gestartet werden, da der Bot kurz vor der Abschaltung steht!",
+	"invites_used_by":				"Invite code **{}** has been used by the user **{}** with the id number **{}**"
 }

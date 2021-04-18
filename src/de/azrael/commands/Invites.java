@@ -62,7 +62,7 @@ public class Invites implements CommandPublic {
 								STATIC.addThread(Thread.currentThread(), "invites_gu"+e.getGuild().getId());
 								
 								inviteStatus.put(e.getGuild().getIdLong(), new InviteManagement(total));
-								final TextChannel textChannel = e.getGuild().getTextChannels().parallelStream().filter(f -> e.getGuild().getSelfMember().hasPermission(f, Permission.MESSAGE_READ)).findAny().orElse(null);
+								final TextChannel textChannel = e.getGuild().getTextChannels().stream().filter(f -> e.getGuild().getSelfMember().hasPermission(f, Permission.MESSAGE_READ)).findAny().orElse(null);
 								if(textChannel != null) {
 									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_CREATE_START)).build()).queue();
 									final ArrayList<String> invites = new ArrayList<String>();
