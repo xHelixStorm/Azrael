@@ -35,6 +35,7 @@ import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -53,10 +54,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class GuildMessageReactionAddListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageReactionAddListener.class);
-	
-	private final static String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
-	private final static String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
-	private final static String shrug = EmojiManager.getForAlias(":shrug:").getUnicode();
 	
 	@Override
 	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent e) {
@@ -340,29 +337,52 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 				final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 				if(thisChannel != null && thisChannel.getChannel_Type() != null && (thisChannel.getChannel_Type().equals(Channel.VOT.getType()) || thisChannel.getChannel_Type().equals(Channel.VO2.getType()))) {
 					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY))) {
-						if(e.getReactionEmote().isEmoji()) {
-							boolean runSpreadsheet = false;
-							if(thumbsup.equals(e.getReactionEmote().getName())) {
-								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsdown, e.getUser()).queue();
-								if(thisChannel.getChannel_Type().equals(Channel.VO2.getType()))
-									e.getChannel().removeReactionById(e.getMessageIdLong(), shrug, e.getUser()).queue();
-								runSpreadsheet = true;
+						final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
+						Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");
+						Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
+						Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
+						
+						boolean runSpreadsheet = false;
+						if((e.getReactionEmote().isEmoji() && thumbsup instanceof String && ((String)thumbsup).equals(e.getReactionEmote().getName())) || (e.getReactionEmote().isEmote() && thumbsup instanceof Emote && ((Emote)thumbsup).getIdLong() == e.getReactionEmote().getIdLong())) {
+							if(thumbsdown instanceof String)
+								e.getChannel().removeReactionById(e.getMessageIdLong(), (String)thumbsdown, e.getUser()).queue();
+							else
+								e.getChannel().removeReactionById(e.getMessageIdLong(), (Emote)thumbsdown, e.getUser()).queue();
+							if(thisChannel.getChannel_Type().equals(Channel.VO2.getType())) {
+								if(shrug instanceof String)
+									e.getChannel().removeReactionById(e.getMessageIdLong(), (String)shrug, e.getUser()).queue();
+								else
+									e.getChannel().removeReactionById(e.getMessageIdLong(), (Emote)shrug, e.getUser()).queue();
 							}
-							else if(thumbsdown.equals(e.getReactionEmote().getName())) {
-								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsup, e.getUser()).queue();
-								if(thisChannel.getChannel_Type().equals(Channel.VO2.getType()))
-									e.getChannel().removeReactionById(e.getMessageIdLong(), shrug, e.getUser()).queue();
-								runSpreadsheet = true;
-							}
-							else if(shrug.equals(e.getReactionEmote().getName())) {
-								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsdown, e.getUser()).queue();
-								e.getChannel().removeReactionById(e.getMessageIdLong(), thumbsup, e.getUser()).queue();
-								runSpreadsheet = true;
-							}
-							
-							//Run google service, if enabled
-							runVoteSpreadsheetService(runSpreadsheet, e);
+							runSpreadsheet = true;
 						}
+						else if((e.getReactionEmote().isEmoji() && thumbsdown instanceof String && ((String)thumbsdown).equals(e.getReactionEmote().getName())) || (e.getReactionEmote().isEmote() && thumbsdown instanceof Emote && ((Emote)thumbsdown).getIdLong() == e.getReactionEmote().getIdLong())) {
+							if(thumbsup instanceof String)
+								e.getChannel().removeReactionById(e.getMessageIdLong(), (String)thumbsup, e.getUser()).queue();
+							else
+								e.getChannel().removeReactionById(e.getMessageIdLong(), (Emote)thumbsup, e.getUser()).queue();
+							if(thisChannel.getChannel_Type().equals(Channel.VO2.getType())) {
+								if(shrug instanceof String)
+									e.getChannel().removeReactionById(e.getMessageIdLong(), (String)shrug, e.getUser()).queue();
+								else
+									e.getChannel().removeReactionById(e.getMessageIdLong(), (Emote)shrug, e.getUser()).queue();
+							}
+							runSpreadsheet = true;
+						}
+						else if((e.getReactionEmote().isEmoji() && shrug instanceof String && ((String)shrug).equals(e.getReactionEmote().getName())) || (e.getReactionEmote().isEmote() && shrug instanceof Emote && ((Emote)shrug).getIdLong() == e.getReactionEmote().getIdLong())) {
+							if(thumbsdown instanceof String)
+								e.getChannel().removeReactionById(e.getMessageIdLong(), (String)thumbsdown, e.getUser()).queue();
+							else
+								e.getChannel().removeReactionById(e.getMessageIdLong(), (Emote)thumbsdown, e.getUser()).queue();
+							if(thumbsup instanceof String)
+								e.getChannel().removeReactionById(e.getMessageIdLong(), (String)thumbsup, e.getUser()).queue();
+							else
+								e.getChannel().removeReactionById(e.getMessageIdLong(), (Emote)thumbsup, e.getUser()).queue();
+							runSpreadsheet = true;
+						}
+						
+						//Run google service, if enabled
+						runVoteSpreadsheetService(runSpreadsheet, e);
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_MANAGE.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
@@ -424,15 +444,19 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 									if(columnUpVote != 0 || columnDownVote != 0 || columnShrugVote != 0) {
 										//build update array
 										ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+										final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
+										Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");
+										Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
+										Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
 										int thumbsUpCount = 0;
 										int thumbsDownCount = 0;
 										int shrugCount = 0;
 										for(final var reaction : e.getChannel().retrieveMessageById(e.getMessageId()).complete().getReactions()) {
-											if(columnUpVote > 0 && reaction.getReactionEmote().getName().equals(thumbsup))
+											if(columnUpVote > 0 && ((reaction.getReactionEmote().isEmoji() && thumbsup instanceof String && reaction.getReactionEmote().getName().equals((String)thumbsup)) || (reaction.getReactionEmote().isEmote() && thumbsup instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)thumbsup).getIdLong())))
 												thumbsUpCount = reaction.getCount()-1;
-											if(columnDownVote > 0 && reaction.getReactionEmote().getName().equals(thumbsdown))
+											if(columnDownVote > 0 && ((reaction.getReactionEmote().isEmoji() && thumbsdown instanceof String && reaction.getReactionEmote().getName().equals((String)thumbsdown)) || (reaction.getReactionEmote().isEmote() && thumbsdown instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)thumbsdown).getIdLong())))
 												thumbsDownCount = reaction.getCount()-1;
-											if(columnShrugVote > 0 && reaction.getReactionEmote().getName().equals(shrug))
+											if(columnShrugVote > 0 && ((reaction.getReactionEmote().isEmoji() && shrug instanceof String && reaction.getReactionEmote().getName().equals((String)shrug)) || (reaction.getReactionEmote().isEmote() && shrug instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)shrug).getIdLong())))
 												shrugCount = reaction.getCount()-1;
 										}
 										int columnCount = 0;

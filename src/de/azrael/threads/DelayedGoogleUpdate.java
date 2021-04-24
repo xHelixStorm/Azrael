@@ -125,6 +125,23 @@ public class DelayedGoogleUpdate implements Runnable {
 		}
 	}
 	
+	public static synchronized boolean containsMessage(String key, String action) {
+		return switch(action) {
+			case "add" -> {
+				yield add.containsKey(key);
+			}
+			case "update" -> {
+				yield update.containsKey(key);
+			}
+			case "remove" -> {
+				yield remove.containsKey(key);
+			}
+			default -> {
+				yield false;
+			}
+		};
+	}
+	
 	public static synchronized void handleRequestRemoval(String key) {
 		if(add.containsKey(key))
 			add.remove(key);

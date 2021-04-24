@@ -17,9 +17,9 @@ import de.azrael.util.STATIC;
 public class Patchnotes {
 	private static final Logger logger = LoggerFactory.getLogger(Patchnotes.class);
 	
-	private static String ip = IniFileReader.getSQLIP4();
-	private static String username = IniFileReader.getSQLUsername4();
-	private static String password = IniFileReader.getSQLPassword4();
+	private static String ip = IniFileReader.getSQLIP();
+	private static String username = IniFileReader.getSQLUsername();
+	private static String password = IniFileReader.getSQLPassword();
 		
 	public static void SQLconnection() {
 		try {
@@ -35,7 +35,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetPrivatePatchnotes);
 			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
@@ -63,7 +63,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetPublicPatchnotes);
 			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
@@ -90,7 +90,7 @@ public class Patchnotes {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLInsertPublishedPatchnotes);
 			stmt.setString(1, STATIC.getVersion());
 			stmt.setLong(2, guild_id);
@@ -109,7 +109,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLcheckPublishedPatchnotes);
 			stmt.setString(1, STATIC.getVersion());
 			stmt.setLong(2, guild_id);
@@ -128,56 +128,13 @@ public class Patchnotes {
 		}
 	}
 	
-	public static long SQLgetGuild(long guild_id) {
-		logger.trace("SQLgetGuild launched. Passed params {}", guild_id);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetGuild);
-			stmt.setLong(1, guild_id);
-			rs = stmt.executeQuery();
-			if(rs.next()){
-				return rs.getLong(1);
-			}
-			return 0;
-		} catch (SQLException e) {
-			logger.error("SQLgetGuild Exception", e);
-			return 0;
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static int SQLInsertGuild(long guild_id, String name) {
-		logger.trace("SQLInsertGuilds launched. Params passed {}, {}", guild_id, name);
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
-			stmt = myConn.prepareStatement(PatchnotesStatements.SQLInsertGuild);
-			stmt.setLong(1, guild_id);
-			stmt.setString(2, name);
-			return stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLInsertGuilds Exception", e);
-			return 0;
-		} finally {
-		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static boolean SQLcheckPublishedBotPatchnotes(long guild_id) {
 		logger.trace("SQLcheckPublishedBotPatchnotes launched. Params passed {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLcheckPublishedBotPatchnotes);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -202,7 +159,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetPrivatePatchnotesArray);
 			rs = stmt.executeQuery();
 			while(rs.next()){
@@ -236,7 +193,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetPublicPatchnotesArray);
 			rs = stmt.executeQuery();
 			while(rs.next()){
@@ -270,7 +227,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Patchnotes", ip), username, password);
+			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetGamePatchnotesArray);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();

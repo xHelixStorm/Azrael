@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
-import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
 import de.azrael.core.UserPrivs;
@@ -27,6 +26,7 @@ import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -43,10 +43,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageReactionRemoveListener.class);
-	
-	private final static String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
-	private final static String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
-	private final static String shrug = EmojiManager.getForAlias(":shrug:").getUnicode();
 	
 	@Override
 	public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent e) {
@@ -217,15 +213,19 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 										if(columnUpVote != 0 || columnDownVote != 0 || columnShrugVote != 0) {
 											//build update array
 											ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+											final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
+											Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");
+											Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
+											Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
 											int thumbsUpCount = 0;
 											int thumbsDownCount = 0;
 											int shrugCount = 0;
 											for(final var reaction : e.getChannel().retrieveMessageById(e.getMessageId()).complete().getReactions()) {
-												if(columnUpVote > 0 && reaction.getReactionEmote().getName().equals(thumbsup))
+												if(columnUpVote > 0 && ((reaction.getReactionEmote().isEmoji() && thumbsup instanceof String && reaction.getReactionEmote().getName().equals((String)thumbsup)) || (reaction.getReactionEmote().isEmote() && thumbsup instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)thumbsup).getIdLong())))
 													thumbsUpCount = reaction.getCount()-1;
-												if(columnDownVote > 0 && reaction.getReactionEmote().getName().equals(thumbsdown))
+												if(columnDownVote > 0 && ((reaction.getReactionEmote().isEmoji() && thumbsdown instanceof String && reaction.getReactionEmote().getName().equals((String)thumbsdown)) || (reaction.getReactionEmote().isEmote() && thumbsdown instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)thumbsdown).getIdLong())))
 													thumbsDownCount = reaction.getCount()-1;
-												if(columnShrugVote > 0 && reaction.getReactionEmote().getName().equals(shrug))
+												if(columnShrugVote > 0 && ((reaction.getReactionEmote().isEmoji() && shrug instanceof String && reaction.getReactionEmote().getName().equals((String)shrug)) || (reaction.getReactionEmote().isEmote() && shrug instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)shrug).getIdLong())))
 													shrugCount = reaction.getCount()-1;
 											}
 											int columnCount = 0;

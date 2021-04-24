@@ -217,41 +217,17 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("RankingSystem", "Password");
 	}
-	public static String getSQLIP3() {
-		Ini ini = readConfig();
-		return ini.get("DiscordRoles", "IP");
-	}
-	public static String getSQLUsername3() {
-		Ini ini = readConfig();
-		return ini.get("DiscordRoles", "Username");
-	}
-	public static String getSQLPassword3() {
-		Ini ini = readConfig();
-		return ini.get("DiscordRoles", "Password");
-	}
-	public static String getSQLIP4() {
-		Ini ini = readConfig();
-		return ini.get("Patchnotes", "IP");
-	}
 	public static String getSQLWebIP() {
 		Ini ini = readConfig();
-		return ini.get("Azrael", "IP");
+		return ini.get("AzraelWeb", "IP");
 	}
 	public static String getSQLWebUsername() {
 		Ini ini = readConfig();
-		return ini.get("Azrael", "Username");
+		return ini.get("AzraelWeb", "Username");
 	}
 	public static String getSQLWebPassword() {
 		Ini ini = readConfig();
-		return ini.get("Azrael", "Password");
-	}
-	public static String getSQLUsername4() {
-		Ini ini = readConfig();
-		return ini.get("Patchnotes", "Username");
-	}
-	public static String getSQLPassword4() {
-		Ini ini = readConfig();
-		return ini.get("Patchnotes", "Password");
+		return ini.get("AzraelWeb", "Password");
 	}
 	public static String getPugThumbnail() {
 		Ini ini = readConfig();

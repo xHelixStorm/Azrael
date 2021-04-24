@@ -9,8 +9,6 @@ import de.azrael.core.Hashes;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.Azrael;
-import de.azrael.sql.DiscordRoles;
-import de.azrael.sql.Patchnotes;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.CollectUsersGuilds;
 import de.azrael.timerTask.ParseSubscription;
@@ -40,17 +38,9 @@ public class GuildJoinListener extends ListenerAdapter {
 		if(Azrael.SQLInsertGuild(guild_id, guild_name) == 0) {
 			logger.error("General guild information couldn't be saved on join in guild {}", guild_id);
 		}
-		//insert into DiscordRoles table
-		if(DiscordRoles.SQLInsertGuild(guild_id, guild_name) == 0) {
-			logger.error("Guild roles information couldn't be saved on join in guild {}", guild_id);
-		}
 		//insert into RankingSystem table
 		if(RankingSystem.SQLInsertGuild(guild_id, guild_name, false) == 0) {
 			logger.error("Guild ranking information couldn't be saved on join in guild {}", guild_id);
-		}
-		//insert into Patchnotes table
-		if(Patchnotes.SQLInsertGuild(guild_id, guild_name) == 0) {
-			logger.error("Guild patchnotes information couldn't be saved on join in guild {}", guild_id);
 		}
 		//insert all categories into table
 		Azrael.SQLBulkInsertCategories(e.getGuild().getCategories());

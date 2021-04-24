@@ -99,22 +99,10 @@ public class ReadyListener extends ListenerAdapter {
 					logger.error("General guild information couldn't be saved in guild {}", guild.getId());
 				}
 			}
-			//verify that the guild is registered in the discord roles database and do the same step
-			if(DiscordRoles.SQLgetGuild(guild.getIdLong()) == 0) {
-				if(DiscordRoles.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
-					logger.error("Guild roles information couldn't be saved in guild {}", guild.getId());
-				}
-			}
 			//verify that the guild is registered in the ranking system database and do the same step
 			if(RankingSystem.SQLgetGuild(guild.getIdLong()) == null) {
 				if(RankingSystem.SQLInsertGuild(guild.getIdLong(), guild.getName(), false) == 0) {
 					logger.error("Guild ranking information couldn't be saved in guild {}", guild.getId());
-				}
-			}
-			//verify that the guild is registered in the patch notes database and do the same step
-			if(Patchnotes.SQLgetGuild(guild.getIdLong()) == 0) {
-				if(Patchnotes.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {
-					logger.error("Guild patchnotes information couldn't be saved in guild {}", guild.getId());
 				}
 			}
 			//Retrieve all registered channels and throw warning, if no channel has been registered. If found, check for the log and bot channel
