@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -1562,12 +1564,14 @@ public class UserExecution {
 							if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 								Member member = e.getGuild().getMemberById(user_id);
 								if(member != null) {
-									member.getRoles().parallelStream().forEach(r -> {
-										roles.parallelStream().forEach(role -> {
-											if(r.getIdLong() == role.getRole_ID())
-												e.getGuild().removeRoleFromMember(member, e.getGuild().getRoleById(r.getIdLong())).queue();
+									if(!GuildIni.getCollectRankingRoles(e.getGuild().getIdLong())) {
+										member.getRoles().parallelStream().forEach(r -> {
+											roles.parallelStream().forEach(role -> {
+												if(r.getIdLong() == role.getRole_ID())
+													e.getGuild().removeRoleFromMember(member, e.getGuild().getRoleById(r.getIdLong())).queue();
+											});
 										});
-									});
+									}
 									if(assign_role != 0) {
 										e.getGuild().addRoleToMember(member, e.getGuild().getRoleById(assign_role)).queue();
 									}
@@ -1601,6 +1605,8 @@ public class UserExecution {
 					int level = 0;
 					long assign_role = 0;
 					boolean toBreak = false;
+					boolean collectRankingRoles = GuildIni.getCollectRankingRoles(e.getGuild().getIdLong());
+					Set<Long> rankingRoles = new HashSet<Long>();
 					var roles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
 					for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong())) {
 						if(experience >= ranks.getExperience()) {
@@ -1610,6 +1616,8 @@ public class UserExecution {
 							var role = roles.parallelStream().filter(f -> f.getLevel() == ranks.getLevel()).findAny().orElse(null);
 							if(role != null) {
 								assign_role = role.getRole_ID();
+								if(collectRankingRoles)
+									rankingRoles.add(assign_role);
 							}
 						}
 						else {
@@ -1634,14 +1642,21 @@ public class UserExecution {
 							if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 								Member member = e.getGuild().getMemberById(user_id);
 								if(member != null) {
-									member.getRoles().parallelStream().forEach(r -> {
-										roles.parallelStream().forEach(role -> {
-											if(r.getIdLong() == role.getRole_ID())
-												e.getGuild().removeRoleFromMember(member, e.getGuild().getRoleById(r.getIdLong())).queue();
+									if(!collectRankingRoles) {
+										member.getRoles().parallelStream().forEach(r -> {
+											roles.parallelStream().forEach(role -> {
+												if(r.getIdLong() == role.getRole_ID())
+													e.getGuild().removeRoleFromMember(member, e.getGuild().getRoleById(r.getIdLong())).queue();
+											});
 										});
-									});
-									if(assign_role != 0) {
+									}
+									if(!collectRankingRoles && assign_role != 0) {
 										e.getGuild().addRoleToMember(member, e.getGuild().getRoleById(assign_role)).queue();
+									}
+									else {
+										rankingRoles.forEach(r -> {
+											e.getGuild().addRoleToMember(member, e.getGuild().getRoleById(r)).queue();
+										});
 									}
 								}
 								else {
@@ -1672,11 +1687,15 @@ public class UserExecution {
 						long rankUpExperience = 0;
 						long assign_role = 0;
 						boolean toBreak = false;
+						boolean collectRankingRoles = GuildIni.getCollectRankingRoles(e.getGuild().getIdLong());
+						Set<Long> rankingRoles = new HashSet<Long>();
 						var roles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
 						for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong())) {
 							var role = roles.parallelStream().filter(f -> f.getLevel() == ranks.getLevel()).findAny().orElse(null);
 							if(role != null && toBreak == false) {
 								assign_role = role.getRole_ID();
+								if(collectRankingRoles)
+									rankingRoles.add(assign_role);
 							}
 							if(level == ranks.getLevel()) {
 								experience = ranks.getExperience();
@@ -1700,14 +1719,21 @@ public class UserExecution {
 								if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 									Member member = e.getGuild().getMemberById(user_id);
 									if(member != null) {
-										member.getRoles().parallelStream().forEach(r -> {
-											roles.parallelStream().forEach(role -> {
-												if(r.getIdLong() == role.getRole_ID())
-													e.getGuild().removeRoleFromMember(member, e.getGuild().getRoleById(r.getIdLong())).queue();
+										if(!collectRankingRoles) {
+											member.getRoles().parallelStream().forEach(r -> {
+												roles.parallelStream().forEach(role -> {
+													if(r.getIdLong() == role.getRole_ID())
+														e.getGuild().removeRoleFromMember(member, e.getGuild().getRoleById(r.getIdLong())).queue();
+												});
 											});
-										});
-										if(assign_role != 0) {
+										}
+										if(!collectRankingRoles && assign_role != 0) {
 											e.getGuild().addRoleToMember(member, e.getGuild().getRoleById(assign_role)).queue();
+										}
+										else {
+											rankingRoles.forEach(r -> {
+												e.getGuild().addRoleToMember(member, e.getGuild().getRoleById(r)).queue();
+											});
 										}
 									}
 									else {

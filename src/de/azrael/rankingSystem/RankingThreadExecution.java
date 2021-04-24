@@ -20,6 +20,7 @@ import de.azrael.constructors.Ranking;
 import de.azrael.constructors.Roles;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Translation;
+import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -304,9 +305,11 @@ public class RankingThreadExecution {
 				final var rankingRoles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
 				List<Role> current_roles = e.getMember().getRoles().parallelStream().filter(f -> f.getIdLong() != user_details.getCurrentRole() && rankingRoles.parallelStream().filter(r -> r.getRole_ID() == f.getIdLong()).findAny().orElse(null) != null).collect(Collectors.toList());
 				if(current_roles.size() > 0) {
-					current_roles.parallelStream().forEach(role -> {
-						e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(role.getIdLong())).queue();
-					});
+					if(!GuildIni.getCollectRankingRoles(e.getGuild().getIdLong())) {
+						current_roles.parallelStream().forEach(role -> {
+							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(role.getIdLong())).queue();
+						});
+					}
 					final Role role = e.getGuild().getRoleById(user_details.getCurrentRole());
 					if(role != null)
 						e.getGuild().addRoleToMember(e.getMember(), role).queue();
@@ -342,10 +345,12 @@ public class RankingThreadExecution {
 			//if a new ranking role has been unlocked, remove old ones and assign the newest one
 			final var rankingRoles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
 			if(level == roleAssignLevel) {
-				for(final Role r : e.getMember().getRoles()) {
-					for(final var role : rankingRoles) {
-						if(r.getIdLong() == role.getRole_ID()) {
-							e.getGuild().removeRoleFromMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(r.getIdLong())).queue();
+				if(!GuildIni.getCollectRankingRoles(e.getGuild().getIdLong())) {
+					for(final Role r : e.getMember().getRoles()) {
+						for(final var role : rankingRoles) {
+							if(r.getIdLong() == role.getRole_ID()) {
+								e.getGuild().removeRoleFromMember(e.getMember(), e.getJDA().getGuildById(e.getGuild().getIdLong()).getRoleById(r.getIdLong())).queue();
+							}
 						}
 					}
 				}

@@ -43,6 +43,7 @@ public class GuildIni {
 		general.put("Notifications", "false");
 		general.put("NewAccountOnJoin", "false");
 		general.put("ReassignRolesAfterMute", "false");
+		general.put("CollectRankingRoles", "false");
 		fileContent.put("General", general);
 		
 		//collect all Google variables
@@ -466,6 +467,10 @@ public class GuildIni {
 	public static boolean getReassignRolesAfterMute(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "ReassignRolesAfterMute", boolean.class);
+	}
+	public static boolean getCollectRankingRoles(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "CollectRankingRoles", boolean.class);
 	}
 	
 	public static boolean getGoogleFunctionalitiesEnabled(long guild_id) {
