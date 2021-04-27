@@ -2,6 +2,7 @@ package de.azrael.listeners;
 
 import java.awt.Color;
 import java.net.SocketTimeoutException;
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
-import com.vdurmont.emoji.EmojiManager;
 
 import de.azrael.constructors.Channels;
 import de.azrael.constructors.Messages;
@@ -35,6 +35,7 @@ import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -220,93 +221,131 @@ public class GuildMessageEditListener extends ListenerAdapter {
 				final String file_id = sheet[0];
 				final String row_start = sheet[1].replaceAll("![A-Z0-9]*", "");
 				if((sheet[2] == null || sheet[2].length() == 0) || sheet[2].equals(e.getChannel().getId())) {
-					try {
-						ValueRange response = DelayedGoogleUpdate.getCachedValueRange("VOTE"+e.getGuild().getId()+e.getChannel().getId());
-						if(response == null) {
-							final var service = GoogleSheets.getSheetsClientService();
-							response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
-							DelayedGoogleUpdate.cacheRetrievedSheetValueRange("VOTE"+e.getGuild().getId()+e.getChannel().getId(), response);
-						}
-						int currentRow = 0;
-						for(var row : response.getValues()) {
-							currentRow++;
-							if(row.parallelStream().filter(f -> {
-								String cell = (String)f;
-								if(cell.equals(e.getMessageId()))
-									return true;
-								else
-									return false;
-								}).findAny().orElse(null) != null) {
-								//retrieve the saved mapping for the vote event
-								final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id, e.getGuild().getIdLong());
-								if(columns != null && columns.size() > 0) {
-									//find out where the up_vote and down_vote columns are and mark them
-									int columnUpVote = 0;
-									int columnDownVote = 0;
-									int columnShrugVote = 0;
-									int columnMessage = 0;
-									for(final var column : columns) {
-										if(column.getItem() == GoogleDD.UP_VOTE)
-											columnUpVote = column.getColumn();
-										else if(column.getItem() == GoogleDD.DOWN_VOTE)
-											columnDownVote = column.getColumn();
-										else if(column.getItem() == GoogleDD.SHRUG_VOTE)
-											columnShrugVote = column.getColumn();
-										else if(column.getItem() == GoogleDD.MESSAGE)
-											columnMessage = column.getColumn();
-									}
-									if(columnMessage != 0) {
-										ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-										String thumbsup = EmojiManager.getForAlias(":thumbsup:").getUnicode();
-										String thumbsdown = EmojiManager.getForAlias(":thumbsdown:").getUnicode();
-										String shrug = EmojiManager.getForAlias(":shrug:").getUnicode();
-										int countThumbsUp = 0;
-										int countThumbsDown = 0;
-										int countShrug = 0;
-										for(final var reaction : e.getMessage().getReactions()) {
-											if(columnUpVote > 0 && reaction.getReactionEmote().getName().equals(thumbsup))
-												countThumbsUp = reaction.getCount()-1;
-											else if(columnDownVote > 0 && reaction.getReactionEmote().getName().equals(thumbsdown))
-												countThumbsDown = reaction.getCount()-1;
-											else if(columnShrugVote > 0 && reaction.getReactionEmote().getName().equals(shrug))
-												countShrug = reaction.getCount()-1;
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
+						try {
+							ValueRange response = DelayedGoogleUpdate.getCachedValueRange("VOTE"+e.getGuild().getId()+e.getChannel().getId());
+							if(response == null) {
+								final var service = GoogleSheets.getSheetsClientService();
+								response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
+								DelayedGoogleUpdate.cacheRetrievedSheetValueRange("VOTE"+e.getGuild().getId()+e.getChannel().getId(), response);
+							}
+							if(response.getValues() != null && response.getValues().parallelStream().filter(f -> f.parallelStream().filter(f2 -> ((String)f2).equals(e.getMessageId())).findAny().orElse(null) != null).findAny().orElse(null) != null) {
+								int currentRow = 0;
+								for(var row : response.getValues()) {
+									currentRow++;
+									if(row.parallelStream().filter(f -> {
+										String cell = (String)f;
+										if(cell.equals(e.getMessageId()))
+											return true;
+										else
+											return false;
+										}).findAny().orElse(null) != null) {
+										//retrieve the saved mapping for the vote event
+										final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.VOTE.id, e.getGuild().getIdLong());
+										if(columns != null && columns.size() > 0) {
+											//find out where the up_vote and down_vote columns are and mark them
+											int columnUpVote = 0;
+											int columnDownVote = 0;
+											int columnShrugVote = 0;
+											int columnMessage = 0;
+											for(final var column : columns) {
+												if(column.getItem() == GoogleDD.UP_VOTE)
+													columnUpVote = column.getColumn();
+												else if(column.getItem() == GoogleDD.DOWN_VOTE)
+													columnDownVote = column.getColumn();
+												else if(column.getItem() == GoogleDD.SHRUG_VOTE)
+													columnShrugVote = column.getColumn();
+												else if(column.getItem() == GoogleDD.MESSAGE)
+													columnMessage = column.getColumn();
+											}
+											if(columnMessage != 0) {
+												ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+												final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
+												Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");
+												Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
+												Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
+												int countThumbsUp = 0;
+												int countThumbsDown = 0;
+												int countShrug = 0;
+												for(final var reaction : e.getChannel().retrieveMessageById(e.getMessageIdLong()).complete().getReactions()) {
+													if(columnUpVote > 0 && ((reaction.getReactionEmote().isEmoji() && thumbsup instanceof String && reaction.getReactionEmote().getName().equals((String)thumbsup)) || (reaction.getReactionEmote().isEmote() && thumbsup instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)thumbsup).getIdLong())))
+														countThumbsUp = reaction.getCount()-1;
+													if(columnDownVote > 0 && ((reaction.getReactionEmote().isEmoji() && thumbsdown instanceof String && reaction.getReactionEmote().getName().equals((String)thumbsdown)) || (reaction.getReactionEmote().isEmote() && thumbsdown instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)thumbsdown).getIdLong())))
+														countThumbsDown = reaction.getCount()-1;
+													if(columnShrugVote > 0 && ((reaction.getReactionEmote().isEmoji() && shrug instanceof String && reaction.getReactionEmote().getName().equals((String)shrug)) || (reaction.getReactionEmote().isEmote() && shrug instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)shrug).getIdLong())))
+														countShrug = reaction.getCount()-1;
+												}
+												//build update array
+												int columnCount = 0;
+												for(final var column : row) {
+													columnCount ++;
+													if(columnCount == columnUpVote)
+														values.add(Arrays.asList(""+countThumbsUp));
+													else if(columnCount == columnDownVote)
+														values.add(Arrays.asList(""+countThumbsDown));
+													else if(columnCount == columnShrugVote)
+														values.add(Arrays.asList(""+countShrug));
+													else if(columnCount == columnMessage)
+														values.add(Arrays.asList(e.getMessage().getContentRaw()));
+													else
+														values.add(Arrays.asList(column));
+												}
+												ValueRange valueRange = new ValueRange().setRange(row_start+"!A"+currentRow).setMajorDimension("COLUMNS").setValues(values);
+												//execute Runnable
+												if(!STATIC.threadExists("VOTE"+e.getGuild().getId()+e.getChannel().getId())) {
+													new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), file_id, e.getChannel().getId(), "update", GoogleEvent.VOTE)).start();
+												}
+												else {
+													DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "update");
+												}
+											}
 										}
-										//build update array
-										int columnCount = 0;
-										for(final var column : row) {
-											columnCount ++;
-											if(columnCount == columnUpVote)
-												values.add(Arrays.asList(""+countThumbsUp));
-											else if(columnCount == columnDownVote)
-												values.add(Arrays.asList(""+countThumbsDown));
-											else if(columnCount == columnShrugVote)
-												values.add(Arrays.asList(""+countShrug));
-											else if(columnCount == columnMessage)
-												values.add(Arrays.asList(e.getMessage().getContentRaw()));
-											else
-												values.add(Arrays.asList(column));
-										}
-										ValueRange valueRange = new ValueRange().setRange(row_start+"!A"+currentRow).setMajorDimension("COLUMNS").setValues(values);
-										//execute Runnable
-										if(!STATIC.threadExists("VOTE"+e.getGuild().getId()+e.getChannel().getId())) {
-											new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), file_id, e.getChannel().getId(), "update", GoogleEvent.VOTE)).start();
-										}
-										else {
-											DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "update");
-										}
+										//interrupt the row search
+										break;
 									}
 								}
-								//interrupt the row search
-								break;
 							}
+							else if(DelayedGoogleUpdate.containsMessage(e.getGuild().getId()+"_"+e.getChannel().getId()+"_"+e.getMessageId(), "add")) {
+								final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
+								Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");
+								Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
+								Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
+								int upVote = 0;
+								int downVote = 0;
+								int shrugVote = 0;
+								for(final var reaction : e.getChannel().retrieveMessageById(e.getMessageId()).complete().getReactions()) {
+									if(reaction.getReactionEmote().isEmoji() && thumbsup instanceof String && reaction.getReactionEmote().getName().equals((String)thumbsup))
+										upVote = reaction.getCount()-1;
+									else if(reaction.getReactionEmote().isEmote() && thumbsup instanceof Emote && reaction.getReactionEmote().getIdLong() == ((Emote)thumbsup).getIdLong())
+										upVote = reaction.getCount()-1;
+									else if(reaction.getReactionEmote().isEmoji() && thumbsdown instanceof String && reaction.getReactionEmote().getName().equals((String)thumbsdown))
+										downVote = reaction.getCount()-1;
+									else if(reaction.getReactionEmote().isEmote() && thumbsdown instanceof Emote && reaction.getReactionEmote().getIdLong() == ((Emote)thumbsdown).getIdLong())
+										downVote = reaction.getCount()-1;
+									else if(reaction.getReactionEmote().isEmoji() && shrug instanceof String && reaction.getReactionEmote().getName().equals((String)shrug))
+										shrugVote = reaction.getCount()-1;
+									else if(reaction.getReactionEmote().isEmote() && shrug instanceof Emote && reaction.getReactionEmote().getIdLong() == ((Emote)shrug).getIdLong())
+										shrugVote = reaction.getCount()-1;
+								}
+								final var values = GoogleSheets.spreadsheetVoteRequest(sheet, e.getGuild(), e.getChannel().getId(), e.getMember().getUser().getId(), new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getMessageIdLong(), e.getMessage().getContentRaw(), upVote, downVote, shrugVote);
+								if(values != null) {
+									ValueRange valueRange = new ValueRange().setValues(values);
+									if(!STATIC.threadExists("VOTE"+e.getGuild().getId()+e.getChannel().getId())) {
+										new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), sheet[0], e.getChannel().getId(), "update", GoogleEvent.VOTE)).start();
+									}
+									else {
+										DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "update");
+									}
+								}
+							}
+						} catch(SocketTimeoutException e1) {
+							if(GoogleUtils.timeoutHandler(e.getGuild(), file_id, GoogleEvent.VOTE.name(), e1)) {
+								runVoteSpreadsheetService(e, allChannels);
+							}
+						} catch (Exception e1) {
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
+							logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
 						}
-					} catch(SocketTimeoutException e1) {
-						if(GoogleUtils.timeoutHandler(e.getGuild(), file_id, GoogleEvent.VOTE.name(), e1)) {
-							runVoteSpreadsheetService(e, allChannels);
-						}
-					} catch (Exception e1) {
-						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());
-						logger.error("Google Spreadsheet webservice error for event VOTE in guild {}", e.getGuild().getIdLong(), e1);
 					}
 				}
 			}
@@ -329,57 +368,75 @@ public class GuildMessageEditListener extends ListenerAdapter {
 								response = GoogleSheets.readWholeSpreadsheet(service, file_id, row_start);
 								DelayedGoogleUpdate.cacheRetrievedSheetValueRange("COMMENT"+e.getGuild().getId()+e.getChannel().getId(), response);
 							}
-							int currentRow = 0;
-							for(var row : response.getValues()) {
-								currentRow++;
-								if(row.parallelStream().filter(f -> {
-									String cell = (String)f;
-									if(cell.equals(e.getMessageId()))
-										return true;
-									else
-										return false;
-									}).findAny().orElse(null) != null) {
-									//retrieve the saved mapping for the comment event
-									final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.COMMENT.id, e.getGuild().getIdLong());
-									if(columns != null && columns.size() > 0) {
-										int columnMessage = 0;
-										int columnAttachment = 0;
-										for(final var column : columns) {
-											if(column.getItem() == GoogleDD.MESSAGE)
-												columnMessage = column.getColumn();
-											else  if(column.getItem() == GoogleDD.SCREEN_URL)
-												columnAttachment = column.getColumn();
-										}
-										if(columnMessage != 0) {
-											ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-											//build update array
-											int columnCount = 0;
-											for(final var column : row) {
-												columnCount ++;
-												if(columnCount == columnMessage)
-													values.add(Arrays.asList(e.getMessage().getContentRaw()));
-												else if(columnCount == columnAttachment) {
-													StringBuilder urls = new StringBuilder();
-													for(final var attachment : e.getMessage().getAttachments()) {
-														urls.append(attachment.getProxyUrl()+"\n");
+							if(response.getValues() != null && response.getValues().parallelStream().filter(f -> f.parallelStream().filter(f2 -> ((String)f2).equals(e.getMessageId())).findAny().orElse(null) != null).findAny().orElse(null) != null) {
+								int currentRow = 0;
+								for(var row : response.getValues()) {
+									currentRow++;
+									if(row.parallelStream().filter(f -> {
+										String cell = (String)f;
+										if(cell.equals(e.getMessageId()))
+											return true;
+										else
+											return false;
+										}).findAny().orElse(null) != null) {
+										//retrieve the saved mapping for the comment event
+										final var columns = Azrael.SQLgetGoogleSpreadsheetMapping(file_id, GoogleEvent.COMMENT.id, e.getGuild().getIdLong());
+										if(columns != null && columns.size() > 0) {
+											int columnMessage = 0;
+											int columnAttachment = 0;
+											for(final var column : columns) {
+												if(column.getItem() == GoogleDD.MESSAGE)
+													columnMessage = column.getColumn();
+												else  if(column.getItem() == GoogleDD.SCREEN_URL)
+													columnAttachment = column.getColumn();
+											}
+											if(columnMessage != 0) {
+												ArrayList<List<Object>> values = new ArrayList<List<Object>>();
+												//build update array
+												int columnCount = 0;
+												for(final var column : row) {
+													columnCount ++;
+													if(columnCount == columnMessage)
+														values.add(Arrays.asList(e.getMessage().getContentRaw()));
+													else if(columnCount == columnAttachment) {
+														StringBuilder urls = new StringBuilder();
+														for(final var attachment : e.getMessage().getAttachments()) {
+															urls.append(attachment.getProxyUrl()+"\n");
+														}
+														values.add(Arrays.asList(urls.toString()));
 													}
-													values.add(Arrays.asList(urls.toString()));
+													else
+														values.add(Arrays.asList(column));
 												}
-												else
-													values.add(Arrays.asList(column));
-											}
-											ValueRange valueRange = new ValueRange().setRange(row_start+"!A"+currentRow).setMajorDimension("COLUMNS").setValues(values);
-											//Execute Runnable
-											if(!STATIC.threadExists("COMMENT"+e.getGuild().getId()+e.getChannel().getId())) {
-												new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), array[0], e.getChannel().getId(), "update", GoogleEvent.COMMENT)).start();
-											}
-											else {
-												DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "update");
+												ValueRange valueRange = new ValueRange().setRange(row_start+"!A"+currentRow).setMajorDimension("COLUMNS").setValues(values);
+												//Execute Runnable
+												if(!STATIC.threadExists("COMMENT"+e.getGuild().getId()+e.getChannel().getId())) {
+													new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), array[0], e.getChannel().getId(), "update", GoogleEvent.COMMENT)).start();
+												}
+												else {
+													DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "update");
+												}
 											}
 										}
+										//interrupt the row search
+										break;
 									}
-									//interrupt the row search
-									break;
+								}
+							}
+							else {
+								StringBuilder urls = new StringBuilder();
+								for(final var attachment : e.getMessage().getAttachments()) {
+									urls.append(attachment.getProxyUrl()+"\n");
+								}
+								final var values = GoogleSheets.spreadsheetCommentRequest(array, e.getGuild(), e.getChannel().getId(), e.getMember().getUser().getId(), new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getMessageIdLong(), e.getMessage().getContentRaw(), urls.toString().trim());
+								if(values != null) {
+									ValueRange valueRange = new ValueRange().setValues(values);
+									if(!STATIC.threadExists("COMMENT"+e.getGuild().getId()+e.getChannel().getId())) {
+										new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), array[0], e.getChannel().getId(), "update", GoogleEvent.COMMENT)).start();
+									}
+									else {
+										DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "update");
+									}
 								}
 							}
 						} catch (SocketTimeoutException e1) {

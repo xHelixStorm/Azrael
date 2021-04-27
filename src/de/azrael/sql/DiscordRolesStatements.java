@@ -3,8 +3,6 @@ package de.azrael.sql;
 import de.azrael.util.STATIC;
 
 class DiscordRolesStatements {
-	final static String SQLgetGuild = STATIC.decrypt("K8jyHUXj1jQLQs8MZcIBhd4jZAyb2umY4CLy1w4+bH0bHXPljH9+xNbc3cgfleZg");
-	final static String SQLInsertGuild = STATIC.decrypt("xT8feoGbkwVNwScURTdaH0GA0GWjnD5ubu9eBeSG/qY4F7lkryeQF6iD30lvGKZ3xXT01EfhDEGSoBFgEMzdvYZEUbY0hSiEMRYkRUoQJQla2LeoiDs/m7HyHrMJ1wCm");
 	final static String SQLInsertRole = STATIC.decrypt("nweeWsN6AwBwHyuBbNhLXc0fcW/tihVc4Q+Oc3YhwYViJc7vfIWGg0OrbwKsgKNlg6M4iQTzSldwTvHgmGAZmyYgrLvefwuFNglqssIXu2T/H009xpXzoAGCUzzcCbLFYQdc32Ob1bnjXA4Wj3CDDJoRpIT4y0zyKaatw6rZ9LZN0dKxlWieaittMo0f/JOayhJJYQG+/YcMHQzC0uejUsG1ZhZy+ySFQ2HHv1WRTx7COqFHP0SUI8Gt8D9+uwdlX91Xjk0DOZ8U/UY79vJIZI1Y0oObev6MAyPmGCFZpa5EGl89Fa6Srd9+VUWT01Li");
 	final static String SQLInsertRoles = STATIC.decrypt("nweeWsN6AwBwHyuBbNhLXc0fcW/tihVc4Q+Oc3YhwYViJc7vfIWGg0OrbwKsgKNlg6M4iQTzSldwTvHgmGAZmyYgrLvefwuFNglqssIXu2T/H009xpXzoAGCUzzcCbLFYQdc32Ob1bnjXA4Wj3CDDJoRpIT4y0zyKaatw6rZ9LZN0dKxlWieaittMo0f/JOayhJJYQG+/YcMHQzC0uejUsG1ZhZy+ySFQ2HHv1WRTx7COqFHP0SUI8Gt8D9+uwdlX91Xjk0DOZ8U/UY79vJIZI1Y0oObev6MAyPmGCFZpa5EGl89Fa6Srd9+VUWT01Li");
 	final static String SQLUpdateAllRoles = STATIC.decrypt("Fx4SAO5otvhxOoRg9Tn8t7MQwxjL1olpMQWMXDM2rxK+kcRkwe1Cd0g4tSlnsdRL0PgPTg/SZ2fOVVexJvgez9ZWIjjkOUE++e6vP5Ist+SCJg1PT6IgCXfXespXSED/");

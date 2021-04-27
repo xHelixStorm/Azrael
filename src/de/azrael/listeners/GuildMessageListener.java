@@ -56,6 +56,7 @@ import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.MessageType;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -271,10 +272,24 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(currentChannel != null && currentChannel.getChannel_Type() != null && (currentChannel.getChannel_Type().equals(Channel.VOT.getType()) || currentChannel.getChannel_Type().equals(Channel.VO2.getType())) && e.getGuild().getSelfMember().getIdLong() != e.getMember().getUser().getIdLong()) {
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION))) {
 							if(e.getMessage().getType() != MessageType.CHANNEL_PINNED_ADD) {
-								e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsup:").getUnicode()).queue();
-								e.getMessage().addReaction(EmojiManager.getForAlias(":thumbsdown:").getUnicode()).queue();
-								if(currentChannel.getChannel_Type().equals(Channel.VO2.getType()))
-									e.getMessage().addReaction(EmojiManager.getForAlias(":shrug:").getUnicode()).queue();
+								final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
+								final Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");;
+								final Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
+								if(thumbsup instanceof Emote)
+									e.getMessage().addReaction((Emote)thumbsup).queue();
+								else if(thumbsup instanceof String)
+									e.getMessage().addReaction((String)thumbsup).queue();
+								if(thumbsdown instanceof Emote)
+									e.getMessage().addReaction((Emote)thumbsdown).queue();
+								else if(thumbsdown instanceof String)
+									e.getMessage().addReaction((String)thumbsdown).queue();
+								if(currentChannel.getChannel_Type().equals(Channel.VO2.getType())) {
+									final Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
+									if(shrug instanceof Emote)
+										e.getMessage().addReaction((Emote)shrug).queue();
+									else if(shrug instanceof String)
+										e.getMessage().addReaction((String)shrug).queue();
+								}
 								
 								//Run google service, if enabled
 								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {

@@ -43,6 +43,7 @@ public class GuildIni {
 		general.put("Notifications", "false");
 		general.put("NewAccountOnJoin", "false");
 		general.put("ReassignRolesAfterMute", "false");
+		general.put("CollectRankingRoles", "false");
 		fileContent.put("General", general);
 		
 		//collect all Google variables
@@ -94,6 +95,9 @@ public class GuildIni {
 		reactions.put("Emoji7", "");
 		reactions.put("Emoji8", "");
 		reactions.put("Emoji9", "");
+		reactions.put("VoteThumbsUp", "");
+		reactions.put("VoteThumbsDown", "");
+		reactions.put("VoteShrug", "");
 		fileContent.put("Reactions", reactions);
 		
 		//collect all Commands variables
@@ -464,6 +468,10 @@ public class GuildIni {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "ReassignRolesAfterMute", boolean.class);
 	}
+	public static boolean getCollectRankingRoles(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "CollectRankingRoles", boolean.class);
+	}
 	
 	public static boolean getGoogleFunctionalitiesEnabled(long guild_id) {
 		Ini ini = readIni(guild_id);
@@ -608,6 +616,14 @@ public class GuildIni {
 		reaction[6] = ini.get("Reactions", "Emoji7");
 		reaction[7] = ini.get("Reactions", "Emoji8");
 		reaction[8] = ini.get("Reactions", "Emoji9");
+		return reaction;
+	}
+	public static String[] getVoteReactions(long guild_id) {
+		Ini ini = readIni(guild_id);
+		String[] reaction = new String[3];
+		reaction[0] = ini.get("Reactions", "VoteThumbsUp");
+		reaction[1] = ini.get("Reactions", "VoteThumbsDown");
+		reaction[2] = ini.get("Reactions", "VoteShrug");
 		return reaction;
 	}
 	

@@ -41,6 +41,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vdurmont.emoji.EmojiManager;
+
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Channels;
 import de.azrael.constructors.SpamDetection;
@@ -83,7 +85,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.41.578";
+	private static final String VERSION = "7.42.580";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -843,5 +845,20 @@ public class STATIC {
 			logger.error("Algorithm is not supported", e);
 		}
 		return null;
+	}
+	
+	public static Object retrieveEmoji(final Guild guild, final String targetEmoji, final String defaultEmoji) {
+		Object emoji = null;
+		if(targetEmoji != null && targetEmoji.length() > 0) {
+			final var emotes = guild.getEmotesByName(targetEmoji, false);
+			if(emotes.size() > 0)
+				emoji = emotes.get(0);
+			else
+				emoji = EmojiManager.getForAlias(":"+targetEmoji+":").getUnicode();
+		}
+		else {
+			emoji = EmojiManager.getForAlias(defaultEmoji).getUnicode();
+		}
+		return emoji;
 	}
 }
