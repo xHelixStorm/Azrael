@@ -1302,6 +1302,7 @@
 	"web_not_allowed":				"Ha desactivado el método de inicio de sesión directo para el sitio web. Por favor, inicie sesión directamente en el sitio web a través de este enlace y cambie la configuración de inicio de sesión para utilizar este método de inicio de sesión.\n",
 	"web_code":						"Utilice esta clave para acceder al sitio web. La clave es válida durante 5 minutos. Si no ha solicitado el acceso, póngase en contacto con un administrador.\n**{}**",
 	"web_recovery":					"Utilice esta clave para recuperar su cuenta web. La clave es válida durante 5 minutos. Si no ha solicitado la clave, póngase en contacto con un administrador.\n**{}**",
+	"web_options":					"Utilice esta clave para cambiar las opciones solicitadas de su cuenta web. La clave es válida durante 5 minutos. Si no ha solicitado la clave, póngase en contacto con un administrador.\n**{}**",
 	"web_confirm":					"¡Aquí la URL de confirmación solicitada para Azrael Web!\n",
 	
 	"accept_no_wait":				"Para utilizar este comando es necesario registrar una categoría de verificación y un rol verificado.",

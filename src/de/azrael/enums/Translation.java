@@ -1304,6 +1304,7 @@ public enum Translation {
 	WEB_NOT_ALLOWED				("web_not_allowed"),
 	WEB_CODE					("web_code"),
 	WEB_RECOVERY				("web_recovery"),
+	WEB_OPTIONS					("web_options"),
 	WEB_CONFIRM					("web_confirm"),
 	
 	ACCEPT_NO_WAIT				("accept_no_wait"),

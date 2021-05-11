@@ -264,7 +264,6 @@ public class Display implements CommandPublic{
 			if(UserPrivs.comparePrivilege(e.getMember(), commandsLevel) || adminPermission) {
 				//collect commands and command levels
 				out.append("About command: "+GuildIni.getAboutLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Hidden commands: "+GuildIni.getCommandsAdminLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Daily command: "+GuildIni.getDailyLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Display command: "+GuildIni.getDisplayLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Display roles subcommand: "+GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong())+"\n");

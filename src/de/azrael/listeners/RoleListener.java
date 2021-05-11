@@ -340,7 +340,7 @@ public class RoleListener extends ListenerAdapter {
 						if(Azrael.SQLMarkGiveawayAsUsed(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), reward) > 0) {
 							e.getMember().getUser().openPrivateChannel().queue(channel -> {
 								String submit = null;
-								final String content = FileSetting.readFile("files/Guilds/"+e.getGuild().getId()+"/assignMessage.txt");
+								final String content = FileSetting.readFile("files/Guilds/"+e.getGuild().getId()+"/assignmessage.txt");
 								if(content != null && content.trim().length() > 0) {
 									submit = content.trim()+"\n**"+reward+"**";
 								}

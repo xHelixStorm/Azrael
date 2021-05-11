@@ -27,7 +27,7 @@ public class GuildIni {
 		LinkedHashMap<String, String> commandLevels = new LinkedHashMap<String, String>();
 		
 		//collect all General variables
-		general.put("Administrator", "");
+		general.put("Administrator", "0");
 		general.put("CommandPrefix", "H!");
 		general.put("JoinMessage", "false");
 		general.put("LeaveMessage", "false");
@@ -373,13 +373,26 @@ public class GuildIni {
 		}
 	}
 	
-	private static Ini readIni(long guild_id) {
+	public static Ini readIni(long guild_id) {
 		try {
 			return new Ini(new File("./ini/"+guild_id+".ini"));
 		} catch (IOException e) {
 			logger.error("Error while reading guild ini file {}.ini", guild_id, e);
 			return null;
 		}
+	}
+	
+	public static boolean saveIniOption(long guild_id, String field, String value) {
+		try {
+			Ini ini = readIni(guild_id);
+			String [] selectedField = field.split("_");
+			ini.put(selectedField[0], selectedField[1], value);
+			ini.store(new File("./ini/"+guild_id+".ini"));
+			return true;
+		} catch (IOException e) {
+			logger.error("Error while overwriting guild ini file {}.ini", guild_id, e);
+		}
+		return false;
 	}
 	
 	public static long getAdmin(long guild_id) {
@@ -594,11 +607,6 @@ public class GuildIni {
 		return credentials;
 	}
 	
-	public static String getPastebinKey(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("Pastebin", "Key");
-	}
-	
 	public static boolean getReactionEnabled(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("Reactions", "Enabled", boolean.class);
@@ -634,10 +642,6 @@ public class GuildIni {
 	public static int getAboutLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "About", int.class);
-	}
-	public static int getCommandsAdminLevel(long guild_id) {
-		Ini ini = readIni(guild_id);
-		return ini.get("CommandLevels", "CommandsAdmin", int.class);
 	}
 	public static boolean getDailyCommand(long guild_id) {
 		Ini ini = readIni(guild_id);
