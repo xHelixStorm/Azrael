@@ -1378,7 +1378,7 @@
     "update_voice_user_limit":      "Limite de usuário do canal de voz atualizado de",
     "update_user_limit":            "Limite de usuário ",
     "update_role_color":            "Cor da função atualizada de ",
-    "update_color":                 "Cor RGB",
+    "update_color":                 "Cor Hex",
     "update_role_permissions":      "Permissões de função atualizadas de ",
     "update_permissions_added":     "Permissões adicionadas ",
     "update_permissions_removed":   "Permissões removidas ",

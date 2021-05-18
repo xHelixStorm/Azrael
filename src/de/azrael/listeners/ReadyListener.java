@@ -212,6 +212,7 @@ public class ReadyListener extends ListenerAdapter {
 										final long user_id = ((JSONObject) item).getLong("user_id");
 										final String username = ((JSONObject) item).getString("username");
 										final JSONArray history = ((JSONObject) item).getJSONArray("history");
+										final boolean isUserBot = ((JSONObject) item).getBoolean("isUserBot");
 										ArrayList<Messages> savedMessages = new ArrayList<Messages>();
 										history.forEach(h -> {
 											if(h instanceof JSONObject) {
@@ -228,6 +229,7 @@ public class ReadyListener extends ListenerAdapter {
 												currentMessage.setIsEdit(edit);
 												currentMessage.setTime(date);
 												currentMessage.setMessage(message);
+												currentMessage.setIsUserBot(isUserBot);
 												savedMessages.add(currentMessage);
 											}
 										});

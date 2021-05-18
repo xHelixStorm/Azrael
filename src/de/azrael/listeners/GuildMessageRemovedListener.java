@@ -105,7 +105,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 											removed_from = entry.getTargetIdLong();
 											//be sure to avoid printing a message which got deleted from a bot or by a bot. Also print a deleted message, if the user has left the server
 											Member member = e.getGuild().getMemberById(removed_from);
-											if(member == null || (member != null && !member.getUser().isBot()) || firstMessage.getUserID()  == 0) {
+											if(member == null || !firstMessage.isUserBot() || firstMessage.getUserID()  == 0) {
 												trigger_user_id = entry.getUser().getIdLong();
 												trigger_user_name = entry.getUser().getName()+"#"+entry.getUser().getDiscriminator();
 												break;
@@ -153,7 +153,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 									}
 								}
 								//if enabled, display all deleted messages which weren't deleted by someone else but from the same user and still isn't a bot
-								else if(GuildIni.getSelfDeletedMessage(e.getGuild().getIdLong()) && firstMessage.getUserID() != 0 && !suppress_deleted && !e.getGuild().getMemberById(firstMessage.getUserID()).getUser().isBot()) {
+								else if(GuildIni.getSelfDeletedMessage(e.getGuild().getIdLong()) && firstMessage.getUserID() != 0 && !suppress_deleted && !firstMessage.isUserBot()) {
 									//confirm that we have a message to print
 									if(firstMessage.getMessage().length() > 0) {
 										message.setColor(Color.GRAY);

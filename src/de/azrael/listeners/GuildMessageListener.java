@@ -860,6 +860,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					collectedMessage.setMessageID(e.getMessageIdLong());
 					collectedMessage.setTime(ZonedDateTime.now());
 					collectedMessage.setIsEdit(false);
+					collectedMessage.setIsUserBot(e.getMember().getUser().isBot());
 					
 					if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "MESSAGE ["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
 					if(log[1]) {

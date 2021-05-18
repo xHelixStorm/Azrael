@@ -1378,7 +1378,7 @@
 	"update_voice_user_limit":		"Голосовой канал: лимит пользователей обновлен ",
 	"update_user_limit":			"Лимит пользователей",
 	"update_role_color":			"Цвет роли обновлен ",
-	"update_color":					"Цвет RGB",
+	"update_color":					"Цвет Hex",
 	"update_role_permissions":		"Разрешения роли обновлены ",
 	"update_permissions_added":		"Разрешения добавлены",
 	"update_permissions_removed":	"Разрешения удалены",

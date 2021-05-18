@@ -226,6 +226,7 @@ public class TwitterModel {
 														collectedMessage.setMessageID(m.getIdLong());
 														collectedMessage.setTime(ZonedDateTime.now());
 														collectedMessage.setIsEdit(false);
+														collectedMessage.setIsUserBot(true);
 														ArrayList<Messages> cacheMessage = new ArrayList<Messages>();
 														cacheMessage.add(collectedMessage);
 														Hashes.addMessagePool(guild.getIdLong(), m.getIdLong(), cacheMessage);
