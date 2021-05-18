@@ -1302,7 +1302,7 @@
     "web_not_allowed":              "Você desativou o método de login direto para o site. Faça login diretamente no site através deste link e altere as configurações de login para usar este método de login! \n ",
     "web_code":                     "Use esta chave para fazer login no site. A chave é válida por 5 minutos. Se você não solicitou o código, entre em contato com um administrador! \n ** {} ** ",
     "web_recovery":                 "Use esta chave para recuperar sua conta da web. A chave é válida por 5 minutos. Se você não solicitou o código, entre em contato com um administrador! \n ** {} ** ",
-    "web_options":					"Use this key to change the requested account options of your web account. The key is valid for 5 minutes. If you didn't request the code, please contact an administrator!\n**{}**",
+    "web_options":					"Use esta chave para alterar as opções de conta solicitadas de sua conta na web. A chave é válida por 5 minutos. Se você não solicitou o código, favor entrar em contato com um administrador!\n**{}**",
     "web_confirm":                  "Aqui está o URL de confirmação solicitado para Azrael Web! \n ",
     
     "accept_no_wait":               "Uma categoria de verificação e uma função verificada precisam ser registradas para usar este comando! ",

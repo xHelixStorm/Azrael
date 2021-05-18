@@ -1302,7 +1302,7 @@
     "web_not_allowed":              "Vous avez désactivé la méthode de connexion directe au site Web. Veuillez vous connecter directement sur le site Web via ce lien et modifier les paramètres de connexion pour utiliser cette méthode de connexion !\n",
     "web_code":                     "Utilisez cette clé pour vous connecter au site web. La clé est valable pendant 5 minutes. Si vous n'avez pas demandé le code, veuillez contacter un administrateur !\n**{}**",
     "web_recovery":                 "Utilisez cette clé pour récupérer votre compte web. La clé est valable pendant 5 minutes. Si vous n'avez pas demandé le code, veuillez contacter un administrateur !\n**{}**",
-    "web_options":                  "Use this key to change the requested account options of your web account. The key is valid for 5 minutes. If you didn't request the code, please contact an administrator!\n**{}**",
+    "web_options":                  "Utilisez cette clé pour modifier les options de compte demandées de votre compte Web. La clé est valable pendant 5 minutes. Si vous n'avez pas demandé ce code, veuillez contacter un administrateur!\n**{}**",
     "web_confirm":                  "Voici l'URL de confirmation demandée pour Azrael Web !\n",
     
     "accept_no_wait":               "Une catégorie de vérification et un rôle vérifié doivent être enregistrés pour utiliser cette commande !",
