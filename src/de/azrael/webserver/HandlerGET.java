@@ -62,7 +62,10 @@ public class HandlerGET {
 							JSONObject serverRole = new JSONObject();
 							serverRole.put("role_id", role.getId());
 							serverRole.put("name", role.getName());
-							serverRole.put("rgb_color", role.getColor().getRed()+","+role.getColor().getGreen()+","+role.getColor().getBlue());
+							if(role.getColor() != null)
+								serverRole.put("color", "#"+Integer.toHexString(role.getColorRaw()));
+							else
+								serverRole.put("color", "#99AAB5");
 							serverRole.put("position", role.getPosition());
 							serverRoles.put(serverRole);
 						}
@@ -382,26 +385,61 @@ public class HandlerGET {
 		}
 		else if(uris.length == 3) {
 			if(uris[1].matches("[0-9]{18}") && uris[2].matches("users")) {
+				boolean staffFilter = false;
+				if(queryParams!= null && queryParams.length > 0) {
+					for(int  i = 0; i < queryParams.length; i++) {
+						final String [] subQueryParam = queryParams[i].split("=");
+						if(subQueryParam.length == 2) {
+							if(subQueryParam[0].equals("type") && subQueryParam[1].equals("staff")) {
+								staffFilter = true;
+							}
+						}
+					}
+				}
+				
 				final Guild guild = e.getJDA().getGuildById(uris[1]);
 				if(guild != null) {
-					final List<Member> members = guild.loadMembers().get();
+					List<Member> members = guild.loadMembers().get();
 					JSONObject json = new JSONObject();
 					json.put("guild_id", guild.getId());
 					json.put("name", guild.getName());
 					json.put("memberCount", members.size());
 					JSONArray serverMembers = new JSONArray();
 					json.put("members", serverMembers);
+					final long botAdmin = GuildIni.getAdmin(guild.getIdLong());
 					for(final Member member : members) {
+						final boolean admin = UserPrivs.isUserAdmin(member);
+						final boolean mod = UserPrivs.isUserMod(member);
+						if(staffFilter && !admin && !mod && member.getUser().getIdLong() != botAdmin)
+							continue;
+						
 						JSONObject serverMember = new JSONObject();
 						serverMember.put("user_id", member.getUser().getId());
 						serverMember.put("name", member.getUser().getName());
 						serverMember.put("discriminator", member.getUser().getDiscriminator());
 						serverMember.put("nickname", member.getEffectiveName());
 						serverMember.put("avatar_url", member.getUser().getEffectiveAvatarUrl());
-						serverMember.put("isUserAdmin", UserPrivs.isUserAdmin(member));
-						serverMember.put("isUserMod", UserPrivs.isUserMod(member));
+						serverMember.put("isUserAdmin", admin);
+						serverMember.put("isUserMod", mod);
 						serverMember.put("isUserCommunity", UserPrivs.isUserCommunity(member));
-						serverMember.put("isUserBotAdmin", (GuildIni.getAdmin(guild.getIdLong()) == member.getUser().getIdLong()));
+						serverMember.put("isUserBotAdmin", (botAdmin == member.getUser().getIdLong()));
+						JSONArray serverRoles = new JSONArray();
+						serverMember.put("roles", serverRoles);
+						final var roles = DiscordRoles.SQLgetRoles(guild.getIdLong());
+						for(final Role role : member.getRoles()) {
+							JSONObject curRole = new JSONObject();
+							curRole.put("role_id", role.getId());
+							curRole.put("name", role.getName());
+							curRole.put("position", role.getPosition());
+							if(role.getColor() != null)
+								curRole.put("color", "#"+Integer.toHexString(role.getColorRaw()));
+							else
+								curRole.put("color", "#99AAB5");
+							final var registeredRole = roles.parallelStream().filter(f -> f.getRole_ID() == role.getIdLong()).findAny().orElse(null);
+							curRole.put("type", (registeredRole != null ? registeredRole.getCategory_Name() : (String)null));
+							curRole.put("permission", (registeredRole != null ? registeredRole.getLevel() : 0));
+							serverRoles.put(curRole);
+						}
 						serverMembers.put(serverMember);
 					}
 					return json;
