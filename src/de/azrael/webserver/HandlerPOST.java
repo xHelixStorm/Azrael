@@ -600,6 +600,13 @@ public class HandlerPOST {
 									valid = true;
 							}
 						}
+						case "General_MessagesExpRateLimit" -> {
+							if(value.matches("[0-9]*")) {
+								final int convertedValue = Integer.parseInt(value);
+								if(convertedValue >= 0 && convertedValue <= 120)
+									valid = true;
+							}
+						}
 						case "CustomMessages_reactionmessage", "CustomMessages_verificationmessage", "CustomMessages_assignmessage" -> {
 							valid = true;
 							textFileEdit = true;

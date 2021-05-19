@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -775,7 +776,12 @@ public class GuildMessageListener extends ListenerAdapter {
 				//run a separate thread for the ranking system
 				executor.execute(() -> {
 					//check if the ranking system is enabled and that there's currently no message timeout
-					if(guild_settings != null && guild_settings.getRankingState() == true && (Hashes.getCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId()) == null || guild_settings.getMessageTimeout() == 0) && !UserPrivs.isUserMuted(e.getMember())) {
+					final var cache = Hashes.getTempCache("expGain_gu"+guild_id+"us"+user_id);
+					if(guild_settings != null && guild_settings.getRankingState() == true && (cache == null || (cache != null && cache.getExpiration() - System.currentTimeMillis() < 0) || guild_settings.getMessageTimeout() == 0) && !UserPrivs.isUserMuted(e.getMember())) {
+						//remember the user for a determined time, if there should be delays between gaining experience points
+						if(guild_settings.getMessageTimeout() != 0)
+							Hashes.addTempCache("expGain_gu"+guild_id+"us"+user_id, new Cache(TimeUnit.MINUTES.toMillis(guild_settings.getMessageTimeout())));
+						
 						//retrieve all details from the user
 						Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
 						if(user_details == null) {

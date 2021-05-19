@@ -44,6 +44,7 @@ public class GuildIni {
 		general.put("NewAccountOnJoin", "false");
 		general.put("ReassignRolesAfterMute", "false");
 		general.put("CollectRankingRoles", "false");
+		general.put("MessagesExpRateLimit", "0");
 		fileContent.put("General", general);
 		
 		//collect all Google variables
@@ -484,6 +485,10 @@ public class GuildIni {
 	public static boolean getCollectRankingRoles(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "CollectRankingRoles", boolean.class);
+	}
+	public static int getMessagesExpRateLimit(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "MessagesExpRateLimit", int.class);
 	}
 	
 	public static boolean getGoogleFunctionalitiesEnabled(long guild_id) {

@@ -609,13 +609,13 @@ public class FilterExecution {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
 							String [] words = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
-							var querryResult = Azrael.SQLReplaceNameFilter(words, false, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-							if(querryResult == 0) {
+							var QueryResult = Azrael.SQLReplaceNameFilter(words, false, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+							if(QueryResult == 0) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
 								Hashes.removeNameFilter(e.getGuild().getIdLong());
 								logger.info("User {} has inserted words with the pastebin url {} into the name filter in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 							}
-							else if(querryResult == 1) {
+							else if(QueryResult == 1) {
 								//throw error for failing the db replacement
 								message.setColor(Color.RED);
 								var duplicates = checkDuplicates(words);
@@ -685,13 +685,13 @@ public class FilterExecution {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
 							String [] words = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
-							var querryResult = Azrael.SQLReplaceNameFilter(words, true, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-							if(querryResult == 0) {
+							var QueryResult = Azrael.SQLReplaceNameFilter(words, true, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+							if(QueryResult == 0) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
 								Hashes.removeNameFilter(e.getGuild().getIdLong());
 								logger.info("User {} has inserted words with the pastebin url {} into the name kick list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 							}
-							else if(querryResult == 1) {
+							else if(QueryResult == 1) {
 								//throw error for failing the db replacement
 								message.setColor(Color.RED);
 								var duplicates = checkDuplicates(words);
@@ -730,7 +730,7 @@ public class FilterExecution {
 				case "insert-funny-names" -> {
 					if(Azrael.SQLInsertFunnyNames(_message, e.getGuild().getIdLong()) >= 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT)).build()).queue();
-						Hashes.removeQuerryResult("funny-names_"+e.getGuild().getId());
+						Hashes.removeQueryResult("funny-names_"+e.getGuild().getId());
 						logger.info("User {} has inserted the word {} into the funky names list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 					}
 					else {
@@ -744,7 +744,7 @@ public class FilterExecution {
 					final var result = Azrael.SQLDeleteFunnyNames(_message, e.getGuild().getIdLong()); 
 					if(result > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE)).build()).queue();
-						Hashes.removeQuerryResult("funny-names_"+e.getGuild().getId());
+						Hashes.removeQueryResult("funny-names_"+e.getGuild().getId());
 						logger.info("User {} has removed the word {} from the funky names list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 					}
 					else if(result == 0) {
@@ -762,13 +762,13 @@ public class FilterExecution {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
 							String [] words = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
-							var querryResult = Azrael.SQLReplaceFunnyNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-							if(querryResult == 0) {
+							var QueryResult = Azrael.SQLReplaceFunnyNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+							if(QueryResult == 0) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
-								Hashes.removeQuerryResult("funny-names_"+e.getGuild().getId());
+								Hashes.removeQueryResult("funny-names_"+e.getGuild().getId());
 								logger.info("User {} has inserted words with the pastebin url {} into the funky names list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 							}
-							else if(querryResult == 1) {
+							else if(QueryResult == 1) {
 								//throw error for failing the db replacement
 								message.setColor(Color.RED);
 								var duplicates = checkDuplicates(words);
@@ -806,7 +806,7 @@ public class FilterExecution {
 				case "insert-staff-names" -> {
 					if(Azrael.SQLInsertStaffName(_message, e.getGuild().getIdLong()) >= 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT)).build()).queue();
-						Hashes.removeQuerryResult("staff-names_"+e.getGuild().getId());
+						Hashes.removeQueryResult("staff-names_"+e.getGuild().getId());
 						logger.info("User {} has inserted the word {} into the staff names list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 					}
 					else {
@@ -821,7 +821,7 @@ public class FilterExecution {
 					if(result > 0) {
 						message.setTitle("Success!");
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE)).build()).queue();
-						Hashes.removeQuerryResult("staff-names_"+e.getGuild().getId());
+						Hashes.removeQueryResult("staff-names_"+e.getGuild().getId());
 						logger.info("User {} has removed the word {} from the staff names list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 					}
 					else if(result == 0) {
@@ -839,13 +839,13 @@ public class FilterExecution {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
 							String [] words = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
-							var querryResult = Azrael.SQLReplaceStaffNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-							if(querryResult == 0) {
+							var QueryResult = Azrael.SQLReplaceStaffNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+							if(QueryResult == 0) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
-								Hashes.removeQuerryResult("staff-names_"+e.getGuild().getId());
+								Hashes.removeQueryResult("staff-names_"+e.getGuild().getId());
 								logger.info("User {} has inserted names with the pastebin url {} into the staff names list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 							}
-							else if(querryResult == 1) {
+							else if(QueryResult == 1) {
 								//throw error for failing the db replacement
 								message.setColor(Color.RED);
 								var duplicates = checkDuplicates(words);
@@ -934,13 +934,13 @@ public class FilterExecution {
 								}
 							}
 							if(checkedURLs.size() > 0 ) {
-								var querryResult = Azrael.SQLReplaceURLBlacklist(url, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-								if(querryResult == 0) {
+								var QueryResult = Azrael.SQLReplaceURLBlacklist(url, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+								if(QueryResult == 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN_URL)).build()).queue();
 									Hashes.removeURLBlacklist(e.getGuild().getIdLong());
 									logger.info("User {} has inserted urls with the pastebin url {} into the url blacklist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 								}
-								else if(querryResult == 1) {
+								else if(QueryResult == 1) {
 									//throw error for failing the db replacement
 									message.setColor(Color.RED);
 									var duplicates = checkDuplicates(url);
@@ -1034,13 +1034,13 @@ public class FilterExecution {
 								}
 							}
 							if(checkedURLs.size() > 0) {
-								var querryResult = Azrael.SQLReplaceURLWhitelist(url, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-								if(querryResult == 0) {
+								var QueryResult = Azrael.SQLReplaceURLWhitelist(url, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+								if(QueryResult == 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN_URL)).build()).queue();
 									Hashes.removeURLWhitelist(e.getGuild().getIdLong());
 									logger.info("User {} has inserted urls with the pastebin url {} into the url whitelist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 								}
-								else if(querryResult == 1) {
+								else if(QueryResult == 1) {
 									//throw error for failing the db replacement
 									message.setColor(Color.RED);
 									var duplicates = checkDuplicates(url);
@@ -1126,13 +1126,13 @@ public class FilterExecution {
 								}
 							}
 							if(checkedUsernames.size() > 0) {
-								var querryResult = Azrael.SQLReplaceTweetBlacklist(usernames, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-								if(querryResult == 0) {
+								var QueryResult = Azrael.SQLReplaceTweetBlacklist(usernames, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+								if(QueryResult == 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN_NICK)).build()).queue();
 									Hashes.removeURLWhitelist(e.getGuild().getIdLong());
 									logger.info("User {} has inserted usernames with the pastebin url {} into the tweet blacklist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 								}
-								else if(querryResult == 1) {
+								else if(QueryResult == 1) {
 									//throw error for failing the db replacement
 									message.setColor(Color.RED);
 									var duplicates = checkDuplicates(usernames);
@@ -1231,7 +1231,7 @@ public class FilterExecution {
 		if(Azrael.SQLInsertWordFilter(lang, CharacterReplacer.simpleReplace(word), e.getGuild().getIdLong()) >= 0) {
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT)).build()).queue();
 			clearHash(e, lang, true);
-			Hashes.removeQuerryResult("all_"+e.getGuild().getId());
+			Hashes.removeQueryResult("all_"+e.getGuild().getId());
 			logger.info("User {} has inserted the word {} into the {} word filter in guild {}", e.getMember().getUser().getIdLong(), word, lang, e.getGuild().getId());
 		}
 		else {
@@ -1247,7 +1247,7 @@ public class FilterExecution {
 		if(result > 0) {
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE)).build()).queue();
 			clearHash(e, lang, true);
-			Hashes.removeQuerryResult("all_"+e.getGuild().getId());
+			Hashes.removeQueryResult("all_"+e.getGuild().getId());
 			logger.info("User {} has removed the word {} from the {} word filter in guild {}", e.getMember().getUser().getIdLong(), word, lang, e.getGuild().getId());
 		}
 		else if(result == 0) {
@@ -1268,14 +1268,14 @@ public class FilterExecution {
 			String[] words;
 			try {
 				words = Pastebin.readPasteLink(_message, e.getGuild().getIdLong()).split("[\\r\\n]+");
-				var querryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, e.getGuild().getIdLong(), replace);
-				if(querryResult == 0) {
+				var QueryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, e.getGuild().getIdLong(), replace);
+				if(QueryResult == 0) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
 					clearHash(e, lang, false);
-					Hashes.removeQuerryResult("all_"+e.getGuild().getId());
+					Hashes.removeQueryResult("all_"+e.getGuild().getId());
 					logger.info("User {} has inserted words with the pastebin url {} into the {} word filter in guild {}", e.getMember().getUser().getIdLong(), _message, lang, e.getGuild().getId());
 				}
-				else if(querryResult == 1) {
+				else if(QueryResult == 1) {
 					//throw error for failing the db replacement
 					message.setColor(Color.RED);
 					var duplicates = checkDuplicates(words);
@@ -1313,23 +1313,23 @@ public class FilterExecution {
 	
 	private static void clearHash(GuildMessageReceivedEvent e, final String lang, final boolean allowAll) {
 		if(lang.equals("eng") || (allowAll && lang.equals("all")))
-			Hashes.removeQuerryResult("eng_"+e.getGuild().getId());
+			Hashes.removeQueryResult("eng_"+e.getGuild().getId());
 		if(lang.equals("ger") || (allowAll && lang.equals("all")))
-			Hashes.removeQuerryResult("ger_"+e.getGuild().getId());
+			Hashes.removeQueryResult("ger_"+e.getGuild().getId());
 		if(lang.equals("fre") || (allowAll && lang.equals("all")))
-			Hashes.removeQuerryResult("fre_"+e.getGuild().getId());
+			Hashes.removeQueryResult("fre_"+e.getGuild().getId());
 		if(lang.equals("tur") || (allowAll && lang.equals("all")))
-			Hashes.removeQuerryResult("tur_"+e.getGuild().getId());
+			Hashes.removeQueryResult("tur_"+e.getGuild().getId());
 		if(lang.equals("rus") || (allowAll && lang.equals("all")))
-			Hashes.removeQuerryResult("rus_"+e.getGuild().getId());
+			Hashes.removeQueryResult("rus_"+e.getGuild().getId());
 		if(lang.equals("spa") || (allowAll && lang.equals("all")))
-			Hashes.removeQuerryResult("spa_"+e.getGuild().getId());
+			Hashes.removeQueryResult("spa_"+e.getGuild().getId());
 		if(lang.equals("por") || (allowAll && lang.equals("all")))
-			Hashes.removeQuerryResult("por_"+e.getGuild().getId());
+			Hashes.removeQueryResult("por_"+e.getGuild().getId());
 		if(lang.equals("ita") || (allowAll && lang.equals("all")))
-			Hashes.removeQuerryResult("ita_"+e.getGuild().getId());
+			Hashes.removeQueryResult("ita_"+e.getGuild().getId());
 		if(lang.equals("ara") || (allowAll && lang.equals("all")))
-			Hashes.removeQuerryResult("ara_"+e.getGuild().getId());
+			Hashes.removeQueryResult("ara_"+e.getGuild().getId());
 	}
 	
 	private static List<String> checkDuplicates(String [] words) {

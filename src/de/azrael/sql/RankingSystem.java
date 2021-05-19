@@ -28,6 +28,7 @@ import de.azrael.constructors.UserLevel;
 import de.azrael.constructors.UserProfile;
 import de.azrael.constructors.UserRank;
 import de.azrael.core.Hashes;
+import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.entities.Member;
@@ -1646,7 +1647,7 @@ public class RankingSystem {
 					guild.setDailyDescriptionY(rs.getInt(60));
 					guild.setDailyDescriptionStartX(rs.getInt(61));
 					guild.setDailyFieldSizeX(rs.getInt(62));
-					guild.setMessageTimeout(IniFileReader.getMessageTimeout());
+					guild.setMessageTimeout(GuildIni.getMessagesExpRateLimit(guild_id));
 					Hashes.addStatus(guild_id, guild);
 					return guild;
 				}

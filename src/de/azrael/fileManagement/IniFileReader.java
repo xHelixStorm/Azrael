@@ -201,10 +201,6 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("Azrael", "Password");
 	}
-	public static long getMessageTimeout() {
-		Ini ini = readConfig();
-		return ini.get("RankingSystem", "MessageTimeout", long.class);
-	}
 	public static String getSQLIP2() {
 		Ini ini = readConfig();
 		return ini.get("RankingSystem", "IP");

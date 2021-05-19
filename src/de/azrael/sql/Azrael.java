@@ -1559,7 +1559,7 @@ public class Azrael {
 	}
 	
 	public synchronized static ArrayList<String> SQLgetFilter(String filter_lang, long guild_id) {
-		final var query = Hashes.getQuerryResult(filter_lang+"_"+guild_id);
+		final var query = Hashes.getQueryResult(filter_lang+"_"+guild_id);
 		if(query == null) {
 			logger.trace("SQLgetFilter launched. Passed params {}, {}", filter_lang, guild_id);
 			Connection myConn = null;
@@ -1581,7 +1581,7 @@ public class Azrael {
 				while(rs.next()) {
 					filter_words.add(rs.getString(1));
 				}
-				Hashes.addQuerryResult(filter_lang+"_"+guild_id, filter_words);
+				Hashes.addQueryResult(filter_lang+"_"+guild_id, filter_words);
 				return filter_words;
 			} catch (SQLException e) {
 				logger.error("SQLgetFilter Exception", e);
@@ -1686,7 +1686,7 @@ public class Azrael {
 	}
 	
 	public synchronized static ArrayList<String> SQLgetStaffNames(long guild_id) {
-		final var query = Hashes.getQuerryResult("staff-names_"+guild_id);
+		final var query = Hashes.getQueryResult("staff-names_"+guild_id);
 		if(query == null) {
 			logger.trace("SQLgetStaffNames launched. Passed params {}", guild_id);
 			ArrayList<String> staff_names = new ArrayList<String>();
@@ -1701,7 +1701,7 @@ public class Azrael {
 				while(rs.next()) {
 					staff_names.add(rs.getString(1));
 				}
-				Hashes.addQuerryResult("staff-names_"+guild_id, staff_names);
+				Hashes.addQueryResult("staff-names_"+guild_id, staff_names);
 				return staff_names;
 			} catch (SQLException e) {
 				logger.error("SQLgetStaffNames Exception", e);
@@ -1829,7 +1829,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetFunnyNames(long guild_id) {
-		final var query = Hashes.getQuerryResult("funny-names_"+guild_id);
+		final var query = Hashes.getQueryResult("funny-names_"+guild_id);
 		if(query == null) {
 			ArrayList<String> names = new ArrayList<String>();
 			logger.trace("SQLgetFunnyNames launched. Passed params {}", guild_id);
@@ -1844,7 +1844,7 @@ public class Azrael {
 				while(rs.next()) {
 					names.add(rs.getString(1));
 				}
-				Hashes.addQuerryResult("funny-names_"+guild_id, names);
+				Hashes.addQueryResult("funny-names_"+guild_id, names);
 				return names;
 			} catch (SQLException e) {
 				logger.error("SQLgetFunnyNames Exception", e);
@@ -2068,7 +2068,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<RSS> SQLgetSubscriptions(long guild_id) {
-		final var feed = Hashes.getFeed(guild_id);
+		final var feed = Hashes.getFeeds(guild_id);
 		if(feed == null) {
 			logger.trace("SQLgetSubscriptions launched. Params passed {}", guild_id);
 			Connection myConn = null;

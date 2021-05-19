@@ -169,6 +169,7 @@ public class HandlerGET {
 					guildObject.put("General_NewAccountOnJoin", ini.get("General", "NewAccountOnJoin", boolean.class));
 					guildObject.put("General_ReassignRolesAfterMute", ini.get("General", "ReassignRolesAfterMute", boolean.class));
 					guildObject.put("General_CollectRankingRoles", ini.get("General", "CollectRankingRoles", boolean.class));
+					guildObject.put("General_MessagesExpRateLimit", ini.get("General", "MessagesExpRateLimit", int.class));
 					
 					guildObject.put("Google_FunctionalitiesEnabled", ini.get("Google", "FunctionalitiesEnabled", boolean.class));
 					guildObject.put("Google_MainEmail", ini.get("Google", "MainEmail"));

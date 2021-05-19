@@ -124,9 +124,6 @@ public class RankingThreadExecution {
 				//gather experience points and save into RankingSystem.user_details table
 				ExperienceGain(e, user_details, guild_settings, currentExperience, experience, 0, roleAssignLevel, max_experience_enabled, null);
 			}
-			//remember the user for a determined time, if there should be delays between gaining experience points
-			if(guild_settings.getMessageTimeout() != 0)
-				Hashes.addCommentedUser(e.getMember().getUser().getId()+"_"+e.getGuild().getId(), e.getMember().getEffectiveName());
 		}
 	}
 	
