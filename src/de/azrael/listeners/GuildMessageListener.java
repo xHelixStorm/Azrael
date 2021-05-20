@@ -58,6 +58,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.MessageType;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -273,23 +274,24 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(currentChannel != null && currentChannel.getChannel_Type() != null && (currentChannel.getChannel_Type().equals(Channel.VOT.getType()) || currentChannel.getChannel_Type().equals(Channel.VO2.getType())) && e.getGuild().getSelfMember().getIdLong() != e.getMember().getUser().getIdLong()) {
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION))) {
 							if(e.getMessage().getType() != MessageType.CHANNEL_PINNED_ADD) {
+								final boolean voteTwoChannel = currentChannel.getChannel_Type().equals(Channel.VO2.getType());
 								final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
 								final Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");;
 								final Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
 								if(thumbsup instanceof Emote)
-									e.getMessage().addReaction((Emote)thumbsup).queue();
+									e.getMessage().addReaction((Emote)thumbsup).complete();
 								else if(thumbsup instanceof String)
-									e.getMessage().addReaction((String)thumbsup).queue();
+									e.getMessage().addReaction((String)thumbsup).complete();
 								if(thumbsdown instanceof Emote)
-									e.getMessage().addReaction((Emote)thumbsdown).queue();
+									e.getMessage().addReaction((Emote)thumbsdown).complete();
 								else if(thumbsdown instanceof String)
-									e.getMessage().addReaction((String)thumbsdown).queue();
-								if(currentChannel.getChannel_Type().equals(Channel.VO2.getType())) {
+									e.getMessage().addReaction((String)thumbsdown).complete();
+								if(voteTwoChannel) {
 									final Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
 									if(shrug instanceof Emote)
-										e.getMessage().addReaction((Emote)shrug).queue();
+										e.getMessage().addReaction((Emote)shrug).complete();
 									else if(shrug instanceof String)
-										e.getMessage().addReaction((String)shrug).queue();
+										e.getMessage().addReaction((String)shrug).complete();
 								}
 								
 								//Run google service, if enabled
@@ -306,6 +308,9 @@ public class GuildMessageListener extends ListenerAdapter {
 										}
 									}
 								}
+								
+								//in rare cases some resctions are not shown below the message. In this case verify each sent message after 30 seconds and add the missing reactions.
+								validateVoteReactions(e.getMessage(), voteTwoChannel, 0);
 							}
 						}
 						else {
@@ -932,6 +937,77 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 				}
 			}).start();
+		}
+	}
+	
+	private void validateVoteReactions(final Message message, boolean shrugRequired, int recursiveCount) {
+		final int count = recursiveCount+1;
+		if(message.getGuild().getSelfMember().hasPermission(message.getTextChannel(), EnumSet.of(Permission.MESSAGE_HISTORY)) || STATIC.setPermissions(message.getGuild(), message.getTextChannel(), EnumSet.of(Permission.MESSAGE_HISTORY))) {
+			new Thread(() -> {
+				try {
+					Thread.sleep(TimeUnit.SECONDS.toMillis(20));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				message.getChannel().retrieveMessageById(message.getIdLong()).queue(m -> {
+					final String [] reactions = GuildIni.getVoteReactions(message.getGuild().getIdLong());
+					final Object thumbsup = STATIC.retrieveEmoji(message.getGuild(), reactions[0], ":thumbsup:");;
+					final Object thumbsdown = STATIC.retrieveEmoji(message.getGuild(), reactions[1], ":thumbsdown:");
+					final Object shrug = STATIC.retrieveEmoji(message.getGuild(), reactions[2], ":shrug:");
+					boolean thumbsUpFound = false;
+					boolean thumbsDownFound = false;
+					boolean shrugFound = false;
+					for(final var reaction : m.getReactions()) {
+						if(!thumbsUpFound && reaction.getReactionEmote().isEmoji() && thumbsup instanceof String && reaction.getReactionEmote().getName().equals((String)thumbsup)) {
+							thumbsUpFound = true;
+						}
+						else if(!thumbsUpFound && reaction.getReactionEmote().isEmote() && thumbsup instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)thumbsup).getIdLong()) {
+							thumbsUpFound = true;
+						}
+						else if(!thumbsDownFound && reaction.getReactionEmote().isEmoji() && thumbsdown instanceof String && reaction.getReactionEmote().getName().equals((String)thumbsdown)) {
+							thumbsDownFound = true;
+						}
+						else if(!thumbsDownFound && reaction.getReactionEmote().isEmote() && thumbsdown instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)thumbsdown).getIdLong()) {
+							thumbsDownFound = true;
+						}
+						else if(shrugRequired || (!shrugFound && reaction.getReactionEmote().isEmoji() && shrug instanceof String && reaction.getReactionEmote().getName().equals((String)shrug))) {
+							shrugFound = true;
+						}
+						else if(shrugRequired || (!shrugFound && reaction.getReactionEmote().isEmote() && shrug instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)shrug).getIdLong())) {
+							shrugFound = true;
+						}
+					}
+					
+					if(!thumbsUpFound) {
+						if(thumbsup instanceof String)
+							m.addReaction((String)thumbsup).queue();
+						else 
+							m.addReaction((Emote)thumbsup).queue();
+					}
+					if(!thumbsDownFound) {
+						if(thumbsdown instanceof String)
+							m.addReaction((String)thumbsdown).queue();
+						else 
+							m.addReaction((Emote)thumbsdown).queue();
+					}
+					if(shrugRequired && !shrugFound) {
+						if(shrug instanceof String)
+							m.addReaction((String)shrug).queue();
+						else 
+							m.addReaction((Emote)shrug).queue();
+					}
+					
+					//check again if this time all reactions are visible, else repeat the above logic after 20 seconds again
+					if(!thumbsUpFound || !thumbsDownFound || (shrugRequired && !shrugFound)) {
+						if(recursiveCount <= 10)
+							validateVoteReactions(message, shrugRequired, count);
+					}
+				});
+				
+			}).start();
+		}
+		else {
+			logger.warn("Reactions on the vote message couldn't be validated because the MESSAGE_HISTORY permission is missing on channel {} in guild {}", message.getTextChannel().getId(), message.getGuild().getId());
 		}
 	}
 }
