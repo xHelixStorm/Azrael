@@ -68,7 +68,7 @@
     "param_staff_names":            "noms-du-personnel",
     "param_prohibited_urls":        "urls-interdites",
     "param_allowed_urls":           "urls-autorisées",
-    "param_prohibited_tweets":      "messages-interdits",
+    "param_prohibited_subs":		"abonnements-interdits",
     "param_insert":                 "insérer",
     "param_add_pastebin":           "ajouter-pastebin",
     "param_load_pastebin":          "charger-pastebin",
@@ -390,7 +390,7 @@
     "equip_exit":                   "Equipage terminé !",
     "equip_select_number":          "Veuillez choisir l'un des numéros visibles !",
     
-    "filter_help":                  "Saisissez l'un des paramètres suivants avec la commande pour travailler sur des listes de censure spécifiques ou *exit* pour interrompre le processus ! Ces listes de censure sont disponibles:\n\n- **filtre-de-mots**:\nPour les mots à censurer dans une langue spécifique!\n-**filtre-de-nom**:\nFor used words in a name to automatically rename!\n- **name-kick**:\nPour les mots utilisés dans un nom à virer automatiquement du serveur!\n- **noms-drôles**:\nLes noms à attribuer aux utilisateurs qui ont été automatiquement renommés!\n- **noms-de-l’équipe**:\nPour les noms utilisés qui appartiennent au personnel à renommer automatiquement ! \n- **urls-interdits**:\nPour les URL qui ne sont pas autorisées à être utilisées sur le serveur!\n- **urls-autorisés**:\nPour les exceptions d'URL lorsque la suppression automatique d'URL est activée!\n- **Tweets-interdits**:\nPour les utilisateurs de Twitter afin d'empêcher leurs tweets de s'afficher sur le serveur !",
+    "filter_help":                  "Saisissez l'un des paramètres suivants avec la commande pour travailler sur des listes de censure spécifiques ou *exit* pour interrompre le processus ! Ces listes de censure sont disponibles:\n\n- **filtre-de-mots**:\nPour les mots à censurer dans une langue spécifique!\n-**filtre-de-nom**:\nFor used words in a name to automatically rename!\n- **name-kick**:\nPour les mots utilisés dans un nom à virer automatiquement du serveur!\n- **noms-drôles**:\nLes noms à attribuer aux utilisateurs qui ont été automatiquement renommés!\n- **noms-de-l’équipe**:\nPour les noms utilisés qui appartiennent au personnel à renommer automatiquement ! \n- **urls-interdits**:\nPour les URL qui ne sont pas autorisées à être utilisées sur le serveur!\n- **urls-autorisés**:\nPour les exceptions d'URL lorsque la suppression automatique d'URL est activée!\n- **abonnements-interdits**:\nPour les utilisateurs de Twitter afin d'empêcher leurs tweets de s'afficher sur le serveur !",
     "filter_abort":                 "La commande *filtre* a été interrompue !",
     "filter_actions":               "Choisissez maintenant l’action souhaitée :\n\n**Afficher\ninsérer\nsupprimer\najouter-pastebin\ncharger-pastebin**",
     "filter_display":               "AFFICHER",
@@ -1026,7 +1026,7 @@
     
     "delete_edited_message":        "**Message édité**! ",
     "delete_message":               "**Message**! ",
-    "delete_tweet":                 "**Tweet** ",
+    "delete_subscription":          "**Abonnement** ",
     "delete_spam":                  "**Messages de spam** détectés !",
     "delete_removed_by":            "Supprimé par ",
     "delete_self":                  "L'utilisateur a supprimé son propre ",

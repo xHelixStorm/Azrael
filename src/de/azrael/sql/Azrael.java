@@ -2476,17 +2476,17 @@ public class Azrael {
 		}
 	}
 	
-	public static synchronized ArrayList<String> SQLgetTweetBlacklist(long guild_id) {
+	public static synchronized ArrayList<String> SQLgetSubscriptionBlacklist(long guild_id) {
 		final var blacklist = Hashes.getTweetBlacklist(guild_id);
 		if(blacklist == null) {
-			logger.trace("SQLgetTweetBlacklist launched. Passed params {}", guild_id);
+			logger.trace("SQLgetSubscriptionBlacklist launched. Passed params {}", guild_id);
 			ArrayList<String> urls = new ArrayList<String>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
 				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-				stmt = myConn.prepareStatement(AzraelStatements.SQLgetTweetBlacklist);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptionBlacklist);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -2495,7 +2495,7 @@ public class Azrael {
 				Hashes.addTweetBlacklist(guild_id, urls);
 				return urls;
 			} catch (SQLException e) {
-				logger.error("SQLgetTweetBlacklist Exception", e);
+				logger.error("SQLgetSubscriptionBlacklist Exception", e);
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2505,18 +2505,18 @@ public class Azrael {
 		return blacklist;
 	}
 	
-	public static int SQLInsertTweetBlacklist(String username, long guild_id) {
-		logger.trace("SQLInsertTweetBlacklist launched. Passed params {}, {}", username, guild_id);
+	public static int SQLInsertSubscriptionBlacklist(String username, long guild_id) {
+		logger.trace("SQLInsertSubscriptionBlacklist launched. Passed params {}, {}", username, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertTweetBlacklist);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertSubscriptionBlacklist);
 			stmt.setString(1, (username.startsWith("@") ? username : "@"+username));
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLInsertTweetBlacklist Exception", e);
+			logger.error("SQLInsertSubscriptionBlacklist Exception", e);
 			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2524,18 +2524,18 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLDeleteTweetBlacklist(String username, long guild_id) {
-		logger.trace("SQLDeleteTweetBlacklist launched. Passed params {}, {}", username, guild_id);
+	public static int SQLDeleteSubscriptionBlacklist(String username, long guild_id) {
+		logger.trace("SQLDeleteSubscriptionBlacklist launched. Passed params {}, {}", username, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteTweetBlacklist);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteSubscriptionBlacklist);
 			stmt.setString(1, (username.startsWith("@") ? username : "@"+username));
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLDeleteTweetBlacklist Exception", e);
+			logger.error("SQLDeleteSubscriptionBlacklist Exception", e);
 			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -3321,18 +3321,18 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertTweetLog(long message_id, long tweet_id) {
-		logger.trace("SQLInsertTweetLog launched. Passed params {}, {}", message_id, tweet_id);
+	public static int SQLInsertSubscriptionLog(long message_id, String subscription_id) {
+		logger.trace("SQLInsertSubscriptionLog launched. Passed params {}, {}", message_id, subscription_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertTweetLog);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertSubscriptionLog);
 			stmt.setLong(1, message_id);
-			stmt.setLong(2, tweet_id);
+			stmt.setString(2, subscription_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLInsertTweetLog Exception", e);
+			logger.error("SQLInsertSubscriptionLog Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -3340,17 +3340,17 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateTweetLogDeleted(long message_id) {
-		logger.trace("SQLUpdateTweetLogDeleted launched. Passed params {}", message_id);
+	public static int SQLUpdateSubscriptionLogDeleted(long message_id) {
+		logger.trace("SQLUpdateSubscriptionLogDeleted launched. Passed params {}", message_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateTweetLogDeleted);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateSubscriptionLogDeleted);
 			stmt.setLong(1, message_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLUpdateTweetLogDeleted Exception", e);
+			logger.error("SQLUpdateSubscriptionLogDeleted Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -3358,22 +3358,22 @@ public class Azrael {
 		}
 	}
 	
-	public static boolean SQLIsTweetDeleted(long tweet_id) {
-		logger.trace("SQLIsTweetDeleted launched. Params passed {}", tweet_id);
+	public static boolean SQLIsSubscriptionDeleted(String subscription_id) {
+		logger.trace("SQLIsSubscriptionDeleted launched. Params passed {}", subscription_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLIsTweetDeleted);
-			stmt.setLong(1, tweet_id);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLIsSubscriptionDeleted);
+			stmt.setString(1, subscription_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				return true;
 			}
 			return false;
 		} catch (SQLException e) {
-			logger.error("SQLIsTweetDeleted Exception", e);
+			logger.error("SQLIsSubscriptionDeleted Exception", e);
 			return false;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -3382,17 +3382,17 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateTweetTimestamp(long tweet_id) {
-		logger.trace("SQLUpdateTweetLogDeleted launched. Passed params {}", tweet_id);
+	public static int SQLUpdateSubscriptionTimestamp(String subscription_id) {
+		logger.trace("SQLUpdateSubscriptionTimestamp launched. Passed params {}", subscription_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateTweetTimestamp);
-			stmt.setLong(1, tweet_id);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateSubscriptionTimestamp);
+			stmt.setString(1, subscription_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLUpdateTweetLogDeleted Exception", e);
+			logger.error("SQLUpdateSubscriptionTimestamp Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -3400,16 +3400,16 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLDeleteTweetLog() {
+	public static int SQLDeleteSubscriptionLog() {
 		logger.trace("SQLDeleteTweetLog launched. No params passed");
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteTweetLog);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteSubscriptionLog);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLDeleteTweetLog Exception", e);
+			logger.error("SQLDeleteSubscriptionLog Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

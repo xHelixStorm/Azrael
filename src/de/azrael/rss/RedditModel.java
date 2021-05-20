@@ -9,6 +9,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.EnumSet;
 import java.util.Locale;
@@ -23,9 +25,11 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiParser;
 
+import de.azrael.constructors.Messages;
 import de.azrael.constructors.RSS;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Translation;
+import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
@@ -114,24 +118,53 @@ public class RedditModel {
 				if(!children.isEmpty()) {
 					success = true;
 					final String format = reddit.getFormat();
+					final var prohibitedSubscriptions = Azrael.SQLgetSubscriptionBlacklist(guild.getIdLong());
 					for(final Object iteration : children) {
 						final JSONObject result = (JSONObject)iteration;
 						final String kind = result.getString("kind");
 						final JSONObject data = result.getJSONObject("data");
+						final String permaLink = data.getString("permalink");
+						final String author = data.getString("author");
 						
-						String message = null;
-						switch(kind) {
-							case "t1" -> message = buildMessageBodyT1(data, format);
-							case "t3" -> message = buildMessageBodyT3(data, format);
+						if(prohibitedSubscriptions.parallelStream().filter(f -> author.equals(f)).findAny().orElse(null) != null)
+		        			continue;
+						
+						if(!Azrael.SQLIsSubscriptionDeleted(permaLink)) {
+							String message = null;
+							switch(kind) {
+								case "t1" -> message = buildMessageBodyT1(data, format);
+								case "t3" -> message = buildMessageBodyT3(data, format);
+							}
+							
+							final String outMessage = message;
+							if(outMessage.length() > 0) {
+								MessageHistory history = new MessageHistory(textChannel);
+								history.retrievePast(100).queue(historyList -> {
+									if(historyList.parallelStream().filter(f -> f.getContentRaw().replaceAll("[^a-zA-Z]", "").equals(outMessage.replaceAll("[^a-zA-Z]", ""))).findAny().orElse(null) == null)
+										textChannel.sendMessage(outMessage).queue(m -> {
+											Azrael.SQLInsertSubscriptionLog(m.getIdLong(), permaLink);
+											if(GuildIni.getCacheLog(guild.getIdLong())) {
+												Messages collectedMessage = new Messages();
+												collectedMessage.setUserID(0);
+												collectedMessage.setUsername(author);
+												collectedMessage.setGuildID(guild.getIdLong());
+												collectedMessage.setChannelID(rss_channel);
+												collectedMessage.setChannelName(textChannel.getName());
+												collectedMessage.setMessage(outMessage);
+												collectedMessage.setMessageID(m.getIdLong());
+												collectedMessage.setTime(ZonedDateTime.now());
+												collectedMessage.setIsEdit(false);
+												collectedMessage.setIsUserBot(true);
+												ArrayList<Messages> cacheMessage = new ArrayList<Messages>();
+												cacheMessage.add(collectedMessage);
+												Hashes.addMessagePool(guild.getIdLong(), m.getIdLong(), cacheMessage);
+											}
+										});
+								});
+							}
 						}
-						
-						final String outMessage = message;
-						if(outMessage.length() > 0) {
-							MessageHistory history = new MessageHistory(textChannel);
-							history.retrievePast(100).queue(historyList -> {
-								if(historyList.parallelStream().filter(f -> f.getContentRaw().replaceAll("[^a-zA-Z]", "").equals(outMessage.replaceAll("[^a-zA-Z]", ""))).findAny().orElse(null) == null)
-									textChannel.sendMessage(outMessage).queue();
-							});
+						else {
+							Azrael.SQLUpdateSubscriptionTimestamp(permaLink);
 						}
 					}
 				}

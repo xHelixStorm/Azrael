@@ -69,9 +69,10 @@ public class TwitterModel {
 							tweets.subList(0, 29);
 					}
 			        final String pattern = "https:\\/\\/t.co\\/[\\w\\d]*";
+			        final var prohibitedSubscriptions = Azrael.SQLgetSubscriptionBlacklist(guild.getIdLong());
 			        for (Status tweet : tweets) {
 			        	if(!tweet.isRetweet()) {
-			        		if(!Azrael.SQLIsTweetDeleted(tweet.getId())) {
+			        		if(!Azrael.SQLIsSubscriptionDeleted(tweet.getId()+"")) {
 			        			String message = tweet.getText();
 				        		boolean tweetProhibited = false;
 				        		final String fullName = tweet.getUser().getName();
@@ -93,7 +94,7 @@ public class TwitterModel {
 				        			if(!tweetFound)
 				        				tweetProhibited = true;
 				        		}
-				        		if(Azrael.SQLgetTweetBlacklist(guild.getIdLong()).parallelStream().filter(f -> username.equals(f)).findAny().orElse(null) != null)
+				        		if(prohibitedSubscriptions.parallelStream().filter(f -> username.equals(f)).findAny().orElse(null) != null)
 				        			tweetProhibited = true;
 				        		
 				        		if(!tweetProhibited) {
@@ -214,7 +215,7 @@ public class TwitterModel {
 											Message historyMessage = historyList.parallelStream().filter(f -> f.getContentRaw().replaceAll("[^a-zA-Z]", "").contains(outMessage.replaceAll("[^a-zA-Z]", ""))).findAny().orElse(null);
 											if(historyMessage == null)
 												guild.getTextChannelById(rss_channel).sendMessage(outMessage).queue(m -> {
-													Azrael.SQLInsertTweetLog(m.getIdLong(), tweet.getId());
+													Azrael.SQLInsertSubscriptionLog(m.getIdLong(), tweet.getId()+"");
 													if(GuildIni.getCacheLog(guild.getIdLong())) {
 														Messages collectedMessage = new Messages();
 														collectedMessage.setUserID(0);
@@ -237,7 +238,7 @@ public class TwitterModel {
 				        		}
 			        		}
 			        		else {
-			        			Azrael.SQLUpdateTweetTimestamp(tweet.getId());
+			        			Azrael.SQLUpdateSubscriptionTimestamp(tweet.getId()+"");
 			        		}
 			        	}
 			        }

@@ -68,7 +68,7 @@
 	"param_staff_names":			"staff-names",
 	"param_prohibited_urls":		"prohibited-urls",
 	"param_allowed_urls":			"allowed-urls",
-	"param_prohibited_tweets":		"prohibited-tweets",
+	"param_prohibited_subs":		"prohibited-subscriptions",
 	"param_insert":					"insert",
 	"param_add_pastebin":			"add-pastebin",
 	"param_load_pastebin":			"load-pastebin",
@@ -390,7 +390,7 @@
 	"equip_exit":					"¡Configuración de equipamiento terminada!",
 	"equip_select_number":			"¡Por favor, selecciona uno de los números visibles!",
 	
-	"filter_help":					"¡Escribe uno de los siguientes parámetros con el comando para trabajar en listas de censura específicas! Estas listas de censura están disponibles:\n\n- **word-filter**:\n¡Para censurar palabras en un idioma específico!\n- **name-filter**:\n¡Para censurar nombres!\n- **name-kick**:\n¡Para expulsar automaticamente al usar palabras filtradas en un nombre!\n- **funny-names**:\n¡Nombres para asignar a los usuarios que fueron renombrados automáticamente!\n- **staff-names**:\n¡Para renombrar a los usuarios que usan nombres del staff!\n- **url-blacklist**:\n¡Para las URL que no están permitidas en el servidor!\n- **url-whitelist**:\n¡Para excepciones de URL cuando la eliminación automática de URL está habilitada!\n- **tweet-blacklist**:\n¡Para que los usuarios en Twitter eviten que sus tweets se muestren en el servidor!",
+	"filter_help":					"¡Escribe uno de los siguientes parámetros con el comando para trabajar en listas de censura específicas! Estas listas de censura están disponibles:\n\n- **word-filter**:\n¡Para censurar palabras en un idioma específico!\n- **name-filter**:\n¡Para censurar nombres!\n- **name-kick**:\n¡Para expulsar automaticamente al usar palabras filtradas en un nombre!\n- **funny-names**:\n¡Nombres para asignar a los usuarios que fueron renombrados automáticamente!\n- **staff-names**:\n¡Para renombrar a los usuarios que usan nombres del staff!\n- **prohibited-urls**:\n¡Para las URL que no están permitidas en el servidor!\n- **allowed-urls**:\n¡Para excepciones de URL cuando la eliminación automática de URL está habilitada!\n- **prohibited-subscriptions**:\nRecuperación de los usuarios de las suscripciones que se saltan.",
 	"filter_abort":					"¡El comando *filter* ha sido anulado!",
 	"filter_actions":				"Elige ahora la acción deseada:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**",
 	"filter_display":				"MOSTRAR",
@@ -1026,7 +1026,7 @@
 	
 	"delete_edited_message":		"¡**Mensaje editado**! ",
 	"delete_message":				"**Mensaje**! ",
-	"delete_tweet":					"**Tweet** ",
+	"delete_subscription":			"**Suscripción** ",
 	"delete_spam":					"**Spam Messages** detected!",
 	"delete_removed_by":			"Eliminado por ",
 	"delete_self":					"El usuario ha eliminado su propio ",

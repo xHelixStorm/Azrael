@@ -138,7 +138,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 										}
 									}
 								}
-								//print removed tweet messages which were removed by an admin or moderator
+								//print removed subscription messages which were removed by an administrator or moderator
 								else if(firstMessage.getUserID() == 0) {
 									//confirm that we have a message to print and a user who deleted the message
 									if(firstMessage.getMessage().length() > 0 && trigger_user_id > 0) {
@@ -146,10 +146,10 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 										message.setColor(Color.CYAN);
 										//print the message
 										message.setTimestamp(firstMessage.getTime()).setTitle(firstMessage.getUserName()).setFooter(e.getChannel().getName()+" ("+e.getChannel().getId()+")");
-										final var printMessage = STATIC.getTranslation2(e.getGuild(), Translation.DELETE_TWEET)+STATIC.getTranslation2(e.getGuild(), Translation.DELETE_REMOVED_BY)+trigger_user_name+"\n\n"+firstMessage.getMessage();
+										final var printMessage = STATIC.getTranslation2(e.getGuild(), Translation.DELETE_SUBSCRIPTION)+STATIC.getTranslation2(e.getGuild(), Translation.DELETE_REMOVED_BY)+trigger_user_name+"\n\n"+firstMessage.getMessage();
 										STATIC.writeToRemoteChannel(e.getGuild(), message, (printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"..."), Channel.TRA.getType());
 										//mark tweet as deleted
-										Azrael.SQLUpdateTweetLogDeleted(message_id);
+										Azrael.SQLUpdateSubscriptionLogDeleted(message_id);
 									}
 								}
 								//if enabled, display all deleted messages which weren't deleted by someone else but from the same user and still isn't a bot

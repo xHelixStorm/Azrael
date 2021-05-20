@@ -54,8 +54,8 @@ public class ClearHashes extends TimerTask {
 		
 		logger.info("Temporary cache has been cleared");
 		
-		//clear any outdated tweet logs
-		Azrael.SQLDeleteTweetLog();
+		//clear any expired subscription log
+		Azrael.SQLDeleteSubscriptionLog();
 	}
 	
 	public static void runTask(){

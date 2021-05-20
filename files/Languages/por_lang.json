@@ -68,7 +68,7 @@
     "param_staff_names":            "staff-names",
     "param_prohibited_urls":        "prohibited-urls",
     "param_allowed_urls":           "allowed-urls",
-    "param_prohibited_tweets":      "prohibited-tweets",
+    "param_prohibited_subs":		"prohibited-subscriptions",
     "param_insert":                 "insert",
     "param_add_pastebin":           "add-pastebin",
     "param_load_pastebin":          "load-pastebin",
@@ -390,7 +390,7 @@
     "equip_exit":                   "Configuração da equipe encerrada!",
     "equip_select_number":          "Selecione um dos números visíveis!",
     
-    "filter_help":                  "Escreva um dos seguintes parâmetros com o comando para trabalhar em listas de censura específicas ou * saia * para interromper o processo! Estas listas de censura estão disponíveis: \n \n- ** filtro de palavras **: \n Para palavras a censurar em um idioma específico! \n- ** filtro de nomes **: \n Para palavras usadas em um nome para renomear automaticamente ! \n- ** name-kick **: \nPara palavras usadas em um nome para chutar automaticamente do servidor! \n- ** nomes engraçados **: \n Nomes para atribuir aos usuários que foram renomeados automaticamente! \n - ** nomes-da-equipe **: \n Para nomes usados ​​pertencentes à equipe para renomear automaticamente! \n- ** URLs- proibidos **: \n Para URLs que não são permitidos para uso no servidor! \n- * * permitidos-urls **: \nPara exceções de URL quando a exclusão automática de URL está habilitada! \n- ** tweets proibidos **: \n Para os usuários do Twitter evitarem que seus tweets sejam exibidos no servidor! ",
+    "filter_help":                  "Escreva um dos seguintes parâmetros com o comando para trabalhar em listas de censura específicas ou * saia * para interromper o processo! Estas listas de censura estão disponíveis: \n \n- ** filtro de palavras **: \n Para palavras a censurar em um idioma específico! \n- ** filtro de nomes **: \n Para palavras usadas em um nome para renomear automaticamente ! \n- ** name-kick **: \nPara palavras usadas em um nome para chutar automaticamente do servidor! \n- ** nomes engraçados **: \n Nomes para atribuir aos usuários que foram renomeados automaticamente! \n - ** nomes-da-equipe **: \n Para nomes usados ​​pertencentes à equipe para renomear automaticamente! \n- ** URLs- proibidos **: \n Para URLs que não são permitidos para uso no servidor! \n- **permitidos-urls**: \nPara exceções de URL quando a exclusão automática de URL está habilitada! \n- **prohibited-subscriptions**: \nUtilizadores recuperados de subscrições que são puladas!",
     "filter_abort":                 "O comando * filtro * foi abortado! ",
     "filter_actions":               "Escolha agora a ação desejada: \n \n ** display \ninsert \nremove \nadd-pastebin \nload-pastebin ** ",
     "filter_display":               "EXIBIÇÃO",
@@ -1026,7 +1026,7 @@
     
     "delete_edited_message":        "**Mensagem Editada **! ",
     "delete_message":               "**Mensagem**! ",
-    "delete_tweet":                 "**Tweet** ",
+    "delete_subscription":          "**Inscrição** ",
     "delete_spam":                  "**Mensagens de spam ** detectadas!",
     "delete_removed_by":            "Removido por ",
     "delete_self":                  "O usuário removeu seu próprio ",

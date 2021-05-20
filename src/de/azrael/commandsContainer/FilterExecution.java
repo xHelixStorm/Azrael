@@ -113,7 +113,7 @@ public class FilterExecution {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlWhitelistLevel, e.getMember())).build()).queue();
 			}
 		}
-		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_TWEETS))) {
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_SUBS))) {
 			final var tweetBlacklistLevel = GuildIni.getFilterTweetBlacklistLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), tweetBlacklistLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
 				message.setTitle("TWEET-BLACKLIST");
@@ -484,7 +484,7 @@ public class FilterExecution {
 				case "tweet-blacklist" -> {
 					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						StringBuilder out = new StringBuilder();
-						for(String word : Azrael.SQLgetTweetBlacklist(e.getGuild().getIdLong())) {
+						for(String word : Azrael.SQLgetSubscriptionBlacklist(e.getGuild().getIdLong())) {
 							out.append(word+"\n");
 						}
 						if(out.length() > 0) {
@@ -1081,7 +1081,7 @@ public class FilterExecution {
 					}
 				}
 				case "insert-tweet-blacklist" -> {
-					if(Azrael.SQLInsertTweetBlacklist(_message, e.getGuild().getIdLong()) >= 0) {
+					if(Azrael.SQLInsertSubscriptionBlacklist(_message, e.getGuild().getIdLong()) >= 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT_NICK)).build()).queue();
 						Hashes.removeTweetBlacklist(e.getGuild().getIdLong());
 						logger.info("User {} has inserted the username {} into the tweet blacklist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
@@ -1094,7 +1094,7 @@ public class FilterExecution {
 					Hashes.clearTempCache(key);
 				}
 				case "remove-tweet-blacklist" -> {
-					final var result = Azrael.SQLDeleteTweetBlacklist(_message, e.getGuild().getIdLong());
+					final var result = Azrael.SQLDeleteSubscriptionBlacklist(_message, e.getGuild().getIdLong());
 					if(result > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE_NICK)).build()).queue();
 						Hashes.removeTweetBlacklist(e.getGuild().getIdLong());
