@@ -37,7 +37,7 @@ public class Invites implements CommandPublic {
 			var commandLevel = GuildIni.getInvitesLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong()))
 				return true;
-			else
+			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
 				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 		}
 		return false;

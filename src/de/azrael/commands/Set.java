@@ -481,7 +481,7 @@ public class Set implements CommandPublic {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
-		else {
+		else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong())) {
 			UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 		}
 	}

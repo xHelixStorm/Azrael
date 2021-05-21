@@ -33,7 +33,7 @@ public class Remove implements CommandPublic {
 			final var commandLevel = GuildIni.getRemoveLevel(e.getGuild().getIdLong());
 			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
 				return true;
-			else
+			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
 				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 		}
 		return false;

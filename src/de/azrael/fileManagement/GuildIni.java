@@ -45,6 +45,7 @@ public class GuildIni {
 		general.put("ReassignRolesAfterMute", "false");
 		general.put("CollectRankingRoles", "false");
 		general.put("MessagesExpRateLimit", "0");
+		general.put("IgnoreMissingPermissions", "false");
 		fileContent.put("General", general);
 		
 		//collect all Google variables
@@ -489,6 +490,10 @@ public class GuildIni {
 	public static int getMessagesExpRateLimit(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("General", "MessagesExpRateLimit", int.class);
+	}
+	public static boolean getIgnoreMissingPermissions(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("General", "IgnoreMissingPermissions", boolean.class);
 	}
 	
 	public static boolean getGoogleFunctionalitiesEnabled(long guild_id) {

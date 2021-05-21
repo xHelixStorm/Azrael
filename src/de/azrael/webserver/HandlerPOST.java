@@ -516,9 +516,9 @@ public class HandlerPOST {
 					switch(field) {
 						case "General_JoinMessage", "General_LeaveMessage", "General_CacheLog", "General_URLBlacklist", "General_ForceReason", "General_OverrideBan",
 						"General_SelfDeletedMessage", "General_EditedMessage", "General_EditedMessageHistory", "General_Notifications", "General_NewAccountOnJoin",
-						"General_ReassignRolesAfterMute", "General_CollectRankingRoles", "Google_FunctionalitiesEnabled", "Google_SpreadsheetsEnabled", 
-						"Messages_SpamDetection", "Patch_PrivatePatchNotes", "Patch_PublicPatchNotes", "Mute_MessageDeleteEnabled", "Mute_ForceMessageDeletion",
-						"Mute_SendReason", "Kick_MessageDeleteEnabled", "Kick_ForceMessageDeletion", "Kick_SendReason", "Ban_MessageDeleteEnabled", 
+						"General_ReassignRolesAfterMute", "General_CollectRankingRoles", "General_IgnoreMissingPermissions", "Google_FunctionalitiesEnabled", 
+						"Google_SpreadsheetsEnabled", "Messages_SpamDetection", "Patch_PrivatePatchNotes", "Patch_PublicPatchNotes", "Mute_MessageDeleteEnabled", 
+						"Mute_ForceMessageDeletion", "Mute_SendReason", "Kick_MessageDeleteEnabled", "Kick_ForceMessageDeletion", "Kick_SendReason", "Ban_MessageDeleteEnabled", 
 						"Ban_ForceMessageDeletion", "Ban_SendReason", "Reactions_Enabled", "Commands_About", "Commands_Daily", "Commands_Display", "Commands_Help",
 						"Commands_Inventory", "Commands_Meow", "Commands_Pug", "Commands_Profile", "Commands_Rank", "Commands_Register", "Commands_Set", "Commands_Shop",
 						"Commands_Top", "Commands_Use", "Commands_User", "Commands_Filter", "Commands_Quiz", "Commands_RoleReaction", "Commands_Subscribe",
