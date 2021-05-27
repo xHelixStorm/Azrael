@@ -124,7 +124,7 @@ public class GoogleSheets {
 		ValueRange values = new ValueRange().setValues(list).setMajorDimension(dimension);
 		AppendValuesResponse result = service.spreadsheets().values()
 			.append(file_id, rowStart, values)
-			.setValueInputOption("RAW")
+			.setValueInputOption("USER_ENTERED")
 			.setInsertDataOption("INSERT_ROWS")
 			.execute();
 		return result.getUpdates().getUpdatedRows();
@@ -145,7 +145,7 @@ public class GoogleSheets {
 		ValueRange values = new ValueRange().setValues(list).setMajorDimension("COLUMNS");
 		UpdateValuesResponse result = service.spreadsheets().values()
 			.update(file_id, rowStart, values)
-			.setValueInputOption("RAW")
+			.setValueInputOption("USER_ENTERED")
 			.execute();
 		return result.size();
 	}
@@ -161,7 +161,7 @@ public class GoogleSheets {
 	 */
 	
 	public static int batchUpdateRowsOnSpreadsheet(final Sheets service, final String file_id, ArrayList<ValueRange> data) throws SocketTimeoutException, IOException {
-		BatchUpdateValuesRequest requestBody = new BatchUpdateValuesRequest().setValueInputOption("RAW").setData(data);
+		BatchUpdateValuesRequest requestBody = new BatchUpdateValuesRequest().setValueInputOption("USER_ENTERED").setData(data);
 		BatchUpdateValuesResponse request = service.spreadsheets().values().batchUpdate(file_id, requestBody).execute();
 		return request.size();
 	}
