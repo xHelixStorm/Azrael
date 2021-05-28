@@ -62,6 +62,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.MessageType;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 /**
@@ -274,43 +275,47 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(currentChannel != null && currentChannel.getChannel_Type() != null && (currentChannel.getChannel_Type().equals(Channel.VOT.getType()) || currentChannel.getChannel_Type().equals(Channel.VO2.getType())) && e.getGuild().getSelfMember().getIdLong() != e.getMember().getUser().getIdLong()) {
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION))) {
 							if(e.getMessage().getType() != MessageType.CHANNEL_PINNED_ADD) {
-								final boolean voteTwoChannel = currentChannel.getChannel_Type().equals(Channel.VO2.getType());
-								final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
-								final Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");;
-								final Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
-								if(thumbsup instanceof Emote)
-									e.getMessage().addReaction((Emote)thumbsup).complete();
-								else if(thumbsup instanceof String)
-									e.getMessage().addReaction((String)thumbsup).complete();
-								if(thumbsdown instanceof Emote)
-									e.getMessage().addReaction((Emote)thumbsdown).complete();
-								else if(thumbsdown instanceof String)
-									e.getMessage().addReaction((String)thumbsdown).complete();
-								if(voteTwoChannel) {
-									final Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
-									if(shrug instanceof Emote)
-										e.getMessage().addReaction((Emote)shrug).complete();
-									else if(shrug instanceof String)
-										e.getMessage().addReaction((String)shrug).complete();
-								}
-								
-								//Run google service, if enabled
-								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
-									final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.VOTE.id, e.getChannel().getId());
-									final var values = GoogleSheets.spreadsheetVoteRequest(array, e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getMessageIdLong(), e.getMessage().getContentRaw(), 0, 0, 0);
-									if(values != null) {
-										ValueRange valueRange = new ValueRange().setValues(values);
-										if(!STATIC.threadExists("VOTE"+e.getGuild().getId()+e.getChannel().getId())) {
-											new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), array[0], e.getChannel().getId(), "add", GoogleEvent.VOTE)).start();
-										}
-										else {
-											DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "add");
+								try {
+									final boolean voteTwoChannel = currentChannel.getChannel_Type().equals(Channel.VO2.getType());
+									final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
+									final Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");;
+									final Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
+									if(thumbsup instanceof Emote)
+										e.getMessage().addReaction((Emote)thumbsup).complete();
+									else if(thumbsup instanceof String)
+										e.getMessage().addReaction((String)thumbsup).complete();
+									if(thumbsdown instanceof Emote)
+										e.getMessage().addReaction((Emote)thumbsdown).complete();
+									else if(thumbsdown instanceof String)
+										e.getMessage().addReaction((String)thumbsdown).complete();
+									if(voteTwoChannel) {
+										final Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
+										if(shrug instanceof Emote)
+											e.getMessage().addReaction((Emote)shrug).complete();
+										else if(shrug instanceof String)
+											e.getMessage().addReaction((String)shrug).complete();
+									}
+									
+									//Run google service, if enabled
+									if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+										final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.VOTE.id, e.getChannel().getId());
+										final var values = GoogleSheets.spreadsheetVoteRequest(array, e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getMessageIdLong(), e.getMessage().getContentRaw(), 0, 0, 0);
+										if(values != null) {
+											ValueRange valueRange = new ValueRange().setValues(values);
+											if(!STATIC.threadExists("VOTE"+e.getGuild().getId()+e.getChannel().getId())) {
+												new Thread(new DelayedGoogleUpdate(e.getGuild(), valueRange, e.getMessageIdLong(), array[0], e.getChannel().getId(), "add", GoogleEvent.VOTE)).start();
+											}
+											else {
+												DelayedGoogleUpdate.handleAdditionalRequest(e.getGuild(), e.getChannel().getId(), valueRange, e.getMessageIdLong(), "add");
+											}
 										}
 									}
+									
+									//in rare cases some resctions are not shown below the message. In this case verify each sent message after 30 seconds and add the missing reactions.
+									validateVoteReactions(e.getMessage(), voteTwoChannel, 0);
+								} catch(ErrorResponseException ere) {
+									logger.warn("The user {} couldn't receive any reactions in the vote channel {} because the user has blocked the bot in guild {}", user_id, channel_id, guild_id);
 								}
-								
-								//in rare cases some resctions are not shown below the message. In this case verify each sent message after 30 seconds and add the missing reactions.
-								validateVoteReactions(e.getMessage(), voteTwoChannel, 0);
 							}
 						}
 						else {
