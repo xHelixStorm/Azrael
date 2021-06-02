@@ -87,6 +87,7 @@ public class ShutDown implements CommandPublic {
 						messageHeader.put("channel_name", message.getChannelName());
 						messageHeader.put("user_id", message.getUserID());
 						messageHeader.put("username", message.getUserName());
+						messageHeader.put("isUserBot", message.isUserBot());
 					}
 					messageBody.put("edit", message.isEdit());
 					messageBody.put("date", message.getTime());

@@ -45,12 +45,12 @@ public class SetRankingSystem {
 				
 				if(ranking_state) {
 					Hashes.initializeGuildRanking(e.getGuild().getIdLong());
-					Hashes.clearRankingLevels();
+					Hashes.removeRankingRoles(e.getGuild().getIdLong());
 					if(RankingSystem.SQLgetRoles(e.getGuild().getIdLong()) == null) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Registered ranking roles couldn't be called and cached in guild {}", e.getGuild().getId());
 					}
-					Hashes.clearRankingLevels();
+					Hashes.removeRankingLevels(e.getGuild().getIdLong());
 					if(RankingSystem.SQLgetLevels(e.getGuild().getIdLong()).size() == 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Ranking levels couldn't be called and cached in guild {}", e.getGuild().getId());

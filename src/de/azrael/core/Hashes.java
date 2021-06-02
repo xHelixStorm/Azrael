@@ -42,7 +42,7 @@ import net.dv8tion.jda.api.entities.Member;
 public class Hashes {
     private final static ConcurrentMap<Long, LinkedHashMap<Long, Ranking>> guild_ranking = new ConcurrentHashMap<Long, LinkedHashMap<Long, Ranking>>();
     private final static ConcurrentMap<Long, LinkedHashMap<Long, ArrayList<Messages>>> guild_message_pool = new ConcurrentHashMap<Long, LinkedHashMap<Long, ArrayList<Messages>>>();
-    private static final ConcurrentMap<String, ArrayList<String>> querry_result = new ConcurrentHashMap<String, ArrayList<String>>();
+    private static final ConcurrentMap<String, ArrayList<String>> query_result = new ConcurrentHashMap<String, ArrayList<String>>();
     private static final ConcurrentMap<Long, ArrayList<NameFilter>> name_filter = new ConcurrentHashMap<Long, ArrayList<NameFilter>>();
     private static final ConcurrentMap<Long, ArrayList<String>> filter_lang = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final Set<String> actionlog = new LinkedHashSet<String>();
@@ -62,7 +62,6 @@ public class Hashes {
     private static final ConcurrentMap<Long, ArrayList<WeaponAbbvs>> weaponAbbvs = new ConcurrentHashMap<Long, ArrayList<WeaponAbbvs>>();
     private static final LinkedHashMap<Long, ArrayList<WeaponStats>> weaponStats = new LinkedHashMap<Long, ArrayList<WeaponStats>>();
     private static final ConcurrentMap<Long, ArrayList<Channels>> channels = new ConcurrentHashMap<Long, ArrayList<Channels>>();
-    private static final ConcurrentMap<String, String> commentedUsers = new ConcurrentHashMap<String, String>();
     private static final ConcurrentMap<String, Cache> tempCache = new ConcurrentHashMap<String, Cache>();
     private static final ConcurrentMap<Long, ArrayList<Skills>> skillShop = new ConcurrentHashMap<Long, ArrayList<Skills>>();
     private static final Set<String> globalURLBlacklist = new HashSet<String>();
@@ -108,8 +107,8 @@ public class Hashes {
 	public static void addFilterLang(long channel_id, ArrayList<String> filter_languages) {
 		filter_lang.put(channel_id, filter_languages);
 	}
-	public static void addQuerryResult(String key, ArrayList<String> result) {
-		querry_result.put(key, result);
+	public static void addQueryResult(String key, ArrayList<String> result) {
+		query_result.put(key, result);
 	}
 	public static void addNameFilter(Long key, ArrayList<NameFilter> names) {
 		name_filter.putIfAbsent(key, names);
@@ -189,9 +188,6 @@ public class Hashes {
 	}
 	public static void addChannels(Long key, ArrayList<Channels> ch) {
 		channels.put(key, ch);
-	}
-	public static void addCommentedUser(String key, String name) {
-		commentedUsers.put(key, name);
 	}
 	public static void addTempCache(String key, Cache cache) {
 		tempCache.put(key, cache);
@@ -311,8 +307,8 @@ public class Hashes {
 	public static LinkedHashMap<Long, ArrayList<Messages>> getWholeMessagePool(long key) {
 		return guild_message_pool.get(key);
 	}
-	public static ArrayList<String> getQuerryResult(String key) {
-		return querry_result.get(key);
+	public static ArrayList<String> getQueryResult(String key) {
+		return query_result.get(key);
 	}
 	public static ArrayList<NameFilter> getNameFilter(Long key) {
 		return name_filter.get(key);
@@ -365,7 +361,7 @@ public class Hashes {
 	public static ArrayList<Roles> getDiscordRole(Long key) {
 		return discordRoles.get(key);
 	}
-	public static ArrayList<RSS> getFeed(Long key) {
+	public static ArrayList<RSS> getFeeds(Long key) {
 		return feeds.get(key);
 	}
 	public static int getFeedsSize(Long key) {
@@ -389,9 +385,6 @@ public class Hashes {
 	}
 	public static ArrayList<Channels> getChannels(Long key) {
 		return channels.get(key);
-	}
-	public static String getCommentedUser(String key) {
-		return commentedUsers.get(key);
 	}
 	public static Cache getTempCache(String key) {
 		return tempCache.get(key);
@@ -498,11 +491,20 @@ public class Hashes {
 	public static void removeFilterLang(long key) {
 		filter_lang.remove(key);
 	}
-	public static void removeQuerryResult(String key) {
-		querry_result.remove(key);
+	public static void clearFilterLang() {
+		filter_lang.clear();
+	}
+	public static void removeQueryResult(String key) {
+		query_result.remove(key);
+	}
+	public static void clearQueryResults() {
+		query_result.clear();
 	}
 	public static void removeNameFilter(Long key) {
 		name_filter.remove(key);
+	}
+	public static void clearNameFilter() {
+		name_filter.clear();
 	}
 	public static void removeGuildRanking(long key) {
 		guild_ranking.remove(key);
@@ -510,8 +512,17 @@ public class Hashes {
 	public static void removeReactionRoles(Long key) {
 		reaction_roles.remove(key);
 	}
+	public static void clearReactionRoles() {
+		reaction_roles.clear();
+	}
 	public static void removeRankingRoles(long key) {
 		ranking_roles.remove(key);
+	}
+	public static void clearRankingRoles() {
+		ranking_roles.clear();
+	}
+	public static void removeRankingLevels(Long key) {
+		ranking_levels.remove(key);
 	}
 	public static void clearRankingLevels() {
 		ranking_levels.clear();
@@ -546,6 +557,9 @@ public class Hashes {
 			quiz_winners.remove(member);
 		}
 	}
+	public static void removeShopContent(Long key) {
+		shopContent.remove(key);
+	}
 	public static void clearShopContent() {
 		shopContent.clear();
 	}
@@ -567,26 +581,35 @@ public class Hashes {
 	public static void clearFeeds() {
 		feeds.clear();
 	}
+	public static void removeWeaponShopContent(Long key) {
+		weaponShopContent.remove(key);
+	}
 	public static void clearWeaponShopContent() {
 		weaponShopContent.clear();
+	}
+	public static void removeWeaponCategories(Long key) {
+		weaponCategories.remove(key);
 	}
 	public static void clearWeaponCategories() {
 		weaponCategories.clear();
 	}
+	public static void removeWeaponAbbreviations(Long key) {
+		weaponAbbvs.remove(key);
+	}
 	public static void clearWeaponAbbreviations() {
 		weaponAbbvs.clear();
+	}
+	public static void removeWeaponStats(Long key) {
+		weaponStats.remove(key);
 	}
 	public static void clearWeaponStats() {
 		weaponStats.clear();
 	}
-	public static void clearChannels() {
-		channels.clear();
-	}
 	public static void removeChannels(Long key) {
 		channels.remove(key);
 	}
-	public static void clearCommentedUsers() {
-		commentedUsers.clear();
+	public static void clearChannels() {
+		channels.clear();
 	}
 	public static void clearTempCache(String key) {
 		tempCache.remove(key);
@@ -594,10 +617,14 @@ public class Hashes {
 	public static void clearExpiredTempCache() {
 		var now = System.currentTimeMillis();
 		for(final var key : tempCache.keySet()) {
-			if(tempCache.get(key).getExpiration() - now <= 0 && tempCache.get(key).getExpire()) {
+			final var curCache = tempCache.get(key);
+			if(curCache.getExpire() && curCache.getExpiration() - now <= 0) {
 				tempCache.remove(key);
 			}
 		}
+	}
+	public static void removeSkillShop(Long key) {
+		skillShop.remove(key);
 	}
 	public static void clearSkillShop() {
 		skillShop.clear();
@@ -628,6 +655,9 @@ public class Hashes {
 	}
 	public static void removeStatus(long key) {
 		status.remove(key);
+	}
+	public static void clearStatus() {
+		status.clear();
 	}
 	public static void removeCensoreMessage(long key) {
 		censorMessage.remove(key);

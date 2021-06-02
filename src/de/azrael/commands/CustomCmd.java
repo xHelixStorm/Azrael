@@ -212,7 +212,7 @@ public class CustomCmd implements CommandPublic {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName())+textChannel.getAsMention(), Channel.LOG.getType());
 				}
 			}
-			else {
+			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong())) {
 				UserPrivs.throwNotEnoughPrivilegeError(e, command.getLevel());
 			}
 		}

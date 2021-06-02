@@ -36,7 +36,7 @@ public class CategoryListener extends ListenerAdapter {
 	@Override
 	public void onCategoryUpdateName(CategoryUpdateNameEvent e) {
 		final int result = Azrael.SQLUpdateCategoryName(e.getCategory().getIdLong(), e.getCategory().getName());
-		if(result == 0) {
+		if(result != -1) {
 			if(Azrael.SQLInsertCategory(e.getCategory().getIdLong(), e.getCategory().getName()) == 0) {
 				logger.error("Missing category {} couldn't be saved in guild {}", e.getCategory().getId(), e.getGuild().getId());
 			}

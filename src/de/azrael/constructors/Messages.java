@@ -12,6 +12,7 @@ public class Messages {
 	private long message_id;
 	private ZonedDateTime time;
 	private boolean edit;
+	private boolean isUserBot;
 	
 	public void setUserID(long _user_id) {
 		this.user_id = _user_id;
@@ -40,6 +41,9 @@ public class Messages {
 	public void setIsEdit(boolean _edit) {
 		this.edit = _edit;
 	}
+	public void setIsUserBot(boolean _isUserBot) {
+		this.isUserBot = _isUserBot;
+	}
 	
 	public long getUserID() {
 		return this.user_id;
@@ -67,5 +71,8 @@ public class Messages {
 	}
 	public boolean isEdit() {
 		return this.edit;
+	}
+	public boolean isUserBot() {
+		return this.isUserBot;
 	}
 }

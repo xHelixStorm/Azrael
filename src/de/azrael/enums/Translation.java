@@ -70,7 +70,7 @@ public enum Translation {
 	PARAM_STAFF_NAMES			("param_staff_names"),
 	PARAM_PROHIBITED_URLS		("param_prohibited_urls"),
 	PARAM_ALLOWED_URLS			("param_allowed_urls"),
-	PARAM_PROHIBITED_TWEETS		("param_prohibited_tweets"),
+	PARAM_PROHIBITED_SUBS		("param_prohibited_subs"),
 	PARAM_INSERT				("param_insert"),
 	PARAM_ADD_PASTEBIN			("param_add_pastebin"),
 	PARAM_LOAD_PASTEBIN			("param_load_pastebin"),
@@ -1028,7 +1028,7 @@ public enum Translation {
 	
 	DELETE_EDITED_MESSAGE		("delete_edited_message"),
 	DELETE_MESSAGE				("delete_message"),
-	DELETE_TWEET				("delete_tweet"),
+	DELETE_SUBSCRIPTION			("delete_subscription"),
 	DELETE_SPAM					("delete_spam"),
 	DELETE_REMOVED_BY			("delete_removed_by"),
 	DELETE_SELF					("delete_self"),
@@ -1304,6 +1304,7 @@ public enum Translation {
 	WEB_NOT_ALLOWED				("web_not_allowed"),
 	WEB_CODE					("web_code"),
 	WEB_RECOVERY				("web_recovery"),
+	WEB_OPTIONS					("web_options"),
 	WEB_CONFIRM					("web_confirm"),
 	
 	ACCEPT_NO_WAIT				("accept_no_wait"),

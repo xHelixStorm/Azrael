@@ -37,7 +37,6 @@ import de.azrael.sql.RankingSystem;
 import de.azrael.threads.CollectUsersGuilds;
 import de.azrael.threads.RoleExtend;
 import de.azrael.threads.Webserver;
-import de.azrael.timerTask.ClearCommentedUser;
 import de.azrael.timerTask.ClearHashes;
 import de.azrael.timerTask.ParseSubscription;
 import de.azrael.timerTask.VerifyMutedMembers;
@@ -212,6 +211,7 @@ public class ReadyListener extends ListenerAdapter {
 										final long user_id = ((JSONObject) item).getLong("user_id");
 										final String username = ((JSONObject) item).getString("username");
 										final JSONArray history = ((JSONObject) item).getJSONArray("history");
+										final boolean isUserBot = ((JSONObject) item).getBoolean("isUserBot");
 										ArrayList<Messages> savedMessages = new ArrayList<Messages>();
 										history.forEach(h -> {
 											if(h instanceof JSONObject) {
@@ -228,6 +228,7 @@ public class ReadyListener extends ListenerAdapter {
 												currentMessage.setIsEdit(edit);
 												currentMessage.setTime(date);
 												currentMessage.setMessage(message);
+												currentMessage.setIsUserBot(isUserBot);
 												savedMessages.add(currentMessage);
 											}
 										});
@@ -276,11 +277,6 @@ public class ReadyListener extends ListenerAdapter {
 		ClearHashes.runTask();
 		//check later on if there are any residual muted users which were not unmuted
 		VerifyMutedMembers.runTask(e, null, null, true);
-		
-		//check if the ranking system should have a timeout for gaining experience points
-		var timeout = IniFileReader.getMessageTimeout();
-		if(timeout != 0)
-			ClearCommentedUser.runTask(timeout);
 		
 		executor.shutdown();
 		

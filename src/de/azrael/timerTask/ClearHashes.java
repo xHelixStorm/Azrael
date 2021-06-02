@@ -31,23 +31,31 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearExpiredTempCache();
 		Hashes.clearTweetBlacklist();
 		Hashes.clearRankingLevels();
+		Hashes.clearReactionRoles();
+		Hashes.clearDiscordRoles();
 		Hashes.clearURLBlacklist();
 		Hashes.clearURLWhitelist();
 		Hashes.clearProfileSkins();
+		Hashes.clearQueryResults();
+		Hashes.clearRankingRoles();
 		Hashes.clearWeaponStats();
 		Hashes.clearShopContent();
 		Hashes.clearLevelSkins();
 		Hashes.clearDailyItems();
 		Hashes.clearCategories();
+		Hashes.clearFilterLang();
+		Hashes.clearNameFilter();
 		Hashes.clearSkillShop();
 		Hashes.clearActionlog();
 		Hashes.clearRankSkins();
 		Hashes.clearChannels();
+		Hashes.clearStatus();
+		Hashes.clearFeeds();
 		
 		logger.info("Temporary cache has been cleared");
 		
-		//clear any outdated tweet logs
-		Azrael.SQLDeleteTweetLog();
+		//clear any expired subscription log
+		Azrael.SQLDeleteSubscriptionLog();
 	}
 	
 	public static void runTask(){

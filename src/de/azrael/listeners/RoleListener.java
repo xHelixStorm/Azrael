@@ -340,7 +340,7 @@ public class RoleListener extends ListenerAdapter {
 						if(Azrael.SQLMarkGiveawayAsUsed(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), reward) > 0) {
 							e.getMember().getUser().openPrivateChannel().queue(channel -> {
 								String submit = null;
-								final String content = FileSetting.readFile("files/Guilds/"+e.getGuild().getId()+"/assignMessage.txt");
+								final String content = FileSetting.readFile("files/Guilds/"+e.getGuild().getId()+"/assignmessage.txt");
 								if(content != null && content.trim().length() > 0) {
 									submit = content.trim()+"\n**"+reward+"**";
 								}
@@ -375,7 +375,17 @@ public class RoleListener extends ListenerAdapter {
 	
 	@Override
 	public void onRoleUpdateColor(RoleUpdateColorEvent e) {
-		STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_ROLE_COLOR)+e.getRole().getAsMention()).addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_COLOR), (e.getOldColor() != null ? e.getOldColor().getRGB() : STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE))+" > "+e.getNewColor().getRGB(), false).setFooter(e.getRole().getId()).setTimestamp(ZonedDateTime.now()), null, Channel.UPD.getType());
+		String oldColor = "";
+		String newColor = "";
+		if(e.getOldColor() != null)
+			oldColor = "#"+Integer.toHexString(e.getOldColorRaw());
+		else
+			oldColor = "#99AAB5";
+		if(e.getNewColor() != null)
+			newColor = "#"+Integer.toHexString(e.getNewColorRaw());
+		else
+			newColor = "#99AAB5";
+		STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_ROLE_COLOR)+e.getRole().getAsMention()).addField(STATIC.getTranslation2(e.getGuild(), Translation.UPDATE_COLOR), oldColor+" > "+newColor, false).setFooter(e.getRole().getId()).setTimestamp(ZonedDateTime.now()), null, Channel.UPD.getType());
 	}
 	
 	@Override

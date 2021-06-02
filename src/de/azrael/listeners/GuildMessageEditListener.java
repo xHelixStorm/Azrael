@@ -133,6 +133,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 					collectedMessage.setMessageID(e.getMessageIdLong());
 					collectedMessage.setTime(ZonedDateTime.now());
 					collectedMessage.setIsEdit(true); // note: flag set to true for edited message
+					collectedMessage.setIsUserBot(e.getMessage().getMember().getUser().isBot());
 					
 					if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "EDIT ["+collectedMessage.getTime().toString()+" - "+e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator()+" ("+e.getMessage().getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
 					if(log[1]) {

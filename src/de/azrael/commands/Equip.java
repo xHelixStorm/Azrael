@@ -36,8 +36,13 @@ public class Equip implements CommandPublic, CommandPrivate {
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
 		//check if the command is enabled
-		if(GuildIni.getEquipCommand(e.getGuild().getIdLong()))
-			return true;
+		if(GuildIni.getEquipCommand(e.getGuild().getIdLong())) {
+			final var commandLevel = GuildIni.getEquipLevel(e.getGuild().getIdLong());
+			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
+				return true;
+			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
+				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
+		}
 		return false;
 	}
 

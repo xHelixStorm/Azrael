@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.enums.Translation;
+import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.interfaces.CommandPrivate;
 import de.azrael.interfaces.CommandPublic;
@@ -24,7 +25,9 @@ public class Web implements CommandPublic, CommandPrivate {
 	
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		return true;
+		if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
+			return true;
+		return false;
 	}
 
 	@Override

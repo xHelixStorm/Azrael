@@ -68,7 +68,7 @@
 	"param_staff_names":			"staff-names",
 	"param_prohibited_urls":		"prohibited-urls",
 	"param_allowed_urls":			"allowed-urls",
-	"param_prohibited_tweets":		"prohibited-tweets",
+	"param_prohibited_subs":		"prohibited-subscriptions",
 	"param_insert":					"insert",
 	"param_add_pastebin":			"add-pastebin",
 	"param_load_pastebin":			"load-pastebin",
@@ -390,7 +390,7 @@
 	"equip_exit":					"Equip setup terminated!",
 	"equip_select_number":			"Please select one of the visible numbers!",
 	
-	"filter_help":					"Write one of the following parameters with the command to work on specific censoring lists or *exit* to interrupt the process! These censoring lists are available:\n\n- **word-filter**:\nFor words to censor in a specific language!\n- **name-filter**:\nFor used words in a name to automatically rename!\n- **name-kick**:\nFor used words in a name to automatically kick from the server!\n- **funny-names**:\nNames to assign to users which got automatically renamed!\n- **staff-names**:\nFor used names which belongs to the staff to automatically rename!\n- **prohibited-urls**:\nFor URLs that are not allowed to use on the server!\n- **allowed-urls**:\nFor URL exceptions when the auto URL deletion is enabled!\n- **prohibited-tweets**:\nFor users on Twitter to keep their tweets from displaying on the server!",
+	"filter_help":					"Write one of the following parameters with the command to work on specific censoring lists or *exit* to interrupt the process! These censoring lists are available:\n\n- **word-filter**:\nFor words to censor in a specific language!\n- **name-filter**:\nFor used words in a name to automatically rename!\n- **name-kick**:\nFor used words in a name to automatically kick from the server!\n- **funny-names**:\nNames to assign to users which got automatically renamed!\n- **staff-names**:\nFor used names which belongs to the staff to automatically rename!\n- **prohibited-urls**:\nFor URLs that are not allowed to use on the server!\n- **allowed-urls**:\nFor URL exceptions when the auto URL deletion is enabled!\n- **prohibited-subscriptions**:\nRetrieved users from subscriptions which are skipped!",
 	"filter_abort":					"The *filter* command has been aborted!",
 	"filter_actions":				"Choose now the desired action:\n\n**display\ninsert\nremove\nadd-pastebin\nload-pastebin**",
 	"filter_display":				"DISPLAY",
@@ -1026,7 +1026,7 @@
 	
 	"delete_edited_message":		"**Edited Message**! ",
 	"delete_message":				"**Message**! ",
-	"delete_tweet":					"**Tweet** ",
+	"delete_subscription":			"**Subscription** ",
 	"delete_spam":					"**Spam Messages** detected!",
 	"delete_removed_by":			"Removed by ",
 	"delete_self":					"User has removed their own ",
@@ -1302,6 +1302,7 @@
 	"web_not_allowed":				"You have disabled the direct login method for the website. Please login directly on the website through this link and change the login settings to use this login method!\n",
 	"web_code":						"Use this key to login into the website. The key is valid for 5 minutes. If you didn't request the code, please contact an administrator!\n**{}**",
 	"web_recovery":					"Use this key to recover your web account. The key is valid for 5 minutes. If you didn't request the code, please contact an administrator!\n**{}**",
+	"web_options":					"Use this key to change the requested account options of your web account. The key is valid for 5 minutes. If you didn't request the code, please contact an administrator!\n**{}**",
 	"web_confirm":					"Here the requested confirmation URL for Azrael Web!\n",
 	
 	"accept_no_wait":				"A verification category and a verified role needs to be registered to use this command!",
@@ -1377,7 +1378,7 @@
 	"update_voice_user_limit":		"Voice channel user limit updated of ",
 	"update_user_limit":			"User limit",
 	"update_role_color":			"Role color updated of ",
-	"update_color":					"Color RGB",
+	"update_color":					"Color Hex",
 	"update_role_permissions":		"Role permissions updated of ",
 	"update_permissions_added":		"Permissions added",
 	"update_permissions_removed":	"Permissions removed",

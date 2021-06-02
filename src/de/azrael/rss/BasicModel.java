@@ -1,9 +1,8 @@
 package de.azrael.rss;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.EnumSet;
 
 import org.slf4j.Logger;
@@ -16,6 +15,7 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -111,8 +111,7 @@ public class BasicModel {
 	public static void ModelTest(GuildMessageReceivedEvent e, RSS rss) {
 		try {
 			String format = rss.getFormat();
-			URL rssUrl = new URL(rss.getURL());
-			BufferedReader in = new BufferedReader(new InputStreamReader(rssUrl.openStream()));
+			BufferedReader in = STATIC.retrieveWebPageCode(rss.getURL());
 			
 			String title = "";
 			String description = "";
@@ -162,6 +161,7 @@ public class BasicModel {
 			}
 			in.close();
 		} catch (IOException e1) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("Subscription couldn't be retrieved from {} in guild {}", rss.getURL(), e.getGuild().getId(), e1);
 		}
 	}
