@@ -367,11 +367,11 @@ public class Display implements CommandPublic{
 				out.append("Leaderboard command: "+GuildIni.getLeaderboardLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Accept command: "+GuildIni.getAcceptLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Deny command: "+GuildIni.getDenyLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Language command: "+GuildIni.getLanguageLevel(e.getGuild().getIdLong()));
-				out.append("Schedule command: "+GuildIni.getScheduleLevel(e.getGuild().getIdLong()));
-				out.append("Prune command: "+GuildIni.getPruneLevel(e.getGuild().getIdLong()));
-				out.append("Warn command: "+GuildIni.getWarnLevel(e.getGuild().getIdLong()));
-				out.append("Reddit command: "+GuildIni.getRedditLevel(e.getGuild().getIdLong()));
+				out.append("Language command: "+GuildIni.getLanguageLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Schedule command: "+GuildIni.getScheduleLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Prune command: "+GuildIni.getPruneLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Warn command: "+GuildIni.getWarnLevel(e.getGuild().getIdLong())+"\n");
+				out.append("Reddit command: "+GuildIni.getRedditLevel(e.getGuild().getIdLong())+"\n");
 				out.append("Invites command: "+GuildIni.getInvitesLevel(e.getGuild().getIdLong()));
 				//print second part
 				e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
