@@ -10,8 +10,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.jpaste.exceptions.PasteException;
-import org.jpaste.pastebin.exceptions.LoginException;
+import org.jpastebin.exceptions.PasteException;
+import org.jpastebin.pastebin.exceptions.LoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,8 +5,8 @@ import java.io.File;
 import java.util.EnumSet;
 import java.util.stream.Collectors;
 
-import org.jpaste.exceptions.PasteException;
-import org.jpaste.pastebin.exceptions.LoginException;
+import org.jpastebin.exceptions.PasteException;
+import org.jpastebin.pastebin.exceptions.LoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

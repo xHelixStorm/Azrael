@@ -109,7 +109,6 @@ public class Main {
 	
 	@SuppressWarnings({ "static-access", "deprecation" })
 	public static void main(String [] args) {
-		
 		//set default uncaught exception handler
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			@Override

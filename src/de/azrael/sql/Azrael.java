@@ -2015,8 +2015,8 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertRSS(String url, long guild_id, int type) {
-		logger.trace("SQLInsertRSS launched. Params passed {}, {}, {}", url, guild_id, type);
+	public static int SQLInsertRSS(String url, long guild_id, int type, String name) {
+		logger.trace("SQLInsertRSS launched. Params passed {}, {}, {}, {}", url, guild_id, type, name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -2030,7 +2030,13 @@ public class Azrael {
 				stmt.setString(3, "From: **{fullName} {username}**\n{description}");
 			else if(type == 3)
 				stmt.setString(3, "From: **{author}** {pubDate}\n<{url}>\n**{title}**\n{description}\n{media}");
+			else if(type == 4)
+				stmt.setString(3, "From: **{channel}** {pubDate}\n<{url}>\n**{title}**\n{description}");
 			stmt.setInt(4, type);
+			if(name != null)
+				stmt.setString(5, name);
+			else
+				stmt.setNull(5, Types.VARCHAR);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertRSS Exception", e);
@@ -2090,6 +2096,7 @@ public class Azrael {
 							rs.getBoolean(5),
 							rs.getBoolean(6),
 							rs.getLong(7),
+							rs.getString(8),
 							SQLgetSubTweets(guild_id, rs.getString(1))
 						)
 					);
@@ -2130,6 +2137,7 @@ public class Azrael {
 						rs.getBoolean(5),
 						rs.getBoolean(6),
 						rs.getLong(7),
+						rs.getString(8),
 						SQLgetSubTweets(guild_id, rs.getString(1))
 					)
 				);
@@ -2167,6 +2175,7 @@ public class Azrael {
 						rs.getBoolean(5),
 						rs.getBoolean(6),
 						rs.getLong(7),
+						rs.getString(8),
 						SQLgetSubTweets(guild_id, rs.getString(1))
 					)
 				);

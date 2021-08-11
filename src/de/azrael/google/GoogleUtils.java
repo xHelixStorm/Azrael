@@ -39,6 +39,7 @@ import net.dv8tion.jda.api.entities.Guild;
  *
  */
 
+@SuppressWarnings("deprecation")
 public class GoogleUtils {
 	private static final Logger logger = LoggerFactory.getLogger(GoogleUtils.class);
 	private static final JacksonFactory jacksonFactory = JacksonFactory.getDefaultInstance();

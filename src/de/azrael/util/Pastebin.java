@@ -3,13 +3,13 @@ package de.azrael.util;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.jpaste.exceptions.PasteException;
-import org.jpaste.pastebin.PasteExpireDate;
-import org.jpaste.pastebin.PastebinLink;
-import org.jpaste.pastebin.PastebinPaste;
-import org.jpaste.pastebin.account.PastebinAccount;
-import org.jpaste.pastebin.exceptions.LoginException;
-import org.jpaste.pastebin.exceptions.ParseException;
+import org.jpastebin.exceptions.PasteException;
+import org.jpastebin.pastebin.PasteExpireDate;
+import org.jpastebin.pastebin.PastebinLink;
+import org.jpastebin.pastebin.PastebinPaste;
+import org.jpastebin.pastebin.account.PastebinAccount;
+import org.jpastebin.pastebin.exceptions.LoginException;
+import org.jpastebin.pastebin.exceptions.ParseException;
 
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;

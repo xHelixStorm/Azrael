@@ -155,6 +155,7 @@
 	"param_max":					"max",
 	"param_exclude":				"ausnahmen",
 	"param_status":					"status",
+	"param_youtube":				"youtube",
 
 	"lang_eng":						"Englisch",
 	"lang_ger":						"Deutsch",
@@ -427,7 +428,7 @@
 	"filter_tweet_remove_err":		"Dieser Twitter Benutzername existiert nicht!",
 	"filter_word_remove_err":		"Dieses Wort exisitert nicht!",
 	
-	"google_help":				 	"Kombinieren Sie verfügbare Bot-Ereignisse mit Google APIs und erstellen Sie eine Schnittstelle für den Datenexport, jedes Mal, wenn ein bestimmtes Ereignis ausgelöst wurde! In einigen Fällen sind Schreib- und Bearbeitungsberechtigungen für diese E-Mail erforderlich *{}*. Zum Beispiel, wenn private Dokumente bearbeitet werden müssen!\n Diese APIs sind derzeit als Parameter verfügbar:\n\n- **dokumente**:\nSchnittstelle mit google docs.\n- **tabellen**:\nSchnittstelle google spreadsheets.\n- **drive**:\nSchnittstelle mit google drive.",
+	"google_help":				 	"Kombinieren Sie verfügbare Bot-Ereignisse mit Google APIs und erstellen Sie eine Schnittstelle für den Datenexport, jedes Mal, wenn ein bestimmtes Ereignis ausgelöst wurde! In einigen Fällen sind Schreib- und Bearbeitungsberechtigungen für diese E-Mail erforderlich *{}*. Zum Beispiel, wenn private Dokumente bearbeitet werden müssen!\n Diese APIs sind derzeit als Parameter verfügbar:\n\n- **tabellen**:\nSchnittstelle google spreadsheets.\n- **youtube**:\nSchnittstelle mit YouTube.",
 	"google_api_not_available":	 	"API existiert nicht, ist nicht verfügbar oder wurde falsch geschrieben! Bitte versuchen Sie es erneut!",
 	"google_webservice":			"Der Google-Webservice hat mit folgendem geantwortet:\n",
 	"google_events":				"Registrierte Ereignisse: ",

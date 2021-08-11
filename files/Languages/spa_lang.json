@@ -155,6 +155,7 @@
 	"param_max":					"max",
 	"param_exclude":				"exclude",
 	"param_status":					"status",
+	"param_youtube":				"youtube",
 	
 	"lang_eng":						"Inglés",
 	"lang_ger":						"Alemán",
@@ -427,7 +428,7 @@
 	"filter_tweet_remove_err":		"The Twitter user doesn't exist!",
 	"filter_word_remove_err":		"The word doesn't exist!",
 	
-	"google_help":				 	"Combina los eventos de Bot disponibles con las API de Google y crea una interfaz para la exportación de datos, ¡cada vez que se active ese evento específico! En algunos casos, se requieren permisos de escritura y edición para el correo electrónico *{}*. Por ejemplo, cuando se debe abrir una hoja de cálculo privada.\nEstas API están actualmente disponibles como parámetros:\n\n- **docs**:\nInterfaz con documentos de google.\n- **spreadsheets**:\nInterfaz con hojas de cálculo de google.\n- **drive**:\nInterfaz con google drive.",
+	"google_help":				 	"Combina los eventos de Bot disponibles con las API de Google y crea una interfaz para la exportación de datos, ¡cada vez que se active ese evento específico! En algunos casos, se requieren permisos de escritura y edición para el correo electrónico *{}*. Por ejemplo, cuando se debe abrir una hoja de cálculo privada.\nEstas API están actualmente disponibles como parámetros:\n\n- **spreadsheets**:\nInterfaz con hojas de cálculo de google.\n- **youtube**:\nInterfaz con YouTube.",
 	"google_api_not_available":	 	"¡La API no existe, no está disponible o se escribió incorrectamente! Inténtalo de nuevo",
 	"google_webservice":			"El servicio web de Google ha respondido con:\n",
 	"google_events":				"Eventos Registrados: ",

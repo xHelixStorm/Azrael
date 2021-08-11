@@ -29,7 +29,7 @@ public class RedditExecution {
 		RedditMethod method = RedditMethod.valueOfType(e.getMessage().getContentRaw());
 		if(method != null) {
 			final String name = method.url.replace("{}", cache.getAdditionalInfo2());
-			final int result = Azrael.SQLInsertRSS(name, e.getGuild().getIdLong(), 3);
+			final int result = Azrael.SQLInsertRSS(name, e.getGuild().getIdLong(), 3, null);
 			if(result > 0) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_REGISTER_STEP_2).replace("{}", name)).build()).queue();
 				logger.info("User {} has subscribed to the reddit username or subreddit {} in guild {}", e.getMember().getUser().getId(), name, e.getGuild().getId());

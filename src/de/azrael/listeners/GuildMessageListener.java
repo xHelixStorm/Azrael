@@ -19,6 +19,7 @@ import com.vdurmont.emoji.EmojiManager;
 import de.azrael.commandsContainer.ClanExecution;
 import de.azrael.commandsContainer.FilterExecution;
 import de.azrael.commandsContainer.GoogleSpreadsheetsExecution;
+import de.azrael.commandsContainer.GoogleYouTubeExecution;
 import de.azrael.commandsContainer.JoinExecution;
 import de.azrael.commandsContainer.PruneExecution;
 import de.azrael.commandsContainer.PurchaseExecution;
@@ -478,13 +479,8 @@ public class GuildMessageListener extends ListenerAdapter {
 						final String key = "google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
 						final String lcMessage = message.toLowerCase();
 						if(!lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
-							//actions for google docs
-							if(google.getAdditionalInfo().equals("docs")) {
-								//TODO: add google docs logic
-							}
-							
 							//actions for google spreadsheets
-							else if(google.getAdditionalInfo().equals("spreadsheets")) {
+							if(google.getAdditionalInfo().equals("spreadsheets")) {
 								GoogleSpreadsheetsExecution.runTask(e, key);
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-selection")) {
@@ -537,9 +533,53 @@ public class GuildMessageListener extends ListenerAdapter {
 								GoogleSpreadsheetsExecution.restrictUpdate(e, google.getAdditionalInfo2(), google.getAdditionalInfo3(), message, key);
 							}
 							
+							//actions for google docs
+							else if(google.getAdditionalInfo().equals("docs")) {
+								//TODO: add google docs logic
+							}
+							
 							//actions for google drive
 							else if(google.getAdditionalInfo().equals("drive")) {
 								//TODO: add google drive logic
+							}
+							
+							else if(google.getAdditionalInfo().equals("youtube")) {
+								GoogleYouTubeExecution.runTask(e, key);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-selection")) {
+								if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD)))
+									GoogleYouTubeExecution.add(e, key);
+								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE)))
+									GoogleYouTubeExecution.remove(e, key);
+								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT)))
+									GoogleYouTubeExecution.format(e, key);
+								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL)))
+									GoogleYouTubeExecution.channel(e, key);
+								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY)))
+									GoogleYouTubeExecution.display(e, key);
+								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST)))
+									GoogleYouTubeExecution.test(e, key);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-add")) {
+								GoogleYouTubeExecution.add(e, key, message);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-remove")) {
+								GoogleYouTubeExecution.remove(e, key, message, google);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-format")) {
+								GoogleYouTubeExecution.format(e, key, message, google);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-format-update")) {
+								GoogleYouTubeExecution.formatUpdate(e, key, message, google);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-channel")) {
+								GoogleYouTubeExecution.channel(e, key, message, google);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-channel-update")) {
+								GoogleYouTubeExecution.channelUpdate(e, key, message, google);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-test")) {
+								GoogleYouTubeExecution.test(e, key, message, google);
 							}
 						}
 						else {

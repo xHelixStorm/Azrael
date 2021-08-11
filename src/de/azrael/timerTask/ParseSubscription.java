@@ -17,6 +17,7 @@ import de.azrael.enums.Translation;
 import de.azrael.rss.BasicModel;
 import de.azrael.rss.RedditModel;
 import de.azrael.rss.TwitterModel;
+import de.azrael.rss.YouTubeModel;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -79,6 +80,8 @@ public class ParseSubscription extends TimerTask{
 									success = TwitterModel.ModelParse(guild, rss, channel_id, defaultChannel);
 								else if(rss.getType() == 3)
 									success = RedditModel.fetchRedditContent(null, guild, rss, channel_id, defaultChannel);
+								else if(rss.getType() == 4)
+									success = YouTubeModel.ModelParse(guild, rss, channel_id, defaultChannel);
 								if(success)
 									Hashes.addSubscriptionStatus(guild.getId()+"_"+rss.getURL(), 0);
 								else
