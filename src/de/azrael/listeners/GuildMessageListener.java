@@ -30,6 +30,7 @@ import de.azrael.commandsContainer.ScheduleExecution;
 import de.azrael.commandsContainer.SetWarning;
 import de.azrael.commandsContainer.ShopExecution;
 import de.azrael.commandsContainer.SubscribeExecution;
+import de.azrael.commandsContainer.TwitchExecution;
 import de.azrael.commandsContainer.UserExecution;
 import de.azrael.commandsContainer.WriteEditExecution;
 import de.azrael.constructors.Cache;
@@ -819,6 +820,34 @@ public class GuildMessageListener extends ListenerAdapter {
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_EXIT)).build()).queue();
 							Hashes.clearTempCache("reddit_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+						}
+					}
+					
+					final var twitch = Hashes.getTempCache("twitch_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+					if(twitch != null && twitch.getExpiration() - System.currentTimeMillis() > 0) {
+						if(!e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
+							if(reddit.getAdditionalInfo().equals("format")) {
+								TwitchExecution.format(e, reddit);
+							}
+							else if(reddit.getAdditionalInfo().equals("format2")) {
+								TwitchExecution.formatUpdate(e, reddit);
+							}
+							else if(reddit.getAdditionalInfo().equals("channel")) {
+								TwitchExecution.channel(e, reddit);
+							}
+							else if(reddit.getAdditionalInfo().equals("channel2")) {
+								TwitchExecution.channelUpdate(e, reddit);
+							}
+							else if(reddit.getAdditionalInfo().equals("remove")) {
+								TwitchExecution.remove(e, reddit);
+							}
+							else if(reddit.getAdditionalInfo().equals("test")) {
+								TwitchExecution.test(e, reddit);
+							}
+						}
+						else {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_EXIT)).build()).queue();
+							Hashes.clearTempCache("twitch_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 						}
 					}
 				});

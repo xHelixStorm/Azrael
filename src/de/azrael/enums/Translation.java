@@ -1454,7 +1454,25 @@ public enum Translation {
 	INVITES_STATUS				("invites_status"),
 	INVITES_STATUS_ERR			("invites_status_err"),
 	INVITES_SHUTDOWN_MODE		("invites_shutdown_mode"),
-	INVITES_USED_BY				("invites_used_by");
+	INVITES_USED_BY				("invites_used_by"),
+	
+	TWITCH_HELP					("twitch_help"),
+	TWITCH_REGISTER_HELP		("twitch_register_help"),
+	TWITCH_REGISTER_INVALID_USER("twitch_register_invalid_user"),
+	TWITCH_REGISTER_STEP		("twitch_register_step"),
+	TWITCH_REGISTER_ERR			("twitch_register_err"),
+	TWITCH_FORMAT_STEP_1		("twitch_format_step_1"),
+	TWITCH_FORMAT_STEP_2		("twitch_format_step_2"),
+	TWITCH_FORMAT_UPDATED		("twitch_format_updated"),
+	TWITCH_CHANNEL_STEP_1		("twitch_channel_step_1"),
+	TWITCH_CHANNEL_STEP_2		("twitch_channel_step_2"),
+	TWITCH_CHANNEL_ADDED		("twitch_channel_added"),
+	TWITCH_REMOVE				("twitch_remove"),
+	TWITCH_REMOVE_ERR			("twitch_remove_err"),
+	TWITCH_REMOVE_ERR_2			("twitch_remove_err_2"),
+	TWITCH_REMOVE_DONE			("twitch_remove_done"),
+	TWITCH_TEST					("twitch_test"),
+	TWITCH_EXIT					("twitch_exit");
 	
 	private String value;
 	

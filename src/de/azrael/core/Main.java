@@ -62,6 +62,7 @@ import de.azrael.commands.Start;
 import de.azrael.commands.Stats;
 import de.azrael.commands.Subscribe;
 import de.azrael.commands.Top;
+import de.azrael.commands.Twitch;
 import de.azrael.commands.Use;
 import de.azrael.commands.User;
 import de.azrael.commands.Warn;
@@ -272,6 +273,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("warn", new Warn());
 		CommandHandler.commandsPublic.put("reddit", new Reddit());
 		CommandHandler.commandsPublic.put("invites", new Invites());
+		CommandHandler.commandsPublic.put("twitch", new Twitch());
 	}
 	
 	public static void addPrivateCommands() {

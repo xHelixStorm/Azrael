@@ -150,6 +150,7 @@ public class GuildIni {
 		commands.put("Warn", "false");
 		commands.put("Reddit", "false");
 		commands.put("Invites", "false");
+		commands.put("Twitch", "false");
 		fileContent.put("Commands", commands);
 		
 		//collect all CommandLevels variables
@@ -268,6 +269,7 @@ public class GuildIni {
 		commandLevels.put("Warn", "20");
 		commandLevels.put("Reddit", "20");
 		commandLevels.put("Invites", "20");
+		commandLevels.put("Twitch", "20");
 		fileContent.put("CommandLevels", commandLevels);
 	}
 	
@@ -1276,5 +1278,13 @@ public class GuildIni {
 	public static int getInvitesLevel(long guild_id) {
 		Ini ini = readIni(guild_id);
 		return ini.get("CommandLevels", "Invites", int.class);
+	}
+	public static boolean getTwitchCommand(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("Commands", "Twitch", boolean.class);
+	}
+	public static int getTwitchLevel(long guild_id) {
+		Ini ini = readIni(guild_id);
+		return ini.get("CommandLevels", "Twitch", int.class);
 	}
 }
