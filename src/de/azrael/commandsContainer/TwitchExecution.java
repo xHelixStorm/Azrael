@@ -12,9 +12,8 @@ import com.vdurmont.emoji.EmojiParser;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.RSS;
 import de.azrael.core.Hashes;
-import de.azrael.enums.RedditMethod;
 import de.azrael.enums.Translation;
-import de.azrael.rss.RedditModel;
+import de.azrael.rss.TwitchModel;
 import de.azrael.sql.Azrael;
 import de.azrael.timerTask.ParseSubscription;
 import de.azrael.util.STATIC;
@@ -45,7 +44,7 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 	public static void formatUpdate(GuildMessageReceivedEvent e, Cache cache) {
 		final RSS twitch = (RSS)cache.getObject();
 		if(Azrael.SQLUpdateRSSFormat(twitch.getURL(), e.getGuild().getIdLong(), EmojiParser.parseToAliases(e.getMessage().getContentRaw())) > 0) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_FORMAT_UPDATED).replace("{}", twitch.getURL())).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_FORMAT_UPDATED).replace("{}", twitch.getName())).build()).queue();
 			Hashes.removeFeeds(e.getGuild().getIdLong());
 			logger.info("User {} has updated the format of the twitch subscription {} in guild {}", e.getMember().getUser().getId(), twitch.getName(), e.getGuild().getId());
 		}
@@ -89,6 +88,27 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 						ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
 					}
 				}
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("The channel of the twitch subscription {} couldn't be updated in guild {}", twitch.getName(), e.getGuild().getId());
+				}
+			}
+		}
+		else if(channel_id.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE))) {
+			final RSS twitch = (RSS)cache.getObject();
+			final var result = Azrael.SQLUpdateRSSChannel(twitch.getURL(), e.getGuild().getIdLong(), 0);
+			if(result > 0) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_CHANNEL_ADDED).replace("{}", STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_DEFAULT))).build()).queue();
+				logger.info("User {} has redirected the twitch subscription {} to channel {} in guild {}", e.getMember().getUser().getId(), twitch.getName(), 0, e.getGuild().getId());
+				Hashes.removeFeeds(e.getGuild().getIdLong());
+				Hashes.clearTempCache("twitch_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+				if(!ParseSubscription.timerIsRunning(e.getGuild().getIdLong())) {
+					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
+				}
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("The channel of the twitch subscription {} couldn't be updated in guild {}", twitch.getName(), e.getGuild().getId());
 			}
 		}
 	}
@@ -101,7 +121,7 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 			if(index >= 0 && index < twitch.size()) {
 				final RSS user = twitch.get(index);
 				if(Azrael.SQLDeleteRSSFeed(user.getURL(), e.getGuild().getIdLong()) > 0) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REMOVE_DONE).replace("{}", user.getURL())).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REMOVE_DONE).replace("{}", user.getName())).build()).queue();
 					logger.info("User {} has removed the twitch subscription {} in guild {}", e.getMember().getUser().getId(), user.getName(), e.getGuild().getId());
 					Hashes.removeFeeds(e.getGuild().getIdLong());
 					Hashes.removeSubscriptionStatus(e.getGuild().getId()+"_"+user.getURL());
@@ -127,8 +147,7 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 			if(index >= 0 && index < twitch.size()) {
 				final RSS user = twitch.get(index);
 				try {
-					//TODO: add TwitchModel for test
-					RedditModel.fetchRedditContent(e, e.getGuild(), user, e.getChannel().getIdLong(), false);
+					TwitchModel.ModelTest(e, user);
 				} catch (IOException e1) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					logger.error("An unexpected error occurred while testing the twitch subscription {} in guild {}", user.getName(), e.getGuild().getId());

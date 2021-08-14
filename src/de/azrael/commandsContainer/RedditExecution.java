@@ -101,17 +101,38 @@ public class RedditExecution {
 		if(channel_id.replaceAll("[0-9]*", "").length() == 0) {
 			TextChannel textChannel = e.getGuild().getTextChannelById(channel_id);
 			if(textChannel != null) {
-				final RSS user = (RSS)cache.getObject();
-				final var result = Azrael.SQLUpdateRSSChannel(user.getURL(), e.getGuild().getIdLong(), textChannel.getIdLong());
+				final RSS reddit = (RSS)cache.getObject();
+				final var result = Azrael.SQLUpdateRSSChannel(reddit.getURL(), e.getGuild().getIdLong(), textChannel.getIdLong());
 				if(result > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_CHANNEL_ADDED).replace("{}", textChannel.getAsMention())).build()).queue();
-					logger.info("User {} has redirected the Reddit subscription {} to channel {} in guild {}", e.getMember().getUser().getId(), user.getURL(), textChannel.getId(), e.getGuild().getId());
+					logger.info("User {} has redirected the Reddit subscription {} to channel {} in guild {}", e.getMember().getUser().getId(), reddit.getURL(), textChannel.getId(), e.getGuild().getId());
 					Hashes.removeFeeds(e.getGuild().getIdLong());
 					Hashes.clearTempCache("reddit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					if(!ParseSubscription.timerIsRunning(e.getGuild().getIdLong())) {
 						ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
 					}
 				}
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("The channel of the twitch subscription {} couldn't be updated in guild {}", reddit.getURL(), e.getGuild().getId());
+				}
+			}
+		}
+		else if(channel_id.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE))) {
+			final RSS reddit = (RSS)cache.getObject();
+			final var result = Azrael.SQLUpdateRSSChannel(reddit.getURL(), e.getGuild().getIdLong(), 0);
+			if(result > 0) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_CHANNEL_ADDED).replace("{}", STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_DEFAULT))).build()).queue();
+				logger.info("User {} has redirected the twitch subscription {} to channel {} in guild {}", e.getMember().getUser().getId(), reddit.getURL(), 0, e.getGuild().getId());
+				Hashes.removeFeeds(e.getGuild().getIdLong());
+				Hashes.clearTempCache("twitch_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+				if(!ParseSubscription.timerIsRunning(e.getGuild().getIdLong())) {
+					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
+				}
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("The channel of the twitch subscription {} couldn't be updated in guild {}", reddit.getURL(), e.getGuild().getId());
 			}
 		}
 	}

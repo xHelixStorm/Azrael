@@ -293,6 +293,7 @@ public enum Translation {
 	COMMAND_WARN				("command_warn"),
 	COMMAND_REDDIT				("command_reddit"),
 	COMMAND_INVITES				("command_invites"),
+	COMMAND_TWITCH				("command_twitch"),
 	COMMANDS_DISABLED			("commands_disabled"),
 	
 	DAILY_REWARD				("daily_reward"),
@@ -1472,7 +1473,8 @@ public enum Translation {
 	TWITCH_REMOVE_ERR_2			("twitch_remove_err_2"),
 	TWITCH_REMOVE_DONE			("twitch_remove_done"),
 	TWITCH_TEST					("twitch_test"),
-	TWITCH_EXIT					("twitch_exit");
+	TWITCH_EXIT					("twitch_exit"),
+	TWITCH_NO_CONTENT			("twitch_no_content");
 	
 	private String value;
 	

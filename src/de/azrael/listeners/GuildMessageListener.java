@@ -826,23 +826,23 @@ public class GuildMessageListener extends ListenerAdapter {
 					final var twitch = Hashes.getTempCache("twitch_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 					if(twitch != null && twitch.getExpiration() - System.currentTimeMillis() > 0) {
 						if(!e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
-							if(reddit.getAdditionalInfo().equals("format")) {
-								TwitchExecution.format(e, reddit);
+							if(twitch.getAdditionalInfo().equals("format")) {
+								TwitchExecution.format(e, twitch);
 							}
-							else if(reddit.getAdditionalInfo().equals("format2")) {
-								TwitchExecution.formatUpdate(e, reddit);
+							else if(twitch.getAdditionalInfo().equals("format2")) {
+								TwitchExecution.formatUpdate(e, twitch);
 							}
-							else if(reddit.getAdditionalInfo().equals("channel")) {
-								TwitchExecution.channel(e, reddit);
+							else if(twitch.getAdditionalInfo().equals("channel")) {
+								TwitchExecution.channel(e, twitch);
 							}
-							else if(reddit.getAdditionalInfo().equals("channel2")) {
-								TwitchExecution.channelUpdate(e, reddit);
+							else if(twitch.getAdditionalInfo().equals("channel2")) {
+								TwitchExecution.channelUpdate(e, twitch);
 							}
-							else if(reddit.getAdditionalInfo().equals("remove")) {
-								TwitchExecution.remove(e, reddit);
+							else if(twitch.getAdditionalInfo().equals("remove")) {
+								TwitchExecution.remove(e, twitch);
 							}
-							else if(reddit.getAdditionalInfo().equals("test")) {
-								TwitchExecution.test(e, reddit);
+							else if(twitch.getAdditionalInfo().equals("test")) {
+								TwitchExecution.test(e, twitch);
 							}
 						}
 						else {

@@ -291,6 +291,7 @@
 	"command_warn":					"- **{}warn**\nFormulate the reason for a warning and send it to a user in private message.\n",
 	"command_reddit":				"- **{}reddit**\nSuscríbete a un usuario de subreddit o reddit para obtener contenido.\n",
 	"command_invites":				"- **{}invites**\nCrea un número de invitaciones de uso único.\n",
+	"command_twitch":				"- **{}twitch**\nSubscribe to a twitch user to fetch content.\n",
 	"commands_disabled":		 	"¡Todos los comandos están deshabilitados!",
 	
 	"daily_reward":				 	"Felicidades. Has desbloqueado la siguiente recompensa:\n",
@@ -1429,7 +1430,7 @@
 	"reddit_format_step_2":			"This is the current format for this Reddit subscription. Type your desired format or type *exit* to interrupt. Key values are `{pubDate}`, `{author}`, `{title}`, `{description}`, `{subreddit}`, `{url}`, `{media}`\n```",
 	"reddit_format_updated":		"Reddit display format for **{}** has been updated",
 	"reddit_channel_step_1":		"Select one of the registered Reddit subscriptions to redirect the fetched content into a selected text channel!\n\n",
-	"reddit_channel_step_2":		"Now please submit a text channel mention or text channel id to redirect the output of this subscription to the selected text channel! Currently selected channel: ",
+	"reddit_channel_step_2":		"Now please submit a text channel mention or text channel id to redirect the output of this subscription to the selected text channel! Para restablecerla, escriba *none*. Currently selected channel: ",
 	"reddit_channel_added":			"This Reddit subscription is now being redirected to text channel {}!",
 	"reddit_remove":				"These Reddit subscriptions are currently registered. Please select one of them to remove!\n\n",
 	"reddit_remove_err":			"Nothing has been registered yet!",
@@ -1453,5 +1454,24 @@
 	"invites_status": 				"Número total de invitaciones procesadas: **{}**/**{}**",
 	"invites_status_err": 			"No se están procesando invitaciones en este momento!",
 	"invites_shutdown_mode": 		"No se pueden iniciar nuevos trabajos de invitación porque el Bot está a punto de cerrarse!",
-	"invites_used_by": 				"El código de Invitación **{}** ha sido usado por el usuario **{}** con número de ID **{}**"
+	"invites_used_by": 				"El código de Invitación **{}** ha sido usado por el usuario **{}** con número de ID **{}**",
+	
+	"twitch_help":					"The Twitch command allows you to subscribe a user and fetch live streams. Write *exit* anytime to interrupt the setup. These parameters are available:\n\n- **register**:\nRegister a username to follow!\n- **format**:\nDefine the display options of the fetched Twitch stream!\n- **channel**:\nUse a specific channel besides the default one!\n- **remove**:\nRemove a registered subscription!\n- **test**:\nTest a registered subscription!",
+	"twitch_register_help":			"Type a username of Twitch together with the command!",
+	"twitch_register_invalid_user":	"Invalid Twitch username found! Please try again!",
+	"twitch_register_step":			"**{}** has been registered successfully!",
+	"twitch_register_err":			"This subscription has been already registered! Action aborted!",
+	"twitch_format_step_1":			"Select one of the registered Twitch subscriptions to format the output messages!\n\n",
+	"twitch_format_step_2":			"This is the current format for this Twitch subscription. Type your desired format or type *exit* to interrupt. Key values are `{pubDate}`, `{user}`, `{user_id}`, `{title}`, `{url}`, `{language}`, {game}\n```",
+	"twitch_format_updated":		"Twitch display format for **{}** has been updated",
+	"twitch_channel_step_1":		"Select one of the registered Twitch subscriptions to redirect the fetched content into a selected text channel!\n\n",
+	"twitch_channel_step_2":		"Now please submit a text channel mention or text channel id to redirect the output of this subscription to the selected text channel! To reset it, type *none*. Currently selected channel: ",
+	"twitch_channel_added":			"This Twitch subscription is now being redirected to text channel {}!",
+	"twitch_remove":				"These Twitch subscriptions are currently registered. Please select one of them to remove!\n\n",
+	"twitch_remove_err":			"Nothing has been registered yet!",
+	"twitch_remove_err_2":			"Selection must be between 1 and {}!",
+	"twitch_remove_done":			"Twitch subscription **{}** has been removed!",
+	"twitch_test":					"These Twitch subscriptions are currently registered. Please select one of them to test!\n\n",
+	"twitch_exit":					"Twitch command aborted!",
+	"twitch_no_content":			"No Twitch related content found!"
 }

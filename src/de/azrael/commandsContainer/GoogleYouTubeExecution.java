@@ -179,7 +179,7 @@ public class GoogleYouTubeExecution {
 			final int selection = Integer.parseInt(number)-1;
 			if(selection >= 0 && selection < channels.size()) {
 				final var channel = channels.get(selection);
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_CHANNEL_2).replace("{}", (channel.getChannelID() > 0 ? "<#"+channel.getChannelID()+">" : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)))).build()).queue();
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_CHANNEL_2).replace("{}", (channel.getChannelID() > 0 ? "<#"+channel.getChannelID()+">" : STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_DEFAULT)))).build()).queue();
 				Hashes.addTempCache(key, cache.setExpiration(180000).updateDescription("youtube-channel-update").setObject(channel));
 			}
 		}

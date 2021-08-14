@@ -290,6 +290,7 @@
 	"command_prune":				"- **{}prune**\nKick a big group of members from the server.\n",
 	"command_warn":					"- **{}warn**\nFormulate the reason for a warning and send it to a user in private message.\n",
 	"command_reddit":				"- **{}reddit**\nSubscribe to a subreddit or reddit user to fetch content.\n",
+	"command_twitch":				"- **{}twitch**\nSubscribe to a twitch user to fetch content.\n",
 	"command_invites":				"- **{}invites**\nCreate a number of one time use invites.\n",
 	"commands_disabled":		 	"All commands are disabled!",
 	
@@ -1429,12 +1430,12 @@
 	"reddit_format_step_2":			"This is the current format for this Reddit subscription. Type your desired format or type *exit* to interrupt. Key values are `{pubDate}`, `{author}`, `{title}`, `{description}`, `{subreddit}`, `{url}`, `{media}`\n```",
 	"reddit_format_updated":		"Reddit display format for **{}** has been updated",
 	"reddit_channel_step_1":		"Select one of the registered Reddit subscriptions to redirect the fetched content into a selected text channel!\n\n",
-	"reddit_channel_step_2":		"Now please submit a text channel mention or text channel id to redirect the output of this subscription to the selected text channel! Currently selected channel: ",
+	"reddit_channel_step_2":		"Now please submit a text channel mention or text channel id to redirect the output of this subscription to the selected text channel! To reset it, type *none*. Currently selected channel: ",
 	"reddit_channel_added":			"This Reddit subscription is now being redirected to text channel {}!",
 	"reddit_remove":				"These Reddit subscriptions are currently registered. Please select one of them to remove!\n\n",
 	"reddit_remove_err":			"Nothing has been registered yet!",
 	"reddit_remove_err_2":			"Selection must be between 1 and {}!",
-	"reddit_remove_done":			"Reddit subscription {} has been removed!",
+	"reddit_remove_done":			"Reddit subscription **{}** has been removed!",
 	"reddit_test":					"These Reddit subscriptions are currently registered. Please select one of them to test!\n\n",
 	"reddit_exit":					"Reddit command aborted!",
 	
@@ -1464,12 +1465,13 @@
 	"twitch_format_step_2":			"This is the current format for this Twitch subscription. Type your desired format or type *exit* to interrupt. Key values are `{pubDate}`, `{user}`, `{user_id}`, `{title}`, `{url}`, `{language}`, {game}\n```",
 	"twitch_format_updated":		"Twitch display format for **{}** has been updated",
 	"twitch_channel_step_1":		"Select one of the registered Twitch subscriptions to redirect the fetched content into a selected text channel!\n\n",
-	"twitch_channel_step_2":		"Now please submit a text channel mention or text channel id to redirect the output of this subscription to the selected text channel! Currently selected channel: ",
+	"twitch_channel_step_2":		"Now please submit a text channel mention or text channel id to redirect the output of this subscription to the selected text channel! To reset it, type *none*. Currently selected channel: ",
 	"twitch_channel_added":			"This Twitch subscription is now being redirected to text channel {}!",
 	"twitch_remove":				"These Twitch subscriptions are currently registered. Please select one of them to remove!\n\n",
 	"twitch_remove_err":			"Nothing has been registered yet!",
 	"twitch_remove_err_2":			"Selection must be between 1 and {}!",
-	"twitch_remove_done":			"Twitch subscription {} has been removed!",
+	"twitch_remove_done":			"Twitch subscription **{}** has been removed!",
 	"twitch_test":					"These Twitch subscriptions are currently registered. Please select one of them to test!\n\n",
-	"twitch_exit":					"Twitch command aborted!"
+	"twitch_exit":					"Twitch command aborted!",
+	"twitch_no_content":			"No Twitch related content found!"
 }

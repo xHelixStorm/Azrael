@@ -291,6 +291,7 @@
     "command_warn":                 "- **{}avertissement**\nFormulez le motif d’un avertissement et envoyez-le à un utilisateur en message privé.\n",
     "command_reddit":               "- **{}reddit**\nS’abonner à un subreddit ou à un utilisateur reddit pour récupérer du contenu.\n",
     "command_invites":              "- **{}invite**\nCréez un certain nombre d’invitations à usage unique.\n",
+    "command_twitch":				"- **{}twitch**\nSubscribe to a twitch user to fetch content.\n",
     "commands_disabled":            "Toutes les commandes sont désactivées !",
     
     "daily_reward":                 "Félicitations ! Vous avez débloqué la récompense suivante : \n",
@@ -1429,7 +1430,7 @@
     "reddit_format_step_2":         "Il s'agit du format actuel pour cet abonnement Reddit. Tapez le format souhaité ou tapez *exit* pour l'interrompre. Les valeurs clés sont `{datepublication}`, `{auteur}`, `{titre}`, `{description}`, `{subreddit}`, `{url}`, `{media}`\n```",
     "reddit_format_updated":        "Le format d'affichage de Reddit pour **{}** a été mis à jour",
     "reddit_channel_step_1":        "Sélectionnez l'un des abonnements Reddit enregistrés pour rediriger le contenu récupéré vers un canal texte sélectionné !\n\n",
-    "reddit_channel_step_2":        "Veuillez maintenant soumettre une mention de canal de texte ou un identifiant de canal de texte pour rediriger la sortie de cet abonnement vers le canal de texte sélectionné ! Canal actuellement sélectionné: ",
+    "reddit_channel_step_2":        "Veuillez maintenant soumettre une mention de canal de texte ou un identifiant de canal de texte pour rediriger la sortie de cet abonnement vers le canal de texte sélectionné ! Pour le réinitialiser, tapez *none*. Canal actuellement sélectionné: ",
     "reddit_channel_added":         "Cet abonnement Reddit est maintenant redirigé vers le canal texte {} !",
     "reddit_remove":                "Ces abonnements Reddit sont actuellement enregistrés. Veuillez en sélectionner un pour le supprimer !n\n",
     "reddit_remove_err":            "Rien n'a encore été enregistré !",
@@ -1453,5 +1454,24 @@
     "invites_status":               "Nombre total d'invitations traitées : **{}**/**{}**",
     "invites_status_err":           "Aucune invitation n'est en cours de traitement pour le moment !",
     "invites_shutdown_mode":        "Les nouvelles invitations ne peuvent pas être lancées parce que le Bot est sur le point de s'arrêter !",
-    "invites_used_by":              "Le code d'invitation **{}** a été utilisé par l'utilisateur **{}** avec le numéro d'identification **{}**"
+    "invites_used_by":              "Le code d'invitation **{}** a été utilisé par l'utilisateur **{}** avec le numéro d'identification **{}**",
+    
+    "twitch_help":					"The Twitch command allows you to subscribe a user and fetch live streams. Write *exit* anytime to interrupt the setup. These parameters are available:\n\n- **register**:\nRegister a username to follow!\n- **format**:\nDefine the display options of the fetched Twitch stream!\n- **channel**:\nUse a specific channel besides the default one!\n- **remove**:\nRemove a registered subscription!\n- **test**:\nTest a registered subscription!",
+	"twitch_register_help":			"Type a username of Twitch together with the command!",
+	"twitch_register_invalid_user":	"Invalid Twitch username found! Please try again!",
+	"twitch_register_step":			"**{}** has been registered successfully!",
+	"twitch_register_err":			"This subscription has been already registered! Action aborted!",
+	"twitch_format_step_1":			"Select one of the registered Twitch subscriptions to format the output messages!\n\n",
+	"twitch_format_step_2":			"This is the current format for this Twitch subscription. Type your desired format or type *exit* to interrupt. Key values are `{pubDate}`, `{user}`, `{user_id}`, `{title}`, `{url}`, `{language}`, {game}\n```",
+	"twitch_format_updated":		"Twitch display format for **{}** has been updated",
+	"twitch_channel_step_1":		"Select one of the registered Twitch subscriptions to redirect the fetched content into a selected text channel!\n\n",
+	"twitch_channel_step_2":		"Now please submit a text channel mention or text channel id to redirect the output of this subscription to the selected text channel! To reset it, type *none*. Currently selected channel: ",
+	"twitch_channel_added":			"This Twitch subscription is now being redirected to text channel {}!",
+	"twitch_remove":				"These Twitch subscriptions are currently registered. Please select one of them to remove!\n\n",
+	"twitch_remove_err":			"Nothing has been registered yet!",
+	"twitch_remove_err_2":			"Selection must be between 1 and {}!",
+	"twitch_remove_done":			"Twitch subscription **{}** has been removed!",
+	"twitch_test":					"These Twitch subscriptions are currently registered. Please select one of them to test!\n\n",
+	"twitch_exit":					"Twitch command aborted!",
+	"twitch_no_content":			"No Twitch related content found!"
 }

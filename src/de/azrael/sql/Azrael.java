@@ -2032,6 +2032,8 @@ public class Azrael {
 				stmt.setString(3, "From: **{author}** {pubDate}\n<{url}>\n**{title}**\n{description}\n{media}");
 			else if(type == 4)
 				stmt.setString(3, "From: **{channel}** {pubDate}\n<{url}>\n**{title}**\n{description}");
+			else if(type == 5)
+				stmt.setString(3, "From: **{user}** {pubDate}\n{url}\n**{title}**\nGame: {game}");
 			stmt.setInt(4, type);
 			if(name != null)
 				stmt.setString(5, name);

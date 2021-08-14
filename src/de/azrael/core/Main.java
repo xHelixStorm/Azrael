@@ -108,7 +108,6 @@ public class Main {
 	private final static Logger logger = LoggerFactory.getLogger(Main.class);
 	private static JDABuilder builder;
 	
-	@SuppressWarnings({ "static-access", "deprecation" })
 	public static void main(String [] args) {
 		//set default uncaught exception handler
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
@@ -199,7 +198,7 @@ public class Main {
 		}
 		
 		String token = STATIC.getToken();
-		builder = new JDABuilder().createDefault(token)
+		builder = JDABuilder.createDefault(token)
 				.enableIntents(EnumSet.of(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES))
 				.setMemberCachePolicy(MemberCachePolicy.ALL);
 		builder.setAutoReconnect(true);

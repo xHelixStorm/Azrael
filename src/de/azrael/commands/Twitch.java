@@ -1,6 +1,7 @@
 package de.azrael.commands;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import de.azrael.core.UserPrivs;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.interfaces.CommandPublic;
+import de.azrael.rss.TwitchModel;
 import de.azrael.sql.Azrael;
 import de.azrael.timerTask.ParseSubscription;
 import de.azrael.util.STATIC;
@@ -44,14 +46,36 @@ public class Twitch implements CommandPublic {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REGISTER_HELP)).build()).queue();
 		}
 		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))) {
-			if(args[1].matches("[a-zA-Z0-9\s_-]{3,20}")) {
+			if(args[1].matches("[a-zA-Z0-9_-]{4,25}")) {
 				final String username = args[1];
-				//TODO: http request to find user
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REGISTER_STEP)).build()).queue();
-				logger.info("User {} has subscribed to the twitch username {} in guild {}", e.getMember().getUser().getId(), username, e.getGuild().getId());
-				if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
-					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
-				Hashes.removeFeeds(e.getGuild().getIdLong());
+				boolean success = false;
+				String [] user = null;
+				try {
+					user = TwitchModel.findUser(username);
+					if(user != null) {
+						success = true;
+					}
+				} catch (IOException e1) {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("Twitch request to find the user {} failed in guild {}", username, e.getGuild().getId());
+				}
+				
+				if(success) {
+					if(Azrael.SQLInsertRSS(user[0], e.getGuild().getIdLong(), 5, user[1]) > 0) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REGISTER_STEP).replace("{}", user[1])).build()).queue();
+						logger.info("User {} has subscribed to the twitch username {} in guild {}", e.getMember().getUser().getId(), user[1], e.getGuild().getId());
+						if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
+							ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
+						Hashes.removeFeeds(e.getGuild().getIdLong());
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Twitch user {} couldn't be registered in guild {}", user[1], e.getGuild().getId());
+					}
+				}
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REGISTER_INVALID_USER)).build()).queue();
+				}
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REGISTER_INVALID_USER)).build()).queue();
