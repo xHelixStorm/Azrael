@@ -119,6 +119,7 @@ public class RedditModel {
 					success = true;
 					final String format = reddit.getFormat();
 					final var prohibitedSubscriptions = Azrael.SQLgetSubscriptionBlacklist(guild.getIdLong());
+					int count = 0;
 					for(final Object iteration : children) {
 						final JSONObject result = (JSONObject)iteration;
 						final String kind = result.getString("kind");
@@ -166,6 +167,9 @@ public class RedditModel {
 						else {
 							Azrael.SQLUpdateSubscriptionTimestamp(permaLink);
 						}
+						count ++;
+						if(count == 5)
+							break;
 					}
 				}
 			}

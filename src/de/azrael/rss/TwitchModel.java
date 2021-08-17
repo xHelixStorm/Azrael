@@ -140,6 +140,7 @@ public class TwitchModel {
 					JSONArray data = fetchLiveStreams(twitch.getURL());
 					if(data != null) {
 						success = true;
+						int count = 0;
 						for(Object curData : data) {
 							JSONObject streamer = (JSONObject)curData;
 							final String streamId = streamer.getString("id");
@@ -191,6 +192,9 @@ public class TwitchModel {
 							else {
 								Azrael.SQLUpdateSubscriptionTimestamp(streamId);
 							}
+							count++;
+							if(count == 5)
+								break;
 						}
 					}
 				}

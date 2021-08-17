@@ -56,8 +56,8 @@ public class TwitterModel {
 						result = twitter.search(query);
 						if(result.getTweets().size() > 0)
 							success = true;
-						if(result.getTweets().size() >= 30)
-							tweets = result.getTweets().subList(0, 29);
+						if(result.getTweets().size() >= 5)
+							tweets = result.getTweets().subList(0, 4);
 						else
 							tweets = result.getTweets().subList(0, result.getTweets().size());
 					}

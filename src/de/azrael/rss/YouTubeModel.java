@@ -36,7 +36,7 @@ public class YouTubeModel {
 		final TextChannel textChannel = guild.getTextChannelById(rss_channel);
 		if(textChannel != null) {
 			if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
-				final SearchListResponse youtubeSearch = GoogleYoutube.searchYouTubeChannelVideos(GoogleYoutube.getService(), rss.getURL(), 30);
+				final SearchListResponse youtubeSearch = GoogleYoutube.searchYouTubeChannelVideos(GoogleYoutube.getService(), rss.getURL(), 5);
 				if(youtubeSearch != null && youtubeSearch.getItems().size() > 0) {
 					success = true;
 					for(final SearchResult item : youtubeSearch.getItems()) {
