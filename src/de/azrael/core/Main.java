@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.sql.Timestamp;
 import java.util.EnumSet;
 
 import javax.security.auth.login.LoginException;
@@ -13,6 +12,7 @@ import javax.security.auth.login.LoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.util.ContextInitializer;
 import de.azrael.commands.About;
 import de.azrael.commands.Accept;
 import de.azrael.commands.Changemap;
@@ -104,7 +104,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 public class Main {
-	static {System.setProperty("logback.configurationFile", "./logback.xml");}
+	static {System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "./logback.xml");}
 	private final static Logger logger = LoggerFactory.getLogger(Main.class);
 	private static JDABuilder builder;
 	
@@ -186,14 +186,13 @@ public class Main {
 		
 		if(IniFileReader.getFileLogger()) {
 			PrintStream out;
-			PrintStream err;
 			try {
-				out = new PrintStream(new FileOutputStream("log/"+STATIC.getSessionName()+"log"+new Timestamp(System.currentTimeMillis()).toString().replaceAll(":", "-")+".txt"));
-				err = new PrintStream(new FileOutputStream("log/"+STATIC.getSessionName()+"err"+new Timestamp(System.currentTimeMillis()).toString().replaceAll(":", "-")+".txt"));
+				final String fileName = (STATIC.getSessionName().length() > 0 ? STATIC.getSessionName() : "Azrael");
+				out = new PrintStream(new FileOutputStream("log/"+fileName+".log", true));
 				System.setOut(out);
-				System.setErr(err);
+				System.setErr(out);
 			} catch (FileNotFoundException e1) {
-				logger.warn("eventlog.txt or errlog.txt couldn't be found on start up", e1);
+				logger.warn("Log file couldn't be found on start up", e1);
 			}
 		}
 		
