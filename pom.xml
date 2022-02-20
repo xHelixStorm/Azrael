@@ -111,6 +111,7 @@
 			    </configuration>
 		    </plugin>
 		</plugins>
+		<finalName>Azrael</finalName>
 	</build>
 	<repositories>
 		<repository>
