@@ -407,8 +407,8 @@
 	"filter_list_lang_na":			"The requested language is not available!",
 	"filter_write_word":			"Now please provide the word or name!",
 	"filter_write_paste":			"Now please provide a pastebin URL which contains all words or names!",
-	"filter_write_fqdn":			"Now please provide a fully qualified domain name. For example: *https://www.google.com*\n Please don't add anything after the top level domain (e.g. com, de, org)!",
-	"filter_write_paste_fqdn":		"Now please provide a Pastebin URL with fully qualified domain names. For example: *https://www.google.com*\n Please don't add anything after the top level domain (e.g. com, de, org) and write one fqdn per line!",
+	"filter_write_fqdn":			"Now please provide a fully qualified domain name. For example: *https:
+	"filter_write_paste_fqdn":		"Now please provide a Pastebin URL with fully qualified domain names. For example: *https:
 	"filter_write_username":		"Now please provide a Twitter username to have the tweets blocked from posting on discord!",
 	"filter_write_paste_username":	"Now please provide a Pastebin URL with Twitter usernames to have the tweets blocked from posting on discord!",
 	"filter_write_insert":			"The word or name has been inserted successfully!",
@@ -439,8 +439,8 @@
 	"google_invalid_dds":			"The following data dictionary items are invalid. Please resubmit your items:\n",
 	"google_sheet_help":			"Use one of the below parameters to navigate through the spreadsheets setup or type *exit* to close the setup any time! This message is shown only once:\n\n- **create**:\nCreate a spreadsheet table!\n- **add**:\nAdd an already existing spreadsheet table!\n- **remove**:\nRemove a linked spreadsheet table (no deletion)!\n- **events**:\nAssign events to existing spreadsheet tables!\n- **sheet**:\nDefine the sheet and row/column to operate on!\n- **map**:\nMap the available table fields with values from the Bot!\n- **restrict**:\nRestrict an event to one text channel!\n\nCurrent Spreadsheets:\n",
 	"google_sheet_create":			"Use this parameter together with a title name to create a new spreadsheet and directly link it with the Bot! Note that for this action, a valid google email address needs to be provided in the Bot settings!",
-	"google_sheet_created":			"Google Spreadsheet has been created and linked to the Bot!\nURL: https://docs.google.com/spreadsheets/d/",
-	"google_sheet_created_2":		"Google Spreadsheet has been created but couldn't be linked with the Bot! Try to link the created spreadsheet with the following url and the *add* parameter:\nURL: https://docs.google.com/spreadsheets/d/",
+	"google_sheet_created":			"Google Spreadsheet has been created and linked to the Bot!\nURL: https:
+	"google_sheet_created_2":		"Google Spreadsheet has been created but couldn't be linked with the Bot! Try to link the created spreadsheet with the following url and the *add* parameter:\nURL: https:
 	"google_sheet_email":			"Please configure a google email address before using this command, so that the ownership can be moved to that email address!",
 	"google_sheet_add_help":		"Use this parameter together with a spreadsheet URL or just the file ID to link it with the Bot!",
 	"google_sheet_added":			"The google spreadsheet has been linked with the Bot!",
@@ -475,7 +475,7 @@
 	"google_sheet_restrict_add":	"Text channel restriction has been added for this event and spreadsheet!",
 	"google_sheet_no_link":			"An internal error has occurred! Google Spreadsheet couldn't be linked to the Bot.",
 	"google_youtube_help":			"Use one of the below parameters to navigate through the youtube setup or type *exit* to close the setup any time! This message is shown only once:\n\n- **add**:\nAdd a channel id to pull the newest videos.\n- **remove**:\nRemove a registered channel.\n- **format**:\nFormat the display message.\n- **channel**:\nDefine in which channel the videos should be displayed.\n- **display**:\nShow all registered channels.\n- **test**:\nTest the YouTube channel subscription.",
-	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https://www.youtube.com/channel/ **UC0ox9NuTHYeRys63yZpBFuB**.",
+	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https:
 	"google_youtube_add_2":			"YouTube channel has been added.\nChannel name: **{}**\nChannel id: {}",
 	"google_youtube_add_err":		"YouTube channel couldn't be found. Please try again!",
 	"google_youtube_remove":		"Please write the number of the channel that you wish to remove!\n",

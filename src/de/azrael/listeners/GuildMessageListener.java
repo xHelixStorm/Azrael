@@ -702,7 +702,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 						}
 					}
-					else if(clan != null && userProfile.getExpiration() - System.currentTimeMillis() < 0) {
+					else if(clan != null && clan.getExpiration() - System.currentTimeMillis() < 0) {
 						Hashes.clearTempCache("clan_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 					}
 					

@@ -407,8 +407,8 @@
 	"filter_list_lang_na":			"¡El idioma solicitado no está disponible!",
 	"filter_write_word":			"¡Ahora por favor proporciona la palabra o nombre!",
 	"filter_write_paste":			"Now please provide a pastebin URL which contains all words or names!",
-	"filter_write_fqdn":			"Ahora proporciona un nombre de dominio completo. Por ejemplo: *https://www.google.com*\n No agregues nada después del dominio de nivel superior (p. ej. com, de, org)!",
-	"filter_write_paste_fqdn":		"Ahora proporciona una URL de Pastebin con nombres de dominio totalmente calificados. Por ejemplo: *https://www.google.com*\n ¡No agregues nada después del dominio de nivel superior (p. ej. com, de, org) y escribe un fqdn por línea!",
+	"filter_write_fqdn":			"Ahora proporciona un nombre de dominio completo. Por ejemplo: *https:
+	"filter_write_paste_fqdn":		"Ahora proporciona una URL de Pastebin con nombres de dominio totalmente calificados. Por ejemplo: *https:
 	"filter_write_username":		"¡Ahora proporciona un nombre de usuario de Twitter para que los tweets no se publiquen en discord!",
 	"filter_write_paste_username":	"¡Ahora proporciona una URL de Pastebin con nombres de usuario de Twitter para que se bloquee la publicación de los tweets en discord!",
 	"filter_write_insert":			"¡La palabra o nombre se ha insertado correctamente!",
@@ -439,8 +439,8 @@
 	"google_invalid_dds":			"Los siguientes elementos del diccionario de datos no son válidos. Vuelve a enviar tus artículos:\n",
 	"google_sheet_help":			"¡Usa uno de los siguientes parámetros para navegar a través de la configuración de hojas de cálculo o escribe *exit* para cerrar la configuración en cualquier momento! Este mensaje se muestra solo una vez:\n\n- **create**:\n¡Crea una tabla de hojas de cálculo!\n- **add**:\n¡Agrega una tabla de hoja de cálculo ya existente!\n- **remove**:\n¡Elimine una tabla de hoja de cálculo vinculada (sin eliminación)!\n- **events**:\n¡Selecciona una tabla de hoja de cálculo ya existente!\n- **sheet**:\n¡Define la hoja y la fila / columna para operar!\n- **map**:\n¡Asigna los campos de tabla disponibles con los valores del bot!\n\nHojas de cálculo actuales:\n",
 	"google_sheet_create":			"¡Usa este parámetro junto con un nombre de título para crear una nueva hoja de cálculo y vincularla directamente con el Bot! ¡Ten en cuenta que para esta acción, se debe proporcionar una dirección de correo electrónico de Google válida en la configuración de Bot!",
-	"google_sheet_created":			"¡La hoja de cálculo de Google se ha creado y vinculado al Bot!\nURL: https://docs.google.com/spreadsheets/d/",
-	"google_sheet_created_2":		"¡La hoja de cálculo de Google se ha creado pero no se ha podido vincular con el Bot! Intenta vincular la hoja de cálculo creada con la siguiente URL y agrega el parámetro:\nURL: https://docs.google.com/spreadsheets/d/",
+	"google_sheet_created":			"¡La hoja de cálculo de Google se ha creado y vinculado al Bot!\nURL: https:
+	"google_sheet_created_2":		"¡La hoja de cálculo de Google se ha creado pero no se ha podido vincular con el Bot! Intenta vincular la hoja de cálculo creada con la siguiente URL y agrega el parámetro:\nURL: https:
 	"google_sheet_email":			"Configura una dirección de correo electrónico de Google antes de usar este comando, para que la propiedad se pueda mover a esa dirección de correo electrónico.",
 	"google_sheet_add_help":		"Utiliza este parámetro junto con una URL de hoja de cálculo o simplemente la ID del archivo para vincularlo con el Bot.",
 	"google_sheet_added":			"¡La hoja de cálculo de Google se ha vinculado con el Bot!",
@@ -475,7 +475,7 @@
 	"google_sheet_restrict_add":	"Text channel restriction has been added for this event and spreadsheet!",
 	"google_sheet_no_link":			"An internal error has occurred! Google Spreadsheet couldn't be linked to the Bot.",
 	"google_youtube_help":			"Use one of the below parameters to navigate through the youtube setup or type *exit* to close the setup any time! This message is shown only once:\n\n- **add**:\nAdd a channel id to pull the newest videos.\n- **remove**:\nRemove a registered channel.\n- **format**:\nFormat the display message.\n- **channel**:\nDefine in which channel the videos should be displayed.\n- **display**:\nShow all registered channels.\n- **test**:\nTest the YouTube channel subscription.",
-	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https://www.youtube.com/channel/ **UC0ox9NuTHYeRys63yZpBFuB**.",
+	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https:
 	"google_youtube_add_2":			"YouTube channel has been added.\nChannel name: **{}**\nChannel id: {}",
 	"google_youtube_add_err":		"YouTube channel couldn't be found. Please try again!",
 	"google_youtube_remove":		"Please write the number of the channel that you wish to remove!\n",

@@ -407,8 +407,8 @@
     "filter_list_lang_na":          "O idioma solicitado não está disponível!",
     "filter_write_word":            "Agora, forneça a palavra ou o nome!",
     "filter_write_paste":           "Agora, forneça um URL pastebin que contenha todas as palavras ou nomes! ",
-    "filter_write_fqdn":            "Agora, forneça um nome de domínio totalmente qualificado. Por exemplo: *https://www.google.com*\nNão adicione nada após o domínio de nível superior (por exemplo, com, de, org)!",
-    "filter_write_paste_fqdn":      "Agora, forneça um URL do Pastebin com nomes de domínio totalmente qualificados. Por exemplo: *https://www.google.com*\nNão adicione nada após o domínio de nível superior (por exemplo, com, de, org) e escreva um fqdn por linha!",
+    "filter_write_fqdn":            "Agora, forneça um nome de domínio totalmente qualificado. Por exemplo: *https:
+    "filter_write_paste_fqdn":      "Agora, forneça um URL do Pastebin com nomes de domínio totalmente qualificados. Por exemplo: *https:
     "filter_write_username":        "Agora, forneça um nome de usuário do Twitter para que os tweets sejam bloqueados de postar no discord!",
     "filter_write_paste_username":  "Agora, forneça um URL do Pastebin com os nomes de usuário do Twitter para que os tweets sejam bloqueados de postar no discord!",
     "filter_write_insert":          "A palavra ou nome foi inserido com sucesso!",
@@ -439,8 +439,8 @@
     "google_invalid_dds":           "Os seguintes itens do dicionário de dados são inválidos. Reenvie seus itens: \n ",
     "google_sheet_help":            "Use um dos parâmetros abaixo para navegar pela configuração das planilhas ou digite *exit* para fechar a configuração a qualquer momento! Esta mensagem é exibida apenas uma vez:\n\n- **create**:\nCriar uma planilha!\n- **add**:\nAdicionar uma planilha já existente!\n- **remove**:\nRemova uma planilha vinculada (sem exclusão)!\n- **events**:\nAtribua eventos às tabelas existentes!\n- **sheet**:\nDefina a planilha e a linha / coluna para operar!\n- **map**:\nMapa os campos de tabela disponíveis com valores do Bot!\n- **restrict**:\nRestringir um evento a um canal de texto!\n\nPlanilhas atuais:\n",
     "google_sheet_create":          "Use este parâmetro junto com um nome de título para criar uma nova planilha e vinculá-la diretamente ao Bot! Observe que, para esta ação, um endereço de e-mail válido do Google precisa ser fornecido nas configurações do bot! ",
-    "google_sheet_created":         "A planilha do Google foi criada e vinculada ao Bot! \nURL: https://docs.google.com/spreadsheets/d/",
-    "google_sheet_created_2":       "A planilha do Google foi criada, mas não pôde ser vinculada ao Bot! Tente vincular a planilha criada ao seguinte url e ao parâmetro *add*:\nURL: https://docs.google.com/spreadsheets/d/ ",
+    "google_sheet_created":         "A planilha do Google foi criada e vinculada ao Bot! \nURL: https:
+    "google_sheet_created_2":       "A planilha do Google foi criada, mas não pôde ser vinculada ao Bot! Tente vincular a planilha criada ao seguinte url e ao parâmetro *add*:\nURL: https:
     "google_sheet_email":           "Configure um endereço de e-mail do Google antes de usar este comando, para que a propriedade possa ser movida para esse endereço de e-mail!",
     "google_sheet_add_help":        "Use este parâmetro junto com um URL de planilha ou apenas o ID do arquivo para vinculá-lo ao Bot!",
     "google_sheet_added":           "A planilha do Google foi vinculada ao Bot! ",
@@ -475,7 +475,7 @@
     "google_sheet_restrict_add":    "Restrição de canal de texto foi adicionada para este evento e planilha!",
     "google_sheet_no_link":         "Ocorreu um erro interno! Não foi possível vincular a planilha do Google ao bot. ",
     "google_youtube_help":			"Use one of the below parameters to navigate through the youtube setup or type *exit* to close the setup any time! This message is shown only once:\n\n- **add**:\nAdd a channel id to pull the newest videos.\n- **remove**:\nRemove a registered channel.\n- **format**:\nFormat the display message.\n- **channel**:\nDefine in which channel the videos should be displayed.\n- **display**:\nShow all registered channels.\n- **test**:\nTest the YouTube channel subscription.",
-	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https://www.youtube.com/channel/ **UC0ox9NuTHYeRys63yZpBFuB**.",
+	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https:
 	"google_youtube_add_2":			"YouTube channel has been added.\nChannel name: **{}**\nChannel id: {}",
 	"google_youtube_add_err":		"YouTube channel couldn't be found. Please try again!",
 	"google_youtube_remove":		"Please write the number of the channel that you wish to remove!\n",

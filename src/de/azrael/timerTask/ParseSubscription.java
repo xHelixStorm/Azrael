@@ -30,6 +30,7 @@ public class ParseSubscription extends TimerTask{
 	private static final Logger logger = LoggerFactory.getLogger(ParseSubscription.class);
 	
 	private static ConcurrentHashMap<Long, Timer> timers = new ConcurrentHashMap<Long, Timer>();
+	private static ConcurrentHashMap<String, Integer> delay = new ConcurrentHashMap<String, Integer>();
 	
 	private JDA e;
 	private long guild_id;
@@ -72,30 +73,37 @@ public class ParseSubscription extends TimerTask{
 							else {
 								return;
 							}
+							boolean success = false;
 							try {
 								logger.trace("Retrieving subscription {} in guild {}", rss.getURL(), e.getGuildById(guild_id).getId());
-								boolean success = false;
 								if(rss.getType() == 1)
 									success = BasicModel.ModelParse(STATIC.retrieveWebPageCode(rss.getURL()), guild, rss, channel_id, defaultChannel);
 								else if(rss.getType() == 2)
 									success = TwitterModel.ModelParse(guild, rss, channel_id, defaultChannel);
 								else if(rss.getType() == 3)
 									success = RedditModel.fetchRedditContent(null, guild, rss, channel_id, defaultChannel);
-								else if(rss.getType() == 4)
-									success = YouTubeModel.ModelParse(guild, rss, channel_id, defaultChannel);
+								else if(rss.getType() == 4) {
+									final var value = delay.get(guild.getId()+"_"+rss.getURL());
+									if(value == null || value == 0) {
+										success = YouTubeModel.ModelParse(guild, rss, channel_id, defaultChannel);
+										delay.put(guild.getId()+"_"+rss.getURL(), 5); // 1 hour delay
+									}
+									else
+										delay.put(guild.getId()+"_"+rss.getURL(), (value-1));
+								}
 								else if(rss.getType() == 5)
 									success = TwitchModel.ModelParse(guild, rss, channel_id, defaultChannel);
-								if(success)
-									Hashes.addSubscriptionStatus(guild.getId()+"_"+rss.getURL(), 0);
-								else
-									incrementSubscriptionStatus(guild, rss.getURL());
 							} catch(SocketTimeoutException e1){
 								logger.warn("Timeout on subscription {}", rss.getURL());
-								incrementSubscriptionStatus(guild, rss.getURL());
+								success = false;
 							} catch (Exception e1) {
 								logger.error("Error on retrieving subscription {}", rss.getURL(), e1);
-								incrementSubscriptionStatus(guild, rss.getURL());
+								success = false;
 							}
+							if(success)
+								Hashes.addSubscriptionStatus(guild.getId()+"_"+rss.getURL(), 0);
+							else
+								incrementSubscriptionStatus(guild, rss.getURL());
 						}).start();
 					}
 				}
@@ -124,13 +132,15 @@ public class ParseSubscription extends TimerTask{
 	}
 	
 	public static void runTask(JDA e, long guild_id) {
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 0);
-		
-		Timer timer = new Timer("Subscription_"+guild_id);
-		timers.put(guild_id, timer);
-		timer.schedule(new ParseSubscription(e, guild_id), calendar.getTime(), TimeUnit.MINUTES.toMillis(10));
+		if(!timers.containsKey(guild_id)) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.set(Calendar.SECOND, 0);
+			calendar.set(Calendar.MILLISECOND, 0);
+			
+			Timer timer = new Timer("Subscription_"+guild_id);
+			timers.put(guild_id, timer);
+			timer.schedule(new ParseSubscription(e, guild_id), calendar.getTime(), TimeUnit.MINUTES.toMillis(10));
+		}
 	}
 	
 	public static boolean timerIsRunning(long guild_id) {

@@ -202,9 +202,9 @@ public class GoogleYouTubeExecution {
 			if(Azrael.SQLUpdateRSSChannel(channel.getURL(), e.getGuild().getIdLong(), channel_id) > 0) {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_CHANNEL_3).replace("{}", channel.getName())).build()).queue();
 				logger.info("User {} has updated the display channel of the YouTube channel id {} in guild {}", e.getMember().getUser().getId(), channel.getURL(), e.getGuild().getIdLong());
+				Hashes.removeFeeds(e.getGuild().getIdLong());
 				if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
 					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
-				Hashes.removeFeeds(e.getGuild().getIdLong());
 				Hashes.addTempCache(key, new Cache(180000, "youtube-selection"));
 			}
 			else {
