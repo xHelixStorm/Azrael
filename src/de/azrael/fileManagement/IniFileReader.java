@@ -160,6 +160,15 @@ public class IniFileReader {
 		return reddit;
 	}
 	
+	public static String[] getTwitchKeys() {
+		Ini ini = readConfig();
+		Ini.Section tokens = ini.get("Twitch");
+		String []twitch = new String[2];
+		twitch[0] = tokens.get("client_id");
+		twitch[1] = tokens.get("client_secret");
+		return twitch;
+	}
+	
 	public static boolean getDoubleExpEnabled() {
 		var doubleExperience = STATIC.getDoubleExperience();
 		if(doubleExperience.equals("true"))

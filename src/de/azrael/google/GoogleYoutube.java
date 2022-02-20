@@ -39,4 +39,22 @@ public class GoogleYoutube {
 			.setType("video")
 			.execute();
 	}
+	
+	/**
+	 * Search for YouTube video(s) from a channel
+	 * @param service YouTube client service
+	 * @param channel_id YouTube channel id
+	 * @return query results
+	 * @throws IOException
+	 */
+	
+	public static SearchListResponse searchYouTubeChannelVideos(final YouTube service, final String channel_id, final long maxResults) throws IOException {
+		//Search YouTube Videos from a channel
+		YouTube.Search.List request = service.search().list("snippet");
+		return request.setMaxResults(maxResults)
+			.setChannelId(channel_id)
+			.setOrder("date")
+			.setType("video")
+			.execute();
+	}
 }

@@ -157,6 +157,7 @@ public enum Translation {
 	PARAM_MAX					("param_max"),
 	PARAM_EXCLUDE				("param_exclude"),
 	PARAM_STATUS				("param_status"),
+	PARAM_YOUTUBE				("param_youtube"),
 	
 	LANG_ENG					("lang_eng"),
 	LANG_GER					("lang_ger"),
@@ -292,6 +293,7 @@ public enum Translation {
 	COMMAND_WARN				("command_warn"),
 	COMMAND_REDDIT				("command_reddit"),
 	COMMAND_INVITES				("command_invites"),
+	COMMAND_TWITCH				("command_twitch"),
 	COMMANDS_DISABLED			("commands_disabled"),
 	
 	DAILY_REWARD				("daily_reward"),
@@ -474,6 +476,22 @@ public enum Translation {
 	GOOGLE_SHEET_RESTRICT_REMOVE("google_sheet_restrict_remove"),
 	GOOGLE_SHEET_RESTRICT_ADD	("google_sheet_restrict_add"),
 	GOOGLE_SHEET_NO_LINK		("google_sheet_not_link"),
+	GOOGLE_YOUTUBE_HELP			("google_youtube_help"),
+	GOOGLE_YOUTUBE_ADD			("google_youtube_add"),
+	GOOGLE_YOUTUBE_ADD_2		("google_youtube_add_2"),
+	GOOGLE_YOUTUBE_ADD_ERR		("google_youtube_add_err"),
+	GOOGLE_YOUTUBE_REMOVE		("google_youtube_remove"),
+	GOOGLE_YOUTUBE_REMOVE_2		("google_youtube_remove_2"),
+	GOOGLE_YOUTUBE_FORMAT		("google_youtube_format"),
+	GOOGLE_YOUTUBE_FORMAT_2		("google_youtube_format_2"),
+	GOOGLE_YOUTUBE_FORMAT_3		("google_youtube_format_3"),
+	GOOGLE_YOUTUBE_CHANNEL		("google_youtube_channel"),
+	GOOGLE_YOUTUBE_CHANNEL_2	("google_youtube_channel_2"),
+	GOOGLE_YOUTUBE_CHANNEL_3	("google_youtube_channel_3"),
+	GOOGLE_YOUTUBE_DISPLAY		("google_youtube_display"),
+	GOOGLE_YOUTUBE_TEST			("google_youtube_test"),
+	GOOGLE_YOUTUBE_ERR			("google_youtube_err"),
+	GOOGLE_YOUTUBE_ERR_2		("google_youtube_err_2"),
 	GOOGLE_EXIT					("google_exit"),
 	GOOGLE_TIMEOUT				("google_timeout"),
 	
@@ -1437,7 +1455,26 @@ public enum Translation {
 	INVITES_STATUS				("invites_status"),
 	INVITES_STATUS_ERR			("invites_status_err"),
 	INVITES_SHUTDOWN_MODE		("invites_shutdown_mode"),
-	INVITES_USED_BY				("invites_used_by");
+	INVITES_USED_BY				("invites_used_by"),
+	
+	TWITCH_HELP					("twitch_help"),
+	TWITCH_REGISTER_HELP		("twitch_register_help"),
+	TWITCH_REGISTER_INVALID_USER("twitch_register_invalid_user"),
+	TWITCH_REGISTER_STEP		("twitch_register_step"),
+	TWITCH_REGISTER_ERR			("twitch_register_err"),
+	TWITCH_FORMAT_STEP_1		("twitch_format_step_1"),
+	TWITCH_FORMAT_STEP_2		("twitch_format_step_2"),
+	TWITCH_FORMAT_UPDATED		("twitch_format_updated"),
+	TWITCH_CHANNEL_STEP_1		("twitch_channel_step_1"),
+	TWITCH_CHANNEL_STEP_2		("twitch_channel_step_2"),
+	TWITCH_CHANNEL_ADDED		("twitch_channel_added"),
+	TWITCH_REMOVE				("twitch_remove"),
+	TWITCH_REMOVE_ERR			("twitch_remove_err"),
+	TWITCH_REMOVE_ERR_2			("twitch_remove_err_2"),
+	TWITCH_REMOVE_DONE			("twitch_remove_done"),
+	TWITCH_TEST					("twitch_test"),
+	TWITCH_EXIT					("twitch_exit"),
+	TWITCH_NO_CONTENT			("twitch_no_content");
 	
 	private String value;
 	

@@ -5,9 +5,9 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jpaste.exceptions.PasteException;
-import org.jpaste.pastebin.exceptions.LoginException;
-import org.jpaste.pastebin.exceptions.ParseException;
+import org.jpastebin.exceptions.PasteException;
+import org.jpastebin.pastebin.exceptions.LoginException;
+import org.jpastebin.pastebin.exceptions.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

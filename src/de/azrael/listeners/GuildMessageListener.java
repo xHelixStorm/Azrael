@@ -19,6 +19,7 @@ import com.vdurmont.emoji.EmojiManager;
 import de.azrael.commandsContainer.ClanExecution;
 import de.azrael.commandsContainer.FilterExecution;
 import de.azrael.commandsContainer.GoogleSpreadsheetsExecution;
+import de.azrael.commandsContainer.GoogleYouTubeExecution;
 import de.azrael.commandsContainer.JoinExecution;
 import de.azrael.commandsContainer.PruneExecution;
 import de.azrael.commandsContainer.PurchaseExecution;
@@ -29,6 +30,7 @@ import de.azrael.commandsContainer.ScheduleExecution;
 import de.azrael.commandsContainer.SetWarning;
 import de.azrael.commandsContainer.ShopExecution;
 import de.azrael.commandsContainer.SubscribeExecution;
+import de.azrael.commandsContainer.TwitchExecution;
 import de.azrael.commandsContainer.UserExecution;
 import de.azrael.commandsContainer.WriteEditExecution;
 import de.azrael.constructors.Cache;
@@ -478,13 +480,8 @@ public class GuildMessageListener extends ListenerAdapter {
 						final String key = "google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
 						final String lcMessage = message.toLowerCase();
 						if(!lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
-							//actions for google docs
-							if(google.getAdditionalInfo().equals("docs")) {
-								//TODO: add google docs logic
-							}
-							
 							//actions for google spreadsheets
-							else if(google.getAdditionalInfo().equals("spreadsheets")) {
+							if(google.getAdditionalInfo().equals("spreadsheets")) {
 								GoogleSpreadsheetsExecution.runTask(e, key);
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-selection")) {
@@ -537,9 +534,53 @@ public class GuildMessageListener extends ListenerAdapter {
 								GoogleSpreadsheetsExecution.restrictUpdate(e, google.getAdditionalInfo2(), google.getAdditionalInfo3(), message, key);
 							}
 							
+							//actions for google docs
+							else if(google.getAdditionalInfo().equals("docs")) {
+								//TODO: add google docs logic
+							}
+							
 							//actions for google drive
 							else if(google.getAdditionalInfo().equals("drive")) {
 								//TODO: add google drive logic
+							}
+							
+							else if(google.getAdditionalInfo().equals("youtube")) {
+								GoogleYouTubeExecution.runTask(e, key);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-selection")) {
+								if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD)))
+									GoogleYouTubeExecution.add(e, key);
+								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE)))
+									GoogleYouTubeExecution.remove(e, key);
+								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT)))
+									GoogleYouTubeExecution.format(e, key);
+								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL)))
+									GoogleYouTubeExecution.channel(e, key);
+								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY)))
+									GoogleYouTubeExecution.display(e, key);
+								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST)))
+									GoogleYouTubeExecution.test(e, key);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-add")) {
+								GoogleYouTubeExecution.add(e, key, message);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-remove")) {
+								GoogleYouTubeExecution.remove(e, key, message, google);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-format")) {
+								GoogleYouTubeExecution.format(e, key, message, google);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-format-update")) {
+								GoogleYouTubeExecution.formatUpdate(e, key, message, google);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-channel")) {
+								GoogleYouTubeExecution.channel(e, key, message, google);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-channel-update")) {
+								GoogleYouTubeExecution.channelUpdate(e, key, message, google);
+							}
+							else if(google.getAdditionalInfo().equals("youtube-test")) {
+								GoogleYouTubeExecution.test(e, key, message, google);
 							}
 						}
 						else {
@@ -661,7 +702,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 						}
 					}
-					else if(clan != null && userProfile.getExpiration() - System.currentTimeMillis() < 0) {
+					else if(clan != null && clan.getExpiration() - System.currentTimeMillis() < 0) {
 						Hashes.clearTempCache("clan_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 					}
 					
@@ -779,6 +820,34 @@ public class GuildMessageListener extends ListenerAdapter {
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_EXIT)).build()).queue();
 							Hashes.clearTempCache("reddit_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+						}
+					}
+					
+					final var twitch = Hashes.getTempCache("twitch_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+					if(twitch != null && twitch.getExpiration() - System.currentTimeMillis() > 0) {
+						if(!e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
+							if(twitch.getAdditionalInfo().equals("format")) {
+								TwitchExecution.format(e, twitch);
+							}
+							else if(twitch.getAdditionalInfo().equals("format2")) {
+								TwitchExecution.formatUpdate(e, twitch);
+							}
+							else if(twitch.getAdditionalInfo().equals("channel")) {
+								TwitchExecution.channel(e, twitch);
+							}
+							else if(twitch.getAdditionalInfo().equals("channel2")) {
+								TwitchExecution.channelUpdate(e, twitch);
+							}
+							else if(twitch.getAdditionalInfo().equals("remove")) {
+								TwitchExecution.remove(e, twitch);
+							}
+							else if(twitch.getAdditionalInfo().equals("test")) {
+								TwitchExecution.test(e, twitch);
+							}
+						}
+						else {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_EXIT)).build()).queue();
+							Hashes.clearTempCache("twitch_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 						}
 					}
 				});

@@ -94,11 +94,11 @@ class AzraelStatements {
 	final static String SQLDeleteNameFilter = STATIC.decrypt("UfhBdItcItaYkB85CSc1/EYDv0pUAY4EwTS9KNBstESHBL7vlGSPzuNAoczCnw2IfwHTjf/pMSk8YBhN4aJWi7FbZ9mJVjr//eJGai3BGRk=");
 	final static String SQLgetRandomName = STATIC.decrypt("hjlW9U3YZMk3NEBosC1Lrgp3LoiSWSgbCZ/wUfxN2H6LYItjfUmWX19R4kJq/pBfO9BkcDjwLCKTOAQlkWwLiUdujaF1SWt8aUlDJmqAuZI=");
 	final static String SQLgetFilterLanguages = STATIC.decrypt("qiqTw4mQIzd1IWH9j1dssheC91FwSmOgyJby+pjXjYjtYMnf6Efmxd5HIP2gLIvc4e6kx1dNiuWrCAsck+VlhkdQApc8fSszzFfOTB16z9w=");
-	final static String SQLInsertRSS = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jJkyVjxlZLiq3QEH2e084qche/5eBwe0cNZei1ih5fBRf+BKKyol8V2HIe+tNRcL/PxPdxJBIQ3omglfrsklwXOmJaacTpi6KPTz3xfcsAanbMAh30IUV12b9NNAWnQrwg==");
+	final static String SQLInsertRSS = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jJkyVjxlZLiq3QEH2e084qche/5eBwe0cNZei1ih5fBRf+BKKyol8V2HIe+tNRcL/Nttw6Rfa/WSnaNC60xtZm/pSqB6AA6Zm2Jyy5refLQcQDGbz1RvKxlOXeMajD2rk0+fH0j4diaR3VC6r9TpSHQ=");
 	final static String SQLgetSubTweets = STATIC.decrypt("8jQE1Zv232929voOfm/VhoUtdSnqZmF539kXY3K3qxlOlZl1MU9jKg7j8HhevS1INCpy65Vv/Bq5vH0OrDoHYFwxCSoNiL7clg9hOFiTymI=");
-	final static String SQLgetSubscriptions = STATIC.decrypt("xlrRW205z1YZCjWrv8PILuiJob/aptTtbuuli6/5DqDQZcLp8g+u/0C7s7NvuNZLX7fy43Oz/sNMVgsJg7t9Qa4I5Qmb3MdoRgZqEJ7zbFmZPSXkbKlW6+efn3vAWbm/ihWcdmvFX9Upp1sOnzKxN3tCOAh4o01SlOqbVE2pRT0=");
-	final static String SQLgetSubscriptions2 = STATIC.decrypt("xlrRW205z1YZCjWrv8PILuiJob/aptTtbuuli6/5DqDQZcLp8g+u/0C7s7NvuNZLX7fy43Oz/sNMVgsJg7t9Qa4I5Qmb3MdoRgZqEJ7zbFn6AqGyxAeIP5iLF7L/5ipBWPBMIlk8YwCzmfoIXF265M9hqLxv9DfRFL8mfFjK038=");
-	final static String SQLgetSubscriptionsRestricted = STATIC.decrypt("xlrRW205z1YZCjWrv8PILuiJob/aptTtbuuli6/5DqDQZcLp8g+u/0C7s7NvuNZLX7fy43Oz/sNMVgsJg7t9Qa4I5Qmb3MdoRgZqEJ7zbFn6AqGyxAeIP5iLF7L/5ipBapSKeQrJeYV8KXgSP1QAw9jM3bPiZMK5gBrBXenfsHht5xGwudLYqpfM7hD4fWwo");
+	final static String SQLgetSubscriptions = STATIC.decrypt("xlrRW205z1YZCjWrv8PILuiJob/aptTtbuuli6/5DqDQZcLp8g+u/0C7s7NvuNZLrbuG/6KN6Gve4M/SqqhrOqerV0BYLuYryMoPbM1MRPayQB5uNTVhuf0OgnSHRg0rfOzMEInEo8GbNmGKgmr/zGsgVIuOvUsnVD/6qY/CYFQ=");
+	final static String SQLgetSubscriptions2 = STATIC.decrypt("xlrRW205z1YZCjWrv8PILuiJob/aptTtbuuli6/5DqDQZcLp8g+u/0C7s7NvuNZLrbuG/6KN6Gve4M/SqqhrOqerV0BYLuYryMoPbM1MRPayQB5uNTVhuf0OgnSHRg0rZJFohSlG68a/pnBE/k3SVIordvVncgSni++pAvXeUnm8BgmmEid8GvGt8FksTRVk");
+	final static String SQLgetSubscriptionsRestricted = STATIC.decrypt("xlrRW205z1YZCjWrv8PILuiJob/aptTtbuuli6/5DqDQZcLp8g+u/0C7s7NvuNZLrbuG/6KN6Gve4M/SqqhrOqerV0BYLuYryMoPbM1MRPayQB5uNTVhuf0OgnSHRg0rC8KEMtBdqYx5V3wNidLGG9kejr5YrlzMFTh4VZ8aS5fSmGvP3AdQu1XobtuJSITChE9I0A0G823dkfTFBJnkTA==");
 	final static String SQLUpdateRSSPictures = STATIC.decrypt("pEQ5x0+IsQ4Mj5US9b8MnTOWI0GqzYURdJLP+xiU0ChWgJarKdeD6l6xo9SP2gNKInyv5Zblms6W9NrcPh+Eyw==");
 	final static String SQLUpdateRSSVideos = STATIC.decrypt("DRBdD7vHJ0EkpQ2B2BXY2FjaOpzc74IEZZLQ1jwv+ooWLOziFdLW9YM4xKHIRNh2aD39vb67k3ZE+LmqWCD89A==");
 	final static String SQLUpdateRSSText = STATIC.decrypt("91z+TApLVEuYZCvoSW5p0WxUTP0rg5cSGnty91rZhD0svcFSbZmfW+SUGlShZt6XgiYNT0+iIAl313rKV0hA/w==");

@@ -115,10 +115,11 @@ public class RedditModel {
 			if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
 				JSONObject parentData = response.getJSONObject("data");
 				JSONArray children = parentData.getJSONArray("children");
-				if(!children.isEmpty()) {
+				if(children.length() > 0) {
 					success = true;
 					final String format = reddit.getFormat();
 					final var prohibitedSubscriptions = Azrael.SQLgetSubscriptionBlacklist(guild.getIdLong());
+					int count = 0;
 					for(final Object iteration : children) {
 						final JSONObject result = (JSONObject)iteration;
 						final String kind = result.getString("kind");
@@ -166,6 +167,9 @@ public class RedditModel {
 						else {
 							Azrael.SQLUpdateSubscriptionTimestamp(permaLink);
 						}
+						count ++;
+						if(count == 5)
+							break;
 					}
 				}
 			}
@@ -198,7 +202,7 @@ public class RedditModel {
 		TextChannel textChannel = e.getGuild().getTextChannelById(rss_channel);
 		JSONObject parentData = response.getJSONObject("data");
 		JSONArray children = parentData.getJSONArray("children");
-		if(!children.isEmpty()) {
+		if(children.length() > 0) {
 			for(final Object iteration : children) {
 				final JSONObject result = (JSONObject)iteration;
 				final String kind = result.getString("kind");

@@ -15,7 +15,7 @@ public class CommandList {
 		boolean entertainment = false;
 		boolean other = false;
 		
-		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getSubscribeCommand(guild_id) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoringCommand(guild_id) || GuildIni.getMuteCommand(guild_id) || GuildIni.getGoogleCommand(guild_id) || GuildIni.getWriteCommand(guild_id) || GuildIni.getEditCommand(guild_id) || GuildIni.getAcceptCommand(guild_id) || GuildIni.getDenyCommand(guild_id) || GuildIni.getScheduleCommand(guild_id) || GuildIni.getPruneCommand(guild_id) || GuildIni.getWarnCommand(guild_id) || GuildIni.getRedditCommand(guild_id) || GuildIni.getInvitesCommand(guild_id))) {
+		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getSubscribeCommand(guild_id) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoringCommand(guild_id) || GuildIni.getMuteCommand(guild_id) || GuildIni.getGoogleCommand(guild_id) || GuildIni.getWriteCommand(guild_id) || GuildIni.getEditCommand(guild_id) || GuildIni.getAcceptCommand(guild_id) || GuildIni.getDenyCommand(guild_id) || GuildIni.getScheduleCommand(guild_id) || GuildIni.getPruneCommand(guild_id) || GuildIni.getWarnCommand(guild_id) || GuildIni.getRedditCommand(guild_id) || GuildIni.getInvitesCommand(guild_id) || GuildIni.getTwitchCommand(guild_id))) {
 			administration = true;
 		}
 		
@@ -49,6 +49,7 @@ public class CommandList {
 			if(GuildIni.getWarnCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_WARN).replace("{}", prefix));
 			if(GuildIni.getRedditCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_REDDIT).replace("{}", prefix));
 			if(GuildIni.getInvitesCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_INVITES).replace("{}", prefix));
+			if(GuildIni.getTwitchCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_TWITCH).replace("{}", prefix));
 		}
 		if(entertainment == true && type == 2) {
 			if(GuildIni.getPugCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PUG).replace("{}", prefix));

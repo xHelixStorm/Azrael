@@ -3,9 +3,9 @@ package de.azrael.commandsContainer;
 import java.awt.Color;
 import java.net.MalformedURLException;
 
-import org.jpaste.exceptions.PasteException;
-import org.jpaste.pastebin.exceptions.LoginException;
-import org.jpaste.pastebin.exceptions.ParseException;
+import org.jpastebin.exceptions.PasteException;
+import org.jpastebin.pastebin.exceptions.LoginException;
+import org.jpastebin.pastebin.exceptions.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

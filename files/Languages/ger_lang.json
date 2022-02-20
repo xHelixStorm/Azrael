@@ -155,6 +155,7 @@
 	"param_max":					"max",
 	"param_exclude":				"ausnahmen",
 	"param_status":					"status",
+	"param_youtube":				"youtube",
 
 	"lang_eng":						"Englisch",
 	"lang_ger":						"Deutsch",
@@ -290,6 +291,7 @@
 	"command_warn":					"- **{}warn**\nFormulieren Sie den Grund für eine Warnung und senden Sie ihn in einer privaten Nachricht an einen Benutzer.\n",
 	"command_reddit":				"- **{}reddit**\nAbonnieren Sie ein Subreddit oder einen Reddit-Benutzer, um Inhalte abzufragen.\n",
 	"command_invites":				"- **{}invites**\nErstellen Sie eine Reihe von Einladungen zur einmaligen Verwendung.\n",
+	"command_twitch":				"- **{}twitch**\nSubscribe to a twitch user to fetch content.\n",
 	"commands_disabled":		 	"Alle Befehle sind deaktiviert!",
 	
 	"daily_reward":				 	"Herzlichen Glückwunsch! Sie haben die folgende Belohnung freigeschaltet:\n",
@@ -405,8 +407,8 @@
 	"filter_list_lang_na":			"Die angefragte Sprache steht nicht zur Auswahl!",
 	"filter_write_word":			"Geben Sie jetzt bitte das Wort oder den Namen an!",
 	"filter_write_paste":			"Geben Sie jetzt bitte eine Pastebin-URL an, die alle Wörter oder Namen enthält!",
-	"filter_write_fqdn":			"Geben Sie jetzt bitte einen voll qualifizierten Domänennamen an. Zum Beispiel: *https://www.google.com*\n Bitte fügen Sie nichts nach der Top-Level-Domain hinzu (z.B. com, de, org)!",
-	"filter_write_paste_fqdn":		"Geben Sie jetzt bitte eine Pastebin-URL mit vollständig qualifizierten Domänennamen an. Zum Beispiel: *https://www.google.com*\n Bitte fügen Sie nach der Top-Level-Domain (z.B. com, de, org) nichts ein und schreiben Sie einen fqdn pro Zeile!",
+	"filter_write_fqdn":			"Geben Sie jetzt bitte einen voll qualifizierten Domänennamen an. Zum Beispiel: *https:
+	"filter_write_paste_fqdn":		"Geben Sie jetzt bitte eine Pastebin-URL mit vollständig qualifizierten Domänennamen an. Zum Beispiel: *https:
 	"filter_write_username":		"Geben Sie jetzt bitte einen Twitter-Benutzernamen an, damit die Tweets nicht mehr in Discord gepostet werden können!",
 	"filter_write_paste_username":	"Geben Sie jetzt bitte eine Pastebin-URL mit Twitter-Benutzernamen an, damit die Tweets nicht mehr in Discord gepostet werden können!",
 	"filter_write_insert":			"Das Wort oder der Name wurde erfolgreich hinzugefügt!",
@@ -427,7 +429,7 @@
 	"filter_tweet_remove_err":		"Dieser Twitter Benutzername existiert nicht!",
 	"filter_word_remove_err":		"Dieses Wort exisitert nicht!",
 	
-	"google_help":				 	"Kombinieren Sie verfügbare Bot-Ereignisse mit Google APIs und erstellen Sie eine Schnittstelle für den Datenexport, jedes Mal, wenn ein bestimmtes Ereignis ausgelöst wurde! In einigen Fällen sind Schreib- und Bearbeitungsberechtigungen für diese E-Mail erforderlich *{}*. Zum Beispiel, wenn private Dokumente bearbeitet werden müssen!\n Diese APIs sind derzeit als Parameter verfügbar:\n\n- **dokumente**:\nSchnittstelle mit google docs.\n- **tabellen**:\nSchnittstelle google spreadsheets.\n- **drive**:\nSchnittstelle mit google drive.",
+	"google_help":				 	"Kombinieren Sie verfügbare Bot-Ereignisse mit Google APIs und erstellen Sie eine Schnittstelle für den Datenexport, jedes Mal, wenn ein bestimmtes Ereignis ausgelöst wurde! In einigen Fällen sind Schreib- und Bearbeitungsberechtigungen für diese E-Mail erforderlich *{}*. Zum Beispiel, wenn private Dokumente bearbeitet werden müssen!\n Diese APIs sind derzeit als Parameter verfügbar:\n\n- **tabellen**:\nSchnittstelle google spreadsheets.\n- **youtube**:\nSchnittstelle mit YouTube.",
 	"google_api_not_available":	 	"API existiert nicht, ist nicht verfügbar oder wurde falsch geschrieben! Bitte versuchen Sie es erneut!",
 	"google_webservice":			"Der Google-Webservice hat mit folgendem geantwortet:\n",
 	"google_events":				"Registrierte Ereignisse: ",
@@ -437,8 +439,8 @@
 	"google_invalid_dds":			"Die folgenden Data-Dictionary-Einträge sind ungültig. Bitte reichen Sie Ihre Einträge erneut ein:\n",
 	"google_sheet_help":			"Benutzen Sie einen der untenstehenden Parameter, um durch das Tabellen-Setup zu navigieren oder geben Sie *verlassen* ein, um das Setup jederzeit zu schließen! Diese Meldung wird nur einmal angezeigt:\n\n- **erstellen**:\nErstellen Sie eine Google Tabelle!\n- **ergänzen**:\nErgänzen Sie eine bereits existierende Google Tabelle!\n- **entfernen**:\nEntfernen Sie eine verknüpfte Google Tabelle (kein Löschen)!\n- **ereignisse**:\nOrdnen Sie Ereignisse zu bestehende Google Tabellen!\n- **tabellenblatt**:\nDefinieren Sie das Tabellenblatt und die Zeile/Spalte, auf denen gearbeitet werden soll!\n- **mappen**:\nMappen Sie die verfügbaren Tabellenfelder mit Werten aus dem Bot!\n- **begrenzen**:\nBegrenze einen Ereignis an einen Textkanal!\n\nRegistrierte Google Tabellen:\n",
 	"google_sheet_create":			"Verwenden Sie diesen Parameter zusammen mit einem Titelnamen, um eine neue Google-Tabelle zu erstellen und diese direkt mit dem Bot zu verknüpfen! Beachten Sie, dass für diese Aktion eine gültige Google-E-Mail-Adresse in den Bot-Einstellungen angegeben werden muss!",
-	"google_sheet_created":			"Google-Tabelle wurde erstellt und mit dem Bot verlinkt!\nURL: https://docs.google.com/spreadsheets/d/",
-	"google_sheet_created_2":		"Google-Tabelle wurde erstellt, konnte aber nicht mit dem Bot verlinkt werden! Versuchen Sie, die erstellte Tabelle mit der folgenden Url und dem Parameter *ergänzen* zu verknüpfen:\nURL: https://docs.google.com/spreadsheets/d/",
+	"google_sheet_created":			"Google-Tabelle wurde erstellt und mit dem Bot verlinkt!\nURL: https:
+	"google_sheet_created_2":		"Google-Tabelle wurde erstellt, konnte aber nicht mit dem Bot verlinkt werden! Versuchen Sie, die erstellte Tabelle mit der folgenden Url und dem Parameter *ergänzen* zu verknüpfen:\nURL: https:
 	"google_sheet_email":			"Bitte konfigurieren Sie eine Google-E-Mail-Adresse, bevor Sie diesen Befehl verwenden, damit das Eigentum auf diese E-Mail-Adresse übertragen werden kann!",
 	"google_sheet_add_help":		"Verwenden Sie diesen Parameter zusammen mit einer Spreadsheet-URL oder nur der Datei-ID, um es mit dem Bot zu verknüpfen!",
 	"google_sheet_added":			"Die Google-Tabelle wurde mit dem Bot verlinkt!",
@@ -472,6 +474,22 @@
 	"google_sheet_restrict_remove":	"Textkanal Bindung entfernt!",
 	"google_sheet_restrict_add":	"Textkanal Bindung gesetzt für dieses Event und Spreadsheet!",
 	"google_sheet_no_link":			"Ein interner Fehler ist aufgetreten! Google Tabelle konnte nicht mit dem Bot verknüpft werden.",
+	"google_youtube_help":			"Use one of the below parameters to navigate through the youtube setup or type *exit* to close the setup any time! This message is shown only once:\n\n- **add**:\nAdd a channel id to pull the newest videos.\n- **remove**:\nRemove a registered channel.\n- **format**:\nFormat the display message.\n- **channel**:\nDefine in which channel the videos should be displayed.\n- **display**:\nShow all registered channels.\n- **test**:\nTest the YouTube channel subscription.",
+	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https:
+	"google_youtube_add_2":			"YouTube channel has been added.\nChannel name: **{}**\nChannel id: {}",
+	"google_youtube_add_err":		"YouTube channel couldn't be found. Please try again!",
+	"google_youtube_remove":		"Please write the number of the channel that you wish to remove!\n",
+	"google_youtube_remove_2":		"YouTube channel **{}** has been successfully removed!",
+	"google_youtube_format":		"Please write the number of the channel that you wish to format!\n",
+	"google_youtube_format_2":		"This is the current format for this YouTube channel. Type your desired format for this channel or type *exit* to interrupt. Key values are `{channel}`, `{channel_id}`, `{pubDate}`, `{title}`, `{description}`, `{url}`, `{video_id}`\n",
+	"google_youtube_format_3":		"The display format of channel **{}** has been updated successfully!",
+	"google_youtube_channel":		"Please write the number of the channel that you wish to assign a text channel!\n",
+	"google_youtube_channel_2":		"This YouTube channel has the following text channel assigned: **{}**\nMention a text channel or write a text channel id to update the display text channel. To clear the text channel, write *none*",
+	"google_youtube_channel_3":		"The display text channel of YouTube channel **{}** has been updated!",
+	"google_youtube_display":		"These YouTube channels are added!\n",
+	"google_youtube_test":			"Please write the number of the YouTube channel that you wish to test!\n",
+	"google_youtube_err":			"No YouTube channel has been registered!",
+	"google_youtube_err_2":			"No YouTube video has been found for this channel!",
 	"google_exit":					"Google-Befehl beendet!",
 	"google_timeout":				"Zeitüberschreitung der Google-Dienstanforderung {}/5. Aktion wird in 5 Sekunden erneut ausgeführt.",
 	
@@ -1412,7 +1430,7 @@
 	"reddit_format_step_2":			"Dies ist das aktuelle Format für dieses Reddit-Abonnement. Geben Sie Ihr gewünschtes Format ein oder geben Sie *verlassen* ein, um abzubrechen. Schlüsselwerte sind `{pubDate}`, `{author}`, `{title}`, `{description}`, `{subreddit}`, `{url}`, `{media}`\n```",
 	"reddit_format_updated":		"Reddit-Anzeigeformat für **{}** wurde aktualisiert",
 	"reddit_channel_step_1":		"Wählen Sie eines der registrierten Reddit-Abonnements, um den abgerufenen Inhalt in einen ausgewählten Textkanal umzuleiten!\n\n",
-	"reddit_channel_step_2":		"Bitte geben Sie nun eine Textkanal-Erwähnung oder eine Textkanal-ID an, um die Ausgabe dieses Abonnements auf den ausgewählten Textkanal umzuleiten! Aktuell ausgewählter Kanal: ",
+	"reddit_channel_step_2":		"Bitte geben Sie nun eine Textkanal-Erwähnung oder eine Textkanal-ID an, um die Ausgabe dieses Abonnements auf den ausgewählten Textkanal umzuleiten! Um sie zurückzusetzen, geben Sie *keine* ein. Aktuell ausgewählter Kanal: ",
 	"reddit_channel_added":			"Dieses Reddit-Abonnement wird jetzt auf den Textkanal {} umgeleitet!",
 	"reddit_remove":				"Diese Reddit-Abonnements sind derzeit registriert. Bitte wählen Sie eines aus, um es zu entfernen!\n\n",
 	"reddit_remove_err":			"Es wurde noch nichts registriert!",
@@ -1436,5 +1454,24 @@
 	"invites_status":				"Gesamtzahl der verarbeiteten Einladungen: **{}**/**{}**",
 	"invites_status_err":			"Zu diesem Zeitpunkt werden keine Einladungen bearbeitet!",
 	"invites_shutdown_mode":		"Neue Einladungsjobs können nicht gestartet werden, da der Bot kurz vor der Abschaltung steht!",
-	"invites_used_by":				"Invite code **{}** has been used by the user **{}** with the id number **{}**"
+	"invites_used_by":				"Invite code **{}** has been used by the user **{}** with the id number **{}**",
+	
+	"twitch_help":					"The Twitch command allows you to subscribe a user and fetch live streams. Write *exit* anytime to interrupt the setup. These parameters are available:\n\n- **register**:\nRegister a username to follow!\n- **format**:\nDefine the display options of the fetched Twitch stream!\n- **channel**:\nUse a specific channel besides the default one!\n- **remove**:\nRemove a registered subscription!\n- **test**:\nTest a registered subscription!",
+	"twitch_register_help":			"Type a username of Twitch together with the command!",
+	"twitch_register_invalid_user":	"Invalid Twitch username found! Please try again!",
+	"twitch_register_step":			"**{}** has been registered successfully!",
+	"twitch_register_err":			"This subscription has been already registered! Action aborted!",
+	"twitch_format_step_1":			"Select one of the registered Twitch subscriptions to format the output messages!\n\n",
+	"twitch_format_step_2":			"This is the current format for this Twitch subscription. Type your desired format or type *exit* to interrupt. Key values are `{pubDate}`, `{user}`, `{user_id}`, `{title}`, `{url}`, `{language}`, {game}\n```",
+	"twitch_format_updated":		"Twitch display format for **{}** has been updated",
+	"twitch_channel_step_1":		"Select one of the registered Twitch subscriptions to redirect the fetched content into a selected text channel!\n\n",
+	"twitch_channel_step_2":		"Now please submit a text channel mention or text channel id to redirect the output of this subscription to the selected text channel! To reset it, type *none*. Currently selected channel: ",
+	"twitch_channel_added":			"This Twitch subscription is now being redirected to text channel {}!",
+	"twitch_remove":				"These Twitch subscriptions are currently registered. Please select one of them to remove!\n\n",
+	"twitch_remove_err":			"Nothing has been registered yet!",
+	"twitch_remove_err_2":			"Selection must be between 1 and {}!",
+	"twitch_remove_done":			"Twitch subscription **{}** has been removed!",
+	"twitch_test":					"These Twitch subscriptions are currently registered. Please select one of them to test!\n\n",
+	"twitch_exit":					"Twitch command aborted!",
+	"twitch_no_content":			"No Twitch related content found!"
 }

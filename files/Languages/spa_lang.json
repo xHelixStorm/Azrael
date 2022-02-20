@@ -155,6 +155,7 @@
 	"param_max":					"max",
 	"param_exclude":				"exclude",
 	"param_status":					"status",
+	"param_youtube":				"youtube",
 	
 	"lang_eng":						"Inglés",
 	"lang_ger":						"Alemán",
@@ -290,6 +291,7 @@
 	"command_warn":					"- **{}warn**\nFormulate the reason for a warning and send it to a user in private message.\n",
 	"command_reddit":				"- **{}reddit**\nSuscríbete a un usuario de subreddit o reddit para obtener contenido.\n",
 	"command_invites":				"- **{}invites**\nCrea un número de invitaciones de uso único.\n",
+	"command_twitch":				"- **{}twitch**\nSubscribe to a twitch user to fetch content.\n",
 	"commands_disabled":		 	"¡Todos los comandos están deshabilitados!",
 	
 	"daily_reward":				 	"Felicidades. Has desbloqueado la siguiente recompensa:\n",
@@ -405,8 +407,8 @@
 	"filter_list_lang_na":			"¡El idioma solicitado no está disponible!",
 	"filter_write_word":			"¡Ahora por favor proporciona la palabra o nombre!",
 	"filter_write_paste":			"Now please provide a pastebin URL which contains all words or names!",
-	"filter_write_fqdn":			"Ahora proporciona un nombre de dominio completo. Por ejemplo: *https://www.google.com*\n No agregues nada después del dominio de nivel superior (p. ej. com, de, org)!",
-	"filter_write_paste_fqdn":		"Ahora proporciona una URL de Pastebin con nombres de dominio totalmente calificados. Por ejemplo: *https://www.google.com*\n ¡No agregues nada después del dominio de nivel superior (p. ej. com, de, org) y escribe un fqdn por línea!",
+	"filter_write_fqdn":			"Ahora proporciona un nombre de dominio completo. Por ejemplo: *https:
+	"filter_write_paste_fqdn":		"Ahora proporciona una URL de Pastebin con nombres de dominio totalmente calificados. Por ejemplo: *https:
 	"filter_write_username":		"¡Ahora proporciona un nombre de usuario de Twitter para que los tweets no se publiquen en discord!",
 	"filter_write_paste_username":	"¡Ahora proporciona una URL de Pastebin con nombres de usuario de Twitter para que se bloquee la publicación de los tweets en discord!",
 	"filter_write_insert":			"¡La palabra o nombre se ha insertado correctamente!",
@@ -427,7 +429,7 @@
 	"filter_tweet_remove_err":		"The Twitter user doesn't exist!",
 	"filter_word_remove_err":		"The word doesn't exist!",
 	
-	"google_help":				 	"Combina los eventos de Bot disponibles con las API de Google y crea una interfaz para la exportación de datos, ¡cada vez que se active ese evento específico! En algunos casos, se requieren permisos de escritura y edición para el correo electrónico *{}*. Por ejemplo, cuando se debe abrir una hoja de cálculo privada.\nEstas API están actualmente disponibles como parámetros:\n\n- **docs**:\nInterfaz con documentos de google.\n- **spreadsheets**:\nInterfaz con hojas de cálculo de google.\n- **drive**:\nInterfaz con google drive.",
+	"google_help":				 	"Combina los eventos de Bot disponibles con las API de Google y crea una interfaz para la exportación de datos, ¡cada vez que se active ese evento específico! En algunos casos, se requieren permisos de escritura y edición para el correo electrónico *{}*. Por ejemplo, cuando se debe abrir una hoja de cálculo privada.\nEstas API están actualmente disponibles como parámetros:\n\n- **spreadsheets**:\nInterfaz con hojas de cálculo de google.\n- **youtube**:\nInterfaz con YouTube.",
 	"google_api_not_available":	 	"¡La API no existe, no está disponible o se escribió incorrectamente! Inténtalo de nuevo",
 	"google_webservice":			"El servicio web de Google ha respondido con:\n",
 	"google_events":				"Eventos Registrados: ",
@@ -437,8 +439,8 @@
 	"google_invalid_dds":			"Los siguientes elementos del diccionario de datos no son válidos. Vuelve a enviar tus artículos:\n",
 	"google_sheet_help":			"¡Usa uno de los siguientes parámetros para navegar a través de la configuración de hojas de cálculo o escribe *exit* para cerrar la configuración en cualquier momento! Este mensaje se muestra solo una vez:\n\n- **create**:\n¡Crea una tabla de hojas de cálculo!\n- **add**:\n¡Agrega una tabla de hoja de cálculo ya existente!\n- **remove**:\n¡Elimine una tabla de hoja de cálculo vinculada (sin eliminación)!\n- **events**:\n¡Selecciona una tabla de hoja de cálculo ya existente!\n- **sheet**:\n¡Define la hoja y la fila / columna para operar!\n- **map**:\n¡Asigna los campos de tabla disponibles con los valores del bot!\n\nHojas de cálculo actuales:\n",
 	"google_sheet_create":			"¡Usa este parámetro junto con un nombre de título para crear una nueva hoja de cálculo y vincularla directamente con el Bot! ¡Ten en cuenta que para esta acción, se debe proporcionar una dirección de correo electrónico de Google válida en la configuración de Bot!",
-	"google_sheet_created":			"¡La hoja de cálculo de Google se ha creado y vinculado al Bot!\nURL: https://docs.google.com/spreadsheets/d/",
-	"google_sheet_created_2":		"¡La hoja de cálculo de Google se ha creado pero no se ha podido vincular con el Bot! Intenta vincular la hoja de cálculo creada con la siguiente URL y agrega el parámetro:\nURL: https://docs.google.com/spreadsheets/d/",
+	"google_sheet_created":			"¡La hoja de cálculo de Google se ha creado y vinculado al Bot!\nURL: https:
+	"google_sheet_created_2":		"¡La hoja de cálculo de Google se ha creado pero no se ha podido vincular con el Bot! Intenta vincular la hoja de cálculo creada con la siguiente URL y agrega el parámetro:\nURL: https:
 	"google_sheet_email":			"Configura una dirección de correo electrónico de Google antes de usar este comando, para que la propiedad se pueda mover a esa dirección de correo electrónico.",
 	"google_sheet_add_help":		"Utiliza este parámetro junto con una URL de hoja de cálculo o simplemente la ID del archivo para vincularlo con el Bot.",
 	"google_sheet_added":			"¡La hoja de cálculo de Google se ha vinculado con el Bot!",
@@ -472,6 +474,22 @@
 	"google_sheet_restrict_remove":	"Restriction has been removed for this event!",
 	"google_sheet_restrict_add":	"Text channel restriction has been added for this event and spreadsheet!",
 	"google_sheet_no_link":			"An internal error has occurred! Google Spreadsheet couldn't be linked to the Bot.",
+	"google_youtube_help":			"Use one of the below parameters to navigate through the youtube setup or type *exit* to close the setup any time! This message is shown only once:\n\n- **add**:\nAdd a channel id to pull the newest videos.\n- **remove**:\nRemove a registered channel.\n- **format**:\nFormat the display message.\n- **channel**:\nDefine in which channel the videos should be displayed.\n- **display**:\nShow all registered channels.\n- **test**:\nTest the YouTube channel subscription.",
+	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https:
+	"google_youtube_add_2":			"YouTube channel has been added.\nChannel name: **{}**\nChannel id: {}",
+	"google_youtube_add_err":		"YouTube channel couldn't be found. Please try again!",
+	"google_youtube_remove":		"Please write the number of the channel that you wish to remove!\n",
+	"google_youtube_remove_2":		"YouTube channel **{}** has been successfully removed!",
+	"google_youtube_format":		"Please write the number of the channel that you wish to format!\n",
+	"google_youtube_format_2":		"This is the current format for this YouTube channel. Type your desired format for this channel or type *exit* to interrupt. Key values are `{channel}`, `{channel_id}`, `{pubDate}`, `{title}`, `{description}`, `{url}`, `{video_id}`\n",
+	"google_youtube_format_3":		"The display format of channel **{}** has been updated successfully!",
+	"google_youtube_channel":		"Please write the number of the channel that you wish to assign a text channel!\n",
+	"google_youtube_channel_2":		"This YouTube channel has the following text channel assigned: **{}**\nMention a text channel or write a text channel id to update the display text channel. To clear the text channel, write *none*",
+	"google_youtube_channel_3":		"The display text channel of YouTube channel **{}** has been updated!",
+	"google_youtube_display":		"These YouTube channels are added!\n",
+	"google_youtube_test":			"Please write the number of the YouTube channel that you wish to test!\n",
+	"google_youtube_err":			"No YouTube channel has been registered!",
+	"google_youtube_err_2":			"No YouTube video has been found for this channel!",
 	"google_exit":					"¡Comando de Google terminado!",
 	"google_timeout":				"Tiempo de espera de la solicitud del servicio de Google {}/5. La acción se reintentará en 5 segundos.",
 	
@@ -1412,7 +1430,7 @@
 	"reddit_format_step_2":			"This is the current format for this Reddit subscription. Type your desired format or type *exit* to interrupt. Key values are `{pubDate}`, `{author}`, `{title}`, `{description}`, `{subreddit}`, `{url}`, `{media}`\n```",
 	"reddit_format_updated":		"Reddit display format for **{}** has been updated",
 	"reddit_channel_step_1":		"Select one of the registered Reddit subscriptions to redirect the fetched content into a selected text channel!\n\n",
-	"reddit_channel_step_2":		"Now please submit a text channel mention or text channel id to redirect the output of this subscription to the selected text channel! Currently selected channel: ",
+	"reddit_channel_step_2":		"Now please submit a text channel mention or text channel id to redirect the output of this subscription to the selected text channel! Para restablecerla, escriba *none*. Currently selected channel: ",
 	"reddit_channel_added":			"This Reddit subscription is now being redirected to text channel {}!",
 	"reddit_remove":				"These Reddit subscriptions are currently registered. Please select one of them to remove!\n\n",
 	"reddit_remove_err":			"Nothing has been registered yet!",
@@ -1436,5 +1454,24 @@
 	"invites_status": 				"Número total de invitaciones procesadas: **{}**/**{}**",
 	"invites_status_err": 			"No se están procesando invitaciones en este momento!",
 	"invites_shutdown_mode": 		"No se pueden iniciar nuevos trabajos de invitación porque el Bot está a punto de cerrarse!",
-	"invites_used_by": 				"El código de Invitación **{}** ha sido usado por el usuario **{}** con número de ID **{}**"
+	"invites_used_by": 				"El código de Invitación **{}** ha sido usado por el usuario **{}** con número de ID **{}**",
+	
+	"twitch_help":					"The Twitch command allows you to subscribe a user and fetch live streams. Write *exit* anytime to interrupt the setup. These parameters are available:\n\n- **register**:\nRegister a username to follow!\n- **format**:\nDefine the display options of the fetched Twitch stream!\n- **channel**:\nUse a specific channel besides the default one!\n- **remove**:\nRemove a registered subscription!\n- **test**:\nTest a registered subscription!",
+	"twitch_register_help":			"Type a username of Twitch together with the command!",
+	"twitch_register_invalid_user":	"Invalid Twitch username found! Please try again!",
+	"twitch_register_step":			"**{}** has been registered successfully!",
+	"twitch_register_err":			"This subscription has been already registered! Action aborted!",
+	"twitch_format_step_1":			"Select one of the registered Twitch subscriptions to format the output messages!\n\n",
+	"twitch_format_step_2":			"This is the current format for this Twitch subscription. Type your desired format or type *exit* to interrupt. Key values are `{pubDate}`, `{user}`, `{user_id}`, `{title}`, `{url}`, `{language}`, {game}\n```",
+	"twitch_format_updated":		"Twitch display format for **{}** has been updated",
+	"twitch_channel_step_1":		"Select one of the registered Twitch subscriptions to redirect the fetched content into a selected text channel!\n\n",
+	"twitch_channel_step_2":		"Now please submit a text channel mention or text channel id to redirect the output of this subscription to the selected text channel! To reset it, type *none*. Currently selected channel: ",
+	"twitch_channel_added":			"This Twitch subscription is now being redirected to text channel {}!",
+	"twitch_remove":				"These Twitch subscriptions are currently registered. Please select one of them to remove!\n\n",
+	"twitch_remove_err":			"Nothing has been registered yet!",
+	"twitch_remove_err_2":			"Selection must be between 1 and {}!",
+	"twitch_remove_done":			"Twitch subscription **{}** has been removed!",
+	"twitch_test":					"These Twitch subscriptions are currently registered. Please select one of them to test!\n\n",
+	"twitch_exit":					"Twitch command aborted!",
+	"twitch_no_content":			"No Twitch related content found!"
 }

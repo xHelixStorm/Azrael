@@ -45,7 +45,7 @@ public class Google implements CommandPublic {
 		if(args.length == 0) {
 			String email;
 			JSONObject credentialContent = new JSONObject(FileSetting.readFile("./files/Google/credentials.json"));
-			if(!credentialContent.isEmpty())
+			if(credentialContent.length() > 0)
 				email = credentialContent.getString("client_email");
 			else 
 				email = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
@@ -53,17 +53,20 @@ public class Google implements CommandPublic {
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGlE_HELP).replace("{}", email)).build()).queue();
 		}
 		else if(args.length == 1) {
-			//Write in cache to display options related to google docs
-			if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DOCS))) {
-				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "docs"));
-			}
 			//Write in cache to display options related to google spreadsheets
-			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SPREADSHEETS))) {
+			if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SPREADSHEETS))) {
 				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "spreadsheets"));
+			}
+			//Write in cache to display options related to google docs
+			/*else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DOCS))) {
+				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "docs"));
 			}
 			//Write in cache to display options related to google drive
 			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DRIVE))) {
 				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "drive"));
+			}*/
+			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_YOUTUBE))) {
+				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "youtube"));
 			}
 			else {
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.RED);

@@ -33,7 +33,7 @@ public class SubscribeExecution {
 	public static void registerFeed(GuildMessageReceivedEvent e, String feed, int type) {
 		EmbedBuilder message = new EmbedBuilder();
 		if(type == 1) {
-			final int result = Azrael.SQLInsertRSS(feed, e.getGuild().getIdLong(), type);
+			final int result = Azrael.SQLInsertRSS(feed, e.getGuild().getIdLong(), type, null);
 			if(result > 0) {
 				message.setColor(Color.BLUE);
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_RSS_ADDED)).build()).queue();
@@ -53,7 +53,7 @@ public class SubscribeExecution {
 			}
 		}
 		else if(STATIC.getTwitterFactory() != null) {
-			final int result = Azrael.SQLInsertRSS(feed, e.getGuild().getIdLong(), type); 
+			final int result = Azrael.SQLInsertRSS(feed, e.getGuild().getIdLong(), type, null); 
 			if(result > 0) {
 				message.setColor(Color.BLUE);
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_HASH_ADDED)).build()).queue();
