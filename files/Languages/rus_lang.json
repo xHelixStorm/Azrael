@@ -407,8 +407,8 @@
 	"filter_list_lang_na":			"Запрошенный язык недоступен!",
 	"filter_write_word":			"Теперь, пожалуйста, укажите слово или имя!",
 	"filter_write_paste":			"Теперь, пожалуйста, предоставьте ссылку на pastebin, содержащую все слова или имена!",
-	"filter_write_fqdn":			"Теперь, пожалуйста, предоставьте полное имя домена. Например: *https:
-	"filter_write_paste_fqdn":		"Теперь, пожалуйста, предоставьте ссылку на pastebin, содержащую полные названия доменов. Например: *https:
+	"filter_write_fqdn":			"Теперь, пожалуйста, предоставьте полное имя домена. Например: *https://www.google.com*\n Пожалуйста, не добавляйте ничего после домена верхнего уровня  (например, com, ru, org)!",
+	"filter_write_paste_fqdn":		"Теперь, пожалуйста, предоставьте ссылку на pastebin, содержащую полные названия доменов. Например: *https://www.google.com*\n Пожалуйста, не добавляйте ничего после домена верхнего уровня  (например, com, ru, org) и указывайте один fqdn в каждой строке!",
 	"filter_write_username":		"Теперь, пожалуйста, предоставьте ник пользователя твиттера, чьи твиты не должны показываться на сервере!",
 	"filter_write_paste_username":	"Теперь, пожалуйста, предоставьте ссылку на Pastebin с никами пользователей твиттера, чьи твиты не должны показываться на сервере!",
 	"filter_write_insert":			"Слово или имя было успешно добавлено!",
@@ -439,8 +439,8 @@
 	"google_invalid_dds":			"Следующие элементы словаря данных недействительны. Пожалуйста, отправьте элементы повторно:\n",
 	"google_sheet_help":			"Используйте один из следующих параметров для навигации по настройкам электронных таблиц или напишите *exit*, чтобы закрыть настройку в любое время! Это сообщение отображается только один раз:\n\n- **create**:\nСоздать электронную таблицу!\n- **add**:\nДобавить уже существующую электронную таблицу!\n- **remove**:\nУдалить связанную таблицу!\n- **events**:\nНазначить события существующей таблице!\n- **sheet**:\nОпределите лист и строку / столбец для работы!\n- **map**:\nСопоставить доступные поля таблицы со значениями бота!\n- **restrict**:\nОграничить событие одним текстовым каналом!\n\nТекущие электронные таблицы:\n",
 	"google_sheet_create":			"Используйте этот параметр вместе с названием заголовка, чтобы создать новую электронную таблицу и напрямую связать ее с ботом! Обратите внимание, что для этого действия в настройках бота должен быть указан действующий адрес электронной почты Google!",
-	"google_sheet_created":			"Таблица Google создана и связана с ботом !\nСсылка: https:
-	"google_sheet_created_2":		"Таблица Google создана, но не может быть связана с ботом! Попробуйте связать созданную таблицу со следующей ссылкой, используя параметр *add*:\nСсылка: https:
+	"google_sheet_created":			"Таблица Google создана и связана с ботом !\nСсылка: https://docs.google.com/spreadsheets/d/",
+	"google_sheet_created_2":		"Таблица Google создана, но не может быть связана с ботом! Попробуйте связать созданную таблицу со следующей ссылкой, используя параметр *add*:\nСсылка: https://docs.google.com/spreadsheets/d/",
 	"google_sheet_email":			"Пожалуйста, перед использованием этой команды настройте адрес электронной почты Google, чтобы право владения можно было переместить на этот адрес электронной почты!",
 	"google_sheet_add_help":		"Используйте этот параметр вместе с URL-адресом электронной таблицы или просто ID файла, чтобы связать его с ботом!",
 	"google_sheet_added":			"Таблица Google была связана с ботом!",
@@ -475,7 +475,7 @@
 	"google_sheet_restrict_add":	"Для этого ивента и таблицы добавлено ограничение текстового канала!",
 	"google_sheet_no_link":			"Произошла внутренняя ошибка! Таблица Google не может быть связана с ботом.",
 	"google_youtube_help":			"Use one of the below parameters to navigate through the youtube setup or type *exit* to close the setup any time! This message is shown only once:\n\n- **add**:\nAdd a channel id to pull the newest videos.\n- **remove**:\nRemove a registered channel.\n- **format**:\nFormat the display message.\n- **channel**:\nDefine in which channel the videos should be displayed.\n- **display**:\nShow all registered channels.\n- **test**:\nTest the YouTube channel subscription.",
-	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https:
+	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https://www.youtube.com/channel/ **UC0ox9NuTHYeRys63yZpBFuB**.",
 	"google_youtube_add_2":			"YouTube channel has been added.\nChannel name: **{}**\nChannel id: {}",
 	"google_youtube_add_err":		"YouTube channel couldn't be found. Please try again!",
 	"google_youtube_remove":		"Please write the number of the channel that you wish to remove!\n",

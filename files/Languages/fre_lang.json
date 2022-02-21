@@ -407,8 +407,8 @@
     "filter_list_lang_na":          "La langue demandée n'est pas disponible !",
     "filter_write_word":            "Maintenant, veuillez fournir le mot ou le nom !",
     "filter_write_paste":           "Maintenant, veuillez fournir une URL pastebin qui contient tous les mots ou noms !",
-    "filter_write_fqdn":            "Veuillez maintenant fournir un nom de domaine entièrement qualifié. Par exemple : *https:
-    "filter_write_paste_fqdn":      "Veuillez maintenant fournir une URL Pastebin avec des noms de domaine entièrement qualifiés. Par exemple : *https:
+    "filter_write_fqdn":            "Veuillez maintenant fournir un nom de domaine entièrement qualifié. Par exemple : *https://www.google.com*\n Veuillez ne rien ajouter après le nom de domaine de premier niveau (par exemple com, de, org) !",
+    "filter_write_paste_fqdn":      "Veuillez maintenant fournir une URL Pastebin avec des noms de domaine entièrement qualifiés. Par exemple : *https://www.google.com*\n N'ajoutez rien après le domaine de premier niveau (par exemple com, de, org) et écrivez un fqdn par ligne !",
     "filter_write_username":        "Maintenant, veuillez fournir un nom d'utilisateur Twitter pour que les tweets soient bloqués sur le discord !",
     "filter_write_paste_username":  "Maintenant, veuillez fournir une URL Pastebin avec les noms d'utilisateurs Twitter pour que les tweets soient bloqués sur discord !",
     "filter_write_insert":          "Le mot ou le nom a été inséré avec succès !",
@@ -439,8 +439,8 @@
     "google_invalid_dds":           "Les éléments suivants du dictionnaire de données ne sont pas valides. Veuillez soumettre à nouveau vos éléments:\n",
     "google_sheet_help":            "Utilisez l'un des paramètres ci-dessous pour naviguer dans la configuration des feuilles de calcul ou tapez *exit* pour fermer la configuration à tout moment ! Ce message ne s'affiche qu'une seule fois:\n\n- **create**:\nCréer une table de calcul!\n- **add**:\nAjouter une table de calcul déjà existante!\n- **remove**:\nSupprimer une table de calcul liée (pas de suppression)!\n- **events**:\nAssigner des événements aux tables de calcul existantes ! \n- **sheet**:\nDéfinir la feuille et la ligne/colonne sur lesquelles opérer!\n- **map**:\nMapper les champs de table disponibles avec les valeurs du Bot!\n- **restrict**:\nRestreindre un événement à un canal de texte!\n\nFormes de calcul actuelles:\n",
     "google_sheet_create":          "Utilisez ce paramètre avec un nom de titre pour créer une nouvelle feuille de calcul et la lier directement au bot ! Notez que pour cette action, une adresse e-mail google valide doit être fournie dans les paramètres du bot ! ",
-    "google_sheet_created":         "La feuille de calcul Google a été créée et liée au Bot!\nURL : https:
-    "google_sheet_created_2":       "La feuille de calcul Google a été créée mais n'a pas pu être liée au robot ! Essayez de lier la feuille de calcul créée avec l'url suivante et le paramètre *add*:\nURL : https:
+    "google_sheet_created":         "La feuille de calcul Google a été créée et liée au Bot!\nURL : https://docs.google.com/spreadsheets/d/",
+    "google_sheet_created_2":       "La feuille de calcul Google a été créée mais n'a pas pu être liée au robot ! Essayez de lier la feuille de calcul créée avec l'url suivante et le paramètre *add*:\nURL : https://docs.google.com/spreadsheets/d/",
     "google_sheet_email":           "Veuillez configurer une adresse email google avant d'utiliser cette commande, afin que la propriété puisse être déplacée vers cette adresse email !",
     "google_sheet_add_help":        "Utilisez ce paramètre avec l'URL d'une feuille de calcul ou simplement l'ID du fichier pour le lier au bot !",
     "google_sheet_added":           "La feuille de calcul google a été liée au Bot !",
@@ -475,7 +475,7 @@
     "google_sheet_restrict_add":    "La restriction du canal texte a été ajoutée pour cet événement et la feuille de calcul !",
     "google_sheet_no_link":         "Une erreur interne s'est produite ! La feuille de calcul Google n'a pas pu être liée au bot.",
     "google_youtube_help":			"Use one of the below parameters to navigate through the youtube setup or type *exit* to close the setup any time! This message is shown only once:\n\n- **add**:\nAdd a channel id to pull the newest videos.\n- **remove**:\nRemove a registered channel.\n- **format**:\nFormat the display message.\n- **channel**:\nDefine in which channel the videos should be displayed.\n- **display**:\nShow all registered channels.\n- **test**:\nTest the YouTube channel subscription.",
-	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https:
+	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https://www.youtube.com/channel/ **UC0ox9NuTHYeRys63yZpBFuB**.",
 	"google_youtube_add_2":			"YouTube channel has been added.\nChannel name: **{}**\nChannel id: {}",
 	"google_youtube_add_err":		"YouTube channel couldn't be found. Please try again!",
 	"google_youtube_remove":		"Please write the number of the channel that you wish to remove!\n",

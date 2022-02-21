@@ -407,8 +407,8 @@
 	"filter_list_lang_na":			"Die angefragte Sprache steht nicht zur Auswahl!",
 	"filter_write_word":			"Geben Sie jetzt bitte das Wort oder den Namen an!",
 	"filter_write_paste":			"Geben Sie jetzt bitte eine Pastebin-URL an, die alle Wörter oder Namen enthält!",
-	"filter_write_fqdn":			"Geben Sie jetzt bitte einen voll qualifizierten Domänennamen an. Zum Beispiel: *https:
-	"filter_write_paste_fqdn":		"Geben Sie jetzt bitte eine Pastebin-URL mit vollständig qualifizierten Domänennamen an. Zum Beispiel: *https:
+	"filter_write_fqdn":			"Geben Sie jetzt bitte einen voll qualifizierten Domänennamen an. Zum Beispiel: *https://www.google.com*\n Bitte fügen Sie nichts nach der Top-Level-Domain hinzu (z.B. com, de, org)!",
+	"filter_write_paste_fqdn":		"Geben Sie jetzt bitte eine Pastebin-URL mit vollständig qualifizierten Domänennamen an. Zum Beispiel: *https://www.google.com*\n Bitte fügen Sie nach der Top-Level-Domain (z.B. com, de, org) nichts ein und schreiben Sie einen fqdn pro Zeile!",
 	"filter_write_username":		"Geben Sie jetzt bitte einen Twitter-Benutzernamen an, damit die Tweets nicht mehr in Discord gepostet werden können!",
 	"filter_write_paste_username":	"Geben Sie jetzt bitte eine Pastebin-URL mit Twitter-Benutzernamen an, damit die Tweets nicht mehr in Discord gepostet werden können!",
 	"filter_write_insert":			"Das Wort oder der Name wurde erfolgreich hinzugefügt!",
@@ -439,8 +439,8 @@
 	"google_invalid_dds":			"Die folgenden Data-Dictionary-Einträge sind ungültig. Bitte reichen Sie Ihre Einträge erneut ein:\n",
 	"google_sheet_help":			"Benutzen Sie einen der untenstehenden Parameter, um durch das Tabellen-Setup zu navigieren oder geben Sie *verlassen* ein, um das Setup jederzeit zu schließen! Diese Meldung wird nur einmal angezeigt:\n\n- **erstellen**:\nErstellen Sie eine Google Tabelle!\n- **ergänzen**:\nErgänzen Sie eine bereits existierende Google Tabelle!\n- **entfernen**:\nEntfernen Sie eine verknüpfte Google Tabelle (kein Löschen)!\n- **ereignisse**:\nOrdnen Sie Ereignisse zu bestehende Google Tabellen!\n- **tabellenblatt**:\nDefinieren Sie das Tabellenblatt und die Zeile/Spalte, auf denen gearbeitet werden soll!\n- **mappen**:\nMappen Sie die verfügbaren Tabellenfelder mit Werten aus dem Bot!\n- **begrenzen**:\nBegrenze einen Ereignis an einen Textkanal!\n\nRegistrierte Google Tabellen:\n",
 	"google_sheet_create":			"Verwenden Sie diesen Parameter zusammen mit einem Titelnamen, um eine neue Google-Tabelle zu erstellen und diese direkt mit dem Bot zu verknüpfen! Beachten Sie, dass für diese Aktion eine gültige Google-E-Mail-Adresse in den Bot-Einstellungen angegeben werden muss!",
-	"google_sheet_created":			"Google-Tabelle wurde erstellt und mit dem Bot verlinkt!\nURL: https:
-	"google_sheet_created_2":		"Google-Tabelle wurde erstellt, konnte aber nicht mit dem Bot verlinkt werden! Versuchen Sie, die erstellte Tabelle mit der folgenden Url und dem Parameter *ergänzen* zu verknüpfen:\nURL: https:
+	"google_sheet_created":			"Google-Tabelle wurde erstellt und mit dem Bot verlinkt!\nURL: https://docs.google.com/spreadsheets/d/",
+	"google_sheet_created_2":		"Google-Tabelle wurde erstellt, konnte aber nicht mit dem Bot verlinkt werden! Versuchen Sie, die erstellte Tabelle mit der folgenden Url und dem Parameter *ergänzen* zu verknüpfen:\nURL: https://docs.google.com/spreadsheets/d/",
 	"google_sheet_email":			"Bitte konfigurieren Sie eine Google-E-Mail-Adresse, bevor Sie diesen Befehl verwenden, damit das Eigentum auf diese E-Mail-Adresse übertragen werden kann!",
 	"google_sheet_add_help":		"Verwenden Sie diesen Parameter zusammen mit einer Spreadsheet-URL oder nur der Datei-ID, um es mit dem Bot zu verknüpfen!",
 	"google_sheet_added":			"Die Google-Tabelle wurde mit dem Bot verlinkt!",
@@ -475,7 +475,7 @@
 	"google_sheet_restrict_add":	"Textkanal Bindung gesetzt für dieses Event und Spreadsheet!",
 	"google_sheet_no_link":			"Ein interner Fehler ist aufgetreten! Google Tabelle konnte nicht mit dem Bot verknüpft werden.",
 	"google_youtube_help":			"Use one of the below parameters to navigate through the youtube setup or type *exit* to close the setup any time! This message is shown only once:\n\n- **add**:\nAdd a channel id to pull the newest videos.\n- **remove**:\nRemove a registered channel.\n- **format**:\nFormat the display message.\n- **channel**:\nDefine in which channel the videos should be displayed.\n- **display**:\nShow all registered channels.\n- **test**:\nTest the YouTube channel subscription.",
-	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https:
+	"google_youtube_add":			"Next write the id of the YouTube channel. The channel id can be found in the url section of the youtube channel. For example https://www.youtube.com/channel/ **UC0ox9NuTHYeRys63yZpBFuB**.",
 	"google_youtube_add_2":			"YouTube channel has been added.\nChannel name: **{}**\nChannel id: {}",
 	"google_youtube_add_err":		"YouTube channel couldn't be found. Please try again!",
 	"google_youtube_remove":		"Please write the number of the channel that you wish to remove!\n",
