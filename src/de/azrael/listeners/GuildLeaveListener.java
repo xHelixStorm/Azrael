@@ -12,10 +12,10 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -64,7 +64,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 					logger.info("User {} has been kicked in guild {}", e.getUser().getId(), e.getGuild().getId());
 					
 					//Run google service, if enabled
-					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+					if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 						GoogleSheets.spreadsheetKickRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.KICK.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, (e.getMember() != null ? e.getMember().getEffectiveName() : e.getUser().getName()), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), kick_reason);
 					}
 					
@@ -91,7 +91,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 							logger.info("User {} has been kicked in guild {}", e.getUser().getId(), e.getGuild().getId());
 							
 							//Run google service, if enabled
-							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+							if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 								GoogleSheets.spreadsheetKickRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.KICK.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, (e.getMember() != null ? e.getMember().getEffectiveName() : e.getUser().getName()), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), kick_reason);
 							}
 							
@@ -106,7 +106,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 							Azrael.SQLUpdateGuildLeft(user_id, guild_id, true);
 						}
 						//if leave messages are enabled, print a message that the user has left the server
-						else if(GuildIni.getLeaveMessage(guild_id) && warnedUser.getBanID() == 1) {
+						else if(BotConfiguration.SQLgetBotConfigs(guild_id).getLeaveMessage() && warnedUser.getBanID() == 1) {
 							EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_TITLE));
 							STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.LEFT_MESSAGE_2).replace("{}", user_name), Channel.LOG.getType());
 						}
@@ -120,7 +120,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 						Azrael.SQLUpdateGuildLeft(user_id, guild_id, true);
 					}
 					//if leave messages are enabled, print a message that the user has left the server
-					else if(GuildIni.getLeaveMessage(guild_id) && warnedUser.getBanID() == 1) {
+					else if(BotConfiguration.SQLgetBotConfigs(guild_id).getLeaveMessage() && warnedUser.getBanID() == 1) {
 						EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_TITLE));
 						STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.LEFT_MESSAGE_2).replace("{}", user_name), Channel.LOG.getType());
 					}

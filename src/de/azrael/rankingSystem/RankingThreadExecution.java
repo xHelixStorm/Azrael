@@ -14,13 +14,13 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Level;
 import de.azrael.constructors.Ranking;
 import de.azrael.constructors.Roles;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -43,7 +43,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class RankingThreadExecution {
 	private final static Logger logger = LoggerFactory.getLogger(RankingThreadExecution.class);
 	
-	public static void setProgress(GuildMessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, long percentMultiplier, Ranking user_details, Guilds guild_settings) {
+	public static void setProgress(GuildMessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, long percentMultiplier, Ranking user_details, Guilds guild_settings, BotConfigs botConfig) {
 		//delete all expired items from the inventory (e.g experience booster)
 		RankingSystem.SQLDeleteInventory();
 		double multiplier = 1;
@@ -109,7 +109,7 @@ public class RankingThreadExecution {
 					Timestamp reset = Timestamp.valueOf(tomorrowMidnight);
 					daily_experience += adder;
 					//gather experience points and save into RankingSystem.user_details table
-					ExperienceGain(e, user_details,  guild_settings, currentExperience, experience, daily_experience, roleAssignLevel, max_experience_enabled, reset);
+					ExperienceGain(e, user_details,  guild_settings, currentExperience, experience, daily_experience, roleAssignLevel, max_experience_enabled, reset, botConfig);
 					//notify the user in private message if the experience limit for the day has been reached
 					if(daily_experience > max_experience*multiplier) {
 						logger.info("User {} has reached the limit of obtainable experience points for today in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
@@ -122,12 +122,12 @@ public class RankingThreadExecution {
 			}
 			else if(max_experience_enabled == false) {
 				//gather experience points and save into RankingSystem.user_details table
-				ExperienceGain(e, user_details, guild_settings, currentExperience, experience, 0, roleAssignLevel, max_experience_enabled, null);
+				ExperienceGain(e, user_details, guild_settings, currentExperience, experience, 0, roleAssignLevel, max_experience_enabled, null, botConfig);
 			}
 		}
 	}
 	
-	private static void ExperienceGain(GuildMessageReceivedEvent e, Ranking user_details, Guilds guild_settings, int currentExperience, long experience, int daily_experience, int roleAssignLevel, boolean max_experience_enabled, Timestamp reset) {
+	private static void ExperienceGain(GuildMessageReceivedEvent e, Ranking user_details, Guilds guild_settings, int currentExperience, long experience, int daily_experience, int roleAssignLevel, boolean max_experience_enabled, Timestamp reset, BotConfigs botConfig) {
 		//check if the default skin had been updated, if yes update level skin, description and file type
 		var old_guild_settings = Hashes.getOldGuildSettings(e.getGuild().getIdLong());
 		if(old_guild_settings != null && old_guild_settings.getLevelID() == user_details.getRankingLevel()) {
@@ -178,7 +178,7 @@ public class RankingThreadExecution {
 				experience = user_details.getExperience();
 				
 				//reset the assigned role, if the user got degraded enough
-				Roles current_role = updateRole(e, user_details.getLevel(), user_details.getLevel(), user_details.getLevel());
+				Roles current_role = updateRole(e, user_details.getLevel(), user_details.getLevel(), user_details.getLevel(), botConfig);
 				if(current_role != null)
 					user_details.setCurrentRole(current_role.getRole_ID());
 				else
@@ -227,7 +227,7 @@ public class RankingThreadExecution {
 				rankUpExperience = 0;
 			}
 			
-			Roles current_role = updateRole(e, level, newLevel, roleAssignLevel);
+			Roles current_role = updateRole(e, level, newLevel, roleAssignLevel, botConfig);
 			
 			//update all user details regarding the level up
 			user_details.setLevel(level);
@@ -302,7 +302,7 @@ public class RankingThreadExecution {
 				final var rankingRoles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
 				List<Role> current_roles = e.getMember().getRoles().parallelStream().filter(f -> f.getIdLong() != user_details.getCurrentRole() && rankingRoles.parallelStream().filter(r -> r.getRole_ID() == f.getIdLong()).findAny().orElse(null) != null).collect(Collectors.toList());
 				if(current_roles.size() > 0) {
-					if(!GuildIni.getCollectRankingRoles(e.getGuild().getIdLong())) {
+					if(!botConfig.getCollectRankingRoles()) {
 						current_roles.parallelStream().forEach(role -> {
 							e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(role.getIdLong())).queue();
 						});
@@ -335,14 +335,14 @@ public class RankingThreadExecution {
 		}
 	}
 	
-	private static Roles updateRole(GuildMessageReceivedEvent e, final int level, final int newLevel, int roleAssignLevel) {
+	private static Roles updateRole(GuildMessageReceivedEvent e, final int level, final int newLevel, int roleAssignLevel, BotConfigs botConfig) {
 		Roles current_role = null;
 		//check that the bot has the manage roles permission to remove and assign roles
 		if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 			//if a new ranking role has been unlocked, remove old ones and assign the newest one
 			final var rankingRoles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
 			if(level == roleAssignLevel) {
-				if(!GuildIni.getCollectRankingRoles(e.getGuild().getIdLong())) {
+				if(!botConfig.getCollectRankingRoles()) {
 					for(final Role r : e.getMember().getRoles()) {
 						for(final var role : rankingRoles) {
 							if(r.getIdLong() == role.getRole_ID()) {

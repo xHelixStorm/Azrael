@@ -37,9 +37,9 @@ public class ReactionMessage {
 				if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
 					var roles = reactionRoles.parallelStream().filter(f -> !f.isPersistent()).collect(Collectors.toList());
 					if(roles.size() > 0) {
-						String [] reactions = GuildIni.getReactions(e.getGuild().getIdLong());
+						String [] reactions = GuildIni.getReactions(e.getGuild());
 						StringBuilder sb = new StringBuilder();
-						var reactionEnabled = GuildIni.getReactionEnabled(e.getGuild().getIdLong());
+						var reactionEnabled = GuildIni.getReactionEnabled(e.getGuild());
 						for(int i = 0; i < roles.size(); i++) {
 							String reaction;
 							if(!reactionEnabled) {

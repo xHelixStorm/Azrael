@@ -22,13 +22,15 @@ import de.azrael.commandsContainer.SetProfileDefaultSkin;
 import de.azrael.commandsContainer.SetRankDefaultSkin;
 import de.azrael.commandsContainer.SetRankingSystem;
 import de.azrael.commandsContainer.SetWarning;
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Dailies;
 import de.azrael.core.UserPrivs;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -36,50 +38,51 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 /**
  * Set up the Bot with various functionalities
- * @author xHelixStorm
- *
  */
 
 public class Set implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(RoleReaction.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		if(GuildIni.getSetCommand(e.getGuild().getIdLong())) {
+	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		if(STATIC.getCommandEnabled(e.getGuild(), Command.SET)) {
 			return true;
 		}
 		return false;
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
-		var adminPermission = (GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong());
-		var commandLevel = GuildIni.getSetLevel(e.getGuild().getIdLong());
-		if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getSetLevel(e.getGuild().getIdLong())) || adminPermission) {
+	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		var adminPermission = BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+		var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET);
+		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
 			if(args.length == 0) {
 				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_HELP)).build()).queue();
+				return true;
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PERMISSION_LEVEL))) {
-				commandLevel = GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_PRIVILEGE);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PERMISSION)).build()).queue();
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PERMISSION_LEVEL))) {
-				commandLevel = GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_PRIVILEGE);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetPrivilegeLevel.runTask(e, args);
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL_CENSOR))) {
-				commandLevel = GuildIni.getSetChannelFilterLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_CHANNEL_FILTER);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					final var langs = Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember()));
 					if(langs != null && langs.size() > 0) {
@@ -96,73 +99,81 @@ public class Set implements CommandPublic {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Languages couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL_CENSOR))) {
-				commandLevel = GuildIni.getSetChannelFilterLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_CHANNEL_FILTER);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetChannelFilter.runTask(e, args);
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNINGS))) {
-				commandLevel = GuildIni.getSetWarningsLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_WARNINGS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetWarning.runHelp(e);
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNINGS))) {
-				commandLevel = GuildIni.getSetWarningsLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_WARNINGS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetWarning.runTask(e, args[1]);
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING))) {
-				commandLevel = GuildIni.getSetRankingLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_RANKING);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANKING)).build()).queue();
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING))) {
-				commandLevel = GuildIni.getSetRankingLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_RANKING);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetRankingSystem.runTask(e, args[1]);
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_EXPERIENCE))) {
-				commandLevel = GuildIni.getSetMaxExperienceLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAX_EXPERIENCE);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MAX_EXPERIENCE)).build()).queue();
+					return true;
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_EXPERIENCE))) {
-				commandLevel = GuildIni.getSetMaxExperienceLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAX_EXPERIENCE);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetMaxExperience.runTask(e, args[1], RankingSystem.SQLgetGuild(e.getGuild().getIdLong()));
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL_SKIN))) {
-				commandLevel = GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_LEVEL_SKIN);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					StringBuilder out = new StringBuilder();
 					StringBuilder out2 = new StringBuilder();
@@ -183,13 +194,14 @@ public class Set implements CommandPublic {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Level skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL_SKIN))) {
-				commandLevel = GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_LEVEL_SKIN);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					final var skins = RankingSystem.SQLgetRankingLevelList(e.getGuild().getIdLong());
 					if(skins != null) {
@@ -207,13 +219,14 @@ public class Set implements CommandPublic {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Level skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK_SKIN))) {
-				commandLevel = GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_RANK_SKIN);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					StringBuilder out = new StringBuilder();
 					StringBuilder out2 = new StringBuilder();
@@ -234,13 +247,14 @@ public class Set implements CommandPublic {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Rank skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK_SKIN))) {
-				commandLevel = GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_RANK_SKIN);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					final var skins = RankingSystem.SQLgetRankingRankList(e.getGuild().getIdLong());
 					if(skins != null) {
@@ -258,13 +272,14 @@ public class Set implements CommandPublic {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Rank skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE_SKIN))) {
-				commandLevel = GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_PROFILE_SKIN);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					StringBuilder out = new StringBuilder();
 					StringBuilder out2 = new StringBuilder();
@@ -285,13 +300,14 @@ public class Set implements CommandPublic {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Profile skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE_SKIN))) {
-				commandLevel = GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_PROFILE_SKIN);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					final var skins = RankingSystem.SQLgetRankingProfileList(e.getGuild().getIdLong());
 					if(skins != null) {
@@ -309,13 +325,14 @@ public class Set implements CommandPublic {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Profile skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICON_SKIN))) {
-				commandLevel = GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_ICON_SKIN);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					StringBuilder out = new StringBuilder();
 					StringBuilder out2 = new StringBuilder();
@@ -336,13 +353,14 @@ public class Set implements CommandPublic {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Icon skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICON_SKIN))) {
-				commandLevel = GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_ICON_SKIN);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					final var skins = RankingSystem.SQLgetRankingIconsList(e.getGuild().getIdLong());
 					if(skins != null) {
@@ -359,119 +377,146 @@ public class Set implements CommandPublic {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Icon skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILY_ITEM))) {
-				commandLevel = GuildIni.getSetDailyItemLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DAILY_ITEM);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_ITEM_HELP)).build()).queue();
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILY_ITEM))) {
-				commandLevel = GuildIni.getSetDailyItemLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DAILY_ITEM);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					ArrayList<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong());
 					var tot_weight = daily_items.parallelStream().mapToInt(i -> i.getWeight()).sum();
 					SetDailyItem.runTask(e, args, daily_items, tot_weight);
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIVEAWAY_ITEMS))) {
-				commandLevel = GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_GIVEAWAY_ITEMS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_GIVEAWAY)).build()).queue();
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIVEAWAY_ITEMS))) {
-				commandLevel = GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_GIVEAWAY_ITEMS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetGiveawayItems.runTask(e, args);
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_COMP_SERVER))) {
-				commandLevel = GuildIni.getSetCompServerLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_COMP_SERVER);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetCompServer.runHelp(e);
+					return true;
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_COMP_SERVER))) {
-				commandLevel = GuildIni.getSetCompServerLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_COMP_SERVER);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetCompServer.runTask(e, args);
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_CLAN_MEMBERS))) {
-				commandLevel = GuildIni.getSetMaxClanMembersLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAX_CLAN_MEMBERS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetMaxClanMembers.runHelp(e);
+					return true;
+				}
+				else {
+					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_CLAN_MEMBERS))) {
-				commandLevel = GuildIni.getSetMaxClanMembersLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAX_CLAN_MEMBERS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetMaxClanMembers.runTask(e, args);
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MATCHMAKING_MEMBERS))) {
-				commandLevel = GuildIni.getSetMatchmakingMembersLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MATCHMAKING_MEMBERS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetMatchmakingMembers.runHelp(e);
+					return true;
+				}
+				else {
+					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MATCHMAKING_MEMBERS))) {
-				commandLevel = GuildIni.getSetMatchmakingMembersLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MATCHMAKING_MEMBERS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetMatchmakingMembers.runTask(e, args);
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAPS))) {
-				commandLevel = GuildIni.getSetMapsLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAPS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetMaps.runHelp(e);
+					return true;
+				}
+				else {
+					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAPS))) {
-				commandLevel = GuildIni.getSetMapsLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAPS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetMaps.runTask(e, args);
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LANGUAGE))) {
-				commandLevel = GuildIni.getSetLanguageLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_LANGUAGE);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetLanguage.runHelp(e);
+					return true;
+				}
+				else {
+					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LANGUAGE))) {
-				commandLevel = GuildIni.getSetLanguageLevel(e.getGuild().getIdLong());
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_LANGUAGE);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					SetLanguage.runTask(e, args);
+					return true;
 				}
 				else {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
@@ -481,13 +526,20 @@ public class Set implements CommandPublic {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
-		else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong())) {
+		else if(!botConfig.getIgnoreMissingPermissions()) {
 			UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 		}
+		return false;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("{} has used Set command for guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			logger.trace("{} has used Set command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SET.getColumn(), out.toString().trim());
+		}
 	}
 }

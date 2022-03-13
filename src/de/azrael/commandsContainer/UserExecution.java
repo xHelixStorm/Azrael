@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Bancollect;
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Channels;
 import de.azrael.constructors.Guilds;
@@ -26,12 +27,14 @@ import de.azrael.constructors.Watchlist;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
+import de.azrael.enums.Command;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.Pastebin;
@@ -46,8 +49,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 /**
  * Addition to the user command
- * @author xHelixStorm
- * 
  */ 
 
 public class UserExecution {
@@ -58,11 +59,11 @@ public class UserExecution {
 		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_HELP)).build()).queue();
 	}
 	
-	public static void runTask(GuildMessageReceivedEvent e, String _input, String _displayed_input) {
+	public static void runTask(GuildMessageReceivedEvent e, String _input, String _displayed_input, BotConfigs botConfig) {
 		var key = "user_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		
-		String name = _displayed_input.replaceAll("@", "");
+		String name = _displayed_input.replaceAll("[@<>!]", "");
 		String raw_input = _input;
 		String user_name = null;
 		
@@ -93,7 +94,7 @@ public class UserExecution {
 				user = Azrael.SQLgetJoinDatesFromUser(Long.parseLong(raw_input), e.getGuild().getIdLong(), user);
 				user_name = user.getUserName();
 			}
-			else if(raw_input.matches("[0-9]{17,18}") && GuildIni.getCacheLog(e.getGuild().getIdLong())) {
+			else if(raw_input.matches("[0-9]{17,18}") && botConfig.getCacheLog()) {
 				final var messages = Hashes.getMessagePool(e.getGuild().getIdLong(), Long.parseLong(raw_input));
 				if(messages != null) {
 					final var cachedMessage = messages.get(0);
@@ -136,7 +137,7 @@ public class UserExecution {
 		}
 	}
 	
-	public static void performAction(GuildMessageReceivedEvent e, String _message, Cache cache, ArrayList<Channels> _allChannels) {
+	public static void performAction(GuildMessageReceivedEvent e, String _message, Cache cache, ArrayList<Channels> _allChannels, BotConfigs botConfig) {
 		var key = "user_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
 		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail());
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
@@ -146,13 +147,15 @@ public class UserExecution {
 			if(comment.equals("exit")) {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_EXIT)).build()).queue();
 				Hashes.clearTempCache(key);
+				Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), e.getMessage().getContentRaw());
 				return;
 			}
 			var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 			if(!cache.getAdditionalInfo().matches("[a-zA-Z\\-]{1,}[\\d]*")) {
 				if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_INFORMATION))) {
-					final var informationLevel = GuildIni.getUserInformationLevel(e.getGuild().getIdLong());
-					if(UserPrivs.comparePrivilege(e.getMember(), informationLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+					final var command = BotConfiguration.SQLgetCommand(e.getGuild().getIdLong(), 2, Command.USER_INFORMATION, Command.USER_USE_WATCH_CHANNEL);
+					final var informationLevel = (Integer)command.get(0);
+					if(UserPrivs.comparePrivilege(e.getMember(), informationLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						User user = Azrael.SQLgetUserThroughID(cache.getAdditionalInfo(), e.getGuild().getIdLong());
 						if(user != null) {
 							user = Azrael.SQLgetJoinDatesFromUser(user_id, e.getGuild().getIdLong(), user);
@@ -168,7 +171,7 @@ public class UserExecution {
 							message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_JOIN_DATE), "**"+user.getOriginalJoinDate()+"**", true);
 							message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_NEW_JOIN_DATE), "**"+user.getNewestJoinDate()+"**", true);
 							var watchedUser = Azrael.SQLgetWatchlist(user_id, e.getGuild().getIdLong());
-							if(watchedUser == null || (watchedUser.hasHigherPrivileges() && !UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUserUseWatchChannelLevel(e.getGuild().getIdLong()))))
+							if(watchedUser == null || (watchedUser.hasHigherPrivileges() && !UserPrivs.comparePrivilege(e.getMember(), (Integer)command.get(1))))
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_WATCH_LEVEL), "**0**", true);
 							else
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_WATCH_LEVEL), "**"+watchedUser.getLevel()+"**", true);
@@ -214,7 +217,7 @@ public class UserExecution {
 									message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES)).setDescription(out.toString());
 								} catch(IllegalArgumentException iae2) {
 									try {
-										String pastebin_link = Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES), out.toString(), e.getGuild().getIdLong());
+										String pastebin_link = Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES), out.toString());
 										message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES)).setDescription(pastebin_link);
 									} catch (IllegalStateException | LoginException | PasteException e2) {
 										logger.error("Error on creating a pastebin page in guild {}", e.getGuild().getId(), e2);
@@ -232,7 +235,7 @@ public class UserExecution {
 									message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES)).setDescription(out.toString());
 								} catch(IllegalArgumentException iae2) {
 									try {
-										String pastebin_link = Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES), out.toString(), e.getGuild().getIdLong());
+										String pastebin_link = Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES), out.toString());
 										message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES)).setDescription(pastebin_link);
 									} catch (IllegalStateException | LoginException | PasteException e2) {
 										message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_NICKNAMES_ERR));
@@ -266,6 +269,7 @@ public class UserExecution {
 							e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_ERR)).build()).queue();
 							logger.error("Information of user {} couldn't be retrieved in guild {}", cache.getAdditionalInfo(), e.getGuild().getId());
 						}
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
 						UserPrivs.throwNotEnoughPrivilegeError(e, informationLevel);
@@ -275,11 +279,12 @@ public class UserExecution {
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_DELETE_MESSAGES))) {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE)) {
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_HISTORY)) {
-							final var deleteMessagesLevel = GuildIni.getUserDeleteMessagesLevel(e.getGuild().getIdLong());
-							if(UserPrivs.comparePrivilege(e.getMember(), deleteMessagesLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+							final var deleteMessagesLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_DELETE_MESSAGES);
+							if(UserPrivs.comparePrivilege(e.getMember(), deleteMessagesLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_HELP)).build()).queue();
 								cache.updateDescription("delete-messages"+user_id).setExpiration(180000);
 								Hashes.addTempCache(key, cache);
+								Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 							}
 							else {
 								UserPrivs.throwNotEnoughPrivilegeError(e, deleteMessagesLevel);
@@ -301,8 +306,8 @@ public class UserExecution {
 					}
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNING))) {
-					final var warningLevel = GuildIni.getUserWarningLevel(e.getGuild().getIdLong());
-					if(UserPrivs.comparePrivilege(e.getMember(), warningLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+					final var warningLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_WARNING);
+					if(UserPrivs.comparePrivilege(e.getMember(), warningLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_WARNING_HELP)).build()).queue();
 						cache.updateDescription("warning"+user_id).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
@@ -325,10 +330,10 @@ public class UserExecution {
 					//abort if the user is already muted and warn to unmute before muting again
 					if(!UserPrivs.isUserMuted(member)) {
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-							final var muteLevel = GuildIni.getUserMuteLevel(e.getGuild().getIdLong());
-							if(UserPrivs.comparePrivilege(e.getMember(), muteLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+							final var muteLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_MUTE);
+							if(UserPrivs.comparePrivilege(e.getMember(), muteLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 								message.setColor(Color.BLUE);
-								if(GuildIni.getForceReason(e.getGuild().getIdLong())) {
+								if(botConfig.getForceReason()) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REASON)).build()).queue();
 									cache.updateDescription("mute-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
 									Hashes.addTempCache(key, cache);
@@ -340,6 +345,7 @@ public class UserExecution {
 									cache.updateDescription("mute"+user_id).setExpiration(180000);
 									Hashes.addTempCache(key, cache);
 								}
+								Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 							}
 							else {
 								UserPrivs.throwNotEnoughPrivilegeError(e, muteLevel);
@@ -361,8 +367,8 @@ public class UserExecution {
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_UNMUTE))) {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
-						final var unmuteLevel = GuildIni.getUserUnmuteLevel(e.getGuild().getIdLong());
-						if(UserPrivs.comparePrivilege(e.getMember(), unmuteLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+						final var unmuteLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_UNMUTE);
+						if(UserPrivs.comparePrivilege(e.getMember(), unmuteLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 							if(!Azrael.SQLisBanned(user_id, e.getGuild().getIdLong())) {
 								if(Azrael.SQLgetCustomMuted(user_id, e.getGuild().getIdLong())) {
 									//write into cache for RoleTimer and RoleRemovedListener to use for any google API operation
@@ -393,7 +399,7 @@ public class UserExecution {
 											e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNMUTE_NOT_MUTED)).build()).queue();
 										}
 									}
-									else if(GuildIni.getOverrideBan(e.getGuild().getIdLong()) && Azrael.SQLgetWarning(user_id, e.getGuild().getIdLong()) == Azrael.SQLgetMaxWarning(e.getGuild().getIdLong()) && Azrael.SQLgetData(user_id, e.getGuild().getIdLong()).getUnmute() == null) {
+									else if(botConfig.getOverrideBan() && Azrael.SQLgetWarning(user_id, e.getGuild().getIdLong()) == Azrael.SQLgetMaxWarning(e.getGuild().getIdLong()) && Azrael.SQLgetData(user_id, e.getGuild().getIdLong()).getUnmute() == null) {
 										Member member = e.getGuild().getMemberById(user_id);
 										if(member != null) {
 											Azrael.SQLDeleteData(user_id, e.getGuild().getIdLong());
@@ -417,7 +423,7 @@ public class UserExecution {
 												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_UNMUTED)).setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNMUTE_INFINITE).replaceFirst("\\{\\}", e.getGuild().getMemberById(user_id).getUser().getName()+"#"+e.getGuild().getMemberById(user_id).getUser().getDiscriminator()).replace("{}", ""+user_id)).build()).queue();
 												Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, e.getGuild().getIdLong(), "Permanent mute terminated");
 												//Run google service, if enabled
-												if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+												if(botConfig.getGoogleFunctionalities()) {
 													final String [] array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE.id, "");
 													if(array != null && !array[0].equals("empty")) {
 														final String NA = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
@@ -441,7 +447,7 @@ public class UserExecution {
 											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_UNMUTED)).setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNMUTE_INFINITE).replaceFirst("\\{\\}", e.getGuild().getMemberById(user_id).getUser().getName()+"#"+e.getGuild().getMemberById(user_id).getUser().getDiscriminator()).replace("{}", ""+user_id)).build()).queue();
 											Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, e.getGuild().getIdLong(), "Permanent mute terminated");
 											//Run google service, if enabled
-											if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+											if(botConfig.getGoogleFunctionalities()) {
 												final String [] array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.UNMUTE.id, "");
 												if(array != null && !array[0].equals("empty")) {
 													final String NA = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
@@ -467,6 +473,7 @@ public class UserExecution {
 								e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNMUTE_IS_BANNED)).build()).queue();
 							}
 							logger.info("User {} has used the unmute action on user {} in guild {}", e.getMember().getUser().getId(), cache.getAdditionalInfo(), e.getGuild().getId());
+							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 						}
 						else {
 							UserPrivs.throwNotEnoughPrivilegeError(e, unmuteLevel);
@@ -490,10 +497,10 @@ public class UserExecution {
 						return;
 					}
 					if(e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
-						final var banLevel = GuildIni.getUserBanLevel(e.getGuild().getIdLong());
-						if(UserPrivs.comparePrivilege(e.getMember(), banLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+						final var banLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_BAN);
+						if(UserPrivs.comparePrivilege(e.getMember(), banLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 							message.setColor(Color.BLUE);
-							if(GuildIni.getForceReason(e.getGuild().getIdLong())) {
+							if(botConfig.getForceReason()) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REASON)).build()).queue();
 								cache.updateDescription("ban-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
 								Hashes.addTempCache(key, cache);
@@ -505,6 +512,7 @@ public class UserExecution {
 								cache.updateDescription("ban"+user_id).setExpiration(180000);
 								Hashes.addTempCache(key, cache);
 							}
+							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 						}
 						else {
 							UserPrivs.throwNotEnoughPrivilegeError(e, banLevel);
@@ -520,10 +528,10 @@ public class UserExecution {
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_UNBAN))) {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
-						final var unbanLevel = GuildIni.getUserUnbanLevel(e.getGuild().getIdLong());
-						if(UserPrivs.comparePrivilege(e.getMember(), unbanLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+						final var unbanLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_UNBAN);
+						if(UserPrivs.comparePrivilege(e.getMember(), unbanLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 							e.getGuild().retrieveBanById(user_id).queue(success -> {
-								if(GuildIni.getForceReason(e.getGuild().getIdLong())) {
+								if(botConfig.getForceReason()) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REASON)).build()).queue();
 									cache.updateDescription("unban-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
 									Hashes.addTempCache(key, cache);
@@ -540,6 +548,7 @@ public class UserExecution {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNBAN_NOT_BANNED)).build()).queue();
 								Hashes.clearTempCache(key);
 							});
+							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 						}
 						else {
 							UserPrivs.throwNotEnoughPrivilegeError(e, unbanLevel);
@@ -567,10 +576,10 @@ public class UserExecution {
 						return;
 					}
 					if(e.getGuild().getSelfMember().hasPermission(Permission.KICK_MEMBERS)) {
-						final var kickLevel = GuildIni.getUserKickLevel(e.getGuild().getIdLong());
-						if(UserPrivs.comparePrivilege(e.getMember(), kickLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+						final var kickLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_KICK);
+						if(UserPrivs.comparePrivilege(e.getMember(), kickLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 							message.setColor(Color.BLUE);
-							if(GuildIni.getForceReason(e.getGuild().getIdLong())) {
+							if(botConfig.getForceReason()) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REASON)).build()).queue();
 								cache.updateDescription("kick-reason"+cache.getAdditionalInfo().replaceAll("[^0-9]*", "")).setExpiration(180000);
 								Hashes.addTempCache(key, cache);
@@ -582,6 +591,7 @@ public class UserExecution {
 								cache.updateDescription("kick"+user_id).setExpiration(180000);
 								Hashes.addTempCache(key, cache);
 							}
+							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 						}
 						else {
 							UserPrivs.throwNotEnoughPrivilegeError(e, kickLevel);
@@ -596,8 +606,8 @@ public class UserExecution {
 					}
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ASSIGN_ROLE))) {
-					final var assignRoleLevel = GuildIni.getUserAssignRoleLevel(e.getGuild().getIdLong());
-					if(UserPrivs.comparePrivilege(e.getMember(), assignRoleLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+					final var assignRoleLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_ASSIGN_ROLE);
+					if(UserPrivs.comparePrivilege(e.getMember(), assignRoleLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						int count = 0;
 						ArrayList<Long> roles = new ArrayList<Long>();
 						StringBuilder out = new StringBuilder();
@@ -617,6 +627,7 @@ public class UserExecution {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_ASSIGN_NO_ROLES)).build()).queue();
 							Hashes.clearTempCache(key);
 						}
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
 						UserPrivs.throwNotEnoughPrivilegeError(e, assignRoleLevel);
@@ -624,8 +635,8 @@ public class UserExecution {
 					}
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_ROLE))) {
-					final var removeRoleLevel = GuildIni.getUserRemoveRoleLevel(e.getGuild().getIdLong());
-					if(UserPrivs.comparePrivilege(e.getMember(), removeRoleLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+					final var removeRoleLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_REMOVE_ROLE);
+					if(UserPrivs.comparePrivilege(e.getMember(), removeRoleLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						int count = 0;
 						ArrayList<Long> roles = new ArrayList<Long>();
 						StringBuilder out = new StringBuilder();
@@ -645,6 +656,7 @@ public class UserExecution {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REMOVE_NO_ROLES)).build()).queue();
 							Hashes.clearTempCache(key);
 						}
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
 						UserPrivs.throwNotEnoughPrivilegeError(e, removeRoleLevel);
@@ -652,8 +664,8 @@ public class UserExecution {
 					}
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_HISTORY))) {
-					final var historyLevel = GuildIni.getUserHistoryLevel(e.getGuild().getIdLong());
-					if(UserPrivs.comparePrivilege(e.getMember(), historyLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+					final var historyLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_HISTORY);
+					if(UserPrivs.comparePrivilege(e.getMember(), historyLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						StringBuilder out = new StringBuilder();
 						for(var history : Azrael.SQLgetHistory(user_id, e.getGuild().getIdLong())) {
 							if(history.getType().equals("roleAdd"))
@@ -669,6 +681,7 @@ public class UserExecution {
 						else
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_TITLE_EMPTY)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_HISTORY_EMPTY)).build()).queue();
 						Hashes.clearTempCache(key);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
 						UserPrivs.throwNotEnoughPrivilegeError(e, historyLevel);
@@ -676,9 +689,9 @@ public class UserExecution {
 					}
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCH))) {
-					final var watchLevel = GuildIni.getUserWatchLevel(e.getGuild().getIdLong());
-					if(UserPrivs.comparePrivilege(e.getMember(), watchLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
-						if(!GuildIni.getCacheLog(e.getGuild().getIdLong())) {
+					final var watchLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_WATCH);
+					if(UserPrivs.comparePrivilege(e.getMember(), watchLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+						if(!botConfig.getCacheLog()) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_WARNING)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_WATCH_CACHE)).build()).queue();
 						}
 						message.setColor(Color.BLUE);
@@ -686,6 +699,7 @@ public class UserExecution {
 						e.getChannel().sendMessage(message.build()).queue();
 						cache.updateDescription("watch"+user_id);
 						Hashes.addTempCache(key, cache);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
 						UserPrivs.throwNotEnoughPrivilegeError(e, watchLevel);
@@ -693,8 +707,9 @@ public class UserExecution {
 					}
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_UNWATCH))) {
-					final var unwatchLevel = GuildIni.getUserUnwatchLevel(e.getGuild().getIdLong());
-					if(UserPrivs.comparePrivilege(e.getMember(), unwatchLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+					final var command = BotConfiguration.SQLgetCommand(e.getGuild().getIdLong(), 2, Command.USER_UNWATCH, Command.USER_USE_WATCH_CHANNEL);
+					final var unwatchLevel = (Integer)command.get(0);
+					if(UserPrivs.comparePrivilege(e.getMember(), unwatchLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						var watchedMember = Azrael.SQLgetWatchlist(user_id, e.getGuild().getIdLong());
 						if(watchedMember != null) {
 							if(!watchedMember.hasHigherPrivileges()) {
@@ -712,7 +727,7 @@ public class UserExecution {
 									logger.error("User {} couldn't be removed from the watchlist in guild {}", user_id, e.getGuild().getId());
 								}
 							}
-							else if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUserUseWatchChannelLevel(e.getGuild().getIdLong()))) {
+							else if(UserPrivs.comparePrivilege(e.getMember(), (Integer)command.get(1))) {
 								//Higher privileges required to unwatch a member that is assigned to a separate watchlist channel
 								if(Azrael.SQLDeleteWatchlist(user_id, e.getGuild().getIdLong()) > 0) {
 									//Successful unwatch operation
@@ -738,6 +753,7 @@ public class UserExecution {
 							message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED);
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNWATCH_NOT_WATCHED)).build()).queue();
 						}
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
 						UserPrivs.throwNotEnoughPrivilegeError(e, unwatchLevel);
@@ -745,8 +761,8 @@ public class UserExecution {
 					Hashes.clearTempCache(key);
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_EXPERIENCE))) {
-					final var giftExperienceLevel = GuildIni.getUserGiftExperienceLevel(e.getGuild().getIdLong());
-					if(UserPrivs.comparePrivilege(e.getMember(), giftExperienceLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+					final var giftExperienceLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_GIFT_EXPERIENCE);
+					if(UserPrivs.comparePrivilege(e.getMember(), giftExperienceLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						if(guild_settings.getRankingState()) {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_GIFT_EXP)).build()).queue();
 							cache.updateDescription("gift-experience"+user_id).setExpiration(180000);
@@ -757,6 +773,7 @@ public class UserExecution {
 							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 							Hashes.clearTempCache(key);
 						}
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
 						UserPrivs.throwNotEnoughPrivilegeError(e, giftExperienceLevel);
@@ -764,8 +781,8 @@ public class UserExecution {
 					}
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_EXPERIENCE))) {
-					final var setExperienceLevel = GuildIni.getUserSetExperienceLevel(e.getGuild().getIdLong());
-					if(UserPrivs.comparePrivilege(e.getMember(), setExperienceLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+					final var setExperienceLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_SET_EXPERIENCE);
+					if(UserPrivs.comparePrivilege(e.getMember(), setExperienceLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						if(guild_settings.getRankingState()) {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_SET_EXP)).build()).queue();
 							cache.updateDescription("set-experience"+user_id).setExpiration(180000);
@@ -776,6 +793,7 @@ public class UserExecution {
 							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 							Hashes.clearTempCache(key);
 						}
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
 						UserPrivs.throwNotEnoughPrivilegeError(e, setExperienceLevel);
@@ -783,8 +801,8 @@ public class UserExecution {
 					}
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_LEVEL))) {
-					final var setLevelLevel = GuildIni.getUserSetLevelLevel(e.getGuild().getIdLong());
-					if(UserPrivs.comparePrivilege(e.getMember(), setLevelLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+					final var setLevelLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_SET_LEVEL);
+					if(UserPrivs.comparePrivilege(e.getMember(), setLevelLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						if(guild_settings.getRankingState()) {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_LEVEL)).build()).queue();
 							cache.updateDescription("set-level"+user_id).setExpiration(180000);
@@ -795,6 +813,7 @@ public class UserExecution {
 							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 							Hashes.clearTempCache(key);
 						}
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
 						UserPrivs.throwNotEnoughPrivilegeError(e, setLevelLevel);
@@ -802,8 +821,8 @@ public class UserExecution {
 					}
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_CURRENCY))) {
-					final var giftCurrencyLevel = GuildIni.getUserGiftCurrencyLevel(e.getGuild().getIdLong());
-					if(UserPrivs.comparePrivilege(e.getMember(), giftCurrencyLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+					final var giftCurrencyLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_GIFT_CURRENCY);
+					if(UserPrivs.comparePrivilege(e.getMember(), giftCurrencyLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						if(guild_settings.getRankingState()) {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_GIFT_CUR)).build()).queue();
 							cache.updateDescription("gift-currency"+user_id).setExpiration(180000);
@@ -814,6 +833,7 @@ public class UserExecution {
 							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 							Hashes.clearTempCache(key);
 						}
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
 						UserPrivs.throwNotEnoughPrivilegeError(e, giftCurrencyLevel);
@@ -821,8 +841,8 @@ public class UserExecution {
 					}
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_CURRENCY))) {
-					final var setCurrencyLevel = GuildIni.getUserSetCurrencyLevel(e.getGuild().getIdLong());
-					if(UserPrivs.comparePrivilege(e.getMember(), setCurrencyLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+					final var setCurrencyLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_SET_CURRENCY);
+					if(UserPrivs.comparePrivilege(e.getMember(), setCurrencyLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						if(guild_settings.getRankingState()) {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_SET_CUR)).build()).queue();
 							cache.updateDescription("set-currency"+user_id).setExpiration(180000);
@@ -833,6 +853,7 @@ public class UserExecution {
 							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 							Hashes.clearTempCache(key);
 						}
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
 						UserPrivs.throwNotEnoughPrivilegeError(e, setCurrencyLevel);
@@ -849,16 +870,18 @@ public class UserExecution {
 					}
 					else {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_DELETING)).build()).queue();
-						deleteMessages(e, user_id, _message, Integer.parseInt(cache.getAdditionalInfo3()), message, key, true);
+						deleteMessages(e, user_id, _message, Integer.parseInt(cache.getAdditionalInfo3()), message, key, true, botConfig);
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 				}
 				else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_ABORT)).build()).queue();
 					Hashes.clearTempCache(key);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_DELETE_MESSAGES.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("delete-messages")) {
-				deleteMessages(e, user_id, _message, 0, message, key, false);
+				deleteMessages(e, user_id, _message, 0, message, key, false, botConfig);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("warning")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
@@ -899,7 +922,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUserWarningForceLevel(e.getGuild().getIdLong())) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
+							if(UserPrivs.comparePrivilege(e.getMember(), STATIC.getCommandLevel(e.getGuild(), Command.USER_WARNING_FORCE)) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 								int warning_id = Integer.parseInt(_message.replaceAll("[^0-9]*", ""));
 								int max_warning_id = Azrael.SQLgetMaxWarning(e.getGuild().getIdLong());
 								if(warning_id <= max_warning_id) {
@@ -932,6 +955,7 @@ public class UserExecution {
 						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_WARNING_IS_MUTED)).build()).queue();
 					}
 					Hashes.clearTempCache(key);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_WARNING.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("mute")) {
@@ -939,33 +963,37 @@ public class UserExecution {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REASON)).build()).queue();
 					cache.updateDescription("mute-reason"+user_id).setExpiration(180000);
 					Hashes.addTempCache(key, cache);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_MUTE.getColumn(), _message);
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {
 					message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_YES), STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_TIME), true);
 					message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_NO), STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_NO_TIME), true);
-					if(GuildIni.getOverrideBan(e.getGuild().getIdLong()))
+					if(botConfig.getOverrideBan())
 						message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_PERM), STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_PERM_DESC), true);
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_CHOICE)).build()).queue();
 					cache.updateDescription("mute-action"+user_id).setExpiration(180000).updateDescription2(STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON));
 					Hashes.addTempCache(key, cache);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_MUTE.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("mute-reason")) {
 				message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_YES), STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_TIME), true);
 				message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_NO), STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_NO_TIME), true);
-				if(GuildIni.getOverrideBan(e.getGuild().getIdLong()))
+				if(botConfig.getOverrideBan())
 					message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_PERM), STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_PERM_DESC), true);
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_CHOICE)).build()).queue();
 				cache.updateDescription("mute-action"+user_id).updateDescription2(_message).setExpiration(180000);
 				Hashes.addTempCache(key, cache);
+				Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_MUTE.getColumn(), _message);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("mute-action")) {
 				if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_YES))) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_FORMAT)).build()).queue();
 					cache.updateDescription("mute-time"+user_id).setExpiration(180000);
 					Hashes.addTempCache(key, cache);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_MUTE.getColumn(), _message);
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO)) || (GuildIni.getOverrideBan(e.getGuild().getIdLong()) && comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PERM)))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO)) || (botConfig.getOverrideBan() && comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PERM)))) {
 					boolean permMute = false;
 					if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PERM)))
 						permMute = true;
@@ -999,7 +1027,7 @@ public class UserExecution {
 							var mute_time = (long)Azrael.SQLgetWarning(e.getGuild().getIdLong(), Azrael.SQLgetData(user_id, e.getGuild().getIdLong()).getWarningID()+1).getTimer();
 							Azrael.SQLInsertHistory(user_id, e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), (mute_time/1000/60), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
 							e.getChannel().sendMessage(message.setDescription((permMute ? STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_ORDER_2) : STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_ORDER_1))).build()).queue();
-							checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key);
+							checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key, botConfig);
 						}
 						else {
 							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_MUTE_ROLE)).build()).queue();
@@ -1012,6 +1040,7 @@ public class UserExecution {
 						logger.warn("MANAGE ROLES permission required to mute a user in guild {}", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_MUTE.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("mute-time")) {
@@ -1062,7 +1091,7 @@ public class UserExecution {
 							Azrael.SQLInsertHistory(e.getGuild().getMemberById(user_id).getUser().getIdLong(), e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), (mute_time/1000/60), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_ORDER_1)).build()).queue();
 							logger.info("User {} has muted user {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
-							checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key);
+							checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key, botConfig);
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_MUTE_ROLE)).build()).queue();
@@ -1075,6 +1104,7 @@ public class UserExecution {
 						logger.warn("MANAGE ROLES permission required to mute a user in guild {}!", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_MUTE.getColumn(), _message);
 				}
 				else {
 					e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_NUMERIC)).build()).queue();
@@ -1085,10 +1115,12 @@ public class UserExecution {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REMINDER_SET)).build()).queue();
 					Azrael.SQLInsertReminder(user_id, e.getGuild().getIdLong(), "mute", cache.getAdditionalInfo2(), e.getMember().getUser().getId(), cache.getAdditionalInfo3());
 					Hashes.clearTempCache(key);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_MUTE.getColumn(), _message);
 				}
 				else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REMINDER_NOT_SET)).build()).queue();
 					Hashes.clearTempCache(key);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_MUTE.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban")) {
@@ -1096,6 +1128,7 @@ public class UserExecution {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REASON)).build()).queue();
 					cache.updateDescription("ban-reason"+user_id).setExpiration(180000);
 					Hashes.addTempCache(key, cache);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_BAN.getColumn(), _message);
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {
 					Member member = e.getGuild().getMemberById(user_id);
@@ -1114,7 +1147,7 @@ public class UserExecution {
 							e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().queue(channel -> {
 								if(warning_id == max_warning_id) {
 									channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM).replace("{}", e.getGuild().getName())
-										+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
+										+ (GuildIni.getBanSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
 											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_ORDER)).build()).queue();
 											e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(reason).queue();
 										}, err -> {
@@ -1124,7 +1157,7 @@ public class UserExecution {
 								}
 								else {
 									channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2).replace("{}", e.getGuild().getName())
-										+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
+										+ (GuildIni.getBanSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
 											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_ORDER)).build()).queue();
 											e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(reason).queue();
 										}, err -> {
@@ -1135,7 +1168,7 @@ public class UserExecution {
 							});
 							Azrael.SQLInsertHistory(user_id, e.getGuild().getIdLong(), "ban", reason, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
 							logger.info("User {} has banned user {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
-							checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key);
+							checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key, botConfig);
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_LEFT)).addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_YES), "", true).addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_NO), "", true).build()).queue();
@@ -1149,6 +1182,7 @@ public class UserExecution {
 						logger.warn("BAN MEMBERS permission required to ban a user in guild {}", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_BAN.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban-reason")) {
@@ -1167,7 +1201,7 @@ public class UserExecution {
 						e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().queue(channel -> {
 							if(warning_id == max_warning_id) {
 								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM).replace("{}", e.getGuild().getName())
-									+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
+									+ (GuildIni.getBanSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
 										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_ORDER)).build()).queue();
 										e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
 									}, err -> {
@@ -1177,7 +1211,7 @@ public class UserExecution {
 							}
 							else {
 								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2).replace("{}", e.getGuild().getName())
-									+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
+									+ (GuildIni.getBanSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
 										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_ORDER)).build()).queue();
 										e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
 									}, err -> {
@@ -1188,7 +1222,7 @@ public class UserExecution {
 						});
 						Azrael.SQLInsertHistory(e.getGuild().getMemberById(user_id).getUser().getIdLong(), e.getGuild().getIdLong(), "ban", _message, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
 						logger.info("User {} has banned user {} in guild {}", e.getMember().getUser().getId(), cache.getAdditionalInfo().replaceAll("[^0-9]",  ""), e.getGuild().getId());
-						checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key);
+						checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key, botConfig);
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_LEFT)).addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_YES), "", true).addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_NO), "", true).build()).queue();
@@ -1202,16 +1236,19 @@ public class UserExecution {
 					logger.warn("BAN MEMBERS permission required to ban a user in guild {}", e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
+				Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_BAN.getColumn(), _message);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("ban-delay")) {
 				if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_YES))) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REMINDER_SET)).build()).queue();
 					Azrael.SQLInsertReminder(user_id, e.getGuild().getIdLong(), "ban", cache.getAdditionalInfo2(), e.getMember().getUser().getId(), "");
 					Hashes.clearTempCache(key);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_BAN.getColumn(), _message);
 				}
 				else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REMINDER_NOT_SET)).build()).queue();
 					Hashes.clearTempCache(key);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_BAN.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("unban")) {
@@ -1219,6 +1256,7 @@ public class UserExecution {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REASON)).build()).queue();
 					cache.updateDescription("unban-reason"+user_id).setExpiration(180000);
 					Hashes.addTempCache(key, cache);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_UNBAN.getColumn(), _message);
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
@@ -1238,6 +1276,7 @@ public class UserExecution {
 						logger.warn("BAN MEMBERS permission required to unban a user in guild {}", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_UNBAN.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("unban-reason")) {
@@ -1257,12 +1296,14 @@ public class UserExecution {
 					logger.warn("BAN MEMBERS permission required to unban a user in guild {}", e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
+				Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_UNBAN.getColumn(), _message);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("kick")) {
 				if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_YES))) {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REASON)).build()).queue();
 					cache.updateDescription("kick-reason"+user_id).setExpiration(180000);
 					Hashes.addTempCache(key, cache);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_KICK.getColumn(), _message);
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {
 					Member member = e.getGuild().getMemberById(user_id);
@@ -1279,7 +1320,7 @@ public class UserExecution {
 							Hashes.addTempCache("kick_gu"+e.getGuild().getId()+"us"+user_id, new Cache(e.getMember().getUser().getId(), reason));
 							member.getUser().openPrivateChannel().queue(channel -> {
 								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_KICK_DM)
-									+ (GuildIni.getKickSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
+									+ (GuildIni.getKickSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
 										e.getGuild().kick(member).reason(reason).queue();
 									}, err -> {
 										e.getGuild().kick(member).reason(reason).queue();
@@ -1288,7 +1329,7 @@ public class UserExecution {
 							});
 							Azrael.SQLInsertHistory(e.getGuild().getMemberById(user_id).getUser().getIdLong(), e.getGuild().getIdLong(), "kick", reason, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
 							logger.info("User {} has kicked user {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getId());
-							checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key);
+							checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key, botConfig);
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_KICK_LEFT)).build()).queue();
@@ -1301,6 +1342,7 @@ public class UserExecution {
 						logger.warn("KICK MEMBERS permission required to kick a user in guild {}!", e.getGuild().getId());
 						Hashes.clearTempCache(key);
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_KICK.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("kick-reason")) {
@@ -1317,7 +1359,7 @@ public class UserExecution {
 						Hashes.addTempCache("kick_gu"+e.getGuild().getId()+"us"+user_id, new Cache(e.getMember().getId(), _message));
 						member.getUser().openPrivateChannel().queue(channel -> {
 							channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_KICK_DM)
-								+ (GuildIni.getKickSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
+								+ (GuildIni.getKickSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
 									e.getGuild().kick(member).reason(_message).queue();
 								}, err -> {
 									e.getGuild().kick(member).reason(_message).queue();
@@ -1326,7 +1368,7 @@ public class UserExecution {
 						});
 						Azrael.SQLInsertHistory(e.getGuild().getMemberById(user_id).getUser().getIdLong(), e.getGuild().getIdLong(), "kick", _message, 0, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator());
 						logger.info("User {} has kicked user {} in guild {}", e.getMember().getUser().getId(), user_id, e.getGuild().getName());
-						checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key);
+						checkIfDeleteMessagesAfterAction(e, cache, user_id, _message, message, key, botConfig);
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_KICK_LEFT)).build()).queue();
@@ -1339,6 +1381,7 @@ public class UserExecution {
 					logger.warn("KICK MEMBERS permission required to kick a user in guild {}", e.getGuild().getId());
 					Hashes.clearTempCache(key);
 				}
+				Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_KICK.getColumn(), _message);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("assign-role")) {
 				@SuppressWarnings("unchecked")
@@ -1385,6 +1428,7 @@ public class UserExecution {
 						cache.setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_ASSIGN_ROLE.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("remove-role")) {
@@ -1432,10 +1476,11 @@ public class UserExecution {
 						cache.setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_REMOVE_ROLE.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("watch")) {
-				if(UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUserUseWatchChannelLevel(e.getGuild().getIdLong())) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong())) {
+				if(UserPrivs.comparePrivilege(e.getMember(), STATIC.getCommandLevel(e.getGuild(), Command.USER_USE_WATCH_CHANNEL)) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 					var trash_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.TRA.getType())).findAny().orElse(null);
 					var watch_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.WAT.getType())).findAny().orElse(null);
 					if(trash_channel != null || watch_channel != null) {
@@ -1520,6 +1565,7 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
+				Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_WATCH.getColumn(), _message);
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*",	"").equals("gift-experience")) {
 				if(_message.replaceAll("[0-9]*", "").length() == 0) {
@@ -1564,7 +1610,7 @@ public class UserExecution {
 							if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 								Member member = e.getGuild().getMemberById(user_id);
 								if(member != null) {
-									if(!GuildIni.getCollectRankingRoles(e.getGuild().getIdLong())) {
+									if(!botConfig.getCollectRankingRoles()) {
 										member.getRoles().parallelStream().forEach(r -> {
 											roles.parallelStream().forEach(role -> {
 												if(r.getIdLong() == role.getRole_ID())
@@ -1593,6 +1639,7 @@ public class UserExecution {
 						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("The amount of {} experience points couldn't be gifted to user {} in guild {}", _message, user_id, e.getGuild().getId());
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_GIFT_EXPERIENCE.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("set-experience")) {
@@ -1605,7 +1652,6 @@ public class UserExecution {
 					int level = 0;
 					long assign_role = 0;
 					boolean toBreak = false;
-					boolean collectRankingRoles = GuildIni.getCollectRankingRoles(e.getGuild().getIdLong());
 					Set<Long> rankingRoles = new HashSet<Long>();
 					var roles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
 					for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong())) {
@@ -1616,7 +1662,7 @@ public class UserExecution {
 							var role = roles.parallelStream().filter(f -> f.getLevel() == ranks.getLevel()).findAny().orElse(null);
 							if(role != null) {
 								assign_role = role.getRole_ID();
-								if(collectRankingRoles)
+								if(botConfig.getCollectRankingRoles())
 									rankingRoles.add(assign_role);
 							}
 						}
@@ -1642,7 +1688,7 @@ public class UserExecution {
 							if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 								Member member = e.getGuild().getMemberById(user_id);
 								if(member != null) {
-									if(!collectRankingRoles) {
+									if(!botConfig.getCollectRankingRoles()) {
 										member.getRoles().parallelStream().forEach(r -> {
 											roles.parallelStream().forEach(role -> {
 												if(r.getIdLong() == role.getRole_ID())
@@ -1650,7 +1696,7 @@ public class UserExecution {
 											});
 										});
 									}
-									if(!collectRankingRoles && assign_role != 0) {
+									if(!botConfig.getCollectRankingRoles() && assign_role != 0) {
 										e.getGuild().addRoleToMember(member, e.getGuild().getRoleById(assign_role)).queue();
 									}
 									else {
@@ -1676,6 +1722,7 @@ public class UserExecution {
 						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("The amount of {} experience points couldn't be set for user {} in guild {}", _message, user_id, e.getGuild().getId());
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_SET_EXPERIENCE.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("set-level")) {
@@ -1687,14 +1734,13 @@ public class UserExecution {
 						long rankUpExperience = 0;
 						long assign_role = 0;
 						boolean toBreak = false;
-						boolean collectRankingRoles = GuildIni.getCollectRankingRoles(e.getGuild().getIdLong());
 						Set<Long> rankingRoles = new HashSet<Long>();
 						var roles = RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
 						for(final var ranks : RankingSystem.SQLgetLevels(e.getGuild().getIdLong())) {
 							var role = roles.parallelStream().filter(f -> f.getLevel() == ranks.getLevel()).findAny().orElse(null);
 							if(role != null && toBreak == false) {
 								assign_role = role.getRole_ID();
-								if(collectRankingRoles)
+								if(botConfig.getCollectRankingRoles())
 									rankingRoles.add(assign_role);
 							}
 							if(level == ranks.getLevel()) {
@@ -1719,7 +1765,7 @@ public class UserExecution {
 								if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 									Member member = e.getGuild().getMemberById(user_id);
 									if(member != null) {
-										if(!collectRankingRoles) {
+										if(!botConfig.getCollectRankingRoles()) {
 											member.getRoles().parallelStream().forEach(r -> {
 												roles.parallelStream().forEach(role -> {
 													if(r.getIdLong() == role.getRole_ID())
@@ -1727,7 +1773,7 @@ public class UserExecution {
 												});
 											});
 										}
-										if(!collectRankingRoles && assign_role != 0) {
+										if(!botConfig.getCollectRankingRoles() && assign_role != 0) {
 											e.getGuild().addRoleToMember(member, e.getGuild().getRoleById(assign_role)).queue();
 										}
 										else {
@@ -1757,6 +1803,7 @@ public class UserExecution {
 					else {
 						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_LEVEL_ERR).replace("{}", ""+guild_settings.getMaxLevel())).build()).queue();
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_SET_LEVEL.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("gift-currency")) {
@@ -1776,6 +1823,7 @@ public class UserExecution {
 						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("The amount of {} money couldn't be gifted to user {} in guild {}", _message, user_id, e.getGuild().getId());
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_GIFT_CURRENCY.getColumn(), _message);
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("set-currency")) {
@@ -1795,6 +1843,7 @@ public class UserExecution {
 						e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Currency of user {} couldn't be set to {} in guild {}", user_id, _message, e.getGuild().getId());
 					}
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_SET_CURRENCY.getColumn(), _message);
 				}
 			}
 		}
@@ -1803,14 +1852,14 @@ public class UserExecution {
 		}
 	}
 	
-	private static void checkIfDeleteMessagesAfterAction(GuildMessageReceivedEvent e, Cache cache, long user_id, String _message, EmbedBuilder message, String key) {
-		if(!GuildIni.getMuteMessageDeleteEnabled(e.getGuild().getIdLong()))
+	private static void checkIfDeleteMessagesAfterAction(GuildMessageReceivedEvent e, Cache cache, long user_id, String _message, EmbedBuilder message, String key, BotConfigs botConfig) {
+		if(!GuildIni.getMuteMessageDeleteEnabled(e.getGuild()))
 			Hashes.clearTempCache(key);
 		else {
-			var removeMessages = GuildIni.getMuteAutoDeleteMessages(e.getGuild().getIdLong());
-			if(GuildIni.getMuteForceMessageDeletion(e.getGuild().getIdLong())) {
+			var removeMessages = GuildIni.getMuteAutoDeleteMessages(e.getGuild());
+			if(GuildIni.getMuteForceMessageDeletion(e.getGuild())) {
 				if(removeMessages > 0) {
-					deleteMessages(e, user_id, _message, removeMessages, message, key, true);
+					deleteMessages(e, user_id, _message, removeMessages, message, key, true, botConfig);
 				}
 				else {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_HELP)).build()).queueAfter(1, TimeUnit.SECONDS);
@@ -1829,7 +1878,7 @@ public class UserExecution {
 		}
 	}
 	
-	private static void deleteMessages(GuildMessageReceivedEvent e, long user_id, String _message, int messagesCount, EmbedBuilder message, String key, boolean passValue) {
+	private static void deleteMessages(GuildMessageReceivedEvent e, long user_id, String _message, int messagesCount, EmbedBuilder message, String key, boolean passValue, BotConfigs botConfig) {
 		if(_message.replaceAll("[0-9]*", "").length() == 0 || passValue) {
 			EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 			int value = (passValue ? messagesCount : Integer.parseInt(_message));
@@ -1882,7 +1931,7 @@ public class UserExecution {
 						if(collected_messages.length() > 0) {
 							try {
 								final var userMessage = messages.get(0).get(0);
-								String paste_link = Pastebin.unlistedPermanentPaste(userMessage.getUserName()+" ("+userMessage.getUserID()+") "+e.getGuild().getId(), hash_counter+" messages from "+userMessage.getUserName()+" ("+userMessage.getUserID()+") have been removed:\n\n"+collected_messages.toString(), e.getGuild().getIdLong());
+								String paste_link = Pastebin.unlistedPermanentPaste(userMessage.getUserName()+" ("+userMessage.getUserID()+") "+e.getGuild().getId(), hash_counter+" messages from "+userMessage.getUserName()+" ("+userMessage.getUserID()+") have been removed:\n\n"+collected_messages.toString());
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_REMOVED)+paste_link).build()).queue();
 								Azrael.SQLInsertActionLog("MESSAGES_DELETED", user_id, e.getGuild().getIdLong(), paste_link);
 								logger.info("User {} has deleted {} messages of user {} in guild {}", e.getMember().getUser().getId(), hash_counter, userMessage.getUserID(), e.getGuild().getId());
@@ -1897,7 +1946,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							if(GuildIni.getCacheLog(e.getGuild().getIdLong()))
+							if(botConfig.getCacheLog())
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_NOTHING)).build()).queue();
 							else
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_NOTHING_2)).build()).queue();
@@ -1909,13 +1958,14 @@ public class UserExecution {
 					}
 				}
 				else {
-					if(GuildIni.getCacheLog(e.getGuild().getIdLong()))
+					if(botConfig.getCacheLog())
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_NOTHING)).build()).queue();
 					else
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_NOTHING_2)).build()).queue();
 				}
 			}
 			Hashes.clearTempCache(key);
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_DELETE_MESSAGES.getColumn(), _message);
 		}
 	}
 }

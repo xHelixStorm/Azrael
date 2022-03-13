@@ -16,15 +16,13 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.fileManagement.IniFileReader;
-
 public class Imgur {
 	private final static Logger logger = LoggerFactory.getLogger(Imgur.class);
 	private final static String IMAGE_UPLOAD = "https://api.imgur.com/3/image";
 	
 	public static String uploadFile(File file) {
-		final String clientID = IniFileReader.getImgurClientID();
-		if(clientID != null && clientID.length() > 0) {
+		final String clientID = System.getProperty("IMGUR_API_KEY");
+		if(clientID.length() > 0) {
 			ByteArrayOutputStream byteArray = null;
 			InputStream is = null;
 			OutputStreamWriter wr = null;

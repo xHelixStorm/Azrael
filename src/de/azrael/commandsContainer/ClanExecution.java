@@ -14,6 +14,7 @@ import de.azrael.constructors.Cache;
 import de.azrael.constructors.Clan;
 import de.azrael.constructors.ClanMember;
 import de.azrael.core.Hashes;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.Competitive;
@@ -76,6 +77,7 @@ public class ClanExecution {
 			logger.error("Clans couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.CLAN.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void apply(GuildMessageReceivedEvent e, String [] args, Cache cache) {
@@ -162,6 +164,7 @@ public class ClanExecution {
 			logger.error("Clan with the name {} couldn't be retrieved in guild {}", clanName, e.getGuild().getId());
 			Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.CLAN.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void create(GuildMessageReceivedEvent e, String [] args, Cache cache) {
@@ -204,6 +207,7 @@ public class ClanExecution {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.CLAN_CREATE_ERR)).build()).queue();
 			Hashes.addTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.CLAN.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void members(GuildMessageReceivedEvent e, Cache cache) {
@@ -246,6 +250,7 @@ public class ClanExecution {
 			logger.error("Clan members couldn't be retrieved from clan {} in guild {}", clan_id, e.getGuild().getId());
 			Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.CLAN.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void leave(GuildMessageReceivedEvent e, String [] args, Cache cache) {
@@ -301,6 +306,7 @@ public class ClanExecution {
 			logger.error("Clan name couldn't be retrieved from clan {} in guild {}", clan_id, e.getGuild().getId());
 			Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.CLAN.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void kick(GuildMessageReceivedEvent e, String [] args, int memberLevel, Cache cache) {
@@ -331,6 +337,7 @@ public class ClanExecution {
 				Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.CLAN.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void invite(GuildMessageReceivedEvent e, String [] args, Cache cache) {
@@ -385,6 +392,7 @@ public class ClanExecution {
 				Hashes.addTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.CLAN.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void promote(GuildMessageReceivedEvent e, String [] args, Cache cache) {
@@ -424,6 +432,7 @@ public class ClanExecution {
 				Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.CLAN.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void icon(GuildMessageReceivedEvent e, String [] args, Cache cache) {
@@ -450,6 +459,7 @@ public class ClanExecution {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.CLAN_ICON_ERR)).build()).queue();
 			Hashes.addTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.CLAN.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void delegate(GuildMessageReceivedEvent e, String [] args, Cache cache) {
@@ -467,6 +477,7 @@ public class ClanExecution {
 				Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.CLAN.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void disband(GuildMessageReceivedEvent e, Cache cache) {
@@ -495,6 +506,7 @@ public class ClanExecution {
 			logger.error("Clan members couldn't be retrieved from clan {} in guild {}", clan_id, e.getGuild().getId());
 			Hashes.clearTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.CLAN.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	private static ClanMember validateUser(GuildMessageReceivedEvent e, String [] args, Cache cache, int clan_id, int memberLevel, boolean validateClan, boolean validateUser, boolean validateNotInClan) {

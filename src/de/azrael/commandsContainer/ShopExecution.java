@@ -12,9 +12,11 @@ import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Skins;
 import de.azrael.constructors.Weapons;
 import de.azrael.core.Hashes;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.enums.WeaponEffect;
 import de.azrael.fileManagement.IniFileReader;
+import de.azrael.sql.Azrael;
 import de.azrael.sql.RankingSystem;
 import de.azrael.sql.RankingSystemItems;
 import de.azrael.util.STATIC;
@@ -65,6 +67,7 @@ public class ShopExecution {
 			logger.error("Shop skins couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SHOP.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void displaySingleItem(GuildMessageReceivedEvent e, String _type, String [] _items, Guilds guild_settings, final int selection) {
@@ -110,6 +113,7 @@ public class ShopExecution {
 				logger.error("Shop content couldn't be retrieved in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SHOP.getColumn(), e.getMessage().getContentRaw());
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_INSPECT_ERR)).build()).queue();
@@ -144,6 +148,7 @@ public class ShopExecution {
 			logger.error("Weapon categories couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SHOP.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void displayShopWeapons(GuildMessageReceivedEvent e, String _type) {
@@ -177,6 +182,7 @@ public class ShopExecution {
 			logger.error("Weapons couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SHOP.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void displaySingleWeapon(GuildMessageReceivedEvent e, String _type, String [] weapons, Guilds guild_settings, final int selection) {
@@ -310,6 +316,7 @@ public class ShopExecution {
 				logger.error("Weapons couldn't be retrieved in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SHOP.getColumn(), e.getMessage().getContentRaw());
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_INSPECT_ERR)).build()).queue();
@@ -348,6 +355,7 @@ public class ShopExecution {
 			logger.error("Skills couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SHOP.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void displaySingleSkill(GuildMessageReceivedEvent e, Guilds guild_settings, String [] skills, final int selection) {
@@ -371,6 +379,7 @@ public class ShopExecution {
 				logger.error("Skills couldn't be retrieved in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SHOP.getColumn(), e.getMessage().getContentRaw());
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_INSPECT_ERR)).build()).queue();

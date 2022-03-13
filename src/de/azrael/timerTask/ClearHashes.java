@@ -29,6 +29,7 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearWeaponShopContent();
 		Hashes.clearWeaponCategories();
 		Hashes.clearExpiredTempCache();
+		Hashes.clearBotConfiguration();
 		Hashes.clearTweetBlacklist();
 		Hashes.clearRankingLevels();
 		Hashes.clearReactionRoles();
@@ -38,7 +39,6 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearProfileSkins();
 		Hashes.clearQueryResults();
 		Hashes.clearRankingRoles();
-		Hashes.clearWeaponStats();
 		Hashes.clearShopContent();
 		Hashes.clearLevelSkins();
 		Hashes.clearDailyItems();

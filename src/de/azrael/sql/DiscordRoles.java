@@ -1,7 +1,6 @@
 package de.azrael.sql;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,16 +12,11 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Roles;
 import de.azrael.core.Hashes;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.entities.Role;
 
 public class DiscordRoles {
 	private static final Logger logger = LoggerFactory.getLogger(DiscordRoles.class);
-	
-	private static String ip = IniFileReader.getSQLIP();
-	private static String username = IniFileReader.getSQLUsername();
-	private static String password = IniFileReader.getSQLPassword();
 	
 	public static void SQLconnection() {
 		try {
@@ -37,7 +31,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLInsertRole);
 			stmt.setLong(1, role_id);
 			stmt.setString(2, role_name);
@@ -60,7 +54,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLInsertRoles);
 			for(var role : roles) {
@@ -91,7 +85,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLUpdateAllRoles);
 			stmt.setLong(1, guild_id);
 			return stmt.executeUpdate();
@@ -109,7 +103,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLUpdateLevel);
 			stmt.setInt(1, level);
 			stmt.setLong(2, role_id);
@@ -134,7 +128,7 @@ public class DiscordRoles {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(DiscordRolesStatements.SQLgetRoles);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -172,7 +166,7 @@ public class DiscordRoles {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(DiscordRolesStatements.SQLgetReactionRoles);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -205,7 +199,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLUpdateRoleName);
 			stmt.setString(1, name);
 			stmt.setLong(2, role_id);
@@ -227,7 +221,7 @@ public class DiscordRoles {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLgetCategories);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -252,7 +246,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLDeleteRole);
 			stmt.setLong(1, role_id);
 			stmt.setLong(2, guild_id);
@@ -271,7 +265,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLUpdateRole);
 			stmt.setLong(1, role_id);
 			stmt.setLong(2, guild_id);
@@ -290,7 +284,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLInsertReaction);
 			stmt.setLong(1, message_id);
 			stmt.setString(2, emoji);
@@ -311,7 +305,7 @@ public class DiscordRoles {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLgetReactionRole);
 			stmt.setLong(1, message_id);
 			stmt.setString(2, emoji);
@@ -335,7 +329,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLDeleteReactions);
 			stmt.setLong(1, message_id);
 			return stmt.executeUpdate();
@@ -354,7 +348,7 @@ public class DiscordRoles {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLInsertReassignRoles);
 			stmt.setLong(1, user_id);
@@ -386,7 +380,7 @@ public class DiscordRoles {
 		ResultSet rs = null;
 		try {
 			ArrayList<Long> roles = new ArrayList<Long>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(DiscordRolesStatements.SQLgetReassignRoles);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);

@@ -11,19 +11,20 @@ import de.azrael.constructors.Cache;
 import de.azrael.constructors.Ranking;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
+import de.azrael.sql.Azrael;
 import de.azrael.sql.RankingSystem;
 import de.azrael.sql.RankingSystemItems;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
  * Addition to the equip command
- * @author xHelixStorm
- *
  */
 
 public class EquipExecution {
@@ -33,13 +34,16 @@ public class EquipExecution {
 		var foundGuilds = guilds.parallelStream().filter(f -> f.contains(filter)).collect(Collectors.toList());
 		if(foundGuilds != null) {
 			if(foundGuilds.size() == 1) {
-				if(UserPrivs.comparePrivilege(e.getJDA().getGuildById(foundGuilds.get(0)).getMemberById(e.getAuthor().getId()), GuildIni.getEquipLevel(Long.parseLong(foundGuilds.get(0))))) {
+				final Guild guild = e.getJDA().getGuildById(foundGuilds.get(0));
+				final Member member = guild.getMemberById(e.getAuthor().getId());
+				final int commandLevel = STATIC.getCommandLevel(guild, Command.EQUIP);
+				if(UserPrivs.comparePrivilege(member, commandLevel)) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)).build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, foundGuilds.get(0)));
 				}
 				else {
 					EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DENIED));
-					e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention() + STATIC.getTranslation3(e.getAuthor(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(GuildIni.getEquipLevel(Long.parseLong(foundGuilds.get(0))), e.getJDA().getGuildById(foundGuilds.get(0)).getMemberById(e.getAuthor().getIdLong()))).build()).queue();
+					e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention() + STATIC.getTranslation3(e.getAuthor(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, member)).build()).queue();
 				}
 			}
 			else {
@@ -47,11 +51,13 @@ public class EquipExecution {
 				var thisGuilds = "";
 				var i = 1;
 				for(final var guild_id : foundGuilds) {
-					if(UserPrivs.comparePrivilege(e.getJDA().getGuildById(guild_id).getMemberById(e.getAuthor().getId()), GuildIni.getEquipLevel(Long.parseLong(guild_id)))) {
-						out.append("**"+i+": "+e.getJDA().getGuildById(guild_id)+" ("+e.getJDA().getGuildById(guild_id).getId()+")**\n");
+					final Guild guild = e.getJDA().getGuildById(foundGuilds.get(0));
+					final Member member = guild.getMemberById(e.getAuthor().getId());
+					if(UserPrivs.comparePrivilege(member, STATIC.getCommandLevel(guild, Command.EQUIP))) {
+						out.append("**"+i+": "+guild+" ("+guild.getId()+")**\n");
 					}
 					else {
-						out.append("**"+i+": "+e.getJDA().getGuildById(guild_id)+" ("+e.getJDA().getGuildById(guild_id).getId()+") "+STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_DENIED)+"**\n");
+						out.append("**"+i+": "+guild+" ("+guild.getId()+") "+STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_DENIED)+"**\n");
 					}
 					if(i != foundGuilds.size())
 						thisGuilds += guild_id+"-";
@@ -78,14 +84,17 @@ public class EquipExecution {
 	public static void selectAvailableGuilds(PrivateMessageReceivedEvent e, final String guilds, final int selection) {
 		var guild_ids = guilds.split("-");
 		if(selection >= 0 && selection < guild_ids.length) {
-			var guild_id = guild_ids[selection];
-			if(UserPrivs.comparePrivilege(e.getJDA().getGuildById(guild_id).getMemberById(e.getAuthor().getId()), GuildIni.getEquipLevel(Long.parseLong(guild_id)))) {
+			final String guild_id = guild_ids[selection];
+			final Guild guild = e.getJDA().getGuildById(Long.parseLong(guild_id));
+			final Member member = guild.getMemberById(e.getAuthor().getId());
+			final int commandLevel = STATIC.getCommandLevel(guild, Command.EQUIP);
+			if(UserPrivs.comparePrivilege(member, commandLevel)) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.blue).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)).build()).queue();
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id));
 			}
 			else {
 				EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DENIED));
-				e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention() + STATIC.getTranslation3(e.getAuthor(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(GuildIni.getEquipLevel(Long.parseLong(guild_id)), e.getJDA().getGuildById(guild_id).getMember(e.getAuthor()))).build()).queue();
+				e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention() + STATIC.getTranslation3(e.getAuthor(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, member)).build()).queue();
 				var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 			}
@@ -159,6 +168,7 @@ public class EquipExecution {
 				+ STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SLOT_4).replace("{}", skill))
 				.build()).queue();
 		Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id, action));
+		Azrael.SQLInsertCommandLog(e.getAuthor().getIdLong(), 0, Command.EQUIP.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void removeWholeEquipment(PrivateMessageReceivedEvent e, final long guild_id) {
@@ -179,6 +189,7 @@ public class EquipExecution {
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_UNEQUIP_ALL_EMPTY)).build()).queue();
 		}
+		Azrael.SQLInsertCommandLog(e.getAuthor().getIdLong(), 0, Command.EQUIP.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void slotSelection(PrivateMessageReceivedEvent e, final String guild_id, final int selection, String action) {
@@ -236,6 +247,7 @@ public class EquipExecution {
 					equipmentItemScreen(e, guild_id, "remove");
 				}
 			}
+			Azrael.SQLInsertCommandLog(e.getAuthor().getIdLong(), 0, Command.EQUIP.getColumn(), e.getMessage().getContentRaw());
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_DIGIT)).build()).queue();
@@ -317,6 +329,7 @@ public class EquipExecution {
 				var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 			}
+			Azrael.SQLInsertCommandLog(e.getAuthor().getIdLong(), 0, Command.EQUIP.getColumn(), e.getMessage().getContentRaw());
 		}
 		else if(selection == 4) {
 			//skill
@@ -364,6 +377,7 @@ public class EquipExecution {
 				var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 			}
+			Azrael.SQLInsertCommandLog(e.getAuthor().getIdLong(), 0, Command.EQUIP.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -445,6 +459,7 @@ public class EquipExecution {
 					}
 				}
 			}
+			Azrael.SQLInsertCommandLog(e.getAuthor().getIdLong(), 0, Command.EQUIP.getColumn(), e.getMessage().getContentRaw());
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_DIGIT)).build()).queue();

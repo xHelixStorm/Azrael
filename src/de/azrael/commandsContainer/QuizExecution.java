@@ -26,7 +26,7 @@ public class QuizExecution {
 		//split the returned String in an array
 		if(link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && link.startsWith("http")) {
 			try {
-				String [] rewards = Pastebin.readPasteLink(link, e.getGuild().getIdLong()).split("[\\r\\n]+");
+				String [] rewards = Pastebin.readPasteLink(link).split("[\\r\\n]+");
 				int index = 1;
 				boolean interrupted = false;
 				Quizes quiz;
@@ -72,7 +72,7 @@ public class QuizExecution {
 					}
 					else {
 						try {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)+"\n"+Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR), integrity, e.getGuild().getIdLong())).build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)+"\n"+Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR), integrity)).build()).queue();
 							logger.error("Quiz rewards couldn't be registered in guild {}", e.getGuild().getId());
 						} catch (IllegalStateException | LoginException | PasteException e1) {
 							logger.warn("Error on creating pastebin page for quiz rewards in guild {}", e.getGuild().getId(), e1);
@@ -104,7 +104,7 @@ public class QuizExecution {
 		if(link.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && link.startsWith("http")) {
 			String [] content = null;
 			try {
-				content = Pastebin.readPasteLink(link, e.getGuild().getIdLong()).split("[\\r\\n]+");
+				content = Pastebin.readPasteLink(link).split("[\\r\\n]+");
 			} catch (MalformedURLException | RuntimeException | LoginException | ParseException e1) {
 				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
@@ -180,7 +180,7 @@ public class QuizExecution {
 				}
 				else {
 					try {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)+"\n"+Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR), integrity, e.getGuild().getIdLong())).build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)+"\n"+Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR), integrity)).build()).queue();
 						logger.error("Quiz questions couldn't be registered in guild {}", e.getGuild().getId());
 					} catch (IllegalStateException | LoginException | PasteException e1) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();

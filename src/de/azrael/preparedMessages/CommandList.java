@@ -1,8 +1,11 @@
 package de.azrael.preparedMessages;
 
+import java.util.ArrayList;
+
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.entities.Member;
 
@@ -15,75 +18,182 @@ public class CommandList {
 		boolean entertainment = false;
 		boolean other = false;
 		
-		if(permissionGranted && (GuildIni.getRegisterCommand(guild_id) || GuildIni.getSetCommand(guild_id) || GuildIni.getUserCommand(guild_id) || GuildIni.getFilterCommand(guild_id) || GuildIni.getRoleReactionCommand(guild_id) || GuildIni.getSubscribeCommand(guild_id) || GuildIni.getRemoveCommand(guild_id) || GuildIni.getHeavyCensoringCommand(guild_id) || GuildIni.getMuteCommand(guild_id) || GuildIni.getGoogleCommand(guild_id) || GuildIni.getWriteCommand(guild_id) || GuildIni.getEditCommand(guild_id) || GuildIni.getAcceptCommand(guild_id) || GuildIni.getDenyCommand(guild_id) || GuildIni.getScheduleCommand(guild_id) || GuildIni.getPruneCommand(guild_id) || GuildIni.getWarnCommand(guild_id) || GuildIni.getRedditCommand(guild_id) || GuildIni.getInvitesCommand(guild_id) || GuildIni.getTwitchCommand(guild_id))) {
+		boolean register = false;
+		boolean set = false;
+		boolean remove = false;
+		boolean user = false;
+		boolean filter = false;
+		boolean roleReaction = false;
+		boolean subscribe = false;
+		boolean doubleExperience = false;
+		boolean heavyCensoring = false;
+		boolean mute = false;
+		boolean google = false;
+		boolean write = false;
+		boolean edit = false;
+		boolean accept = false;
+		boolean deny = false;
+		boolean schedule = false;
+		boolean prune = false;
+		boolean warn = false;
+		boolean reddit = false;
+		boolean invites = false;
+		boolean twitch = false;
+		
+		boolean pug = false;
+		boolean meow = false;
+		boolean rank = false;
+		boolean profile = false;
+		boolean top = false;
+		boolean use = false;
+		boolean shop = false;
+		boolean inventory = false;
+		boolean daily = false;
+		boolean quiz = false;
+		boolean randomshop = false;
+		boolean equip = false;
+		boolean matchmaking = false;
+		boolean join = false;
+		boolean leave = false;
+		boolean clan = false;
+		boolean queue = false;
+		boolean cw = false;
+		boolean room = false;
+		boolean stats = false;
+		boolean leaderboard = false;
+		
+		boolean about = false;
+		boolean display = false;
+		boolean patchnotes = false;
+		boolean language = false;
+		
+		final var commands = (ArrayList<?>)BotConfiguration.SQLgetCommand(guild_id, 3, Command.REGISTER, Command.SET, Command.REMOVE, Command.USER, Command.FILTER, Command.ROLE_REACTION, Command.SUBSCRIBE
+				, Command.DOUBLE_EXPERIENCE, Command.HEAVY_CENSORING, Command.MUTE, Command.GOOGLE, Command.WRITE, Command.EDIT, Command.ACCEPT, Command.DENY, Command.SCHEDULE, Command.PRUNE
+				, Command.WARN, Command.REDDIT, Command.INVITES, Command.TWITCH, Command.PUG, Command.MEOW, Command.RANK, Command.PROFILE, Command.TOP, Command.USE, Command.SHOP, Command.INVENTORY 
+				, Command.DAILY , Command.QUIZ, Command.RANDOMSHOP, Command.EQUIP, Command.MATCHMAKING, Command.JOIN, Command.LEAVE, Command.CLAN, Command.QUEUE, Command.CW, Command.ROOM, Command.STATS
+				, Command.LEADERBOARD, Command.ABOUT, Command.DISPLAY, Command.PATCHNOTES, Command.LANGUAGE);
+		
+		for(int i = 0; i < commands.size(); i++) {
+			final boolean command = (Boolean)commands.get(i);
+			switch(i) {
+				case 0 	-> register 		= command;
+				case 1 	-> set 				= command;
+				case 2 	-> remove 			= command;
+				case 3 	-> user 			= command;
+				case 4 	-> filter 			= command;
+				case 5 	-> roleReaction 	= command;
+				case 6 	-> subscribe 		= command;
+				case 7 	-> doubleExperience = command;
+				case 8 	-> heavyCensoring 	= command;
+				case 9 	-> mute 			= command;
+				case 10 -> google 			= command;
+				case 11 -> write 			= command;
+				case 12 -> edit 			= command;
+				case 13 -> accept 			= command;
+				case 14 -> deny 			= command;
+				case 15 -> schedule 		= command;
+				case 16 -> prune 			= command;
+				case 17 -> warn 			= command;
+				case 18 -> reddit 			= command;
+				case 19 -> invites 			= command;
+				case 20 -> twitch 			= command;
+				case 21 -> pug 				= command;
+				case 22 -> meow 			= command;
+				case 23 -> rank 			= command;
+				case 24 -> profile 			= command;
+				case 25 -> top 				= command;
+				case 26 -> use 				= command;
+				case 27 -> shop 			= command;
+				case 28 -> inventory 		= command;
+				case 29 -> daily 			= command;
+				case 30 -> quiz 			= command;
+				case 31 -> randomshop 		= command;
+				case 32 -> equip 			= command;
+				case 33 -> matchmaking 		= command;
+				case 34 -> join 			= command;
+				case 35 -> leave 			= command;
+				case 36 -> clan 			= command;
+				case 37 -> queue 			= command;
+				case 38 -> cw 				= command;
+				case 39 -> room 			= command;
+				case 40 -> stats 			= command;
+				case 41 -> leaderboard 		= command;
+				case 42 -> about 			= command;
+				case 43 -> display 			= command;
+				case 44 -> patchnotes 		= command;
+				case 45 -> language 		= command;
+			}
+		}
+		
+		if(permissionGranted && (register || set || remove || user || filter || roleReaction || subscribe || doubleExperience || heavyCensoring || mute || google || write || edit || accept || deny || schedule || prune || warn || reddit || invites || twitch)) {
 			administration = true;
 		}
 		
-		if(GuildIni.getEquipCommand(guild_id) || GuildIni.getPugCommand(guild_id) || GuildIni.getMeowCommand(guild_id) || GuildIni.getRankCommand(guild_id) || GuildIni.getProfileCommand(guild_id) || GuildIni.getTopCommand(guild_id) || GuildIni.getUseCommand(guild_id) || GuildIni.getShopCommand(guild_id) || GuildIni.getInventoryCommand(guild_id) || GuildIni.getDailyCommand(guild_id) || GuildIni.getQuizCommand(guild_id) || GuildIni.getRandomshopCommand(guild_id) || GuildIni.getEquipCommand(guild_id) || GuildIni.getMatchmakingCommand(guild_id) || GuildIni.getJoinCommand(guild_id) || GuildIni.getLeaveCommand(guild_id) || GuildIni.getClanCommand(guild_id) || GuildIni.getQueueCommand(guild_id) || GuildIni.getCwCommand(guild_id) || GuildIni.getRoomCommand(guild_id) || GuildIni.getStatsCommand(guild_id) || GuildIni.getLeaderboardCommand(guild_id)) {
+		if(pug || meow || rank || profile || top || use || shop || inventory || daily || quiz || randomshop || equip || matchmaking || join || leave || clan || queue || cw || room || stats || leaderboard) {
 			entertainment = true;
 		}
 		
-		if(GuildIni.getAboutCommand(guild_id) || GuildIni.getHelpCommand(guild_id) || GuildIni.getDisplayCommand(guild_id) || GuildIni.getPatchnotesCommand(guild_id) || GuildIni.getLanguageCommand(guild_id)) {
+		if(about || display || patchnotes || language) {
 			other = true;
 		}
 		
-		final String prefix = GuildIni.getCommandPrefix(guild_id);
+		final String prefix = BotConfiguration.SQLgetBotConfigs(guild_id).getCommandPrefix();
 		if(administration == true && type == 1) {
-			if(GuildIni.getRegisterCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_REGISTER).replace("{}", prefix));
-			if(GuildIni.getSetCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SET).replace("{}", prefix));
-			if(GuildIni.getRemoveCommand(guild_id)) 			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_REMOVE).replace("{}", prefix));
-			if(GuildIni.getUserCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_USER).replace("{}", prefix));
-			if(GuildIni.getFilterCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_FILTER).replace("{}", prefix));
-			if(GuildIni.getRoleReactionCommand(guild_id))		textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ROLE_REACTION).replace("{}", prefix));
-			if(GuildIni.getSubscribeCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SUBSCRIBE).replace("{}", prefix));
-			if(GuildIni.getDoubleExperienceCommand(guild_id))	textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DOUBLE_EXPERIENCE).replace("{}", prefix));
-			if(GuildIni.getHeavyCensoringCommand(guild_id))		textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_HEAVY_CENSORING).replace("{}", prefix));
-			if(GuildIni.getMuteCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_MUTE).replace("{}", prefix));
-			if(GuildIni.getGoogleCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_GOOGLE).replace("{}", prefix));
-			if(GuildIni.getWriteCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_WRITE).replace("{}", prefix));
-			if(GuildIni.getEditCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_EDIT).replace("{}", prefix));
-			if(GuildIni.getAcceptCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ACCEPT).replace("{}", prefix));
-			if(GuildIni.getDenyCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DENY).replace("{}", prefix));
-			if(GuildIni.getScheduleCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SCHEDULE).replace("{}", prefix));
-			if(GuildIni.getPruneCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PRUNE).replace("{}", prefix));
-			if(GuildIni.getWarnCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_WARN).replace("{}", prefix));
-			if(GuildIni.getRedditCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_REDDIT).replace("{}", prefix));
-			if(GuildIni.getInvitesCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_INVITES).replace("{}", prefix));
-			if(GuildIni.getTwitchCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_TWITCH).replace("{}", prefix));
+			if(register)			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_REGISTER).replace("{}", prefix));
+			if(set)					textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SET).replace("{}", prefix));
+			if(remove) 				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_REMOVE).replace("{}", prefix));
+			if(user)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_USER).replace("{}", prefix));
+			if(filter)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_FILTER).replace("{}", prefix));
+			if(roleReaction)		textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ROLE_REACTION).replace("{}", prefix));
+			if(subscribe)			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SUBSCRIBE).replace("{}", prefix));
+			if(doubleExperience)	textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DOUBLE_EXPERIENCE).replace("{}", prefix));
+			if(heavyCensoring)		textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_HEAVY_CENSORING).replace("{}", prefix));
+			if(mute)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_MUTE).replace("{}", prefix));
+			if(google)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_GOOGLE).replace("{}", prefix));
+			if(write)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_WRITE).replace("{}", prefix));
+			if(edit)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_EDIT).replace("{}", prefix));
+			if(accept)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ACCEPT).replace("{}", prefix));
+			if(deny)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DENY).replace("{}", prefix));
+			if(schedule)			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SCHEDULE).replace("{}", prefix));
+			if(prune)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PRUNE).replace("{}", prefix));
+			if(warn)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_WARN).replace("{}", prefix));
+			if(reddit)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_REDDIT).replace("{}", prefix));
+			if(invites)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_INVITES).replace("{}", prefix));
+			if(twitch)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_TWITCH).replace("{}", prefix));
 		}
 		if(entertainment == true && type == 2) {
-			if(GuildIni.getPugCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PUG).replace("{}", prefix));
-			if(GuildIni.getMeowCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_MEOW).replace("{}", prefix));
-			if(GuildIni.getRankCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_RANK).replace("{}", prefix));
-			if(GuildIni.getProfileCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PROFILE).replace("{}", prefix));
-			if(GuildIni.getTopCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_TOP).replace("{}", prefix));
-			if(GuildIni.getUseCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_USE).replace("{}", prefix));
-			if(GuildIni.getShopCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SHOP).replace("{}", prefix));
-			if(GuildIni.getInventoryCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_INVENTORY).replace("{}", prefix));
-			if(GuildIni.getDailyCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DAILY).replace("{}", prefix));
-			if(GuildIni.getQuizCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_QUIZ).replace("{}", prefix));
-			if(GuildIni.getRandomshopCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_RANDOMSHOP).replace("{}", prefix));
-			if(GuildIni.getEquipCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_EQUIP).replace("{}", prefix));
-			if(GuildIni.getMatchmakingCommand(guild_id))		textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_MATCHMAKING).replace("{}", prefix));
-			if(GuildIni.getJoinCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_JOIN).replace("{}", prefix));
-			if(GuildIni.getLeaveCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_LEAVE).replace("{}", prefix));
-			if(GuildIni.getClanCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_CLAN).replace("{}", prefix));
-			if(GuildIni.getQueueCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_QUEUE).replace("{}", prefix));
-			if(GuildIni.getCwCommand(guild_id))					textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_CW).replace("{}", prefix));
-			if(GuildIni.getRoomCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ROOM).replace("{}", prefix));
-			if(GuildIni.getStatsCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_STATS).replace("{}", prefix));
-			if(GuildIni.getLeaderboardCommand(guild_id))		textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_LEADERBOARD).replace("{}", prefix));
+			if(pug)					textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PUG).replace("{}", prefix));
+			if(meow)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_MEOW).replace("{}", prefix));
+			if(rank)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_RANK).replace("{}", prefix));
+			if(profile)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PROFILE).replace("{}", prefix));
+			if(top)					textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_TOP).replace("{}", prefix));
+			if(use)					textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_USE).replace("{}", prefix));
+			if(shop)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SHOP).replace("{}", prefix));
+			if(inventory)			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_INVENTORY).replace("{}", prefix));
+			if(daily)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DAILY).replace("{}", prefix));
+			if(quiz)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_QUIZ).replace("{}", prefix));
+			if(randomshop)			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_RANDOMSHOP).replace("{}", prefix));
+			if(equip)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_EQUIP).replace("{}", prefix));
+			if(matchmaking)			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_MATCHMAKING).replace("{}", prefix));
+			if(join)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_JOIN).replace("{}", prefix));
+			if(leave)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_LEAVE).replace("{}", prefix));
+			if(clan)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_CLAN).replace("{}", prefix));
+			if(queue)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_QUEUE).replace("{}", prefix));
+			if(cw)					textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_CW).replace("{}", prefix));
+			if(room)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ROOM).replace("{}", prefix));
+			if(stats)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_STATS).replace("{}", prefix));
+			if(leaderboard)			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_LEADERBOARD).replace("{}", prefix));
 		}
 		if(other == true && type == 3) {
-			if(GuildIni.getAboutCommand(guild_id))				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ABOUT).replace("{}", prefix));
-			if(GuildIni.getDisplayCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DISPLAY).replace("{}", prefix));
-			if(GuildIni.getPatchnotesCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PATCHNOTES).replace("{}", prefix));
-			if(GuildIni.getLanguageCommand(guild_id))			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_LANGUAGE).replace("{}", prefix));
+			if(about)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_ABOUT).replace("{}", prefix));
+			if(display)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_DISPLAY).replace("{}", prefix));
+			if(patchnotes)			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PATCHNOTES).replace("{}", prefix));
+			if(language)			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_LANGUAGE).replace("{}", prefix));
 		}
 		if(type == 4) {
-			final var commands = Azrael.SQLgetCustomCommands2(guild_id);
-			if(commands != null && commands.size() > 0) {
-				for(final var command : commands) {
+			final var customCommands = Azrael.SQLgetCustomCommands2(guild_id);
+			if(customCommands != null && customCommands.size() > 0) {
+				for(final var command : customCommands) {
 					textCollector.append("- **"+command.getCommand()+"**\n"+command.getDescription()+"\n");
 				}
 			}

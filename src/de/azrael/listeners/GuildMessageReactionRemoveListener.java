@@ -21,6 +21,7 @@ import de.azrael.fileManagement.GuildIni;
 import de.azrael.google.GoogleSheets;
 import de.azrael.google.GoogleUtils;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.util.STATIC;
@@ -72,10 +73,10 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 								//continue if a reaction name has been found
 								if(reactionName.length() > 0) {
 									//retrieve all names of the reactions from the guild ini file
-									String [] reactions = GuildIni.getReactions(e.getGuild().getIdLong());
+									String [] reactions = GuildIni.getReactions(e.getGuild());
 									boolean emoteFound = false;
 									//check if the custom emote mode is enabled, else assign roles to members basing on the default emote
-									if(GuildIni.getReactionEnabled(e.getGuild().getIdLong())) {
+									if(GuildIni.getReactionEnabled(e.getGuild())) {
 										//iterate through all reaction roles in order
 										for(int i = 0; i < reactionRoles.size(); i++) {
 											//check if the reacted reaction is the same which is saved in the ini file, if yes assign role basing that reaction
@@ -168,7 +169,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 	}
 	
 	private static void runVoteSpreadsheetService(GuildMessageReactionRemoveEvent e) {
-		if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+		if(BotConfiguration.SQLgetBotConfigs(e.getGuild().getIdLong()).getGoogleFunctionalities()) {
 			//check if it's a vote channel
 			final var channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
 			final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.VOT.getType()) || f.getChannel_Type().equals(Channel.VO2.getType()))).findAny().orElse(null);
@@ -213,7 +214,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 										if(columnUpVote != 0 || columnDownVote != 0 || columnShrugVote != 0) {
 											//build update array
 											ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-											final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
+											final String [] reactions = GuildIni.getVoteReactions(e.getGuild());
 											Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");
 											Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
 											Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");

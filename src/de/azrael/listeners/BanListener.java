@@ -13,10 +13,10 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -105,7 +105,7 @@ public class BanListener extends ListenerAdapter {
 						Hashes.clearTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 						
 						//Run google service, if enabled
-						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+						if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 							GoogleSheets.spreadsheetBanRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.BAN.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), ban_reason, ""+user.getWarningID());
 						}
 					}
@@ -155,7 +155,7 @@ public class BanListener extends ListenerAdapter {
 					}
 					
 					//Run google service, if enabled
-					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+					if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 						GoogleSheets.spreadsheetBanRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.BAN.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), ban_reason, ""+user.getWarningID());
 					}
 				}

@@ -6,11 +6,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.interfaces.CommandPrivate;
 import de.azrael.interfaces.CommandPublic;
+import de.azrael.sql.Azrael;
 import de.azrael.sql.AzraelWeb;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -24,20 +26,27 @@ public class Web implements CommandPublic, CommandPrivate {
 	private final static String CREATE_ENDPOINT = "/account/create.php?user_id=";
 	
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
+	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		if(!botConfig.getIgnoreMissingPermissions())
 			return true;
 		return false;
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
+	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.WEB_WRONG_CHANNEL).replace("{}", e.getGuild().getSelfMember().getAsMention())).build()).queue();
+		return true;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("User {} has used Web command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			logger.trace("{} has used Web command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.WEB.getColumn(), out.toString().trim());
+		}
 	}
 
 	@Override
@@ -46,7 +55,7 @@ public class Web implements CommandPublic, CommandPrivate {
 	}
 
 	@Override
-	public void action(String[] args, PrivateMessageReceivedEvent e) {
+	public boolean action(String[] args, PrivateMessageReceivedEvent e) {
 		final String URL = IniFileReader.getWebURL();
 		if(URL != null && URL.length() > 0) {
 			//Retrieve auth type
@@ -84,10 +93,17 @@ public class Web implements CommandPublic, CommandPrivate {
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.WEB_REDIRECT_ERR)).build()).queue();
 		}
+		return true;
 	}
 
 	@Override
-	public void executed(boolean success, PrivateMessageReceivedEvent e) {
-		logger.trace("User {} has used Web command", e.getAuthor().getId());
+	public void executed(String[] args, boolean success, PrivateMessageReceivedEvent e) {
+		if(success) {
+			logger.trace("{} has used Web command", e.getAuthor().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getAuthor().getIdLong(), 0, Command.WEB.getColumn(), out.toString().trim());
+		}
 	}
 }

@@ -26,18 +26,6 @@ public class IniFileReader {
 		Ini ini = readConfig();
 		return ini.get("Bot", "Token");
 	}
-	public static long getAdmin() {
-		var admin = STATIC.getAdmin();
-		if(admin > 0) {
-			return admin;
-		}
-		else {
-			Ini ini = readConfig();
-			admin = ini.get("Bot", "Admin", long.class);
-			STATIC.setAdmin(admin);
-			return admin;
-		}
-	}
 	public static String getTimezone() {
 		var timezone = STATIC.getTimezone();
 		if(timezone.length() > 0) {
@@ -128,38 +116,6 @@ public class IniFileReader {
 		return ini.get("Bot", "DelayedGoogleRequestTime", int.class);
 	}
 	
-	public static String getPastebinDeveloperKey() {
-		Ini ini = readConfig();
-		return ini.get("Pastebin", "DeveloperKey");
-	}
-	
-	public static String getImgurClientID() {
-		Ini ini = readConfig();
-		return ini.get("Imgur", "ClientID");
-	}
-	
-	public static String[] getTwitterKeys() {
-		Ini ini = readConfig();
-		Ini.Section tokens = ini.get("Twitter");
-		String []twitter = new String[4];
-		twitter[0] = tokens.get("ConsumerKey");
-		twitter[1] = tokens.get("ConsumerKeySecret");
-		twitter[2] = tokens.get("AccessToken");
-		twitter[3] = tokens.get("AccessTokenSecret");
-		return twitter;
-	}
-	
-	public static String[] getRedditKeys() {
-		Ini ini = readConfig();
-		Ini.Section tokens = ini.get("Reddit");
-		String []reddit = new String[4];
-		reddit[0] = tokens.get("username");
-		reddit[1] = tokens.get("password");
-		reddit[2] = tokens.get("client_id");
-		reddit[3] = tokens.get("client_secret");
-		return reddit;
-	}
-	
 	public static String[] getTwitchKeys() {
 		Ini ini = readConfig();
 		Ini.Section tokens = ini.get("Twitch");
@@ -197,42 +153,6 @@ public class IniFileReader {
 			Ini ini = readConfig();
 			return ini.get("DoubleExperience", "End", Weekday.class);
 		}
-	}
-	public static String getSQLIP() {
-		Ini ini = readConfig();
-		return ini.get("Azrael", "IP");
-	}
-	public static String getSQLUsername() {
-		Ini ini = readConfig();
-		return ini.get("Azrael", "Username");
-	}
-	public static String getSQLPassword() {
-		Ini ini = readConfig();
-		return ini.get("Azrael", "Password");
-	}
-	public static String getSQLIP2() {
-		Ini ini = readConfig();
-		return ini.get("RankingSystem", "IP");
-	}
-	public static String getSQLUsername2() {
-		Ini ini = readConfig();
-		return ini.get("RankingSystem", "Username");
-	}
-	public static String getSQLPassword2() {
-		Ini ini = readConfig();
-		return ini.get("RankingSystem", "Password");
-	}
-	public static String getSQLWebIP() {
-		Ini ini = readConfig();
-		return ini.get("AzraelWeb", "IP");
-	}
-	public static String getSQLWebUsername() {
-		Ini ini = readConfig();
-		return ini.get("AzraelWeb", "Username");
-	}
-	public static String getSQLWebPassword() {
-		Ini ini = readConfig();
-		return ini.get("AzraelWeb", "Password");
 	}
 	public static String getPugThumbnail() {
 		Ini ini = readConfig();

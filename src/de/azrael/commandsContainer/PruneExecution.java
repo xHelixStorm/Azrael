@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.GuildPrune;
 import de.azrael.core.Hashes;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
@@ -23,6 +24,7 @@ public class PruneExecution {
 	
 	public static void runTask(GuildMessageReceivedEvent e, Cache cache) {
 		if(e.getGuild().getSelfMember().hasPermission(Permission.KICK_MEMBERS)) {
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.PRUNE.getColumn(), e.getMessage().getContentRaw());
 			final GuildPrune prune = (GuildPrune)cache.getObject();
 			final List<Member> kickMembers = prune.getKickMembers();
 			final List<Member> excludedMembers = prune.getExcludedMembes();

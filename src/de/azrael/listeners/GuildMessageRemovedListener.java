@@ -16,15 +16,16 @@ import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.google.GoogleSheets;
 import de.azrael.google.GoogleUtils;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.util.STATIC;
@@ -60,8 +61,9 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 			final EmbedBuilder message = new EmbedBuilder();
 			//remove reaction messages from db
 			DiscordRoles.SQLDeleteReactions(e.getMessageIdLong());
+			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(e.getGuild().getIdLong());
 			//verify that the message in cache logger is enabled
-			if(GuildIni.getCacheLog(e.getGuild().getIdLong())) {
+			if(botConfig.getCacheLog()) {
 				//retrieve current message id, the message as a whole that got deleted and delete the message from cache
 				long message_id = e.getMessageIdLong();
 				final var removed_messages = Hashes.getMessagePool(e.getGuild().getIdLong(), message_id);
@@ -153,7 +155,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 									}
 								}
 								//if enabled, display all deleted messages which weren't deleted by someone else but from the same user and still isn't a bot
-								else if(GuildIni.getSelfDeletedMessage(e.getGuild().getIdLong()) && firstMessage.getUserID() != 0 && !suppress_deleted && !firstMessage.isUserBot()) {
+								else if(botConfig.getSelfDeletedMessages() && firstMessage.getUserID() != 0 && !suppress_deleted && !firstMessage.isUserBot()) {
 									//confirm that we have a message to print
 									if(firstMessage.getMessage().length() > 0) {
 										message.setColor(Color.GRAY);
@@ -215,7 +217,7 @@ public class GuildMessageRemovedListener extends ListenerAdapter {
 			}
 			
 			//Run google service if enabled
-			if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+			if(botConfig.getGoogleFunctionalities()) {
 				runVoteSpreadsheetService(e);
 				runCommentSpreadsheetService(e);
 				

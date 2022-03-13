@@ -2,17 +2,18 @@ package de.azrael.commands;
 
 import java.awt.Color;
 import java.util.EnumSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.commandsContainer.QuizExecution;
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
@@ -32,22 +33,15 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class Quiz implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Quiz.class);
+	private static ConcurrentHashMap<Long, Integer> commandLevel = new ConcurrentHashMap<Long, Integer>();
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		//check if the command is enabled and that the user has enough permissions
-		if(GuildIni.getQuizCommand(e.getGuild().getIdLong())) {
-			var commandLevel = GuildIni.getQuizLevel(e.getGuild().getIdLong());
-			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
-				return true;
-			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
-				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
-		}
-		return false;
+	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		return STATIC.commandValidation(e, botConfig, Command.QUIZ);
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
+	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		//be sure that the quiz session isn't already running
 		if(Hashes.getTempCache("quiztime"+e.getGuild().getId()) == null) {
 			EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
@@ -106,6 +100,7 @@ public class Quiz implements CommandPublic {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_RUN_HELP)).build()).queue();
 									//write to cache to remind the bot that we're waiting for input
 									Hashes.addTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(180000, e.getMember().getUser().getId()));
+									commandLevel.put(e.getGuild().getIdLong(), STATIC.getCommandLevel(e.getGuild(), Command.QUIZ));
 								}
 								else {
 									e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_MISSING_PERMISSION)).build()).queue();
@@ -129,10 +124,21 @@ public class Quiz implements CommandPublic {
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED)).setThumbnail(IniFileReader.getDeniedThumbnail());
 			e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_ERR)).build()).queue();
 		}
+		return true;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("{} has used Quiz command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			logger.trace("{} has used Quiz command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.QUIZ.getColumn(), out.toString().trim());
+		}
+	}
+	
+	public static int getCommandLevel(long guild_id) {
+		return commandLevel.get(guild_id);
 	}
 }

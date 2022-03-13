@@ -18,8 +18,8 @@ import de.azrael.constructors.Messages;
 import de.azrael.constructors.RSS;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -56,8 +56,8 @@ public class TwitterModel {
 						result = twitter.search(query);
 						if(result.getTweets().size() > 0)
 							success = true;
-						if(result.getTweets().size() >= 5)
-							tweets = result.getTweets().subList(0, 4);
+						if(result.getTweets().size() >= 30)
+							tweets = result.getTweets().subList(0, 29);
 						else
 							tweets = result.getTweets().subList(0, result.getTweets().size());
 					}
@@ -216,7 +216,7 @@ public class TwitterModel {
 											if(historyMessage == null)
 												guild.getTextChannelById(rss_channel).sendMessage(outMessage).queue(m -> {
 													Azrael.SQLInsertSubscriptionLog(m.getIdLong(), tweet.getId()+"");
-													if(GuildIni.getCacheLog(guild.getIdLong())) {
+													if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getCacheLog()) {
 														Messages collectedMessage = new Messages();
 														collectedMessage.setUserID(0);
 														collectedMessage.setUsername(fullName + " ("+username+")");

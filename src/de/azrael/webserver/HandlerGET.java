@@ -1,6 +1,7 @@
 package de.azrael.webserver;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,6 +11,7 @@ import org.json.JSONObject;
 import de.azrael.core.UserPrivs;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -55,7 +57,7 @@ public class HandlerGET {
 						server.put("isUserAdmin", UserPrivs.isUserAdmin(member));
 						server.put("isUserMod", UserPrivs.isUserMod(member));
 						server.put("isUserCommunity", UserPrivs.isUserCommunity(member));
-						server.put("isUserBotAdmin", (GuildIni.getAdmin(guild.getIdLong()) == user.getIdLong()));
+						server.put("isUserBotAdmin", BotConfiguration.SQLisAdministrator(user.getIdLong(), guild.getIdLong()));
 						JSONArray serverRoles = new JSONArray();
 						server.put("roles", serverRoles);
 						for(Role role : member.getRoles()) {
@@ -125,7 +127,7 @@ public class HandlerGET {
 							user.put("isUserAdmin", UserPrivs.isUserAdmin(member));
 							user.put("isUserMod", UserPrivs.isUserMod(member));
 							user.put("isUserCommunity", UserPrivs.isUserCommunity(member));
-							user.put("isUserBotAdmin", (GuildIni.getAdmin(guild.getIdLong()) == member.getUser().getIdLong()));
+							user.put("isUserBotAdmin", BotConfiguration.SQLisAdministrator(member.getUser().getIdLong(), guild.getIdLong()));
 							guildObject.put("user", user);
 						}
 						else
@@ -152,7 +154,7 @@ public class HandlerGET {
 						serverRoles.put(curRole);
 					}
 					
-					final var ini = GuildIni.readIni(guild.getIdLong());
+					final var ini = GuildIni.readIni(guild);
 					guildObject.put("General_Administrator", ini.get("General", "Administrator", long.class));
 					guildObject.put("General_CommandPrefix", ini.get("General", "CommandPrefix"));
 					guildObject.put("General_JoinMessage", ini.get("General", "JoinMessage", boolean.class));
@@ -408,11 +410,11 @@ public class HandlerGET {
 					json.put("memberCount", members.size());
 					JSONArray serverMembers = new JSONArray();
 					json.put("members", serverMembers);
-					final long botAdmin = GuildIni.getAdmin(guild.getIdLong());
+					final ArrayList<Long> botAdmin = BotConfiguration.SQLgetAdministrators(guild.getIdLong());
 					for(final Member member : members) {
 						final boolean admin = UserPrivs.isUserAdmin(member);
 						final boolean mod = UserPrivs.isUserMod(member);
-						if(staffFilter && !admin && !mod && member.getUser().getIdLong() != botAdmin)
+						if(staffFilter && !admin && !mod && botAdmin.contains(member.getUser().getIdLong()))
 							continue;
 						
 						JSONObject serverMember = new JSONObject();
@@ -424,7 +426,7 @@ public class HandlerGET {
 						serverMember.put("isUserAdmin", admin);
 						serverMember.put("isUserMod", mod);
 						serverMember.put("isUserCommunity", UserPrivs.isUserCommunity(member));
-						serverMember.put("isUserBotAdmin", (botAdmin == member.getUser().getIdLong()));
+						serverMember.put("isUserBotAdmin", botAdmin.contains(member.getUser().getIdLong()));
 						JSONArray serverRoles = new JSONArray();
 						serverMember.put("roles", serverRoles);
 						final var roles = DiscordRoles.SQLgetRoles(guild.getIdLong());

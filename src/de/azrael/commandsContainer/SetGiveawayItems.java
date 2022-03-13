@@ -56,7 +56,7 @@ public class SetGiveawayItems {
 						//verify pastebin link and save the content into array
 						else if(args[2].matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && args[2].startsWith("http")) {
 							try {
-								String [] rewards = Pastebin.readPasteLink(args[2], e.getGuild().getIdLong()).split("[\\r\\n]+");
+								String [] rewards = Pastebin.readPasteLink(args[2]).split("[\\r\\n]+");
 								//calculate the next beginning of the month
 								Timestamp timestamp = calculateMonth();
 								
@@ -90,7 +90,7 @@ public class SetGiveawayItems {
 				case "2" -> {
 					if(args[2].matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && args[2].startsWith("http")) {
 						try {
-							String [] rewards = Pastebin.readPasteLink(args[2], e.getGuild().getIdLong()).split("[\\r\\n]+");
+							String [] rewards = Pastebin.readPasteLink(args[2]).split("[\\r\\n]+");
 							boolean success = Azrael.SQLInsertGiveawayRewards(e.getGuild().getIdLong(), rewards);
 							if(success) {
 								logger.info("User {} has used the pastebin url {} to save giveaway rewards in guild {}", e.getMember().getUser().getId(), args[2], e.getGuild().getId());

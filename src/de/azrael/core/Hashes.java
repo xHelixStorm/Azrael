@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.CategoryConf;
 import de.azrael.constructors.Channels;
@@ -35,13 +36,13 @@ import de.azrael.constructors.UserProfile;
 import de.azrael.constructors.UserRank;
 import de.azrael.constructors.Watchlist;
 import de.azrael.constructors.WeaponAbbvs;
-import de.azrael.constructors.WeaponStats;
 import de.azrael.constructors.Weapons;
 import net.dv8tion.jda.api.entities.Member;
 
 public class Hashes {
-    private final static ConcurrentMap<Long, LinkedHashMap<Long, Ranking>> guild_ranking = new ConcurrentHashMap<Long, LinkedHashMap<Long, Ranking>>();
-    private final static ConcurrentMap<Long, LinkedHashMap<Long, ArrayList<Messages>>> guild_message_pool = new ConcurrentHashMap<Long, LinkedHashMap<Long, ArrayList<Messages>>>();
+	private static final ConcurrentMap<Long, BotConfigs> botConfiguration = new ConcurrentHashMap<Long, BotConfigs>();
+    private static final ConcurrentMap<Long, LinkedHashMap<Long, Ranking>> guild_ranking = new ConcurrentHashMap<Long, LinkedHashMap<Long, Ranking>>();
+    private static final ConcurrentMap<Long, LinkedHashMap<Long, ArrayList<Messages>>> guild_message_pool = new ConcurrentHashMap<Long, LinkedHashMap<Long, ArrayList<Messages>>>();
     private static final ConcurrentMap<String, ArrayList<String>> query_result = new ConcurrentHashMap<String, ArrayList<String>>();
     private static final ConcurrentMap<Long, ArrayList<NameFilter>> name_filter = new ConcurrentHashMap<Long, ArrayList<NameFilter>>();
     private static final ConcurrentMap<Long, ArrayList<String>> filter_lang = new ConcurrentHashMap<Long, ArrayList<String>>();
@@ -60,7 +61,6 @@ public class Hashes {
     private static final ConcurrentMap<Long, ArrayList<Weapons>> weaponShopContent = new ConcurrentHashMap<Long, ArrayList<Weapons>>();
     private static final ConcurrentMap<Long, ArrayList<String>> weaponCategories = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final ConcurrentMap<Long, ArrayList<WeaponAbbvs>> weaponAbbvs = new ConcurrentHashMap<Long, ArrayList<WeaponAbbvs>>();
-    private static final LinkedHashMap<Long, ArrayList<WeaponStats>> weaponStats = new LinkedHashMap<Long, ArrayList<WeaponStats>>();
     private static final ConcurrentMap<Long, ArrayList<Channels>> channels = new ConcurrentHashMap<Long, ArrayList<Channels>>();
     private static final ConcurrentMap<String, Cache> tempCache = new ConcurrentHashMap<String, Cache>();
     private static final ConcurrentMap<Long, ArrayList<Skills>> skillShop = new ConcurrentHashMap<Long, ArrayList<Skills>>();
@@ -86,6 +86,10 @@ public class Hashes {
     private static final ConcurrentMap<Long, HashMap<String, Long>> itemEffect = new ConcurrentHashMap<Long, HashMap<String, Long>>();
     private static final ConcurrentMap<String, Spreadsheet> spreadsheetProperties = new ConcurrentHashMap<String, Spreadsheet>();
     
+    
+    public static void addBotConfiguration(Long key, BotConfigs config) {
+    	botConfiguration.put(key, config);
+    }
     public static void initializeGuildMessagePool(Long key, final int max_message_pool_size) {
     	LinkedHashMap<Long, ArrayList<Messages>> message_pool = new LinkedHashMap<Long, ArrayList<Messages>>() {
 			private static final long serialVersionUID = 1770564696361163460L;
@@ -182,9 +186,6 @@ public class Hashes {
 	}
 	public static void addWeaponAbbreviation(Long key, ArrayList<WeaponAbbvs> abbreviations) {
 		weaponAbbvs.put(key, abbreviations);
-	}
-	public static void addWeaponStat(Long key, ArrayList<WeaponStats> stats) {
-		weaponStats.put(key, stats);
 	}
 	public static void addChannels(Long key, ArrayList<Channels> ch) {
 		channels.put(key, ch);
@@ -295,6 +296,9 @@ public class Hashes {
 		spreadsheetProperties.put(key, spreadsheet);
 	}
 	
+	public static BotConfigs getBotConfiguration(Long key) {
+		return botConfiguration.get(key);
+	}
 	public static ArrayList<Messages> getMessagePool(long key, long message_id) {
 		final var message_pool = guild_message_pool.get(key);
 		if(message_pool == null)
@@ -379,9 +383,6 @@ public class Hashes {
 	}
 	public static ArrayList<WeaponAbbvs> getWeaponAbbreviations(Long key) {
 		return weaponAbbvs.get(key);
-	}
-	public static ArrayList<WeaponStats> getWeaponStats(Long key) {
-		return weaponStats.get(key);
 	}
 	public static ArrayList<Channels> getChannels(Long key) {
 		return channels.get(key);
@@ -483,6 +484,12 @@ public class Hashes {
 		return spreadsheetProperties.get(key);
 	}
 	
+	public static void removeBotConfiguration(Long key) {
+		botConfiguration.remove(key);
+	}
+	public static void clearBotConfiguration() {
+		botConfiguration.clear();
+	}
 	public static void removeMessagePool(final long key, long message_id) {
 		final var message_pool = guild_message_pool.get(key);
 		message_pool.remove(message_id);
@@ -598,12 +605,6 @@ public class Hashes {
 	}
 	public static void clearWeaponAbbreviations() {
 		weaponAbbvs.clear();
-	}
-	public static void removeWeaponStats(Long key) {
-		weaponStats.remove(key);
-	}
-	public static void clearWeaponStats() {
-		weaponStats.clear();
 	}
 	public static void removeChannels(Long key) {
 		channels.remove(key);

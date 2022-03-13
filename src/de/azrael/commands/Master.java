@@ -5,9 +5,12 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Member;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
+import de.azrael.sql.Azrael;
 import de.azrael.sql.Competitive;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,12 +20,12 @@ public class Master implements CommandPublic {
 	final static private Logger logger = LoggerFactory.getLogger(Master.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		return true;
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
+	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		final int room_id = Competitive.SQLisUserInRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong());
 		if(room_id > 0) {
 			final var room = Competitive.SQLgetMatchmakingRoom(e.getGuild().getIdLong(), room_id);
@@ -85,11 +88,18 @@ public class Master implements CommandPublic {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("It couldn't be verified if user {} has already joined a room in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 		}
+		return true;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("{} has used Master command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			logger.trace("{} has used Master command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.MASTER.getColumn(), out.toString().trim());
+		}
 	}
 
 }

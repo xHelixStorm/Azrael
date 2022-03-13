@@ -2,15 +2,14 @@ package de.azrael.core;
 
 import java.util.ArrayList;
 
-import de.azrael.fileManagement.GuildIni;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 public class CommandParser {
 	
-	public static CommandContainer parser(String raw, GuildMessageReceivedEvent e, PrivateMessageReceivedEvent e2) {
+	public static CommandContainer parser(String prefix, String raw, GuildMessageReceivedEvent e, PrivateMessageReceivedEvent e2) {
 		
-		String beheaded = (e != null ? raw.replaceFirst(GuildIni.getCommandPrefix(e.getGuild().getIdLong()), "") : raw);
+		String beheaded = (e != null ? raw.replaceFirst(prefix, "") : raw);
 		String[] splitBeheaded = beheaded.split(" ");
 		String invoke = splitBeheaded[0];
 		ArrayList <String> split = new ArrayList <String>();

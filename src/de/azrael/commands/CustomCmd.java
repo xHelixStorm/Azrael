@@ -11,14 +11,15 @@ import org.slf4j.LoggerFactory;
 
 import com.google.api.services.youtube.model.SearchListResponse;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.CommandAction;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.google.GoogleYoutube;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -31,17 +32,17 @@ public class CustomCmd implements CommandPublic {
 	private final static String YOUTUBEENDPOINT = "https://www.youtube.com/watch?v=";
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
+	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		return true;
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
+	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		//Retrieve the command name only without prefix
-		final String cmd = e.getMessage().getContentRaw().split(" ")[0].substring(GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length());
+		final String cmd = e.getMessage().getContentRaw().split(" ")[0].substring(botConfig.getCommandPrefix().length());
 		final var command = Azrael.SQLgetCustomCommand(e.getGuild().getIdLong(), cmd);
 		if(command != null && command.isEnabled()) {
-			if(UserPrivs.comparePrivilege(e.getMember(), command.getLevel()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {		
+			if(UserPrivs.comparePrivilege(e.getMember(), command.getLevel()) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {		
 				//channel restrictions check
 				HashSet<String> restrictions = Azrael.SQLgetCustomCommandRestrictions(e.getGuild().getIdLong(), command.getCommand());
 				if(restrictions != null && restrictions.size() > 0) {
@@ -66,24 +67,24 @@ public class CustomCmd implements CommandPublic {
 						});
 						if(!restrictedChannels.contains(e.getChannel().getId())) {
 							e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.NOT_BOT_CHANNEL)+STATIC.getRestrictedChannels(restrictedChannels)).queue();
-							return;
+							return true;
 						}
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Registered channels couldn't be retrieved for command {} in guild {}", command.getCommand(), e.getGuild().getId());
-						return;
+						return true;
 					}
 				}
 				else if(restrictions == null) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					logger.error("Command restrictions couldn't be retrieved for command {} in guild {}", command.getCommand(), e.getGuild().getId());
-					return;
+					return true;
 				}
 				
 				if(command.getAction().inputRequired && args.length == 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
-					return;
+					return true;
 				}
 				
 				//default output message formatting
@@ -123,7 +124,7 @@ public class CustomCmd implements CommandPublic {
 					} catch (Exception e1) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("YouTube query couldn't be executed for command {} in guild {}", command.getCommand(), e.getGuild().getId(), e1);
-						return;
+						return true;
 					}
 					
 					if(response != null && response.getItems().size() > 0) {
@@ -136,7 +137,7 @@ public class CustomCmd implements CommandPublic {
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.YOUTUBE_VIDEO_NOT_FOUND)).build()).queue();
-						return;
+						return true;
 					}
 				}
 				//Assign or remove role(s) to user
@@ -183,18 +184,18 @@ public class CustomCmd implements CommandPublic {
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
 								logger.error("Permission MANAGE_ROLES required to assign or remove roles in guild {}", e.getGuild().getId());
-								return;
+								return true;
 							}
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROLES_NOW_INVALID)).build()).queue();
-							return;
+							return true;
 						}
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Roles to assign couldn't be retrieved for custom command {} in guild {}", command.getCommand(), e.getGuild().getId());
-						return;
+						return true;
 					}
 				}
 				
@@ -212,15 +213,24 @@ public class CustomCmd implements CommandPublic {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName())+textChannel.getAsMention(), Channel.LOG.getType());
 				}
 			}
-			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong())) {
+			else if(!botConfig.getIgnoreMissingPermissions()) {
 				UserPrivs.throwNotEnoughPrivilegeError(e, command.getLevel());
 			}
+			return true;
 		}
+		return false;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("{} has used the custom command {} in guild {}", e.getMember().getUser().getId(), e.getMessage().getContentRaw().split(" ")[0].toLowerCase(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			String command = e.getMessage().getContentRaw().split(" ")[0].toLowerCase();
+			logger.trace("{} has used the custom command {} in guild {}", e.getMember().getUser().getId(), command, e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), command, out.toString().trim());
+		}
 	}
 
 }

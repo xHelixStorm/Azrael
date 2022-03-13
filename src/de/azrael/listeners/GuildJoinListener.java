@@ -9,6 +9,7 @@ import de.azrael.core.Hashes;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.CollectUsersGuilds;
 import de.azrael.timerTask.ParseSubscription;
@@ -42,6 +43,10 @@ public class GuildJoinListener extends ListenerAdapter {
 		if(RankingSystem.SQLInsertGuild(guild_id, guild_name, false) == 0) {
 			logger.error("Guild ranking information couldn't be saved on join in guild {}", guild_id);
 		}
+		//insert into BotConfiguration tables
+		if(!BotConfiguration.SQLInsertBotConfigs(guild_id)) {
+			logger.error("Bot configurations couldn't be generated on join in guild {}", guild_id);
+		}
 		//insert all categories into table
 		Azrael.SQLBulkInsertCategories(e.getGuild().getCategories());
 		//insert all channels into table
@@ -49,10 +54,10 @@ public class GuildJoinListener extends ListenerAdapter {
 		
 		FileSetting.createGuildDirectory(e.getGuild());
 		//check if guild ini file exists, else create a new one or verify content
-		if(!new File("./ini/"+guild_id+".ini").exists())
-			GuildIni.createIni(guild_id);
+		if(!new File("./ini/"+e.getJDA().getSelfUser().getName()+"_"+guild_id+".ini").exists())
+			GuildIni.createIni(e.getGuild());
 		else
-			GuildIni.verifyIni(guild_id);
+			GuildIni.verifyIni(e.getGuild());
 		
 		//run server specific timers
 		ParseSubscription.runTask(e.getJDA(), guild_id);

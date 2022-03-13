@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
@@ -86,6 +87,7 @@ public class SetWarning {
 			else {
 				Hashes.clearTempCache(key);
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SET_WARNINGS.getColumn(), _message);
 		}
 	}
 }

@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Channels;
 import de.azrael.constructors.Messages;
 import de.azrael.core.Hashes;
@@ -30,6 +31,7 @@ import de.azrael.filter.URLFilter;
 import de.azrael.google.GoogleSheets;
 import de.azrael.google.GoogleUtils;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -101,11 +103,12 @@ public class GuildMessageEditListener extends ListenerAdapter {
 			}
 			
 			executor.execute(() -> {
+				BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(e.getGuild().getIdLong());
 				boolean printEditHistory = false;
 				//check if edited messages should be collected and printed in a channel
-				if(GuildIni.getEditedMessage(e.getGuild().getIdLong())) {
+				if(botConfig.getEditedMessages()) {
 					//verify if the message history has to be printed and not just the edited message
-					if(GuildIni.getEditedMessageHistory(e.getGuild().getIdLong())) {
+					if(botConfig.getEditedMessagesHistory()) {
 						printEditHistory = true;
 					}
 					//print the edited message either in an edit or trash channel
@@ -117,8 +120,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 				}
 				
 				//check if the channel log and cache log is enabled and if one of the two or bot is/are enabled then write message to file or/and log to system cache
-				var log = GuildIni.getChannelAndCacheLog(e.getGuild().getIdLong());
-				if((log[0] || log[1]) && e.getMessage().getMember() != null && !e.getMessage().getMember().getUser().isBot()) {
+				if((botConfig.getChannelLog() || botConfig.getCacheLog()) && e.getMessage().getMember() != null && !e.getMessage().getMember().getUser().isBot()) {
 					StringBuilder image_url = new StringBuilder();
 					for(Attachment attch : e.getMessage().getAttachments()){
 						image_url.append((e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? "("+attch.getProxyUrl()+")" : "\n("+attch.getProxyUrl()+")");
@@ -135,8 +137,9 @@ public class GuildMessageEditListener extends ListenerAdapter {
 					collectedMessage.setIsEdit(true); // note: flag set to true for edited message
 					collectedMessage.setIsUserBot(e.getMessage().getMember().getUser().isBot());
 					
-					if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "EDIT ["+collectedMessage.getTime().toString()+" - "+e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator()+" ("+e.getMessage().getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
-					if(log[1]) {
+					if(botConfig.getChannelLog())
+						FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "EDIT ["+collectedMessage.getTime().toString()+" - "+e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator()+" ("+e.getMessage().getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
+					if(botConfig.getCacheLog()) {
 						if(messages != null) {
 							messages.add(collectedMessage);
 							Hashes.addMessagePool(e.getGuild().getIdLong(), e.getMessageIdLong(), messages);
@@ -204,7 +207,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 					}
 				}
 				
-				if(GuildIni.getGoogleFunctionalitiesEnabled(e.getGuild().getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(e.getGuild().getIdLong())) {
+				if(botConfig.getGoogleFunctionalities()) {
 					//Run google service, if enabled
 					runVoteSpreadsheetService(e, allChannels);
 					
@@ -261,7 +264,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 											}
 											if(columnMessage != 0) {
 												ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-												final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
+												final String [] reactions = GuildIni.getVoteReactions(e.getGuild());
 												Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");
 												Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
 												Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
@@ -307,7 +310,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 								}
 							}
 							else if(DelayedGoogleUpdate.containsMessage(e.getGuild().getId()+"_"+e.getChannel().getId()+"_"+e.getMessageId(), "add")) {
-								final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
+								final String [] reactions = GuildIni.getVoteReactions(e.getGuild());
 								Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");
 								Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
 								Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");

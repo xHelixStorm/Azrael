@@ -105,17 +105,18 @@
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 		    <plugin>
-			    <artifactId>maven-compiler-plugin</artifactId>
-			    <version>3.8.1</version>
+			    <artifactId>maven-assembly-plugin</artifactId>
+			    <version>3.3.0</version>
 			    <configuration>
+			    	<descriptorRefs>
+			    		<descriptorRef>jar-with-dependencies</descriptorRef>
+			    	</descriptorRefs>
+			    	<appendAssemblyId>false</appendAssemblyId>
 			    	<archive>
 			    		<manifest>
 			    			<mainClass>de.azrael.core.Main</mainClass>
 			    		</manifest>
 			    	</archive>
-			    	<descriptorRefs>
-			    		<descriptorRef>jar-with-dependencies</descriptorRef>
-			    	</descriptorRefs>
 			    </configuration>
 		    </plugin>
 		</plugins>

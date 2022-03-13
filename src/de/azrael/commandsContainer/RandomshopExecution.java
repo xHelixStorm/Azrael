@@ -110,7 +110,7 @@ public class RandomshopExecution {
 				Ranking user_details = RankingSystem.SQLgetWholeRankView(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 				final long price = guild_settings.getRandomshopPrice();
 				if(user_details.getCurrency() >= price) {
-					List<WeaponStats> stats = RankingSystemItems.SQLgetWeaponStats(e.getGuild().getIdLong());
+					List<WeaponStats> stats = RankingSystemItems.SQLgetWeaponStats();
 					if(stats.size() > 0) {
 						final int rand = ThreadLocalRandom.current().nextInt(0, stats.size());
 						user_details.setCurrency(user_details.getCurrency()-price);

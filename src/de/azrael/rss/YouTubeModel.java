@@ -16,9 +16,9 @@ import de.azrael.constructors.Messages;
 import de.azrael.constructors.RSS;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.google.GoogleYoutube;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -65,7 +65,7 @@ public class YouTubeModel {
 								if(historyMessage == null)
 									guild.getTextChannelById(rss_channel).sendMessage(outMessage).queue(m -> {
 										Azrael.SQLInsertSubscriptionLog(m.getIdLong(), item.getId().getVideoId());
-										if(GuildIni.getCacheLog(guild.getIdLong())) {
+										if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getCacheLog()) {
 											Messages collectedMessage = new Messages();
 											collectedMessage.setUserID(0);
 											collectedMessage.setUsername(channelName);

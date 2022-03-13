@@ -66,8 +66,6 @@ public class Guilds {
 	private int daily_description_startx;
 	private int daily_field_sizex;
 	
-	private long messageTimeout;
-	
 	public void setName(String _name) {
 		this.name = _name;
 	}
@@ -127,9 +125,6 @@ public class Guilds {
 	}
 	public void setStartCurrency(long _start_currency) {
 		this.start_currency = _start_currency;
-	}
-	public void setMessageTimeout(long _messageTimeout) {
-		this.messageTimeout = _messageTimeout;
 	}
 	public void setInventoryStartX(int _inventory_startx) {
 		this.inventory_startx = _inventory_startx;
@@ -314,9 +309,6 @@ public class Guilds {
 	}
 	public long getStartCurrency() {
 		return this.start_currency;
-	}
-	public long getMessageTimeout() {
-		return this.messageTimeout;
 	}
 	public int getInventoryStartX() {
 		return this.inventory_startx;

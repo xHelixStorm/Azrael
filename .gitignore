@@ -7,3 +7,4 @@
 /target/
 /config.ini
 config.ini
+.secret_data

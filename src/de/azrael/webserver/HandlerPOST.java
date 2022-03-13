@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import de.azrael.commands.Invites;
 import de.azrael.commands.ShutDown;
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
@@ -23,6 +24,7 @@ import de.azrael.google.GoogleSheets;
 import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.AzraelWeb;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -282,7 +284,7 @@ public class HandlerPOST {
 			if(json.has("guild_id")) {
 				Guild guild = e.getJDA().getGuildById(json.getLong("guild_id"));
 				if(guild != null) {
-					if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+					if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getGoogleFunctionalities()) {
 						if(GoogleSheets.spreadsheetExportRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.EXPORT.id, ""), guild, "", e.getJDA().getSelfUser().getId(), new Timestamp(System.currentTimeMillis()), e.getJDA().getGatewayPing(), guild.getMemberCount(), e.getJDA().getGuilds().size())) {
 							WebserviceUtils.return201(out, "Data exported to google spreadsheet.", false);
 						}
@@ -301,7 +303,7 @@ public class HandlerPOST {
 			else {
 				long guilds_count = e.getJDA().getGuilds().size();
 				for(final var guild : e.getJDA().getGuilds()) {
-					if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+					if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getGoogleFunctionalities()) {
 						GoogleSheets.spreadsheetExportRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.EXPORT.id, ""), guild, "", e.getJDA().getSelfUser().getId(), new Timestamp(System.currentTimeMillis()), e.getJDA().getGatewayPing(), guild.getMemberCount(), guilds_count);
 					}
 				}
@@ -314,7 +316,8 @@ public class HandlerPOST {
 		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
 		WebserviceUtils.return200(out, "Bot shutdown", false, false);
 		e.getJDA().getGuilds().parallelStream().forEach(guild -> {
-			if(GuildIni.getNotifications(guild.getIdLong())) {
+			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild.getIdLong());
+			if(botConfig.getNotifications()) {
 				if(json.has("message")) {
 					STATIC.writeToRemoteChannel(guild, null, json.getString("message"), Channel.LOG.getType());
 				}
@@ -322,7 +325,7 @@ public class HandlerPOST {
 					STATIC.writeToRemoteChannel(guild, null, STATIC.getTranslation2(guild, Translation.SHUTDOWN_SOON), Channel.LOG.getType());
 				}
 			}
-			ShutDown.saveCache(guild);
+			ShutDown.saveCache(guild, botConfig);
 		});
 		Invites.enableShutdownMode();
 		while(true) {
@@ -510,7 +513,7 @@ public class HandlerPOST {
 		if(guild != null) {
 			Member serverMember = guild.getMemberById(user_id);
 			if(serverMember != null) {
-				if(UserPrivs.isUserAdmin(serverMember) || serverMember.getUser().getIdLong() == GuildIni.getAdmin(guild.getIdLong())) {
+				if(UserPrivs.isUserAdmin(serverMember) || BotConfiguration.SQLisAdministrator(serverMember.getUser().getIdLong(), guild.getIdLong())) {
 					boolean valid = false;
 					boolean textFileEdit = false;
 					switch(field) {
@@ -559,7 +562,7 @@ public class HandlerPOST {
 							}
 						}
 						case "General_Administrator" -> {
-							if(value.matches("[0-9]*") && guild.getMemberById(value) != null && user_id == GuildIni.getAdmin(guild.getIdLong()))
+							if(value.matches("[0-9]*") && guild.getMemberById(value) != null && BotConfiguration.SQLisAdministrator(user_id, guild.getIdLong()))
 								valid = true;
 						}
 						case "General_CommandPrefix" -> {
@@ -619,12 +622,13 @@ public class HandlerPOST {
 					
 					if(valid) {
 						if(!textFileEdit) {
-							if(GuildIni.saveIniOption(guild.getIdLong(), field, value)) {
+							if(GuildIni.saveIniOption(guild, field, value)) {
 								WebserviceUtils.return200(out, "Option updated!", true, false);
 								AzraelWeb.SQLInsertActionLog(user_id, address, "BOT_OPTION_UPDATED", field+" for guild "+guild.getIdLong());
 								
 								if(field.equals("General_DoubleExperience")) {
-									GuildIni.setDoubleExperienceMode(guild.getIdLong(), value);
+									BotConfiguration.SQLUpdateBotConfigsDoubleExperience(guild.getIdLong(), value);
+									Hashes.removeBotConfiguration(guild.getIdLong());
 									if(!value.equals("auto"))
 										Hashes.addTempCache("doubleExp_gu"+guild.getId(), new Cache(value));
 									else 

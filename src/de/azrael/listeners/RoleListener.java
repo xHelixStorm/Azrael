@@ -1,13 +1,5 @@
 package de.azrael.listeners;
 
-/**
- * this class gets executed when a user receives a role.
- * 
- * Handled is when a user receives the mute role. After
- * receiving the mute role, it will be checked what
- * kind and level of punishment the user will receive.
- */ 
-
 import java.awt.Color;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
@@ -18,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Bancollect;
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Ranking;
 import de.azrael.constructors.Warning;
 import de.azrael.core.Hashes;
@@ -29,6 +22,7 @@ import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.RoleTimer;
@@ -42,6 +36,14 @@ import net.dv8tion.jda.api.events.role.update.RoleUpdateColorEvent;
 import net.dv8tion.jda.api.events.role.update.RoleUpdatePermissionsEvent;
 import net.dv8tion.jda.api.events.role.update.RoleUpdatePositionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
+/**
+ * this class gets executed when a user receives a role.
+ * 
+ * Handled is when a user receives the mute role. After
+ * receiving the mute role, it will be checked what
+ * kind and level of punishment the user will receive.
+ */ 
 
 public class RoleListener extends ListenerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(RoleListener.class);
@@ -91,7 +93,7 @@ public class RoleListener extends ListenerAdapter {
 						Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 						STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.ROLE_AGAIN_MUTED_1).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 						Azrael.SQLInsertActionLog("MEMBER_PERM_MUTE_READD", user_id, guild_id, "Permanent Mute role reassigned");
-						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+						if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 							final String [] array =  Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE_READD.id, "");
 							if(array != null && !array[0].equals("empty")) {
 								Object [] object = getReporterFromAuditLog(e);
@@ -128,7 +130,7 @@ public class RoleListener extends ListenerAdapter {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), Permission.MANAGE_ROLES.getName()+STATIC.getTranslation2(e.getGuild(), Translation.ROLE_ROLES_REMOVE_ERR), Channel.LOG.getType());
 					Azrael.SQLInsertActionLog("MEMBER_MUTE_READD", user_id, guild_id, "Mute role reassigned");
 					//Run google service, if enabled
-					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+					if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 						final String [] array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE_READD.id, "");
 						if(array != null && !array[0].equals("empty")) {
 							Object [] object = getReporterFromAuditLog(e);
@@ -188,7 +190,7 @@ public class RoleListener extends ListenerAdapter {
 						//send a private message to the user
 						e.getUser().openPrivateChannel().queue(channel -> {
 							channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM).replaceFirst("\\{\\}", e.getGuild().getName()).replace("{}", hour_add+and_add+minute_add)
-									+ (GuildIni.getMuteSendReason(guild_id) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
+									+ (GuildIni.getMuteSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 										//success callback not required
 										channel.close().queue();
 									}, error -> {
@@ -201,7 +203,7 @@ public class RoleListener extends ListenerAdapter {
 						logger.info("User {} got muted in guild {}", e.getUser().getId(), e.getGuild().getId());
 						
 						//Run google service, if enabled
-						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+						if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 							GoogleSheets.spreadsheetMuteRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE.id, ""), e.getGuild(), "", e.getMember().getUser().getId(), new Timestamp(time), user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), new Timestamp(time+mute_time));
 						}
 					}
@@ -237,7 +239,7 @@ public class RoleListener extends ListenerAdapter {
 							//send a private message
 							e.getUser().openPrivateChannel().queue(channel -> {
 								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM_2).replaceFirst("\\{\\}", e.getGuild().getName()).replaceFirst("\\{\\}", hour_add+and_add+minute_add).replace("{}", "**"+(warning_id+1)+"**/**"+max_warning+"**")
-										+ (GuildIni.getMuteSendReason(guild_id) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
+										+ (GuildIni.getMuteSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 											//success callback not required
 											channel.close().queue();
 										}, error -> {
@@ -250,19 +252,20 @@ public class RoleListener extends ListenerAdapter {
 							logger.info("User {} got muted in guild {}", e.getUser().getId(), e.getGuild().getId());
 							
 							//Run google service, if enabled
-							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+							if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 								GoogleSheets.spreadsheetMuteRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE.id, ""), e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, hour_add+minute_add+and_add, ""+(warning_id+1), unmute_timestamp);
 							}
 						}
 						//ban or perm mute if the current warning exceeded the max allowed warning
 						else if((warning_id+1) > max_warning) {
 							//execute this block if perm mute is disabled
-							if(!GuildIni.getOverrideBan(guild_id)) {
+							BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild_id);
+							if(!botConfig.getOverrideBan()) {
 								if(e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
 									//send a private message to the user
 									e.getUser().openPrivateChannel().queue(channel -> {
 										channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_DM).replace("{}", e.getGuild().getName())
-												+ (GuildIni.getBanSendReason(guild_id) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
+												+ (GuildIni.getBanSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 													//ban the user
 													e.getGuild().ban(e.getMember(), 0).reason(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_REASON)).queue();
 													Azrael.SQLInsertHistory(user_id, guild_id, "ban", reason, 0, e.getJDA().getSelfUser().getName()+"#"+e.getJDA().getSelfUser().getDiscriminator());
@@ -290,7 +293,7 @@ public class RoleListener extends ListenerAdapter {
 								//send a private message
 								e.getUser().openPrivateChannel().queue(channel -> {
 									channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM_3).replace("{}", e.getGuild().getName())
-											+ (GuildIni.getMuteSendReason(guild_id) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
+											+ (GuildIni.getMuteSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 												//no callback required
 												channel.close().queue();
 											}, error -> {
@@ -302,7 +305,7 @@ public class RoleListener extends ListenerAdapter {
 								new Thread(new RoleTimer(e, mute_id, issuer, reason)).start();
 								
 								//Run google service, if enabled
-								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+								if(botConfig.getGoogleFunctionalities()) {
 									GoogleSheets.spreadsheetMuteRequest(Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.MUTE.id, ""), e.getGuild(), "", e.getMember().getUser().getId(), timestamp, user_name, e.getMember().getEffectiveName(), reporter.getUser().getName()+"#"+reporter.getUser().getDiscriminator(), reporter.getEffectiveName(), reason, "PERMANENT", ""+(warning_id+1), unmute_timestamp);
 								}
 							}
@@ -455,7 +458,7 @@ public class RoleListener extends ListenerAdapter {
 					);
 				}
 			}
-			if(roles.size() > 0 && GuildIni.getReassignRolesAfterMute(e.getGuild().getIdLong())) {
+			if(roles.size() > 0 && BotConfiguration.SQLgetBotConfigs(e.getGuild().getIdLong()).getReassignRoles()) {
 				DiscordRoles.SQLInsertReassignRoles(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), roles);
 			}
 		}

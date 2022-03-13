@@ -37,8 +37,8 @@ import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -84,7 +84,7 @@ public class URLFilter implements Runnable{
 						shortURL = matcher2.group();
 					final var fqdn = shortURL;
 					//check if the bot is in full url delete mode for this server, if not, remove urls basing a blacklist table 
-					var fullBlacklist = GuildIni.getURLBlacklist(guild_id);
+					var fullBlacklist = BotConfiguration.SQLgetBotConfigs(member.getGuild().getIdLong()).getUrlBlacklist();
 					if(fullBlacklist) {
 						//remove url if that fqdn had been used before
 						if(Hashes.findGlobalURLBlacklist(fqdn)) {

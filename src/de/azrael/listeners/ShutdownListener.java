@@ -68,8 +68,6 @@ public class ShutdownListener extends ListenerAdapter {
 		params.append(STATIC.getToken());
 		if(STATIC.getSessionName().length() > 0)
 			params.append(" sessionname:"+STATIC.getSessionName());
-		if(STATIC.getAdmin() > 0)
-			params.append(" admin:"+STATIC.getAdmin());
 		if(STATIC.getTimezone().length() > 0)
 			params.append(" timezone:"+STATIC.getTimezone());
 		if(STATIC.getActionLog().length() > 0)

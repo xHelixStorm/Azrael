@@ -11,6 +11,7 @@ import com.vdurmont.emoji.EmojiParser;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.RSS;
 import de.azrael.core.Hashes;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.rss.BasicModel;
 import de.azrael.rss.TwitterModel;
@@ -76,6 +77,7 @@ public class SubscribeExecution {
 			message.setColor(Color.RED);
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_LOGIN_TWITTER)).build()).queue();
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void removeFeed(GuildMessageReceivedEvent e, int feed) {
@@ -99,6 +101,7 @@ public class SubscribeExecution {
 		else {
 			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_DISPLAYED_NUM)).build()).queue();
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void currentFormat(GuildMessageReceivedEvent e, int feed, String key) {
@@ -114,6 +117,7 @@ public class SubscribeExecution {
 			EmbedBuilder message = new EmbedBuilder();
 			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_DISPLAYED_NUM)).build()).queue();
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void updateFormat(GuildMessageReceivedEvent e, int feed, String format) {
@@ -128,6 +132,7 @@ public class SubscribeExecution {
 			e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("The display format of RSS url {} couldn't be updated in guild {}", rss.get(feed).getURL(), e.getGuild().getId());
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void changeOptions(GuildMessageReceivedEvent e, int feed, String key) {
@@ -147,6 +152,7 @@ public class SubscribeExecution {
 					+ STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_OPTIONS_5).replace("{}", (out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)))
 					+ STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_OPTIONS_6)).build()).queue();
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void updateOptions(GuildMessageReceivedEvent e, int feed, String key) {
@@ -277,6 +283,7 @@ public class SubscribeExecution {
 					+ STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_OPTIONS_5).replace("{}", (out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)))
 					+ STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_OPTIONS_6)).build()).queue();
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void setChannel(GuildMessageReceivedEvent e, int feed, String key) {
@@ -287,6 +294,7 @@ public class SubscribeExecution {
 			Hashes.addTempCache(key, new Cache(180000, "set-channel", ""+feed));
 			e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_ADD).replace("{}", (subscription.getChannelID() > 0 ? "<#"+subscription.getChannelID()+">" : STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_DEFAULT)))).build()).queue();
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void updateAlternativeChannel(GuildMessageReceivedEvent e, int feed, String key) {
@@ -320,6 +328,7 @@ public class SubscribeExecution {
 		else {
 			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_ERR_2)).build()).queue();
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void runTest(GuildMessageReceivedEvent e, int feed) {
@@ -337,5 +346,6 @@ public class SubscribeExecution {
 			EmbedBuilder message = new EmbedBuilder();
 			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_DISPLAYED_NUM)).build()).queue();
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
 	}
 }

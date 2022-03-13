@@ -2,24 +2,15 @@ package de.azrael.listeners;
 
 import java.sql.Timestamp;
 
-/**
- * This class gets executed when the nickname of a user gets updated!
- * 
- * Depending on the nickname change, the nickname will either get deleted
- * from or inserted into the Azrael.nickname table. The Azrael.nickname
- * table is meant to keep the administrators updated regarding users,
- * that have a nickname.  
- */
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.core.Hashes;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
@@ -29,8 +20,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 /**
  * This class will update the nickname table on name change
  * and eventually log to google spreadsheets, if available
- * @author xHelixStorm
- *
  */
 
 public class NicknameListener extends ListenerAdapter {
@@ -66,7 +55,7 @@ public class NicknameListener extends ListenerAdapter {
 					}
 				}
 				//Run google service, if enabled
-				if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+				if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 					final String [] array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.RENAME_MANUAL.id, "");
 					if(array != null && !array[0].equals("empty")) {
 						final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);

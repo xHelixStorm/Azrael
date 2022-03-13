@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
@@ -45,8 +45,8 @@ public class RegisterCategory {
 		}
 	}
 	
-	public static void runCommand(GuildMessageReceivedEvent e, String [] args, boolean adminPermission) {
-		final var commandLevel = GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong());
+	public static boolean runCommand(GuildMessageReceivedEvent e, String [] args, boolean adminPermission) {
+		final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_CATEGORY);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			Pattern pattern = Pattern.compile("(ver)");
 			Matcher matcher = pattern.matcher(args[1]);
@@ -84,10 +84,12 @@ public class RegisterCategory {
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
+			return true;
 		}
 		else {
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
 			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
+		return false;
 	}
 }

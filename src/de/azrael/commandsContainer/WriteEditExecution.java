@@ -10,7 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
+import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -67,6 +69,7 @@ public class WriteEditExecution implements Runnable {
 			cache.setExpiration(180000);
 			Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache);
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.WRITE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void editHelp(GuildMessageReceivedEvent e, Cache cache) {
@@ -118,6 +121,7 @@ public class WriteEditExecution implements Runnable {
 			cache.setExpiration(180000);
 			Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache);
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.EDIT.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void reactionAddHelp(GuildMessageReceivedEvent e, Cache cache) {
@@ -125,6 +129,7 @@ public class WriteEditExecution implements Runnable {
 			Hashes.addTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId()+"me"+message.getId(), new Cache(180000, cache.getAdditionalInfo2(), cache.getAdditionalInfo3()));
 			Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		});
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.EDIT.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void reactionAnswer(GuildMessageReceivedEvent e, Cache cache, String message) {
@@ -146,10 +151,12 @@ public class WriteEditExecution implements Runnable {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NO_ROLES)).build()).queue();
 				Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.EDIT.getColumn(), e.getMessage().getContentRaw());
 		}
 		else if(message.equals("no")) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_COMPLETE)).build()).queue();
 			Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.EDIT.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -173,6 +180,7 @@ public class WriteEditExecution implements Runnable {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NO_NUMBER)).build()).queue();
 				Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.EDIT.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -192,6 +200,7 @@ public class WriteEditExecution implements Runnable {
 				logger.error("MANAGE_MESSAGES permission required for channel {} to remove reactions from a message in guild {}", cache.getAdditionalInfo2(), e.getGuild().getId());
 			}
 		});
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.EDIT.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	private GuildMessageReceivedEvent e;

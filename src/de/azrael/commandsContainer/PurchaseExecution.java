@@ -10,7 +10,9 @@ import de.azrael.constructors.Guilds;
 import de.azrael.constructors.InventoryContent;
 import de.azrael.constructors.Weapons;
 import de.azrael.core.Hashes;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
+import de.azrael.sql.Azrael;
 import de.azrael.sql.RankingSystem;
 import de.azrael.sql.RankingSystemItems;
 import de.azrael.util.STATIC;
@@ -113,6 +115,7 @@ public class PurchaseExecution {
 				ShopExecution.displaySkills(e, guild_settings);
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SHOP.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void sell(GuildMessageReceivedEvent e, final String type, final String item_number, Guilds guild_settings) {
@@ -165,6 +168,7 @@ public class PurchaseExecution {
 				returnSkinMenu(e, guild_settings, type);
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SHOP.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	private static void returnSkinMenu(GuildMessageReceivedEvent e, Guilds guild_settings, final String type) {

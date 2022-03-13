@@ -1,7 +1,6 @@
 package de.azrael.sql;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,16 +8,10 @@ import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.util.STATIC;
 
 public class AzraelWeb {
 private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
-	
-	private static String ip = IniFileReader.getSQLWebIP();
-	private static String username = IniFileReader.getSQLWebUsername();
-	private static String password = IniFileReader.getSQLWebPassword();
-	
 	
 	public static void SQLconnection() {
 		try {
@@ -33,7 +26,7 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
+			myConn = STATIC.getDatabaseURL(4);
 			stmt = myConn.prepareStatement(AzraelWebStatements.SQLInsertActionLog);
 			stmt.setLong(1, user_id);
 			stmt.setString(2, address);
@@ -54,7 +47,7 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
+			myConn = STATIC.getDatabaseURL(4);
 			stmt = myConn.prepareStatement(AzraelWebStatements.SQLInsertLoginInfo);
 			stmt.setLong(1, user_id);
 			stmt.setInt(2, type);
@@ -75,7 +68,7 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
+			myConn = STATIC.getDatabaseURL(4);
 			stmt = myConn.prepareStatement(AzraelWebStatements.SQLCodeUsageLog);
 			stmt.setLong(1, user_id);
 			stmt.setString(2, address);
@@ -100,7 +93,7 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
+			myConn = STATIC.getDatabaseURL(4);
 			stmt = myConn.prepareStatement(AzraelWebStatements.SQLgetLoginType);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, bot_id);
@@ -125,7 +118,7 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("AzraelWeb", ip), username, password);
+			myConn = STATIC.getDatabaseURL(4);
 			stmt = myConn.prepareStatement(AzraelWebStatements.SQLisDefaultBot);
 			stmt.setLong(1, bot_id);
 			rs = stmt.executeQuery();

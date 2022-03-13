@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.commands.CustomCmd;
 import de.azrael.commandsContainer.ScheduleExecution;
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Messages;
@@ -31,6 +32,7 @@ import de.azrael.fileManagement.IniFileReader;
 import de.azrael.rankingSystem.DoubleExperienceOff;
 import de.azrael.rankingSystem.DoubleExperienceStart;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.Patchnotes;
 import de.azrael.sql.RankingSystem;
@@ -87,10 +89,10 @@ public class ReadyListener extends ListenerAdapter {
 		for(Guild guild : e.getJDA().getGuilds()) {
 			//create a guild ini file for new servers or verify if there are any old or missing variables that need to be added or removed
 			FileSetting.createGuildDirectory(guild);
-			if(!new File("ini/"+guild.getId()+".ini").exists())
-				GuildIni.createIni(guild.getIdLong());
+			if(!new File("ini/"+e.getJDA().getSelfUser().getName()+"_"+guild.getId()+".ini").exists())
+				GuildIni.createIni(guild);
 			else
-				GuildIni.verifyIni(guild.getIdLong());
+				GuildIni.verifyIni(guild);
 			
 			//verify that the guild is registered in the database, if not insert the current guild into the database
 			if(Azrael.SQLgetGuild(guild.getIdLong()) == 0) {
@@ -102,6 +104,25 @@ public class ReadyListener extends ListenerAdapter {
 			if(RankingSystem.SQLgetGuild(guild.getIdLong()) == null) {
 				if(RankingSystem.SQLInsertGuild(guild.getIdLong(), guild.getName(), false) == 0) {
 					logger.error("Guild ranking information couldn't be saved in guild {}", guild.getId());
+				}
+			}
+			//verify that bot configurations exist in the bot configuration database
+			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild.getIdLong());
+			if(botConfig.isDefault()) {
+				if(!BotConfiguration.SQLInsertBotConfigs(guild.getIdLong())) {
+					logger.error("Guild configuration couldn't be generated in guild {}", guild.getId());
+				}
+			}
+			//verify that commands exist in the bot configurations, else create them
+			if(!BotConfiguration.SQLCommandsAvailable(guild.getIdLong())) {
+				if(!BotConfiguration.SQLInsertBotConfigs(guild.getIdLong())) {
+					logger.error("Guild commands configuration couldn't be generated in guild {}", guild.getId());
+				}
+			}
+			//verify that commands permissions exist in the bot configurations, else create them
+			if(!BotConfiguration.SQLCommandsLevelAvailable(guild.getIdLong())) {
+				if(!BotConfiguration.SQLInsertBotConfigs(guild.getIdLong())) {
+					logger.error("Guild command permissions configuration couldn't be generated in guild {}", guild.getId());
 				}
 			}
 			//Retrieve all registered channels and throw warning, if no channel has been registered. If found, check for the log and bot channel
@@ -156,7 +177,7 @@ public class ReadyListener extends ListenerAdapter {
 			
 			//retrieve private patch notes
 			var published = false;
-			if(priv_notes != null && GuildIni.getPrivatePatchNotes(guild.getIdLong())) {
+			if(priv_notes != null && botConfig.getPrivatePatchNotes()) {
 				EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle(STATIC.getTranslation2(guild, Translation.PATCHNOTES_LATEST_TITLE));
 				final var result = STATIC.writeToRemoteChannel(guild, messageBuild, STATIC.getTranslation2(guild, Translation.PATCHNOTES_VERSION)+"**"+STATIC.getVersion()+"** "+priv_notes.getDate()+"\n"+priv_notes.getMessage1(), Channel.LOG.getType());
 				if(result) {
@@ -166,7 +187,7 @@ public class ReadyListener extends ListenerAdapter {
 				}
 			}
 			//retrieve public patch notes
-			if(publ_notes != null && GuildIni.getPublicPatchNotes(guild.getIdLong())) {
+			if(publ_notes != null && botConfig.getPublicPatchnotes()) {
 				EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getAvatarUrl()).setTitle(STATIC.getTranslation2(guild, Translation.PATCHNOTES_LATEST_TITLE));
 				final var result = STATIC.writeToRemoteChannel(guild, messageBuild, STATIC.getTranslation2(guild, Translation.PATCHNOTES_VERSION)+"**"+STATIC.getVersion()+"** "+publ_notes.getDate()+"\n"+publ_notes.getMessage1(), Channel.BOT.getType());
 				if(result) {
@@ -180,7 +201,7 @@ public class ReadyListener extends ListenerAdapter {
 			}
 			
 			//check if double exp should be enabled or disabled for the current guild
-			var doubleExp = GuildIni.getDoubleExperienceMode(guild.getIdLong());
+			var doubleExp = botConfig.getDoubleExperience();
 			if(!doubleExp.equals("auto"))
 				Hashes.addTempCache("doubleExp_gu"+guild.getId(), new Cache(0, doubleExp));
 			
@@ -189,7 +210,7 @@ public class ReadyListener extends ListenerAdapter {
 			
 			//initialize Message pool cache and load saved messages, if available
 			Hashes.initializeGuildMessagePool(guild.getIdLong(), 10000);
-			if(GuildIni.getCacheLog(guild.getIdLong())) {
+			if(botConfig.getCacheLog()) {
 				if(new File(tempDirectory+"message_pool"+guild.getId()+".json").exists()) {
 					JSONObject json = null;
 					try {
@@ -251,8 +272,9 @@ public class ReadyListener extends ListenerAdapter {
 		executor.execute(new CollectUsersGuilds(e, null));
 		e.getJDA().getGuilds().parallelStream().forEach(g -> {
 			//print bot is now operational message in all servers
+			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(g.getIdLong());
 			//TODO: translate message
-			if(GuildIni.getNotifications(g.getIdLong()))
+			if(botConfig.getNotifications())
 				STATIC.writeToRemoteChannel(g, null, "Bot is now operational!", Channel.LOG.getType());
 			executor.execute(new RoleExtend(g));
 			Azrael.SQLBulkInsertCategories(g.getCategories());

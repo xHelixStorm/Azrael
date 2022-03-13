@@ -13,6 +13,9 @@ import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -43,18 +46,21 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiManager;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Channels;
 import de.azrael.constructors.SpamDetection;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -85,7 +91,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class STATIC {
 	private final static Logger logger = LoggerFactory.getLogger(STATIC.class);
 	
-	private static final String VERSION = "7.43.593";
+	private static final String VERSION = "8.01.591";
 	
 	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
 	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
@@ -94,11 +100,15 @@ public class STATIC {
 	private static final JSONObject por_lang = new JSONObject(FileSetting.readFile("./files/Languages/por_lang.json"));
 	private static final JSONObject fre_lang = new JSONObject(FileSetting.readFile("./files/Languages/fre_lang.json"));
 	
+	private static final String TWITTER_CONSUMER_KEY = "TWITTER_CONSUMER_KEY";
+	private static final String TWITTER_CONSUMER_KEY_SECRET = "TWITTER_CONSUMER_KEY_SECRET";
+	private static final String TWITTER_ACCESS_TOKEN = "TWITTER_ACCESS_TOKEN";
+	private static final String TWITTER_ACCESS_TOKEN_SECRET = "TWITTER_ACCESS_TOKEN_SECRET";
+	
 	private static OffsetDateTime bootTime = null;
 	
 	private static String TOKEN = "";
 	private static String SESSION_NAME = "";
-	private static long ADMIN = 0;
 	private static String TIMEZONE = "";
 	private static String ACTIONLOG = "";
 	private static String DOUBLEEXPERIENCE = "";
@@ -235,12 +245,26 @@ public class STATIC {
 		return lang;
 	}
 	
-	//default mysql url String to access the database. As parameters, the database name and ip address to the mysql server are required
-	public static String getDatabaseURL(final String _dbName, final String _ip) {
-		return "jdbc:mysql://"+_ip+"/"+_dbName+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="+IniFileReader.getTimezone();
+	//MYSQL
+	public static Connection getDatabaseURL(final int setup) throws SQLException {
+		final String host = System.getProperty("DB_"+setup+"_HOST");
+		final String ip = System.getProperty("DB_"+setup+"_IP");
+		final String port = System.getProperty("DB_"+setup+"_PORT");
+		final String database = System.getProperty("DB_"+setup+"_DB_NAME");
+		final String user = System.getProperty("DB_"+setup+"_USER");
+		final String pass = System.getProperty("DB_"+setup+"_PASS");
+		return DriverManager.getConnection("jdbc:mysql://"+(!host.isEmpty() ? host : ip)+":"+port+"/"+database+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="+IniFileReader.getTimezone()
+			, user, pass);
 	}
-	public static String getDatabaseURL(final String _dbName, final String _ip, String _param) {
-		return "jdbc:mysql://"+_ip+"/"+_dbName+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="+IniFileReader.getTimezone()+_param;
+	public static Connection getDatabaseURL(final int setup, String param) throws SQLException {
+		final String host = System.getProperty("DB_"+setup+"_HOST");
+		final String ip = System.getProperty("DB_"+setup+"_IP");
+		final String port = System.getProperty("DB_"+setup+"_PORT");
+		final String database = System.getProperty("DB_"+setup+"_DB_NAME");
+		final String user = System.getProperty("DB_"+setup+"_USER");
+		final String pass = System.getProperty("DB_"+setup+"_PASS");
+		return DriverManager.getConnection("jdbc:mysql://"+(!host.isEmpty() ? host : ip)+":"+port+"/"+database+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="+IniFileReader.getTimezone()+param
+			, user, pass);
 	}
 	
 	public static void initializeBootTime() {
@@ -262,13 +286,6 @@ public class STATIC {
 	}
 	public static String getSessionName() {
 		return SESSION_NAME;
-	}
-	
-	public static void setAdmin(long _admin) {
-		ADMIN = _admin;
-	}
-	public static long getAdmin() {
-		return ADMIN;
 	}
 	
 	public static void setTimezone(String _timezone) {
@@ -338,6 +355,37 @@ public class STATIC {
 	}
 	public static int getPort() {
 		return PORT;
+	}
+	
+	//check if the command is enabled and that the user has enough permissions
+	public static boolean commandValidation(GuildMessageReceivedEvent e, BotConfigs botConfig, Command commandName) {
+		boolean enabled = false;
+		int commandLevel = 0;
+		@SuppressWarnings("unchecked")
+		final var command = (ArrayList<Object>)BotConfiguration.SQLgetCommand(e.getGuild().getIdLong(), 1, commandName);
+		for(Object val : command) {
+			if(val instanceof Boolean)
+				enabled = (Boolean)val;
+			else if(val instanceof Integer)
+				commandLevel = (Integer)val;
+		}
+		if(enabled) {
+			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong()))
+				return true;
+			else if(!botConfig.getIgnoreMissingPermissions())
+				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
+		}
+		return false;
+	}
+	
+	//check if command is enabled
+	public static boolean getCommandEnabled(Guild guild, Command command) {
+		return (Boolean)((ArrayList<?>)BotConfiguration.SQLgetCommand(guild.getIdLong(), 1, command)).get(0);
+	}
+	
+	//return command level 
+	public static int getCommandLevel(Guild guild, Command command) {
+		return (Integer)BotConfiguration.SQLgetCommand(guild.getIdLong(), 2, command);
 	}
 	
 	//collect a running thread (for example a user mute due to the Thread.sleep) to concurrent array and assign a name to it
@@ -573,14 +621,17 @@ public class STATIC {
 	//login into twitter. Only done if required and the bot has been set up to collect tweets with a specific hashtag
 	public static void loginTwitter() {
 		if(twitterFactory == null) {
-			final var tokens = IniFileReader.getTwitterKeys();
-			if(tokens[0] != null && tokens[1] != null && tokens[2] != null && tokens[3] != null) {
+			final String twitterConsumerKey = System.getProperty(TWITTER_CONSUMER_KEY);
+			final String twitterConsumerKeySecret = System.getProperty(TWITTER_CONSUMER_KEY_SECRET);
+			final String twitterAccessToken = System.getProperty(TWITTER_ACCESS_TOKEN);
+			final String twitterAccessTokenSecret = System.getProperty(TWITTER_ACCESS_TOKEN_SECRET);
+			if(!twitterConsumerKey.isEmpty() && !twitterConsumerKeySecret.isEmpty() && !twitterAccessToken.isEmpty() && !twitterAccessTokenSecret.isEmpty()) {
 				ConfigurationBuilder cb = new ConfigurationBuilder()
 						.setDebugEnabled(false)
-						.setOAuthConsumerKey(tokens[0])
-						.setOAuthConsumerSecret(tokens[1])
-						.setOAuthAccessToken(tokens[2])
-						.setOAuthAccessTokenSecret(tokens[3]);
+						.setOAuthConsumerKey(twitterConsumerKey)
+						.setOAuthConsumerSecret(twitterConsumerKeySecret)
+						.setOAuthAccessToken(twitterAccessToken)
+						.setOAuthAccessTokenSecret(twitterAccessTokenSecret);
 				twitterFactory = new TwitterFactory(cb.build());
 			}
 		}
@@ -613,11 +664,11 @@ public class STATIC {
 			final String message = e.getMessage().getContentRaw();
 			
 			//verify if the current user is spamming
-			if(GuildIni.getSpamDetection(guild_id)) {
+			if(GuildIni.getSpamDetection(e.getGuild())) {
 				//User doesn't have to be an admin, moderator or bot user and they are only allowed to spam in a bot channel
 				if(!e.getMember().getUser().isBot() && !UserPrivs.isUserMod(e.getMember()) && !UserPrivs.isUserAdmin(e.getMember()) && Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.BOT.getType()) || f.getChannel_Type().equals(Channel.QUI.getType()))).findAny().orElse(null) == null) {
-					final int messagesLimit = GuildIni.getMessagesLimit(e.getGuild().getIdLong());
-					final int messagesOverChannelsLimit = GuildIni.getMessageOverChannelsLimit(guild_id);
+					final int messagesLimit = GuildIni.getMessagesLimit(e.getGuild());
+					final int messagesOverChannelsLimit = GuildIni.getMessageOverChannelsLimit(e.getGuild());
 					final var cache = Hashes.getTempCache("spamDetection_gu"+guild_id+"us"+user_id);
 					if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
 						if(cache.getAdditionalInfo().equalsIgnoreCase(message)) {
@@ -651,7 +702,7 @@ public class STATIC {
 					final String lcMessage = message.toLowerCase();
 					var spamMessages = Hashes.getSpamDetection(user_id+"_"+guild_id);
 					if(spamMessages == null) {
-						spamMessages = new SpamDetection(GuildIni.getMessageExpires(guild_id));
+						spamMessages = new SpamDetection(GuildIni.getMessageExpires(e.getGuild()));
 						spamMessages.put(lcMessage, e.getMessageIdLong(), channel_id);
 					}
 					else if(!spamMessages.isExpired()) {
@@ -673,7 +724,7 @@ public class STATIC {
 						if(cache == null) {
 							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 								e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
-							Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage).setObject(spamMessages));
+							Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(e.getGuild()), lcMessage).setObject(spamMessages));
 						}
 						else {
 							if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
@@ -710,7 +761,7 @@ public class STATIC {
 							if(cache == null) {
 								if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 									e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
-								Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(guild_id), lcMessage).setObject(spamMessages));
+								Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(e.getGuild()), lcMessage).setObject(spamMessages));
 							}
 							else {
 								if(e.getGuild().getSelfMember().canInteract(e.getMember())) {

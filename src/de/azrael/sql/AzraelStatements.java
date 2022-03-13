@@ -4,6 +4,7 @@ import de.azrael.util.STATIC;
 
 class AzraelStatements {
 	final static String SQLInsertActionLog = STATIC.decrypt("n+gtIb6Ty81fhezvdep/wioLzgHwspmlYwfc6uPAUU4+15N21vP6khtwMDQt3hqwBm/+iGxpwPR6XvNI2aFU/I6lDbx92KZmghYJOmFLGupmjVs69TMRCLb7DOZTmXT+b/3+A7crHdjA11h+Cd7w3A==");
+	final static String SQLInsertCommandLog = STATIC.decrypt("ID0iJhHjo348wXX2w0mxjRtq5qhR8+8ROCs3ihFY4KaykuA0aFVLJ8mSeiS0/cP/38DBSBBNZshHe7R89/TOoRTmY+49Ktx/zb0J1ZdCMDg=");
 	final static String SQLInsertHistory = STATIC.decrypt("rysLn4hAP8ZiSqEvbp+rAa31JzRcvMlj8a1tiDrJ/sPpo/ac/tfkm8AaQ1Db3MAG5BX0vNBSIzol9ZZ9tO+UeFyom7bjhS2ts5kP3QHagLP5GaxQw1DW6Ww1G6QRczNy6P6rX4TfOqwDPHYgAebfAg==");
 	final static String SQLInsertHistory2 = STATIC.decrypt("rysLn4hAP8ZiSqEvbp+rAa31JzRcvMlj8a1tiDrJ/sPpo/ac/tfkm8AaQ1Db3MAG5BX0vNBSIzol9ZZ9tO+UeFyom7bjhS2ts5kP3QHagLP5GaxQw1DW6Ww1G6QRczNy76Ab1UY528jVcQRQLZ8K/g==");
 	final static String SQLBulkInsertHistory = STATIC.decrypt("rysLn4hAP8ZiSqEvbp+rAa31JzRcvMlj8a1tiDrJ/sPpo/ac/tfkm8AaQ1Db3MAG5BX0vNBSIzol9ZZ9tO+UeFyom7bjhS2ts5kP3QHagLP5GaxQw1DW6Ww1G6QRczNy6P6rX4TfOqwDPHYgAebfAg==");

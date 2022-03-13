@@ -15,9 +15,9 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
 import de.azrael.enums.Weekday;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.Permission;
@@ -51,7 +51,7 @@ public class DoubleExperienceStart extends TimerTask {
 			Hashes.addTempCache("doubleExp", new Cache("on"));
 			for(Guild g : event.getJDA().getGuilds()) {
 				guild_id = g.getIdLong();
-				if(RankingSystem.SQLgetGuild(guild_id).getRankingState() || GuildIni.getDoubleExperienceMode(guild_id).equals("auto")) {
+				if(RankingSystem.SQLgetGuild(guild_id).getRankingState() || BotConfiguration.SQLgetBotConfigs(guild_id).getDoubleExperience().equals("auto")) {
 					var bot_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).findAny().orElse(null);
 					if(bot_channel != null) {
 						final TextChannel textChannel = g.getTextChannelById(bot_channel.getChannel_ID());

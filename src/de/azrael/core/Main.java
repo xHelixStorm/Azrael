@@ -1,11 +1,13 @@
 package de.azrael.core;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.EnumSet;
+import java.util.Properties;
 
 import javax.security.auth.login.LoginException;
 
@@ -128,7 +130,6 @@ public class Main {
 			//display all available parmeters if program receives 'list' as parameter and terminate with exit 0
 			if(args[0].equals("list")) {
 				System.out.println("These are all available parameters. If nothing has been provided, the values from config.ini will be taken:\n\n"
-						+ "admin:<NUMERIC> (17/18 digit long user id that defines the admin for shutdown and reboot)\n"
 						+ "timezone:<String> (timezone location like 'Europe/Berlin' for mysql databases)\n"
 						+ "sessionname: <String> (if the bot should be started multiple times, assign a name)"
 						+ "actionlog:<BOOLEAN> (true/false parameter to log actions related to the ranking system and other updates)\n"
@@ -148,8 +149,6 @@ public class Main {
 				if(args.length > 1) {
 					for(final var argument : args) {
 						final var currentArgument = argument.toLowerCase();
-						if(currentArgument.startsWith("admin:"))
-							STATIC.setAdmin(Long.parseLong(argument.split(":")[1].trim()));
 						if(currentArgument.startsWith("timezone:"))
 							STATIC.setTimezone(argument.split(":")[1].trim());
 						if(currentArgument.startsWith("sessionname:"))
@@ -194,6 +193,83 @@ public class Main {
 			} catch (FileNotFoundException e1) {
 				logger.warn("Log file couldn't be found on start up", e1);
 			}
+		}
+		
+		//Load DB configuration from file
+		Properties prop = new Properties();
+		try {
+			FileInputStream secret = new FileInputStream("./.secret_data");
+			prop.load(secret);
+			
+			//Database options
+			final String dbNumber = prop.getProperty("DATABASE_NUMBER");
+			if(dbNumber != null && dbNumber.trim().matches("^[0-9]*$")) {
+				for(int i = 1; i <= Integer.parseInt(dbNumber.trim()); i++) {
+					final String sourceCodeName = prop.getProperty("DB_"+i+"_SOURCECODE_NAME");
+					final String dbName = prop.getProperty("DB_"+i+"_DB_NAME");
+					final String ip = prop.getProperty("DB_"+i+"_IP", "127.0.0.1");
+					final String port = prop.getProperty("DB_"+i+"_PORT", "3306");
+					final String host = prop.getProperty("DB_"+i+"_HOST", "http://localhost");
+					final String user = prop.getProperty("DB_"+i+"_USER");
+					final String pass = prop.getProperty("DB_"+i+"_PASS");
+					
+					if(sourceCodeName == null || dbName == null || user == null || pass == null) {
+						if(sourceCodeName == null)
+							logger.error("Parameter DB_{}_SOURCECODE_NAME not found!", i);
+						if(dbName == null)
+							logger.error("Parameter DB_{}_DB_NAME not found!", i);
+						if(user == null)
+							logger.error("Parameter DB_{}_USER not found!", i);
+						if(pass == null)
+							logger.error("Parameter DB_{}_PASS not found!", i);
+						logger.error("Database configuration couldn't be loaded. Application shutdown!");
+						return;
+					}
+					
+					System.setProperty("DB_"+i+"_SOURCECODE_NAME", sourceCodeName.trim());
+					System.setProperty("DB_"+i+"_DB_NAME", dbName.trim());
+					System.setProperty("DB_"+i+"_IP", ip.trim());
+					System.setProperty("DB_"+i+"_PORT", port.trim());
+					System.setProperty("DB_"+i+"_HOST", host.trim());
+					System.setProperty("DB_"+i+"_USER", STATIC.decrypt(user.trim()));
+					System.setProperty("DB_"+i+"_PASS", STATIC.decrypt(pass.trim()));
+				}
+			}
+			else if(dbNumber == null) {
+				logger.error("DATABASE_NUMBER parameter not found!");
+				return;
+			}
+			else {
+				logger.error("Invalid number of database connections!");
+				return;
+			}
+			
+			//Pastebin options
+			System.setProperty("PASTEBIN_API_KEY", prop.getProperty("PASTEBIN_API_KEY", "").trim());
+			final String pastebinUser = prop.getProperty("PASTEBIN_USER", "");
+			final String pastebinPass = prop.getProperty("PASTEBIN_PASS", "");
+			System.setProperty("PASTEBIN_USER", (pastebinUser.isBlank() ? pastebinUser.trim() : STATIC.decrypt(pastebinUser.trim())));
+			System.setProperty("PASTEBIN_PASS", (pastebinPass.isBlank() ? pastebinPass.trim() : STATIC.decrypt(pastebinPass.trim())));
+			
+			//Imgur options
+			System.setProperty("IMGUR_API_KEY", prop.getProperty("IMGUR_API_KEY", "").trim());
+			
+			//Twitter options
+			System.setProperty("TWITTER_CONSUMER_KEY", prop.getProperty("TWITTER_CONSUMER_KEY", "").trim());
+			System.setProperty("TWITTER_CONSUMER_KEY_SECRET", prop.getProperty("TWITTER_CONSUMER_KEY_SECRET", "").trim());
+			System.setProperty("TWITTER_ACCESS_TOKEN", prop.getProperty("TWITTER_ACCESS_TOKEN", "").trim());
+			System.setProperty("TWITTER_ACCESS_TOKEN_SECRET", prop.getProperty("TWITTER_ACCESS_TOKEN_SECRET", "").trim());
+			
+			//Reddit options
+			System.setProperty("REDDIT_CLIENT_ID", prop.getProperty("REDDIT_CLIENT_ID", "").trim());
+			System.setProperty("REDDIT_CLIENT_SECRET", prop.getProperty("REDDIT_CLIENT_SECRET", "").trim());
+			final String redditUser = prop.getProperty("REDDIT_USER", "");
+			final String redditPass = prop.getProperty("REDDIT_PASS", "");
+			System.setProperty("REDDIT_USER", (redditUser.isBlank() ? redditUser.trim() : STATIC.decrypt(redditUser.trim())));
+			System.setProperty("REDDIT_PASS", (redditPass.isBlank() ? redditPass.trim() : STATIC.decrypt(redditPass.trim())));
+		} catch (Exception e1) {
+			logger.error("Database configurations couldn't be loaded. Application shutdown!", e1);
+			return;
 		}
 		
 		String token = STATIC.getToken();

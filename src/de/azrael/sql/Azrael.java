@@ -1,7 +1,6 @@
 package de.azrael.sql;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,10 +44,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 public class Azrael {
 	private static final Logger logger = LoggerFactory.getLogger(Azrael.class);
 	
-	private static String ip = IniFileReader.getSQLIP();
-	private static String username = IniFileReader.getSQLUsername();
-	private static String password = IniFileReader.getSQLPassword();
-	
 	
 	public static void SQLconnection() {
 		try {
@@ -64,7 +59,7 @@ public class Azrael {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLInsertActionLog);
 				stmt.setString(1, event);
 				stmt.setLong(2, target_id);
@@ -81,12 +76,34 @@ public class Azrael {
 		}
 	}
 	
+	public static synchronized void SQLInsertCommandLog(long user_id, long guild_id, String command, String params) {
+		if(IniFileReader.getActionLog()) {
+			logger.trace("SQLInsertCommandLog launched. Passed params {}, {}, {}, {}", user_id, guild_id, command, params);
+			Connection myConn = null;
+			PreparedStatement stmt = null;
+			try {
+				myConn = STATIC.getDatabaseURL(1);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLInsertCommandLog);
+				stmt.setLong(1, user_id);
+				stmt.setLong(2, guild_id);
+				stmt.setString(3, command);
+				stmt.setString(4, params);
+				stmt.executeUpdate();
+			} catch (SQLException e) {
+				logger.error("SQLInsertCommandLog Exception", e);
+			} finally {
+			    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+			}
+		}
+	}
+	
 	public static void SQLInsertHistory(long user_id, long guild_id, String type, String reason, long penalty, String info) {
 		logger.trace("SQLInsertHistory launched. Passed params {}, {}, {}, {}, {}, {}", user_id, guild_id, type, reason, penalty, info);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement((penalty != 0 ? AzraelStatements.SQLInsertHistory : AzraelStatements.SQLInsertHistory2));
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -114,7 +131,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement((penalty != 0 ? AzraelStatements.SQLBulkInsertHistory : AzraelStatements.SQLBulkInsertHistory2));
 			for(final Member member : members) {
 				stmt.setLong(1, member.getUser().getIdLong());
@@ -147,7 +164,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetHistory);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -180,7 +197,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSingleActionEventCount);
 			stmt.setLong(1, target_id);
 			stmt.setLong(2, guild_id);
@@ -207,7 +224,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetDoubleActionEventDescriptions);
 			stmt.setLong(1, target_id);
 			stmt.setLong(2, guild_id);
@@ -235,7 +252,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSingleActionEventDescriptions);
 			stmt.setLong(1, target_id);
 			stmt.setLong(2, guild_id);
@@ -261,7 +278,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCriticalActionEvents);
 			stmt.setLong(1, target_id);
 			stmt.setLong(2, guild_id);
@@ -287,7 +304,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSingleActionEventDescriptionsOrdered);
 			stmt.setLong(1, target_id);
 			stmt.setLong(2, guild_id);
@@ -312,7 +329,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertUser);
 			stmt.setLong(1, user_id);
 			stmt.setString(2, name);
@@ -333,7 +350,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip, "&rewriteBatchedStatements=true"), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false); 
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBulkInsertUsers);
 			for(Member member : members) {
@@ -358,7 +375,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateAvatar);
 			stmt.setString(1, avatar);
 			stmt.setLong(2, user_id);
@@ -377,7 +394,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertJoinDate);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -400,7 +417,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip, "&rewriteBatchedStatements=true"), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false); 
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBulkInsertJoinDates);
 			for(int i = 0; i <= 1; i++) {
@@ -427,7 +444,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateJoinDate);
 			stmt.setString(1, join_date);
 			stmt.setLong(2, user_id);
@@ -448,7 +465,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetUser);
 			stmt.setString(1, name);
 			stmt.setLong(2, guild_id);
@@ -472,7 +489,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetUserThroughID);
 			stmt.setString(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -497,7 +514,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			ArrayList<User> users = new ArrayList<User>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetPossibleUsers);
 			stmt.setString(1, name);
 			stmt.setLong(2, guild_id);
@@ -523,7 +540,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetJoinDatesFromUser);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -551,7 +568,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateUser);
 			stmt.setString(1, name);
 			stmt.setLong(2, user_id);
@@ -573,7 +590,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetUserLang);
 				stmt.setLong(1, user_id);
 				rs = stmt.executeQuery();
@@ -599,7 +616,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateUserLanguage);
 			stmt.setString(1, language);
 			stmt.setLong(2, user_id);
@@ -619,7 +636,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGuild);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -643,7 +660,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetLanguage);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -666,7 +683,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateLanguage);
 			stmt.setString(1, language);
 			stmt.setLong(2, guild_id);
@@ -685,7 +702,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertGuild);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, guild_name);
@@ -705,7 +722,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetNickname);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -729,7 +746,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertNickname);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -749,7 +766,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateNickname);
 			stmt.setString(1, nickname);
 			stmt.setLong(2, user_id);
@@ -769,7 +786,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteNickname);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -789,7 +806,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetData);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -814,7 +831,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetMuted);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -839,7 +856,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCustomMuted);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -864,7 +881,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLisBanned);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -892,7 +909,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetWarning);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -917,7 +934,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetWarning2);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, warning_id);
@@ -941,7 +958,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertData);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -966,7 +983,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteData);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -985,7 +1002,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateMuted);
 			stmt.setBoolean(1, muted);
 			stmt.setLong(2, user_id);
@@ -1005,7 +1022,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateMutedAndCustomMuted);
 			stmt.setBoolean(1, muted);
 			stmt.setBoolean(2, custom_time);
@@ -1026,7 +1043,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateMutedOnEnd);
 			stmt.setBoolean(1, muted);
 			stmt.setBoolean(2, custom_time);
@@ -1047,7 +1064,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateGuildLeft);
 			stmt.setBoolean(1, guildLeft);
 			stmt.setLong(2, user_id);
@@ -1068,7 +1085,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetMaxWarning);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -1091,7 +1108,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			switch(warning_id) {
 				case 1 -> {
 					stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWarning);
@@ -1144,7 +1161,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateWarning);
 			stmt.setInt(1, warning_id);
 			stmt.setLong(2, user_id);
@@ -1164,7 +1181,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateMuteTimeOfWarning);
 			stmt.setLong(1, mute_time);
 			stmt.setLong(2, guild_id);
@@ -1184,7 +1201,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateUnmute);
 			stmt.setTimestamp(1, timestamp);
 			stmt.setTimestamp(2, unmute);
@@ -1207,7 +1224,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateUnmute2);
 			stmt.setTimestamp(1, unmute);
 			stmt.setLong(2, user_id);
@@ -1227,7 +1244,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateBan);
 			stmt.setInt(1, ban_id);
 			stmt.setLong(2, user_id);
@@ -1247,7 +1264,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChannels);
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, channel_name);
@@ -1266,7 +1283,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false); 
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBulkInsertChannels);
 			for(final var channel : textChannels) {
@@ -1289,7 +1306,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteChannels);
 			stmt.setLong(1, channel_id);
 			return stmt.executeUpdate();
@@ -1307,7 +1324,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChannel_Conf);
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, channel_type);
@@ -1327,7 +1344,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteChannelConf);
 			stmt.setLong(1, channel_id);
 			stmt.setLong(2, guild_id);
@@ -1346,7 +1363,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteAllChannelConfs);
 			stmt.setLong(1, guild_id);
 			return stmt.executeUpdate();
@@ -1364,7 +1381,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChannel_ConfURLCensoring);
 			stmt.setLong(1, channel_id);
 			stmt.setLong(2, guild_id);
@@ -1384,7 +1401,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChannel_ConfTXTCensoring);
 			stmt.setLong(1, channel_id);
 			stmt.setLong(2, guild_id);
@@ -1404,7 +1421,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteChannelType);
 			stmt.setString(1, channel_type);
 			stmt.setLong(2, guild_id);
@@ -1427,7 +1444,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetChannels);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -1465,7 +1482,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetChannelTypes);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -1491,7 +1508,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCommandExecutionReaction);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -1514,7 +1531,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateReaction);
 			stmt.setBoolean(1, reactions);
 			stmt.setLong(2, guild_id);
@@ -1536,7 +1553,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				ArrayList<String> filter_lang = new ArrayList<String>();
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetChannel_Filter);
 				stmt.setLong(1, channel_id);
@@ -1566,7 +1583,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				ArrayList<String> filter_words = new ArrayList<String>();
 				if(filter_lang.equals("all")) {
 					stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilter);
@@ -1599,7 +1616,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			var sql = "";
 			if(!lang.equals("all"))
 				sql = AzraelStatements.SQLInsertWordFilter;
@@ -1646,7 +1663,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteWordFilterAllLang);
 			stmt.setString(1, word);
 			stmt.setLong(2, guild_id);
@@ -1666,7 +1683,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement((!lang.equals("all") ? AzraelStatements.SQLDeleteWordFilter : AzraelStatements.SQLDeleteWordFilter2));
 			stmt.setString(1, word);
 			if(!lang.equals("all")) {
@@ -1694,7 +1711,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetStaffNames);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -1720,7 +1737,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertStaffName);
 			stmt.setString(1, word.toLowerCase());
 			stmt.setLong(2, guild_id);
@@ -1739,7 +1756,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteStaffNames);
 			stmt.setString(1, word.toLowerCase());
 			stmt.setLong(2, guild_id);
@@ -1759,7 +1776,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceStaffNames);
@@ -1796,7 +1813,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChannel_Filter);
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, filter_lang);
@@ -1815,7 +1832,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteChannel_Filter);
 			stmt.setLong(1, channel_id);
 			return stmt.executeUpdate();
@@ -1837,7 +1854,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetFunnyNames);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -1863,7 +1880,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertFunnyNames);
 			stmt.setString(1, word);
 			stmt.setLong(2, guild_id);
@@ -1882,7 +1899,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteFunnyNames);
 			stmt.setString(1, word);
 			stmt.setLong(2, guild_id);
@@ -1905,7 +1922,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetNameFilter);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -1931,7 +1948,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertNameFilter);
 			stmt.setString(1, word.toLowerCase());
 			stmt.setBoolean(2, kick);
@@ -1951,7 +1968,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteNameFilter);
 			stmt.setString(1, word);
 			stmt.setLong(2, guild_id);
@@ -1972,7 +1989,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetRandomName);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -1997,7 +2014,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilterLanguages);
 			stmt.setString(1, lang);
 			rs = stmt.executeQuery();
@@ -2020,7 +2037,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertRSS);
 			stmt.setString(1, url);
 			stmt.setLong(2, guild_id);
@@ -2056,7 +2073,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubTweets);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, tweet);
@@ -2084,7 +2101,7 @@ public class Azrael {
 			ResultSet rs = null;
 			try {
 				ArrayList<RSS> feeds = new ArrayList<RSS>();
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptions);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -2124,7 +2141,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptions2);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, type);
@@ -2163,7 +2180,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			ArrayList<RSS> feeds = new ArrayList<RSS>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptionsRestricted);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -2199,7 +2216,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSPictures);
 			stmt.setBoolean(1, option);
 			stmt.setString(2, url);
@@ -2219,7 +2236,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSVideos);
 			stmt.setBoolean(1, option);
 			stmt.setString(2, url);
@@ -2239,7 +2256,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSText);
 			stmt.setBoolean(1, option);
 			stmt.setString(2, url);
@@ -2259,7 +2276,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChildTweet);
 			stmt.setString(1, urlParent);
 			stmt.setString(2, urlChild);
@@ -2279,7 +2296,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteChildTweet);
 			stmt.setString(1, urlParent);
 			stmt.setString(2, urlChild);
@@ -2299,7 +2316,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteRSSFeed);
 			stmt.setString(1, url);
 			stmt.setLong(2, guild_id);
@@ -2318,7 +2335,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSFormat);
 			stmt.setString(1, format);
 			stmt.setString(2, url);
@@ -2338,7 +2355,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSChannel);
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, url);
@@ -2362,7 +2379,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetURLBlacklist);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -2387,7 +2404,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertURLBlacklist);
 			stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 			stmt.setLong(2, guild_id);
@@ -2406,7 +2423,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteURLBlacklist);
 			stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 			stmt.setLong(2, guild_id);
@@ -2429,7 +2446,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetURLWhitelist);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -2454,7 +2471,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertURLWhitelist);
 			stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replaceAll("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 			stmt.setLong(2, guild_id);
@@ -2473,7 +2490,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteURLWhitelist);
 			stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
 			stmt.setLong(2, guild_id);
@@ -2496,7 +2513,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptionBlacklist);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -2521,7 +2538,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertSubscriptionBlacklist);
 			stmt.setString(1, (username.startsWith("@") ? username : "@"+username));
 			stmt.setLong(2, guild_id);
@@ -2540,7 +2557,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteSubscriptionBlacklist);
 			stmt.setString(1, (username.startsWith("@") ? username : "@"+username));
 			stmt.setLong(2, guild_id);
@@ -2563,7 +2580,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetWatchlist);
 				stmt.setLong(1, user_id);
 				stmt.setLong(2, guild_id);
@@ -2591,7 +2608,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetWholeWatchlist);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -2613,7 +2630,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetWholeWatchlist2);
 			stmt.setLong(1, guild_id);
 			stmt.setBoolean(2, highPrivileges);
@@ -2637,7 +2654,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWatchlist);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -2659,7 +2676,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteWatchlist);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -2680,7 +2697,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleAPISetupOnGuildAndAPI);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, api_id);
@@ -2704,7 +2721,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertGoogleAPISetup);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
@@ -2725,7 +2742,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteGoogleAPISetup);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
@@ -2746,7 +2763,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleLinkedEvents);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
@@ -2772,7 +2789,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleLinkedEventsRestrictions);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
@@ -2798,7 +2815,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleEventsSupportSpreadsheet);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -2820,7 +2837,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchInsertGoogleFileToEventLink);
 			for(final int event: events) {
 				stmt.setLong(1, guild_id);
@@ -2844,7 +2861,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateGoogleChannelRestriction);
 			stmt.setLong(1, channel_id);
 			stmt.setLong(2, guild_id);
@@ -2865,7 +2882,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateGoogleRemoveChannelRestriction);
 			stmt.setNull(1, Types.BIGINT);
 			stmt.setLong(2, guild_id);
@@ -2886,7 +2903,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchDeleteGoogleSpreadsheetSheet);
 			for(final int event: events) {
 				stmt.setString(1, file_id);
@@ -2910,7 +2927,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertGoogleSpreadsheetSheet);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, file_id);
@@ -2933,7 +2950,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleSpreadsheetSheets);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
@@ -2957,7 +2974,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteGoogleSpreadsheetSheet);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
@@ -2976,7 +2993,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchDeleteGoogleSpreadsheetMapping);
 			for(final int event: events) {
 				stmt.setString(1, file_id);
@@ -3000,7 +3017,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteGoogleSpreadsheetMapping);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
@@ -3019,7 +3036,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteGoogleSpreadsheetMapping2);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
@@ -3039,7 +3056,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchDeleteGoogleFileToEvent);
 			for(final int event: events) {
 				stmt.setString(1, file_id);
@@ -3063,7 +3080,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteGoogleFileToEvent);
 			stmt.setString(1, file_id);
 			stmt.setLong(2, guild_id);
@@ -3084,7 +3101,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleEventsToDD);
 			stmt.setInt(1, api_id);
 			stmt.setInt(2, event_id);
@@ -3108,7 +3125,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchInsertGoogleSpreadsheetMapping);
 			for(int columnNumber = 0; columnNumber < dd_items.size(); columnNumber++) {
 				stmt.setLong(1, guild_id);
@@ -3137,7 +3154,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleSpreadsheetMapping);
 			stmt.setString(1, file_id);
 			stmt.setInt(2, event_id);
@@ -3163,7 +3180,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetGoogleFilesAndEvent);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, api_id);
@@ -3195,7 +3212,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertReminder);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -3219,7 +3236,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetRejoinTask);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -3243,7 +3260,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteRejoinTask);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -3264,7 +3281,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetLanguages);
 			stmt.setString(1, lang);
 			rs = stmt.executeQuery();
@@ -3289,7 +3306,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetTranslatedLanguages);
 			stmt.setString(1, lang);
 			rs = stmt.executeQuery();
@@ -3313,7 +3330,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLisLanguageTranslated);
 			stmt.setString(1, lang);
 			stmt.setString(2, lang2);
@@ -3337,7 +3354,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertSubscriptionLog);
 			stmt.setLong(1, message_id);
 			stmt.setString(2, subscription_id);
@@ -3356,7 +3373,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateSubscriptionLogDeleted);
 			stmt.setLong(1, message_id);
 			return stmt.executeUpdate();
@@ -3375,7 +3392,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLIsSubscriptionDeleted);
 			stmt.setString(1, subscription_id);
 			rs = stmt.executeQuery();
@@ -3398,7 +3415,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateSubscriptionTimestamp);
 			stmt.setString(1, subscription_id);
 			return stmt.executeUpdate();
@@ -3416,7 +3433,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteSubscriptionLog);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -3433,7 +3450,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false); 
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBulkInsertCategories);
 			for(final var category : categories) {
@@ -3460,7 +3477,7 @@ public class Azrael {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetCategories);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -3489,7 +3506,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertCategory);
 			stmt.setLong(1, category_id);
 			stmt.setString(2, name);
@@ -3508,7 +3525,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteCategory);
 			stmt.setLong(1, category_id);
 			return stmt.executeUpdate();
@@ -3526,7 +3543,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateCategoryName);
 			stmt.setString(1, name);
 			stmt.setLong(2, category_id);
@@ -3545,7 +3562,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertCategoryConf);
 			stmt.setLong(1, category_id);
 			stmt.setString(2, categoryType);
@@ -3565,7 +3582,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteCategoryConf);
 			stmt.setLong(1, category_id);
 			return stmt.executeUpdate();
@@ -3583,7 +3600,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteAllCategoryConfs);
 			stmt.setLong(1, guild_id);
 			return stmt.executeUpdate();
@@ -3603,7 +3620,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCategoryTypes);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -3629,7 +3646,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCustomCommand);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, command);
@@ -3662,7 +3679,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			ArrayList<String> commands = new ArrayList<String>();
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCustomCommands);
 			stmt.setLong(1, guild_id);
@@ -3687,7 +3704,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			ArrayList<CustomCommand> commands = new ArrayList<CustomCommand>();
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCustomCommands2);
 			stmt.setLong(1, guild_id);
@@ -3722,7 +3739,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			HashSet<String> channels = new HashSet<String>();
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCustomCommandRestrictions);
 			stmt.setLong(1, guild_id);
@@ -3756,7 +3773,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			ArrayList<Long> roles = new ArrayList<Long>();
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetCustomCommandRoles);
 			stmt.setLong(1, guild_id);
@@ -3782,7 +3799,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetQuizData);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -3816,7 +3833,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteQuizData);
 			stmt.setLong(1, guild_id);
 			return stmt.executeUpdate();
@@ -3834,7 +3851,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateUsedQuizReward);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, reward);
@@ -3855,7 +3872,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			ArrayList<Schedule> schedules = new ArrayList<Schedule>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetScheduledMessages);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -3890,7 +3907,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertScheduledMessage);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, schedule.getChannel_id());
@@ -3918,7 +3935,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteScheduledMessageTask);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, schedule_id);
@@ -3938,7 +3955,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLisGiveawayAvailable);
 			stmt.setLong(1, guild_id);
 			stmt.setBoolean(2, false);
@@ -3962,7 +3979,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertGiveawayRewards);
 			for(final String reward : rewards) {
 				stmt.setLong(1, guild_id);
@@ -3986,7 +4003,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLisGiveawayRewardAlreadySent);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);
@@ -4011,7 +4028,7 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSingleGiveawayReward);
 			stmt.setLong(1, guild_id);
 			stmt.setBoolean(2, false);
@@ -4035,7 +4052,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLMarkGiveawayAsUsed);
 			stmt.setLong(1, user_id);
 			stmt.setBoolean(2, true);
@@ -4056,7 +4073,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchInsertInvites);
 			for(final String invite : invites) {
 				stmt.setString(1, invite);
@@ -4081,7 +4098,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			ArrayList<String> invites = new ArrayList<String>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetUnusedInvites);
 			stmt.setLong(1, guild_id);
 			stmt.setBoolean(2, false);
@@ -4106,7 +4123,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBatchDeleteInvites);
 			for(final String invite : invites) {
 				stmt.setString(1, invite);
@@ -4129,7 +4146,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateUsedinvite);
 			stmt.setBoolean(1, true);
 			stmt.setLong(2, user_id);
@@ -4152,7 +4169,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLLowerTotalWarning);
 			stmt.setInt(1, warning_id);
@@ -4185,7 +4202,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceWordFilter);
@@ -4226,7 +4243,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceNameFilter);
@@ -4267,7 +4284,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceFunnyNames);
@@ -4305,7 +4322,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceURLBlacklist);
@@ -4343,7 +4360,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceURLWhitelist);
@@ -4381,7 +4398,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			if(delete) {
 				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceTweetBlacklist);
@@ -4419,7 +4436,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLRegisterLanguageChannel);
 			stmt.setLong(1, channel_id);
@@ -4458,7 +4475,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLRegisterSpecialChannel);
 			stmt.setLong(1, channel_id);
@@ -4491,7 +4508,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLRegisterUniqueChannel);
 			stmt.setString(1, channel_type);
@@ -4525,7 +4542,7 @@ public class Azrael {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLOverwriteQuizData);
 			stmt.setLong(1, guild_id);

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import de.azrael.constructors.Bancollect;
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Ranking;
@@ -32,6 +33,7 @@ import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.google.GoogleUtils;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.DelayedGoogleUpdate;
@@ -76,7 +78,8 @@ public class GuildListener extends ListenerAdapter {
 			long user_id = e.getMember().getUser().getIdLong();
 			String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
 			long guild_id = e.getGuild().getIdLong();
-			long currentTime = System.currentTimeMillis();;
+			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild_id);
+			long currentTime = System.currentTimeMillis();
 			boolean badName = false;
 			long unmute = 0;
 			boolean muted;
@@ -117,10 +120,8 @@ public class GuildListener extends ListenerAdapter {
 			Bancollect warnedUser = Azrael.SQLgetData(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 			muted = warnedUser.getMuted();
 			//print join message, if the user is not muted and if the printing of join messages is allowed
-			final boolean joinMessage = GuildIni.getJoinMessage(guild_id);
-			final boolean newAccountOnJoin = GuildIni.getNewAccountOnJoin(guild_id);
-			if(joinMessage || newAccountOnJoin) {
-				if(!newAccountOnJoin)
+			if(botConfig.getJoinMessage() || botConfig.getNewAccountOnJoin()) {
+				if(!botConfig.getNewAccountOnJoin())
 					STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
 				else {
 					//TODO: check logic again during daylight saving 
@@ -131,7 +132,7 @@ public class GuildListener extends ListenerAdapter {
 					if(hours < 24) {
 						STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setFooter(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_NEW).replaceFirst("\\{\\}", ""+hours).replace("{}", ""+minutes)), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
 					}
-					else if(joinMessage) {
+					else if(botConfig.getJoinMessage()) {
 						STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
 					}
 				}
@@ -266,7 +267,7 @@ public class GuildListener extends ListenerAdapter {
 						//send a private message before banning
 						e.getUser().openPrivateChannel().queue(channel -> {
 							channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2).replace("{}", e.getGuild().getName())
-									+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+rejoinAction.getReason() : "")).queue(success -> {
+									+ (GuildIni.getBanSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+rejoinAction.getReason() : "")).queue(success -> {
 										Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getReporter(), rejoinAction.getReason()));
 										e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
 										Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
@@ -318,7 +319,7 @@ public class GuildListener extends ListenerAdapter {
 						logger.info("Impersonation attempt found from user {} in guild {}", user_id, guild_id);
 						Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild_id, nickname);
 						//Run google service, if enabled
-						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+						if(botConfig.getGoogleFunctionalities()) {
 							GoogleSheets.spreadsheetRenameRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.RENAME.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_STAFF_IMPERSONATION), e.getMember().getEffectiveName(), nickname);
 						}
 					}
@@ -345,7 +346,7 @@ public class GuildListener extends ListenerAdapter {
 								logger.info("Improper name found from user {} in guild {}", user_id, guild_id);
 								Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild_id, nickname);
 								//Run google service, if enabled
-								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+								if(botConfig.getGoogleFunctionalities()) {
 									GoogleSheets.spreadsheetRenameRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.RENAME.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_REASON), e.getMember().getEffectiveName(), nickname);
 								}
 							}
@@ -373,7 +374,7 @@ public class GuildListener extends ListenerAdapter {
 								});
 								Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), 0, "");
 								//Run google service, if enabled
-								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+								if(botConfig.getGoogleFunctionalities()) {
 									GoogleSheets.spreadsheetKickRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.KICK.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()));
 								}
 							}
@@ -411,7 +412,7 @@ public class GuildListener extends ListenerAdapter {
 				}
 				
 				//single use invite logic
-				handleSingleUseInvites(e.getGuild(), e.getMember());
+				handleSingleUseInvites(botConfig, e.getGuild(), e.getMember());
 			}
 			
 			Azrael.SQLInsertActionLog("GUILD_MEMBER_JOIN", user_id, guild_id, user_name);
@@ -456,7 +457,7 @@ public class GuildListener extends ListenerAdapter {
 		}
 	}
 	
-	private static void handleSingleUseInvites(Guild guild, Member member) {
+	private static void handleSingleUseInvites(BotConfigs botConfig, Guild guild, Member member) {
 		final var invites = Azrael.SQLgetUnusedInvites(guild.getIdLong());
 		if(invites != null && invites.size() > 0) {
 			if(guild.getSelfMember().hasPermission(Permission.MANAGE_SERVER)) {
@@ -489,7 +490,7 @@ public class GuildListener extends ListenerAdapter {
 								logger.warn("Used invite {} from {} couldn't be labeled as used in guild {}", invite, member.getUser().getId(), guild.getId());
 							
 							//Google spreadsheet execution
-							if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+							if(botConfig.getGoogleFunctionalities()) {
 								handleGoogleInviteRequest(guild, member, invite);
 							}
 							break;

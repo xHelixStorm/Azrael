@@ -1,13 +1,5 @@
 package de.azrael.threads;
 
-/**
- * this class is meant to search for muted users and to restart the mute timer
- * in case it was still running before the bot has been restarted.
- * 
- * If there's a muted user on the server but there are no saved details, the mute
- * role will be removed.
- */
-
 import java.awt.Color;
 import java.util.EnumSet;
 import java.util.stream.Collectors;
@@ -15,12 +7,13 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Guilds;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
@@ -30,6 +23,14 @@ import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+
+/**
+ * this class is meant to search for muted users and to restart the mute timer
+ * in case it was still running before the bot has been restarted.
+ * 
+ * If there's a muted user on the server but there are no saved details, the mute
+ * role will be removed.
+ */
 
 public class RoleExtend implements Runnable {
 	private final static Logger logger = LoggerFactory.getLogger(RoleExtend.class);
@@ -73,10 +74,11 @@ public class RoleExtend implements Runnable {
 				}
 			}
 			//display the amount of users that are still muted
-			if(banHammerFound == true && GuildIni.getNotifications(guild.getIdLong())) {
+			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild.getIdLong());
+			if(banHammerFound == true && botConfig.getNotifications()) {
 				logger.info("{} muted users found on startup in guild {}", i, guild.getId());
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_TITLE));
-				STATIC.writeToRemoteChannel(guild, message, i+STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT)+(GuildIni.getOverrideBan(guild.getIdLong()) ? STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_EXCLUDED) : ""), Channel.LOG.getType());
+				STATIC.writeToRemoteChannel(guild, message, i+STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT)+(botConfig.getOverrideBan() ? STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_EXCLUDED) : ""), Channel.LOG.getType());
 			}
 		}
 		

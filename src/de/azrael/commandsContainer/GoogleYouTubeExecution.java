@@ -12,6 +12,7 @@ import com.google.api.services.youtube.model.SearchResult;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.RSS;
 import de.azrael.core.Hashes;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.google.GoogleYoutube;
 import de.azrael.rss.YouTubeModel;
@@ -68,6 +69,7 @@ public class GoogleYouTubeExecution {
 				}
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void remove(GuildMessageReceivedEvent e, final String key) {
@@ -85,6 +87,7 @@ public class GoogleYouTubeExecution {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_ERR)).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "youtube-selection"));
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void remove(GuildMessageReceivedEvent e, final String key, String number, Cache cache) {
@@ -107,6 +110,7 @@ public class GoogleYouTubeExecution {
 					Hashes.clearTempCache(key);
 				}
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -125,6 +129,7 @@ public class GoogleYouTubeExecution {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_ERR)).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "youtube-selection"));
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void format(GuildMessageReceivedEvent e, final String key, String number, Cache cache) {
@@ -137,6 +142,7 @@ public class GoogleYouTubeExecution {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_FORMAT_2)+"```"+channel.getFormat()+"```").build()).queue();
 				Hashes.addTempCache(key, cache.setExpiration(180000).updateDescription("youtube-format-update").setObject(channel));
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -153,6 +159,7 @@ public class GoogleYouTubeExecution {
 			logger.error("The format of YouTube channel id {} couldn't be updated in guild {}", channel.getURL(), e.getGuild().getId());
 			Hashes.clearTempCache(key);
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void channel(GuildMessageReceivedEvent e, String key) {
@@ -170,6 +177,7 @@ public class GoogleYouTubeExecution {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_ERR)).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "youtube-selection"));
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void channel(GuildMessageReceivedEvent e, final String key, String number, Cache cache) {
@@ -182,6 +190,7 @@ public class GoogleYouTubeExecution {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_CHANNEL_2).replace("{}", (channel.getChannelID() > 0 ? "<#"+channel.getChannelID()+">" : STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_DEFAULT)))).build()).queue();
 				Hashes.addTempCache(key, cache.setExpiration(180000).updateDescription("youtube-channel-update").setObject(channel));
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -213,6 +222,7 @@ public class GoogleYouTubeExecution {
 				Hashes.clearTempCache(key);
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void display(GuildMessageReceivedEvent e, String key) {
@@ -229,6 +239,7 @@ public class GoogleYouTubeExecution {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_ERR)).build()).queue();
 		}
 		Hashes.addTempCache(key, new Cache(180000, "youtube-selection"));
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void test(GuildMessageReceivedEvent e, String key) {
@@ -246,6 +257,7 @@ public class GoogleYouTubeExecution {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_ERR)).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "youtube-selection"));
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void test(GuildMessageReceivedEvent e, final String key, String number, Cache cache) {
@@ -258,6 +270,7 @@ public class GoogleYouTubeExecution {
 				YouTubeModel.ModelTest(e, channel);
 				Hashes.addTempCache(key, new Cache(180000, "youtube-selection"));
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 }

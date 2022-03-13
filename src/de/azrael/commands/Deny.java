@@ -6,9 +6,10 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.GuildIni;
 import de.azrael.interfaces.CommandPublic;
@@ -25,20 +26,12 @@ public class Deny implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Deny.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		//check if the command is enabled and that the user has enough permissions
-		if(GuildIni.getDenyCommand(e.getGuild().getIdLong())) {
-			final var commandLevel = GuildIni.getDenyLevel(e.getGuild().getIdLong());
-			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
-				return true;
-			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
-				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
-		}
-		return false;
+	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		return STATIC.commandValidation(e, botConfig, Command.DENY);
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
+	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		//start by looking if a Verification / Waiting category has been set up
 		final var categories = Azrael.SQLgetCategories(e.getGuild().getIdLong());
 		if(categories != null) {
@@ -68,7 +61,7 @@ public class Deny implements CommandPublic {
 											final String reportReason = (userReason.length() > 0 ? userReason : STATIC.getTranslation2(e.getGuild(), Translation.DENY_REASON));
 											Hashes.addTempCache("kick_gu"+e.getGuild().getId()+"us"+member.getUser().getId(), new Cache(3000, member.getUser().getId(), reportReason));
 											member.getUser().openPrivateChannel().queue(channel -> {
-												channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_KICK_DM).replace("{}", e.getGuild().getName())+(GuildIni.getKickSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reportReason : "")).queue(m -> {
+												channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_KICK_DM).replace("{}", e.getGuild().getName())+(GuildIni.getKickSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reportReason : "")).queue(m -> {
 													kickUser(e, member, textChannel, reportReason);
 												}, err -> {
 													kickUser(e, member, textChannel, reportReason);
@@ -114,11 +107,18 @@ public class Deny implements CommandPublic {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("Categories couldn't be retrieved for guild {}", e.getGuild().getId());
 		}
+		return true;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("{} has used Deny command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			logger.trace("{} has used Deny command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.DENY.getColumn(), out.toString().trim());
+		}
 	}
 
 	private static void kickUser(GuildMessageReceivedEvent e, Member member, TextChannel textChannel, String reportReason) {

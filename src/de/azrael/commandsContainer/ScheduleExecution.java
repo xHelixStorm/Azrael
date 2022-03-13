@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
@@ -54,6 +55,7 @@ public class ScheduleExecution {
 			logger.error("Schedules messages couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SCHEDULE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void displayMessage(GuildMessageReceivedEvent e, Cache cache, String message) {
@@ -64,13 +66,14 @@ public class ScheduleExecution {
 			final var schedule = schedules.get(index);
 			e.getChannel().sendMessage(schedule.getMessage().replaceAll("(@here)", "`@here`").replaceAll("(@everyone)", "`@everyone`")).queue();
 			Hashes.addTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SCHEDULE.getColumn(), e.getMessage().getContentRaw());
 		}
-		
 	}
 	
 	public static void create(GuildMessageReceivedEvent e, Cache cache) {
 		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_CREATE)).build()).queue();
 		Hashes.addTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000).updateDescription("create"));
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SCHEDULE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void createMessage(GuildMessageReceivedEvent e, Cache cache, String message) {
@@ -78,6 +81,7 @@ public class ScheduleExecution {
 		schedule.setMessage(message);
 		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_CREATE2)).build()).queue();
 		Hashes.addTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000).updateDescription2("channel").setObject(schedule));
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SCHEDULE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void createChannel(GuildMessageReceivedEvent e, Cache cache, String message) {
@@ -100,6 +104,7 @@ public class ScheduleExecution {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_ERR2)).build()).queue();
 				Hashes.addTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SCHEDULE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -119,6 +124,7 @@ public class ScheduleExecution {
 				+ " **SA**: "+(schedule.isSaturday() ? enabled : disabled)
 				+ " **SU**: "+(schedule.isSunday() ? enabled : disabled)).build()).queue();
 			Hashes.addTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000).updateDescription2("days").setObject(schedule));
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SCHEDULE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -163,6 +169,7 @@ public class ScheduleExecution {
 				Hashes.clearTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SCHEDULE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void remove(GuildMessageReceivedEvent e, Cache cache) {
@@ -196,6 +203,7 @@ public class ScheduleExecution {
 			logger.error("Schedules messages couldn't be retrieved in guild {}", e.getGuild().getId());
 			Hashes.clearTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SCHEDULE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void removeMessage(GuildMessageReceivedEvent e, Cache cache, String message) {
@@ -213,6 +221,7 @@ public class ScheduleExecution {
 				logger.error("Scheduled message couldn't be deleted in guild {}", e.getGuild().getId());
 			}
 			Hashes.clearTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SCHEDULE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	

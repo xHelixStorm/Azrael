@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.vdurmont.emoji.EmojiManager;
 
+import de.azrael.commands.Quiz;
 import de.azrael.commandsContainer.ClanExecution;
 import de.azrael.commandsContainer.FilterExecution;
 import de.azrael.commandsContainer.GoogleSpreadsheetsExecution;
@@ -33,6 +34,7 @@ import de.azrael.commandsContainer.SubscribeExecution;
 import de.azrael.commandsContainer.TwitchExecution;
 import de.azrael.commandsContainer.UserExecution;
 import de.azrael.commandsContainer.WriteEditExecution;
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Messages;
@@ -42,6 +44,7 @@ import de.azrael.core.CommandParser;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
+import de.azrael.enums.Command;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
@@ -51,6 +54,7 @@ import de.azrael.filter.URLFilter;
 import de.azrael.google.GoogleSheets;
 import de.azrael.rankingSystem.RankingThreadExecution;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.Competitive;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.DelayedGoogleUpdate;
@@ -92,6 +96,7 @@ public class GuildMessageListener extends ListenerAdapter {
 				Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 				var allChannels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
 				var currentChannel = allChannels.parallelStream().filter(f -> f.getChannel_ID() == channel_id).findAny().orElse(null);
+				BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild_id);
 				
 				//allow to run only one thread at the same time
 				ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -100,9 +105,9 @@ public class GuildMessageListener extends ListenerAdapter {
 						return;
 					
 					//execute commands
-					if(e.getMessage().getContentRaw().startsWith(GuildIni.getCommandPrefix(e.getGuild().getIdLong())) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
-						var prefixLength = GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length();
-						if(!CommandHandler.handleCommand(CommandParser.parser(e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength), e, null))) {
+					if(e.getMessage().getContentRaw().startsWith(botConfig.getCommandPrefix()) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
+						var prefixLength = botConfig.getCommandPrefix().length();
+						if(!CommandHandler.handleCommand(CommandParser.parser(botConfig.getCommandPrefix(), e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength), e, null), botConfig)) {
 							logger.debug("Command {} doesn't exist in guild {}", e.getMessage().getContentRaw(), e.getGuild().getId());
 						}
 					}
@@ -241,7 +246,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					//check if the user command has been used and forward the user for the next steps
 					final var user = Hashes.getTempCache("user_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					if(user != null) {
-						UserExecution.performAction(e, message, user, allChannels);
+						UserExecution.performAction(e, message, user, allChannels, botConfig);
 					}
 					
 					//check if the inventory command has been used and if yes, append reactions when there are multiple pages to jump into
@@ -279,7 +284,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							if(e.getMessage().getType() != MessageType.CHANNEL_PINNED_ADD) {
 								try {
 									final boolean voteTwoChannel = currentChannel.getChannel_Type().equals(Channel.VO2.getType());
-									final String [] reactions = GuildIni.getVoteReactions(e.getGuild().getIdLong());
+									final String [] reactions = GuildIni.getVoteReactions(e.getGuild());
 									final Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");;
 									final Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
 									if(thumbsup instanceof Emote)
@@ -299,7 +304,7 @@ public class GuildMessageListener extends ListenerAdapter {
 									}
 									
 									//Run google service, if enabled
-									if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+									if(botConfig.getGoogleFunctionalities()) {
 										final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.VOTE.id, e.getChannel().getId());
 										final var values = GoogleSheets.spreadsheetVoteRequest(array, e.getGuild(), e.getChannel().getId(), ""+user_id, new Timestamp(System.currentTimeMillis()), e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getMessageIdLong(), e.getMessage().getContentRaw(), 0, 0, 0);
 										if(values != null) {
@@ -409,6 +414,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						else {
 							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
 							e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_EXIT)).build()).queue();
+							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), message);
 						}
 					}
 					
@@ -449,10 +455,11 @@ public class GuildMessageListener extends ListenerAdapter {
 							var qui_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.QUI.getType())).findAny().orElse(null);
 							if(qui_channel != null && qui_channel.getChannel_ID() == e.getChannel().getIdLong() && !e.getMember().getUser().isBot()) {
 								//check if an administrator or moderator wishes to skip a question or interrupt all questions
-								if(UserPrivs.isUserAdmin(e.getMember()) || UserPrivs.isUserMod(e.getMember()) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(guild_id)) {
+								if(UserPrivs.comparePrivilege(e.getMember(), Quiz.getCommandLevel(guild_id)) || BotConfiguration.SQLisAdministrator(user_id, guild_id)) {
 									if(message.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_SKIP_QUESTION)) || message.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
 										RunQuiz.quizState.put(e.getGuild().getIdLong(), message);
 										STATIC.killThread("quiz_gu"+e.getGuild().getId());
+										Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.QUIZ.getColumn(), message);
 									}
 								}
 								if(!(content.length() == 7) || !(content.length() == 8)) {
@@ -486,7 +493,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-selection")) {
 								if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE)))
-									GoogleSpreadsheetsExecution.create(e, (lcMessage.length() > 7 ? message.substring(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE).length()+1) : null), key);
+									GoogleSpreadsheetsExecution.create(e, (lcMessage.length() > 7 ? message.substring(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE).length()+1) : null), key, botConfig);
 								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD)))
 									GoogleSpreadsheetsExecution.add(e, (lcMessage.length() > 4 ? message.substring(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD).length()+1) : null), key);
 								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE)))
@@ -534,16 +541,6 @@ public class GuildMessageListener extends ListenerAdapter {
 								GoogleSpreadsheetsExecution.restrictUpdate(e, google.getAdditionalInfo2(), google.getAdditionalInfo3(), message, key);
 							}
 							
-							//actions for google docs
-							else if(google.getAdditionalInfo().equals("docs")) {
-								//TODO: add google docs logic
-							}
-							
-							//actions for google drive
-							else if(google.getAdditionalInfo().equals("drive")) {
-								//TODO: add google drive logic
-							}
-							
 							else if(google.getAdditionalInfo().equals("youtube")) {
 								GoogleYouTubeExecution.runTask(e, key);
 							}
@@ -587,6 +584,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_EXIT)).build()).queue();
 							//remove the google command from cache
 							Hashes.clearTempCache(key);
+							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 						}
 					}
 					
@@ -616,7 +614,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					
 					final var userProfile = Hashes.getTempCache("userProfile_gu"+guild_id+"ch"+channel_id+"us"+user_id);
-					if(userProfile != null && !message.startsWith(GuildIni.getCommandPrefix(guild_id)) && userProfile.getExpiration() - System.currentTimeMillis() > 0) {
+					if(userProfile != null && !message.startsWith(botConfig.getCommandPrefix()) && userProfile.getExpiration() - System.currentTimeMillis() > 0) {
 						if(userProfile.getAdditionalInfo().equals("name")) {
 							JoinExecution.registerName(e, userProfile);
 						}
@@ -775,6 +773,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_EXITED)).build()).queue();
 							Hashes.clearTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SCHEDULE.getColumn(), e.getMessage().getContentRaw());
 						}
 					}
 					
@@ -789,6 +788,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							//Abort prune
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_ABORT)).build()).queue();
 							Hashes.clearTempCache("prune_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.PRUNE.getColumn(), e.getMessage().getContentRaw());
 						}
 					}
 					
@@ -820,6 +820,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_EXIT)).build()).queue();
 							Hashes.clearTempCache("reddit_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.REDDIT.getColumn(), e.getMessage().getContentRaw());
 						}
 					}
 					
@@ -848,6 +849,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_EXIT)).build()).queue();
 							Hashes.clearTempCache("twitch_gu"+guild_id+"ch"+channel_id+"us"+user_id);
+							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.TWITCH.getColumn(), e.getMessage().getContentRaw());
 						}
 					}
 				});
@@ -856,10 +858,10 @@ public class GuildMessageListener extends ListenerAdapter {
 				executor.execute(() -> {
 					//check if the ranking system is enabled and that there's currently no message timeout
 					final var cache = Hashes.getTempCache("expGain_gu"+guild_id+"us"+user_id);
-					if(guild_settings != null && guild_settings.getRankingState() == true && (cache == null || (cache != null && cache.getExpiration() - System.currentTimeMillis() < 0) || guild_settings.getMessageTimeout() == 0) && !UserPrivs.isUserMuted(e.getMember())) {
+					if(guild_settings != null && guild_settings.getRankingState() == true && (cache == null || (cache != null && cache.getExpiration() - System.currentTimeMillis() < 0) || botConfig.getExpRateLimit() == 0) && !UserPrivs.isUserMuted(e.getMember())) {
 						//remember the user for a determined time, if there should be delays between gaining experience points
-						if(guild_settings.getMessageTimeout() != 0)
-							Hashes.addTempCache("expGain_gu"+guild_id+"us"+user_id, new Cache(TimeUnit.MINUTES.toMillis(guild_settings.getMessageTimeout())));
+						if(botConfig.getExpRateLimit() != 0)
+							Hashes.addTempCache("expGain_gu"+guild_id+"us"+user_id, new Cache(TimeUnit.MINUTES.toMillis(botConfig.getExpRateLimit())));
 						
 						//retrieve all details from the user
 						Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
@@ -895,7 +897,7 @@ public class GuildMessageListener extends ListenerAdapter {
 								}
 								
 								//run method to gain experience points or level up
-								RankingThreadExecution.setProgress(e, user_id, guild_id, message, roleAssignLevel, role_id, percentMultiplier, user_details, guild_settings);
+								RankingThreadExecution.setProgress(e, user_id, guild_id, message, roleAssignLevel, role_id, percentMultiplier, user_details, guild_settings, botConfig);
 							}
 						}
 					}
@@ -929,8 +931,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 				}
 				//check if the channel log and cache log is enabled and if one of the two or bot is/are enabled then write message to file or/and log to system cache
-				var log = GuildIni.getChannelAndCacheLog(guild_id);
-				if((log[0] || log[1]) && !e.getMember().getUser().isBot()) {
+				if((botConfig.getChannelLog() || botConfig.getCacheLog()) && !e.getMember().getUser().isBot()) {
 					StringBuilder image_url = new StringBuilder();
 					for(Attachment attch : e.getMessage().getAttachments()) {
 						image_url.append((e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? "("+attch.getProxyUrl()+")" : "\n("+attch.getProxyUrl()+")");
@@ -947,8 +948,9 @@ public class GuildMessageListener extends ListenerAdapter {
 					collectedMessage.setIsEdit(false);
 					collectedMessage.setIsUserBot(e.getMember().getUser().isBot());
 					
-					if(log[0]) 	FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "MESSAGE ["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
-					if(log[1]) {
+					if(botConfig.getChannelLog()) 	
+						FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "MESSAGE ["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
+					if(botConfig.getCacheLog()) {
 						ArrayList<Messages> cacheMessage = new ArrayList<Messages>();
 						cacheMessage.add(collectedMessage);
 						Hashes.addMessagePool(e.getGuild().getIdLong(), e.getMessageIdLong(), cacheMessage);
@@ -988,7 +990,7 @@ public class GuildMessageListener extends ListenerAdapter {
 				}
 				
 				//Run google service, if enabled
-				if(!e.getMember().getUser().isBot() && GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+				if(!e.getMember().getUser().isBot() && botConfig.getGoogleFunctionalities()) {
 					final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.COMMENT.id, e.getChannel().getId());
 					if(array != null && !array[0].equals("empty")) {
 						//log low priority messages to google spreadsheets
@@ -1024,7 +1026,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					e.printStackTrace();
 				}
 				message.getChannel().retrieveMessageById(message.getIdLong()).queue(m -> {
-					final String [] reactions = GuildIni.getVoteReactions(message.getGuild().getIdLong());
+					final String [] reactions = GuildIni.getVoteReactions(message.getGuild());
 					final Object thumbsup = STATIC.retrieveEmoji(message.getGuild(), reactions[0], ":thumbsup:");;
 					final Object thumbsdown = STATIC.retrieveEmoji(message.getGuild(), reactions[1], ":thumbsdown:");
 					final Object shrug = STATIC.retrieveEmoji(message.getGuild(), reactions[2], ":shrug:");

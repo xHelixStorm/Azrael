@@ -29,9 +29,8 @@ import de.azrael.constructors.Messages;
 import de.azrael.constructors.RSS;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -45,18 +44,26 @@ public class RedditModel {
 	private static final String TOKEN_REQUEST = "https://www.reddit.com/api/v1/access_token?grant_type=password&username={}&password={}";
 	private static final String OAUTH_REQUEST = "https://oauth.reddit.com/";
 	
+	private static final String REDDIT_CLIENT_ID = "REDDIT_CLIENT_ID";
+	private static final String REDDIT_CLIENT_SECRET = "REDDIT_CLIENT_SECRET";
+	private static final String REDDIT_USER = "REDDIT_USER";
+	private static final String REDDIT_PASS = "REDDIT_PASS";
+	
 	private static String accessToken = null;
 	private static long tokenValidity = 0;
 	
 	public static synchronized boolean fetchRedditContent(GuildMessageReceivedEvent e, Guild guild, RSS reddit, long rss_channel, boolean defaultChannel) throws IOException {
 		if(accessToken == null || tokenValidity - System.currentTimeMillis() < 0) {
-			final String [] redditKeys = IniFileReader.getRedditKeys();
-			if(redditKeys[0] != null && redditKeys[0].length() > 0 && redditKeys[1] != null && redditKeys[1].length() > 0 && redditKeys[2] != null && redditKeys[2].length() > 0 && redditKeys[3] != null && redditKeys[3].length() > 0) {
-				URL url = new URL(TOKEN_REQUEST.replaceFirst("\\{\\}", redditKeys[0]).replace("{}", redditKeys[1]));
+			final String clientId = System.getProperty(REDDIT_CLIENT_ID);
+			final String clientSecret = System.getProperty(REDDIT_CLIENT_SECRET);
+			final String user = System.getProperty(REDDIT_USER);
+			final String pass = System.getProperty(REDDIT_PASS);
+			if(clientId.length() > 0 && clientSecret.length() > 0 && user.length() > 0 && pass.length() > 0) {
+				URL url = new URL(TOKEN_REQUEST.replaceFirst("\\{\\}", user).replace("{}", pass));
 				HttpURLConnection con = (HttpURLConnection) url.openConnection();
 				con.setRequestMethod("POST");
 				con.setRequestProperty("User-Agent", "de.azrael-bot/0.1 by HelixStorm");
-				final String auth = redditKeys[2]+":"+redditKeys[3];
+				final String auth = clientId+":"+clientSecret;
 				con.setRequestProperty("Authorization", "Basic " + Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8)));
 				con.connect();
 				
@@ -119,7 +126,6 @@ public class RedditModel {
 					success = true;
 					final String format = reddit.getFormat();
 					final var prohibitedSubscriptions = Azrael.SQLgetSubscriptionBlacklist(guild.getIdLong());
-					int count = 0;
 					for(final Object iteration : children) {
 						final JSONObject result = (JSONObject)iteration;
 						final String kind = result.getString("kind");
@@ -144,7 +150,7 @@ public class RedditModel {
 									if(historyList.parallelStream().filter(f -> f.getContentRaw().replaceAll("[^a-zA-Z]", "").equals(outMessage.replaceAll("[^a-zA-Z]", ""))).findAny().orElse(null) == null)
 										textChannel.sendMessage(outMessage).queue(m -> {
 											Azrael.SQLInsertSubscriptionLog(m.getIdLong(), permaLink);
-											if(GuildIni.getCacheLog(guild.getIdLong())) {
+											if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getCacheLog()) {
 												Messages collectedMessage = new Messages();
 												collectedMessage.setUserID(0);
 												collectedMessage.setUsername(author);
@@ -167,9 +173,6 @@ public class RedditModel {
 						else {
 							Azrael.SQLUpdateSubscriptionTimestamp(permaLink);
 						}
-						count ++;
-						if(count == 5)
-							break;
 					}
 				}
 			}

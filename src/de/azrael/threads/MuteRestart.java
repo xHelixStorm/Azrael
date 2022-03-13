@@ -1,24 +1,20 @@
 package de.azrael.threads;
 
-/**
- * Abbreviation of the RoleTimer class. Works the same way basing on 
- * removing the mute role after a determined time.
- */
-
 import java.awt.Color;
 import java.sql.Timestamp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -26,6 +22,11 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+
+/**
+ * Abbreviation of the RoleTimer class. Works the same way basing on 
+ * removing the mute role after a determined time.
+ */
 
 public class MuteRestart implements Runnable {
 	private final static Logger logger = LoggerFactory.getLogger(MuteRestart.class);
@@ -72,7 +73,7 @@ public class MuteRestart implements Runnable {
 						guild.removeRoleFromMember(member, mute_role).queue(r -> {
 							if(assignedRole != 0 && ranking_state == true){guild.addRoleToMember(member, guild.getRoleById(assignedRole)).queue();}
 							//retrieve all other roles to reassign, if enabled
-							if(GuildIni.getReassignRolesAfterMute(guild.getIdLong())) {
+							if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getReassignRoles()) {
 								final var roles = DiscordRoles.SQLgetReassignRoles(member.getUser().getIdLong(), guild.getIdLong());
 								if(roles != null && roles.size() > 0) {
 									for(final var role : roles) {
@@ -99,7 +100,7 @@ public class MuteRestart implements Runnable {
 						}
 						Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild.getIdLong(), "Mute role removed");
 						//Run google service, if enabled
-						if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+						if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getGoogleFunctionalities()) {
 							final String NA = STATIC.getTranslation2(guild, Translation.NOT_AVAILABLE);
 							GoogleSheets.spreadsheetUnmuteRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.UNMUTE.id, ""), guild, "", ""+user_id, timestamp, user_name, effectiveName, "", "", NA, NA, NA);
 						}
@@ -116,6 +117,7 @@ public class MuteRestart implements Runnable {
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				Azrael.SQLUpdateUnmute(user_id, guild.getIdLong(), timestamp);
 				STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.UNMUTE_MESSAGE_2).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
+				BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild.getIdLong());
 				//if the user is still present on the server, remove the mute role and assign back a ranking role, if available
 				Role role = null;
 				member = guild.getMemberById(user_id);
@@ -126,7 +128,7 @@ public class MuteRestart implements Runnable {
 						guild.removeRoleFromMember(member, mute_role).queue(r -> {
 							if(assignedRole != 0 && ranking_state == true) guild.addRoleToMember(member, guild.getRoleById(assignedRole)).queue();
 							//retrieve all other roles to reassign, if enabled
-							if(GuildIni.getReassignRolesAfterMute(guild.getIdLong())) {
+							if(botConfig.getReassignRoles()) {
 								final var roles = DiscordRoles.SQLgetReassignRoles(member.getUser().getIdLong(), guild.getIdLong());
 								if(roles != null && roles.size() > 0) {
 									for(final var curRole : roles) {
@@ -148,7 +150,7 @@ public class MuteRestart implements Runnable {
 				}
 				Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild.getIdLong(), "Mute role removed");
 				//Run google service, if enabled
-				if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+				if(botConfig.getGoogleFunctionalities()) {
 					final String NA = STATIC.getTranslation2(guild, Translation.NOT_AVAILABLE);
 					final var cache = Hashes.getTempCache("unmute_gu"+guild.getId()+"us"+user_id);
 					String reporter_name = NA;

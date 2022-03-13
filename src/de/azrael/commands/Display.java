@@ -1,20 +1,23 @@
 package de.azrael.commands;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.CategoryConf;
 import de.azrael.constructors.Channels;
 import de.azrael.constructors.Dailies;
 import de.azrael.constructors.Roles;
 import de.azrael.core.UserPrivs;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
@@ -39,44 +42,83 @@ public class Display implements CommandPublic{
 	private static EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		//check if the command is enabled and that the user has enough permissions
-		if(GuildIni.getDisplayCommand(e.getGuild().getIdLong())) {
-			var commandLevel = GuildIni.getDisplayLevel(e.getGuild().getIdLong());
-			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong()))
-				return true;
-			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
-				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
-		}
-		return false;
+	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		return STATIC.commandValidation(e, botConfig, Command.DISPLAY);
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
-		var adminPermission = e.getMember().getUser().getIdLong() == GuildIni.getAdmin(e.getGuild().getIdLong());
+	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		var adminPermission = BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		long guild_id = e.getGuild().getIdLong();
 		StringBuilder out = new StringBuilder();
 		
 		//if no arguments have been added to the command, print a list of all available parameters
 		if(args.length == 0) {
+			//default values at 100 to avoid command abuse in case of errors
+			int displayRolesLevel = 100;
+			int displayRegisteredRolesLevel = 100;
+			int displayRankingRolesLevel = 100;
+			int displayCategoriesLevel = 100;
+			int displayRegisteredCategoriesLevel = 100;
+			int displayTextChannelsLevels = 100;
+			int displayVoiceChannelsLevels = 100;
+			int displayRegisteredChannelsLevel = 100;
+			int displayDailiesLevel = 100;
+			int displayWatchedUsersLevel = 100;
+			
+			final var commands = (ArrayList<?>)BotConfiguration.SQLgetCommand(guild_id, 1, Command.DISPLAY_ROLES, Command.DISPLAY_REGISTERED_ROLES, Command.DISPLAY_RANKING_ROLES
+					, Command.DISPLAY_CATEGORIES, Command.DISPLAY_REGISTERED_CATEGORIES, Command.DISPLAY_TEXT_CHANNELS, Command.DISPLAY_VOICE_CHANNELS
+					, Command.DISPLAY_REGISTERED_CHANNELS, Command.DISPLAY_DAILIES, Command.DISPLAY_WATCHED_USERS);
+			
+			for(final Object command : commands) {
+				int permissionLevel = 0;
+				String name = "";
+				for(Object values : (ArrayList<?>)command) {
+					if(values instanceof Integer)
+						permissionLevel = (Integer)values;
+					else if(values instanceof String)
+						name = ((String)values).split(":")[0];
+				}
+				
+				if(name.equals(Command.DISPLAY_ROLES.getColumn()))
+					displayRolesLevel = permissionLevel;
+				else if(name.equals(Command.DISPLAY_ROLES.getColumn()))
+					displayRolesLevel = permissionLevel;
+				else if(name.equals(Command.DISPLAY_REGISTERED_ROLES.getColumn()))
+					displayRolesLevel = permissionLevel;
+				else if(name.equals(Command.DISPLAY_RANKING_ROLES.getColumn()))
+					displayRolesLevel = permissionLevel;
+				else if(name.equals(Command.DISPLAY_CATEGORIES.getColumn()))
+					displayRolesLevel = permissionLevel;
+				else if(name.equals(Command.DISPLAY_REGISTERED_CATEGORIES.getColumn()))
+					displayRolesLevel = permissionLevel;
+				else if(name.equals(Command.DISPLAY_TEXT_CHANNELS.getColumn()))
+					displayRolesLevel = permissionLevel;
+				else if(name.equals(Command.DISPLAY_VOICE_CHANNELS.getColumn()))
+					displayRolesLevel = permissionLevel;
+				else if(name.equals(Command.DISPLAY_REGISTERED_CHANNELS.getColumn()))
+					displayRolesLevel = permissionLevel;
+				else if(name.equals(Command.DISPLAY_WATCHED_USERS.getColumn()))
+					displayRolesLevel = permissionLevel;
+			}
+			
 			out.append(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP)
-					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong())) || adminPermission 				? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_1) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRegisteredRolesLevel(e.getGuild().getIdLong())) || adminPermission 		? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_2) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong())) || adminPermission 		? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_3) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayCategoriesLevel(e.getGuild().getIdLong())) || adminPermission 			? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_4) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRegisteredCategoriesLevel(e.getGuild().getIdLong())) || adminPermission ? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_5) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayTextChannelsLevel(e.getGuild().getIdLong())) || adminPermission 		? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_6) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayVoiceChannelsLevel(e.getGuild().getIdLong())) || adminPermission 		? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_7) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayRegisteredChannelsLevel(e.getGuild().getIdLong())) || adminPermission 	? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_8) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong())) || adminPermission 				? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_9) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayWatchedUsersLevel(e.getGuild().getIdLong())) || adminPermission 		? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_10) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong())) || adminPermission 		? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_11) : ""));
+					+ (UserPrivs.comparePrivilege(e.getMember(), displayRolesLevel) || adminPermission 					? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_1) : "")
+					+ (UserPrivs.comparePrivilege(e.getMember(), displayRegisteredRolesLevel) || adminPermission 		? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_2) : "")
+					+ (UserPrivs.comparePrivilege(e.getMember(), displayRankingRolesLevel) || adminPermission 			? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_3) : "")
+					+ (UserPrivs.comparePrivilege(e.getMember(), displayCategoriesLevel) || adminPermission 			? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_4) : "")
+					+ (UserPrivs.comparePrivilege(e.getMember(), displayRegisteredCategoriesLevel) || adminPermission 	? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_5) : "")
+					+ (UserPrivs.comparePrivilege(e.getMember(), displayTextChannelsLevels) || adminPermission 			? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_6) : "")
+					+ (UserPrivs.comparePrivilege(e.getMember(), displayVoiceChannelsLevels) || adminPermission 		? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_7) : "")
+					+ (UserPrivs.comparePrivilege(e.getMember(), displayRegisteredChannelsLevel) || adminPermission 	? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_8) : "")
+					+ (UserPrivs.comparePrivilege(e.getMember(), displayDailiesLevel) || adminPermission 				? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_9) : "")
+					+ (UserPrivs.comparePrivilege(e.getMember(), displayWatchedUsersLevel) || adminPermission 			? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_10) : ""));
 			e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(out.toString()).build()).queue();
 		}
 		//display all roles
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLES))) {
 			//verify that the current user is allowed to use this parameter
-			final var rolesLevel = GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong());
+			final var rolesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_ROLES);
 			if(UserPrivs.comparePrivilege(e.getMember(), rolesLevel) || adminPermission) {
 				//retrieve roles from the server
 				for(Role r : e.getGuild().getRoles()) {
@@ -91,7 +133,7 @@ public class Display implements CommandPublic{
 		//display all registered roles
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_ROLES))) {
 			//verify that the current user is allowed to use this parameter
-			final var registeredRolesLevel = GuildIni.getDisplayRegisteredRolesLevel(e.getGuild().getIdLong());
+			final var registeredRolesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_REGISTERED_ROLES);
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredRolesLevel) || adminPermission) {
 				//retrieve roles from table
 				for(Roles r : DiscordRoles.SQLgetRoles(guild_id)) {
@@ -110,7 +152,7 @@ public class Display implements CommandPublic{
 		//display all registered ranking roles
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLES))) {
 			//verify that the current user is allowed to use this parameter
-			final var rankingRolesLevel = GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong());
+			final var rankingRolesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_RANKING_ROLES);
 			if(UserPrivs.comparePrivilege(e.getMember(), rankingRolesLevel) || adminPermission) {
 				//confirm that the ranking system is enabled
 				if(RankingSystem.SQLgetGuild(guild_id).getRankingState()) {
@@ -131,7 +173,7 @@ public class Display implements CommandPublic{
 		//display all categories
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORIES))) {
 			//verify that the current user is allowed to use this parameter
-			final var categoriesLevel = GuildIni.getDisplayCategoriesLevel(e.getGuild().getIdLong());
+			final var categoriesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_CATEGORIES);
 			if(UserPrivs.comparePrivilege(e.getMember(), categoriesLevel) || adminPermission) {
 				//retrieve all text channels from the server
 				for(Category ct : e.getGuild().getCategories()) {
@@ -146,7 +188,7 @@ public class Display implements CommandPublic{
 		//display all registered categories
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_CATEGORIES))) {
 			//verify that the current user is allowed to use this parameter
-			final var registeredCategoriesLevel = GuildIni.getDisplayRegisteredCategoriesLevel(e.getGuild().getIdLong());
+			final var registeredCategoriesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_REGISTERED_CATEGORIES);
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredCategoriesLevel) || adminPermission) {
 				//retrieve all registered text channels from table
 				for(final CategoryConf ct : Azrael.SQLgetCategories(guild_id)) {
@@ -164,7 +206,7 @@ public class Display implements CommandPublic{
 		//display all text channels
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNELS))) {
 			//verify that the current user is allowed to use this parameter
-			final var textChannelsLevel = GuildIni.getDisplayTextChannelsLevel(e.getGuild().getIdLong());
+			final var textChannelsLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_TEXT_CHANNELS);
 			if(UserPrivs.comparePrivilege(e.getMember(), textChannelsLevel) || adminPermission) {
 				//retrieve all text channels from the server
 				for(TextChannel tc : e.getGuild().getTextChannels()) {
@@ -179,7 +221,7 @@ public class Display implements CommandPublic{
 		//display all voice channels
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_VOICE_CHANNELS))) {
 			//verify that the current user is allowed to use this parameter
-			final var voiceChannelsLevel = GuildIni.getDisplayVoiceChannelsLevel(e.getGuild().getIdLong());
+			final var voiceChannelsLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_VOICE_CHANNELS);
 			if(UserPrivs.comparePrivilege(e.getMember(), voiceChannelsLevel) || adminPermission) {
 				//retrieve all voice channels from the server
 				for(VoiceChannel vc : e.getGuild().getVoiceChannels()) {
@@ -194,7 +236,7 @@ public class Display implements CommandPublic{
 		//display all registered text channels
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_CHANNELS))) {
 			//verify that the current user is allowed to use this parameter
-			final var registeredChannelsLevel = GuildIni.getDisplayRegisteredChannelsLevel(e.getGuild().getIdLong());
+			final var registeredChannelsLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_REGISTERED_CHANNELS);
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredChannelsLevel) || adminPermission) {
 				long prevChannelID = 0;
 				//retrieve all registered text channels from table
@@ -222,7 +264,7 @@ public class Display implements CommandPublic{
 		//display all registered daily rewards
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILIES))) {
 			//verify that the current user is allowed to use this parameter
-			final var dailiesLevel = GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong());
+			final var dailiesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_DAILIES);
 			if(UserPrivs.comparePrivilege(e.getMember(), dailiesLevel) || adminPermission) {
 				//retrieve all daily rewards from table
 				for(Dailies daily : RankingSystem.SQLgetDailiesAndType(guild_id)) {
@@ -237,11 +279,11 @@ public class Display implements CommandPublic{
 		//display all users that are being watched
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCHED_USERS))) {
 			//verify that the current user is allowed to use this parameter
-			final var watchedUsersLevel = GuildIni.getDisplayWatchedUsersLevel(e.getGuild().getIdLong());
+			final var watchedUsersLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_WATCHED_USERS);
 			if(UserPrivs.comparePrivilege(e.getMember(), watchedUsersLevel) || adminPermission) {
 				List<String> watchedUsers = null;
 				//verify that the current user is allowed to use the watch channel, if yes, retrieve users that can get displayed in that channel
-				if(!UserPrivs.comparePrivilege(e.getMember(), GuildIni.getUserUseWatchChannelLevel(e.getGuild().getIdLong()))) {
+				if(!UserPrivs.comparePrivilege(e.getMember(), STATIC.getCommandLevel(e.getGuild(), Command.USER_USE_WATCH_CHANNEL))) {
 					watchedUsers = Azrael.SQLgetWholeWatchlist(e.getGuild().getIdLong(), false);
 				}
 				else {
@@ -257,147 +299,21 @@ public class Display implements CommandPublic{
 				UserPrivs.throwNotEnoughPrivilegeError(e, watchedUsersLevel);
 			}
 		}
-		//display all available commands with their permission level
-		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PERMISSIONS))) {
-			//verify that the current user is allowed to use this parameter
-			var commandsLevel = GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong());
-			if(UserPrivs.comparePrivilege(e.getMember(), commandsLevel) || adminPermission) {
-				//collect commands and command levels
-				out.append("About command: "+GuildIni.getAboutLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Daily command: "+GuildIni.getDailyLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Display command: "+GuildIni.getDisplayLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Display roles subcommand: "+GuildIni.getDisplayRolesLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Display registered roles subcommand: "+GuildIni.getDisplayRegisteredRolesLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Display ranking roles subcommand: "+GuildIni.getDisplayRankingRolesLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Display categories subcommand: "+GuildIni.getDisplayCategoriesLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Display registered categories subcommand: "+GuildIni.getDisplayRegisteredCategoriesLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Display text channels subcommand: "+GuildIni.getDisplayTextChannelsLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Display voice channels subcommand: "+GuildIni.getDisplayVoiceChannelsLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Display registered text channel subcommand: "+GuildIni.getDisplayRegisteredChannelsLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Display dailies subcommand: "+GuildIni.getDisplayDailiesLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Display watched users subcommand: "+GuildIni.getDisplayWatchedUsersLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Display command levels subcommand: "+GuildIni.getDisplayCommandLevelsLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Help command: "+GuildIni.getHelpLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Inventory command: "+GuildIni.getInventoryLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Meow command: "+GuildIni.getMeowLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Pug command: "+GuildIni.getPugLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Profile command: "+GuildIni.getProfileLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Rank command: "+GuildIni.getRankLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Register command: "+GuildIni.getRegisterLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Register role subcommand: "+GuildIni.getRegisterRoleLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Register category subcommand: "+GuildIni.getRegisterCategoryLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Register text channel subcommand: "+GuildIni.getRegisterTextChannelLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Register text channel url subcommand: "+GuildIni.getRegisterTextChannelURLLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Register text channel txt subcommand: "+GuildIni.getRegisterTextChannelTXTLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Register text channels subcommand: "+GuildIni.getRegisterTextChannelsLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Register ranking role subcommand: "+GuildIni.getRegisterRankingRoleLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Register users subcommand: "+GuildIni.getRegisterUsersLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set command: "+GuildIni.getSetLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set privilege level subcommand: "+GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set channel filter subcommand: "+GuildIni.getSetChannelFilterLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set warnings subcommand: "+GuildIni.getSetWarningsLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set ranking subcommand: "+GuildIni.getSetRankingLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set max experience subcommand: "+GuildIni.getSetMaxExperienceLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set main level skin subcommand: "+GuildIni.getSetDefaultLevelSkinLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set main rank skin subcommand: "+GuildIni.getSetDefaultRankSkinLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set main profile skin subcommand: "+GuildIni.getSetDefaultProfileSkinLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set main icon skin subcommand: "+GuildIni.getSetDefaultIconSkinLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set daily item sucommand: "+GuildIni.getSetDailyItemLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set giveaway items subcommand: "+GuildIni.getSetGiveawayItemsLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set privilege level sucommand: "+GuildIni.getSetPrivilegeLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Shop command: "+GuildIni.getShopLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Top command: "+GuildIni.getTopLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Use command: "+GuildIni.getUseLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User command: "+GuildIni.getUserLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User information subcommand: "+GuildIni.getUserInformationLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User delete messages subcommand: "+GuildIni.getUserDeleteMessagesLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User warning subcommand: "+GuildIni.getUserWarningLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User forced warning subcommand: "+GuildIni.getUserWarningForceLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User mute subcommand: "+GuildIni.getUserMuteLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User unmute subcommand: "+GuildIni.getUserUnmuteLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User ban subcommand: "+GuildIni.getUserBanLevel(e.getGuild().getIdLong())+"\n");
-				//print the first half
-				e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
-				out.setLength(0);
-				//collect the second half
-				out.append("User unban subcommand: "+GuildIni.getUserUnbanLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User kick subcommand: "+GuildIni.getUserKickLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User history subcommand: "+GuildIni.getUserHistoryLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User assign-role subcommand: "+GuildIni.getUserAssignRoleLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User remove-role subcommand: "+GuildIni.getUserAssignRoleLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User watch subcommand: "+GuildIni.getUserWatchLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User unwatch subcommand: "+GuildIni.getUserUnwatchLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User use watch channel subcommand: "+GuildIni.getUserUseWatchChannelLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User gift experience subcommand: "+GuildIni.getUserGiftExperienceLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User set experience subcommand: "+GuildIni.getUserSetExperienceLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User gift currency subcommand: "+GuildIni.getUserGiftCurrencyLevel(e.getGuild().getIdLong())+"\n");
-				out.append("User set currency subcommand: "+GuildIni.getUserSetCurrencyLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Filter command: "+GuildIni.getFilterLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Filter word filter subcommand: "+GuildIni.getFilterWordFilterLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Filter name filter subcommand: "+GuildIni.getFilterNameFilterLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Filter name kick subcommand: "+GuildIni.getFilterNameKickLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Filter funny names subcommand: "+GuildIni.getFilterFunnyNamesLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Filter staff names subcommand: "+GuildIni.getFilterStaffNamesLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Filter url blacklist subcommand: "+GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Filter url whitelist subcommand: "+GuildIni.getFilterURLBlacklistLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Filter tweet blacklist subcommand: "+GuildIni.getFilterTweetBlacklistLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Quiz command: "+GuildIni.getQuizLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Rolereaction command: "+GuildIni.getRoleReactionLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Rss command: "+GuildIni.getSubscribeLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Randomshop command: "+GuildIni.getRandomshopLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Patchnotes command: "+GuildIni.getPatchnotesLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Doubleexperience command: "+GuildIni.getDoubleExperienceLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Equip command: "+GuildIni.getEquipLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Remove command: "+GuildIni.getRemoveLevel(e.getGuild().getIdLong())+"\n");
-				out.append("HeavyCensoring command: "+GuildIni.getHeavyCensoringLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Mute command: "+GuildIni.getMuteLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Google command: "+GuildIni.getGoogleLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Write command: "+GuildIni.getWriteLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Matchmaking command: "+GuildIni.getMatchmakingLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Join command: "+GuildIni.getJoinLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Leave command: "+GuildIni.getLeaveLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Clan command: "+GuildIni.getClanLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Queue command: "+GuildIni.getQueueLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Cw command: "+GuildIni.getCwLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Room command: "+GuildIni.getRoomLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Close rooms room subcommand: "+GuildIni.getRoomCloseLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Set winners room subcommand command: "+GuildIni.getRoomWinnerLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Reopen rooms room subcommand: "+GuildIni.getRoomReopenLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Stats command: "+GuildIni.getStatsLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Leaderboard command: "+GuildIni.getLeaderboardLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Accept command: "+GuildIni.getAcceptLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Deny command: "+GuildIni.getDenyLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Language command: "+GuildIni.getLanguageLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Schedule command: "+GuildIni.getScheduleLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Prune command: "+GuildIni.getPruneLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Warn command: "+GuildIni.getWarnLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Reddit command: "+GuildIni.getRedditLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Invites command: "+GuildIni.getInvitesLevel(e.getGuild().getIdLong())+"\n");
-				out.append("Twitch command: "+GuildIni.getTwitchLevel(e.getGuild().getIdLong()));
-				//print second part
-				e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
-				//print third part (custom commands)
-				out.setLength(0);
-				final var commands = Azrael.SQLgetCustomCommands2(guild_id);
-				if(commands != null && commands.size() > 0) {
-					for(final var command : commands) {
-						out.append(command.getCommand().replaceFirst(command.getCommand().substring(0, 1), command.getCommand().substring(0, 1).toUpperCase())+" command: "+command.getLevel()+"\n");
-					}
-					e.getChannel().sendMessage("```java\n"+out.toString()+"\n```").queue();
-				}
-			}
-			else{
-				UserPrivs.throwNotEnoughPrivilegeError(e, commandsLevel);
-			}
-		}
 		else {
 			e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 		}
+		return true;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("{} has used Display command in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			logger.trace("{} has used Display command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.DISPLAY.getColumn(), out.toString().trim());
+		}
 	}
 
 }

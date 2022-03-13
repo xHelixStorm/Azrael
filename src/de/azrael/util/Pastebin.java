@@ -11,18 +11,21 @@ import org.jpastebin.pastebin.account.PastebinAccount;
 import org.jpastebin.pastebin.exceptions.LoginException;
 import org.jpastebin.pastebin.exceptions.ParseException;
 
-import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
-
 public class Pastebin {
-	public static String unlistedPaste(String _title, String _contents, long guild_id) throws LoginException, PasteException, IllegalStateException {
-		String[] credentials = GuildIni.getPastebinCredentials(guild_id);
+	private final static String PASTEBIN_API_KEY = "PASTEBIN_API_KEY";
+	private final static String PASTEBIN_USER = "PASTEBIN_USER";
+	private final static String PASTEBIN_PASS = "PASTEBIN_PASS";
+	
+	public static String unlistedPaste(String _title, String _contents) throws LoginException, PasteException, IllegalStateException {
+		final String key = System.getProperty(PASTEBIN_API_KEY);
+		final String user = System.getProperty(PASTEBIN_USER);
+		final String pass = System.getProperty(PASTEBIN_PASS);
 		
 		String title = _title; // insert your own title
 		String contents = _contents; // insert your own paste contents
 		int visibility = PastebinPaste.VISIBILITY_UNLISTED; // makes paste unlisted
 		
-		PastebinAccount account = new PastebinAccount(IniFileReader.getPastebinDeveloperKey(), credentials[0], credentials[1]);
+		PastebinAccount account = new PastebinAccount(key, user, pass);
 		// fetches an user session id
 		account.login();
 		
@@ -43,7 +46,7 @@ public class Pastebin {
 		String contents = _contents; // insert your own paste contents
 		int visibility = PastebinPaste.VISIBILITY_PUBLIC; // makes paste unlisted
 		
-		PastebinAccount account = new PastebinAccount(IniFileReader.getPastebinDeveloperKey());
+		PastebinAccount account = new PastebinAccount(System.getProperty(PASTEBIN_API_KEY));
 		// fetches an user session id
 		account.login();
 		
@@ -59,14 +62,16 @@ public class Pastebin {
 		return link.getLink().toString();
 	}
 	
-	public static String unlistedPermanentPaste(String _title, String _contents, long guild_id) throws LoginException, PasteException, IllegalStateException, RuntimeException {
-		String[] credentials = GuildIni.getPastebinCredentials(guild_id);
+	public static String unlistedPermanentPaste(String _title, String _contents) throws LoginException, PasteException, IllegalStateException, RuntimeException {
+		final String key = System.getProperty(PASTEBIN_API_KEY);
+		final String user = System.getProperty(PASTEBIN_USER);
+		final String pass = System.getProperty(PASTEBIN_PASS);
 		
 		String title = _title; // insert your own title
 		String contents = _contents; // insert your own paste contents
 		int visibility = PastebinPaste.VISIBILITY_UNLISTED; // makes paste unlisted
 		
-		PastebinAccount account = new PastebinAccount(IniFileReader.getPastebinDeveloperKey(), credentials[0], credentials[1]);
+		PastebinAccount account = new PastebinAccount(key, user, pass);
 		// fetches an user session id
 		account.login();
 		
@@ -82,15 +87,15 @@ public class Pastebin {
 		return link.getLink().toString();
 	}
 	
-	public static String readPasteLink(String _link, long guild_id) throws MalformedURLException, RuntimeException, LoginException, ParseException {
-		String[] credentials = GuildIni.getPastebinCredentials(guild_id);
+	public static String readPasteLink(String _link) throws MalformedURLException, RuntimeException, LoginException, ParseException {
+		final String key = System.getProperty(PASTEBIN_API_KEY);
+		final String user = System.getProperty(PASTEBIN_USER);
+		final String pass = System.getProperty(PASTEBIN_PASS);
 		
-		//read the developerKey into account
-		String developerKey = IniFileReader.getPastebinDeveloperKey();
 		PastebinAccount account = null;
-		if(credentials[0].length() > 0 && credentials[1].length() > 0) {
+		if(user.length() > 0 && pass.length() > 0) {
 			//private pastes
-			account = new PastebinAccount(developerKey, credentials[0], credentials[1]);
+			account = new PastebinAccount(key, user, pass);
 			account.login();
 			
 			PastebinLink[] pastes = account.getPastes(1000);
@@ -103,7 +108,7 @@ public class Pastebin {
 		}
 		else {
 			//public and unlisted pastes
-			account = new PastebinAccount(developerKey);
+			account = new PastebinAccount(key);
 		}
 		
 		//convert String URL and fetch the content of the link

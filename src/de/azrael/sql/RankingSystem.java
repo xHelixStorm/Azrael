@@ -1,7 +1,6 @@
 package de.azrael.sql;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,17 +27,11 @@ import de.azrael.constructors.UserLevel;
 import de.azrael.constructors.UserProfile;
 import de.azrael.constructors.UserRank;
 import de.azrael.core.Hashes;
-import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.entities.Member;
 
 public class RankingSystem {
 	private static final Logger logger = LoggerFactory.getLogger(RankingSystem.class);
-	
-	private static String ip = IniFileReader.getSQLIP2();
-	private static String username = IniFileReader.getSQLUsername2();
-	private static String password = IniFileReader.getSQLPassword2();
 		
 	public static void SQLconnection() {
 		try {
@@ -54,7 +47,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLInsertActionLog);
 			stmt.setString(1, warning_level);
 			stmt.setLong(2, entity);
@@ -76,7 +69,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			if(level_skin != 0 || rank_skin != 0 || profile_skin != 0 || icon_skin != 0) {
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLInsertUser);
 				stmt.setLong(1, user_id);
@@ -120,7 +113,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip, "&rewriteBatchedStatements=true"), username, password);
+			myConn = STATIC.getDatabaseURL(2, "&rewriteBatchedStatements=true");
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLBulkInsertUsers);
 			for(Member member : members) {
@@ -160,7 +153,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateUserLevelSkin);
 			if(skin_id > 0)
 				stmt.setInt(1, skin_id);
@@ -184,7 +177,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateUsersDefaultLevelSkin);
 			if(skin_id_new > 0)
 				stmt.setInt(1, skin_id_new);
@@ -207,7 +200,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateUserRankSkin);
 			if(skin_id > 0)
 				stmt.setInt(1, skin_id);
@@ -231,7 +224,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateUsersDefaultRankSkin);
 			if(skin_id_new > 0)
 				stmt.setInt(1, skin_id_new);
@@ -254,7 +247,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateUserProfileSkin);
 			if(skin_id > 0)
 				stmt.setInt(1, skin_id);
@@ -278,7 +271,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateUsersDefaultProfileSkin);
 			if(skin_id_new > 0)
 				stmt.setInt(1, skin_id_new);
@@ -301,7 +294,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateUserIconSkin);
 			if(skin_id > 0)
 				stmt.setInt(1, skin_id);
@@ -325,7 +318,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateUsersDefaultIconSkin);
 			if(skin_id_new > 0)
 				stmt.setInt(1, skin_id_new);
@@ -349,7 +342,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLInsertGuild);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, name);
@@ -369,7 +362,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateMaxExperience);
 			stmt.setLong(1, experience);
 			stmt.setBoolean(2, enabled);
@@ -389,7 +382,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateRankingSystem);
 			stmt.setString(1, guild_name);
 			stmt.setBoolean(2, ranking_state);
@@ -409,7 +402,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateLevelDefaultSkin);
 			stmt.setString(1, guild_name);
 			if(level_skin > 0)
@@ -432,7 +425,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateRankDefaultSkin);
 			stmt.setString(1, guild_name);
 			if(rank_skin > 0)
@@ -455,7 +448,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateProfileDefaultSkin);
 			stmt.setString(1, guild_name);
 			if(profile_skin > 0)
@@ -478,7 +471,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateIconDefaultSkin);
 			stmt.setString(1, guild_name);
 			if(icon_skin > 0)
@@ -502,7 +495,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLInsertRole);
 			stmt.setLong(1, role_id);
 			stmt.setString(2, name);
@@ -523,7 +516,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLDeleteRole);
 			stmt.setLong(1, role_id);
 			stmt.setLong(2, guild_id);
@@ -542,7 +535,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLclearRoles);
 			stmt.setLong(1, guild_id);
 			return stmt.executeUpdate();
@@ -564,7 +557,7 @@ public class RankingSystem {
 			ResultSet rs = null;
 			ArrayList<Roles> roles = new ArrayList<Roles>();
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetRoles);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -591,7 +584,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetRole);
 			stmt.setLong(1, role_id);
 			stmt.setLong(2, guild_id);
@@ -616,7 +609,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLInsertUserDetails);
 			stmt.setLong(1, user_id);
 			stmt.setInt(2, level);
@@ -640,7 +633,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip, "&rewriteBatchedStatements=true"), username, password);
+			myConn = STATIC.getDatabaseURL(2, "&rewriteBatchedStatements=true");
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLBulkInsertUserDetails);
 			for(Member member : members) {
@@ -669,7 +662,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetAssignedRole);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -693,7 +686,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateExperience);
 			stmt.setLong(1, experience);
 			stmt.setTimestamp(2, last_update);
@@ -714,7 +707,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLsetLevelUp);
 			stmt.setInt(1, level);
 			stmt.setLong(2, experience);
@@ -738,7 +731,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateCurrentRole);
 			stmt.setLong(1, role_assign);
 			stmt.setLong(2, guild_id);
@@ -757,7 +750,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateCurrency);
 			stmt.setLong(1, currency);
 			stmt.setTimestamp(2, last_update);
@@ -780,7 +773,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLRanking);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -809,7 +802,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLInsertDailyExperience);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, experience);
@@ -830,7 +823,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLDeleteDailyExperience);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -863,7 +856,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetRankingLevelList);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -927,7 +920,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetRankingRankList);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -1002,7 +995,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetRankingProfileList);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -1086,7 +1079,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetRankingIconsList);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -1121,7 +1114,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLInsertDailyItems);
 			stmt.setString(1, description);
 			stmt.setInt(2, weight);
@@ -1143,7 +1136,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLInsertInventory);
 			stmt.setLong(1, user_id);
 			stmt.setInt(2, item_id);
@@ -1166,7 +1159,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLInsertInventoryWithLimit);
 			stmt.setLong(1, user_id);
 			stmt.setInt(2, item_id);
@@ -1191,7 +1184,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetNumberLimitFromInventory);
 			stmt.setLong(1, user_id);
 			stmt.setInt(2, item_id);
@@ -1217,7 +1210,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetExpirationFromInventory);
 			stmt.setLong(1, user_id);
 			stmt.setInt(2, item_id);
@@ -1242,7 +1235,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLDeleteInventory);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -1259,7 +1252,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetTotalItemNumber);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -1284,7 +1277,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetTotalItemNumber2);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -1310,7 +1303,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetTotalItemNumber3);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -1336,7 +1329,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetTotalItemNumber4);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -1361,7 +1354,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetTotalItemNumber5);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -1388,7 +1381,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetDailiesUsage);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -1412,7 +1405,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLInsertDailiesUsage);
 			stmt.setLong(1, user_id);
 			stmt.setTimestamp(2, opened);
@@ -1434,7 +1427,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			myConn.setAutoCommit(false); 
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLBulkInsertGiveawayRewards);
 			for(String reward : rewards) {
@@ -1463,7 +1456,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLRetrieveGiveawayReward);
 			stmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
 			stmt.setLong(2, guild_id);
@@ -1488,7 +1481,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateUsedOnReward);
 			stmt.setString(1, code);
 			stmt.setLong(2, guild_id);
@@ -1507,7 +1500,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateRewardExpiration);
 			stmt.setTimestamp(1, timestamp);
 			stmt.setLong(2, guild_id);
@@ -1530,7 +1523,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetWholeRankView);
 				stmt.setLong(1, user_id);
 				stmt.setLong(2, guild_id);
@@ -1580,7 +1573,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetGuild);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -1647,7 +1640,6 @@ public class RankingSystem {
 					guild.setDailyDescriptionY(rs.getInt(60));
 					guild.setDailyDescriptionStartX(rs.getInt(61));
 					guild.setDailyFieldSizeX(rs.getInt(62));
-					guild.setMessageTimeout(GuildIni.getMessagesExpRateLimit(guild_id));
 					Hashes.addStatus(guild_id, guild);
 					return guild;
 				}
@@ -1673,7 +1665,7 @@ public class RankingSystem {
 			ResultSet rs = null;
 			try {
 				ArrayList<Level> levels = new ArrayList<Level>();
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetLevels);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -1703,7 +1695,7 @@ public class RankingSystem {
 			ResultSet rs = null;
 			ArrayList<Skins> set_skin = new ArrayList<Skins>();
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetSkinshopContentAndType);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -1741,7 +1733,7 @@ public class RankingSystem {
 			ResultSet rs = null;
 			ArrayList<Skins> set_skin = new ArrayList<Skins>();
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetSkinshopContentAndType2);
 				stmt.setLong(1, guild_id);
 				stmt.setBoolean(2, enabled);
@@ -1777,7 +1769,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetItemID);
 			stmt.setLong(1, user_id);
 			stmt.setInt(2, item_id);
@@ -1803,7 +1795,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetItemIDAndSkinType);
 			stmt.setLong(1, user_id);
 			stmt.setString(2, description);
@@ -1829,7 +1821,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetInventoryNumber);
 			stmt.setLong(1, user_id);
 			stmt.setString(2, description);
@@ -1857,7 +1849,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetInventoryAndDescriptions);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -1899,7 +1891,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetInventoryAndDescriptionsItems);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -1941,7 +1933,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetInventoryAndDescriptionsWeapons);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -1983,7 +1975,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			if(!category.equalsIgnoreCase("skill")) {
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetInventoryAndDescriptionsWeapons2);
 				stmt.setString(3, category);
@@ -2033,7 +2025,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetInventoryAndDescriptionsSkins);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -2070,7 +2062,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetInventoryAndDescriptionWithoutLimit);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -2099,7 +2091,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetNumberAndExpirationFromInventory);
 			stmt.setLong(1, user_id);
 			stmt.setString(2, description);
@@ -2132,7 +2124,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetDailiesAndType);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -2169,7 +2161,7 @@ public class RankingSystem {
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetitemEffects);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -2197,7 +2189,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateCurrencyAndInsertInventory);
 			stmt.setLong(1, currency);
@@ -2235,7 +2227,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateCurrencyAndRemoveInventory);
 			stmt.setLong(1, currency);
@@ -2271,7 +2263,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateAndInsertInventory);
 			stmt.setInt(1, number-1);
@@ -2310,7 +2302,7 @@ public class RankingSystem {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLDeleteAndInsertInventory);
 			stmt.setLong(1, user_id);
@@ -2350,7 +2342,7 @@ public class RankingSystem {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemStatements.SQLExpBoosterExistsInInventory);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);

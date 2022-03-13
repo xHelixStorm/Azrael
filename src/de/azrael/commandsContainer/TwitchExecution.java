@@ -12,6 +12,7 @@ import com.vdurmont.emoji.EmojiParser;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.RSS;
 import de.azrael.core.Hashes;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.rss.TwitchModel;
 import de.azrael.sql.Azrael;
@@ -38,6 +39,7 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REMOVE_ERR_2).replace("{}", ""+twitch.size())).build()).queue();
 				Hashes.addTempCache("twitch_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.TWITCH.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -53,6 +55,7 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 			logger.error("The display format of twitch subscription {} couldn't be updated in guild {}", twitch.getName(), e.getGuild().getId());
 		}
 		Hashes.clearTempCache("twitch_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.TWITCH.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -69,6 +72,7 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REMOVE_ERR_2).replace("{}", ""+twitch.size())).build()).queue();
 				Hashes.addTempCache("twitch_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.TWITCH.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -93,6 +97,7 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 					logger.error("The channel of the twitch subscription {} couldn't be updated in guild {}", twitch.getName(), e.getGuild().getId());
 				}
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.TWITCH.getColumn(), e.getMessage().getContentRaw());
 		}
 		else if(channel_id.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE))) {
 			final RSS twitch = (RSS)cache.getObject();
@@ -110,6 +115,7 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				logger.error("The channel of the twitch subscription {} couldn't be updated in guild {}", twitch.getName(), e.getGuild().getId());
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.TWITCH.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -136,6 +142,7 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REMOVE_ERR_2).replace("{}", ""+twitch.size())).build()).queue();
 				Hashes.addTempCache("twitch_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.TWITCH.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -158,6 +165,7 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REMOVE_ERR_2).replace("{}", ""+twitch.size())).build()).queue();
 				Hashes.addTempCache("twitch_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.TWITCH.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 }

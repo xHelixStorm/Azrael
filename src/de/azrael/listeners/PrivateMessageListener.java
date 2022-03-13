@@ -13,8 +13,10 @@ import de.azrael.commandsContainer.EquipExecution;
 import de.azrael.core.CommandHandler;
 import de.azrael.core.CommandParser;
 import de.azrael.core.Hashes;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
+import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message.Attachment;
@@ -41,7 +43,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 			//handle private messages commands
 			var message = e.getMessage().getContentRaw().toLowerCase();
 			if(e.getMessage().getContentRaw().startsWith("!") && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
-				if(!CommandHandler.handleCommand(CommandParser.parser(message, null, e))) {
+				if(!CommandHandler.handleCommand(CommandParser.parser(null, message, null, e), null)) {
 					logger.debug("Private message command {} doesn't exist", e.getMessage().getContentRaw());
 				}
 			}
@@ -53,6 +55,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 				if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_EXIT))) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EXIT)).build()).queue();
 					Hashes.clearTempCache("equip_us"+e.getAuthor());
+					Azrael.SQLInsertCommandLog(e.getAuthor().getIdLong(), 0, Command.EQUIP.getColumn(), e.getMessage().getContentRaw());
 				}
 				//execute this block when no main parameter has been chosen yet
 				else if(equip.getAdditionalInfo2().length() == 0) {
@@ -60,7 +63,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 					if(equip.getAdditionalInfo().length() == 18) {
 						//show the current equipment
 						if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_SHOW))) {
-							
+							//TODO: show equipment
 						}
 						//equip weapons or skills
 						else if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_SET))) {

@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
@@ -29,14 +29,14 @@ public class RegisterRankingRole {
 		e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_HELP)).build()).queue();
 	}
 	
-	public static void runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission) {
+	public static boolean runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission) {
 		long guild_id = e.getGuild().getIdLong();
 		long role_id = 0;
 		String role_name = "";
 		String level = "";
 		int level_requirement = 0;
 		
-		var commandLevel = GuildIni.getRegisterRankingRoleLevel(e.getGuild().getIdLong());
+		var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_RANKING_ROLE);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			if(_args.length == 3) {
 				if(e.getGuild().getRoleById(_args[1]) != null) {
@@ -45,7 +45,7 @@ public class RegisterRankingRole {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_ROLE_ID)).build()).queue();
-					return;
+					return true;
 				}
 				if(_args[2].replaceAll("[0-9]*", "").length() == 0) {
 					level = _args[2];
@@ -53,12 +53,12 @@ public class RegisterRankingRole {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_NO_LEVEL)).build()).queue();
-					return;
+					return true;
 				}
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
-				return;
+				return true;
 			}
 			if(level_requirement < 1 || level_requirement > 10000) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_NO_LEVEL)).build()).queue();
@@ -85,10 +85,12 @@ public class RegisterRankingRole {
 					RankingSystem.SQLInsertActionLog("High", role_id, guild_id, "Role couldn't be registered as ranking role", "The role "+role_name+" couldn't be inserted into the RankingSystem.roles table");
 				}
 			}
+			return true;
 		}
 		else {
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
 			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
+		return false;
 	}
 }

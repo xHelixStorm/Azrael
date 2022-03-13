@@ -11,13 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.GoogleAPISetup;
 import de.azrael.core.Hashes;
+import de.azrael.enums.Command;
 import de.azrael.enums.GoogleDD;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.google.GoogleDrive;
 import de.azrael.google.GoogleSheets;
 import de.azrael.google.GoogleUtils;
@@ -54,13 +55,13 @@ public class GoogleSpreadsheetsExecution {
 		Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 	}
 	
-	public static void create(GuildMessageReceivedEvent e, String title, final String key) {
+	public static void create(GuildMessageReceivedEvent e, String title, final String key, BotConfigs botConfig) {
 		if(title == null) {
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_CREATE)).build()).queue();
 		}
 		else {
 			//create and transfer ownership only if an email has been provided
-			final String email = GuildIni.getGoogleMainEmail(e.getGuild().getIdLong());
+			final String email = botConfig.getGoogleMainEmail();
 			if(email != null && email.length() > 0) {
 				String file_id = "";
 				String processStep = "";
@@ -78,7 +79,7 @@ public class GoogleSpreadsheetsExecution {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_TIMEOUT).replace("{}", ""+(counter+1))).build()).queue();
 					}
 					if(GoogleUtils.timeoutHandler(e.getGuild(), (e.getGuild().getId()+"create"), null, e1)) {
-						create(e, title, key);
+						create(e, title, key, botConfig);
 					}
 					err = true;
 				} catch (Exception e1) {
@@ -103,6 +104,7 @@ public class GoogleSpreadsheetsExecution {
 			}
 		}
 		Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void add(GuildMessageReceivedEvent e, String file_id, final String key) {
@@ -151,6 +153,7 @@ public class GoogleSpreadsheetsExecution {
 				Hashes.clearTempCache(key);
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void remove(GuildMessageReceivedEvent e, String file_id, final String key) {
@@ -203,6 +206,7 @@ public class GoogleSpreadsheetsExecution {
 				Hashes.clearTempCache(key);
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void events(GuildMessageReceivedEvent e, final String key) {
@@ -228,6 +232,7 @@ public class GoogleSpreadsheetsExecution {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_NO_FILE)).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void eventsFileSelection(GuildMessageReceivedEvent e, int selection, final String key) {
@@ -280,6 +285,7 @@ public class GoogleSpreadsheetsExecution {
 				logger.error("Google spreadsheets events are not defined in guild {}", e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -344,6 +350,7 @@ public class GoogleSpreadsheetsExecution {
 					Hashes.clearTempCache(key);
 				}
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -370,6 +377,7 @@ public class GoogleSpreadsheetsExecution {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_NO_FILE)).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void sheetSelection(GuildMessageReceivedEvent e, int selection, final String key) {
@@ -418,6 +426,7 @@ public class GoogleSpreadsheetsExecution {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_NOT_LINKED_EVENT)).build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -435,6 +444,7 @@ public class GoogleSpreadsheetsExecution {
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-sheet-update", file_id, event));
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void sheetUpdate(GuildMessageReceivedEvent e, String file_id, String event, String startingPoint, final String key) {
@@ -450,6 +460,7 @@ public class GoogleSpreadsheetsExecution {
 				logger.error("Google spreadsheet starting point couldn't be updated for spreadsheet {} and event {} with value {} in guild {}", file_id, event, startingPoint, e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -476,6 +487,7 @@ public class GoogleSpreadsheetsExecution {
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_NO_FILE)).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void mapSelection(GuildMessageReceivedEvent e, int selection, final String key) {
@@ -510,6 +522,7 @@ public class GoogleSpreadsheetsExecution {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_NOT_LINKED_EVENT)).build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -548,6 +561,7 @@ public class GoogleSpreadsheetsExecution {
 				}
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void mapUpdate(GuildMessageReceivedEvent e, String file_id, int event, String dditems, final String key) {
@@ -599,6 +613,7 @@ public class GoogleSpreadsheetsExecution {
 				Hashes.clearTempCache(key);
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void restrict(GuildMessageReceivedEvent e, final String key) {
@@ -624,6 +639,7 @@ public class GoogleSpreadsheetsExecution {
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_NO_FILE)).build()).queue();
 			Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void restrictSelection(GuildMessageReceivedEvent e, int selection, final String key) {
@@ -658,6 +674,7 @@ public class GoogleSpreadsheetsExecution {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_RESTRICT_ERR)).build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
@@ -675,6 +692,7 @@ public class GoogleSpreadsheetsExecution {
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-restrict-update", file_id, event));
 			}
 		}
+		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
 	public static void restrictUpdate(GuildMessageReceivedEvent e, String file_id, String event, String channel, final String key) {
@@ -694,6 +712,7 @@ public class GoogleSpreadsheetsExecution {
 				logger.error("Channel restriction couldn't be removed for file id {} and event {} in guild {}", file_id, event, e.getGuild().getId());
 				Hashes.clearTempCache(key);
 			}
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 		}
 		else {
 			final String channel_id = channel.replaceAll("[<#>]*", "");
@@ -716,6 +735,7 @@ public class GoogleSpreadsheetsExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
+				Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 			}
 		}
 		Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
