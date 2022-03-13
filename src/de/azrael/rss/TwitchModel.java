@@ -21,7 +21,6 @@ import de.azrael.constructors.Messages;
 import de.azrael.constructors.RSS;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
@@ -39,6 +38,9 @@ public class TwitchModel {
 	private final static String STREAMS_REQUEST = "https://api.twitch.tv/helix/streams";
 	private final static String USER_ID_ENDPOINT = "?user_id=";
 	
+	private static final String TWITCH_CLIENT_ID = "TWITCH_CLIENT_ID";
+	private static final String TWITCH_CLIENT_SECRET = "TWITCH_CLIENT_SECRET";
+	
 	private static String accessToken = null;
 	private static long tokenValidity = 0;
 	
@@ -49,8 +51,7 @@ public class TwitchModel {
 		if(bearer)
 			con.setRequestProperty("Authorization", "Bearer "+accessToken);
 		if(tokenHeader) {
-			final String [] twitchKeys = IniFileReader.getTwitchKeys();
-			con.setRequestProperty("Client-Id", twitchKeys[0]);
+			con.setRequestProperty("Client-Id", System.getProperty(TWITCH_CLIENT_ID));
 		}
 		con.connect();
 		return con;
@@ -69,9 +70,10 @@ public class TwitchModel {
 	
 	private static synchronized boolean generateToken() throws IOException {
 		if(accessToken == null || tokenValidity - System.currentTimeMillis() < 0) {
-			final String [] twitchKeys = IniFileReader.getTwitchKeys();
-			if(twitchKeys[0] != null && twitchKeys[0].length() > 0 && twitchKeys[1] != null && twitchKeys[1].length() > 0) {
-				URL url = new URL(TOKEN_REQUEST.replaceFirst("\\{\\}", twitchKeys[0]).replace("{}", twitchKeys[1]));
+			final String clientId = System.getProperty(TWITCH_CLIENT_ID);
+			final String clientSecret = System.getProperty(TWITCH_CLIENT_SECRET);
+			if(clientId != null && clientId.length() > 0 && clientSecret != null && clientSecret.length() > 0) {
+				URL url = new URL(TOKEN_REQUEST.replaceFirst("\\{\\}", clientId).replace("{}", clientSecret));
 				HttpURLConnection con = buildConnection(url, "POST", false, false);
 				
 				if(con.getResponseCode() == 200) {

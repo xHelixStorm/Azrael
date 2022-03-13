@@ -108,6 +108,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 public class Main {
 	static {System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "./logback.xml");}
 	private final static Logger logger = LoggerFactory.getLogger(Main.class);
+	private final static String SECRET = "./.secret_data";
 	private static JDABuilder builder;
 	
 	public static void main(String [] args) {
@@ -198,7 +199,7 @@ public class Main {
 		//Load DB configuration from file
 		Properties prop = new Properties();
 		try {
-			FileInputStream secret = new FileInputStream("./.secret_data");
+			FileInputStream secret = new FileInputStream(SECRET);
 			prop.load(secret);
 			
 			//Database options
@@ -267,6 +268,10 @@ public class Main {
 			final String redditPass = prop.getProperty("REDDIT_PASS", "");
 			System.setProperty("REDDIT_USER", (redditUser.isBlank() ? redditUser.trim() : STATIC.decrypt(redditUser.trim())));
 			System.setProperty("REDDIT_PASS", (redditPass.isBlank() ? redditPass.trim() : STATIC.decrypt(redditPass.trim())));
+			
+			//Twitch options
+			System.setProperty("TWITCH_CLIENT_ID", prop.getProperty("TWITCH_CLIENT_ID", "").trim());
+			System.setProperty("TWITCH_CLIENT_SECRET", prop.getProperty("TWITCH_CLIENT_SECRET", "").trim());
 		} catch (Exception e1) {
 			logger.error("Database configurations couldn't be loaded. Application shutdown!", e1);
 			return;
