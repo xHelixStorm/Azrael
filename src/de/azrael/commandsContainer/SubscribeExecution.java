@@ -9,14 +9,14 @@ import org.slf4j.LoggerFactory;
 import com.vdurmont.emoji.EmojiParser;
 
 import de.azrael.constructors.Cache;
-import de.azrael.constructors.RSS;
+import de.azrael.constructors.Subscription;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.rss.BasicModel;
-import de.azrael.rss.TwitterModel;
 import de.azrael.sql.Azrael;
-import de.azrael.timerTask.ParseSubscription;
+import de.azrael.subscription.RSSModel;
+import de.azrael.subscription.SubscriptionUtils;
+import de.azrael.subscription.TwitterModel;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -34,13 +34,11 @@ public class SubscribeExecution {
 	public static void registerFeed(GuildMessageReceivedEvent e, String feed, int type) {
 		EmbedBuilder message = new EmbedBuilder();
 		if(type == 1) {
-			final int result = Azrael.SQLInsertRSS(feed, e.getGuild().getIdLong(), type, null);
+			final int result = Azrael.SQLInsertSubscription(feed, e.getGuild().getIdLong(), type, null);
 			if(result > 0) {
 				message.setColor(Color.BLUE);
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_RSS_ADDED)).build()).queue();
-				if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
-					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
-				Hashes.removeFeeds(e.getGuild().getIdLong());
+				SubscriptionUtils.startTimer(e.getJDA());
 				logger.info("User {} has registered the RSS url {} in guild {}", e.getMember().getUser().getId(), feed, e.getGuild().getId());
 			}
 			else if(result == 0) {
@@ -54,13 +52,11 @@ public class SubscribeExecution {
 			}
 		}
 		else if(STATIC.getTwitterFactory() != null) {
-			final int result = Azrael.SQLInsertRSS(feed, e.getGuild().getIdLong(), type, null); 
+			final int result = Azrael.SQLInsertSubscription(feed, e.getGuild().getIdLong(), type, null); 
 			if(result > 0) {
 				message.setColor(Color.BLUE);
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_HASH_ADDED)).build()).queue();
-				if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
-					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
-				Hashes.removeFeeds(e.getGuild().getIdLong());
+				SubscriptionUtils.startTimer(e.getJDA());
 				logger.info("User {} has registered the Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), feed, e.getGuild().getId());
 			}
 			else if(result == 0) {
@@ -82,12 +78,12 @@ public class SubscribeExecution {
 	
 	public static void removeFeed(GuildMessageReceivedEvent e, int feed) {
 		EmbedBuilder message = new EmbedBuilder();
-		ArrayList<RSS> rss = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
+		ArrayList<Subscription> rss = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
 		if(rss.size() >= feed+1) {
 			String url = rss.get(feed).getURL();
 			Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-			if(Azrael.SQLDeleteRSSFeed(url, e.getGuild().getIdLong()) > 0) {
-				Hashes.removeFeeds(e.getGuild().getIdLong());
+			if(Azrael.SQLDeleteSubscription(url, e.getGuild().getIdLong()) > 0) {
+				Hashes.clearSubscriptions();
 				Hashes.removeSubscriptionStatus(e.getGuild().getId()+"_"+url);
 				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_REMOVED)).build()).queue();
 				logger.info("User {} has removed the RSS url {} in guild {}", e.getMember().getUser().getId(), url, e.getGuild().getId());
@@ -105,7 +101,7 @@ public class SubscribeExecution {
 	}
 	
 	public static void currentFormat(GuildMessageReceivedEvent e, int feed, String key) {
-		ArrayList<RSS> rss = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
+		ArrayList<Subscription> rss = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
 		if(rss.size() >= feed+1) {
 			Hashes.addTempCache(key, new Cache(180000, "updateformat"+feed));
 			if(rss.get(feed).getType() == 1)
@@ -122,9 +118,9 @@ public class SubscribeExecution {
 	
 	public static void updateFormat(GuildMessageReceivedEvent e, int feed, String format) {
 		EmbedBuilder message = new EmbedBuilder();
-		ArrayList<RSS> rss = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
-		if(Azrael.SQLUpdateRSSFormat(rss.get(feed).getURL(), e.getGuild().getIdLong(), EmojiParser.parseToAliases(format)) > 0) {
-			Hashes.removeFeeds(e.getGuild().getIdLong());
+		ArrayList<Subscription> rss = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
+		if(Azrael.SQLUpdateSubscriptionFormat(rss.get(feed).getURL(), e.getGuild().getIdLong(), EmojiParser.parseToAliases(format)) > 0) {
+			Hashes.clearSubscriptions();
 			e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_FORMAT_UPDATED)).build()).queue();
 			logger.info("User {} has updated the display format of the RSS url {} in guild {}", e.getMember().getUser().getId(), rss.get(feed).getURL(), e.getGuild().getId());
 		}
@@ -137,10 +133,10 @@ public class SubscribeExecution {
 	
 	public static void changeOptions(GuildMessageReceivedEvent e, int feed, String key) {
 		EmbedBuilder message = new EmbedBuilder();
-		ArrayList<RSS> tweets = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 2);
+		ArrayList<Subscription> tweets = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 2);
 		if(tweets.size() >= feed+1) {
 			Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
-			RSS tweet = tweets.get(feed);
+			Subscription tweet = tweets.get(feed);
 			StringBuilder out = new StringBuilder();
 			for(final String childTweet : tweet.getChildTweets()) {
 				out.append(childTweet+" ");
@@ -156,12 +152,12 @@ public class SubscribeExecution {
 	}
 	
 	public static void updateOptions(GuildMessageReceivedEvent e, int feed, String key) {
-		ArrayList<RSS> tweets = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 2);
-		RSS tweet = tweets.get(feed);
+		ArrayList<Subscription> tweets = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 2);
+		Subscription tweet = tweets.get(feed);
 		final String lcMessage = e.getMessage().getContentRaw().toLowerCase();
 		boolean printMessage = false;
 		if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE_PICTURES))) {
-			if(Azrael.SQLUpdateRSSPictures(tweet.getURL(), e.getGuild().getIdLong(), true) > 0) {
+			if(Azrael.SQLUpdateSubscriptionPictures(tweet.getURL(), e.getGuild().getIdLong(), true) > 0) {
 				logger.info("User {} has allowed pictures to be displayed for the Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
 				printMessage = true;
@@ -173,7 +169,7 @@ public class SubscribeExecution {
 			}
 		}
 		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE_VIDEOS))) {
-			if(Azrael.SQLUpdateRSSVideos(tweet.getURL(), e.getGuild().getIdLong(), true) > 0) {
+			if(Azrael.SQLUpdateSubscriptionVideos(tweet.getURL(), e.getGuild().getIdLong(), true) > 0) {
 				logger.info("User {} has allowed videos to be displayed for the Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
 				printMessage = true;
@@ -185,7 +181,7 @@ public class SubscribeExecution {
 			}
 		}
 		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE_TEXT))) {
-			if(Azrael.SQLUpdateRSSText(tweet.getURL(), e.getGuild().getIdLong(), true) > 0) {
+			if(Azrael.SQLUpdateSubscriptionText(tweet.getURL(), e.getGuild().getIdLong(), true) > 0) {
 				logger.info("User {} has allowed text messages to be displayed for Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
 				printMessage = true;
@@ -197,7 +193,7 @@ public class SubscribeExecution {
 			}
 		}
 		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE_PICTURES))) {
-			if(Azrael.SQLUpdateRSSPictures(tweet.getURL(), e.getGuild().getIdLong(), false) > 0) {
+			if(Azrael.SQLUpdateSubscriptionPictures(tweet.getURL(), e.getGuild().getIdLong(), false) > 0) {
 				logger.info("User {} has disallowed pictures to be displayed for Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
 				printMessage = true;
@@ -209,7 +205,7 @@ public class SubscribeExecution {
 			}
 		}
 		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE_VIDEOS))) {
-			if(Azrael.SQLUpdateRSSVideos(tweet.getURL(), e.getGuild().getIdLong(), false) > 0) {
+			if(Azrael.SQLUpdateSubscriptionVideos(tweet.getURL(), e.getGuild().getIdLong(), false) > 0) {
 				logger.info("User {} has disallowed videos to be displayed for Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
 				printMessage = true;
@@ -221,7 +217,7 @@ public class SubscribeExecution {
 			}
 		}
 		else if(lcMessage.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE_TEXT))) {
-			if(Azrael.SQLUpdateRSSText(tweet.getURL(), e.getGuild().getIdLong(), false) > 0) {
+			if(Azrael.SQLUpdateSubscriptionText(tweet.getURL(), e.getGuild().getIdLong(), false) > 0) {
 				logger.info("User {} has disallowed text messages to be displayed for Twitter hashtag {} in guild {}", e.getMember().getUser().getId(), tweet.getURL(), e.getGuild().getId());
 				Hashes.addTempCache(key, new Cache(180000, "options-page", ""+feed));
 				printMessage = true;
@@ -236,7 +232,7 @@ public class SubscribeExecution {
 			if(lcMessage.matches(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_CHILD)+" #[a-z0-9]{1,}[^\\s]*")) {
 				printMessage = true;
 				final String hashtag = lcMessage.substring(10);
-				final int result = Azrael.SQLInsertChildTweet(tweet.getURL(), hashtag, e.getGuild().getIdLong()); 
+				final int result = Azrael.SQLInsertChildSubscription(tweet.getURL(), hashtag, e.getGuild().getIdLong()); 
 				if(result > 0) {
 					logger.info("User {} has added the child hashtag {} to the parent hashtag {} in guild {}", e.getMember().getUser().getId(), hashtag, tweet.getURL(), e.getGuild().getId());
 				}
@@ -246,12 +242,13 @@ public class SubscribeExecution {
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					logger.error("Child hashtag {} couldn't be added to the parent hashtag {} in guild {}", hashtag, tweet.getURL(), e.getGuild().getId());
+					printMessage = false;
 				}
 			}
 			else if(lcMessage.matches(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_CHILD)+" #[a-z0-9]{1,}[^\\s]*")) {
 				printMessage = true;
 				final String hashtag = lcMessage.substring(13);
-				final int result = Azrael.SQLDeleteChildTweet(tweet.getURL(), hashtag, e.getGuild().getIdLong());
+				final int result = Azrael.SQLDeleteChildSubscription(tweet.getURL(), hashtag, e.getGuild().getIdLong());
 				if(result > 0) {
 					logger.info("User {} has removed the child hashtag {} from the parent hashtag {} in guild {}", hashtag, tweet.getURL(), e.getGuild().getId());
 				}
@@ -261,6 +258,7 @@ public class SubscribeExecution {
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					logger.error("Child hashtag {} couldn't be removed for the parent hashtag {} in guild {}", hashtag, tweet.getURL(), e.getGuild().getId());
+					printMessage = false;
 				}
 			}
 			else {
@@ -270,7 +268,7 @@ public class SubscribeExecution {
 		
 		if(printMessage) {
 			EmbedBuilder message = new EmbedBuilder();
-			Hashes.removeFeeds(e.getGuild().getIdLong());
+			Hashes.clearSubscriptions();
 			tweet = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 2).get(feed);
 			StringBuilder out = new StringBuilder();
 			for(final String childTweet : tweet.getChildTweets()) {
@@ -288,7 +286,7 @@ public class SubscribeExecution {
 	
 	public static void setChannel(GuildMessageReceivedEvent e, int feed, String key) {
 		EmbedBuilder message = new EmbedBuilder();
-		ArrayList<RSS> subscriptions = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
+		ArrayList<Subscription> subscriptions = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
 		if(subscriptions.size() >= feed+1) {
 			final var subscription = subscriptions.get(feed);
 			Hashes.addTempCache(key, new Cache(180000, "set-channel", ""+feed));
@@ -303,17 +301,14 @@ public class SubscribeExecution {
 		if(channel_id.replaceAll("[0-9]*", "").length() == 0) {
 			TextChannel textChannel = e.getGuild().getTextChannelById(e.getMessage().getContentRaw().replaceAll("[<>#]*", ""));
 			if(textChannel != null) {
-				ArrayList<RSS> subscriptions = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
-				RSS subscription = subscriptions.get(feed);
-				final var result = Azrael.SQLUpdateRSSChannel(subscription.getURL(), e.getGuild().getIdLong(), textChannel.getIdLong());
+				ArrayList<Subscription> subscriptions = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
+				Subscription subscription = subscriptions.get(feed);
+				final var result = Azrael.SQLUpdateSubscriptionChannel(subscription.getURL(), e.getGuild().getIdLong(), textChannel.getIdLong());
 				if(result > 0) {
 					e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_ADDED)).build()).queue();
 					logger.info("User {} has set the alternative print channel {} for the Twitter hashtag or RSS url {} in guild {}", e.getMember().getUser().getId(), textChannel.getId(), subscription.getURL(), e.getGuild().getId());
-					Hashes.removeFeeds(e.getGuild().getIdLong());
 					Hashes.clearTempCache(key);
-					if(!ParseSubscription.timerIsRunning(e.getGuild().getIdLong())) {
-						ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
-					}
+					SubscriptionUtils.startTimer(e.getJDA());
 				}
 				else {
 					e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -332,12 +327,12 @@ public class SubscribeExecution {
 	}
 	
 	public static void runTest(GuildMessageReceivedEvent e, int feed) {
-		ArrayList<RSS> rss = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
+		ArrayList<Subscription> rss = Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong());
 		if(rss.size() >= feed+1) {
 			Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 			final var foundRSS = rss.get(feed);
 			if(foundRSS.getType() == 1)
-				BasicModel.ModelTest(e, foundRSS);
+				RSSModel.ModelTest(e, foundRSS);
 			else if(foundRSS.getType() == 2) {
 				TwitterModel.ModelTest(e, foundRSS);
 			}

@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import com.google.api.services.sheets.v4.model.Spreadsheet;
@@ -24,7 +25,7 @@ import de.azrael.constructors.Level;
 import de.azrael.constructors.Messages;
 import de.azrael.constructors.NameFilter;
 import de.azrael.constructors.Quizes;
-import de.azrael.constructors.RSS;
+import de.azrael.constructors.Subscription;
 import de.azrael.constructors.Ranking;
 import de.azrael.constructors.Roles;
 import de.azrael.constructors.Skills;
@@ -57,7 +58,7 @@ public class Hashes {
     private static final ConcurrentMap<Long, ArrayList<Skins>> shopContent = new ConcurrentHashMap<Long, ArrayList<Skins>>();
     private static final ConcurrentMap<Long, ArrayList<Dailies>> daily_items = new ConcurrentHashMap<Long, ArrayList<Dailies>>();
     private static final ConcurrentMap<Long, ArrayList<Roles>> discordRoles = new ConcurrentHashMap<Long, ArrayList<Roles>>();
-    private static final ConcurrentMap<Long, ArrayList<RSS>> feeds = new ConcurrentHashMap<Long, ArrayList<RSS>>();
+    private static final CopyOnWriteArrayList<Subscription> subscriptions = new CopyOnWriteArrayList<Subscription>();
     private static final ConcurrentMap<Long, ArrayList<Weapons>> weaponShopContent = new ConcurrentHashMap<Long, ArrayList<Weapons>>();
     private static final ConcurrentMap<Long, ArrayList<String>> weaponCategories = new ConcurrentHashMap<Long, ArrayList<String>>();
     private static final ConcurrentMap<Long, ArrayList<WeaponAbbvs>> weaponAbbvs = new ConcurrentHashMap<Long, ArrayList<WeaponAbbvs>>();
@@ -175,8 +176,8 @@ public class Hashes {
 	public static void addDiscordRole(Long key, ArrayList<Roles> roles) {
 		discordRoles.put(key, roles);
 	}
-	public static void addFeeds(Long key, ArrayList<RSS> subscriptions) {
-		feeds.put(key, subscriptions);
+	public static void addSubscription(Subscription subscription) {
+		subscriptions.add(subscription);
 	}
 	public static void addWeaponShopContent(Long key, ArrayList<Weapons> weapons) {
 		weaponShopContent.put(key, weapons);
@@ -365,15 +366,11 @@ public class Hashes {
 	public static ArrayList<Roles> getDiscordRole(Long key) {
 		return discordRoles.get(key);
 	}
-	public static ArrayList<RSS> getFeeds(Long key) {
-		return feeds.get(key);
+	public static CopyOnWriteArrayList<Subscription> getSubscriptions() {
+		return subscriptions;
 	}
-	public static int getFeedsSize(Long key) {
-		ArrayList<RSS> feedList = feeds.get(key);
-		if(feedList == null)
-			return 0;
-		else
-			return feedList.size();
+	public static int getSubscriptionSize() {
+		return subscriptions.size();
 	}
 	public static ArrayList<Weapons> getWeaponShopContent(Long key) {
 		return weaponShopContent.get(key);
@@ -582,11 +579,8 @@ public class Hashes {
 	public static void clearDiscordRoles() {
 		discordRoles.clear();
 	}
-	public static void removeFeeds(long key) {
-		feeds.remove(key);
-	}
-	public static void clearFeeds() {
-		feeds.clear();
+	public static void clearSubscriptions() {
+		subscriptions.clear();
 	}
 	public static void removeWeaponShopContent(Long key) {
 		weaponShopContent.remove(key);

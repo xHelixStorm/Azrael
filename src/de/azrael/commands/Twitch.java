@@ -9,14 +9,14 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
-import de.azrael.constructors.RSS;
+import de.azrael.constructors.Subscription;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
-import de.azrael.rss.TwitchModel;
 import de.azrael.sql.Azrael;
-import de.azrael.timerTask.ParseSubscription;
+import de.azrael.subscription.SubscriptionUtils;
+import de.azrael.subscription.TwitchModel;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -53,12 +53,10 @@ public class Twitch implements CommandPublic {
 				}
 				
 				if(success) {
-					if(Azrael.SQLInsertRSS(user[0], e.getGuild().getIdLong(), 5, user[1]) > 0) {
+					if(Azrael.SQLInsertSubscription(user[0], e.getGuild().getIdLong(), 5, user[1]) > 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REGISTER_STEP).replace("{}", user[1])).build()).queue();
 						logger.info("User {} has subscribed to the twitch username {} in guild {}", e.getMember().getUser().getId(), user[1], e.getGuild().getId());
-						if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
-							ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
-						Hashes.removeFeeds(e.getGuild().getIdLong());
+						SubscriptionUtils.startTimer(e.getJDA());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -74,7 +72,7 @@ public class Twitch implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))) {
-			final ArrayList<RSS> twitch = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 5);
+			final ArrayList<Subscription> twitch = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 5);
 			if(twitch != null && twitch.size() > 0) {
 				int count = 0;
 				StringBuilder out = new StringBuilder();
@@ -94,7 +92,7 @@ public class Twitch implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))) {
-			final ArrayList<RSS> twitch = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 5);
+			final ArrayList<Subscription> twitch = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 5);
 			if(twitch != null && twitch.size() > 0) {
 				int count = 0;
 				StringBuilder out = new StringBuilder();
@@ -114,7 +112,7 @@ public class Twitch implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
-			final ArrayList<RSS> twitch = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 5);
+			final ArrayList<Subscription> twitch = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 5);
 			if(twitch != null && twitch.size() > 0) {
 				int count = 0;
 				StringBuilder out = new StringBuilder();
@@ -134,7 +132,7 @@ public class Twitch implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))) {
-			final ArrayList<RSS> twitch = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 5);
+			final ArrayList<Subscription> twitch = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 5);
 			if(twitch != null && twitch.size() > 0) {
 				int count = 0;
 				StringBuilder out = new StringBuilder();

@@ -15,7 +15,7 @@ import de.azrael.enums.Translation;
 import de.azrael.fileManagement.IniFileReader;
 import de.azrael.preparedMessages.ReactionMessage;
 import de.azrael.sql.Azrael;
-import de.azrael.timerTask.ParseSubscription;
+import de.azrael.subscription.SubscriptionUtils;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -70,7 +70,7 @@ public class RegisterChannel {
 		
 		final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNEL);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|ara|rea|qui|rss|wat|del|edi|vot|vo2|co1|co2|co3|co4|co5|co6|upd)");
+			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|ara|rea|qui|sub|wat|del|edi|vot|vo2|co1|co2|co3|co4|co5|co6|upd)");
 			Matcher matcher = pattern.matcher(args[1]);
 			if(args.length > 2 && matcher.find()) {
 				channel_type = matcher.group();
@@ -85,7 +85,7 @@ public class RegisterChannel {
 						case "bot", "co1", "co2", "co3", "co4", "co5", "co6", "vot", "vo2" -> {
 							result = Azrael.SQLRegisterSpecialChannel(guild_id, channel_id, channel_type);
 						}
-						case "log", "tra", "rea", "qui", "rss", "wat", "del", "edi", "upd" -> {
+						case "log", "tra", "rea", "qui", "sub", "wat", "del", "edi", "upd" -> {
 							result = Azrael.SQLRegisterUniqueChannel(guild_id, channel_id, channel_type);
 						}
 					}
@@ -103,8 +103,8 @@ public class RegisterChannel {
 								logger.error("Role reactions couldn't be automatically enabled in guild {}", guild_id);
 							}
 						}
-						else if(channel_type.equals("rss") && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong())) {
-							ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
+						else if(channel_type.equals("sub")) {
+							SubscriptionUtils.startTimer(e.getJDA());
 						}
 					}
 					else {

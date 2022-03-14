@@ -10,14 +10,14 @@ import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 
 import de.azrael.constructors.Cache;
-import de.azrael.constructors.RSS;
+import de.azrael.constructors.Subscription;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.google.GoogleYoutube;
-import de.azrael.rss.YouTubeModel;
 import de.azrael.sql.Azrael;
-import de.azrael.timerTask.ParseSubscription;
+import de.azrael.subscription.SubscriptionUtils;
+import de.azrael.subscription.YouTubeModel;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -49,13 +49,11 @@ public class GoogleYouTubeExecution {
 			if(result != null) {
 				if(result.getItems().size() > 0) {
 					final SearchResult item = result.getItems().get(0);
-					if(Azrael.SQLInsertRSS(item.getSnippet().getChannelId(), e.getGuild().getIdLong(), 4, item.getSnippet().getChannelTitle()) > 0) {
+					if(Azrael.SQLInsertSubscription(item.getSnippet().getChannelId(), e.getGuild().getIdLong(), 4, item.getSnippet().getChannelTitle()) > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_ADD_2).replaceFirst("\\{\\}", item.getSnippet().getChannelTitle()).replace("{}", item.getSnippet().getChannelId())).build()).queue();
 						logger.info("User {} has subscribed the YouTube channel {} in guild {}", e.getMember().getUser().getId(), item.getSnippet().getChannelId(), e.getGuild().getId());
 						Hashes.addTempCache(key, new Cache(180000, "youtube-selection"));
-						if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
-							ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
-						Hashes.removeFeeds(e.getGuild().getIdLong());
+						SubscriptionUtils.startTimer(e.getJDA());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -93,12 +91,12 @@ public class GoogleYouTubeExecution {
 	public static void remove(GuildMessageReceivedEvent e, final String key, String number, Cache cache) {
 		if(number.matches("[0-9]*")) {
 			@SuppressWarnings("unchecked")
-			final ArrayList<RSS> channels = (ArrayList<RSS>)cache.getObject();
+			final ArrayList<Subscription> channels = (ArrayList<Subscription>)cache.getObject();
 			final int selection = Integer.parseInt(number)-1;
 			if(selection >= 0 && selection < channels.size()) {
 				final var channel = channels.get(selection);
-				if(Azrael.SQLDeleteRSSFeed(channel.getURL(), e.getGuild().getIdLong()) > 0) {
-					Hashes.removeFeeds(e.getGuild().getIdLong());
+				if(Azrael.SQLDeleteSubscription(channel.getURL(), e.getGuild().getIdLong()) > 0) {
+					Hashes.clearSubscriptions();
 					Hashes.removeSubscriptionStatus(e.getGuild().getId()+"_"+channel.getURL());
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_REMOVE_2).replace("{}", channel.getName())).build()).queue();
 					logger.info("User {} has removed the YouTube channel subscription {} in guild {}", e.getMember().getUser().getId(), channel.getURL(), e.getGuild().getId());
@@ -135,7 +133,7 @@ public class GoogleYouTubeExecution {
 	public static void format(GuildMessageReceivedEvent e, final String key, String number, Cache cache) {
 		if(number.matches("[0-9]*")) {
 			@SuppressWarnings("unchecked")
-			final ArrayList<RSS> channels = (ArrayList<RSS>)cache.getObject();
+			final ArrayList<Subscription> channels = (ArrayList<Subscription>)cache.getObject();
 			final int selection = Integer.parseInt(number)-1;
 			if(selection >= 0 && selection < channels.size()) {
 				final var channel = channels.get(selection);
@@ -147,12 +145,12 @@ public class GoogleYouTubeExecution {
 	}
 	
 	public static void formatUpdate(GuildMessageReceivedEvent e, final String key, String format, Cache cache) {
-		final RSS channel = (RSS)cache.getObject();
-		if(Azrael.SQLUpdateRSSFormat(channel.getURL(), e.getGuild().getIdLong(), format) > 0) {
+		final Subscription channel = (Subscription)cache.getObject();
+		if(Azrael.SQLUpdateSubscriptionFormat(channel.getURL(), e.getGuild().getIdLong(), format) > 0) {
 			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_FORMAT_3).replace("{}", channel.getName())).build()).queue();
 			logger.info("User {} has updated the format of the YouTube channel id {} in guild {}", e.getMember().getUser().getId(), channel.getURL(), e.getGuild().getIdLong());
 			Hashes.addTempCache(key, new Cache(180000, "youtube-selection"));
-			Hashes.removeFeeds(e.getGuild().getIdLong());
+			Hashes.clearSubscriptions();
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -183,7 +181,7 @@ public class GoogleYouTubeExecution {
 	public static void channel(GuildMessageReceivedEvent e, final String key, String number, Cache cache) {
 		if(number.matches("[0-9]*")) {
 			@SuppressWarnings("unchecked")
-			final ArrayList<RSS> channels = (ArrayList<RSS>)cache.getObject();
+			final ArrayList<Subscription> channels = (ArrayList<Subscription>)cache.getObject();
 			final int selection = Integer.parseInt(number)-1;
 			if(selection >= 0 && selection < channels.size()) {
 				final var channel = channels.get(selection);
@@ -195,7 +193,7 @@ public class GoogleYouTubeExecution {
 	}
 	
 	public static void channelUpdate(GuildMessageReceivedEvent e, final String key, String textChannel, Cache cache) {
-		final RSS channel = (RSS)cache.getObject();
+		final Subscription channel = (Subscription)cache.getObject();
 		textChannel = textChannel.replaceAll("[<>#]", "");
 		long channel_id = 0;
 		boolean valid = false;
@@ -208,12 +206,10 @@ public class GoogleYouTubeExecution {
 		}
 		
 		if(valid) {
-			if(Azrael.SQLUpdateRSSChannel(channel.getURL(), e.getGuild().getIdLong(), channel_id) > 0) {
+			if(Azrael.SQLUpdateSubscriptionChannel(channel.getURL(), e.getGuild().getIdLong(), channel_id) > 0) {
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_CHANNEL_3).replace("{}", channel.getName())).build()).queue();
 				logger.info("User {} has updated the display channel of the YouTube channel id {} in guild {}", e.getMember().getUser().getId(), channel.getURL(), e.getGuild().getIdLong());
-				Hashes.removeFeeds(e.getGuild().getIdLong());
-				if(Hashes.getFeedsSize(e.getGuild().getIdLong()) == 0 && !ParseSubscription.timerIsRunning(e.getGuild().getIdLong()))
-					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
+				SubscriptionUtils.startTimer(e.getJDA());
 				Hashes.addTempCache(key, new Cache(180000, "youtube-selection"));
 			}
 			else {
@@ -263,7 +259,7 @@ public class GoogleYouTubeExecution {
 	public static void test(GuildMessageReceivedEvent e, final String key, String number, Cache cache) {
 		if(number.matches("[0-9]*")) {
 			@SuppressWarnings("unchecked")
-			final ArrayList<RSS> channels = (ArrayList<RSS>)cache.getObject();
+			final ArrayList<Subscription> channels = (ArrayList<Subscription>)cache.getObject();
 			final int selection = Integer.parseInt(number)-1;
 			if(selection >= 0 && selection < channels.size()) {
 				final var channel = channels.get(selection);

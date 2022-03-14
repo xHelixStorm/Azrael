@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
-import de.azrael.constructors.RSS;
+import de.azrael.constructors.Subscription;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
@@ -73,7 +73,7 @@ public class Subscribe implements CommandPublic {
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
-			for(RSS feed : Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong())) {
+			for(Subscription feed : Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong())) {
 				out.append((counter++)+": **"+feed.getURL()+"**\n");
 			}
 			message.setColor(Color.BLUE);
@@ -84,7 +84,7 @@ public class Subscribe implements CommandPublic {
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))) {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
-			for(RSS feed : Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong())) {
+			for(Subscription feed : Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong())) {
 				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}
@@ -96,7 +96,7 @@ public class Subscribe implements CommandPublic {
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_OPTIONS))) {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
-			for(RSS feed: Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 2)) {
+			for(Subscription feed: Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 2)) {
 				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}
@@ -113,7 +113,7 @@ public class Subscribe implements CommandPublic {
 		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))) {
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
-			for(RSS feed: Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong())) {
+			for(Subscription feed: Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong())) {
 				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}
@@ -131,7 +131,7 @@ public class Subscribe implements CommandPublic {
 			//test a feed
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
-			for(RSS feed : Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong())) {
+			for(Subscription feed : Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong())) {
 				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}
@@ -144,7 +144,7 @@ public class Subscribe implements CommandPublic {
 			//display the registered feeds
 			int counter = 1;
 			StringBuilder out = new StringBuilder();
-			for(RSS feed : Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong())) {
+			for(Subscription feed : Azrael.SQLgetSubscriptionsRestricted(e.getGuild().getIdLong())) {
 				out.append(counter+": **"+feed.getURL()+"**\n");
 				counter++;
 			}

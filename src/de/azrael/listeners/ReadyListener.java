@@ -163,8 +163,8 @@ public class ReadyListener extends ListenerAdapter {
 			else if(customCommands == null) {
 				logger.error("Custom commands couldn't be retrieved in guild {}", guild.getId());
 			}
-			//retrieve all registered rss feeds and start the timer to make these display on the server
-			ParseSubscription.runTask(e.getJDA(), guild.getIdLong());
+			//retrieve all registered subscriptions and start the timer to make these display on the server
+			ParseSubscription.runTask(e.getJDA());
 			
 			//print public and private patch notes, if available for the current version of the bot
 			Patchnote priv_notes = null;

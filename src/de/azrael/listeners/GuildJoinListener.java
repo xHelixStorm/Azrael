@@ -60,7 +60,7 @@ public class GuildJoinListener extends ListenerAdapter {
 			GuildIni.verifyIni(e.getGuild());
 		
 		//run server specific timers
-		ParseSubscription.runTask(e.getJDA(), guild_id);
+		ParseSubscription.runTask(e.getJDA());
 		
 		//set the default language for this server
 		Hashes.setLanguage(guild_id, "eng");

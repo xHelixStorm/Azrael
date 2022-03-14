@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
-import de.azrael.constructors.RSS;
+import de.azrael.constructors.Subscription;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.RedditMethod;
@@ -50,7 +50,7 @@ public class Reddit implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))) {
-			final ArrayList<RSS> reddit = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 3);
+			final ArrayList<Subscription> reddit = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 3);
 			if(reddit != null && reddit.size() > 0) {
 				int count = 0;
 				StringBuilder out = new StringBuilder();
@@ -70,7 +70,7 @@ public class Reddit implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))) {
-			final ArrayList<RSS> reddit = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 3);
+			final ArrayList<Subscription> reddit = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 3);
 			if(reddit != null && reddit.size() > 0) {
 				int count = 0;
 				StringBuilder out = new StringBuilder();
@@ -90,7 +90,7 @@ public class Reddit implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
-			final ArrayList<RSS> reddit = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 3);
+			final ArrayList<Subscription> reddit = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 3);
 			if(reddit != null && reddit.size() > 0) {
 				int count = 0;
 				StringBuilder out = new StringBuilder();
@@ -110,7 +110,7 @@ public class Reddit implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))) {
-			final ArrayList<RSS> reddit = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 3);
+			final ArrayList<Subscription> reddit = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), 3);
 			if(reddit != null && reddit.size() > 0) {
 				int count = 0;
 				StringBuilder out = new StringBuilder();

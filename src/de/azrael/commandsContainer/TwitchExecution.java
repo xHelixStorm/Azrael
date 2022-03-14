@@ -10,13 +10,13 @@ import org.slf4j.LoggerFactory;
 import com.vdurmont.emoji.EmojiParser;
 
 import de.azrael.constructors.Cache;
-import de.azrael.constructors.RSS;
+import de.azrael.constructors.Subscription;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.rss.TwitchModel;
 import de.azrael.sql.Azrael;
-import de.azrael.timerTask.ParseSubscription;
+import de.azrael.subscription.SubscriptionUtils;
+import de.azrael.subscription.TwitchModel;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -29,9 +29,9 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 	public static void format(GuildMessageReceivedEvent e, Cache cache) {
 		if(e.getMessage().getContentRaw().matches("[0-9]*")) {
 			final int index = Integer.parseInt(e.getMessage().getContentRaw())-1;
-			ArrayList<RSS> twitch = (ArrayList<RSS>)cache.getObject();
+			ArrayList<Subscription> twitch = (ArrayList<Subscription>)cache.getObject();
 			if(index >= 0 && index < twitch.size()) {
-				final RSS user = twitch.get(index);
+				final Subscription user = twitch.get(index);
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_FORMAT_STEP_2)+user.getFormat()+"```").build()).queue();
 				Hashes.addTempCache("twitch_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000).setObject(user).updateDescription("format2"));
 			}
@@ -44,10 +44,10 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 	}
 	
 	public static void formatUpdate(GuildMessageReceivedEvent e, Cache cache) {
-		final RSS twitch = (RSS)cache.getObject();
-		if(Azrael.SQLUpdateRSSFormat(twitch.getURL(), e.getGuild().getIdLong(), EmojiParser.parseToAliases(e.getMessage().getContentRaw())) > 0) {
+		final Subscription twitch = (Subscription)cache.getObject();
+		if(Azrael.SQLUpdateSubscriptionFormat(twitch.getURL(), e.getGuild().getIdLong(), EmojiParser.parseToAliases(e.getMessage().getContentRaw())) > 0) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_FORMAT_UPDATED).replace("{}", twitch.getName())).build()).queue();
-			Hashes.removeFeeds(e.getGuild().getIdLong());
+			Hashes.clearSubscriptions();
 			logger.info("User {} has updated the format of the twitch subscription {} in guild {}", e.getMember().getUser().getId(), twitch.getName(), e.getGuild().getId());
 		}
 		else {
@@ -62,9 +62,9 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 	public static void channel(GuildMessageReceivedEvent e, Cache cache) {
 		if(e.getMessage().getContentRaw().matches("[0-9]*")) {
 			final int index = Integer.parseInt(e.getMessage().getContentRaw())-1;
-			ArrayList<RSS> twitch = (ArrayList<RSS>)cache.getObject();
+			ArrayList<Subscription> twitch = (ArrayList<Subscription>)cache.getObject();
 			if(index >= 0 && index < twitch.size()) {
-				final RSS user = twitch.get(index);
+				final Subscription user = twitch.get(index);
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_CHANNEL_STEP_2)+(user.getChannelID() != 0 ? "<#"+user.getChannelID()+">" : STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_DEFAULT))).build()).queue();
 				Hashes.addTempCache("twitch_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000).setObject(user).updateDescription("channel2"));
 			}
@@ -81,16 +81,13 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 		if(channel_id.replaceAll("[0-9]*", "").length() == 0) {
 			TextChannel textChannel = e.getGuild().getTextChannelById(channel_id);
 			if(textChannel != null) {
-				final RSS twitch = (RSS)cache.getObject();
-				final var result = Azrael.SQLUpdateRSSChannel(twitch.getURL(), e.getGuild().getIdLong(), textChannel.getIdLong());
+				final Subscription twitch = (Subscription)cache.getObject();
+				final var result = Azrael.SQLUpdateSubscriptionChannel(twitch.getURL(), e.getGuild().getIdLong(), textChannel.getIdLong());
 				if(result > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_CHANNEL_ADDED).replace("{}", textChannel.getAsMention())).build()).queue();
 					logger.info("User {} has redirected the twitch subscription {} to channel {} in guild {}", e.getMember().getUser().getId(), twitch.getName(), textChannel.getId(), e.getGuild().getId());
-					Hashes.removeFeeds(e.getGuild().getIdLong());
 					Hashes.clearTempCache("twitch_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-					if(!ParseSubscription.timerIsRunning(e.getGuild().getIdLong())) {
-						ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
-					}
+					SubscriptionUtils.startTimer(e.getJDA());
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -100,16 +97,13 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.TWITCH.getColumn(), e.getMessage().getContentRaw());
 		}
 		else if(channel_id.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE))) {
-			final RSS twitch = (RSS)cache.getObject();
-			final var result = Azrael.SQLUpdateRSSChannel(twitch.getURL(), e.getGuild().getIdLong(), 0);
+			final Subscription twitch = (Subscription)cache.getObject();
+			final var result = Azrael.SQLUpdateSubscriptionChannel(twitch.getURL(), e.getGuild().getIdLong(), 0);
 			if(result > 0) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_CHANNEL_ADDED).replace("{}", STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_DEFAULT))).build()).queue();
 				logger.info("User {} has redirected the twitch subscription {} to channel {} in guild {}", e.getMember().getUser().getId(), twitch.getName(), 0, e.getGuild().getId());
-				Hashes.removeFeeds(e.getGuild().getIdLong());
 				Hashes.clearTempCache("twitch_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-				if(!ParseSubscription.timerIsRunning(e.getGuild().getIdLong())) {
-					ParseSubscription.runTask(e.getJDA(), e.getGuild().getIdLong());
-				}
+				SubscriptionUtils.startTimer(e.getJDA());
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -123,13 +117,13 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 	public static void remove(GuildMessageReceivedEvent e, Cache cache) {
 		if(e.getMessage().getContentRaw().matches("[0-9]*")) {
 			final int index = Integer.parseInt(e.getMessage().getContentRaw())-1;
-			ArrayList<RSS> twitch = (ArrayList<RSS>)cache.getObject();
+			ArrayList<Subscription> twitch = (ArrayList<Subscription>)cache.getObject();
 			if(index >= 0 && index < twitch.size()) {
-				final RSS user = twitch.get(index);
-				if(Azrael.SQLDeleteRSSFeed(user.getURL(), e.getGuild().getIdLong()) > 0) {
+				final Subscription user = twitch.get(index);
+				if(Azrael.SQLDeleteSubscription(user.getURL(), e.getGuild().getIdLong()) > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_REMOVE_DONE).replace("{}", user.getName())).build()).queue();
 					logger.info("User {} has removed the twitch subscription {} in guild {}", e.getMember().getUser().getId(), user.getName(), e.getGuild().getId());
-					Hashes.removeFeeds(e.getGuild().getIdLong());
+					Hashes.clearSubscriptions();
 					Hashes.removeSubscriptionStatus(e.getGuild().getId()+"_"+user.getURL());
 				}
 				else {
@@ -150,9 +144,9 @@ private static final Logger logger = LoggerFactory.getLogger(TwitchExecution.cla
 	public static void test(GuildMessageReceivedEvent e, Cache cache) {
 		if(e.getMessage().getContentRaw().matches("[0-9]*")) {
 			final int index = Integer.parseInt(e.getMessage().getContentRaw())-1;
-			ArrayList<RSS> twitch = (ArrayList<RSS>)cache.getObject();
+			ArrayList<Subscription> twitch = (ArrayList<Subscription>)cache.getObject();
 			if(index >= 0 && index < twitch.size()) {
-				final RSS user = twitch.get(index);
+				final Subscription user = twitch.get(index);
 				try {
 					TwitchModel.ModelTest(e, user);
 				} catch (IOException e1) {

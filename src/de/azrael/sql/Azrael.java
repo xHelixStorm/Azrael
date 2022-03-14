@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ import de.azrael.constructors.GoogleSheetColumn;
 import de.azrael.constructors.History;
 import de.azrael.constructors.NameFilter;
 import de.azrael.constructors.Quizes;
-import de.azrael.constructors.RSS;
+import de.azrael.constructors.Subscription;
 import de.azrael.constructors.RejoinTask;
 import de.azrael.constructors.Schedule;
 import de.azrael.constructors.User;
@@ -2032,13 +2033,13 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertRSS(String url, long guild_id, int type, String name) {
-		logger.trace("SQLInsertRSS launched. Params passed {}, {}, {}, {}", url, guild_id, type, name);
+	public static int SQLInsertSubscription(String url, long guild_id, int type, String name) {
+		logger.trace("SQLInsertSubscription launched. Params passed {}, {}, {}, {}", url, guild_id, type, name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertRSS);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertSubscription);
 			stmt.setString(1, url);
 			stmt.setLong(2, guild_id);
 			if(type == 1)
@@ -2058,7 +2059,7 @@ public class Azrael {
 				stmt.setNull(5, Types.VARCHAR);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLInsertRSS Exception", e);
+			logger.error("SQLInsertSubscription Exception", e);
 			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2066,15 +2067,15 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<String> SQLgetSubTweets(long guild_id, String tweet) {
-		logger.trace("SQLgetSubTweets launched. Params passed {}, {}", guild_id, tweet);
+	public static ArrayList<String> SQLgetChildSubscriptions(long guild_id, String tweet) {
+		logger.trace("SQLgetChildSubscriptions launched. Params passed {}, {}", guild_id, tweet);
 		ArrayList<String> tweets = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubTweets);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetChildSubscriptions);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, tweet);
 			rs = stmt.executeQuery();
@@ -2083,7 +2084,7 @@ public class Azrael {
 			}
 			return tweets;
 		} catch (SQLException e) {
-			logger.error("SQLgetSubTweets Exception", e);
+			logger.error("SQLgetChildSubscriptions Exception", e);
 			return tweets;
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
@@ -2092,35 +2093,34 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<RSS> SQLgetSubscriptions(long guild_id) {
-		final var feed = Hashes.getFeeds(guild_id);
-		if(feed == null) {
-			logger.trace("SQLgetSubscriptions launched. Params passed {}", guild_id);
+	public static CopyOnWriteArrayList<Subscription> SQLgetSubscriptions() {
+		final var subscriptions = Hashes.getSubscriptions();
+		if(subscriptions.isEmpty()) {
+			logger.trace("SQLgetSubscriptions launched. No params passed");
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				ArrayList<RSS> feeds = new ArrayList<RSS>();
+				CopyOnWriteArrayList<Subscription> feeds = new CopyOnWriteArrayList<Subscription>();
 				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptions);
-				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
 				while(rs.next()) {
-					feeds.add(
-						new RSS(
+					Subscription subscription = new Subscription(
 							rs.getString(1),
-							rs.getString(2),
-							rs.getInt(3),
-							rs.getBoolean(4),
+							rs.getLong(2),
+							rs.getString(3),
+							rs.getInt(4),
 							rs.getBoolean(5),
 							rs.getBoolean(6),
-							rs.getLong(7),
-							rs.getString(8),
-							SQLgetSubTweets(guild_id, rs.getString(1))
-						)
+							rs.getBoolean(7),
+							rs.getLong(8),
+							rs.getString(9),
+							SQLgetChildSubscriptions(rs.getLong(2), rs.getString(1))
 					);
+					feeds.add(subscription);
+					Hashes.addSubscription(subscription);
 				}
-				Hashes.addFeeds(guild_id, feeds);
 				return feeds;
 			} catch (SQLException e) {
 				logger.error("SQLgetSubscriptions Exception", e);
@@ -2131,12 +2131,12 @@ public class Azrael {
 			    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 			}
 		}
-		return feed;
+		return subscriptions;
 	}
 	
-	public static ArrayList<RSS> SQLgetSubscriptions(long guild_id, int type) {
+	public static ArrayList<Subscription> SQLgetSubscriptions(long guild_id, int type) {
 		logger.trace("SQLgetSubscriptions launched. Params passed {}, {}", guild_id, type);
-		ArrayList<RSS> feeds = new ArrayList<RSS>();
+		ArrayList<Subscription> feeds = new ArrayList<Subscription>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2148,8 +2148,9 @@ public class Azrael {
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				feeds.add(
-					new RSS(
+					new Subscription(
 						rs.getString(1),
+						guild_id, 
 						rs.getString(2),
 						rs.getInt(3),
 						rs.getBoolean(4),
@@ -2157,11 +2158,10 @@ public class Azrael {
 						rs.getBoolean(6),
 						rs.getLong(7),
 						rs.getString(8),
-						SQLgetSubTweets(guild_id, rs.getString(1))
+						SQLgetChildSubscriptions(guild_id, rs.getString(1))
 					)
 				);
 			}
-			Hashes.addFeeds(guild_id, feeds);
 			return feeds;
 		} catch (SQLException e) {
 			logger.error("SQLgetSubscriptions Exception", e);
@@ -2173,21 +2173,22 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<RSS> SQLgetSubscriptionsRestricted(long guild_id) {
+	public static ArrayList<Subscription> SQLgetSubscriptionsRestricted(long guild_id) {
 		logger.trace("SQLgetSubscriptionsRestricted launched. Params passed {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			ArrayList<RSS> feeds = new ArrayList<RSS>();
+			ArrayList<Subscription> feeds = new ArrayList<Subscription>();
 			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptionsRestricted);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				feeds.add(
-					new RSS(
+					new Subscription(
 						rs.getString(1),
+						guild_id, 
 						rs.getString(2),
 						rs.getInt(3),
 						rs.getBoolean(4),
@@ -2195,11 +2196,10 @@ public class Azrael {
 						rs.getBoolean(6),
 						rs.getLong(7),
 						rs.getString(8),
-						SQLgetSubTweets(guild_id, rs.getString(1))
+						SQLgetChildSubscriptions(guild_id, rs.getString(1))
 					)
 				);
 			}
-			Hashes.addFeeds(guild_id, feeds);
 			return feeds;
 		} catch (SQLException e) {
 			logger.error("SQLgetSubscriptionsRestricted Exception", e);
@@ -2211,19 +2211,19 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateRSSPictures(String url, long guild_id, boolean option) {
-		logger.trace("SQLUpdateRSSPictures launched. Params passed {}, {}, {}", url, guild_id, option);
+	public static int SQLUpdateSubscriptionPictures(String url, long guild_id, boolean option) {
+		logger.trace("SQLUpdateSubscriptionPictures launched. Params passed {}, {}, {}", url, guild_id, option);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSPictures);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateSubscriptionPictures);
 			stmt.setBoolean(1, option);
 			stmt.setString(2, url);
 			stmt.setLong(3, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLUpdateRSSPictures Exception", e);
+			logger.error("SQLUpdateSubscriptionPictures Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2231,19 +2231,19 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateRSSVideos(String url, long guild_id, boolean option) {
-		logger.trace("SQLUpdateRSSVideos launched. Params passed {}, {}, {}", url, guild_id, option);
+	public static int SQLUpdateSubscriptionVideos(String url, long guild_id, boolean option) {
+		logger.trace("SQLUpdateSubscriptionVideos launched. Params passed {}, {}, {}", url, guild_id, option);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSVideos);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateSubscriptionVideos);
 			stmt.setBoolean(1, option);
 			stmt.setString(2, url);
 			stmt.setLong(3, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLUpdateRSSVideos Exception", e);
+			logger.error("SQLUpdateSubscriptionVideos Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2251,19 +2251,19 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateRSSText(String url, long guild_id, boolean option) {
-		logger.trace("SQLUpdateRSSText launched. Params passed {}, {}, {}", url, guild_id, option);
+	public static int SQLUpdateSubscriptionText(String url, long guild_id, boolean option) {
+		logger.trace("SQLUpdateSubscriptionText launched. Params passed {}, {}, {}", url, guild_id, option);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSText);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateSubscriptionText);
 			stmt.setBoolean(1, option);
 			stmt.setString(2, url);
 			stmt.setLong(3, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLUpdateRSSText Exception", e);
+			logger.error("SQLUpdateSubscriptionText Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2271,19 +2271,19 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertChildTweet(String urlParent, String urlChild, long guild_id) {
-		logger.trace("SQLInsertChildTweet launched. Params passed {}, {}, {}", urlParent, urlChild, guild_id);
+	public static int SQLInsertChildSubscription(String urlParent, String urlChild, long guild_id) {
+		logger.trace("SQLInsertChildSubscription launched. Params passed {}, {}, {}", urlParent, urlChild, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChildTweet);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChildSubscription);
 			stmt.setString(1, urlParent);
 			stmt.setString(2, urlChild);
 			stmt.setLong(3, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLInsertChildTweet Exception", e);
+			logger.error("SQLInsertChildSubscription Exception", e);
 			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2291,19 +2291,19 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLDeleteChildTweet(String urlParent, String urlChild, long guild_id) {
-		logger.trace("SQLDeleteChildTweet launched. Params passed {}, {}, {}", urlParent, urlChild, guild_id);
+	public static int SQLDeleteChildSubscription(String urlParent, String urlChild, long guild_id) {
+		logger.trace("SQLDeleteChildSubscription launched. Params passed {}, {}, {}", urlParent, urlChild, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteChildTweet);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteChildSubscription);
 			stmt.setString(1, urlParent);
 			stmt.setString(2, urlChild);
 			stmt.setLong(3, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLDeleteChildTweet Exception", e);
+			logger.error("SQLDeleteChildSubscription Exception", e);
 			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2311,18 +2311,18 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLDeleteRSSFeed(String url, long guild_id) {
-		logger.trace("SQLDeleteRSSFeed launched. Params passed {}, {}", url, guild_id);
+	public static int SQLDeleteSubscription(String url, long guild_id) {
+		logger.trace("SQLDeleteSubscription launched. Params passed {}, {}", url, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteRSSFeed);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteSubscription);
 			stmt.setString(1, url);
 			stmt.setLong(2, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLDeleteRSSFeed Exception", e);
+			logger.error("SQLDeleteSubscription Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2330,19 +2330,19 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateRSSFormat(String url, long guild_id, String format) {
-		logger.trace("SQLUpdateRSSFormat launched. Params passed {}, {}, {}", url, guild_id, format);
+	public static int SQLUpdateSubscriptionFormat(String url, long guild_id, String format) {
+		logger.trace("SQLUpdateSubscriptionFormat launched. Params passed {}, {}, {}", url, guild_id, format);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSFormat);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateSubscriptionFormat);
 			stmt.setString(1, format);
 			stmt.setString(2, url);
 			stmt.setLong(3, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLUpdateRSSFormat Exception", e);
+			logger.error("SQLUpdateSubscriptionFormat Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2350,19 +2350,19 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateRSSChannel(String url, long guild_id, long channel_id) {
-		logger.trace("SQLUpdateRSSChannel launched. Params passed {}, {}, {}", url, guild_id, channel_id);
+	public static int SQLUpdateSubscriptionChannel(String url, long guild_id, long channel_id) {
+		logger.trace("SQLUpdateSubscriptionChannel launched. Params passed {}, {}, {}", url, guild_id, channel_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateRSSChannel);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateSubscriptionChannel);
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, url);
 			stmt.setLong(3, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			logger.error("SQLUpdateRSSChannel Exception", e);
+			logger.error("SQLUpdateSubscriptionChannel Exception", e);
 			return 0;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

@@ -33,6 +33,7 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearTweetBlacklist();
 		Hashes.clearRankingLevels();
 		Hashes.clearReactionRoles();
+		Hashes.clearSubscriptions();
 		Hashes.clearDiscordRoles();
 		Hashes.clearURLBlacklist();
 		Hashes.clearURLWhitelist();
@@ -50,7 +51,6 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearRankSkins();
 		Hashes.clearChannels();
 		Hashes.clearStatus();
-		Hashes.clearFeeds();
 		
 		logger.info("Temporary cache has been cleared");
 		
