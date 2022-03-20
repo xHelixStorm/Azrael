@@ -293,9 +293,7 @@
     "command_schedule":             "- **{}Calendrier**\nProgrammez un message quotidien sur un canal à une heure précise.\n",
     "command_prune":                "- **{}prune**\nRenvoyer un grand groupe de membres du serveur.\n",
     "command_warn":                 "- **{}avertissement**\nFormulez le motif d’un avertissement et envoyez-le à un utilisateur en message privé.\n",
-    "command_reddit":               "- **{}reddit**\nS’abonner à un subreddit ou à un utilisateur reddit pour récupérer du contenu.\n",
     "command_invites":              "- **{}invite**\nCréez un certain nombre d’invitations à usage unique.\n",
-    "command_twitch":				"- **{}twitch**\nSubscribe to a twitch user to fetch content.\n",
     "commands_disabled":            "Toutes les commandes sont désactivées !",
     
     "daily_reward":                 "Félicitations ! Vous avez débloqué la récompense suivante : \n",
@@ -736,6 +734,7 @@
     "shutdown_soon":                "Le Bot va s'éteindre sous peu !",
     
     "subscribe_help":               "Utilisez cette commande pour vous abonner à ce qui suit. Écrivez-la en même temps que la commande complète ! La commande peut être interrompue à tout moment avec `{}` !\n",
+    "subscribe_disabled":			"Tous les types d'abonnement sont actuellement désactivés !",
     "subscribe_register_help":      "Souhaitez-vous ajouter un Flux RSS ou un Hashtag/Utilisateur Twitter ? Inscrivez soit 1 pour enregistrer un Flux RSS, soit 2 pour enregistrer un Hashtag/Utilisateur Twitter comme second paramètre !",
     "subscribe_remove_help":		"Supprimez un abonnement enregistré en le sélectionnant avec un numéro qui s'affiche ci-dessous :\n\n",
     "subscribe_format_help":		"Formatez le message de sortie d'un abonnement enregistré en le sélectionnant avec un numéro qui s'affiche ci-dessous :\n\n",

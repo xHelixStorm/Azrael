@@ -293,9 +293,7 @@
 	"command_schedule":				"- **{}schedule**\nPlane eine tägliche Nachricht, die um eine selbst definierte Uhrzeit versendet wird.\n",
 	"command_prune":				"- **{}prune**\nKicken Sie eine große Gruppe von Mitgliedern vom Server.\n",
 	"command_warn":					"- **{}warn**\nFormulieren Sie den Grund für eine Warnung und senden Sie ihn in einer privaten Nachricht an einen Benutzer.\n",
-	"command_reddit":				"- **{}reddit**\nAbonnieren Sie ein Subreddit oder einen Reddit-Benutzer, um Inhalte abzufragen.\n",
 	"command_invites":				"- **{}invites**\nErstellen Sie eine Reihe von Einladungen zur einmaligen Verwendung.\n",
-	"command_twitch":				"- **{}twitch**\nSubscribe to a twitch user to fetch content.\n",
 	"commands_disabled":		 	"Alle Befehle sind deaktiviert!",
 	
 	"daily_reward":				 	"Herzlichen Glückwunsch! Sie haben die folgende Belohnung freigeschaltet:\n",
@@ -736,6 +734,7 @@
 	"shutdown_soon":				"Der Bot fährt in kurze herunter!",
 	
 	"subscribe_help":				"Verwenden Sie diesen Befehl, um Folgendes zu abonnieren. Schreiben Sie es zusammen mit dem gesamten Befehl! Der Befehl kann jederzeit mit `{}` unterbrochen werden!\n",
+	"subscribe_disabled":			"Alle Abonnementtypen sind derzeit deaktiviert!",
 	"subscribe_register_help":		"Möchten Sie einen RSS-Feed oder einen Twitter-Hashtag/Benutzer hinzufügen?\nSchreiben Sie entweder 1, um einen RSS-Feed zu registrieren oder 2, um einen Twitter-Hashtag/Benutzer als zweiten Parameter zu registrieren!",
 	"subscribe_remove_help":		"Entfernen Sie ein registriertes Abonnement, indem Sie es mit einer Nummer auswählen, die unten angezeigt wird:\n\n",
 	"subscribe_format_help":		"Formatieren Sie die Nachrichtenausgabe eines registrierten Abonnements, indem Sie es mit einer Nummer auswählen, die unten angezeigt wird:\n\n",

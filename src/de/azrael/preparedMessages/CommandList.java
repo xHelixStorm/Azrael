@@ -36,9 +36,7 @@ public class CommandList {
 		boolean schedule = false;
 		boolean prune = false;
 		boolean warn = false;
-		boolean reddit = false;
 		boolean invites = false;
-		boolean twitch = false;
 		
 		boolean pug = false;
 		boolean meow = false;
@@ -69,9 +67,9 @@ public class CommandList {
 		
 		final var commands = (ArrayList<?>)BotConfiguration.SQLgetCommand(guild_id, 3, Command.REGISTER, Command.SET, Command.REMOVE, Command.USER, Command.FILTER, Command.ROLE_REACTION, Command.SUBSCRIBE
 				, Command.DOUBLE_EXPERIENCE, Command.HEAVY_CENSORING, Command.MUTE, Command.GOOGLE, Command.WRITE, Command.EDIT, Command.ACCEPT, Command.DENY, Command.SCHEDULE, Command.PRUNE
-				, Command.WARN, Command.REDDIT, Command.INVITES, Command.TWITCH, Command.PUG, Command.MEOW, Command.RANK, Command.PROFILE, Command.TOP, Command.USE, Command.SHOP, Command.INVENTORY 
-				, Command.DAILY , Command.QUIZ, Command.RANDOMSHOP, Command.EQUIP, Command.MATCHMAKING, Command.JOIN, Command.LEAVE, Command.CLAN, Command.QUEUE, Command.CW, Command.ROOM, Command.STATS
-				, Command.LEADERBOARD, Command.ABOUT, Command.DISPLAY, Command.PATCHNOTES, Command.LANGUAGE);
+				, Command.WARN, Command.INVITES, Command.PUG, Command.MEOW, Command.RANK, Command.PROFILE, Command.TOP, Command.USE, Command.SHOP, Command.INVENTORY, Command.DAILY , Command.QUIZ
+				, Command.RANDOMSHOP, Command.EQUIP, Command.MATCHMAKING, Command.JOIN, Command.LEAVE, Command.CLAN, Command.QUEUE, Command.CW, Command.ROOM, Command.STATS, Command.LEADERBOARD
+				, Command.ABOUT, Command.DISPLAY, Command.PATCHNOTES, Command.LANGUAGE);
 		
 		for(int i = 0; i < commands.size(); i++) {
 			final boolean command = (Boolean)commands.get(i);
@@ -94,38 +92,36 @@ public class CommandList {
 				case 15 -> schedule 		= command;
 				case 16 -> prune 			= command;
 				case 17 -> warn 			= command;
-				case 18 -> reddit 			= command;
-				case 19 -> invites 			= command;
-				case 20 -> twitch 			= command;
-				case 21 -> pug 				= command;
-				case 22 -> meow 			= command;
-				case 23 -> rank 			= command;
-				case 24 -> profile 			= command;
-				case 25 -> top 				= command;
-				case 26 -> use 				= command;
-				case 27 -> shop 			= command;
-				case 28 -> inventory 		= command;
-				case 29 -> daily 			= command;
-				case 30 -> quiz 			= command;
-				case 31 -> randomshop 		= command;
-				case 32 -> equip 			= command;
-				case 33 -> matchmaking 		= command;
-				case 34 -> join 			= command;
-				case 35 -> leave 			= command;
-				case 36 -> clan 			= command;
-				case 37 -> queue 			= command;
-				case 38 -> cw 				= command;
-				case 39 -> room 			= command;
-				case 40 -> stats 			= command;
-				case 41 -> leaderboard 		= command;
-				case 42 -> about 			= command;
-				case 43 -> display 			= command;
-				case 44 -> patchnotes 		= command;
-				case 45 -> language 		= command;
+				case 18 -> invites 			= command;
+				case 19 -> pug 				= command;
+				case 20 -> meow 			= command;
+				case 21 -> rank 			= command;
+				case 22 -> profile 			= command;
+				case 23 -> top 				= command;
+				case 24 -> use 				= command;
+				case 25 -> shop 			= command;
+				case 26 -> inventory 		= command;
+				case 27 -> daily 			= command;
+				case 28 -> quiz 			= command;
+				case 29 -> randomshop 		= command;
+				case 30 -> equip 			= command;
+				case 31 -> matchmaking 		= command;
+				case 32 -> join 			= command;
+				case 33 -> leave 			= command;
+				case 34 -> clan 			= command;
+				case 35 -> queue 			= command;
+				case 36 -> cw 				= command;
+				case 37 -> room 			= command;
+				case 38 -> stats 			= command;
+				case 39 -> leaderboard 		= command;
+				case 40 -> about 			= command;
+				case 41 -> display 			= command;
+				case 42 -> patchnotes 		= command;
+				case 43 -> language 		= command;
 			}
 		}
 		
-		if(permissionGranted && (register || set || remove || user || filter || roleReaction || subscribe || doubleExperience || heavyCensoring || mute || google || write || edit || accept || deny || schedule || prune || warn || reddit || invites || twitch)) {
+		if(permissionGranted && (register || set || remove || user || filter || roleReaction || subscribe || doubleExperience || heavyCensoring || mute || google || write || edit || accept || deny || schedule || prune || warn || invites)) {
 			administration = true;
 		}
 		
@@ -157,9 +153,7 @@ public class CommandList {
 			if(schedule)			textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_SCHEDULE).replace("{}", prefix));
 			if(prune)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PRUNE).replace("{}", prefix));
 			if(warn)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_WARN).replace("{}", prefix));
-			if(reddit)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_REDDIT).replace("{}", prefix));
 			if(invites)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_INVITES).replace("{}", prefix));
-			if(twitch)				textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_TWITCH).replace("{}", prefix));
 		}
 		if(entertainment == true && type == 2) {
 			if(pug)					textCollector.append(STATIC.getTranslation(member, Translation.COMMAND_PUG).replace("{}", prefix));

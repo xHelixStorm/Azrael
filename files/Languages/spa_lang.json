@@ -293,9 +293,7 @@
 	"command_schedule":				"- **{}schedule**\nSchedule a daily message on a channel during a specified time.\n",
 	"command_prune":				"- **{}prune**\nKick a big group of members from the server.\n",
 	"command_warn":					"- **{}warn**\nFormulate the reason for a warning and send it to a user in private message.\n",
-	"command_reddit":				"- **{}reddit**\nSuscríbete a un usuario de subreddit o reddit para obtener contenido.\n",
 	"command_invites":				"- **{}invites**\nCrea un número de invitaciones de uso único.\n",
-	"command_twitch":				"- **{}twitch**\nSubscribe to a twitch user to fetch content.\n",
 	"commands_disabled":		 	"¡Todos los comandos están deshabilitados!",
 	
 	"daily_reward":				 	"Felicidades. Has desbloqueado la siguiente recompensa:\n",
@@ -736,6 +734,7 @@
 	"shutdown_soon":				"¡El Bot se apagará en breve!",
 	
 	"subscribe_help":				"Utilice este comando para suscribirse a lo siguiente. ¡Escríbalo junto con el comando completo! ¡El comando puede ser interrumpido en cualquier momento con `{}`!\n",
+	"subscribe_disabled":			"Todos los tipos de suscripción están actualmente desactivados.",
 	"subscribe_register_help":		"¿Deseas añadir un canal RSS o un hashtag/usuario de Twitter?\nEscribe 1 para registrar una fuente RSS o 2 para registrar un Hashtag/Usuario de Twitter como segundo parámetro.",	
 	"subscribe_remove_help":		"Elimine una suscripción registrada seleccionándola con un número que se muestra a continuación:\n\n",
 	"subscribe_format_help":		"Formatee la salida de mensajes de una suscripción registrada seleccionándola con un número que se muestra a continuación:\n\n",

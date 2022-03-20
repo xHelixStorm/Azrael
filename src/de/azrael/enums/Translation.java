@@ -298,9 +298,7 @@ public enum Translation {
 	COMMAND_SCHEDULE			("command_schedule"),
 	COMMAND_PRUNE				("command_prune"),
 	COMMAND_WARN				("command_warn"),
-	COMMAND_REDDIT				("command_reddit"),
 	COMMAND_INVITES				("command_invites"),
-	COMMAND_TWITCH				("command_twitch"),
 	COMMANDS_DISABLED			("commands_disabled"),
 	
 	DAILY_REWARD				("daily_reward"),
@@ -741,6 +739,7 @@ public enum Translation {
 	SHUTDOWN_SOON				("shutdown_soon"),
 	
 	SUBSCRIBE_HELP				("subscribe_help"),
+	SUBSCRIBE_DISABLED			("subscribe_disabled"),
 	SUBSCRIBE_REGISTER_HELP		("subscribe_register_help"),
 	SUBSCRIBE_REMOVE_HELP		("subscribe_remove_help"),
 	SUBSCRIBE_FORMAT_HELP		("subscribe_format_help"),

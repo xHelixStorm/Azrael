@@ -293,8 +293,6 @@
 	"command_schedule":				"- **{}schedule**\nSchedule a daily message on a channel during a specified time.\n",
 	"command_prune":				"- **{}prune**\nKick a big group of members from the server.\n",
 	"command_warn":					"- **{}warn**\nFormulate the reason for a warning and send it to a user in private message.\n",
-	"command_reddit":				"- **{}reddit**\nSubscribe to a subreddit or reddit user to fetch content.\n",
-	"command_twitch":				"- **{}twitch**\nSubscribe to a twitch user to fetch content.\n",
 	"command_invites":				"- **{}invites**\nCreate a number of one time use invites.\n",
 	"commands_disabled":		 	"All commands are disabled!",
 	
@@ -736,6 +734,7 @@
 	"shutdown_soon":				"The Bot will shut down shortly!",
 	
 	"subscribe_help":				"Use this command to subscribe to the following. Write it together with the whole command! The command can be interrupted at any moment with `{}`!\n",
+	"subscribe_disabled":			"All subscription types are currently disabled!",
 	"subscribe_register_help":		"Do you wish to add a RSS Feed or a Twitter Hashtag/User?\nWrite either 1 to register a RSS Feed or 2 to register a Twitter Hashtag/User as second parameter!",
 	"subscribe_remove_help":		"Remove a registered subscription by selecting it with a number which is displayed below:\n\n",
 	"subscribe_format_help":		"Format the message output of a registered subscription by selecting it with a number which is displayed below:\n\n",

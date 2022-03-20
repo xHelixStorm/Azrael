@@ -87,6 +87,11 @@ public enum Command {
 	MUTE							("mute", "cm"),
 	GOOGLE							("google", "cm"),
 	SUBSCRIBE						("subscribe", "cm"),
+	SUBSCRIBE_RSS					("subscribe_rss", "scm"),
+	SUBSCRIBE_TWITTER				("subscribe_twitter", "scm"),
+	SUBSCRIBE_REDDIT				("subscribe_reddit", "scm"),
+	SUBSCRIBE_YOUTUBE				("subscribe_youtube", "scm"),
+	SUBSCRIBE_TWITCH				("subscribe_twitch", "scm"),
 	WRITE							("write", "cm"),
 	EDIT							("edit", "cm"),
 	ACCEPT							("accept", "cm"),
@@ -95,7 +100,6 @@ public enum Command {
 	SCHEDULE						("schedule", "cm"),
 	PRUNE							("prune", "cm"),
 	WARN							("warn", "cm"),
-	REDDIT							("reddit", "cm"),
 	INVITES							("invites", "cm"),
 	ABOUT							("about", "cm"),
 	DAILY							("daily", "cm"),
@@ -132,8 +136,7 @@ public enum Command {
 	RESTRICT						("restrict", "scm"),
 	SHUTDOWN						("shutdown", "cm"),
 	START							("start", "scm"),
-	WEB								("web", "cm"),
-	TWITCH							("twitch", "cm");
+	WEB								("web", "cm");
 	
 	private String column;
 	private String type;
