@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public class RedditModel {
 	private static String accessToken = null;
 	private static long tokenValidity = 0;
 	
-	public static synchronized boolean fetchRedditContent(GuildMessageReceivedEvent e, Guild guild, Subscription subscription, long subscriptionChannel, boolean defaultChannel) throws IOException {
+	public static String fetchRedditContent(Guild guild, Subscription subscription) throws IOException {
 		if(accessToken == null || tokenValidity - System.currentTimeMillis() < 0) {
 			final String clientId = System.getProperty(REDDIT_CLIENT_ID);
 			final String clientSecret = System.getProperty(REDDIT_CLIENT_SECRET);
@@ -75,14 +76,14 @@ public class RedditModel {
 						logger.info("Reddit access token created: {}", accessToken);
 					}
 					else 
-						return false;
+						return null;
 					rd.close();
 				}
 				else
-					return false;
+					return null;
 			}
 			else
-				return false;
+				return null;
 		}
 		
 		if(tokenValidity - System.currentTimeMillis() > 0) {
@@ -100,20 +101,18 @@ public class RedditModel {
 				while((line = rd.readLine()) != null) {
 					out.append(line+"\n");
 				}
-				if(e == null)
-					return ModelParse(new JSONObject(out.toString()), guild, subscription, subscriptionChannel, defaultChannel);
-				else 
-					ModelTest(new JSONObject(out.toString()), e, subscription, subscriptionChannel);
+				return out.toString();
 			}
 		}
-		return false;
+		return null;
 	}
 	
-	private static boolean ModelParse(JSONObject response, Guild guild, Subscription subscription, long subscriptionChannel, boolean defaultChannel) {
+	public static boolean ModelParse(Guild guild, Subscription subscription, long subscriptionChannel, boolean defaultChannel) throws JSONException, IOException {
 		boolean success = false;
 		final TextChannel textChannel = guild.getTextChannelById(subscriptionChannel);
 		if(textChannel != null) {
 			if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
+				JSONObject response = new JSONObject(fetchRedditContent(guild, subscription));
 				JSONObject parentData = response.getJSONObject("data");
 				JSONArray children = parentData.getJSONArray("children");
 				if(children.length() > 0) {
@@ -159,29 +158,34 @@ public class RedditModel {
 		return success;
 	}
 	
-	private static void ModelTest(JSONObject response, GuildMessageReceivedEvent e, Subscription subscription, long subscriptionChannel) {
-		TextChannel textChannel = e.getGuild().getTextChannelById(subscriptionChannel);
-		JSONObject parentData = response.getJSONObject("data");
-		JSONArray children = parentData.getJSONArray("children");
-		if(children.length() > 0) {
-			for(final Object iteration : children) {
-				final JSONObject result = (JSONObject)iteration;
-				final String kind = result.getString("kind");
-				final JSONObject data = result.getJSONObject("data");
-				
-				String message = null;
-				switch(kind) {
-					case "t1" -> message = buildMessageBodyT1(data, subscription.getFormat());
-					case "t3" -> message = buildMessageBodyT3(data, subscription.getFormat());
+	public static void ModelTest(GuildMessageReceivedEvent e, Subscription subscription) {
+		try {
+			JSONObject response = new JSONObject(fetchRedditContent(e.getGuild(), subscription));
+			JSONObject parentData = response.getJSONObject("data");
+			JSONArray children = parentData.getJSONArray("children");
+			if(children.length() > 0) {
+				for(final Object iteration : children) {
+					final JSONObject result = (JSONObject)iteration;
+					final String kind = result.getString("kind");
+					final JSONObject data = result.getJSONObject("data");
+					
+					String message = null;
+					switch(kind) {
+						case "t1" -> message = buildMessageBodyT1(data, subscription.getFormat());
+						case "t3" -> message = buildMessageBodyT3(data, subscription.getFormat());
+					}
+					
+					final String outMessage = message;
+					if(outMessage.length() > 0) {
+						e.getChannel().sendMessage(message).queue();
+						return;
+					}
 				}
-				
-				final String outMessage = message;
-				if(outMessage.length() > 0) {
-					textChannel.sendMessage(message).queue();
-					return;
-				}
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_NO_CONTENT)).build()).queue();
 			}
-			textChannel.sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_NO_CONTENT)).build()).queue();
+		} catch (Exception e1) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_NO_CONTENT)).build()).queue();
+			logger.error("Subscription couldn't be retrieved from {} in guild {}!", subscription.getURL(), e.getGuild().getId(), e1);
 		}
 	}
 	

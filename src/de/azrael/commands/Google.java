@@ -50,9 +50,6 @@ public class Google implements CommandPublic {
 			if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SPREADSHEETS))) {
 				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "spreadsheets"));
 			}
-			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_YOUTUBE))) {
-				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "youtube"));
-			}
 			else {
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.RED);
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_API_NOT_AVAILABLE)).build()).queue();

@@ -159,6 +159,7 @@ public enum Command {
 			objects.add(this.column+":"+this.type);
 		}
 		else if(this.type.equals("scm")) {
+			objects.add(rs.getBoolean(this.column+"_scm"));
 			objects.add(rs.getInt(this.column+"_lv"));
 			objects.add(this.column+":"+this.type);
 		}
@@ -171,5 +172,9 @@ public enum Command {
 	
 	public boolean resolveResultSetCm(ResultSet rs) throws SQLException {
 		return rs.getBoolean(this.column+"_cm");
+	}
+	
+	public boolean resolveResultSetScm(ResultSet rs) throws SQLException {
+		return rs.getBoolean(this.column+"_scm");
 	}
 }

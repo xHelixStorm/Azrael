@@ -68,7 +68,7 @@ public class ParseSubscription extends TimerTask {
 								else if(subscription.getType() == 2)
 									success = TwitterModel.ModelParse(guild, subscription, channel_id, defaultChannel);
 								else if(subscription.getType() == 3)
-									success = RedditModel.fetchRedditContent(null, guild, subscription, channel_id, defaultChannel);
+									success = RedditModel.ModelParse(guild, subscription, channel_id, defaultChannel);
 								else if(subscription.getType() == 4) 
 									success = YouTubeModel.ModelParse(guild, subscription, channel_id, defaultChannel);
 								else if(subscription.getType() == 5)

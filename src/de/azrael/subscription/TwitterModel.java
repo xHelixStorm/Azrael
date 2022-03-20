@@ -271,11 +271,12 @@ public class TwitterModel {
 					e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.TWITTER_NO_TWEET)).queue();
 				}
 			} catch (TwitterException e1) {
+				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.TWITTER_NO_TWEET)).queue();
 				logger.error("Subscription couldn't be retrieved from {} in guild {}!", subscription.getURL(), e.getGuild().getId(), e1);
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_LOGIN_TWITTER)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITTER_LOGIN)).build()).queue();
 		}
 	}
 }

@@ -119,6 +119,12 @@ public class ReadyListener extends ListenerAdapter {
 					logger.error("Guild commands configuration couldn't be generated in guild {}", guild.getId());
 				}
 			}
+			//verify that sub commands exist in the bot configurations, else create them
+			if(!BotConfiguration.SQLSubCommandsAvailable(guild.getIdLong())) {
+				if(!BotConfiguration.SQLInsertBotConfigs(guild.getIdLong())) {
+					logger.error("Guild sub commands configuration couldn't be generated in guild {}", guild.getId());
+				}
+			}
 			//verify that commands permissions exist in the bot configurations, else create them
 			if(!BotConfiguration.SQLCommandsLevelAvailable(guild.getIdLong())) {
 				if(!BotConfiguration.SQLInsertBotConfigs(guild.getIdLong())) {

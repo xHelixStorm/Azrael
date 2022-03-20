@@ -50,7 +50,6 @@ import de.azrael.commands.Quiz;
 import de.azrael.commands.Randomshop;
 import de.azrael.commands.Rank;
 import de.azrael.commands.Reboot;
-import de.azrael.commands.Reddit;
 import de.azrael.commands.Register;
 import de.azrael.commands.Remove;
 import de.azrael.commands.Restrict;
@@ -64,7 +63,6 @@ import de.azrael.commands.Start;
 import de.azrael.commands.Stats;
 import de.azrael.commands.Subscribe;
 import de.azrael.commands.Top;
-import de.azrael.commands.Twitch;
 import de.azrael.commands.Use;
 import de.azrael.commands.User;
 import de.azrael.commands.Warn;
@@ -350,9 +348,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("start", new Start());
 		CommandHandler.commandsPublic.put("prune", new Prune());
 		CommandHandler.commandsPublic.put("warn", new Warn());
-		CommandHandler.commandsPublic.put("reddit", new Reddit());
 		CommandHandler.commandsPublic.put("invites", new Invites());
-		CommandHandler.commandsPublic.put("twitch", new Twitch());
 	}
 	
 	public static void addPrivateCommands() {

@@ -95,6 +95,10 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 			stmt.setLong(1, guild_id);
 			stmt.executeUpdate();
 			
+			stmt = myConn.prepareStatement(BotConfigurationStatements.SQLInsertBotConfigs4);
+			stmt.setLong(1, guild_id);
+			stmt.executeUpdate();
+			
 			myConn.commit();
 			return true;
 		} catch (SQLException e) {
@@ -203,6 +207,30 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 		}
 	}
 	
+	public static boolean SQLSubCommandsAvailable(long guild_id) {
+		logger.trace("SQLSubCommandsAvailable launched. Passed params {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = STATIC.getDatabaseURL(3);
+			stmt = myConn.prepareStatement(BotConfigurationStatements.SQLSubCommandsAvailable);
+			stmt.setLong(1, guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return true;
+			}
+			return false;
+		} catch (SQLException e) {
+			logger.error("SQLSubCommandsAvailable Exception", e);
+			return false;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static boolean SQLCommandsLevelAvailable(long guild_id) {
 		logger.trace("SQLCommandsLevelAvailable launched. Passed params {}", guild_id);
 		Connection myConn = null;
@@ -242,15 +270,19 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 					return command.resolveResultSet(rs);
 				else if(mode == 2)
 					return command.resolveResultSetLv(rs);
-				else
+				else if(mode == 3)
 					return command.resolveResultSetCm(rs);
+				else if(mode == 4)
+					return command.resolveResultSetScm(rs);
 			}
 			ArrayList<Object> values = new ArrayList<Object>();
 			if(mode == 1) {
 				values.add(false);
 				values.add(100);
 			}
-			else if(mode == 3)
+			else if(mode == 2)
+				values.add(100);
+			else if(mode == 3 || mode == 4)
 				values.add(false);
 			return values;
 		} catch (SQLException e) {
@@ -278,7 +310,7 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 		ResultSet rs = null;
 		try {
 			myConn = STATIC.getDatabaseURL(3);
-			stmt = myConn.prepareStatement(BotConfigurationStatements.SQLgetCommand2);
+			stmt = myConn.prepareStatement(BotConfigurationStatements.SQLgetCommand);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
 			if(rs.next()) {
@@ -287,8 +319,10 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 						values.add(command.resolveResultSet(rs));
 					else if(mode == 2)
 						values.add(command.resolveResultSetLv(rs));
-					else
+					else if(mode == 3)
 						values.add(command.resolveResultSetCm(rs));
+					else if(mode == 4)
+						values.add(command.resolveResultSetScm(rs));
 				}
 				return values;
 			}

@@ -115,11 +115,11 @@ public class YouTubeModel {
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_YOUTUBE_ERR_2)).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.YOUTUBE_NOT_FOUND)).build()).queue();
 			}
 		} catch (Exception e1) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
-			logger.error("YouTube subscription couldn't be retrieved from {} in guild {}!", subscription.getURL(), e.getGuild().getId(), e1);
+			logger.error("YouTube subscription couldn't be retrieved from {} in guild {}", subscription.getURL(), e.getGuild().getId(), e1);
 		}
 	}
 }

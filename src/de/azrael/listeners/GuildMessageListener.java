@@ -20,18 +20,14 @@ import de.azrael.commands.Quiz;
 import de.azrael.commandsContainer.ClanExecution;
 import de.azrael.commandsContainer.FilterExecution;
 import de.azrael.commandsContainer.GoogleSpreadsheetsExecution;
-import de.azrael.commandsContainer.GoogleYouTubeExecution;
 import de.azrael.commandsContainer.JoinExecution;
 import de.azrael.commandsContainer.PruneExecution;
 import de.azrael.commandsContainer.PurchaseExecution;
-import de.azrael.commandsContainer.RedditExecution;
 import de.azrael.commandsContainer.RegisterRole;
 import de.azrael.commandsContainer.RoomExecution;
 import de.azrael.commandsContainer.ScheduleExecution;
 import de.azrael.commandsContainer.SetWarning;
 import de.azrael.commandsContainer.ShopExecution;
-import de.azrael.commandsContainer.SubscribeExecution;
-import de.azrael.commandsContainer.TwitchExecution;
 import de.azrael.commandsContainer.UserExecution;
 import de.azrael.commandsContainer.WriteEditExecution;
 import de.azrael.constructors.BotConfigs;
@@ -39,6 +35,7 @@ import de.azrael.constructors.Cache;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Messages;
 import de.azrael.constructors.Ranking;
+import de.azrael.constructors.Subscription;
 import de.azrael.core.CommandHandler;
 import de.azrael.core.CommandParser;
 import de.azrael.core.Hashes;
@@ -57,6 +54,7 @@ import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.Competitive;
 import de.azrael.sql.RankingSystem;
+import de.azrael.subscription.SubscriptionUtils;
 import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.threads.RunQuiz;
 import de.azrael.util.STATIC;
@@ -85,6 +83,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class GuildMessageListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		if(e.getMember() != null) {
@@ -364,57 +363,80 @@ public class GuildMessageListener extends ListenerAdapter {
 						Hashes.clearTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 					}
 					
-					//check if the rss command has been used
-					final var rss = Hashes.getTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-					if(rss != null && !e.getMember().getUser().isBot() && rss.getExpiration() - System.currentTimeMillis() > 0) {
-						String task = rss.getAdditionalInfo();
-						//check if the user wishes to close the rss window
+					//check if the subscribe command has been used
+					final var subscribe = Hashes.getTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+					if(subscribe != null && !e.getMember().getUser().isBot() && subscribe.getExpiration() - System.currentTimeMillis() > 0) {
+						String type = subscribe.getAdditionalInfo();
+						String task = subscribe.getAdditionalInfo2();
+						//check if the user wishes to close the subscription set up
 						if(!message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
-							//register a rss feed if selected
-							if(task.equals("register") && ((message.startsWith("http") && rss.getAdditionalInfo2().equals("1")) || ((message.startsWith("#") || message.startsWith("@")) && rss.getAdditionalInfo2().equals("2")))) {
-								Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-								SubscribeExecution.registerFeed(e, message, Integer.parseInt(rss.getAdditionalInfo2()));
+							//Show registration information of a subscription
+							if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER)) && !task.equals("register")) {
+								SubscriptionUtils.register(e, type);
 							}
-							//remove a rss feed if selected
-							if(task.equals("remove") && message.replaceAll("[0-9]*", "").length() == 0) {
-								SubscribeExecution.removeFeed(e, Integer.parseInt(message)-1);
+							//Register the subscription
+							else if(task.equals("register")) {
+								SubscriptionUtils.register(e, type, message);
 							}
-							//format a rss feed if selected
-							else if(task.equals("format") && message.replaceAll("[0-9]*", "").length() == 0) {
-								SubscribeExecution.currentFormat(e, Integer.parseInt(message)-1, "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+							//Show removal information and subscription listing
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE)) && !task.equals("remove")) {
+								SubscriptionUtils.remove(e, type);
 							}
-							//update the format of an rss feed if format has been selected the step before
-							else if(task.contains("updateformat")) {
-								Hashes.clearTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-								SubscribeExecution.updateFormat(e, Integer.parseInt(task.replaceAll("[^0-9]", "")), message);
+							//remove a subscription
+							else if(task.equals("remove")) {
+								SubscriptionUtils.remove(e, message, (ArrayList<Subscription>)subscribe.getObject());
 							}
-							//do a test print of one selected feed
-							else if(task.equals("test") && message.replaceAll("[0-9]*", "").length() == 0) {
-								SubscribeExecution.runTest(e, Integer.parseInt(message)-1);
+							//Show message output details with subscription listing
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT)) && !task.equals("format") && !task.equals("formatUpdate")) {
+								SubscriptionUtils.format(e, type);
 							}
-							//change the options of a tweet
-							else if(task.equals("options") && message.replaceAll("[0-9]*", "").length() == 0) {
-								SubscribeExecution.changeOptions(e, Integer.parseInt(message)-1, "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+							//Show message output details of the selected subscription
+							else if(task.equals("format")) {
+								SubscriptionUtils.format(e, type, message, (ArrayList<Subscription>)subscribe.getObject());
 							}
-							//update the hashtag options
-							else if(task.equals("options-page")) {
-								final String lowCaseMessage = message.toLowerCase();
-								if(lowCaseMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)) || lowCaseMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE)) || lowCaseMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_CHILD)) || lowCaseMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_CHILD)))
-									SubscribeExecution.updateOptions(e, Integer.parseInt(rss.getAdditionalInfo2()), "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+							//update the format of a subscription
+							else if(task.contains("formatUpdate")) {
+								SubscriptionUtils.format(e, message, (Subscription)subscribe.getObject());
 							}
-							//set a text channel besides the default one
-							else if(task.equals("channel") && message.replaceAll("[0-9]*", "").length() == 0) {
-								SubscribeExecution.setChannel(e, Integer.parseInt(message)-1, "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+							//Show information of the option parameter with subscription listing
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_OPTIONS)) && !task.equals("options") && !task.equals("optionsUpdate")) {
+								SubscriptionUtils.options(e, type);
+							}
+							//Display the current options of a subscription
+							else if(task.equals("options")) {
+								SubscriptionUtils.options(e, type, message, (ArrayList<Subscription>)subscribe.getObject());
+							}
+							//Update an option of a subscription
+							else if(task.equals("optionsUpdate")) {
+								SubscriptionUtils.options(e, type, message, (Subscription)subscribe.getObject());
+							}
+							////Show test information and subscription listing
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST)) && !task.equals("test")) {
+								SubscriptionUtils.test(e, type);
+							}
+							//do a test print of a subscription
+							else if(task.equals("test")) {
+								SubscriptionUtils.test(e, type, message, (ArrayList<Subscription>)subscribe.getObject());
+							}
+							//Show information on how to redirect subscriptions into another text channel with subscription listing
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL)) && !task.equals("channel") && !task.equals("channelUpdate")) {
+								SubscriptionUtils.channel(e, type);
+							}
+							//Display the current redirection options of the selected subscription
+							else if(task.equals("channel")) {
+								SubscriptionUtils.channel(e, type, message, (ArrayList<Subscription>)subscribe.getObject());
 							}
 							//register the alternative text channel
-							else if(task.equals("set-channel")) {
-								SubscribeExecution.updateAlternativeChannel(e, Integer.parseInt(rss.getAdditionalInfo2()), "rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+							else if(task.equals("channelUpdate")) {
+								SubscriptionUtils.channel(e, message, (Subscription)subscribe.getObject());
+							}
+							//list registered subscriptions
+							else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
+								SubscriptionUtils.display(e, type);
 							}
 						}
 						else {
-							EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE);
-							e.getChannel().sendMessage(embed.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_EXIT)).build()).queue();
-							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), message);
+							SubscriptionUtils.interrupt(e, message);
 						}
 					}
 					
@@ -539,45 +561,6 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 							else if(google.getAdditionalInfo().equals("spreadsheets-restrict-update")) {
 								GoogleSpreadsheetsExecution.restrictUpdate(e, google.getAdditionalInfo2(), google.getAdditionalInfo3(), message, key);
-							}
-							
-							else if(google.getAdditionalInfo().equals("youtube")) {
-								GoogleYouTubeExecution.runTask(e, key);
-							}
-							else if(google.getAdditionalInfo().equals("youtube-selection")) {
-								if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD)))
-									GoogleYouTubeExecution.add(e, key);
-								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE)))
-									GoogleYouTubeExecution.remove(e, key);
-								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT)))
-									GoogleYouTubeExecution.format(e, key);
-								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL)))
-									GoogleYouTubeExecution.channel(e, key);
-								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY)))
-									GoogleYouTubeExecution.display(e, key);
-								else if(lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST)))
-									GoogleYouTubeExecution.test(e, key);
-							}
-							else if(google.getAdditionalInfo().equals("youtube-add")) {
-								GoogleYouTubeExecution.add(e, key, message);
-							}
-							else if(google.getAdditionalInfo().equals("youtube-remove")) {
-								GoogleYouTubeExecution.remove(e, key, message, google);
-							}
-							else if(google.getAdditionalInfo().equals("youtube-format")) {
-								GoogleYouTubeExecution.format(e, key, message, google);
-							}
-							else if(google.getAdditionalInfo().equals("youtube-format-update")) {
-								GoogleYouTubeExecution.formatUpdate(e, key, message, google);
-							}
-							else if(google.getAdditionalInfo().equals("youtube-channel")) {
-								GoogleYouTubeExecution.channel(e, key, message, google);
-							}
-							else if(google.getAdditionalInfo().equals("youtube-channel-update")) {
-								GoogleYouTubeExecution.channelUpdate(e, key, message, google);
-							}
-							else if(google.getAdditionalInfo().equals("youtube-test")) {
-								GoogleYouTubeExecution.test(e, key, message, google);
 							}
 						}
 						else {
@@ -789,67 +772,6 @@ public class GuildMessageListener extends ListenerAdapter {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_ABORT)).build()).queue();
 							Hashes.clearTempCache("prune_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.PRUNE.getColumn(), e.getMessage().getContentRaw());
-						}
-					}
-					
-					final var reddit = Hashes.getTempCache("reddit_gu"+guild_id+"ch"+channel_id+"us"+user_id);
-					if(reddit != null && reddit.getExpiration() - System.currentTimeMillis() > 0) {
-						if(!e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
-							if(reddit.getAdditionalInfo().equals("register")) {
-								RedditExecution.register(e, reddit);
-							}
-							else if(reddit.getAdditionalInfo().equals("format")) {
-								RedditExecution.format(e, reddit);
-							}
-							else if(reddit.getAdditionalInfo().equals("format2")) {
-								RedditExecution.formatUpdate(e, reddit);
-							}
-							else if(reddit.getAdditionalInfo().equals("channel")) {
-								RedditExecution.channel(e, reddit);
-							}
-							else if(reddit.getAdditionalInfo().equals("channel2")) {
-								RedditExecution.channelUpdate(e, reddit);
-							}
-							else if(reddit.getAdditionalInfo().equals("remove")) {
-								RedditExecution.remove(e, reddit);
-							}
-							else if(reddit.getAdditionalInfo().equals("test")) {
-								RedditExecution.test(e, reddit);
-							}
-						}
-						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_EXIT)).build()).queue();
-							Hashes.clearTempCache("reddit_gu"+guild_id+"ch"+channel_id+"us"+user_id);
-							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.REDDIT.getColumn(), e.getMessage().getContentRaw());
-						}
-					}
-					
-					final var twitch = Hashes.getTempCache("twitch_gu"+guild_id+"ch"+channel_id+"us"+user_id);
-					if(twitch != null && twitch.getExpiration() - System.currentTimeMillis() > 0) {
-						if(!e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
-							if(twitch.getAdditionalInfo().equals("format")) {
-								TwitchExecution.format(e, twitch);
-							}
-							else if(twitch.getAdditionalInfo().equals("format2")) {
-								TwitchExecution.formatUpdate(e, twitch);
-							}
-							else if(twitch.getAdditionalInfo().equals("channel")) {
-								TwitchExecution.channel(e, twitch);
-							}
-							else if(twitch.getAdditionalInfo().equals("channel2")) {
-								TwitchExecution.channelUpdate(e, twitch);
-							}
-							else if(twitch.getAdditionalInfo().equals("remove")) {
-								TwitchExecution.remove(e, twitch);
-							}
-							else if(twitch.getAdditionalInfo().equals("test")) {
-								TwitchExecution.test(e, twitch);
-							}
-						}
-						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_EXIT)).build()).queue();
-							Hashes.clearTempCache("twitch_gu"+guild_id+"ch"+channel_id+"us"+user_id);
-							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.TWITCH.getColumn(), e.getMessage().getContentRaw());
 						}
 					}
 				});

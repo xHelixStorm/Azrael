@@ -97,6 +97,7 @@ class AzraelStatements {
 	final static String SQLgetFilterLanguages = STATIC.decrypt("qiqTw4mQIzd1IWH9j1dssheC91FwSmOgyJby+pjXjYjtYMnf6Efmxd5HIP2gLIvc4e6kx1dNiuWrCAsck+VlhkdQApc8fSszzFfOTB16z9w=");
 	final static String SQLInsertSubscription = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jPqvOETUl2NLOEgue/T0BdFjNZhQnKKU6UmJbwVMp1ZAQGq0Dboc9pi1VCmJqoGqjvqqUAdYlzrwll+WGvwISiJ0HgrYapdxxdMlLgbJ0WqYpiWmnE6Yuij0898X3LAGp4QZc7PchGnYcRKiNntjB7k=");
 	final static String SQLgetChildSubscriptions = STATIC.decrypt("Dg7vg8YjQ9B8ZHP+6K5MCUviwYQ3zw1qUcJKET/edVys080NkefZvcyFuWcAsQALkjM5slfTVs9dlQFeBmWqZku+2Xmm7VfVseQoaq8om/2gh2zZo3GhJcibFsI4ciXV");
+	final static String SQLgetSubscriptionsTypes = STATIC.decrypt("cI3CF1s29svFIqqdCOq3VkfIwjEJjayfVWISVTs9gf7bCEzDXnoPGegE+OsetWoY");
 	final static String SQLgetSubscriptions = STATIC.decrypt("nlzIXDuxoK/0SVStLbqKw5Mk0YzZ0uWFkrLF+u6GK3VWn5qz0km6eCQ4OYj1NBtQKuK5BQB6iS8tq3J0YkGaJsvOBmtYT5LYMJCROF76qzw5itXacFDZfCEmJF7f4eANPKH3rnMLCkT6+I1BQl5pbgbSHFY7QFB2K3NjJeeNuL9OW3SiML5lmXb9eX/qpwoS");
 	final static String SQLgetSubscriptions2 = STATIC.decrypt("xlrRW205z1YZCjWrv8PILuiJob/aptTtbuuli6/5DqDQZcLp8g+u/0C7s7NvuNZLrbuG/6KN6Gve4M/SqqhrOuSc8795c2m8aFk06H++6thAYPOpIPr7ENqjYVQI+Uel+gKhssQHiD+Yixey/+YqQVjwTCJZPGMAs5n6CFxduuTPYai8b/Q30RS/JnxYytN/");
 	final static String SQLgetSubscriptionsRestricted = STATIC.decrypt("xlrRW205z1YZCjWrv8PILuiJob/aptTtbuuli6/5DqDQZcLp8g+u/0C7s7NvuNZLrbuG/6KN6Gve4M/SqqhrOuSc8795c2m8aFk06H++6thAYPOpIPr7ENqjYVQI+Uel+gKhssQHiD+Yixey/+YqQWqUinkKyXmFfCl4Ej9UAMPYzN2z4mTCuYAawV3p37B4becRsLnS2KqXzO4Q+H1sKA==");

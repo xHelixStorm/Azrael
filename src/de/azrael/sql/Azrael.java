@@ -2093,6 +2093,30 @@ public class Azrael {
 		}
 	}
 	
+	public static ArrayList<String> SQLgetSubscriptionsTypes() {
+		logger.trace("SQLgetSubscriptionsTypes launched. No params passed");
+		ArrayList<String> types = new ArrayList<String>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = STATIC.getDatabaseURL(1);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptionsTypes);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				types.add(rs.getString(1));
+			}
+			return types;
+		} catch (SQLException e) {
+			logger.error("SQLgetSubscriptionsTypes Exception", e);
+			return null;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static CopyOnWriteArrayList<Subscription> SQLgetSubscriptions() {
 		final var subscriptions = Hashes.getSubscriptions();
 		if(subscriptions.isEmpty()) {
