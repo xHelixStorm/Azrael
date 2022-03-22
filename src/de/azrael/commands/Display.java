@@ -51,17 +51,31 @@ public class Display implements CommandPublic{
 		var adminPermission = BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		long guild_id = e.getGuild().getIdLong();
 		StringBuilder out = new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		
 		//if no arguments have been added to the command, print a list of all available parameters
 		if(args.length == 0) {
+			//sub commands are disabled by default
+			boolean displayRoles = false;
+			boolean displayRegisteredRoles = false;
+			boolean displayRankingRoles = false;
+			boolean displayCategories = false;
+			boolean displayRegisteredCategories = false;
+			boolean displayTextChannels = false;
+			boolean displayVoiceChannels = false;
+			boolean displayRegisteredChannels = false;
+			boolean displayDailies = false;
+			boolean displayWatchedUsers = false;
+			
+			
 			//default values at 100 to avoid command abuse in case of errors
 			int displayRolesLevel = 100;
 			int displayRegisteredRolesLevel = 100;
 			int displayRankingRolesLevel = 100;
 			int displayCategoriesLevel = 100;
 			int displayRegisteredCategoriesLevel = 100;
-			int displayTextChannelsLevels = 100;
-			int displayVoiceChannelsLevels = 100;
+			int displayTextChannelsLevel = 100;
+			int displayVoiceChannelsLevel = 100;
 			int displayRegisteredChannelsLevel = 100;
 			int displayDailiesLevel = 100;
 			int displayWatchedUsersLevel = 100;
@@ -72,51 +86,80 @@ public class Display implements CommandPublic{
 			
 			for(final Object command : commands) {
 				int permissionLevel = 0;
+				boolean enabled = false;
 				String name = "";
 				for(Object values : (ArrayList<?>)command) {
 					if(values instanceof Integer)
 						permissionLevel = (Integer)values;
+					else if(values instanceof Boolean)
+						enabled = (Boolean)values;
 					else if(values instanceof String)
 						name = ((String)values).split(":")[0];
 				}
 				
-				if(name.equals(Command.DISPLAY_ROLES.getColumn()))
+				if(name.equals(Command.DISPLAY_ROLES.getColumn())) {
+					displayRoles = enabled;
 					displayRolesLevel = permissionLevel;
-				else if(name.equals(Command.DISPLAY_ROLES.getColumn()))
-					displayRolesLevel = permissionLevel;
-				else if(name.equals(Command.DISPLAY_REGISTERED_ROLES.getColumn()))
-					displayRolesLevel = permissionLevel;
-				else if(name.equals(Command.DISPLAY_RANKING_ROLES.getColumn()))
-					displayRolesLevel = permissionLevel;
-				else if(name.equals(Command.DISPLAY_CATEGORIES.getColumn()))
-					displayRolesLevel = permissionLevel;
-				else if(name.equals(Command.DISPLAY_REGISTERED_CATEGORIES.getColumn()))
-					displayRolesLevel = permissionLevel;
-				else if(name.equals(Command.DISPLAY_TEXT_CHANNELS.getColumn()))
-					displayRolesLevel = permissionLevel;
-				else if(name.equals(Command.DISPLAY_VOICE_CHANNELS.getColumn()))
-					displayRolesLevel = permissionLevel;
-				else if(name.equals(Command.DISPLAY_REGISTERED_CHANNELS.getColumn()))
-					displayRolesLevel = permissionLevel;
-				else if(name.equals(Command.DISPLAY_WATCHED_USERS.getColumn()))
-					displayRolesLevel = permissionLevel;
+				}
+				else if(name.equals(Command.DISPLAY_REGISTERED_ROLES.getColumn())) {
+					displayRegisteredRoles = enabled;
+					displayRegisteredRolesLevel = permissionLevel;
+				}
+				else if(name.equals(Command.DISPLAY_RANKING_ROLES.getColumn())) {
+					displayRankingRoles = enabled;
+					displayRankingRolesLevel = permissionLevel;
+				}
+				else if(name.equals(Command.DISPLAY_CATEGORIES.getColumn())) {
+					displayCategories = enabled;
+					displayCategoriesLevel = permissionLevel;
+				}
+				else if(name.equals(Command.DISPLAY_REGISTERED_CATEGORIES.getColumn())) {
+					displayRegisteredCategories = enabled;
+					displayRegisteredCategoriesLevel = permissionLevel;
+				}
+				else if(name.equals(Command.DISPLAY_TEXT_CHANNELS.getColumn())) {
+					displayTextChannels = enabled;
+					displayTextChannelsLevel = permissionLevel;
+				}
+				else if(name.equals(Command.DISPLAY_VOICE_CHANNELS.getColumn())) {
+					displayVoiceChannels = enabled;
+					displayVoiceChannelsLevel = permissionLevel;
+				}
+				else if(name.equals(Command.DISPLAY_REGISTERED_CHANNELS.getColumn())) {
+					displayRegisteredChannels = enabled;
+					displayRegisteredChannelsLevel = permissionLevel;
+				}
+				else if(name.equals(Command.DISPLAY_DAILIES.getColumn())) {
+					displayRegisteredChannels = enabled;
+					displayRegisteredChannelsLevel = permissionLevel;
+				}
+				else if(name.equals(Command.DISPLAY_WATCHED_USERS.getColumn())) {
+					displayWatchedUsers = enabled;
+					displayWatchedUsersLevel = permissionLevel;
+				}
 			}
 			
-			out.append(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP)
-					+ (UserPrivs.comparePrivilege(e.getMember(), displayRolesLevel) || adminPermission 					? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_1).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLES)) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), displayRegisteredRolesLevel) || adminPermission 		? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_2).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_ROLES)) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), displayRankingRolesLevel) || adminPermission 			? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_3).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLES)) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), displayCategoriesLevel) || adminPermission 			? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_4).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORIES)) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), displayRegisteredCategoriesLevel) || adminPermission 	? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_5).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_CATEGORIES)) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), displayTextChannelsLevels) || adminPermission 			? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_6).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNELS)) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), displayVoiceChannelsLevels) || adminPermission 		? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_7).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_VOICE_CHANNELS)) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), displayRegisteredChannelsLevel) || adminPermission 	? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_8).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_CHANNELS)) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), displayDailiesLevel) || adminPermission 				? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_9).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILIES)) : "")
-					+ (UserPrivs.comparePrivilege(e.getMember(), displayWatchedUsersLevel) || adminPermission 			? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_10).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCHED_USERS)) : ""));
-			e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(out.toString()).build()).queue();
+			sb.append((displayRoles && (UserPrivs.comparePrivilege(e.getMember(), displayRolesLevel) || adminPermission) 								? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_1).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLES)) : "")
+					+ (displayRegisteredRoles && (UserPrivs.comparePrivilege(e.getMember(), displayRegisteredRolesLevel) || adminPermission) 			? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_2).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_ROLES)) : "")
+					+ (displayRankingRoles && (UserPrivs.comparePrivilege(e.getMember(), displayRankingRolesLevel) || adminPermission) 					? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_3).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLES)) : "")
+					+ (displayCategories && (UserPrivs.comparePrivilege(e.getMember(), displayCategoriesLevel) || adminPermission) 						? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_4).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORIES)) : "")
+					+ (displayRegisteredCategories && (UserPrivs.comparePrivilege(e.getMember(), displayRegisteredCategoriesLevel) || adminPermission) 	? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_5).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_CATEGORIES)) : "")
+					+ (displayTextChannels && (UserPrivs.comparePrivilege(e.getMember(), displayTextChannelsLevel) || adminPermission) 					? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_6).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNELS)) : "")
+					+ (displayVoiceChannels && (UserPrivs.comparePrivilege(e.getMember(), displayVoiceChannelsLevel) || adminPermission) 				? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_7).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_VOICE_CHANNELS)) : "")
+					+ (displayRegisteredChannels && (UserPrivs.comparePrivilege(e.getMember(), displayRegisteredChannelsLevel) || adminPermission) 		? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_8).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_CHANNELS)) : "")
+					+ (displayDailies && (UserPrivs.comparePrivilege(e.getMember(), displayDailiesLevel) || adminPermission) 							? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_9).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILIES)) : "")
+					+ (displayWatchedUsers && (UserPrivs.comparePrivilege(e.getMember(), displayWatchedUsersLevel) || adminPermission) 					? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_10).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCHED_USERS)) : ""));
+			
+			if(sb.length() > 0) {
+				out.append(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP)+sb.toString());
+				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(out.toString()).build()).queue();
+			}
+			else {
+				//TODO: add error
+			}
 		}
 		//display all roles
-		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLES))) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLES)) && STATIC.getCommandEnabled(e.getGuild(), Command.DISPLAY_ROLES)) {
 			//verify that the current user is allowed to use this parameter
 			final var rolesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_ROLES);
 			if(UserPrivs.comparePrivilege(e.getMember(), rolesLevel) || adminPermission) {
@@ -131,7 +174,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all registered roles
-		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_ROLES))) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_ROLES)) && STATIC.getCommandEnabled(e.getGuild(), Command.DISPLAY_REGISTERED_ROLES)) {
 			//verify that the current user is allowed to use this parameter
 			final var registeredRolesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_REGISTERED_ROLES);
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredRolesLevel) || adminPermission) {
@@ -150,7 +193,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all registered ranking roles
-		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLES))) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLES)) && STATIC.getCommandEnabled(e.getGuild(), Command.DISPLAY_RANKING_ROLES)) {
 			//verify that the current user is allowed to use this parameter
 			final var rankingRolesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_RANKING_ROLES);
 			if(UserPrivs.comparePrivilege(e.getMember(), rankingRolesLevel) || adminPermission) {
@@ -171,7 +214,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all categories
-		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORIES))) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORIES)) && STATIC.getCommandEnabled(e.getGuild(), Command.DISPLAY_CATEGORIES)) {
 			//verify that the current user is allowed to use this parameter
 			final var categoriesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_CATEGORIES);
 			if(UserPrivs.comparePrivilege(e.getMember(), categoriesLevel) || adminPermission) {
@@ -186,7 +229,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all registered categories
-		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_CATEGORIES))) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_CATEGORIES)) && STATIC.getCommandEnabled(e.getGuild(), Command.DISPLAY_REGISTERED_CATEGORIES)) {
 			//verify that the current user is allowed to use this parameter
 			final var registeredCategoriesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_REGISTERED_CATEGORIES);
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredCategoriesLevel) || adminPermission) {
@@ -204,7 +247,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all text channels
-		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNELS))) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNELS)) && STATIC.getCommandEnabled(e.getGuild(), Command.DISPLAY_TEXT_CHANNELS)) {
 			//verify that the current user is allowed to use this parameter
 			final var textChannelsLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_TEXT_CHANNELS);
 			if(UserPrivs.comparePrivilege(e.getMember(), textChannelsLevel) || adminPermission) {
@@ -219,7 +262,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all voice channels
-		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_VOICE_CHANNELS))) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_VOICE_CHANNELS)) && STATIC.getCommandEnabled(e.getGuild(), Command.DISPLAY_VOICE_CHANNELS)) {
 			//verify that the current user is allowed to use this parameter
 			final var voiceChannelsLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_VOICE_CHANNELS);
 			if(UserPrivs.comparePrivilege(e.getMember(), voiceChannelsLevel) || adminPermission) {
@@ -234,7 +277,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all registered text channels
-		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_CHANNELS))) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_CHANNELS)) && STATIC.getCommandEnabled(e.getGuild(), Command.DISPLAY_REGISTERED_CHANNELS)) {
 			//verify that the current user is allowed to use this parameter
 			final var registeredChannelsLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_REGISTERED_CHANNELS);
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredChannelsLevel) || adminPermission) {
@@ -262,7 +305,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all registered daily rewards
-		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILIES))) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILIES)) && STATIC.getCommandEnabled(e.getGuild(), Command.DISPLAY_DAILIES)) {
 			//verify that the current user is allowed to use this parameter
 			final var dailiesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_DAILIES);
 			if(UserPrivs.comparePrivilege(e.getMember(), dailiesLevel) || adminPermission) {
@@ -277,7 +320,7 @@ public class Display implements CommandPublic{
 			}
 		}
 		//display all users that are being watched
-		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCHED_USERS))) {
+		else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCHED_USERS)) && STATIC.getCommandEnabled(e.getGuild(), Command.DISPLAY_WATCHED_USERS)) {
 			//verify that the current user is allowed to use this parameter
 			final var watchedUsersLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_WATCHED_USERS);
 			if(UserPrivs.comparePrivilege(e.getMember(), watchedUsersLevel) || adminPermission) {
