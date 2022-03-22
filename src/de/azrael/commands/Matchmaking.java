@@ -44,7 +44,9 @@ public class Matchmaking implements CommandPublic {
 			else if(this_channel != null) {
 				//run help first, since nothing has been defined
 				if(args.length == 0) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_HELP)).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_HELP)
+							.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_NORMAL))
+							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PICKING))).build()).queue();
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NORMAL))) {
 					regular(e, botConfig);

@@ -48,10 +48,10 @@ public class DoubleExperience implements CommandPublic {
 			//if no parameters have been provided, show the command details
 			if(args.length == 0) {
 				message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS));
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_HELP)
-					+ STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_HELP_1)
-					+ STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_HELP_2)
-					+ STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_HELP_3))
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_HELP).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_STATE))
+					+ STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_HELP_1).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_AUTO))
+					+ STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_HELP_2).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ON))
+					+ STATIC.getTranslation(e.getMember(), Translation.DOUBLE_EXPERIENCE_HELP_3).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_OFF)))
 					.build()).queue();
 			}
 			//display the current state of the double experience (enabled/disabled/auto)

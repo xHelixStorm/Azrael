@@ -47,7 +47,11 @@ public class Quiz implements CommandPublic {
 			EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 			//execute the command help if no parameters have been applied to the command
 			if(args.length == 0) {
-				e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ABOUT)).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_HELP)).build()).queue();
+				e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ABOUT)).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_HELP)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER_REWARDS))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER_QUESTIONS))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CLEAR))
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RUN))).build()).queue();
 			}
 			//help command to register quiz rewards when there's just one parameter
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER_REWARDS))) {

@@ -26,7 +26,8 @@ public class Schedule implements CommandPublic {
 
 	@Override
 	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
-		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_HELP)+"\n"
+		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_HELP)
+				.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))+"\n\n"
 			+ "**"+STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY)+"**\n"
 			+ "**"+STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE)+"**\n"
 			+ "**"+STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE)+"**").build()).queue();

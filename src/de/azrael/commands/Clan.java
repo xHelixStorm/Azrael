@@ -36,13 +36,30 @@ public class Clan implements CommandPublic {
 					String message = null;
 					switch(memberLevel) {
 						case 1 -> {
-							message = STATIC.getTranslation(e.getMember(), Translation.CLAN_MEMBER);
+							message = STATIC.getTranslation(e.getMember(), Translation.CLAN_MEMBER)
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SEARCH))
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MEMBERS))
+									.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_LEAVE));
 						}
 						case 2 -> {
-							message = STATIC.getTranslation(e.getMember(), Translation.CLAN_STAFF);
+							message = STATIC.getTranslation(e.getMember(), Translation.CLAN_STAFF)
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SEARCH))
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MEMBERS))
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_LEAVE))
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_KICK))
+									.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_INVITE));
 						}
 						case 3 -> {
-							message = STATIC.getTranslation(e.getMember(), Translation.CLAN_OWNER);
+							message = STATIC.getTranslation(e.getMember(), Translation.CLAN_OWNER)
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SEARCH))
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MEMBERS))
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_LEAVE))
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_KICK))
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_INVITE))
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DELEGATE))
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ICON))
+									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PROMOTE))
+									.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISBAND));
 						}
 					}
 					EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE).setTitle(clan.getClanName());
@@ -65,7 +82,10 @@ public class Clan implements CommandPublic {
 			}
 			else if(memberLevel == 0) {
 				//is not part of any clan
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.CLAN_MEMBERLESS)).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.CLAN_MEMBERLESS)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SEARCH))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_APPLY))
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE))).build()).queue();
 				Hashes.addTempCache("clan_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
 			}
 			else {

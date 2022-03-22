@@ -38,7 +38,9 @@ public class RandomshopExecution {
 			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_NOT_AVAILABLE)).build()).queue();
 		}
 		else {
-			message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_HELP));
+			message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANDOMSHOP_HELP)
+					.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PLAY))
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REPLAY)));
 			
 			if(abbreviations.size() > 0) {
 				//display all weapons

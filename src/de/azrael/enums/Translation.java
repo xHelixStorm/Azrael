@@ -119,7 +119,6 @@ public enum Translation {
 	PARAM_EVENTS				("param_events"),
 	PARAM_SHEET					("param_sheet"),
 	PARAM_MAP					("param_map"),
-	PARAM_SHOW					("param_show"),
 	PARAM_SET					("param_set"),
 	PARAM_REMOVE_ALL			("param_remove_all"),
 	PARAM_COMP_SERVER			("param_comp_server"),

@@ -34,7 +34,8 @@ public class Restrict implements CommandPublic {
 					if(fromMember != null) {
 						if(fromMember.isMaster()) {
 							if(args.length == 0) {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RESTRICT_HELP)).build()).queue();
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RESTRICT_HELP)
+										.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX))).build()).queue();
 							}
 							else if(args.length == 1) {
 								int memberLimit = 0;
@@ -55,7 +56,8 @@ public class Restrict implements CommandPublic {
 											allowed = true;
 										}
 										else {
-											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RESTRICT_ERR)).build()).queue();
+											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.RESTRICT_ERR)
+													.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX))).build()).queue();
 										}
 									}
 								}

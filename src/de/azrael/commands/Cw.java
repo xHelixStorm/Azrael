@@ -53,7 +53,10 @@ public class Cw implements CommandPublic {
 		final var member = Competitive.SQLgetClanDetails(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		if(member != null && member.getClanID() != 0) {
 			if(args.length == 0) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.CW_HELP)).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.CW_HELP)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_JOIN))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_LEAVE))
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_START))).build()).queue();
 			}
 			else {
 				if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_JOIN))) {

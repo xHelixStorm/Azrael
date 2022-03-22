@@ -38,7 +38,12 @@ public class EquipExecution {
 				final Member member = guild.getMemberById(e.getAuthor().getId());
 				final int commandLevel = STATIC.getCommandLevel(guild, Command.EQUIP);
 				if(UserPrivs.comparePrivilege(member, commandLevel)) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)
+							.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_EXIT))
+							.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_DISPLAY))
+							.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_SET))
+							.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_REMOVE))
+							.replace("{}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_REMOVE_ALL))).build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, foundGuilds.get(0)));
 				}
 				else {
@@ -89,7 +94,12 @@ public class EquipExecution {
 			final Member member = guild.getMemberById(e.getAuthor().getId());
 			final int commandLevel = STATIC.getCommandLevel(guild, Command.EQUIP);
 			if(UserPrivs.comparePrivilege(member, commandLevel)) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.blue).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.blue).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)
+						.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_EXIT))
+						.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_DISPLAY))
+						.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_SET))
+						.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_REMOVE))
+						.replace("{}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_REMOVE_ALL))).build()).queue();
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id));
 			}
 			else {
@@ -162,6 +172,7 @@ public class EquipExecution {
 		}
 		
 		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_EQUIPMENT)
+				.replace("{}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_EXIT))
 				+ STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SLOT_1).replace("{}", weapon1)
 				+ STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SLOT_2).replace("{}", weapon2)
 				+ STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SLOT_3).replace("{}", weapon3)
@@ -292,13 +303,15 @@ public class EquipExecution {
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED)).build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED)
+									.replace("{}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_RETURN))).build()).queue();
 							var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 							Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED_2)).build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED_2)
+								.replace("{}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_RETURN))).build()).queue();
 						var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 						Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 					}
@@ -325,7 +338,8 @@ public class EquipExecution {
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id, "set-"+selection+"_"+items));
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_WEP_NOT_FOUND)).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_WEP_NOT_FOUND)
+						.replace("{}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_RETURN))).build()).queue();
 				var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 			}
@@ -352,7 +366,8 @@ public class EquipExecution {
 					}
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_ALREADY_EQUIPPED)).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_ALREADY_EQUIPPED)
+							.replace("{}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_RETURN))).build()).queue();
 					var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 				}
@@ -373,7 +388,8 @@ public class EquipExecution {
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id, "set-"+selection+"_"+items));
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_SKILL_NOT_FOUND)).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SELECT_SKILL_NOT_FOUND)
+						.replace("{}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_RETURN))).build()).queue();
 				var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 			}
@@ -413,13 +429,15 @@ public class EquipExecution {
 								}
 							}
 							else {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED)).build()).queue();
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED)
+										.replace("{}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_RETURN))).build()).queue();
 								var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 								Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED_2)).build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_ALREADY_EQUIPPED_2)
+									.replace("{}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_RETURN))).build()).queue();
 							var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 							Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 						}
@@ -448,7 +466,8 @@ public class EquipExecution {
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_ALREADY_EQUIPPED)).build()).queue();
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SKILL_ALREADY_EQUIPPED)
+									.replace("{}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_RETURN))).build()).queue();
 							var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 							Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);
 						}

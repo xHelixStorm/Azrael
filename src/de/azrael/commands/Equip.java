@@ -76,7 +76,12 @@ public class Equip implements CommandPublic, CommandPrivate {
 				//check if the user is allowed to use this command
 				if(UserPrivs.comparePrivilege(e.getJDA().getGuildById(mutualGuilds.get(0).getId()).getMemberById(e.getAuthor().getId()), STATIC.getCommandLevel(mutualGuilds.get(0), Command.EQUIP))) {
 					//directly make the selection screen appear (e.g. show, set, etc)
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)
+							.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_EXIT))
+							.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_DISPLAY))
+							.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_SET))
+							.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_REMOVE))
+							.replace("{}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_REMOVE_ALL))).build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, mutualGuilds.get(0).getId()));
 				}
 				else {

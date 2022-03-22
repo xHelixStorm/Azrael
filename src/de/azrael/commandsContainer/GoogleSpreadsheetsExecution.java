@@ -51,7 +51,15 @@ public class GoogleSpreadsheetsExecution {
 				out.append("**"+GoogleUtils.buildFileURL(spreadsheet.getFileID(), 2)+"**\n");
 			}
 		}
-		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_HELP)+out.toString()).build()).queue();
+		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_HELP)
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EVENTS))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SHEET))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MAP))
+				.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RESTRICT))+out.toString()).build()).queue();
 		Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 	}
 	
@@ -94,7 +102,8 @@ public class GoogleSpreadsheetsExecution {
 						logger.info("Spreadsheet with the file id {} has been created in guild {}", file_id, e.getGuild().getIdLong());
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_CREATED_2)+file_id).build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_CREATED_2)
+								.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD))+file_id).build()).queue();
 						logger.warn("Spreadsheet with the file id {} has been created in guild {} but without linkage", file_id, e.getGuild().getIdLong());
 					}
 				}
@@ -276,7 +285,10 @@ public class GoogleSpreadsheetsExecution {
 				if(registeredEvents.size() == 0)
 					out2.append(NA);
 				
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_EVENTS_ADD)+out.toString()+"\n"+STATIC.getTranslation(e.getMember(), Translation.GOOGLE_EVENTS)+out2.toString()).build()).queue();
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_EVENTS_ADD)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD))
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
+						+out.toString()+"\n"+STATIC.getTranslation(e.getMember(), Translation.GOOGLE_EVENTS)+out2.toString()).build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-events-update", file.getFileID()));
 			}
 			else {
@@ -688,7 +700,8 @@ public class GoogleSpreadsheetsExecution {
 		else {
 			GoogleEvent EVENT = GoogleEvent.valueOfEvent(event);
 			if(EVENT != null && events.parallelStream().filter(f -> f == EVENT.id).findAny().orElse(null) != null) {
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_RESTRICT_SET)).build()).queue();
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_RESTRICT_SET)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE))).build()).queue();
 				Hashes.addTempCache(key, new Cache(180000, "spreadsheets-restrict-update", file_id, event));
 			}
 		}

@@ -106,27 +106,46 @@ public class UserExecution {
 		
 		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17) && user_name != null && user_name.length() > 0) {
 			StringBuilder out = new StringBuilder();
-			out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_1).replace("{}", user_name)
+			out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_1)
+						.replaceFirst("\\{\\}", user_name).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_2)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_INFORMATION))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_3)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DELETE_MESSAGES))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_4)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNING))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_5)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MUTE))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_6)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_UNMUTE))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_7)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_BAN))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_8)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_UNBAN))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_9)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_KICK))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_10)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ASSIGN_ROLE))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_11)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_ROLE))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_12)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_HISTORY))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_13)
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_14));
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCH))
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_14)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_UNWATCH)));
 			final var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 			if(guild_settings != null && guild_settings.getRankingState()) {
 				out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_15)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_EXPERIENCE))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_16)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_EXPERIENCE))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_17)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_LEVEL))
 					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_18)
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_19));
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_CURRENCY))
+					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_19)
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_CURRENCY)));
 			}
 			message.setDescription(out.toString());
 			e.getChannel().sendMessage(message.build()).queue();
@@ -361,7 +380,8 @@ public class UserExecution {
 					}
 					else {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED);
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_ALREADY_MUTED)).build()).queue();
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_MUTE_ALREADY_MUTED)
+								.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_UNMUTE))).build()).queue();
 						Hashes.clearTempCache(key);
 					}
 				}

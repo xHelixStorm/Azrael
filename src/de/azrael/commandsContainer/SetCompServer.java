@@ -15,7 +15,9 @@ public class SetCompServer {
 	private final static Logger logger = LoggerFactory.getLogger(SetCompServer.class);
 	
 	public static void runHelp(GuildMessageReceivedEvent e) {
-		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_COMP_SERVER_HELP)).build()).queue();
+		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_COMP_SERVER_HELP)
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD))
+				.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))).build()).queue();
 	}
 	
 	public static void runTask(GuildMessageReceivedEvent e, String [] args) {

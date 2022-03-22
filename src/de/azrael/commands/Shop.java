@@ -43,21 +43,27 @@ public class Shop implements CommandPublic {
 				StringBuilder out = new StringBuilder();
 				final var skins = RankingSystem.SQLgetSkinshopContentAndType(e.getGuild().getIdLong(), true);
 				if(skins != null && skins.size() > 0) {
-					out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP));
+					out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP)
+							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT)));
 					if(skins.parallelStream().filter(f -> f.getSkinType().equals("lev")).findAny().orElse(null) != null) {
-						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_2));
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_2)
+								.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_LEVEL_UPS).toUpperCase()));
 					}
 					if(skins.parallelStream().filter(f -> f.getSkinType().equals("ran")).findAny().orElse(null) != null) {
-						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_3));
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_3)
+								.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKS).toUpperCase()));
 					}
 					if(skins.parallelStream().filter(f -> f.getSkinType().equals("pro")).findAny().orElse(null) != null) {
-						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_4));
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_4)
+								.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PROFILES).toUpperCase()));
 					}
 					if(skins.parallelStream().filter(f -> f.getSkinType().equals("ico")).findAny().orElse(null) != null) {
-						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_5));
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_5)
+								.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ICONS).toUpperCase()));
 					}
 					if(skins.parallelStream().filter(f -> f.getSkinType().equals("ite")).findAny().orElse(null) != null) {
-						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_6));
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_6)
+								.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ITEMS).toUpperCase()));
 					}
 				}
 				else if(skins == null) {
@@ -66,8 +72,10 @@ public class Shop implements CommandPublic {
 				final var weapons = RankingSystemItems.SQLgetWholeWeaponShop(e.getGuild().getIdLong());
 				if(weapons != null && weapons.size() > 0 && weapons.parallelStream().filter(f -> f.getEnabled()).findAny().orElse(null) != null) {
 					if(out.length() == 0)
-						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP));
-					out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_7));
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP)
+								.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT)));
+					out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_7)
+							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WEAPONS).toUpperCase()));
 				}
 				else if(weapons == null) {
 					logger.error("Shop weapons couldn't be retrieved in guild {}", e.getGuild().getId());
@@ -75,8 +83,10 @@ public class Shop implements CommandPublic {
 				final var skills = RankingSystemItems.SQLgetSkills(e.getGuild().getIdLong());
 				if(skills != null && skills.size() > 0 && skills.parallelStream().filter(f -> f.getEnabled()).findAny().orElse(null) != null) {
 					if(out.length() == 0)
-						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP));
-					out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_8));
+						out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP)
+								.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT)));
+					out.append(STATIC.getTranslation(e.getMember(), Translation.SHOP_HELP_8)
+							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SKILLS).toUpperCase()));
 				}
 				else if(skills == null) {
 					logger.error("Shop skills couldn't be retrieved in guild {}", e.getGuild().getId());

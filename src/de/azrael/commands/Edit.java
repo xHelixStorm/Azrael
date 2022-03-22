@@ -38,7 +38,9 @@ public class Edit implements CommandPublic {
 	@Override
 	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		if(args.length == 0) {
-			e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_HELP)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_HELP)
+					.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_REACTION))
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CLEAR_REACTIONS))).build()).queue();
 		}
 		else if (args.length == 2) {
 			String channel_id = args[0].replaceAll("[<>#]", "");

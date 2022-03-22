@@ -43,7 +43,8 @@ public class Google implements CommandPublic {
 			else 
 				email = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
 			EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS));
-			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGlE_HELP).replace("{}", email)).build()).queue();
+			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGlE_HELP).replaceFirst("\\{\\}", email)
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SPREADSHEETS))).build()).queue();
 		}
 		else if(args.length == 1) {
 			//Write in cache to display options related to google spreadsheets

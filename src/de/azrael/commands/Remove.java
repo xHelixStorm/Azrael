@@ -34,10 +34,16 @@ public class Remove implements CommandPublic {
 	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		if(args.length == 0) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS))
-				.setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_HELP)).build()).queue();
+				.setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_HELP)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL))
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL_CENSOR))).build()).queue();
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_ROLE_HELP)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_ROLE_HELP)
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))).build()).queue();
 		}
 		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
 			if(args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))) {
@@ -80,7 +86,8 @@ public class Remove implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE))) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_RANKING_HELP)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_RANKING_HELP)
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))).build()).queue();
 		}
 		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE))) {
 			if(args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))) {
@@ -122,7 +129,8 @@ public class Remove implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY))) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CATEGORY_HELP)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CATEGORY_HELP)
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))).build()).queue();
 		}
 		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY))) {
 			if(args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))) {
@@ -169,7 +177,8 @@ public class Remove implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL))) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_TXT_CHANNEL_HELP)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_TXT_CHANNEL_HELP)
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))).build()).queue();
 		}
 		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL))) {
 			if(args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))) {
@@ -218,7 +227,8 @@ public class Remove implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL_CENSOR))) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CENSOR_HELP)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REMOVE_CENSOR_HELP)
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))).build()).queue();
 		}
 		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL_CENSOR))) {
 			if(args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))) {

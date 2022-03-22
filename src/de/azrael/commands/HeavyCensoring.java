@@ -37,7 +37,10 @@ public class HeavyCensoring implements CommandPublic {
 	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		//run help if no parameter has been added
 		if(args.length == 0) {
-			e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_HELP)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_HELP)
+					.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))
+					.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RESET))).build()).queue();
 		}
 		//enter if a parameter has been passed
 		else if(args.length == 1) {

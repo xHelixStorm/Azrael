@@ -115,7 +115,8 @@ public class ScheduleExecution {
 			schedule.setTime(Integer.parseInt(message));
 			final String enabled = STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_ENABLED);
 			final String disabled = STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_DISABLED);
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_CREATE4)+"\n\n"
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_CREATE4)
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_COMPLETE))+"\n\n"
 				+ "**MO**: "+(schedule.isMonday() ? enabled : disabled)
 				+ " **TU**: "+(schedule.isTuesday() ? enabled : disabled)
 				+ " **WE**: "+(schedule.isWednesday() ? enabled : disabled)

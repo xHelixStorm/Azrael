@@ -39,7 +39,10 @@ public class Invites implements CommandPublic {
 	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		if(args.length == 0) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS))
-				.setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_HELP)).build()).queue();
+				.setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_HELP)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_STATUS))).build()).queue();
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE))) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_CREATE)).build()).queue();
@@ -117,7 +120,8 @@ public class Invites implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_REMOVE_HELP)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_REMOVE_HELP)
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))).build()).queue();
 		}
 		else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE)) && args[1].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))) {
 			if(!STATIC.threadExists("invites_gu"+e.getGuild().getId())) {

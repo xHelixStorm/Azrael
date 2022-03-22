@@ -34,7 +34,9 @@ public class Prune implements CommandPublic {
 	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		if(args.length == 0) {
 			//command explanation
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_HELP)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_HELP)
+					.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXCLUDE))
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))).build()).queue();
 		}
 		else {
 			long tMembers = 0;
@@ -164,7 +166,10 @@ public class Prune implements CommandPublic {
 			}
 			else {
 				//notify user of how many members have been found and excluded. Write to cache to allow a final confirmation
-				final EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_CONFIRMATION).replaceFirst("\\{\\}", ""+tMembers).replace("{}", ""+tExcludedMembers));
+				final EmbedBuilder embed = new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_CONFIRMATION)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_YES)).toUpperCase()
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_NO)).toUpperCase()
+						.replaceFirst("\\{\\}", ""+tMembers).replace("{}", ""+tExcludedMembers));
 				
 				//Add fields to show the current selection and exclusions
 				if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL)) || !selectedMembers.isEmpty()) {

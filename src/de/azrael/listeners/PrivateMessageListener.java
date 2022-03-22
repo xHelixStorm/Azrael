@@ -62,7 +62,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 					//run this block when a clear guild with enabled ranking system has been selected and found
 					if(equip.getAdditionalInfo().length() == 18) {
 						//show the current equipment
-						if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_SHOW))) {
+						if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_DISPLAY))) {
 							//TODO: show equipment
 						}
 						//equip weapons or skills

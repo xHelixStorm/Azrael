@@ -44,7 +44,11 @@ public class Use implements CommandPublic {
 			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
 				if(args.length == 0) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_HELP)).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USE_HELP)
+							.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL))
+							.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK))
+							.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE))
+							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICONS))).build()).queue();
 				}
 				else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL))) {
 					user_details.setRankingLevel(guild_settings.getLevelID());

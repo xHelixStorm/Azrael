@@ -30,7 +30,16 @@ public class FilterExecution {
 	
 	public static void runHelp(GuildMessageReceivedEvent e) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS));
-		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_HELP)).build()).queue();
+		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_HELP)
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_FILTER))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_KICK))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FUNNY_NAMES))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_STAFF_NAMES))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_URLS))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ALLOWED_URLS))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_SUBS))).build()).queue();
 	}
 	
 	public static void runTask(GuildMessageReceivedEvent e, String _message) {
@@ -41,7 +50,7 @@ public class FilterExecution {
 			final var wordFilterLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_WORD_FILTER);
 			if(UserPrivs.comparePrivilege(e.getMember(), wordFilterLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("WORD-FILTER");
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "word-filter"));
 			}
 			else {
@@ -52,7 +61,7 @@ public class FilterExecution {
 			final var nameFilterLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_NAME_FILTER);
 			if(UserPrivs.comparePrivilege(e.getMember(), nameFilterLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("NAME-FILTER");
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "name-filter"));
 			}
 			else {
@@ -63,7 +72,7 @@ public class FilterExecution {
 			final var nameKickLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_NAME_KICK);
 			if(UserPrivs.comparePrivilege(e.getMember(), nameKickLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("NAME-KICK");
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "name-kick"));
 			}
 			else {
@@ -74,7 +83,7 @@ public class FilterExecution {
 			final var funnyNamesLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_FUNNY_NAMES);
 			if(UserPrivs.comparePrivilege(e.getMember(), funnyNamesLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("FUNNY-NAMES");
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "funny-names"));
 			}
 			else {
@@ -85,7 +94,7 @@ public class FilterExecution {
 			final var staffNamesLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_STAFF_NAMES);
 			if(UserPrivs.comparePrivilege(e.getMember(), staffNamesLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("STAFF-NAMES");
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "staff-names"));
 			}
 			else {
@@ -96,7 +105,7 @@ public class FilterExecution {
 			final var urlBlacklistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_URL_BLACKLIST);
 			if(UserPrivs.comparePrivilege(e.getMember(), urlBlacklistLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("URL-BLACKLIST");
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "url-blacklist"));
 			}
 			else {
@@ -107,7 +116,7 @@ public class FilterExecution {
 			final var urlWhitelistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_URL_WHITELIST);
 			if(UserPrivs.comparePrivilege(e.getMember(), urlWhitelistLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("URL-WHITELIST");
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "url-whitelist"));
 			}
 			else {
@@ -118,7 +127,7 @@ public class FilterExecution {
 			final var tweetBlacklistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_SUBSCRIPTION_BLACKLIST);
 			if(UserPrivs.comparePrivilege(e.getMember(), tweetBlacklistLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("TWEET-BLACKLIST");
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)).build()).queue();
+				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "tweet-blacklist"));
 			}
 			else {
@@ -1412,6 +1421,15 @@ public class FilterExecution {
 			Hashes.removeQueryResult("ita_"+e.getGuild().getId());
 		if(lang.equals("ara") || (allowAll && lang.equals("all")))
 			Hashes.removeQueryResult("ara_"+e.getGuild().getId());
+	}
+	
+	private static void printFilterActions(GuildMessageReceivedEvent e, EmbedBuilder message) {
+		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ACTIONS)
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))).build()).queue();
 	}
 	
 	private static List<String> checkDuplicates(String [] words) {
