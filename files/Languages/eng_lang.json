@@ -332,6 +332,7 @@
 	"display_is_not_enabled":	 	"Disabled",
 	"display_unlock_level":		 	"Unlock Level: ",
 	"display_probability":		 	"Probability: ",
+	"display_disabled":				"All parameters for the *Display* command are disabled. Please enable at least one and then try again!",
 	
 	"double_experience_help":	 	"Use this command to update the current mode for double experience events. Writing *{}*, will display the current mode. These modes are available:\n\n",
 	"double_experience_help_1":	 	"- **{}**:\nThe Double Experience event will start and terminate automatically.\n",

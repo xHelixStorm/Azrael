@@ -332,6 +332,7 @@
 	"display_is_not_enabled":	 	"Deaktiviert",
 	"display_unlock_level":		 	"Freischalte Stufe: ",
 	"display_probability":		 	"Wahrscheinlichkeit: ",
+	"display_disabled":				"Alle Parameter für den Befehl *Display* sind deaktiviert. Bitte aktivieren Sie mindestens einen und versuchen Sie es dann erneut!",
 	
 	"double_experience_help":	 	"Verwenden Sie diesen Befehl, um den aktuellen Modus für Ereignisse mit doppelter Erfahrung zu aktualisieren. Wenn Sie *{}* schreiben, wird der aktuelle Modus angezeigt. Diese Modi sind verfügbar:\n\n",
 	"double_experience_help_1":	 	"- **{}**:\nDas Doppelte Erfahrung Ereignis beginnt und endet automatisch.\n",

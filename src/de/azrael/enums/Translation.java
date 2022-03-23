@@ -337,6 +337,7 @@ public enum Translation {
 	DISPLAY_IS_NOT_ENABLED		("display_is_not_enabled"),
 	DISPLAY_UNLOCK_LEVEL		("display_unlock_level"),
 	DISPLAY_PROBABILITY			("display_probability"),
+	DISPLAY_DISABLED			("display_disabled"),
 	
 	DOUBLE_EXPERIENCE_HELP		("double_experience_help"),
 	DOUBLE_EXPERIENCE_HELP_1	("double_experience_help_1"),

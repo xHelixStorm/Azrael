@@ -155,7 +155,7 @@ public class Display implements CommandPublic{
 				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(out.toString()).build()).queue();
 			}
 			else {
-				//TODO: add error
+				e.getChannel().sendMessage(messageBuild.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_DISABLED)).build()).queue();
 			}
 		}
 		//display all roles

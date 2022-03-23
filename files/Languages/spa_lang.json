@@ -332,6 +332,7 @@
 	"display_is_not_enabled":	 	"Deshabilitado",
 	"display_unlock_level":		 	"Nivel de desbloqueo: ",
 	"display_probability":		 	"Probabilidad: ",
+	"display_disabled":				"Todos los parámetros del comando *Display* están desactivados. Por favor, active al menos uno y vuelva a intentarlo.",
 	
 	"double_experience_help":	 	"Usa este comando para actualizar el modo actual para eventos de doble experiencia. Al escribir *{}*, se mostrará el modo actual. Estos modos están disponibles:\n\n",
 	"double_experience_help_1":	 	"- **{}**:\nEl evento de doble experiencia comenzará y terminará automáticamente.\n",
