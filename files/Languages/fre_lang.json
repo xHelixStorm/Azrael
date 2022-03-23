@@ -566,7 +566,15 @@
     "reboot":                       "**Redémarrage en cours!**",
     
     "register_help_1":              "Utilisez cette commande pour enregistrer soit un canal, un rôle, un rôle de classement ou tous les utilisateurs d'une guilde. Pour la première fois, un rôle d'administrateur doit être enregistré et ensuite toutes les autres fonctionnalités de cette commande seront débloquées. Ecrivez le paramètre rôle avec la commande !",
-    "register_help_2":              "Utilisez cette commande pour enregistrer soit un canal, un rôle, un rôle de classement ou tous les utilisateurs d'une guilde. Utilisez les paramètres suivants avec la commande pour obtenir plus de détails:\n\n- **{}**:\nEnregistrer un rôle.\n- **{}**:\nEnregistrer une catégorie.\n- **{}**:\nEnregistrer un canal texte.\n- **{}**:\nActiver ou désactiver la censure des url pour un canal texte. \n- **{}**:\nActiver ou désactiver la suppression du texte dans un canal texte.\n- **{}**:\nEnregistrer tous les canaux texte.\n- **{}**:\nEnregistrer un rôle de classement à débloquer après avoir monté de niveau.\n- **{}**:\nEnregistrer tous les utilisateurs du serveur.",
+    "register_help_2":              "Utilisez cette commande pour enregistrer soit un canal, un rôle, un rôle de classement ou tous les utilisateurs d'une guilde. Utilisez les paramètres suivants avec la commande pour obtenir plus de détails:\n\n",
+    "register_param_1":				"- **{}**:\nEnregistrer un rôle.\n",
+	"register_param_2":				"- **{}**:\nEnregistrer une catégorie.\n",
+	"register_param_3":				"- **{}**:\nEnregistrer un canal texte.\n",
+	"register_param_4":				"- **{}**:\nActiver ou désactiver la censure des url pour un canal texte.\n",
+	"register_param_5":				"- **{}**:\nActiver ou désactiver la suppression du texte dans un canal texte.\n",
+	"register_param_6":				"- **{}**:\nEnregistrer tous les canaux texte.\n",
+	"register_param_7":				"- **{}**:\nEnregistrer un rôle de classement à débloquer après avoir monté de niveau.\n",
+	"register_param_8":				"- **{}**:\nEnregistrer tous les utilisateurs du serveur.",
     "register_category_help" :      "Enregistrez les catégories pour que le Bot puisse utiliser la plupart de ses fonctionnalités ! Pour enregistrer des catégories, écrivez le type de catégorie comme deuxième paramètre et écrivez l'id de la catégorie comme troisième paramètre avec la commande ! Ces types de catégories sont disponibles :\n\n",
     "register_category_no_types":   "Aucun type de catégorie n'a été trouvé !",
     "register_category_registered": "La catégorie a été enregistrée!",
@@ -590,6 +598,7 @@
     "register_role_assign_start":   "Le rôle est attribué à tous les membres!",
     "register_role_done":           "Inscription terminée !",
     "register_role_key":            "Ce rôle nécessite des récompenses pour les cadeaux enregistrés ! N'oubliez pas de les télécharger !",
+    "register_disabled":			"Tous les paramètres de la commande *Register* sont désactivés. Veuillez en activer au moins un et réessayer!",
     
     "remove_help":                  "Supprimez une option enregistrée ! Pour plus de détails, accompagnez la commande de l'un des paramètres suivants : \n\n- **{}**:\nSupprime un rôle enregistré.\n- **{}**:\nSupprime un rôle de classement enregistré.\n- **{}**:\nSupprime une catégorie enregistrée.\n- **{}**:\nSupprime un canal de texte enregistré.\n- **{}**:\nSupprime les langues de censure d'un canal de texte.",
     "remove_role_help":             "Insérez un ID de rôle avec la commande complète pour supprimer un rôle enregistré ou tapez *{}* pour supprimer tous les rôles enregistrés !",
@@ -734,7 +743,6 @@
     "shutdown_soon":                "Le Bot va s'éteindre sous peu !",
     
     "subscribe_help":               "Utilisez cette commande pour vous abonner à ce qui suit. Écrivez-la en même temps que la commande complète ! La commande peut être interrompue à tout moment avec `{}` !\n",
-    "subscribe_disabled":			"Tous les types d'abonnement sont actuellement désactivés !",
     "subscribe_register_help":      "Souhaitez-vous ajouter un Flux RSS ou un Hashtag/Utilisateur Twitter ? Inscrivez soit 1 pour enregistrer un Flux RSS, soit 2 pour enregistrer un Hashtag/Utilisateur Twitter comme second paramètre !",
     "subscribe_remove_help":		"Supprimez un abonnement enregistré en le sélectionnant avec un numéro qui s'affiche ci-dessous :\n\n",
     "subscribe_format_help":		"Formatez le message de sortie d'un abonnement enregistré en le sélectionnant avec un numéro qui s'affiche ci-dessous :\n\n",
@@ -752,6 +760,7 @@
     "subscribe_channel_default":    "DEFAUT",
     "subscribe_status":             "L'abonnement de **{}** n'a pas pu être récupéré au cours des dernières 24 heures. Veuillez vérifier que l'url est toujours disponible et que les permissions sur le canal texte sont correctement définies.",
     "subscribe_exit":               "Commande d'abonnement interrompue !",
+    "subscribe_disabled":			"Tous les paramètres de la commande *Subscribe* sont désactivés. Veuillez en activer au moins un et réessayer !",
     
     "rss_help": 					"Paramètres disponibles pour s'abonner à un flux RSS : \n\n- **{}**:\nS'abonner à un flux RSS!\n- **{}**:\nDéfinir les options d'affichage de votre flux RSS ! \n- **{}**:\nUtiliser un canal spécifique en plus du canal par défaut!\n- **{}**:\nSupprimer un flux RSS enregistré!\n- **{}**:\nTester un flux RSS enregistré!\n- **{}**:\nAfficher la liste des flux RSS enregistrés !",
 	"rss_register":			        "Maintenant, veuillez appliquer une URL RSS !",

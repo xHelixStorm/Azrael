@@ -332,7 +332,7 @@
     "display_is_not_enabled":       "Desativado",
     "display_unlock_level":         "Nível de desbloqueio: ",
     "display_probability":          "Probabilidade: ",
-    "display_disabled":				"Todos os parâmetros para o comando *Display* estão desactivados. Por favor, active pelo menos um e depois tente novamente!",
+    "display_disabled":				"Todos os parâmetros para o comando *Display* estão desactivados. Por favor, active pelo menos um deles e depois tente novamente!",
     
     "double_experience_help":       "Use este comando para atualizar o modo atual para eventos de experiência dupla. Escrevendo *{}*, exibirá o modo atual. Estes modos estão disponíveis:\n\n",
     "double_experience_help_1":     "- **{}**:\nO evento Double Experience começará e terminará automaticamente. \n ",
@@ -566,7 +566,15 @@
     "reboot":                       "**Reinicializando agora!**",
     
     "register_help_1":              "Use este comando para registrar um canal, uma função, uma função de classificação ou todos os usuários em uma guilda. Pela primeira vez, uma função de administrador precisa ser registrada e depois todos os outros recursos para este comando serão desbloqueados. Escreva o parâmetro de função junto com o comando! ",
-    "register_help_2":              "Use este comando para registrar um canal, uma função, uma função de classificação ou todos os usuários em uma guilda. Use os seguintes parâmetros junto com o comando para obter mais detalhes:\n\n- **{}**:\nRegistrar uma função.\n- **{}**:\nRegistrar uma categoria.\n- **{}**:\nRegistrar um canal de texto.\n- **{}**:\nAtiva ou desativa a censura de url para um canal de texto.\n- **{}**:\nAtive ou Desative a remoção de texto em um canal de texto.\n- **{}**:\nRegistre todos os canais de texto.\n- **{}**:\nRegistre uma função de classificação para desbloquear após subir de nível.\n- **{}**:\nRegistre todos os usuários no servidor. ",
+    "register_help_2":              "Use este comando para registrar um canal, uma função, uma função de classificação ou todos os usuários em uma guilda. Use os seguintes parâmetros junto com o comando para obter mais detalhes:\n\n",
+    "register_param_1":				"- **{}**:\nRegistrar uma função.\n",
+	"register_param_2":				"- **{}**:\nRegistrar uma categoria.\n",
+	"register_param_3":				"- **{}**:\nRegistrar um canal de texto.\n",
+	"register_param_4":				"- **{}**:\nAtiva ou desativa a censura de url para um canal de texto.\n",
+	"register_param_5":				"- **{}**:\nAtive ou Desative a remoção de texto em um canal de texto.\n",
+	"register_param_6":				"- **{}**:\nRegistre todos os canais de texto.\n",
+	"register_param_7":				"- **{}**:\nRegistre uma função de classificação para desbloquear após subir de nível.\n",
+	"register_param_8":				"- **{}**:\nRegistre todos os usuários no servidor.",
     "register_category_help":       "Registre categorias para que o Bot possa usar a maioria de suas funcionalidades! Para registrar categorias, escreva o tipo de categoria como segundo parâmetro e escreva o id da categoria como terceiro parâmetro junto com o comando! Estes tipos de categoria estão disponíveis:\n\n",
     "register_category_no_types":   "Nenhum tipo de categoria foi encontrado! ",
     "register_category_registered": "A categoria foi registrada!",
@@ -590,6 +598,7 @@
     "register_role_assign_start":   "A função está sendo atribuída a todos os membros!",
     "register_role_done":           "Registro concluído!",
     "register_role_key":            "Esta função requer recompensas de brindes registradas! Por favor, não se esqueça de carregá-los! ",
+    "register_disabled":			"Todos os parâmetros para o comando *Register* estão desactivados. Por favor, active pelo menos um deles e depois tente novamente!",
     
     "remove_help":                  "Remova uma opção registrada! Escreva um dos seguintes parâmetros junto com o comando para mais detalhes:\n\n- **{}**:\nRemova uma função registrada.\n- **{}**:\nRemover uma função de classificação registrada.\n- **{}**:\nRemova uma categoria registrada.\n- **{}**:\nRemova um canal de texto registrado.\n- **{}**:\nRemova a censura de idiomas de um canal de texto. ",
     "remove_role_help":             "Insira um ID de função junto com o comando completo para remover uma função registrada ou digite *{}* para remover todas as funções registradas!",
@@ -734,7 +743,6 @@
     "shutdown_soon":                "O Bot será encerrado em breve!",
     
     "subscribe_help":               "Utilize este comando para subscrever o seguinte. Escreva-o juntamente com o comando completo! O comando pode ser interrompido a qualquer momento com `{}`!\n",
-    "subscribe_disabled":			"Todos os tipos de assinatura estão actualmente desactivados!",
     "subscribe_register_help":      "Deseja adicionar um RSS Feed ou um Twitter Hashtag / Usuário? \nEscreva 1 para registrar um RSS Feed ou 2 para registrar um Twitter Hashtag / Usuário como segundo parâmetro! ",
     "subscribe_remove_help":		"Remover uma subscrição registada seleccionando-a com um número que é exibido abaixo:\n\n",
     "subscribe_format_help":		"Formatar a saída de mensagem de uma subscrição registada seleccionando-a com um número que é apresentado abaixo:\n\n",
@@ -752,6 +760,7 @@
     "subscribe_channel_default":    "PADRÃO",
     "subscribe_status":             "Não foi possível obter a assinatura de **{}** nas últimas 24 horas. Por favor, verifique se o url ainda está disponível e se as permissões no canal de texto estão definidas corretamente. ",
     "subscribe_exit":               "Comando de inscrição interrompido!",
+    "subscribe_disabled":			"Todos os parâmetros para o comando *Subscribe* estão desactivados. Por favor, active pelo menos um deles e depois tente novamente!",
     
     "rss_help": 					"Parâmetro disponível para subscrever num feed RSS:\n- **{}**:\nSubscrever um feed RSS!\n- **{}**:\nDefinir as opções de visualização do seu feed RSS!\n- **{}**:\nUse um canal específico para além do canal por defeito!\n- **{}**:\nRemover um feed RSS registado!\n- **{}**:\nTeste um feed RSS registado!\n- **{}**:\nMostrar uma lista de feeds RSS registados!",
 	"rss_register":			        "Agora, aplique um URL RSS!",

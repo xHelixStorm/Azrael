@@ -332,7 +332,7 @@
 	"display_is_not_enabled":	 	"Disabled",
 	"display_unlock_level":		 	"Unlock Level: ",
 	"display_probability":		 	"Probability: ",
-	"display_disabled":				"All parameters for the *Display* command are disabled. Please enable at least one and then try again!",
+	"display_disabled":				"All parameters for the *Display* command are disabled. Please enable at least one of them and then try again!",
 	
 	"double_experience_help":	 	"Use this command to update the current mode for double experience events. Writing *{}*, will display the current mode. These modes are available:\n\n",
 	"double_experience_help_1":	 	"- **{}**:\nThe Double Experience event will start and terminate automatically.\n",
@@ -566,7 +566,15 @@
 	"reboot":						"**Now Rebooting!**",
 	
 	"register_help_1":				"Use this command to register either a channel, a role, a ranking role or all users in a guild. For the first time, an administrator role needs to be registered and afterwards all the other features for this command will be unlocked. Write the role parameter together with the command!",
-	"register_help_2":				"Use this command to register either a channel, a role, a ranking role or all users in a guild. Use the following parameters together with the command to get more details:\n\n- **{}**:\nRegister a role.\n- **{}**:\nRegister a category.\n- **{}**:\nRegister a text channel.\n- **{}**:\nEnable or Disable url censoring for a text channel.\n- **{}**:\nEnable or Disable text removal in a text channel.\n- **{}**:\nRegister all text channels.\n- **{}**:\nRegister a ranking role to unlock after leveling up.\n- **{}**:\nRegister all users on the server.",
+	"register_help_2":				"Use this command to register either a channel, a role, a ranking role or all users in a guild. Use the following parameters together with the command to get more details:\n\n",
+	"register_param_1":				"- **{}**:\nRegister a role.\n",
+	"register_param_2":				"- **{}**:\nRegister a category.\n",
+	"register_param_3":				"- **{}**:\nRegister a text channel.\n",
+	"register_param_4":				"- **{}**:\nEnable or Disable url censoring for a text channel.\n",
+	"register_param_5":				"- **{}**:\nEnable or Disable text removal in a text channel.\n",
+	"register_param_6":				"- **{}**:\nRegister all text channels.\n",
+	"register_param_7":				"- **{}**:\nRegister a ranking role to unlock after leveling up.\n",
+	"register_param_8":				"- **{}**:\nRegister all users on the server.",
 	"register_category_help":		"Register categories so that the Bot can use most of his functionalities! To register categories, write the category type as second parameter and write the category id as third parameter together with the command! These category types are available:\n\n",
 	"register_category_no_types":	"No category types have been found!",
 	"register_category_registered":	"Category has been registered!",
@@ -590,6 +598,7 @@
 	"register_role_assign_start":	"Role is being assigned to all members!",
 	"register_role_done":			"Registration completed!",
 	"register_role_key":			"This role requires registered giveaway rewards! Please don't forget to upload them!",
+	"register_disabled":			"All parameters for the command *Register* are disabled. Please enable at least one of them and then try again!",
 	
 	"remove_help":					"Remove a registered option! Write one of the following parameters together with the command for more details:\n\n- **{}**:\nRemove a registered role.\n- **{}**:\nRemove a registered ranking role.\n- **{}**:\nRemove a registered category.\n- **{}**:\nRemove a registered text channel.\n- **{}**:\nRemove censoring languages from a text channel.",
 	"remove_role_help":				"Insert a role ID together with the full command to remove a registered role or type *{}* to remove all registerd roles!",
@@ -734,7 +743,6 @@
 	"shutdown_soon":				"The Bot will shut down shortly!",
 	
 	"subscribe_help":				"Use this command to subscribe to the following. Write it together with the whole command! The command can be interrupted at any moment with `{}`!\n",
-	"subscribe_disabled":			"All subscription types are currently disabled!",
 	"subscribe_register_help":		"Do you wish to add a RSS Feed or a Twitter Hashtag/User?\nWrite either 1 to register a RSS Feed or 2 to register a Twitter Hashtag/User as second parameter!",
 	"subscribe_remove_help":		"Remove a registered subscription by selecting it with a number which is displayed below:\n\n",
 	"subscribe_format_help":		"Format the message output of a registered subscription by selecting it with a number which is displayed below:\n\n",
@@ -752,6 +760,7 @@
 	"subscribe_channel_default":	"DEFAULT",
 	"subscribe_status":				"Subscription from **{}** couldn't be fetched for the last 24 hours. Please verify that the url is still available and that the permissions on the text channel are set correctly.",
 	"subscribe_exit":				"Subscribe command interrupted!",
+	"subscribe_disabled":			"All parameters for the command *Subscribe* are disabled. Please enable at least one of them and then try again!",
 	
 	"rss_help": 					"Available parameters to subscribe on a RSS feed:\n\n- **{}**:\nSubscribe a RSS Feed!\n- **{}**:\nDefine the display options for your RSS feed!\n- **{}**:\nUse a specific channel beside the default one!\n- **{}**:\nRemove a registered RSS feed!\n- **{}**:\nTest a registered RSS feed!\n- **{}**:\nShow a list of registered RSS feeds!",
 	"rss_register":					"Now please apply a RSS url!",

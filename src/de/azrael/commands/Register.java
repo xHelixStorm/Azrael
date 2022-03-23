@@ -70,15 +70,64 @@ public class Register implements CommandPublic {
 		}
 		else if(UserPrivs.comparePrivilege(e.getMember(), STATIC.getCommandLevel(e.getGuild(), Command.REGISTER)) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 			if(args.length == 0) {
-				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_HELP_2)
-						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))
-						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY))
-						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL))
-						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_URL))
-						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_TXT))
-						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNELS))
-						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE))
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_USERS))).build()).queue();
+				//parameters are disabled by default in case of errors
+				boolean registerRole = false;
+				boolean registerCategory = false;
+				boolean registerTextChannel = false;
+				boolean registerTextChannelUrl = false;
+				boolean registerTextChannelTxt = false;
+				boolean registerTextChannels = false;
+				boolean registerRankingRole = false;
+				boolean registerUsers = false;
+				
+				final var commands = BotConfiguration.SQLgetCommand(e.getGuild().getIdLong(), 1, Command.REGISTER_ROLE, Command.REGISTER_CATEGORY, Command.REGISTER_TEXT_CHANNEL, Command.REGISTER_TEXT_CHANNEL_URL
+						, Command.REGISTER_TEXT_CHANNEL_TXT, Command.REGISTER_TEXT_CHANNELS, Command.REGISTER_RANKING_ROLE, Command.REGISTER_USERS);
+				
+				for(final Object values : commands) {
+					boolean enabled = false;
+					String name = "";
+					if(values instanceof Boolean)
+						enabled = (Boolean)values;
+					else if(values instanceof String)
+						name = ((String)values).split(":")[0];
+					
+					if(name.equals(Command.REGISTER_ROLE.getColumn())) {
+						registerRole = enabled;
+					}
+					else if(name.equals(Command.REGISTER_CATEGORY.getColumn())) {
+						registerCategory = enabled;
+					}
+					else if(name.equals(Command.REGISTER_TEXT_CHANNEL.getColumn())) {
+						registerTextChannel = enabled;
+					}
+					else if(name.equals(Command.REGISTER_TEXT_CHANNEL_URL.getColumn())) {
+						registerTextChannelUrl = enabled;
+					}
+					else if(name.equals(Command.REGISTER_TEXT_CHANNEL_TXT.getColumn())) {
+						registerTextChannelTxt = enabled;
+					}
+					else if(name.equals(Command.REGISTER_TEXT_CHANNELS.getColumn())) {
+						registerTextChannels = enabled;
+					}
+					else if(name.equals(Command.REGISTER_RANKING_ROLE.getColumn())) {
+						registerRankingRole = enabled;
+					}
+					else if(name.equals(Command.REGISTER_USERS.getColumn())) {
+						registerUsers = enabled;
+					}
+				}
+				
+				StringBuilder sb = new StringBuilder();
+				if(registerRole)			sb.append(STATIC.getTranslation(e.getMember(), Translation.REGISTER_PARAM_1).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE)));
+				if(registerCategory)		sb.append(STATIC.getTranslation(e.getMember(), Translation.REGISTER_PARAM_2).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY)));
+				if(registerTextChannel)		sb.append(STATIC.getTranslation(e.getMember(), Translation.REGISTER_PARAM_3).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL)));
+				if(registerTextChannelUrl)	sb.append(STATIC.getTranslation(e.getMember(), Translation.REGISTER_PARAM_4).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_URL)));
+				if(registerTextChannelTxt)	sb.append(STATIC.getTranslation(e.getMember(), Translation.REGISTER_PARAM_5).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_TXT)));
+				if(registerTextChannels)	sb.append(STATIC.getTranslation(e.getMember(), Translation.REGISTER_PARAM_6).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNELS)));
+				if(registerRankingRole)		sb.append(STATIC.getTranslation(e.getMember(), Translation.REGISTER_PARAM_7).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE)));
+				if(registerUsers)			sb.append(STATIC.getTranslation(e.getMember(), Translation.REGISTER_PARAM_8).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_USERS)));
+				
+				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_HELP_2)+sb.toString()).build()).queue();
 				return true;
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {

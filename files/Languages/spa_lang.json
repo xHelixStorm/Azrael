@@ -332,7 +332,7 @@
 	"display_is_not_enabled":	 	"Deshabilitado",
 	"display_unlock_level":		 	"Nivel de desbloqueo: ",
 	"display_probability":		 	"Probabilidad: ",
-	"display_disabled":				"Todos los parámetros del comando *Display* están desactivados. Por favor, active al menos uno y vuelva a intentarlo.",
+	"display_disabled":				"Todos los parámetros del comando *Display* están desactivados. ¡Por favor, active al menos uno de ellos y vuelva a intentarlo!",
 	
 	"double_experience_help":	 	"Usa este comando para actualizar el modo actual para eventos de doble experiencia. Al escribir *{}*, se mostrará el modo actual. Estos modos están disponibles:\n\n",
 	"double_experience_help_1":	 	"- **{}**:\nEl evento de doble experiencia comenzará y terminará automáticamente.\n",
@@ -566,7 +566,15 @@
 	"reboot":						"**Now Rebooting!**",
 	
 	"register_help_1":				"Utiliza este comando para registrar un canal, un rol, un rol de clasificación o todos los usuarios de un gremio. Por primera vez, es necesario registrar un rol de administrador y después se desbloquearán todas las demás funciones de este comando. Escribe el parámetro del rol junto con el comando.",
-	"register_help_2":				"Utiliza este comando para registrar un canal, un rol, un rol de clasificación o todos los usuarios de un gremio. Utiliza los siguientes parámetros junto con el comando para obtener más detalles:\n\n- **{}**:\nRegistrar rol.\n- **{}**:\nRegistrar una categoría.\n- **{}**:\nRegistrar un canal de texto.\n- **{}**:\nHabilitar o Deshabilitar censura de enlaces para un canal de texto.\n- **{}**:\nHabilitar o desahabilitar eliminación de texto en un canal de texto.\n- **{}**:\nRegistrar todos los canales de texto .\n- **{}**:\nRegistrar un rol de rango para desbloquear después de subir de nivel.\n- **{}**:\nRegistrar todos los usuarios en el servidor.",
+	"register_help_2":				"Utiliza este comando para registrar un canal, un rol, un rol de clasificación o todos los usuarios de un gremio. Utiliza los siguientes parámetros junto con el comando para obtener más detalles:\n\n",
+	"register_param_1":				"- **{}**:\nRegistrar rol.\n",
+	"register_param_2":				"- **{}**:\nRegistrar una categoría.\n",
+	"register_param_3":				"- **{}**:\nRegistrar un canal de texto.\n",
+	"register_param_4":				"- **{}**:\nHabilitar o Deshabilitar censura de enlaces para un canal de texto.\n",
+	"register_param_5":				"- **{}**:\nHabilitar o desahabilitar eliminación de texto en un canal de texto.\n",
+	"register_param_6":				"- **{}**:\nRegistrar todos los canales de texto.\n",
+	"register_param_7":				"- **{}**:\nRegistrar un rol de rango para desbloquear después de subir de nivel.\n",
+	"register_param_8":				"- **{}**:\nRegistrar todos los usuarios en el servidor.",
 	"register_category_help":		"¡Registra las categorías para que el Bot pueda utilizar la mayoría de sus funciones! ¡Para registrar categorías, escribe el tipo de categoría como segundo parámetro y escribe el id de la categoría como tercer parámetro junto con el comando! Estos tipos de categoría están disponibles:\n\n",
 	"register_category_no_types":	"No se ha encontrado ningún tipo de categoría!",
 	"register_category_registered":	"Se ha registrado la categoría !",
@@ -590,6 +598,7 @@
 	"register_role_assign_start":	"¡El rol se está asignando a todos los miembros!",
 	"register_role_done":			"¡Registro completado!",
 	"register_role_key":			"¡Este rol requiere de recompensas registradas para los regalos! ¡Por favor, no olvides subirlas!",
+	"register_disabled":			"Todos los parámetros del comando *Register* están desactivados. ¡Por favor, active al menos uno de ellos y vuelva a intentarlo!",
 	
 	"remove_help":					"¡Elimina una opción registrada! Escriba uno de los siguientes parámetros junto con el comando para obtener más detalles:\n\n- **{}**:\nEliminar un rol registrado.\n- **{}**:\nRemover un ranking de roles registrado.\n- **{}**:\nRemover una categoría registrada.\n- **{}**:\nRemover un canal de texto.\n- **{}**:\nRemover censora de idiomas de un canal de texto.",
 	"remove_role_help":				"Introduzca un ID de rol junto con el comando completo para eliminar un rol registrado o escriba *{}* para eliminar todos los roles registrados.",
@@ -734,7 +743,6 @@
 	"shutdown_soon":				"¡El Bot se apagará en breve!",
 	
 	"subscribe_help":				"Utilice este comando para suscribirse a lo siguiente. ¡Escríbalo junto con el comando completo! ¡El comando puede ser interrumpido en cualquier momento con `{}`!\n",
-	"subscribe_disabled":			"Todos los tipos de suscripción están actualmente desactivados.",
 	"subscribe_register_help":		"¿Deseas añadir un canal RSS o un hashtag/usuario de Twitter?\nEscribe 1 para registrar una fuente RSS o 2 para registrar un Hashtag/Usuario de Twitter como segundo parámetro.",	
 	"subscribe_remove_help":		"Elimine una suscripción registrada seleccionándola con un número que se muestra a continuación:\n\n",
 	"subscribe_format_help":		"Formatee la salida de mensajes de una suscripción registrada seleccionándola con un número que se muestra a continuación:\n\n",
@@ -752,6 +760,7 @@
 	"subscribe_channel_default":	"DEFAULT",
 	"subscribe_status":				"La suscripción de **{}** no se ha podido recuperar en las últimas 24 horas. Por favor, compruebe que la url sigue disponible y que los permisos del canal de texto están configurados correctamente.",
 	"subscribe_exit":				"¡Comando de suscripción interrumpido!",
+	"subscribe_disabled":			"Todos los parámetros del comando *Subscribe* están desactivados. ¡Por favor, active al menos uno de ellos y vuelva a intentarlo!",
 	
 	"rss_help": 					"Parámetros disponibles para suscribirse a un canal RSS:\n- **{}**:\n¡Suscribir un canal RSS!\n- **{}**:\n¡Defina las opciones de visualización de su canal RSS!- **{}**:\n¡Usar un canal específico además del predeterminado!\n- **{}**:\n¡Eliminar un canal RSS registrado!\n- **{}**:\n¡Probar un canal RSS registrado!\n- **{}**:\n¡Mostrar una lista de canales RSS registrados!",
 	"rss_register":					"Ahora, por favor, aplique una URL RSS.",

@@ -332,7 +332,7 @@
 	"display_is_not_enabled":	 	"Deaktiviert",
 	"display_unlock_level":		 	"Freischalte Stufe: ",
 	"display_probability":		 	"Wahrscheinlichkeit: ",
-	"display_disabled":				"Alle Parameter für den Befehl *Display* sind deaktiviert. Bitte aktivieren Sie mindestens einen und versuchen Sie es dann erneut!",
+	"display_disabled":				"Alle Parameter für den Befehl *Display* sind deaktiviert. Bitte aktivieren Sie mindestens einen von ihnen und versuchen Sie es dann erneut!",
 	
 	"double_experience_help":	 	"Verwenden Sie diesen Befehl, um den aktuellen Modus für Ereignisse mit doppelter Erfahrung zu aktualisieren. Wenn Sie *{}* schreiben, wird der aktuelle Modus angezeigt. Diese Modi sind verfügbar:\n\n",
 	"double_experience_help_1":	 	"- **{}**:\nDas Doppelte Erfahrung Ereignis beginnt und endet automatisch.\n",
@@ -566,7 +566,15 @@
 	"reboot":						"**Bot startet jetzt neu!**",
 	
 	"register_help_1":				"Verwenden Sie diesen Befehl, um entweder einen Kanal, eine Rolle, eine Rang-Rolle oder alle Benutzer in einer Gilde zu registrieren. Zum ersten Mal muss eine Administrator-Rolle registriert werden, danach werden alle anderen Funktionen für diesen Befehl freigeschaltet. Schreiben Sie den Rollen-Parameter zusammen mit dem Befehl!",
-	"register_help_2":				"Verwenden Sie diesen Befehl, um entweder einen Kanal, eine Rolle, eine Rang-Rolle oder alle Benutzer in einer Gilde zu registrieren.Verwenden Sie die folgenden Parameter zusammen mit dem Befehl, um weitere Details zu erhalten:\n\n- **{}**:\nRolle registrieren.\n- **{}**:\nKategorie registrieren.\n- **{}**:\nTextkanal registrieren.\n- **{}**:\nAktivieren oder Deaktivieren der Url-Zensierung für einen Textkanal.\n- **{}**:\nAktivieren oder Deaktivieren der Text-Entfernung in einem Textkanal.\n- **{}**:\nAlle Textkanäle registrieren.\n- **{}**:\nRegistrieren Sie eine Rang-Rolle, um sie nach dem Level Aufstieg freizuschalten.\n- **{}**:\nAlle Benutzer im Server registrieren.",
+	"register_help_2":				"Verwenden Sie diesen Befehl, um entweder einen Kanal, eine Rolle, eine Rang-Rolle oder alle Benutzer in einer Gilde zu registrieren.Verwenden Sie die folgenden Parameter zusammen mit dem Befehl, um weitere Details zu erhalten:\n\n",
+	"register_param_1":				"- **{}**:\nRolle registrieren.\n",
+	"register_param_2":				"- **{}**:\nKategorie registrieren.\n",
+	"register_param_3":				"- **{}**:\nTextkanal registrieren.\n",
+	"register_param_4":				"- **{}**:\nAktivieren oder Deaktivieren der Url-Zensierung für einen Textkanal.\n",
+	"register_param_5":				"- **{}**:\nAktivieren oder Deaktivieren der Text-Entfernung in einem Textkanal.\n",
+	"register_param_6":				"- **{}**:\nAlle Textkanäle registrieren.\n",
+	"register_param_7":				"- **{}**:\nRegistrieren Sie eine Rang-Rolle, um sie nach dem Level Aufstieg freizuschalten.\n",
+	"register_param_8":				"- **{}**:\nAlle Benutzer im Server registrieren.",
 	"register_category_help":		"Registrieren Sie Kategories, damit der Bot die meisten seiner Funktionalitäten nutzen kann! Um Kategorien zu registrieren, schreiben Sie den Kategorie Typ als zweiten Parameter und schreiben Sie die Kategory ID als dritten Parameter zusammen mit dem Befehl! Dies sind die verfügbaren Kategorie Typen:\n\n",
 	"register_category_no_types":	"Es wurden keine Kategorien Typen gefunden!",
 	"register_category_registered":	"Kategorie wurde registriert!",
@@ -590,6 +598,7 @@
 	"register_role_assign_start":	"Rolle wird an alle Mitglieder zugewiesen!",
 	"register_role_done":			"Registrierung abgeschlossen!",
 	"register_role_key":			"Diese Rolle erfordert registrierte Giveaway-Belohnungen! Bitte vergessen Sie nicht, diese hochzuladen!",
+	"register_disabled":			"Alle Parameter für den Befehl *Register* sind deaktiviert. Bitte aktivieren Sie mindestens einen von ihnen und versuchen Sie es dann erneut!",
 	
 	"remove_help":					"Entfernen Sie eine registrierte Option! Schreiben Sie einen der folgenden Parameter zusammen mit dem Befehl für weitere Details:\n\n- **{}**:\nEine registrierte Rolle entfernen.\n- **{}**:\nEine registrierte Rang-Rolle entfernen.\n- **{}**:\nEine registrierte Kategorie entfernen.\n- **{}**:\nEinen registrierten Textkanal entfernen.\n- **{}**:\nEntfernen Sie Sprachzensuren aus einem Textkanal.",
 	"remove_role_help":				"Fügen Sie eine Rollen-ID zusammen mit dem vollständigen Befehl zum Entfernen einer registrierten Rolle ein oder geben Sie *{}* ein, um alle registrierten Rollen zu entfernen!",
@@ -734,7 +743,6 @@
 	"shutdown_soon":				"Der Bot fährt in kurze herunter!",
 	
 	"subscribe_help":				"Verwenden Sie diesen Befehl, um Folgendes zu abonnieren. Schreiben Sie es zusammen mit dem gesamten Befehl! Der Befehl kann jederzeit mit `{}` unterbrochen werden!\n",
-	"subscribe_disabled":			"Alle Abonnementtypen sind derzeit deaktiviert!",
 	"subscribe_register_help":		"Möchten Sie einen RSS-Feed oder einen Twitter-Hashtag/Benutzer hinzufügen?\nSchreiben Sie entweder 1, um einen RSS-Feed zu registrieren oder 2, um einen Twitter-Hashtag/Benutzer als zweiten Parameter zu registrieren!",
 	"subscribe_remove_help":		"Entfernen Sie ein registriertes Abonnement, indem Sie es mit einer Nummer auswählen, die unten angezeigt wird:\n\n",
 	"subscribe_format_help":		"Formatieren Sie die Nachrichtenausgabe eines registrierten Abonnements, indem Sie es mit einer Nummer auswählen, die unten angezeigt wird:\n\n",
@@ -752,6 +760,7 @@
 	"subscribe_channel_default":	"STANDARD",
 	"subscribe_status":				"Das Abonnement von **{}** konnte in den letzten 24 Stunden nicht geholt werden. Bitte überprüfen Sie, ob die Url noch verfügbar ist und ob die Berechtigungen für den Textkanal korrekt gesetzt sind.",
 	"subscribe_exit":				"Abonnieren-Befehl unterbrochen!",
+	"subscribe_disabled":			"Alle Parameter für den Befehl *Subscribe* sind deaktiviert. Bitte aktivieren Sie mindestens einen von ihnen und versuchen Sie es dann erneut!",
 	
 	"rss_help": 					"Verfügbare Parameter zum Abonnieren eines RSS-Feeds:\n\n- **{}**:\nAbonnieren Sie einen RSS-Feed!\n- **{}**:\nDefinieren Sie die Anzeigeoptionen für Ihren RSS-Feed! \n- **{}**:\nVerwenden Sie einen bestimmten Kanal neben dem Standardkanal!\n- **{}**:\nEntfernen Sie einen registrierten RSS-Feed!\n- **{}**:\nTesten Sie einen registrierten RSS-Feed!\n- **{}**:\nZeigen Sie eine Liste der registrierten RSS-Feeds!",
 	"rss_register":					"Verwenden Sie jetzt bitte eine RSS-URL!",

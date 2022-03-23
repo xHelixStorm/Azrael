@@ -572,6 +572,14 @@ public enum Translation {
 	
 	REGISTER_HELP_1				("register_help_1"),
 	REGISTER_HELP_2				("register_help_2"),
+	REGISTER_PARAM_1			("register_param_1"),
+	REGISTER_PARAM_2			("register_param_2"),
+	REGISTER_PARAM_3			("register_param_3"),
+	REGISTER_PARAM_4			("register_param_4"),
+	REGISTER_PARAM_5			("register_param_5"),
+	REGISTER_PARAM_6			("register_param_6"),
+	REGISTER_PARAM_7			("register_param_7"),
+	REGISTER_PARAM_8			("register_param_8"),
 	REGISTER_CATEGORY_HELP		("register_category_help"),
 	REGISTER_CATEGORY_NO_TYPES	("register_category_no_types"),
 	REGISTER_CATEGORY_REGISTERED("register_category_registered"),
@@ -595,6 +603,7 @@ public enum Translation {
 	REGISTER_ROLE_ASSIGN_START	("register_role_assign_start"),
 	REGISTER_ROLE_DONE			("register_role_done"),
 	REGISTER_ROLE_KEY			("register_role_key"),
+	REGISTER_DISABLED			("register_disabled"),
 	
 	REMOVE_HELP					("remove_help"),
 	REMOVE_ROLE_HELP			("remove_role_help"),
@@ -739,7 +748,6 @@ public enum Translation {
 	SHUTDOWN_SOON				("shutdown_soon"),
 	
 	SUBSCRIBE_HELP				("subscribe_help"),
-	SUBSCRIBE_DISABLED			("subscribe_disabled"),
 	SUBSCRIBE_REGISTER_HELP		("subscribe_register_help"),
 	SUBSCRIBE_REMOVE_HELP		("subscribe_remove_help"),
 	SUBSCRIBE_FORMAT_HELP		("subscribe_format_help"),
@@ -757,6 +765,7 @@ public enum Translation {
 	SUBSCRIBE_CHANNEL_DEFAULT	("subscribe_channel_default"),
 	SUBSCRIBE_STATUS			("subscribe_status"),
 	SUBSCRIBE_EXIT				("subscribe_exit"),
+	SUBSCRIBE_DISABLED			("subscribe_disabled"),
 
 	TWITCH_HELP					("twitch_help"),
 	TWITCH_REGISTER				("twitch_register"),
