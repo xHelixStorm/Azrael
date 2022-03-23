@@ -127,7 +127,10 @@ public class Register implements CommandPublic {
 				if(registerRankingRole)		sb.append(STATIC.getTranslation(e.getMember(), Translation.REGISTER_PARAM_7).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE)));
 				if(registerUsers)			sb.append(STATIC.getTranslation(e.getMember(), Translation.REGISTER_PARAM_8).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_USERS)));
 				
-				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_HELP_2)+sb.toString()).build()).queue();
+				if(sb.length() > 0)
+					e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_HELP_2)+sb.toString()).build()).queue();
+				else
+					e.getChannel().sendMessage(messageBuild.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_DISABLED)).build()).queue();
 				return true;
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
