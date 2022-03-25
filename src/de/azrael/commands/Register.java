@@ -133,7 +133,7 @@ public class Register implements CommandPublic {
 					e.getChannel().sendMessage(messageBuild.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_DISABLED)).build()).queue();
 				return true;
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_ROLE)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_ROLE);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					RegisterRole.RegisterRoleHelper(e);
@@ -143,10 +143,10 @@ public class Register implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_ROLE)) {
 				return RegisterRole.runCommand(e, guild_id, args, adminPermission);
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY))) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_CATEGORY)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_CATEGORY);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					RegisterCategory.runHelp(e);
@@ -156,10 +156,10 @@ public class Register implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY))) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_CATEGORY)) {
 				RegisterCategory.runCommand(e, args, adminPermission);
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL))) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNEL);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					RegisterChannel.RegisterChannelHelper(e);
@@ -169,10 +169,10 @@ public class Register implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL))) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL)) {
 				return RegisterChannel.runCommand(e, guild_id, args, adminPermission);
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_URL))) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_URL)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_URL)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_URL);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					RegisterChannel.RegisterChannelHelperURL(e);
@@ -182,10 +182,10 @@ public class Register implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_URL))) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_URL)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_URL)) {
 				return RegisterChannel.runCommandURL(e, guild_id, args, adminPermission);
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_TXT))) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_TXT)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_TXT)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_TXT);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					RegisterChannel.RegisterChannelHelperTxt(e);
@@ -195,13 +195,13 @@ public class Register implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_TXT))) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_TXT)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_TXT)) {
 				return RegisterChannel.runCommandTxt(e, guild_id, args, adminPermission);
 			}
-			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNELS))) {
+			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNELS)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNELS)) {
 				return RegisterChannel.runChannelsRegistration(e, guild_id, adminPermission);
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE))) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_RANKING_ROLE)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_RANKING_ROLE);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					RegisterRankingRole.RegisterRankingRoleHelper(e);
@@ -211,10 +211,10 @@ public class Register implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE))) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_RANKING_ROLE)) {
 				return RegisterRankingRole.runCommand(e, guild_id, args, adminPermission);
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_USERS))) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_USERS)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_USERS)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_USERS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 					new Thread(new CollectUsers(e, false)).start();
