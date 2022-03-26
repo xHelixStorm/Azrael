@@ -968,6 +968,7 @@
 	"user_kick_dm":					"Du wurdest von {} gekickt! Danke für ihren Verständnis.\nDas it eine automatische verfasste Nachricht. Nachrichten werden in privat Nachricht nicht erwiedert!",
 	"user_kick_left":				"Aktion konnte nicht ausgeführt werden. Der Benutzer hat den Server bereits verlassen.",
 	"user_register_complete":		"Benutzer Registrierung abgeschlossen!",
+	"user_disabled":				"Benutzer **{}** wurde gefunden! Es sind keine weiteren Aktionen möglich, da alle Parameter deaktiviert sind!",
 	
 	"write_help":					"Schreiben Sie eine Nachricht in einen anderen Textkanal, das auch mit den *Edit* Befehl wieder editiert werden kann!\nAls ersten Parameter, erwähnen Sie den Textkanal oder schreiben Sie eine Textkanal ID, zum Beginnen! Wenn Sie die Nachricht verzögern möchten, schreiben Sie die Minuten als zweiten Parameter.",
 	"write_update":					"Verfassen Sie jetzt eine Nachricht!",

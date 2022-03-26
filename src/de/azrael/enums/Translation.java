@@ -973,6 +973,7 @@ public enum Translation {
 	USER_KICK_DM				("user_kick_dm"),
 	USER_KICK_LEFT				("user_kick_left"),
 	USER_REGISTER_COMPLETE		("user_register_complete"),
+	USER_DISABLED				("user_disabled"),
 		
 	WRITE_HELP					("write_help"),
 	WRITE_UPDATE				("write_update"),

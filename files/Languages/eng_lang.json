@@ -968,6 +968,7 @@
 	"user_kick_dm":					"You have been kicked from {}! Thank you for your understanding.\nThis is an automated reply. You'll receive no reply by writing in direct message!",
 	"user_kick_left":				"Action cannot be executed. User has already left the server.",
 	"user_register_complete":		"Users registration complete!",
+	"user_disabled":				"User **{}** has been found! No further actions are available because all parameters are disabled!",
 	
 	"write_help":					"Write a message into another text channel which then can be updated with the *Edit* command!\nMention the text channel or write out the channel ID as first parameter to begin! If you wish to delay the message, write the minutes as second parameter.",
 	"write_update":					"Now please submit your message!",

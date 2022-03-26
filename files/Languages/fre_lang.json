@@ -968,6 +968,7 @@
     "user_kick_dm":                 "Vous avez été viré de {} ! Merci de votre compréhension. Ceci est une réponse automatique. Vous ne recevrez aucune réponse en écrivant en message direct !",
     "user_kick_left":               "L'action ne peut pas être exécutée. L'utilisateur a déjà quitté le serveur",
     "user_register_complete":       "Enregistrement des utilisateurs terminé !",
+    "user_disabled":				"L'utilisateur **{}** a été trouvé ! Aucune autre action n'est disponible car tous les paramètres sont désactivés !",
     
     "write_help":                   "Écrivez un message dans un autre canal de texte qui peut ensuite être mis à jour avec la commande *Edit* !\nMentionnez le canal de texte ou écrivez l'ID du canal comme premier paramètre pour commencer ! Si vous souhaitez retarder le message, écrivez les minutes comme deuxième paramètre.",
     "write_update":                 "Maintenant, veuillez soumettre votre message !",

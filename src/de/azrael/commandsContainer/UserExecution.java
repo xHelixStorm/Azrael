@@ -105,51 +105,111 @@ public class UserExecution {
 		}
 		
 		if(raw_input != null && (raw_input.length() == 18 || raw_input.length() == 17) && user_name != null && user_name.length() > 0) {
-			StringBuilder out = new StringBuilder();
-			out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_1)
-						.replaceFirst("\\{\\}", user_name).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_2)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_INFORMATION))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_3)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DELETE_MESSAGES))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_4)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNING))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_5)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MUTE))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_6)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_UNMUTE))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_7)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_BAN))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_8)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_UNBAN))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_9)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_KICK))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_10)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ASSIGN_ROLE))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_11)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_ROLE))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_12)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_HISTORY))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_13)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCH))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_14)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_UNWATCH)));
 			final var guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
-			if(guild_settings != null && guild_settings.getRankingState()) {
-				out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_15)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_EXPERIENCE))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_16)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_EXPERIENCE))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_17)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_LEVEL))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_18)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_CURRENCY))
-					+ STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_19)
-						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_CURRENCY)));
+			
+			//parameters are disabled by default in case of errors
+			boolean userInformation = false;
+			boolean userDeleteMessages = false;
+			boolean userWarning = false;
+			boolean userMute = false;
+			boolean userUnmute = false;
+			boolean userBan = false;
+			boolean userUnban = false;
+			boolean userKick = false;
+			boolean userAssignRole = false;
+			boolean userRemoveRole = false;
+			boolean userHistory = false;
+			boolean userWatch = false;
+			boolean userUnwatch = false;
+			boolean userGiftExperience = false;
+			boolean userSetExperience = false;
+			boolean userSetLevel = false;
+			boolean userGiftCurrency = false;
+			boolean userSetCurrency = false;
+			
+			final var subCommands = BotConfiguration.SQLgetCommand(e.getGuild().getIdLong(), 1, Command.USER_INFORMATION, Command.USER_DELETE_MESSAGES
+					, Command.USER_WARNING, Command.USER_MUTE, Command.USER_UNMUTE, Command.USER_BAN, Command.USER_UNBAN, Command.USER_KICK
+					, Command.USER_ASSIGN_ROLE, Command.USER_REMOVE_ROLE, Command.USER_HISTORY, Command.USER_WATCH, Command.USER_UNWATCH
+					, Command.USER_GIFT_EXPERIENCE, Command.USER_SET_EXPERIENCE, Command.USER_SET_LEVEL, Command.USER_GIFT_EXPERIENCE
+					, Command.USER_SET_CURRENCY);
+			
+			for(final var values : subCommands) {
+				boolean enabled = false;
+				name = "";
+				if(values instanceof Boolean)
+					enabled = (Boolean)values;
+				else if(values instanceof String)
+					name = ((String)values).split(":")[0];
+				
+				if(name.equals(Command.USER_INFORMATION.getColumn()))
+					userInformation = enabled;
+				else if(name.equals(Command.USER_DELETE_MESSAGES.getColumn()))
+					userDeleteMessages = enabled;
+				else if(name.equals(Command.USER_WARNING.getColumn()))
+					userWarning = enabled;
+				else if(name.equals(Command.USER_MUTE.getColumn()))
+					userMute = enabled;
+				else if(name.equals(Command.USER_UNMUTE.getColumn()))
+					userUnmute = enabled;
+				else if(name.equals(Command.USER_BAN.getColumn()))
+					userBan = enabled;
+				else if(name.equals(Command.USER_UNBAN.getColumn()))
+					userUnban = enabled;
+				else if(name.equals(Command.USER_KICK.getColumn()))
+					userKick = enabled;
+				else if(name.equals(Command.USER_ASSIGN_ROLE.getColumn()))
+					userAssignRole = enabled;
+				else if(name.equals(Command.USER_REMOVE_ROLE.getColumn()))
+					userRemoveRole = enabled;
+				else if(name.equals(Command.USER_HISTORY.getColumn()))
+					userHistory = enabled;
+				else if(name.equals(Command.USER_WATCH.getColumn()))
+					userWatch = enabled;
+				else if(name.equals(Command.USER_UNWATCH.getColumn()))
+					userUnwatch = enabled;
+				else if(name.equals(Command.USER_GIFT_EXPERIENCE.getColumn()))
+					userGiftExperience = enabled;
+				else if(name.equals(Command.USER_SET_EXPERIENCE.getColumn()))
+					userSetExperience = enabled;
+				else if(name.equals(Command.USER_SET_LEVEL.getColumn()))
+					userSetLevel = enabled;
+				else if(name.equals(Command.USER_GIFT_CURRENCY.getColumn()))
+					userGiftCurrency = enabled;
+				else if(name.equals(Command.USER_SET_CURRENCY.getColumn()))
+					userSetCurrency = enabled;
 			}
-			message.setDescription(out.toString());
-			e.getChannel().sendMessage(message.build()).queue();
-			Hashes.addTempCache(key, new Cache(180000, raw_input));
+			
+			StringBuilder out = new StringBuilder();
+			if(userInformation)			out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_2).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_INFORMATION)));
+			if(userDeleteMessages)		out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_3).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DELETE_MESSAGES)));
+			if(userWarning)				out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_4).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNING)));
+			if(userMute)				out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_5).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MUTE)));
+			if(userUnmute)				out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_6).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_UNMUTE)));
+			if(userBan)					out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_7).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_BAN)));
+			if(userUnban)				out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_8).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_UNBAN)));
+			if(userKick)				out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_9).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_KICK)));
+			if(userAssignRole)			out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_10).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ASSIGN_ROLE)));
+			if(userRemoveRole)			out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_11).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_ROLE)));
+			if(userHistory)				out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_12).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_HISTORY)));
+			if(userWatch)				out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_13).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCH)));
+			if(userUnwatch)				out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_14).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_UNWATCH)));
+			if(guild_settings != null && guild_settings.getRankingState()) {
+				if(userGiftExperience)	out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_15).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_EXPERIENCE)));
+				if(userSetExperience)	out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_16).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_EXPERIENCE)));
+				if(userSetLevel)		out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_17).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_LEVEL)));
+				if(userGiftCurrency)	out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_18).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_CURRENCY)));
+				if(userSetCurrency)		out.append(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_19).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_CURRENCY)));
+			}
+			
+			if(out.length() > 0) {
+				message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_FOUND_1)
+						.replaceFirst("\\{\\}", user_name).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))+out.toString());
+				e.getChannel().sendMessage(message.build()).queue();
+				Hashes.addTempCache(key, new Cache(180000, raw_input));
+			}
+			else {
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DISABLED)).build()).queue();
+			}
 		}
 		else {
 			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_NOT_FOUND)).build()).queue();
@@ -158,7 +218,6 @@ public class UserExecution {
 	
 	public static void performAction(GuildMessageReceivedEvent e, String _message, Cache cache, ArrayList<Channels> _allChannels, BotConfigs botConfig) {
 		var key = "user_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
-		EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail());
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
 			Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
@@ -171,7 +230,7 @@ public class UserExecution {
 			}
 			var user_id = Long.parseLong(cache.getAdditionalInfo().replaceAll("[^0-9]*", ""));
 			if(!cache.getAdditionalInfo().matches("[a-zA-Z\\-]{1,}[\\d]*")) {
-				if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_INFORMATION))) {
+				if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_INFORMATION)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_INFORMATION)) {
 					final var command = BotConfiguration.SQLgetCommand(e.getGuild().getIdLong(), 2, Command.USER_INFORMATION, Command.USER_USE_WATCH_CHANNEL);
 					final var informationLevel = (Integer)command.get(0);
 					if(UserPrivs.comparePrivilege(e.getMember(), informationLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
@@ -196,7 +255,7 @@ public class UserExecution {
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_WATCH_LEVEL), "**"+watchedUser.getLevel()+"**", true);
 							message.addBlankField(false);
 							Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
-							if(guild_settings.getRankingState() == true && user_details != null) {
+							if(guild_settings != null && guild_settings.getRankingState() == true && user_details != null) {
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_LEVEL), "**"+user_details.getLevel()+"**/**"+guild_settings.getMaxLevel()+"**", true);
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_EXPERIENCE), "**"+user_details.getCurrentExperience()+"**/**"+user_details.getRankUpExperience()+"**", true);
 								if(user_details.getCurrentRole() != 0) {
@@ -295,7 +354,7 @@ public class UserExecution {
 					}
 					Hashes.clearTempCache(key);
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_DELETE_MESSAGES))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_DELETE_MESSAGES)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_DELETE_MESSAGES)) {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE)) {
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_HISTORY)) {
 							final var deleteMessagesLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_DELETE_MESSAGES);
@@ -324,7 +383,7 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNING))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNING)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_WARNING)) {
 					final var warningLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_WARNING);
 					if(UserPrivs.comparePrivilege(e.getMember(), warningLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_WARNING_HELP)).build()).queue();
@@ -336,7 +395,7 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_MUTE))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_MUTE)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_MUTE)) {
 					Member member = e.getGuild().getMemberById(user_id);
 					if(member == null)
 						e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_WARNING)).setColor(Color.ORANGE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_LEFT)).build()).queue();
@@ -385,7 +444,7 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_UNMUTE))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_UNMUTE)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_UNMUTE)) {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 						final var unmuteLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_UNMUTE);
 						if(UserPrivs.comparePrivilege(e.getMember(), unmuteLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
@@ -506,7 +565,7 @@ public class UserExecution {
 					}
 					Hashes.clearTempCache(key);
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_BAN))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_BAN)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_BAN)) {
 					Member member = e.getGuild().getMemberById(user_id);
 					if(member == null)
 						e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_WARNING)).setColor(Color.ORANGE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_LEFT)).build()).queue();
@@ -546,7 +605,7 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_UNBAN))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_UNBAN)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_UNBAN)) {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
 						final var unbanLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_UNBAN);
 						if(UserPrivs.comparePrivilege(e.getMember(), unbanLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
@@ -582,7 +641,7 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_KICK))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_KICK)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_KICK)) {
 					Member member = e.getGuild().getMemberById(user_id);
 					if(member == null) {
 						e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_WARNING)).setColor(Color.ORANGE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_LEFT)).build()).queue();
@@ -625,7 +684,7 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ASSIGN_ROLE))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ASSIGN_ROLE)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_ASSIGN_ROLE)) {
 					final var assignRoleLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_ASSIGN_ROLE);
 					if(UserPrivs.comparePrivilege(e.getMember(), assignRoleLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						int count = 0;
@@ -654,7 +713,7 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_ROLE))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_ROLE)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_REMOVE_ROLE)) {
 					final var removeRoleLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_REMOVE_ROLE);
 					if(UserPrivs.comparePrivilege(e.getMember(), removeRoleLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						int count = 0;
@@ -683,7 +742,7 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_HISTORY))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_HISTORY)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_HISTORY)) {
 					final var historyLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_HISTORY);
 					if(UserPrivs.comparePrivilege(e.getMember(), historyLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						StringBuilder out = new StringBuilder();
@@ -708,7 +767,7 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCH))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCH)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_WATCH)) {
 					final var watchLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_WATCH);
 					if(UserPrivs.comparePrivilege(e.getMember(), watchLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 						if(!botConfig.getCacheLog()) {
@@ -726,7 +785,7 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_UNWATCH))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_UNWATCH)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_UNWATCH)) {
 					final var command = BotConfiguration.SQLgetCommand(e.getGuild().getIdLong(), 2, Command.USER_UNWATCH, Command.USER_USE_WATCH_CHANNEL);
 					final var unwatchLevel = (Integer)command.get(0);
 					if(UserPrivs.comparePrivilege(e.getMember(), unwatchLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
@@ -780,19 +839,12 @@ public class UserExecution {
 					}
 					Hashes.clearTempCache(key);
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_EXPERIENCE))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_EXPERIENCE)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_GIFT_EXPERIENCE) && guild_settings != null && guild_settings.getRankingState()) {
 					final var giftExperienceLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_GIFT_EXPERIENCE);
 					if(UserPrivs.comparePrivilege(e.getMember(), giftExperienceLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-						if(guild_settings.getRankingState()) {
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_GIFT_EXP)).build()).queue();
-							cache.updateDescription("gift-experience"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
-						}
-						else {
-							denied.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
-							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
-							Hashes.clearTempCache(key);
-						}
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_GIFT_EXP)).build()).queue();
+						cache.updateDescription("gift-experience"+user_id).setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
@@ -800,19 +852,12 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_EXPERIENCE))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_EXPERIENCE)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_SET_EXPERIENCE) && guild_settings != null && guild_settings.getRankingState()) {
 					final var setExperienceLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_SET_EXPERIENCE);
 					if(UserPrivs.comparePrivilege(e.getMember(), setExperienceLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-						if(guild_settings.getRankingState()) {
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_SET_EXP)).build()).queue();
-							cache.updateDescription("set-experience"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
-						}
-						else {
-							denied.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
-							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
-							Hashes.clearTempCache(key);
-						}
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_SET_EXP)).build()).queue();
+						cache.updateDescription("set-experience"+user_id).setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
@@ -820,19 +865,12 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_LEVEL))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_LEVEL)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_SET_LEVEL) && guild_settings != null && guild_settings.getRankingState()) {
 					final var setLevelLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_SET_LEVEL);
 					if(UserPrivs.comparePrivilege(e.getMember(), setLevelLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-						if(guild_settings.getRankingState()) {
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_LEVEL)).build()).queue();
-							cache.updateDescription("set-level"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
-						}
-						else {
-							denied.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
-							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
-							Hashes.clearTempCache(key);
-						}
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_LEVEL)).build()).queue();
+						cache.updateDescription("set-level"+user_id).setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
@@ -840,19 +878,12 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_CURRENCY))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_CURRENCY)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_GIFT_CURRENCY) && guild_settings != null && guild_settings.getRankingState()) {
 					final var giftCurrencyLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_GIFT_CURRENCY);
 					if(UserPrivs.comparePrivilege(e.getMember(), giftCurrencyLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-						if(guild_settings.getRankingState()) {
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_GIFT_CUR)).build()).queue();
-							cache.updateDescription("gift-currency"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
-						}
-						else {
-							denied.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
-							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
-							Hashes.clearTempCache(key);
-						}
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_GIFT_CUR)).build()).queue();
+						cache.updateDescription("gift-currency"+user_id).setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {
@@ -860,19 +891,12 @@ public class UserExecution {
 						Hashes.clearTempCache(key);
 					}
 				}
-				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_CURRENCY))) {
+				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_CURRENCY)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_SET_CURRENCY) && guild_settings != null && guild_settings.getRankingState()) {
 					final var setCurrencyLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_SET_CURRENCY);
 					if(UserPrivs.comparePrivilege(e.getMember(), setCurrencyLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-						if(guild_settings.getRankingState()) {
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_SET_CUR)).build()).queue();
-							cache.updateDescription("set-currency"+user_id).setExpiration(180000);
-							Hashes.addTempCache(key, cache);
-						}
-						else {
-							denied.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
-							e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
-							Hashes.clearTempCache(key);
-						}
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_SET_CUR)).build()).queue();
+						cache.updateDescription("set-currency"+user_id).setExpiration(180000);
+						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER.getColumn(), _message);
 					}
 					else {

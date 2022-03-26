@@ -968,6 +968,7 @@
     "user_kick_dm":                 "Você foi expulso de {}! Obrigado pela sua compreensão. \nEsta é uma resposta automática. Você não receberá resposta por escrito em mensagem direta! ",
     "user_kick_left":               "A ação não pode ser executada. O usuário já saiu do servidor. ",
     "user_register_complete":       "Registro de usuários concluído!",
+    "user_disabled":				"O utilizador **{}*** foi encontrado! Não estão disponíveis mais acções porque todos os parâmetros estão desactivados!",
     
     "write_help":                   "Escreva uma mensagem em outro canal de texto que pode ser atualizado com o comando *Edit*! \nMencione o canal de texto ou escreva o ID do canal como o primeiro parâmetro para começar! Se desejar atrasar a mensagem, escreva os minutos como segundo parâmetro. ",
     "write_update":                 "Agora, por favor, envie sua mensagem!",
