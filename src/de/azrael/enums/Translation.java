@@ -399,6 +399,14 @@ public enum Translation {
 	EQUIP_SELECT_NUMBER			("equip_select_number"),
 	
 	FILTER_HELP					("filter_help"),
+	FILTER_PARAM_1				("filter_param_1"),
+	FILTER_PARAM_2				("filter_param_2"),
+	FILTER_PARAM_3				("filter_param_3"),
+	FILTER_PARAM_4				("filter_param_4"),
+	FILTER_PARAM_5				("filter_param_5"),
+	FILTER_PARAM_6				("filter_param_6"),
+	FILTER_PARAM_7				("filter_param_7"),
+	FILTER_PARAM_8				("filter_param_8"),
 	FILTER_ABORT				("filter_abort"),
 	FILTER_ACTIONS				("filter_actions"),
 	FILTER_DISPLAY				("filter_display"),
@@ -434,6 +442,7 @@ public enum Translation {
 	FILTER_URL_REMOVE_ERR		("filter_url_remove_err"),
 	FILTER_TWEET_REMOVE_ERR		("filter_tweet_remove_err"),
 	FILTER_WORD_REMOVE_ERR		("filter_word_remove_err"),
+	FILTER_DISABLED				("filter_disabled"),
 	
 	GOOGlE_HELP					("google_help"),
 	GOOGLE_API_NOT_AVAILABLE	("google_api_not_available"),

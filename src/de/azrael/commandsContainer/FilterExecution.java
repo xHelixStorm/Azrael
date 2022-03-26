@@ -29,24 +29,70 @@ public class FilterExecution {
 	private final static Logger logger = LoggerFactory.getLogger(FilterExecution.class);
 	
 	public static void runHelp(GuildMessageReceivedEvent e) {
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS));
-		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_HELP)
-				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))
-				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER))
-				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_FILTER))
-				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_KICK))
-				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FUNNY_NAMES))
-				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_STAFF_NAMES))
-				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_URLS))
-				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ALLOWED_URLS))
-				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_SUBS))).build()).queue();
+		//parameters are disabled by default in case of errors
+		boolean filterWordFilter = false;
+		boolean filterNameFilter = false;
+		boolean filterNameKick = false;
+		boolean filterFunnyNames = false;
+		boolean filterStaffNames = false;
+		boolean filterProhibitedUrls = false;
+		boolean filterAllowedUrls = false;
+		boolean filterProhibitedSubs = false;
+		
+		final var subCommands = BotConfiguration.SQLgetCommand(e.getGuild().getIdLong(), 1, Command.FILTER_WORD_FILTER, Command.FILTER_NAME_FILTER, Command.FILTER_NAME_KICK
+				, Command.FILTER_FUNNY_NAMES, Command.FILTER_STAFF_NAMES, Command.FILTER_PROHIBITED_URLS, Command.FILTER_ALLOWED_URLS, Command.FILTER_PROHIBITED_SUBS);
+		
+		for(final var values : subCommands) {
+			boolean enabled = false;
+			String name = "";
+			if(values instanceof Boolean)
+				enabled = (Boolean)values;
+			else if(values instanceof String)
+				name = ((String)values).split(":")[0];
+			
+			if(name.equals(Command.FILTER_WORD_FILTER.getColumn()))
+				filterWordFilter = enabled;
+			else if(name.equals(Command.FILTER_NAME_FILTER.getColumn()))
+				filterNameFilter = enabled;
+			else if(name.equals(Command.FILTER_NAME_KICK.getColumn()))
+				filterNameKick = enabled;
+			else if(name.equals(Command.FILTER_FUNNY_NAMES.getColumn()))
+				filterFunnyNames = enabled;
+			else if(name.equals(Command.FILTER_STAFF_NAMES.getColumn()))
+				filterStaffNames = enabled;
+			else if(name.equals(Command.FILTER_PROHIBITED_URLS.getColumn()))
+				filterProhibitedUrls = enabled;
+			else if(name.equals(Command.FILTER_ALLOWED_URLS.getColumn()))
+				filterAllowedUrls = enabled;
+			else if(name.endsWith(Command.FILTER_PROHIBITED_SUBS.getColumn()))
+				filterProhibitedSubs = enabled;
+		}
+		
+		StringBuilder sf = new StringBuilder();
+		if(filterWordFilter)	sf.append(STATIC.getTranslation(e.getMember(), Translation.FILTER_PARAM_1).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER)));
+		if(filterNameFilter)	sf.append(STATIC.getTranslation(e.getMember(), Translation.FILTER_PARAM_2).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_FILTER)));
+		if(filterNameKick)		sf.append(STATIC.getTranslation(e.getMember(), Translation.FILTER_PARAM_3).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_KICK)));
+		if(filterFunnyNames)	sf.append(STATIC.getTranslation(e.getMember(), Translation.FILTER_PARAM_4).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FUNNY_NAMES)));
+		if(filterStaffNames)	sf.append(STATIC.getTranslation(e.getMember(), Translation.FILTER_PARAM_5).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_STAFF_NAMES)));
+		if(filterProhibitedUrls)sf.append(STATIC.getTranslation(e.getMember(), Translation.FILTER_PARAM_6).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_URLS)));
+		if(filterAllowedUrls)	sf.append(STATIC.getTranslation(e.getMember(), Translation.FILTER_PARAM_7).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ALLOWED_URLS)));
+		if(filterProhibitedSubs)sf.append(STATIC.getTranslation(e.getMember(), Translation.FILTER_PARAM_8).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_SUBS)));
+		
+		if(sf.length() > 0) {
+			EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS));
+			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_HELP)
+					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))+sf.toString()).build()).queue();
+		}
+		else {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DISABLED)).build()).queue();
+		}
 	}
 	
 	public static void runTask(GuildMessageReceivedEvent e, String _message) {
 		String key = "filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		
-		if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER))) {
+		if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_WORD_FILTER)) {
 			final var wordFilterLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_WORD_FILTER);
 			if(UserPrivs.comparePrivilege(e.getMember(), wordFilterLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("WORD-FILTER");
@@ -57,7 +103,7 @@ public class FilterExecution {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(wordFilterLevel, e.getMember())).build()).queue();
 			}
 		}
-		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_FILTER))) {
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_FILTER)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_NAME_FILTER)) {
 			final var nameFilterLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_NAME_FILTER);
 			if(UserPrivs.comparePrivilege(e.getMember(), nameFilterLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("NAME-FILTER");
@@ -68,7 +114,7 @@ public class FilterExecution {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(nameFilterLevel, e.getMember())).build()).queue();
 			}
 		}
-		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_KICK))) {
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_KICK)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_NAME_KICK)) {
 			final var nameKickLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_NAME_KICK);
 			if(UserPrivs.comparePrivilege(e.getMember(), nameKickLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("NAME-KICK");
@@ -79,7 +125,7 @@ public class FilterExecution {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(nameKickLevel, e.getMember())).build()).queue();
 			}
 		}
-		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_FUNNY_NAMES))) {
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_FUNNY_NAMES)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_FUNNY_NAMES)) {
 			final var funnyNamesLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_FUNNY_NAMES);
 			if(UserPrivs.comparePrivilege(e.getMember(), funnyNamesLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("FUNNY-NAMES");
@@ -90,7 +136,7 @@ public class FilterExecution {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(funnyNamesLevel, e.getMember())).build()).queue();
 			}
 		}
-		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_STAFF_NAMES))) {
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_STAFF_NAMES)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_STAFF_NAMES)) {
 			final var staffNamesLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_STAFF_NAMES);
 			if(UserPrivs.comparePrivilege(e.getMember(), staffNamesLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				message.setTitle("STAFF-NAMES");
@@ -101,34 +147,34 @@ public class FilterExecution {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(staffNamesLevel, e.getMember())).build()).queue();
 			}
 		}
-		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_URLS))) {
-			final var urlBlacklistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_URL_BLACKLIST);
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_URLS)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_PROHIBITED_URLS)) {
+			final var urlBlacklistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_PROHIBITED_URLS);
 			if(UserPrivs.comparePrivilege(e.getMember(), urlBlacklistLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-				message.setTitle("URL-BLACKLIST");
+				message.setTitle("PROHIBITED-URLS");
 				printFilterActions(e, message);
-				Hashes.addTempCache(key, new Cache(180000, "url-blacklist"));
+				Hashes.addTempCache(key, new Cache(180000, "prohibited-urls"));
 			}
 			else {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlBlacklistLevel, e.getMember())).build()).queue();
 			}
 		}
-		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALLOWED_URLS))) {
-			final var urlWhitelistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_URL_WHITELIST);
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALLOWED_URLS)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_ALLOWED_URLS)) {
+			final var urlWhitelistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_ALLOWED_URLS);
 			if(UserPrivs.comparePrivilege(e.getMember(), urlWhitelistLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-				message.setTitle("URL-WHITELIST");
+				message.setTitle("ALLOWED-URLS");
 				printFilterActions(e, message);
-				Hashes.addTempCache(key, new Cache(180000, "url-whitelist"));
+				Hashes.addTempCache(key, new Cache(180000, "allowed-urls"));
 			}
 			else {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlWhitelistLevel, e.getMember())).build()).queue();
 			}
 		}
-		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_SUBS))) {
-			final var tweetBlacklistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_SUBSCRIPTION_BLACKLIST);
+		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_SUBS)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_PROHIBITED_SUBS)) {
+			final var tweetBlacklistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_PROHIBITED_SUBS);
 			if(UserPrivs.comparePrivilege(e.getMember(), tweetBlacklistLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-				message.setTitle("TWEET-BLACKLIST");
+				message.setTitle("PROHIBITED-SUBS");
 				printFilterActions(e, message);
-				Hashes.addTempCache(key, new Cache(180000, "tweet-blacklist"));
+				Hashes.addTempCache(key, new Cache(180000, "prohibited-subs"));
 			}
 			else {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(tweetBlacklistLevel, e.getMember())).build()).queue();
@@ -421,7 +467,7 @@ public class FilterExecution {
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_STAFF_NAMES.getColumn(), _message);
 					}
 				}
-				case "url-blacklist" -> {
+				case "prohibited-urls" -> {
 					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						StringBuilder out = new StringBuilder();
 						for(String word : Azrael.SQLgetURLBlacklist(e.getGuild().getIdLong())) {
@@ -429,13 +475,13 @@ public class FilterExecution {
 						}
 						if(out.length() > 0) {
 							try {
-								String paste_link = Pastebin.unlistedPaste("URL-BLACKLIST", out.toString());
-								message.setTitle("URL-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
+								String paste_link = Pastebin.unlistedPaste("PROHIBITED-URLS", out.toString());
+								message.setTitle("PROHIBITED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST)+paste_link).build()).queue();
 							} catch (IllegalStateException | LoginException | PasteException e2) {
 								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR)).build()).queue();
-								logger.warn("Error on creating pastebin with blacklisted urls in guild {}", e.getGuild().getId(), e2);
+								logger.warn("Error on creating pastebin with prohibited urls in guild {}", e.getGuild().getId(), e2);
 							}
 						}
 						else {
@@ -443,38 +489,38 @@ public class FilterExecution {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST_EMPTY)).build()).queue();
 						}
 						Hashes.clearTempCache(key);
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_BLACKLIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
-						message.setTitle("URL-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
+						message.setTitle("PROHIBITED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FQDN)).build()).queue();
-						cache.updateDescription("insert-url-blacklist").setExpiration(180000);
+						cache.updateDescription("insert-prohibited-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_BLACKLIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
-						message.setTitle("URL-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
+						message.setTitle("PROHIBITED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FQDN)).build()).queue();
-						cache.updateDescription("remove-url-blacklist").setExpiration(180000);
+						cache.updateDescription("remove-prohibited-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_BLACKLIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
-						message.setTitle("URL-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
+						message.setTitle("PROHIBITED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_FQDN)).build()).queue();
-						cache.updateDescription("add-load-url-blacklist").setExpiration(180000);
+						cache.updateDescription("add-load-prohibited-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_BLACKLIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
-						message.setTitle("URL-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
+						message.setTitle("PROHIBITED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_FQDN)).build()).queue();
-						cache.updateDescription("load-url-blacklist").setExpiration(180000);
+						cache.updateDescription("load-prohibited-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_BLACKLIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
 					}
 				}
-				case "url-whitelist" -> {
+				case "allowed-urls" -> {
 					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						StringBuilder out = new StringBuilder();
 						for(String word : Azrael.SQLgetURLWhitelist(e.getGuild().getIdLong())) {
@@ -482,8 +528,8 @@ public class FilterExecution {
 						}
 						if(out.length() > 0) {
 							try {
-								String paste_link = Pastebin.unlistedPaste("URL-WHITELIST", out.toString());
-								message.setTitle("URL-WHITELIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
+								String paste_link = Pastebin.unlistedPaste("ALLOWED-URLS", out.toString());
+								message.setTitle("ALLOWED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST)+paste_link).build()).queue();
 							} catch (IllegalStateException | LoginException | PasteException e2) {
 								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
@@ -496,38 +542,38 @@ public class FilterExecution {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST_EMPTY)).build()).queue();
 						}
 						Hashes.clearTempCache(key);
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_WHITELIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
-						message.setTitle("URL-WHITELIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
+						message.setTitle("ALLOWED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FQDN)).build()).queue();
-						cache.updateDescription("insert-url-whitelist").setExpiration(180000);
+						cache.updateDescription("insert-allowed-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_WHITELIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
-						message.setTitle("URL-WHITELIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
+						message.setTitle("ALLOWED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FQDN)).build()).queue();
-						cache.updateDescription("remove-url-whitelist").setExpiration(180000);
+						cache.updateDescription("remove-allowed-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_WHITELIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
-						message.setTitle("URL-WHITELIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
+						message.setTitle("ALLOWED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_FQDN)).build()).queue();
-						cache.updateDescription("add-load-url-whitelist").setExpiration(180000);
+						cache.updateDescription("add-load-allowed-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_WHITELIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
-						message.setTitle("URL-WHITELIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
+						message.setTitle("ALLOWED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_FQDN)).build()).queue();
-						cache.updateDescription("load-url-whitelist").setExpiration(180000);
+						cache.updateDescription("load-allowed-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_WHITELIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
 					}
 				}
-				case "tweet-blacklist" -> {
+				case "prohibited-subs" -> {
 					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						StringBuilder out = new StringBuilder();
 						for(String word : Azrael.SQLgetSubscriptionBlacklist(e.getGuild().getIdLong())) {
@@ -535,13 +581,13 @@ public class FilterExecution {
 						}
 						if(out.length() > 0) {
 							try {
-								String paste_link = Pastebin.unlistedPaste("TWEET-BLACKLIST", out.toString());
-								message.setTitle("TWEET-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
+								String paste_link = Pastebin.unlistedPaste("PROHIBITED-SUBS", out.toString());
+								message.setTitle("PROHIBITED-SUBS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST)+paste_link).build()).queue();
 							} catch (IllegalStateException | LoginException | PasteException e2) {
 								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR)).build()).queue();
-								logger.warn("Error on creating pastebin with blacklisted tweeters in guild {}!", e.getGuild().getId(), e2);
+								logger.warn("Error on creating pastebin with prohibited subscriptions in guild {}!", e.getGuild().getId(), e2);
 							}
 						}
 						else {
@@ -549,35 +595,35 @@ public class FilterExecution {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST_EMPTY)).build()).queue();
 						}
 						Hashes.clearTempCache(key);
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_SUBSCRIPTION_BLACKLIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
-						message.setTitle("TWEET-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
+						message.setTitle("PROHIBITED-SUBS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_USERNAME)).build()).queue();
-						cache.updateDescription("insert-tweet-blacklist").setExpiration(180000);
+						cache.updateDescription("insert-prohibited-subs").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_SUBSCRIPTION_BLACKLIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
-						message.setTitle("TWEET-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
+						message.setTitle("PROHIBITED-SUBS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_USERNAME)).build()).queue();
-						cache.updateDescription("remove-tweet-blacklist").setExpiration(180000);
+						cache.updateDescription("remove-prohibited-subs").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_SUBSCRIPTION_BLACKLIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
-						message.setTitle("TWEET-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
+						message.setTitle("PROHIBITED-SUBS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_USERNAME)).build()).queue();
-						cache.updateDescription("add-load-tweet-blacklist").setExpiration(180000);
+						cache.updateDescription("add-load-prohibited-subs").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_SUBSCRIPTION_BLACKLIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
-						message.setTitle("TWEET-BLACKLIST "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
+						message.setTitle("PROHIBITED-SUBS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_USERNAME)).build()).queue();
-						cache.updateDescription("load-tweet-blacklist").setExpiration(180000);
+						cache.updateDescription("load-prohibited-subs").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
-						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_SUBSCRIPTION_BLACKLIST.getColumn(), _message);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
 					}
 				}
 				case "display-word-filter" -> {
@@ -962,17 +1008,17 @@ public class FilterExecution {
 					}
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_STAFF_NAMES.getColumn(), _message);
 				}
-				case "insert-url-blacklist" -> {
+				case "insert-prohibited-urls" -> {
 					if((_message.startsWith("http://") || _message.startsWith("https://")) && !_message.matches("[\\s]")) {
 						if(Azrael.SQLInsertURLBlacklist(_message, e.getGuild().getIdLong()) >= 0) {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT_URL)).build()).queue();
 							Hashes.removeURLBlacklist(e.getGuild().getIdLong());
-							logger.info("User {} has inserted the url {} into the url blacklist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+							logger.info("User {} has saved the url {} as a prohibited url in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 						}
 						else {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("URL {} couldn't be inserted into the url blacklist in guild {}", _message, e.getGuild().getId());
+							logger.error("URL {} couldn't be saved as a prohibited url in guild {}", _message, e.getGuild().getId());
 						}
 						Hashes.clearTempCache(key);
 					}
@@ -982,14 +1028,14 @@ public class FilterExecution {
 						cache.setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_BLACKLIST.getColumn(), _message);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
 				}
-				case "remove-url-blacklist" -> {
+				case "remove-prohibited-urls" -> {
 					final var result = Azrael.SQLDeleteURLBlacklist(_message, e.getGuild().getIdLong());
 					if(result > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE_URL)).build()).queue();
 						Hashes.removeURLBlacklist(e.getGuild().getIdLong());
-						logger.info("User {} has removed the url {} from the url blacklist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+						logger.info("User {} has removed the url {} from the prohibited urls in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 					}
 					else if(result == 0) {
 						message.setColor(Color.RED);
@@ -998,12 +1044,12 @@ public class FilterExecution {
 					else {
 						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("URL {} couldn't be removed from the url blacklist in guild {}", _message, e.getGuild().getId());
+						logger.error("URL {} couldn't be removed from the prohibited urls in guild {}", _message, e.getGuild().getId());
 					}
 					Hashes.clearTempCache(key);
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_BLACKLIST.getColumn(), _message);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
 				}
-				case "add-load-url-blacklist", "load-url-blacklist" -> {
+				case "add-load-prohibited-urls", "load-prohibited-urls" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
 							String [] url = Pastebin.readPasteLink(_message).split("[\\r\\n]+");
@@ -1022,7 +1068,7 @@ public class FilterExecution {
 								if(QueryResult == 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN_URL)).build()).queue();
 									Hashes.removeURLBlacklist(e.getGuild().getIdLong());
-									logger.info("User {} has inserted urls with the pastebin url {} into the url blacklist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+									logger.info("User {} has inserted urls with the pastebin url {} into the prohibited urls in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 								}
 								else if(QueryResult == 1) {
 									//throw error for failing the db replacement
@@ -1030,7 +1076,7 @@ public class FilterExecution {
 									var duplicates = checkDuplicates(url);
 									if(duplicates == null || duplicates.size() == 0) {
 										e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.error("The url blacklist couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
+										logger.error("The prohibited urls list couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
 									}
 									else {
 										StringBuilder out = new StringBuilder();
@@ -1044,7 +1090,7 @@ public class FilterExecution {
 									//thow error for failing the rollback
 									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
-									logger.error("Changes on the url blacklist couldn't be rolled back on error in guild {}", e.getGuild().getId());
+									logger.error("Changes on the prohibited urls couldn't be rolled back on error in guild {}", e.getGuild().getId());
 								}
 							}
 							else {
@@ -1054,7 +1100,7 @@ public class FilterExecution {
 						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-							logger.error("Reading pastebin url {} for the url blacklist failed in guild {}", _message, e.getGuild().getId(), e2);
+							logger.error("Reading pastebin url {} for the prohibited urls failed in guild {}", _message, e.getGuild().getId(), e2);
 						}
 						Hashes.clearTempCache(key);
 					}
@@ -1063,19 +1109,19 @@ public class FilterExecution {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 					}
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_BLACKLIST.getColumn(), _message);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
 				}
-				case "insert-url-whitelist" -> {
+				case "insert-allowed-urls" -> {
 					if((_message.startsWith("http://") || _message.startsWith("https://")) && !_message.matches("[\\s]")) {
 						if(Azrael.SQLInsertURLWhitelist(_message, e.getGuild().getIdLong()) >= 0) {
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT_URL)).build()).queue();
 							Hashes.removeURLBlacklist(e.getGuild().getIdLong());
-							logger.info("User {} has inserted the url {} into the url-whitelist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+							logger.info("User {} has saved the url {} as an allowed url in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 						}
 						else {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("URL {} couldn't be inserted into the url whitelist in guild {}", _message, e.getGuild().getId());
+							logger.error("URL {} couldn't be saved as an allowed url in guild {}", _message, e.getGuild().getId());
 						}
 						Hashes.clearTempCache(key);
 					}
@@ -1085,14 +1131,14 @@ public class FilterExecution {
 						cache.setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 					}
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_WHITELIST.getColumn(), _message);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
 				}
-				case "remove-url-whitelist" -> {
+				case "remove-allowed-urls" -> {
 					final var result = Azrael.SQLDeleteURLWhitelist(_message, e.getGuild().getIdLong());
 					if(result > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE_URL)).build()).queue();
 						Hashes.removeURLBlacklist(e.getGuild().getIdLong());
-						logger.info("User {} has removed the url {} from the url whitelist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+						logger.info("User {} has removed the url {} from the allowed urls in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 					}
 					else if(result == 0) {
 						message.setColor(Color.RED);
@@ -1101,12 +1147,12 @@ public class FilterExecution {
 					else {
 						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("URL {} couldn't be removed from the url whitelist in guild {}", _message, e.getGuild().getId());
+						logger.error("URL {} couldn't be removed from the allowed urls in guild {}", _message, e.getGuild().getId());
 					}
 					Hashes.clearTempCache(key);
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_WHITELIST.getColumn(), _message);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
 				}
-				case "add-load-url-whitelist", "load-url-whitelist" -> {
+				case "add-load-allowed-urls", "load-allowed-urls" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
 							String [] url = Pastebin.readPasteLink(_message).split("[\\r\\n]+");
@@ -1125,7 +1171,7 @@ public class FilterExecution {
 								if(QueryResult == 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN_URL)).build()).queue();
 									Hashes.removeURLWhitelist(e.getGuild().getIdLong());
-									logger.info("User {} has inserted urls with the pastebin url {} into the url whitelist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+									logger.info("User {} has inserted urls with the pastebin url {} into the allowed urls in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 								}
 								else if(QueryResult == 1) {
 									//throw error for failing the db replacement
@@ -1133,7 +1179,7 @@ public class FilterExecution {
 									var duplicates = checkDuplicates(url);
 									if(duplicates == null || duplicates.size() == 0) {
 										e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.error("The url whitelist couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
+										logger.error("The allowed urls list couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
 									}
 									else {
 										StringBuilder out = new StringBuilder();
@@ -1147,7 +1193,7 @@ public class FilterExecution {
 									//thow error for failing the rollback
 									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
-									logger.error("Changes on the url whitelist couldn't be rolled back on error in guild {}", e.getGuild().getId());
+									logger.error("Changes on the allowed urls couldn't be rolled back on error in guild {}", e.getGuild().getId());
 								}
 							}
 							else {
@@ -1157,7 +1203,7 @@ public class FilterExecution {
 						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-							logger.error("Reading pastebin url {} for the url blacklist failed in guild {}", _message, e.getGuild().getId(), e2);
+							logger.error("Reading pastebin url {} for the allowed urls failed in guild {}", _message, e.getGuild().getId(), e2);
 						}
 						Hashes.clearTempCache(key);
 					}
@@ -1166,28 +1212,28 @@ public class FilterExecution {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 					}
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_URL_WHITELIST.getColumn(), _message);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
 				}
-				case "insert-tweet-blacklist" -> {
+				case "insert-prohibited-subs" -> {
 					if(Azrael.SQLInsertSubscriptionBlacklist(_message, e.getGuild().getIdLong()) >= 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT_NICK)).build()).queue();
 						Hashes.removeTweetBlacklist(e.getGuild().getIdLong());
-						logger.info("User {} has inserted the username {} into the tweet blacklist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+						logger.info("User {} has saved the username {} as a prohibited subscription in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 					}
 					else {
 						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Username {} couldn't be inserted into the tweet blacklist in guild {}", _message, e.getGuild().getId());
+						logger.error("Username {} couldn't be saved as a prohibited subscription in guild {}", _message, e.getGuild().getId());
 					}
 					Hashes.clearTempCache(key);
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_SUBSCRIPTION_BLACKLIST.getColumn(), _message);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
 				}
-				case "remove-tweet-blacklist" -> {
+				case "remove-prohibited-subs" -> {
 					final var result = Azrael.SQLDeleteSubscriptionBlacklist(_message, e.getGuild().getIdLong());
 					if(result > 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE_NICK)).build()).queue();
 						Hashes.removeTweetBlacklist(e.getGuild().getIdLong());
-						logger.info("User {} has removed the username {} from the tweet blacklist", e.getMember().getUser().getIdLong(), _message);
+						logger.info("User {} has removed the username {} and is no longer a prohibited subscription in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 					}
 					else if(result == 0) {
 						message.setColor(Color.RED);
@@ -1196,12 +1242,12 @@ public class FilterExecution {
 					else {
 						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Username {} couldn't be removed from the tweet blacklist in guild {}", _message, e.getGuild().getId());
+						logger.error("Username {} couldn't be removed and is still available as a prohibited subscription in guild {}", _message, e.getGuild().getId());
 					}
 					Hashes.clearTempCache(key);
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_SUBSCRIPTION_BLACKLIST.getColumn(), _message);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
 				}
-				case "add-load-tweet-blacklist", "load-tweet-blacklist" -> {
+				case "add-load-prohibited-subs", "load-prohibited-subs" -> {
 					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
 						try {
 							String [] usernames = Pastebin.readPasteLink(_message).split("[\\r\\n]+");
@@ -1220,7 +1266,7 @@ public class FilterExecution {
 								if(QueryResult == 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN_NICK)).build()).queue();
 									Hashes.removeURLWhitelist(e.getGuild().getIdLong());
-									logger.info("User {} has inserted usernames with the pastebin url {} into the tweet blacklist in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+									logger.info("User {} has inserted usernames with the pastebin url {} to prohibit subscriptions from in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 								}
 								else if(QueryResult == 1) {
 									//throw error for failing the db replacement
@@ -1228,7 +1274,7 @@ public class FilterExecution {
 									var duplicates = checkDuplicates(usernames);
 									if(duplicates == null || duplicates.size() == 0) {
 										e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.warn("The tweet blacklist couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
+										logger.warn("The list with prohibited subscriptions couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
 									}
 									else {
 										StringBuilder out = new StringBuilder();
@@ -1242,7 +1288,7 @@ public class FilterExecution {
 									//thow error for failing the rollback
 									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
-									logger.error("Changes on the tweet blacklist couldn't be rolled back on error in guild {}", e.getGuild().getId());
+									logger.error("Changes on the prohibited subscriptions couldn't be rolled back on error in guild {}", e.getGuild().getId());
 								}
 							}
 							else {
@@ -1252,7 +1298,7 @@ public class FilterExecution {
 						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-							logger.error("Reading pastebin url {} for the tweet blacklist failed in guild {}", _message, e.getGuild().getId(), e2);
+							logger.error("Reading pastebin url {} for updating prohibited subscriptions failed in guild {}", _message, e.getGuild().getId(), e2);
 						}
 						Hashes.clearTempCache(key);
 					}
@@ -1261,7 +1307,7 @@ public class FilterExecution {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 					}
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_SUBSCRIPTION_BLACKLIST.getColumn(), _message);
+					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
 				}
 			}
 		}
