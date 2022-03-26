@@ -208,7 +208,7 @@ public class UserExecution {
 				Hashes.addTempCache(key, new Cache(180000, raw_input));
 			}
 			else {
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DISABLED)).build()).queue();
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DISABLED).replace("{}", user_name)).build()).queue();
 			}
 		}
 		else {
