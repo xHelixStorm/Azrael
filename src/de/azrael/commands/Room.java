@@ -94,11 +94,11 @@ public class Room implements CommandPublic {
 							else if(room.getStatus() == 2 || room.getStatus() == 4) {
 								boolean paramAvailable = false;
 								String parameters = null;
-								if(UserPrivs.comparePrivilege(e.getMember(), (Integer)commandLevels.get(0)) || admin) {
+								if((UserPrivs.comparePrivilege(e.getMember(), (Integer)commandLevels.get(0)) || admin) && STATIC.getCommandEnabled(e.getGuild(), Command.ROOM_CLOSE)) {
 									parameters = STATIC.getTranslation(e.getMember(), Translation.ROOM_PARAM_1);
 									paramAvailable = true;
 								}
-								if(UserPrivs.comparePrivilege(e.getMember(), (Integer)commandLevels.get(1)) || admin) {
+								if((UserPrivs.comparePrivilege(e.getMember(), (Integer)commandLevels.get(1)) || admin) && STATIC.getCommandEnabled(e.getGuild(), Command.ROOM_WINNER)) {
 									if(paramAvailable)
 										parameters += "\n";
 									else
@@ -110,7 +110,7 @@ public class Room implements CommandPublic {
 									Hashes.addTempCache("room_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "2", ""+room.getRoomID(), (room.getType() == 3 ? "1" : "0")));
 								}
 							}
-							else if(room.getStatus() == 3 && (UserPrivs.comparePrivilege(e.getMember(), (Integer)commandLevels.get(2)) || admin)) {
+							else if(room.getStatus() == 3 && (UserPrivs.comparePrivilege(e.getMember(), (Integer)commandLevels.get(2)) || admin) && STATIC.getCommandEnabled(e.getGuild(), Command.ROOM_REOPEN)) {
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.ROOM_PARAMETERS), STATIC.getTranslation(e.getMember(), Translation.ROOM_PARAM_3), false);
 								Hashes.addTempCache("room_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "3", ""+room.getRoomID(), (room.getType() == 3 ? "1" : "0")));
 							}
