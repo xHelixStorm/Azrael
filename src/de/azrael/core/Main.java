@@ -190,7 +190,6 @@ public class Main {
 				final String dbNumber = prop.getProperty("DATABASE_NUMBER");
 				if(dbNumber != null && dbNumber.trim().matches("^[0-9]*$")) {
 					for(int i = 1; i <= Integer.parseInt(dbNumber.trim()); i++) {
-						final String sourceCodeName = prop.getProperty("DB_"+i+"_SOURCECODE_NAME");
 						final String dbName = prop.getProperty("DB_"+i+"_DB_NAME");
 						final String ip = prop.getProperty("DB_"+i+"_IP", "127.0.0.1");
 						final String port = prop.getProperty("DB_"+i+"_PORT", "3306");
@@ -199,27 +198,22 @@ public class Main {
 						final String user = prop.getProperty("DB_"+i+"_USER");
 						final String pass = prop.getProperty("DB_"+i+"_PASS");
 						
-						if(sourceCodeName == null || dbName == null || user == null || pass == null) {
-							if(sourceCodeName == null)
-								logger.error("Parameter DB_{}_SOURCECODE_NAME not found!", i);
+						if(dbName == null || user == null || pass == null) {
 							if(dbName == null)
 								logger.error("Parameter DB_{}_DB_NAME not found!", i);
 							if(user == null)
 								logger.error("Parameter DB_{}_USER not found!", i);
-							if(pass == null)
-								logger.error("Parameter DB_{}_PASS not found!", i);
 							logger.error("Database configuration couldn't be loaded. Application shutdown!");
 							return;
 						}
 						
-						System.setProperty("DB_"+i+"_SOURCECODE_NAME", sourceCodeName.trim());
 						System.setProperty("DB_"+i+"_DB_NAME", dbName.trim());
 						System.setProperty("DB_"+i+"_IP", ip.trim());
 						System.setProperty("DB_"+i+"_PORT", port.trim());
 						System.setProperty("DB_"+i+"_HOST", host.trim());
 						System.setProperty("DB_"+i+"_TIMEZONE", timezone);
 						System.setProperty("DB_"+i+"_USER", STATIC.decrypt(user.trim()));
-						System.setProperty("DB_"+i+"_PASS", STATIC.decrypt(pass.trim()));
+						System.setProperty("DB_"+i+"_PASS", (pass != null ? STATIC.decrypt(pass.trim()) : null));
 					}
 				}
 				else if(dbNumber == null) {
