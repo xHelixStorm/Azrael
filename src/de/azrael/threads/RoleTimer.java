@@ -12,7 +12,6 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -79,7 +78,7 @@ public class RoleTimer extends ListenerAdapter implements Runnable {
 	@Override
 	public void run() {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTED_TITLE));
-		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN).setThumbnail(IniFileReader.getUnmuteThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_UNMUTED));
+		EmbedBuilder message2 = new EmbedBuilder().setColor(Color.GREEN).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getUnmute()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_UNMUTED));
 		//collect current thread and assign a name to make interruptions possible, if required
 		STATIC.addThread(Thread.currentThread(), "mute_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 		message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());

@@ -12,7 +12,6 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -57,7 +56,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 					Member member = e.getGuild().getMemberById(cache.getAdditionalInfo());
 					var kick_issuer = member.getAsMention();
 					var kick_reason = cache.getAdditionalInfo2();
-					EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.KICK_TITLE));
+					EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getKick()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.KICK_TITLE));
 					STATIC.writeToRemoteChannel(e.getGuild(), kick, STATIC.getTranslation2(e.getGuild(), Translation.KICK_MESSAGE).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", e.getUser().getId()).replace("{}", kick_issuer)+kick_reason, Channel.LOG.getType());
 					Azrael.SQLInsertActionLog("MEMBER_KICK", e.getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
 					Hashes.clearTempCache("kick_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
@@ -85,7 +84,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 							//retrieve the user who kicked and the reason is available from the audit log entry
 							var kick_issuer = entry.getUser().getAsMention();
 							var kick_reason = (entry.getReason() != null && entry.getReason().length() > 0 ? entry.getReason() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON));
-							EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.KICK_TITLE));
+							EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getKick()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.KICK_TITLE));
 							STATIC.writeToRemoteChannel(e.getGuild(), kick, STATIC.getTranslation2(e.getGuild(), Translation.KICK_MESSAGE).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", e.getUser().getId()).replace("{}", kick_issuer)+kick_reason, Channel.LOG.getType());
 							Azrael.SQLInsertActionLog("MEMBER_KICK", e.getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
 							logger.info("User {} has been kicked in guild {}", e.getUser().getId(), e.getGuild().getId());

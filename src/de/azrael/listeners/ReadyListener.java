@@ -25,11 +25,8 @@ import de.azrael.core.CommandHandler;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
-import de.azrael.enums.Weekday;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
-import de.azrael.rankingSystem.DoubleExperienceOff;
 import de.azrael.rankingSystem.DoubleExperienceStart;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -66,15 +63,16 @@ public class ReadyListener extends ListenerAdapter {
 		//Save the time when the Bot successfully booted up
 		STATIC.initializeBootTime();
 		
-		final String tempDirectory = IniFileReader.getTempDirectory();
+		final String tempDirectory = System.getProperty("TEMP_DIRECTORY");
 		//create the temp directory and verify if multiple sessions are running. If yes, terminate this session
 		FileSetting.createTemp(e);
-		if(new File(tempDirectory+STATIC.getSessionName()+"running.azr").exists() && FileSetting.readFile(tempDirectory+STATIC.getSessionName()+"running.azr").contains("1")) {
-			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "2");
+		File session = new File(tempDirectory+System.getProperty("SESSION_NAME")+"running.azr");
+		if(session.exists() && FileSetting.readFile(session.getAbsolutePath()).contains("1")) {
+			FileSetting.createFile(session.getAbsolutePath(), "2");
 			e.getJDA().shutdownNow();
 			return;
 		}
-		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "1");
+		FileSetting.createFile(session.getAbsolutePath(), "1");
 		
 		//print default message + version
 		System.out.println();
@@ -129,6 +127,12 @@ public class ReadyListener extends ListenerAdapter {
 			if(!BotConfiguration.SQLCommandsLevelAvailable(guild.getIdLong())) {
 				if(!BotConfiguration.SQLInsertBotConfigs(guild.getIdLong())) {
 					logger.error("Guild command permissions configuration couldn't be generated in guild {}", guild.getId());
+				}
+			}
+			//verify that commands permissions exist in the bot configurations, else create them
+			if(BotConfiguration.SQLgetThumbnails(guild.getIdLong()).isDefault()) {
+				if(!BotConfiguration.SQLInsertBotConfigs(guild.getIdLong())) {
+					logger.error("Default thumbnails couldn't be generated in guild {}", guild.getId());
 				}
 			}
 			//Retrieve all registered channels and throw warning, if no channel has been registered. If found, check for the log and bot channel
@@ -217,10 +221,10 @@ public class ReadyListener extends ListenerAdapter {
 			//initialize Message pool cache and load saved messages, if available
 			Hashes.initializeGuildMessagePool(guild.getIdLong(), 10000);
 			if(botConfig.getCacheLog()) {
-				if(new File(tempDirectory+"message_pool"+guild.getId()+".json").exists()) {
+				if(new File(tempDirectory+"message_pool"+guild.getId()+".azr").exists()) {
 					JSONObject json = null;
 					try {
-						json = new JSONObject(FileSetting.readFile(tempDirectory+"message_pool"+guild.getId()+".json"));
+						json = new JSONObject(STATIC.decrypt(FileSetting.readFile(tempDirectory+"message_pool"+guild.getId()+".azr")));
 					} catch(JSONException e1) {
 						logger.error("Error in retrieving message pool of past session in guild {}", guild.getId(), e1);
 					}
@@ -285,23 +289,19 @@ public class ReadyListener extends ListenerAdapter {
 			executor.execute(new RoleExtend(g));
 			Azrael.SQLBulkInsertCategories(g.getCategories());
 			Azrael.SQLBulkInsertChannels(g.getTextChannels());
+			
+			//turn on double experience, if it's enabled and is within the day range
+			if(botConfig.getDoubleExperience().equals("auto")) {
+				Calendar calendar = Calendar.getInstance();
+				final int day = calendar.get(Calendar.DAY_OF_WEEK);
+				if(day >= botConfig.getDoubleExperienceStart() && (day%7) <= botConfig.getDoubleExperienceEnd())
+					Hashes.addTempCache("doubleExp_gu"+g.getId(), new Cache("on"));
+			}
 		});
 		
 		//if double experience is enabled, run 2 tasks for the start time and end time
-		if(IniFileReader.getDoubleExpEnabled()) {
-			Calendar calendar = Calendar.getInstance();
-			calendar.set(Calendar.DAY_OF_WEEK, Weekday.getDay(IniFileReader.getDoubleExpStart()));
-			Calendar calendar2 = Calendar.getInstance();
-			calendar2.set(Calendar.DAY_OF_WEEK, Weekday.getDay(IniFileReader.getDoubleExpEnd()));
-			calendar2.set(Calendar.HOUR_OF_DAY, 23);
-			calendar2.set(Calendar.MINUTE, 59);
-			var currentTime = System.currentTimeMillis();
-			//if the bot has started right between the double experience time
-			if(calendar.getTime().getTime() < currentTime && calendar2.getTime().getTime() > currentTime)
-				Hashes.addTempCache("doubleExp", new Cache("on"));
-			DoubleExperienceStart.runTask(e, null, null, null);
-			DoubleExperienceOff.runTask();
-		}
+		DoubleExperienceStart.runTask(e, null, null, null);
+		
 		ClearHashes.runTask();
 		//check later on if there are any residual muted users which were not unmuted
 		VerifyMutedMembers.runTask(e, null, null, true);

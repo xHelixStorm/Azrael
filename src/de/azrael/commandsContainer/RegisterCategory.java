@@ -7,12 +7,13 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.Thumbnails;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Category;
@@ -21,8 +22,8 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class RegisterCategory {
 	private final static Logger logger = LoggerFactory.getLogger(RegisterCategory.class);
 	
-	public static void runHelp(GuildMessageReceivedEvent e) {
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
+	public static void runHelp(GuildMessageReceivedEvent e, Thumbnails thumbnails) {
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(thumbnails.getSettings());
 		StringBuilder strB = new StringBuilder();
 		StringBuilder strB2 = new StringBuilder();
 		
@@ -45,7 +46,7 @@ public class RegisterCategory {
 		}
 	}
 	
-	public static boolean runCommand(GuildMessageReceivedEvent e, String [] args, boolean adminPermission) {
+	public static boolean runCommand(GuildMessageReceivedEvent e, String [] args, boolean adminPermission, Thumbnails thumbnails) {
 		final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_CATEGORY);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			Pattern pattern = Pattern.compile("(ver)");
@@ -87,7 +88,7 @@ public class RegisterCategory {
 			return true;
 		}
 		else {
-			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
 			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
 		return false;

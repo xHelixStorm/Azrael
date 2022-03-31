@@ -13,8 +13,8 @@ import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
 import de.azrael.sql.RankingSystemItems;
 import de.azrael.util.STATIC;
@@ -47,7 +47,7 @@ public class EquipExecution {
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, foundGuilds.get(0)));
 				}
 				else {
-					EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DENIED));
+					EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(guild.getIdLong()).getDenied()).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DENIED));
 					e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention() + STATIC.getTranslation3(e.getAuthor(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, member)).build()).queue();
 				}
 			}
@@ -103,7 +103,7 @@ public class EquipExecution {
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guild_id));
 			}
 			else {
-				EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DENIED));
+				EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(guild.getIdLong()).getDenied()).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DENIED));
 				e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention() + STATIC.getTranslation3(e.getAuthor(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, member)).build()).queue();
 				var cache = Hashes.getTempCache("equip_us"+e.getAuthor().getId()).setExpiration(180000);
 				Hashes.addTempCache("equip_us"+e.getAuthor().getId(), cache);

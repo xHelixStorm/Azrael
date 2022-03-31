@@ -15,8 +15,8 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.enums.WeaponEffect;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
 import de.azrael.sql.RankingSystemItems;
 import de.azrael.util.STATIC;
@@ -53,7 +53,7 @@ public class ShopExecution {
 					priceBuilder.append("*_"+price+"_*\n");
 					index++;
 				}
-				EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail());
+				EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getShop());
 				message.addField(filteredContent.get(0).getSkinDescription(), STATIC.getTranslation(e.getMember(), Translation.SHOP_SHOW), false);
 				message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_DESCRIPTION), builder.toString(), true);
 				message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_PRICE), priceBuilder.toString(), true);
@@ -139,7 +139,7 @@ public class ShopExecution {
 						builder.append(", **"+category+"**");
 					}
 				}
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail()).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_DISPLAY_WEP)+builder.toString()).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getShop()).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_DISPLAY_WEP)+builder.toString()).build()).queue();
 				Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "wea", categories));
 			}
 		}
@@ -168,7 +168,7 @@ public class ShopExecution {
 					priceBuilder.append("*_"+weapon.getPrice()+" "+guild_settings.getCurrency()+"_*\n");
 					index++;
 				}
-				EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail());
+				EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getShop());
 				message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_WEAPONS)+filteredContent.get(0).getCategoryDescription(), STATIC.getTranslation(e.getMember(), Translation.SHOP_SHOW), false);
 				message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_DESCRIPTION), builder.toString(), true);
 				message.addField(STATIC.getTranslation(e.getMember(), Translation.SHOP_PRICE), priceBuilder.toString(), true);
@@ -326,7 +326,7 @@ public class ShopExecution {
 	}
 	
 	public static void displaySkills(GuildMessageReceivedEvent e, Guilds guild_settings) {
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getShopThumbnail());
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getShop());
 		var skills = RankingSystemItems.SQLgetSkills(e.getGuild().getIdLong());
 		if(skills != null) {
 			if(skills.size() > 0) {

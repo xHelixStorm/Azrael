@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import de.azrael.constructors.BotConfigs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.interfaces.CommandPrivate;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
@@ -56,8 +55,8 @@ public class Web implements CommandPublic, CommandPrivate {
 
 	@Override
 	public boolean action(String[] args, PrivateMessageReceivedEvent e) {
-		final String URL = IniFileReader.getWebURL();
-		if(URL != null && URL.length() > 0) {
+		final String URL = System.getProperty("HOMEPAGE");
+		if(URL != null && URL.length() > 0 && URL.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*")) {
 			//Retrieve auth type
 			final int auth_type = AzraelWeb.SQLgetLoginType(e.getAuthor().getIdLong(), e.getJDA().getSelfUser().getIdLong());
 			if(auth_type > 0) {

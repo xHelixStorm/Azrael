@@ -29,7 +29,6 @@ import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.google.GoogleUtils;
 import de.azrael.sql.Azrael;
@@ -71,7 +70,6 @@ public class GuildListener extends ListenerAdapter {
 	public void onGuildMemberJoin(GuildMemberJoinEvent e) {
 		new Thread(() -> {
 			final EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_TITLE));
-			final EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_TITLE));
 			final EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR));
 			logger.trace("User {} has joined in guild {}", e.getUser().getId(), e.getGuild().getId());
 			boolean excludeChannelCreation = false;
@@ -308,6 +306,7 @@ public class GuildListener extends ListenerAdapter {
 				//lookup if the user is using the same name as a registered staff member name
 				final var name = Azrael.SQLgetStaffNames(guild_id).parallelStream().filter(f -> lc_user_name.matches(f+"#[0-9]{4}")).findAny().orElse(null);
 				if(name != null) {
+					final EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getCaught()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_TITLE));
 					nick_assign.setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_STAFF_TITLE)).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
 					//verify if the bot has the permission to manage nicknames
 					if(e.getGuild().getSelfMember().hasPermission(Permission.NICKNAME_MANAGE)) {
@@ -335,6 +334,7 @@ public class GuildListener extends ListenerAdapter {
 					//look up the name filter for not allowed words
 					final var word = Azrael.SQLgetNameFilter(guild_id).parallelStream().filter(f -> lc_user_name.contains(f.getName())).findAny().orElse(null);
 					if(word != null) {
+						final EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getCaught()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_TITLE));
 						if(!word.getKick()) {
 							//verify if the bot has the permission to manage nicknames
 							if(e.getGuild().getSelfMember().hasPermission(Permission.NICKNAME_MANAGE)) {
@@ -364,11 +364,11 @@ public class GuildListener extends ListenerAdapter {
 								e.getMember().getUser().openPrivateChannel().queue(channel -> {
 									channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_DM).replaceFirst("\\{\\}", e.getGuild().getName()).replace("{}", word.getName().toUpperCase())).queue(success -> {
 										e.getGuild().kick(e.getMember()).reason(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase())).queue();
-										nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_TITLE));
+										nick_assign.setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_TITLE));
 										STATIC.writeToRemoteChannel(e.getGuild(), nick_assign, STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_MESSAGE_1).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", word.getName().toUpperCase()), Channel.LOG.getType());
 									}, error -> {
 										e.getGuild().kick(e.getMember()).reason(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase())).queue();
-										nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_TITLE));
+										nick_assign.setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_TITLE));
 										STATIC.writeToRemoteChannel(e.getGuild(), nick_assign, STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_MESSAGE_2).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", word.getName().toUpperCase()), Channel.LOG.getType());
 									});
 								});

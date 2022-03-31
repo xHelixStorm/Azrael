@@ -1,8 +1,6 @@
 package de.azrael.listeners;
 
 import de.azrael.commandsContainer.ScheduleExecution;
-import de.azrael.fileManagement.IniFileReader;
-import de.azrael.rankingSystem.DoubleExperienceOff;
 import de.azrael.rankingSystem.DoubleExperienceStart;
 import de.azrael.timerTask.ClearHashes;
 import de.azrael.timerTask.VerifyMutedMembers;
@@ -26,10 +24,7 @@ public class ReconnectedListener extends ListenerAdapter{
 		//clear all timers
 		STATIC.killAllTimers();
 		//restart all timers
-		if(IniFileReader.getDoubleExpEnabled()) {
-			DoubleExperienceStart.runTask(null, e, null, null);
-			DoubleExperienceOff.runTask();
-		}
+		DoubleExperienceStart.runTask(null, e, null, null);
 		for(final var guild : e.getJDA().getGuilds()) {
 			ScheduleExecution.restartTimers(guild);
 		}

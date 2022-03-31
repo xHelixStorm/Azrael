@@ -35,7 +35,6 @@ import de.azrael.constructors.Watchlist;
 import de.azrael.core.Hashes;
 import de.azrael.enums.GoogleDD;
 import de.azrael.enums.GoogleEvent;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.util.CharacterReplacer;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.entities.Category;
@@ -55,7 +54,7 @@ public class Azrael {
 	}
 	
 	public static synchronized void SQLInsertActionLog(String event, long target_id, long guild_id, String description) {
-		if(IniFileReader.getActionLog()) {
+		if(System.getProperty("ACTION_LOG").equals("true")) {
 			logger.trace("SQLInsertActionLog launched. Passed params {}, {}, {}, {}", event, target_id, guild_id, description);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -78,7 +77,7 @@ public class Azrael {
 	}
 	
 	public static synchronized void SQLInsertCommandLog(long user_id, long guild_id, String command, String params) {
-		if(IniFileReader.getActionLog()) {
+		if(System.getProperty("ACTION_LOG").equals("true")) {
 			logger.trace("SQLInsertCommandLog launched. Passed params {}, {}, {}, {}", user_id, guild_id, command, params);
 			Connection myConn = null;
 			PreparedStatement stmt = null;

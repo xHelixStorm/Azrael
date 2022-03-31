@@ -9,9 +9,9 @@ import de.azrael.constructors.BotConfigs;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.threads.LowerHeavyCensoring;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -53,7 +53,7 @@ public class HeavyCensoring implements CommandPublic {
 					//only enable if heavy censoring is disabled or empty
 					if(heavyCensoring == null || !heavyCensoring) {
 						Hashes.addHeavyCensoring(e.getGuild().getIdLong(), true);
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_ENABLED)).setThumbnail(IniFileReader.getHeavyThumbnail()).build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_ENABLED)).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getHeavy()).build()).queue();
 						logger.info("User {} has enabled heavy censoring in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 						new Thread(new LowerHeavyCensoring(e)).start();
 					}
@@ -67,7 +67,7 @@ public class HeavyCensoring implements CommandPublic {
 					if(heavyCensoring != null && heavyCensoring) {
 						//clear all heavy censoring related HashMaps and thread
 						Hashes.addHeavyCensoring(e.getGuild().getIdLong(), false);
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_DISABLED)).setThumbnail(IniFileReader.getHeavyEndThumbnail()).build()).queue();
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.HEAVY_CENSORING_DISABLED)).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getHeavyEnd()).build()).queue();
 						logger.info("User {} has disabled heavy censoring in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 						Hashes.removeCensoreMessage(e.getGuild().getIdLong());
 						Hashes.removeFilterThreshold(e.getGuild().getIdLong());

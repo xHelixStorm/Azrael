@@ -12,6 +12,8 @@ public class BotConfigs {
 	private boolean channelLog;
 	private boolean cacheLog;
 	private String doubleExperience;
+	private int doubleExperienceStart;
+	private int doubleExperienceEnd;
 	private boolean forceReason;
 	private boolean overrideBan;
 	private boolean urlBlacklist;
@@ -41,6 +43,8 @@ public class BotConfigs {
 		this.channelLog = false;
 		this.cacheLog = false;
 		this.doubleExperience = "off";
+		this.doubleExperienceStart = 7;
+		this.doubleExperienceEnd = 1;
 		this.forceReason = false;
 		this.overrideBan = false;
 		this.urlBlacklist = false;
@@ -67,6 +71,8 @@ public class BotConfigs {
 	 * @param _channelLog
 	 * @param _cacheLog
 	 * @param _doubleExperience
+	 * @param _doubleExperienceStart
+	 * @param _doubleExperienceEnd
 	 * @param _forceReason
 	 * @param _overrideBan
 	 * @param _urlBlacklist
@@ -86,10 +92,11 @@ public class BotConfigs {
 	 */
 	
 	public BotConfigs(String _commandPrefix, boolean _joinMessage, boolean _leaveMessage, boolean _channelLog
-			, boolean _cacheLog, String _doubleExperience, boolean _forceReason, boolean _overrideBan, boolean _urlBlacklist
-			, boolean _selfDeletedMessages, boolean _editedMessages, boolean _editedMessagesHistory, boolean _notifications, boolean _newAccountOnJoin
-			, boolean _reassignRoles, boolean _collectRankingRoles, int _expRateLimit, boolean _ignoreMissingPermissions, boolean _privatePatchNotes
-			, boolean _publicPatchNotes, boolean _googleFunctionalities, String _googleMainEmail) {
+			, boolean _cacheLog, String _doubleExperience, int _doubleExperienceStart, int _doubleExperienceEnd
+			, boolean _forceReason, boolean _overrideBan, boolean _urlBlacklist, boolean _selfDeletedMessages
+			, boolean _editedMessages, boolean _editedMessagesHistory, boolean _notifications, boolean _newAccountOnJoin
+			, boolean _reassignRoles, boolean _collectRankingRoles, int _expRateLimit, boolean _ignoreMissingPermissions
+			, boolean _privatePatchNotes, boolean _publicPatchNotes, boolean _googleFunctionalities, String _googleMainEmail) {
 		
 		this.isDefault = false;
 		this.commandPrefix = _commandPrefix;
@@ -98,6 +105,8 @@ public class BotConfigs {
 		this.channelLog = _channelLog;
 		this.cacheLog = _cacheLog;
 		this.doubleExperience = _doubleExperience;
+		this.doubleExperienceStart = _doubleExperienceStart;
+		this.doubleExperienceEnd = _doubleExperienceEnd;
 		this.forceReason = _forceReason;
 		this.overrideBan = _overrideBan;
 		this.urlBlacklist = _urlBlacklist;
@@ -138,6 +147,12 @@ public class BotConfigs {
 		if(this.doubleExperience.equals("off") || this.doubleExperience.equals("on") || this.doubleExperience.equals("auto"))
 			return this.doubleExperience;
 		return "off";
+	}
+	public int getDoubleExperienceStart() {
+		return this.doubleExperienceStart;
+	}
+	public int getDoubleExperienceEnd() {
+		return this.doubleExperienceEnd;
 	}
 	public boolean getForceReason() {
 		return this.forceReason;

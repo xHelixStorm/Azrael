@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.JDA;
@@ -33,16 +32,19 @@ public class ShutdownListener extends ListenerAdapter {
 	
 	@Override
 	public void onShutdown(ShutdownEvent e) {
+		final String sessionName = System.getProperty("SESSION_NAME");
+		final String fileName = System.getProperty("TEMP_DIRECTORY")+sessionName+"running.azr";
+		
 		//retrieve the file with the bot state (e.g. running / not running)
-		String filecontent = FileSetting.readFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr");
+		String filecontent = FileSetting.readFile(fileName);
 		
 		//execute if the bot is labeled as running
 		if(filecontent.contains("1")) {
-			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
+			FileSetting.createFile(fileName, "0");
 			try {
 				Process proc;
 				//execute command to restart the bot
-				proc = Runtime.getRuntime().exec((IniFileReader.getLinuxScreen() ? "screen -dm "+(STATIC.getSessionName().length() > 0 ? "-S "+STATIC.getSessionName()+" " : "") : "")+"java -jar --enable-preview Azrael.jar "+compileParameters());
+				proc = Runtime.getRuntime().exec("screen -dm -S "+sessionName+" java -jar Azrael.jar "+compileParameters());
 				proc.waitFor();
 			} catch (IOException | InterruptedException e1) {
 				logger.error("Bot couldn't be restarted!");
@@ -51,7 +53,7 @@ public class ShutdownListener extends ListenerAdapter {
 		
 		//check if a duplicate session has been started and terminate the current session, if it occurred
 		if(filecontent.contains("2")) {
-			FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "1");
+			FileSetting.createFile(fileName, "1");
 			logger.warn("Duplicate running session shut down!");
 			Azrael.SQLInsertActionLog("DUPLICATE_SESSION", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
 		}
@@ -65,27 +67,17 @@ public class ShutdownListener extends ListenerAdapter {
 	
 	private static String compileParameters() {
 		StringBuilder params = new StringBuilder();
-		params.append(STATIC.getToken());
-		if(STATIC.getSessionName().length() > 0)
-			params.append(" sessionname:"+STATIC.getSessionName());
-		if(STATIC.getTimezone().length() > 0)
-			params.append(" timezone:"+STATIC.getTimezone());
-		if(STATIC.getActionLog().length() > 0)
-			params.append(" actionlog:"+STATIC.getActionLog());
-		if(STATIC.getDoubleExperience().length() > 0)
-			params.append(" doubleexperience:"+STATIC.getDoubleExperience());
-		if(STATIC.getDoubleExperienceStart().length() > 0)
-			params.append(" doubleexperiencestart:"+STATIC.getDoubleExperienceStart());
-		if(STATIC.getDoubleExperienceEnd().length() > 0)
-			params.append(" doubleexperienceend:"+STATIC.getDoubleExperienceEnd());
-		if(STATIC.getCountMembers().length() > 0)
-			params.append(" countmembers:"+STATIC.getCountMembers());
-		if(STATIC.getFileLogger().length() > 0)
-			params.append(" filelogger:"+STATIC.getFileLogger());
-		if(STATIC.getGameMessage().length() > 0)
-			params.append(" gamemessage:"+STATIC.getGameMessage());
-		if(STATIC.getTemp().length() > 0)
-			params.append(" temp:"+STATIC.getTemp());
+		params.append(System.getProperty("TOKEN"));
+		params.append(" sessionname:"+System.getProperty("SESSION_NAME"));
+		params.append(" encryption:"+System.getProperty("AES_SECRET"));
+		params.append(" actionlog:"+System.getProperty("ACTION_LOG"));
+		params.append(" countguilds:"+System.getProperty("COUNT_GUILDS"));
+		params.append(" filelog:"+System.getProperty("FILE_LOG"));
+		params.append(" statusmessage:"+System.getProperty("STATUS_MESSAGE"));
+		params.append(" homepage:"+System.getProperty("HOMEPAGE"));
+		params.append(" port:"+System.getProperty("WEBSERVER_PORT"));
+		params.append(" temp:"+System.getProperty("TEMP_DIRECTORY"));
+		params.append(" spreadsheetdelay:"+System.getProperty("SPREADSHEET_UPDATE_DELAY"));
 		
 		return params.toString();
 	}

@@ -8,13 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Channels;
+import de.azrael.constructors.Thumbnails;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.preparedMessages.ReactionMessage;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.subscription.SubscriptionUtils;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -30,8 +31,8 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class RegisterChannel {
 	private static final Logger logger = LoggerFactory.getLogger(RegisterChannel.class);
 	
-	public static void RegisterChannelHelper(GuildMessageReceivedEvent e) {
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
+	public static void RegisterChannelHelper(GuildMessageReceivedEvent e, Thumbnails thumbnails) {
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(thumbnails.getSettings());
 		StringBuilder strB = new StringBuilder();
 		StringBuilder strB2 = new StringBuilder();
 		
@@ -54,20 +55,20 @@ public class RegisterChannel {
 	}
 	
 	public static void RegisterChannelHelperURL(GuildMessageReceivedEvent e) {
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getSettings());
 		e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_URL_HELP)
 				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))
 				.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))).build()).queue();
 	}
 	
 	public static void RegisterChannelHelperTxt(GuildMessageReceivedEvent e) {
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getSettings());
 		e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_TXT_HELP)
 				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))
 				.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))).build()).queue();
 	}
 	
-	public static boolean runCommand(GuildMessageReceivedEvent e, long guild_id, String [] args, boolean adminPermission) {
+	public static boolean runCommand(GuildMessageReceivedEvent e, long guild_id, String [] args, boolean adminPermission, Thumbnails thumbnails) {
 		String channel;
 		long channel_id;
 		String channel_type;
@@ -126,13 +127,13 @@ public class RegisterChannel {
 			return true;
 		}
 		else {
-			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(thumbnails.getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
 			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
 		return false;
 	}
 	
-	public static boolean runCommandURL(GuildMessageReceivedEvent e, long _guild_id, String [] args, boolean adminPermission) {
+	public static boolean runCommandURL(GuildMessageReceivedEvent e, long _guild_id, String [] args, boolean adminPermission, Thumbnails thumbnails) {
 		final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_URL);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			var channel = args[1].replaceAll("[<>#]", "");
@@ -160,13 +161,13 @@ public class RegisterChannel {
 			return true;
 		}
 		else {
-			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(thumbnails.getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
 		return false;
 	}
 	
-	public static boolean runCommandTxt(GuildMessageReceivedEvent e, long _guild_id, String [] args, boolean adminPermission) {
+	public static boolean runCommandTxt(GuildMessageReceivedEvent e, long _guild_id, String [] args, boolean adminPermission, Thumbnails thumbnails) {
 		final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_TXT);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			var channel = args[1].replaceAll("[<>#]", "");
@@ -194,13 +195,13 @@ public class RegisterChannel {
 			return false;
 		}
 		else {
-			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(thumbnails.getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
 		return true;
 	}
 	
-	public static boolean runChannelsRegistration(GuildMessageReceivedEvent e, long _guild_id, boolean adminPermission) {
+	public static boolean runChannelsRegistration(GuildMessageReceivedEvent e, long _guild_id, boolean adminPermission, Thumbnails thumbnails) {
 		final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNELS);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			for(TextChannel tc : e.getGuild().getTextChannels()) {
@@ -214,7 +215,7 @@ public class RegisterChannel {
 			return true;
 		}
 		else {
-			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(thumbnails.getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
 			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
 		return false;

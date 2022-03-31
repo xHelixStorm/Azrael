@@ -14,9 +14,9 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -125,7 +125,7 @@ public class Quiz implements CommandPublic {
 			}
 		}
 		else {
-			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED)).setThumbnail(IniFileReader.getDeniedThumbnail());
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED)).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getDenied());
 			e.getChannel().sendMessage(denied.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_ERR)).build()).queue();
 		}
 		return true;

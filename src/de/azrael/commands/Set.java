@@ -27,7 +27,6 @@ import de.azrael.constructors.Dailies;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -56,7 +55,7 @@ public class Set implements CommandPublic {
 		var adminPermission = BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-			EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
+			EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getSettings());
 			if(args.length == 0) {
 				//parameters are disabled by default
 				boolean setPermissions = false;

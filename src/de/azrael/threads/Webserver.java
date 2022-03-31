@@ -13,7 +13,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.util.STATIC;
 import de.azrael.webserver.HandlerGET;
 import de.azrael.webserver.HandlerPOST;
 import de.azrael.webserver.WebserviceUtils;
@@ -85,7 +84,7 @@ public class Webserver implements Runnable {
 									final String header = in.readLine();
 									if(header.startsWith("Token:")) {
 										String [] token = header.split(" ");
-										if(token.length == 2 && STATIC.getToken().equals(token[1])) {
+										if(token.length == 2 && System.getProperty("TOKEN").equals(token[1])) {
 											tokenVerified = true;
 											break;
 										}

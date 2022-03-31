@@ -11,7 +11,6 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -51,7 +50,7 @@ public class MuteRestart implements Runnable {
 
 	@Override
 	public void run() {
-		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setThumbnail(IniFileReader.getUnmuteThumbnail()).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_UNMUTED));
+		EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setThumbnail(BotConfiguration.SQLgetThumbnails(guild.getIdLong()).getUnmute()).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_UNMUTED));
 		long user_id = member.getUser().getIdLong();
 		String effectiveName = member.getEffectiveName();
 		STATIC.addThread(Thread.currentThread(), "mute_gu"+guild.getId()+"us"+user_id);

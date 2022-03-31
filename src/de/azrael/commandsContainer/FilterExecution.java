@@ -16,7 +16,6 @@ import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.util.CharacterReplacer;
@@ -100,7 +99,7 @@ public class FilterExecution {
 				Hashes.addTempCache(key, new Cache(180000, "word-filter"));
 			}
 			else {
-				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(wordFilterLevel, e.getMember())).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getDenied()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(wordFilterLevel, e.getMember())).build()).queue();
 			}
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_FILTER)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_NAME_FILTER)) {
@@ -111,7 +110,7 @@ public class FilterExecution {
 				Hashes.addTempCache(key, new Cache(180000, "name-filter"));
 			}
 			else {
-				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(nameFilterLevel, e.getMember())).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getDenied()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(nameFilterLevel, e.getMember())).build()).queue();
 			}
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_KICK)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_NAME_KICK)) {
@@ -122,7 +121,7 @@ public class FilterExecution {
 				Hashes.addTempCache(key, new Cache(180000, "name-kick"));
 			}
 			else {
-				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(nameKickLevel, e.getMember())).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getDenied()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(nameKickLevel, e.getMember())).build()).queue();
 			}
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_FUNNY_NAMES)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_FUNNY_NAMES)) {
@@ -133,7 +132,7 @@ public class FilterExecution {
 				Hashes.addTempCache(key, new Cache(180000, "funny-names"));
 			}
 			else {
-				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(funnyNamesLevel, e.getMember())).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getDenied()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(funnyNamesLevel, e.getMember())).build()).queue();
 			}
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_STAFF_NAMES)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_STAFF_NAMES)) {
@@ -144,7 +143,7 @@ public class FilterExecution {
 				Hashes.addTempCache(key, new Cache(180000, "staff-names"));
 			}
 			else {
-				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(staffNamesLevel, e.getMember())).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getDenied()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(staffNamesLevel, e.getMember())).build()).queue();
 			}
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_URLS)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_PROHIBITED_URLS)) {
@@ -155,7 +154,7 @@ public class FilterExecution {
 				Hashes.addTempCache(key, new Cache(180000, "prohibited-urls"));
 			}
 			else {
-				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlBlacklistLevel, e.getMember())).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getDenied()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlBlacklistLevel, e.getMember())).build()).queue();
 			}
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALLOWED_URLS)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_ALLOWED_URLS)) {
@@ -166,7 +165,7 @@ public class FilterExecution {
 				Hashes.addTempCache(key, new Cache(180000, "allowed-urls"));
 			}
 			else {
-				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlWhitelistLevel, e.getMember())).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getDenied()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(urlWhitelistLevel, e.getMember())).build()).queue();
 			}
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_SUBS)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_PROHIBITED_SUBS)) {
@@ -177,7 +176,7 @@ public class FilterExecution {
 				Hashes.addTempCache(key, new Cache(180000, "prohibited-subs"));
 			}
 			else {
-				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(tweetBlacklistLevel, e.getMember())).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getDenied()).setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(tweetBlacklistLevel, e.getMember())).build()).queue();
 			}
 		}
 		else {

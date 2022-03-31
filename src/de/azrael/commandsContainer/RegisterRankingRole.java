@@ -5,11 +5,11 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.Thumbnails;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -24,12 +24,12 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class RegisterRankingRole {
 	private final static Logger logger = LoggerFactory.getLogger(RegisterRankingRole.class);
 	
-	public static void RegisterRankingRoleHelper(GuildMessageReceivedEvent e) {
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
+	public static void RegisterRankingRoleHelper(GuildMessageReceivedEvent e, Thumbnails thumbnails) {
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(thumbnails.getSettings());
 		e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_HELP)).build()).queue();
 	}
 	
-	public static boolean runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission) {
+	public static boolean runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission, Thumbnails thumbnails) {
 		long guild_id = e.getGuild().getIdLong();
 		long role_id = 0;
 		String role_name = "";
@@ -88,7 +88,7 @@ public class RegisterRankingRole {
 			return true;
 		}
 		else {
-			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(thumbnails.getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
 			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
 		return false;

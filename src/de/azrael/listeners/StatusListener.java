@@ -1,7 +1,5 @@
 package de.azrael.listeners;
 
-import de.azrael.fileManagement.IniFileReader;
-import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.events.user.update.UserUpdateOnlineStatusEvent;
@@ -21,15 +19,15 @@ public class StatusListener extends ListenerAdapter {
 	public void onUserUpdateOnlineStatus(UserUpdateOnlineStatusEvent e) {
 		new Thread(() -> {
 			//if enabled in config file, check how many users are online and set it as currently playing
-			if(IniFileReader.getCountMembers() && (e.getNewOnlineStatus().toString().equals("OFFLINE") || e.getNewOnlineStatus().toString().equals("ONLINE"))) {
-				e.getJDA().getPresence().setActivity(Activity.of(ActivityType.DEFAULT, e.getGuild().getMembers().parallelStream().filter(f -> f.getOnlineStatus() == OnlineStatus.ONLINE || f.getOnlineStatus() == OnlineStatus.IDLE || f.getOnlineStatus() == OnlineStatus.DO_NOT_DISTURB).count()+" Discord Members online"));
+			if(System.getProperty("COUNT_GUILDS").equals("true") && (e.getNewOnlineStatus().toString().equals("OFFLINE") || e.getNewOnlineStatus().toString().equals("ONLINE"))) {
+				e.getJDA().getPresence().setActivity(Activity.of(ActivityType.DEFAULT, e.getJDA().getGuilds().size()+" Discord servers"));
 			}
 			else {
 				//set the game message if provided
-				final String message = IniFileReader.getGameMessage();
+				final String message = System.getProperty("STATUS_MESSAGE");
 				if(message != null && message.length() > 0 && !message.equals(oldActivity)) {
 					oldActivity = message;
-					e.getJDA().getPresence().setActivity(Activity.of(ActivityType.DEFAULT, IniFileReader.getGameMessage()));
+					e.getJDA().getPresence().setActivity(Activity.of(ActivityType.DEFAULT, message));
 				}
 			}
 		}).start();

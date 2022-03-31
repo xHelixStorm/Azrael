@@ -11,7 +11,6 @@ import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
 import de.azrael.timerTask.MessageSchedule;
 import de.azrael.util.STATIC;
@@ -92,7 +91,7 @@ public class ScheduleExecution {
 			if(textChannel != null) {
 				if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.MESSAGE_WRITE))) {
 					schedule.setChannelId(textChannel.getIdLong());
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_CREATE3).replace("{}", IniFileReader.getTimezone())).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_CREATE3).replace("{}", System.getProperty("DB_1_TIMEZONE"))).build()).queue();
 					Hashes.addTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000).updateDescription2("time").setObject(schedule));
 				}
 				else {

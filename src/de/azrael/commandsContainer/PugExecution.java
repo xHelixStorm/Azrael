@@ -7,8 +7,8 @@ import java.io.IOException;
 import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.preparedMessages.PugUsage;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class PugExecution {
 	public static void Execute(GuildMessageReceivedEvent e, String [] _variable, String _path, long channel_id) throws IOException{
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail(IniFileReader.getPugThumbnail());
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.PINK).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getPug());
 		var variable = _variable;
 		String path = _path;
 		String pictureName = "";

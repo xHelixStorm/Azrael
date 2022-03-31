@@ -13,7 +13,6 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -89,7 +88,7 @@ public class BanListener extends ListenerAdapter {
 						var ban_issuer = member.getAsMention();
 						var ban_reason = cache.getAdditionalInfo2();
 						
-						EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
+						EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getBan()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
 						//retrieve max allowed warnings per guild and print a message depending on the applied warnings before ban
 						int max_warning_id = Azrael.SQLgetMaxWarning(guild_id);
 						if(user.getWarningID() == 0) {
@@ -115,7 +114,7 @@ public class BanListener extends ListenerAdapter {
 							getBanAuditLog(e, user_id, guild_id, log_channel, user);
 						}
 						else {
-							EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
+							EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getBan()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
 							textChannel.sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_4).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE)).replace("{}", STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON))).build()).queue();
 							logger.warn("VIEW AUDIT LOGS permission required in guild {}", e.getGuild().getId());
 						}
@@ -141,7 +140,7 @@ public class BanListener extends ListenerAdapter {
 					ban_issuer = entry.getUser().getAsMention();
 					ban_reason = (entry.getReason() != null && entry.getReason().length() > 0 ? entry.getReason() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON));
 				
-					EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
+					EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getBan()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
 					//retrieve max allowed warnings per guild and print a message depending on the applied warnings before ban
 					int max_warning_id = Azrael.SQLgetMaxWarning(guild_id);
 					if(user.getWarningID() == 0) {

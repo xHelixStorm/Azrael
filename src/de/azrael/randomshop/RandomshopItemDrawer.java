@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Weapons;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -70,10 +69,10 @@ public class RandomshopItemDrawer {
 			}
 			g.setFont(new Font("Nexa Bold", Font.BOLD, generalFontSize));
 			g.drawString(current_page+" / "+ last_page, pageX+getCenteredString(current_page+" / "+ last_page, 0, g), pageY);
-			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png"));
+			ImageIO.write(overlay, "png", new File(System.getProperty("TEMP_DIRECTORY")+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png"));
 			g.dispose();
 			
-			File file1 = new File(IniFileReader.getTempDirectory()+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png");
+			File file1 = new File(System.getProperty("TEMP_DIRECTORY")+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png");
 			channel.sendFile(file1, "randomshop.png").queue(m -> {
 				file1.delete();
 			});

@@ -49,7 +49,6 @@ import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -99,22 +98,9 @@ public class STATIC {
 	
 	private static OffsetDateTime bootTime = null;
 	
-	private static String TOKEN = "";
-	private static String SESSION_NAME = "";
-	private static String TIMEZONE = "";
-	private static String ACTIONLOG = "";
-	private static String DOUBLEEXPERIENCE = "";
-	private static String DOUBLEEXPERIENCESTART = "";
-	private static String DOUBLEEXPERIENCEEND = "";
-	private static String COUNTMEMBERS = "";
-	private static String GAMEMESSAGE = "";
-	private static String FILELOGGER = "";
-	private static String TEMP = "";
-	private static int PORT = 0;
 	private static TwitterFactory twitterFactory = null;
 	private static final CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<Thread>();
 	private static final CopyOnWriteArrayList<Timer> timers = new CopyOnWriteArrayList<Timer>();
-	private static final String AESSECRET = IniFileReader.getAESSecret();
 	
 	public static String getVersion() {
 		return VERSION;
@@ -243,9 +229,10 @@ public class STATIC {
 		final String ip = System.getProperty("DB_"+setup+"_IP");
 		final String port = System.getProperty("DB_"+setup+"_PORT");
 		final String database = System.getProperty("DB_"+setup+"_DB_NAME");
+		final String timezone = System.getProperty("DB_"+setup+"_TIMEZONE");
 		final String user = System.getProperty("DB_"+setup+"_USER");
 		final String pass = System.getProperty("DB_"+setup+"_PASS");
-		return DriverManager.getConnection("jdbc:mysql://"+(!host.isEmpty() ? host : ip)+":"+port+"/"+database+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="+IniFileReader.getTimezone()
+		return DriverManager.getConnection("jdbc:mysql://"+(!host.isEmpty() ? host : ip)+":"+port+"/"+database+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="+timezone
 			, user, pass);
 	}
 	public static Connection getDatabaseURL(final int setup, String param) throws SQLException {
@@ -253,9 +240,10 @@ public class STATIC {
 		final String ip = System.getProperty("DB_"+setup+"_IP");
 		final String port = System.getProperty("DB_"+setup+"_PORT");
 		final String database = System.getProperty("DB_"+setup+"_DB_NAME");
+		final String timezone = System.getProperty("DB_"+setup+"_TIMEZONE");
 		final String user = System.getProperty("DB_"+setup+"_USER");
 		final String pass = System.getProperty("DB_"+setup+"_PASS");
-		return DriverManager.getConnection("jdbc:mysql://"+(!host.isEmpty() ? host : ip)+":"+port+"/"+database+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="+IniFileReader.getTimezone()+param
+		return DriverManager.getConnection("jdbc:mysql://"+(!host.isEmpty() ? host : ip)+":"+port+"/"+database+"?autoReconnect=true&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="+timezone+param
 			, user, pass);
 	}
 	
@@ -264,89 +252,6 @@ public class STATIC {
 	}
 	public static OffsetDateTime getBootTime() {
 		return bootTime;
-	}
-	
-	public static void setToken(String _token) {
-		TOKEN = _token;
-	}
-	public static String getToken() {
-		return TOKEN;
-	}
-	
-	public static void setSessionName(String _name) {
-		SESSION_NAME = _name;
-	}
-	public static String getSessionName() {
-		return SESSION_NAME;
-	}
-	
-	public static void setTimezone(String _timezone) {
-		TIMEZONE = _timezone;
-	}
-	public static String getTimezone() {
-		return TIMEZONE;
-	}
-	
-	public static void setActionLog(String _actionLog) {
-		ACTIONLOG = _actionLog;
-	}
-	public static String getActionLog() {
-		return ACTIONLOG;
-	}
-	
-	public static void setDoubleExperience(String _doubleExperience) {
-		DOUBLEEXPERIENCE = _doubleExperience;
-	}
-	public static String getDoubleExperience() {
-		return DOUBLEEXPERIENCE;
-	}
-	
-	public static void setDoubleExperienceStart(String _doubleExperienceStart) {
-		DOUBLEEXPERIENCESTART = _doubleExperienceStart;
-	}
-	public static String getDoubleExperienceStart() {
-		return DOUBLEEXPERIENCESTART;
-	}
-	
-	public static void setDoubleExperienceEnd(String _doubleExperienceEnd) {
-		DOUBLEEXPERIENCEEND = _doubleExperienceEnd;
-	}
-	public static String getDoubleExperienceEnd() {
-		return DOUBLEEXPERIENCEEND;
-	}
-	
-	public static void setCountMembers(String _countMembers) {
-		COUNTMEMBERS = _countMembers;
-	}
-	public static String getCountMembers() {
-		return COUNTMEMBERS;
-	}
-	
-	public static void setGameMessage(String _gameMessage) {
-		GAMEMESSAGE = _gameMessage;
-	}
-	public static String getGameMessage() {
-		return GAMEMESSAGE;
-	}
-	
-	public static void setFileLogger(String _fileLogger) {
-		FILELOGGER = _fileLogger;
-	}
-	public static String getFileLogger() {
-		return FILELOGGER;
-	}
-	
-	public static void setTemp(String _temp) {
-		TEMP = _temp;
-	}
-	public static String getTemp() {
-		return TEMP;
-	}
-	public static void setPort(int _port) {
-		PORT = _port;
-	}
-	public static int getPort() {
-		return PORT;
 	}
 	
 	//check if the command is enabled and that the user has enough permissions
@@ -846,10 +751,37 @@ public class STATIC {
 		return false;
 	}
 	
+	public static String encrypt(final String rawMessage) {
+		MessageDigest sha = null;
+		try {
+			byte [] key = System.getProperty("AES_SECRET").getBytes("UTF-8");
+			sha = MessageDigest.getInstance("SHA-1");
+			key = sha.digest(key);
+			key = Arrays.copyOf(key, 16);
+			final SecretKeySpec secret = new SecretKeySpec(key, "AES");
+			try {
+				Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+				cipher.init(Cipher.ENCRYPT_MODE, secret);
+				return new String(cipher.doFinal(Base64.getEncoder().encode(rawMessage.getBytes())));
+			} catch (NoSuchPaddingException e) {
+				logger.error("Encryption padding not available", e);
+			} catch (InvalidKeyException e) {
+				logger.error("Encryption key invalid", e);
+			} catch (Exception e) {
+				logger.error("Message couldn't be encrypted", e);
+			}
+		} catch (UnsupportedEncodingException e) {
+			logger.error("AES secret not available", e);
+		} catch (NoSuchAlgorithmException e) {
+			logger.error("Algorithm is not supported", e);
+		}
+		return null;
+	}
+	
 	public static String decrypt(final String encryptedMessage) {
 		MessageDigest sha = null;
 		try {
-			byte [] key = AESSECRET.getBytes("UTF-8");
+			byte [] key = System.getProperty("AES_SECRET").getBytes("UTF-8");
 			sha = MessageDigest.getInstance("SHA-1");
 			key = sha.digest(key);
 			key = Arrays.copyOf(key, 16);

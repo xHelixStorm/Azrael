@@ -141,7 +141,7 @@ public class FileSetting {
 	}
 	
 	public static void createTemp(ReadyEvent e) {
-		(new File(IniFileReader.getTempDirectory())).mkdirs();
+		(new File(System.getProperty("TEMP_DIRECTORY"))).mkdirs();
 	}
 	
 	public static void createGuildDirectory(Guild guild) {

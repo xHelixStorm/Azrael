@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.InventoryContent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -103,8 +102,8 @@ public class InventoryBuilder {
 					}
 				}
 				
-				ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png"));
-				File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png");
+				ImageIO.write(overlay, "png", new File(System.getProperty("TEMP_DIRECTORY")+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png"));
+				File upload = new File(System.getProperty("TEMP_DIRECTORY")+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png");
 				channel.sendFile(upload, "inventory.png").queue(m -> {
 					upload.delete();
 				});

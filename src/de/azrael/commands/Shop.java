@@ -13,9 +13,9 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
 import de.azrael.sql.RankingSystemItems;
 import de.azrael.util.STATIC;
@@ -92,7 +92,7 @@ public class Shop implements CommandPublic {
 					logger.error("Shop skills couldn't be retrieved in guild {}", e.getGuild().getId());
 				}
 				if(out.length() > 0) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.SHOP_TITLE)).setThumbnail(IniFileReader.getShopThumbnail())
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.SHOP_TITLE)).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getShop())
 						.setDescription(out.toString()).build()).queue();
 					Hashes.addTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000));
 				}

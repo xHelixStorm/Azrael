@@ -31,7 +31,6 @@ import de.azrael.enums.Command;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -322,7 +321,7 @@ public class UserExecution {
 								}
 								e.getChannel().sendMessage(message.build()).queue();
 							}
-							if(IniFileReader.getActionLog()) {
+							if(System.getProperty("ACTION_LOG").equals("true")) {
 								message.clear();
 								message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_DELETED_MESSAGES));
 								out.setLength(0);
@@ -499,7 +498,7 @@ public class UserExecution {
 														e.getGuild().addRoleToMember(e.getGuild().getMemberById(user_id), e.getGuild().getRoleById(assignedRole)).queue();
 												}
 												Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_UNMUTED)).setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNMUTE_INFINITE).replaceFirst("\\{\\}", e.getGuild().getMemberById(user_id).getUser().getName()+"#"+e.getGuild().getMemberById(user_id).getUser().getDiscriminator()).replace("{}", ""+user_id)).build()).queue();
+												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_UNMUTED)).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getUnmute()).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNMUTE_INFINITE).replaceFirst("\\{\\}", e.getGuild().getMemberById(user_id).getUser().getName()+"#"+e.getGuild().getMemberById(user_id).getUser().getDiscriminator()).replace("{}", ""+user_id)).build()).queue();
 												Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, e.getGuild().getIdLong(), "Permanent mute terminated");
 												//Run google service, if enabled
 												if(botConfig.getGoogleFunctionalities()) {
@@ -517,13 +516,13 @@ public class UserExecution {
 												}
 											}
 											else {
-												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_MUTE_ROLE)).build()).queue();
+												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getUnmute()).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_MUTE_ROLE)).build()).queue();
 												Hashes.clearTempCache("unmute_gu"+e.getGuild().getId()+"us"+user_id);
 											}
 										}
 										else {
 											Azrael.SQLDeleteData(user_id, e.getGuild().getIdLong());
-											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_UNMUTED)).setThumbnail(IniFileReader.getUnmuteThumbnail()).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNMUTE_INFINITE).replaceFirst("\\{\\}", e.getGuild().getMemberById(user_id).getUser().getName()+"#"+e.getGuild().getMemberById(user_id).getUser().getDiscriminator()).replace("{}", ""+user_id)).build()).queue();
+											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_UNMUTED)).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getUnmute()).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_UNMUTE_INFINITE).replaceFirst("\\{\\}", e.getGuild().getMemberById(user_id).getUser().getName()+"#"+e.getGuild().getMemberById(user_id).getUser().getDiscriminator()).replace("{}", ""+user_id)).build()).queue();
 											Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, e.getGuild().getIdLong(), "Permanent mute terminated");
 											//Run google service, if enabled
 											if(botConfig.getGoogleFunctionalities()) {

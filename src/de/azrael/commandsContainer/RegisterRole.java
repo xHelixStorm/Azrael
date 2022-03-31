@@ -11,11 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Roles;
+import de.azrael.constructors.Thumbnails;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.util.STATIC;
@@ -34,8 +34,8 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class RegisterRole {
 	private static final Logger logger = LoggerFactory.getLogger(RegisterRole.class);
 	
-	public static void RegisterRoleHelper(GuildMessageReceivedEvent e) {
-		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(IniFileReader.getSettingsThumbnail());
+	public static void RegisterRoleHelper(GuildMessageReceivedEvent e, Thumbnails thumbnails) {
+		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(thumbnails.getSettings());
 		StringBuilder strB = new StringBuilder();
 		StringBuilder strB2 = new StringBuilder();
 		
@@ -60,7 +60,7 @@ public class RegisterRole {
 		}
 	}
 	
-	public static boolean runCommandWithAdminFirst(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission) {
+	public static boolean runCommandWithAdminFirst(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission, Thumbnails thumbnails) {
 		String category_abv = null;
 		String role;
 		String role_name;
@@ -91,13 +91,13 @@ public class RegisterRole {
 			return true;
 		}
 		else {
-			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(thumbnails.getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
 			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_REQUIRED)).build()).queue();
 		}
 		return false;
 	}
 
-	public static boolean runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission) {
+	public static boolean runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission, Thumbnails thumbnails) {
 		String category_abv = null;
 		String role;
 		String role_name;
@@ -150,7 +150,7 @@ public class RegisterRole {
 			return true;
 		}
 		else {
-			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
+			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(thumbnails.getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
 			e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE) + UserPrivs.retrieveRequiredRoles(commandLevel, e.getMember())).build()).queue();
 		}
 		return false;

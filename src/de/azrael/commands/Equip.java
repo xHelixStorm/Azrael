@@ -13,10 +13,10 @@ import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.interfaces.CommandPrivate;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -74,7 +74,8 @@ public class Equip implements CommandPublic, CommandPrivate {
 			//if only one guild has been found
 			if(mutualGuilds.size() == 1) {
 				//check if the user is allowed to use this command
-				if(UserPrivs.comparePrivilege(e.getJDA().getGuildById(mutualGuilds.get(0).getId()).getMemberById(e.getAuthor().getId()), STATIC.getCommandLevel(mutualGuilds.get(0), Command.EQUIP))) {
+				long guild_id = mutualGuilds.get(0).getIdLong();
+				if(UserPrivs.comparePrivilege(e.getJDA().getGuildById(guild_id).getMemberById(e.getAuthor().getId()), STATIC.getCommandLevel(mutualGuilds.get(0), Command.EQUIP))) {
 					//directly make the selection screen appear (e.g. show, set, etc)
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)
 							.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_EXIT))
@@ -85,7 +86,7 @@ public class Equip implements CommandPublic, CommandPrivate {
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, mutualGuilds.get(0).getId()));
 				}
 				else {
-					EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DENIED));
+					EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(guild_id).getDenied()).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DENIED));
 					e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention()+STATIC.getTranslation3(e.getAuthor(), Translation.HIGHER_PRIVILEGES_ROLE)+UserPrivs.retrieveRequiredRoles(STATIC.getCommandLevel(mutualGuilds.get(0), Command.EQUIP), mutualGuilds.get(0).getMemberById(e.getAuthor().getIdLong()))).build()).queue();
 				}
 			}

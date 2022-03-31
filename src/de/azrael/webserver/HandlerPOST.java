@@ -19,7 +19,6 @@ import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.fileManagement.FileSetting;
 import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
@@ -67,7 +66,7 @@ public class HandlerPOST {
 			return false;
 		}
 		final String token = (String)json.get("token"); 
-		if(!token.equals(STATIC.getToken())) {
+		if(!token.equals(System.getProperty("TOKEN"))) {
 			WebserviceUtils.return502(out, "Invalid Token", false);
 			return false;
 		}
@@ -313,7 +312,7 @@ public class HandlerPOST {
 	}
 	
 	private static void shutdown(ReadyEvent e, PrintWriter out, JSONObject json) {
-		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
+		FileSetting.createFile(System.getProperty("TEMP_DIRECTORY")+System.getProperty("SESSION_NAME")+"running.azr", "0");
 		WebserviceUtils.return200(out, "Bot shutdown", false, false);
 		e.getJDA().getGuilds().parallelStream().forEach(guild -> {
 			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild.getIdLong());
@@ -408,7 +407,7 @@ public class HandlerPOST {
 				if(!member.getUser().isBot()) {
 					final var channel = member.getUser().openPrivateChannel().complete();
 					try {
-						channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_CONFIRM)+IniFileReader.getWebURL()+"/account/confirm.php?key="+confirmToken).build()).queue();
+						channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_CONFIRM)+System.getProperty("HOMEPAGE")+"/account/confirm.php?key="+confirmToken).build()).queue();
 						AzraelWeb.SQLInsertActionLog(user_id, address, "ACCOUNT_CONFIRMATION_SENT", "Confirmation sent.");
 						WebserviceUtils.return200(out, "Success", true, false);
 					} catch(Exception exc) {

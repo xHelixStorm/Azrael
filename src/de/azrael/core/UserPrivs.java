@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Roles;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
@@ -150,7 +150,7 @@ public class UserPrivs {
 							Role rankingRole = e.getGuild().getRoleById(currentRole.getRole_ID());
 							if(rankingRole != null) {
 								//send message with the required role before the command can be used
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED))
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED))
 									.setDescription(STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_RANKING).replace("{}", ""+role.getLevel()) + rankingRole.getAsMention()).build()).queue();
 								return false;
 							}
@@ -171,7 +171,7 @@ public class UserPrivs {
 	public static void throwNotEnoughPrivilegeError(GuildMessageReceivedEvent e, int requiredLevel) {
 		//verify first if a ranking role can use the command, else print message with all allowed roles
 		if(evaluateRequiredRole(requiredLevel, e))
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getDeniedThumbnail()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED))
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED))
 				.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_ROLE)+UserPrivs.retrieveRequiredRoles(requiredLevel, e.getMember())).build()).queue();
 	}
 }

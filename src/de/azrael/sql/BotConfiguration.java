@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.BotConfigs;
+import de.azrael.constructors.Thumbnails;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.util.STATIC;
@@ -99,6 +100,10 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 			stmt.setLong(1, guild_id);
 			stmt.executeUpdate();
 			
+			stmt = myConn.prepareStatement(BotConfigurationStatements.SQLInsertBotConfigs5);
+			stmt.setLong(1, guild_id);
+			stmt.executeUpdate();
+			
 			myConn.commit();
 			return true;
 		} catch (SQLException e) {
@@ -130,6 +135,8 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 							rs.getBoolean("channel_log"),
 							rs.getBoolean("cache_log"),
 							rs.getString("double_experience"),
+							rs.getInt("double_experience_start"),
+							rs.getInt("double_experience_end"),
 							rs.getBoolean("force_reason"),
 							rs.getBoolean("override_ban"),
 							rs.getBoolean("url_blacklist"),
@@ -330,6 +337,44 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 		} catch (SQLException e) {
 			logger.error("SQLgetCommand Exception", e);
 			return values;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static Thumbnails SQLgetThumbnails(long guild_id) {
+		logger.trace("SQLgetThumbnails launched. Passed params {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = STATIC.getDatabaseURL(3);
+			stmt = myConn.prepareStatement(BotConfigurationStatements.SQLgetThumbnails);
+			stmt.setLong(1, guild_id);
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				return new Thumbnails(
+						rs.getString("pug"),
+						rs.getString("meow"),
+						rs.getString("ban"),
+						rs.getString("settings"),
+						rs.getString("denied"),
+						rs.getString("shop"),
+						rs.getString("unban"),
+						rs.getString("unmute"),
+						rs.getString("kick"),
+						rs.getString("caught"),
+						rs.getString("false_alarm"),
+						rs.getString("heavy"),
+						rs.getString("heavy_end")
+				);
+			}
+			return new Thumbnails();
+		} catch (SQLException e) {
+			logger.error("SQLgetThumbnails Exception", e);
+			return new Thumbnails();
 		} finally {
 			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }

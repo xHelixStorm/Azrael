@@ -19,7 +19,6 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.google.GoogleUtils;
 import de.azrael.listeners.ShutdownListener;
@@ -74,7 +73,7 @@ public class DelayedGoogleUpdate implements Runnable {
 		boolean interrupted = false;
 		
 		try {
-			Thread.sleep(TimeUnit.MINUTES.toMillis(IniFileReader.getDelayedGoogleRequestTime()));
+			Thread.sleep(TimeUnit.MINUTES.toMillis(Integer.parseInt(System.getProperty("SPREADSHEET_UPDATE_DELAY"))));
 		} catch (InterruptedException e) {
 			interrupted = true;
 		}

@@ -10,7 +10,6 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -80,7 +79,7 @@ public class UnbanListener extends ListenerAdapter {
 			
 			//print unban message if a log channel has been registered
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getUnbanThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_TITLE));
+			EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getUnban()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_TITLE));
 			STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_MESSAGE).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", trigger_user_name)+reason+append_message, Channel.LOG.getType());
 			//remove the affected user from the bancollect table to symbolize that all current warnings have been removed
 			if(Azrael.SQLDeleteData(user_id, guild_id) == -1) {
